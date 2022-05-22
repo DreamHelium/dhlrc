@@ -1,0 +1,3 @@
+[submodule "libnbt"]
+	path = libnbt
+	url = https://github.com/djytw/libnbt.git
