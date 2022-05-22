@@ -13,8 +13,8 @@ int main(int argc,char** argb)
     else
         printf("%s\n",argb[1]);
 
-    FILE* f = fopen(argb[1],"r");
-    //FILE* f = fopen("/home/dream_he/.minecraft/schematics/1.litematic","r");
+    FILE* f = fopen(argb[1],"rb");
+    //FILE* f = fopen("/path/to/litematic","rb");
     if(!f)
     {
         printf("Read Error, exiting!\n");
@@ -33,16 +33,10 @@ int main(int argc,char** argb)
     free(data);
 
     int rNum = lite_region_Num(root);
-    printf("%d\n",rNum);
+    //printf("%d\n",rNum);
     int region_err = 0;
     char** region = lite_region_Name(root,rNum,&region_err);
-    if(region)
-    {
-        for(int i = 0; i < rNum ; i++)
-        {
-            printf("%d %s\n",i,region[i]);
-        }
-    }
+    if(region);
     else
     {
         NBT_Free(root);
@@ -57,25 +51,15 @@ int main(int argc,char** argb)
         printf("Processing Region %d / %d : %s \n",i + 1,rNum,region[i]);
         blockList0 = lite_region_BlockListExtend(root,i,blockList0,rbN,&rbN);
     }
-
-    /*
-    for(int i = 0 ; i < rbN ; i++)
-    {
-        printf("%s,%d\n",blockList0[i].name,blockList0[i].num);
-    }
-    */
-
-    blockList0 = sortBlockList(blockList0,rbN);
+    blockList0 = BlockList_Sort(blockList0,rbN);
     printf("\n\nAfter Sorting Block list: \n");
     for(int i = 0 ; i < rbN ; i++)
     {
         if(blockList0[i].num != 0)
-            printf("%s,%d\n",blockList0[i].name,blockList0[i].num);
+            printf("%-50s,%d\n",blockList0[i].name,blockList0[i].num);
     }
-    freeBlock(blockList0,rbN);
-
+    Block_Free(blockList0,rbN);
     lite_region_FreeNameArray(region,rNum);
-
     NBT_Free(root);
 
 

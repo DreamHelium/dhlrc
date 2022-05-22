@@ -13,6 +13,16 @@ typedef struct Block{
     int num;
 } Block;
 
+typedef struct BlackList{
+    char* name;
+    struct BlackList* next;
+} BlackList;
+
+typedef struct ReplaceList{
+    char* o_name;
+    char* r_name;
+    struct ReplaceList* next;
+} ReplaceList;
 
 // litematica processing stuff
 
@@ -47,15 +57,26 @@ int lite_region_BlockLevel(NBT* root,int r_num,int id);
  *************************************************************/
 
 
-void freeBlock(Block* target,int num);
+void Block_Free(Block* target,int num);
 /*
  *  Free the memory used in Block* in case of memory leak.
  */
 
 
-Block* sortBlockList(Block* oBlock, int oBlockNum);
+Block* BlockList_Sort(Block* oBlock, int oBlockNum);
 Block* BlockList_InitNewItem(Block* oBlock,char* block_name,int* block_num);
+BlackList* BlackList_Init();
+/*
+ * Init a new blacklist and add some common blacklisted blocks.
+ */
+void BlackList_Free(BlackList* bl);
+BlackList* BlackList_Extend(BlackList* bl, const char* name);
+int BlackList_Scan(BlackList* bl,const char* name);
 
+ReplaceList* ReplaceList_Init();
+ReplaceList* ReplaceList_Extend(ReplaceList* rl,const char* o_name,const char* r_name);
+char* ReplaceList_Replace(ReplaceList* rl,char* o_name);
+void ReplaceList_Free(ReplaceList* rl);
 
 #ifdef __cplusplus
 }
