@@ -1,4 +1,4 @@
-#include "nbtProcess.h"
+#include "litematica_region.h"
 
 #include "libnbt/nbt.h"
 #include <string.h>
@@ -207,53 +207,30 @@ char* lite_region_BlockType(NBT* root, int r_num, int id)
     return (char*)NBT_GetChild_Deep(lite_region_SpecificBlockStatePalette(root,r_num,id),"Properties","type",NULL)->value_a.value;
 }
 
-Block* lite_region_BlockList(NBT* root, int r_num, int* rBlockNum)
+ItemList *lite_region_ItemList(NBT* root, int r_num)
 {
-    return lite_region_BlockListExtend(root,r_num,NULL,0,rBlockNum);
+    return lite_region_ItemListExtend(root,r_num,NULL);
 }
 
-Block* lite_region_BlockListExtend(NBT* root, int r_num, Block* oBlock, int oBlockNum, int* rBlockNum)
+ItemList *lite_region_ItemListExtend(NBT* root, int r_num, ItemList* oBlock)
 {
     int bNum = lite_region_BlockNum(root,r_num);
     char** originBlockName = lite_region_BlockNameArray(root,r_num,bNum);
-    int originBlockNum = oBlockNum;
-    *rBlockNum = originBlockNum;
-    char none[] = "none";
-
-    int water = 0;
 
     // First, read originBlockName and compare it to oBlock, add Blocks to it
     if(bNum == 0)
     {
         return NULL;
     }
-    if(originBlockNum == 0 || oBlock == NULL)
-    {
-        oBlock = malloc(1 * sizeof(Block));
-        oBlock[0].name = malloc(5* sizeof(char));
-        oBlock[0].name = none;
-    }
     BlackList* bl = BlackList_Init();
     ReplaceList* rl = ReplaceList_Init();
     for(int i = 0 ; i < bNum ; i++)    //scan block
     {
         char* i_block_name = originBlockName[i];
-        int r = 0;
         i_block_name = ReplaceList_Replace(rl,i_block_name);
-        for(int j = 0; j < *rBlockNum ; j++)    //scan outputBlockStruct
+        if(!ItemList_ScanRepeat(oBlock,i_block_name) && !BlackList_Scan(bl,i_block_name))
         {
-            if(!strcmp(oBlock[j].name,i_block_name))
-            {
-                r = 1;
-                break;
-            }
-
-        }
-        if(!r && !BlackList_Scan(bl,i_block_name))
-        {
-            if(!strcmp(i_block_name,"minecraft:water_bucket")) water = *rBlockNum;
-            oBlock = BlockList_InitNewItem(oBlock,i_block_name,rBlockNum);
-            if(!oBlock)
+            if(ItemList_InitNewItem(&oBlock,i_block_name))
             {
                 BlackList_Free(bl);
                 ReplaceList_Free(rl);
@@ -277,21 +254,28 @@ Block* lite_region_BlockListExtend(NBT* root, int r_num, Block* oBlock, int oBlo
                 int id = lite_region_BlockArrayPos(root,r_num,index);
                 char* id_block_name = originBlockName[id];
                 id_block_name = ReplaceList_Replace(rl,id_block_name);
-                for(int i = 0 ; i < *rBlockNum && !BlackList_Scan(bl,id_block_name); i++)
+                if(!BlackList_Scan(bl,id_block_name))
                 {
-                    if(!strcmp(id_block_name,oBlock[i].name))  // search for item name
+                    if(ItemList_ScanRepeat(oBlock,id_block_name))  // search for item name
                     {
                         if(strstr(id_block_name,"_slab"))     // special for slab
                         {
                             if(!strcmp(lite_region_BlockType(root,r_num,id),"double"))
-                                oBlock[i].num++;
+                                ItemList_AddNum(oBlock,1,id_block_name);
                         }
-                        if(lite_region_IsBlockWaterlogged(root,r_num,id)) oBlock[water].num++;
+                        if(lite_region_IsBlockWaterlogged(root,r_num,id))
+                        {
+                            if(!ItemList_ScanRepeat(oBlock,"minecraft_water_bucket"))
+                                ItemList_InitNewItem(&oBlock,"minecraft:water_bucket");
+                            ItemList_AddNum(oBlock,1,"minecraft:water_bucket");
+                        }
                         if(!strcmp(id_block_name,"minecraft:water_bucket") ||
-                                !strcmp(id_block_name,"minecraft:lava_bucket"))
-                            if(lite_region_BlockLevel(root,r_num,id) != 0) break;
-                        oBlock[i].num++;
-                        break;
+                          !strcmp(id_block_name,"minecraft:lava_bucket"))
+                        {
+                            if(lite_region_BlockLevel(root,r_num,id) != 0)
+                                ItemList_AddNum(oBlock,-1,id_block_name);
+                        }
+                        ItemList_AddNum(oBlock,1,id_block_name);
                     }
                 }
                 printf("[%c] Processing Blocks %ld/%d, (%3d,%3d,%3d)/(%3d,%3d,%3d)\r", process[id % 4] ,index+1,rSize[0] * rSize[1] * rSize[2],
@@ -306,56 +290,6 @@ Block* lite_region_BlockListExtend(NBT* root, int r_num, Block* oBlock, int oBlo
     lite_region_FreeNameArray(originBlockName,bNum);
     free(rSize);
     return oBlock;
-}
-
-void Block_Free(Block* target, int num)
-{
-    for(int i = 0; i < num ; i++)
-        free(target[i].name);
-    free(target);
-}
-
-Block* BlockList_Sort(Block* oBlock,int oBlockNum)
-{
-    for(int i = 0 ; i < oBlockNum ; i++)
-    {
-        int j = i;
-        int imax = i;
-        for(; j < oBlockNum ; j++)
-        {
-            if(oBlock[j].num > oBlock[imax].num)
-                imax = j;
-        }
-        if(imax != i)
-        {
-            Block temp = oBlock[i];
-            oBlock[i] = oBlock[imax];
-            oBlock[imax] = temp;
-        }
-    }
-    return oBlock;
-}
-
-Block* BlockList_InitNewItem(Block* oBlock,char* block_name,int* block_num)
-{
-    *block_num = *block_num + 1;
-    Block* pBlock = realloc(oBlock,*block_num * sizeof(Block));
-    if(!pBlock)
-    {
-        //lite_region_FreeNameArray(originBlockName,bNum);
-        Block_Free(oBlock,*block_num - 1);
-        *block_num = 0;
-        return NULL;
-    }
-    else
-    {
-        oBlock = pBlock;
-        oBlock[*block_num - 1].len = strlen(block_name) + 1;
-        oBlock[*block_num - 1].name = malloc(oBlock[*block_num - 1].len * sizeof(char));
-        strcpy(oBlock[*block_num - 1].name,block_name);
-        oBlock[*block_num - 1].num = 0;
-        return oBlock;
-    }
 }
 
 int lite_region_IsBlockWaterlogged(NBT* root,int r_num,int id)
@@ -379,137 +313,4 @@ int lite_region_BlockLevel(NBT* root,int r_num,int id)
         //printf("%d\n",atoi(level->value_a.value));
         return atoi(level->value_a.value);
     }
-}
-
-BlackList* BlackList_Init()
-{
-    BlackList* bl = (BlackList*) malloc(sizeof(BlackList));
-    bl->name = (char*)malloc(5*sizeof(char));
-    bl->name = "none";
-    bl->next = NULL;
-    BlackList_Extend(bl,"minecraft:air");
-    BlackList_Extend(bl,"minecraft:piston_head");
-    BlackList_Extend(bl,"minecraft:fire");
-    BlackList_Extend(bl,"minecraft:soul_fire");
-    BlackList_Extend(bl,"minecraft:bubble_column");
-    return bl;
-}
-
-BlackList* BlackList_Extend(BlackList* bl,const char* name)
-{
-    if(!strcmp(bl->name,"none"))
-    {
-        bl->name = (char*)malloc((strlen(name) + 1) * sizeof(char));
-        strcpy(bl->name,name);
-        return bl;
-    }
-    else
-    {
-        BlackList* bld = bl;
-        while(bld->next != NULL)
-            bld = bld->next;
-        bld->next = (BlackList*)malloc(sizeof(BlackList));
-        bld->next->name = (char*)malloc((strlen(name) + 1) * sizeof(char));
-        strcpy(bld->next->name,name);
-        bld->next->next = NULL;
-        return bl;
-    }
-}
-
-void BlackList_Free(BlackList* bl)
-{
-    if(bl->next)
-    {
-        BlackList_Free(bl->next);
-        bl->next = NULL;
-    }
-    free(bl->name);
-    bl->name = NULL;
-    free(bl);
-    bl = NULL;
-}
-
-int BlackList_Scan(BlackList* bl,const char* name)
-{
-    if(!bl)
-        return 0;
-    else
-    {
-        BlackList* bld = bl;
-        while(bld)
-        {
-            if(!strcmp(name,bld->name)) return 1;
-            bld = bld->next;
-        }
-        return 0;
-    }
-}
-
-ReplaceList* ReplaceList_Init()
-{
-    ReplaceList* rl = (ReplaceList*)malloc(sizeof(ReplaceList));
-    rl->o_name = (char*)malloc(5 * sizeof(char));
-    rl->r_name = (char*)malloc(5 * sizeof(char));
-    strcpy(rl->o_name,"none");
-    strcpy(rl->r_name,"none");
-    rl->next = NULL;
-    ReplaceList_Extend(rl,"minecraft:water","minecraft:water_bucket");
-    ReplaceList_Extend(rl,"minecraft:lava","minecraft:lava_bucket");
-    ReplaceList_Extend(rl,"minecraft:redstone_wall_torch","minecraft:redstone_torch");
-    return rl;
-}
-
-ReplaceList* ReplaceList_Extend(ReplaceList* rl,const char* o_name,const char* r_name)
-{
-    if(!strcmp(rl->o_name,"none"))
-    {
-        rl->o_name = (char*)malloc((strlen(o_name)+1) * sizeof(char));
-        rl->r_name = (char*)malloc((strlen(r_name)+1) * sizeof(char));
-        strcpy(rl->o_name,o_name);
-        strcpy(rl->r_name,r_name);
-        return rl;
-    }
-    else
-    {
-        ReplaceList* rld = rl;
-        if(rld->next) rld = rld->next;
-        rld->next = (ReplaceList*)malloc(sizeof(ReplaceList));
-        rld = rld->next;
-        rld->o_name = (char*)malloc((strlen(o_name)+1) * sizeof(char));
-        rld->r_name = (char*)malloc((strlen(r_name)+1) * sizeof(char));
-        strcpy(rld->o_name,o_name);
-        strcpy(rld->r_name,r_name);
-        rld->next = NULL;
-        return rl;
-    }
-}
-
-char* ReplaceList_Replace(ReplaceList* rl,char* o_name)
-{
-    if(rl)
-    {
-        ReplaceList* rld = rl;
-        while(rld)
-        {
-            if(!strcmp(o_name,rld->o_name))
-            {
-                return rld->r_name;
-            }
-            else rld = rld->next;
-        }
-    }
-    return o_name;
-}
-
-void ReplaceList_Free(ReplaceList* rl)
-{
-    if(rl->next)
-        ReplaceList_Free(rl->next);
-    rl->next = NULL;
-    free(rl->o_name);
-    rl->o_name = NULL;
-    free(rl->r_name);
-    rl->r_name = NULL;
-    free(rl);
-    rl = NULL;
 }

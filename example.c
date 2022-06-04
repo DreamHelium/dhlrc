@@ -1,20 +1,21 @@
 #include <stdio.h>
-#include "nbtProcess.h"
+#include "litematica_region.h"
 #include <stdint.h>
 #include <stdlib.h>
 #include "libnbt/nbt.h"
 #include <string.h>
+#include "recipe_util.h"
 
 int main(int argc,char** argb)
 {
-
+    //Test();
     if(argc == 1)
         printf("No input, quiting......\n");
     else
         printf("%s\n",argb[1]);
 
     FILE* f = fopen(argb[1],"rb");
-    //FILE* f = fopen("/path/to/litematic","rb");
+    //FILE* f = fopen("/path/to/litematica_file","rb");
     if(!f)
     {
         printf("Read Error, exiting!\n");
@@ -43,25 +44,29 @@ int main(int argc,char** argb)
         return -1;
     }
 
-    int rbN = 0;
-    printf("Processing Region 1 / %d : %s \n",rNum,region[0]);
-    Block* blockList0 = lite_region_BlockList(root,0,&rbN);
-    for(int i = 1 ; i < rNum ; i++)
+    ItemList* blockList0 = NULL;
+    for(int i = 0 ; i < rNum ; i++)
     {
         printf("Processing Region %d / %d : %s \n",i + 1,rNum,region[i]);
-        blockList0 = lite_region_BlockListExtend(root,i,blockList0,rbN,&rbN);
+        blockList0 = lite_region_ItemListExtend(root,i,blockList0);
     }
-    blockList0 = BlockList_Sort(blockList0,rbN);
+    ItemList_DeleteZeroItem(&blockList0);
+    ItemList_CombineRecipe(&blockList0);
+    ItemList_CombineRecipe(&blockList0);
+    ItemList_Sort(&blockList0);
     printf("\n\nAfter Sorting Block list: \n");
-    for(int i = 0 ; i < rbN ; i++)
+    ItemList* block_list_read = blockList0;
+    for( ; block_list_read ; block_list_read = block_list_read->next)
     {
-        if(blockList0[i].num != 0)
-            printf("%-50s,%d\n",blockList0[i].name,blockList0[i].num);
+        char* trans_name = Name_BlockTranslate(block_list_read->name);
+        if(trans_name)
+            printf("%-50s,%d\n",trans_name,block_list_read->num);
+        else
+            printf("%-50s,%d\n",block_list_read->name,block_list_read->num);
+        free(trans_name);
     }
-    Block_Free(blockList0,rbN);
+    ItemList_Free(blockList0);
     lite_region_FreeNameArray(region,rNum);
     NBT_Free(root);
-
-
     return 0;
 }

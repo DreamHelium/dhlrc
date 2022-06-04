@@ -3,12 +3,19 @@ CONFIG += console
 CONFIG -= app_bundle
 CONFIG -= qt
 
-SOURCES += main.cpp \
-           nbtProcess.c\
-           libnbt/nbt.c
+SOURCES += \
+           example.c \
+           libnbt/nbt.c \
+           litematica_region.c \
+           lrc_list.c \
+           recipe_util.c
 
-HEADERS += nbtProcess.h \
-           libnbt/nbt.h
+HEADERS += \
+           libnbt/nbt.h \
+           litematica_region.h \
+           lrc_list.h \
+           recipe_util.h
 
 
-LIBS += -lz
+LIBS += -lz -lcjson
+DEFINES += LOAD_RECIPES
