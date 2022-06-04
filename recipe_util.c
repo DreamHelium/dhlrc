@@ -4,125 +4,132 @@
 #include <stdlib.h>
 #include "litematica_region.h"
 
-long* NumArray_GetFromInput(int* array_num)
+long* NumArray_GetFromInput(int* array_num, int max_num)
 {
     long* array = NULL;
     int i = 0;
     char* input = NULL;
-    int len = 0;
-    if(getline(&input,&len,stdin) != -1)
+    size_t len = 0;
+    printf("Input nums directly, or type 'a' for all numbers:");
+    while(getline(&input,&len,stdin) != -1)
     {
         char* inputl = input;
-        while(1)
+        while(*inputl == ' ')
+            inputl++;
+        if(*inputl == 'a' || *inputl == 'A')
         {
-        char* end;
-        long value = strtol(inputl,&end,10);
-        if(inputl == end) break;
-        i++;
-        long* parray = realloc(array,i*sizeof(long));
-        if(!parray)
+            char* after_a = inputl+1;
+            while(*after_a == ' ')
+                after_a++;
+            if(*after_a == '\n')
+            {
+                array = (long*)malloc(max_num * sizeof(long));
+                *array_num = max_num;
+                for(int i = 0 ; i < max_num ; i++)
+                    array[i] = i;
+                free(input);
+                return array;
+            }
+            else
+                printf("Unrecognized string %s, please write again:", input);
+        }
+        else if(*inputl >= '0' && *inputl <= '9')
+        { // when input is num
+            while(1)
+            {
+            char* end;
+            long value = strtol(inputl,&end,10);
+            if(inputl == end) break;
+            i++;
+            long* parray = realloc(array,i*sizeof(long));
+            if(!parray)
+            {
+                free(array);
+                free(input);
+                *array_num = 0;
+                return NULL;
+            }
+            array = parray;
+            array[i - 1] = value;
+            //printf("%ld ",value);
+            inputl = end;
+            }
+            free(input);
+            *array_num = i;
+            return array;
+        }
+        else if(*inputl == '\n')
         {
-            free(array);
             free(input);
             *array_num = 0;
             return NULL;
         }
-        array = parray;
-        array[i - 1] = value;
-        //printf("%ld ",value);
-        inputl = end;
+        else
+        {
+            printf("Unrecognized string %s, please write again:",input);
         }
     }
     free(input);
-    *array_num = i;
-    return array;
+    *array_num = 0;
+    return NULL;
 }
 
 int ItemList_CombineRecipe(ItemList** o_bl)
 {
-    ItemList* bl = *o_bl;
-    char** recipe_list = NULL;
-    int recipe_num = 0;
-    while(bl)
+    ItemList* il = *o_bl;
+    do
     {
-        ItemList* recipe = ItemList_Recipe(bl->name,0);
-        if(recipe)
-        {
-            recipe_num++;
-            char** temp_rl = realloc(recipe_list,recipe_num * sizeof(char*));
-            if(!temp_rl)
-            {
-                perror("Allocate recipe list error\n");
-                lite_region_FreeNameArray(recipe_list,recipe_num);
-                return -1;
-            }
-            recipe_list = temp_rl;
-            recipe_list[recipe_num - 1] = (char*)malloc(bl->len * sizeof(char));
-            strcpy(recipe_list[recipe_num - 1],bl->name);
-            ItemList_Free(recipe);
-        }
-        bl = bl->next;
-    }
-    if(recipe_list)
-    {
-        printf("Please select recipes to combine: \n");
-        for(int i = 0 ; i < recipe_num ; i++)
-        {
-            char* trans_name = Name_BlockTranslate(recipe_list[i]);
-            if(trans_name)
-                printf("[%d] %s \n",i,trans_name);
-            else
-                printf("[%d] %s\n",i,recipe_list[i]);
-            free(trans_name);
-        }
-        printf("input here:");
         int craft_num = 0;
-        long* craft = NumArray_GetFromInput(&craft_num);
-        if(!craft)
+        char** craft_list = NameArray_CanCraft(&craft_num,il);
+        if(!craft_list)
         {
-            lite_region_FreeNameArray(recipe_list,recipe_num);
+            printf("There is no items to craft.\n");
             return 0;
         }
         else
         {
+            printf("Please select recipes to combine: \n");
             for(int i = 0 ; i < craft_num ; i++)
             {
-                int item_num = 0;
-                bl = *o_bl;
-                while(bl)
-                {
-                    if(!strcmp(bl->name,recipe_list[craft[i]]))
-                    {
-                        item_num = bl->num;
-                        break;
-                    }
-                    bl = bl->next;
-                }
-                ItemList* recipe = ItemList_Recipe(recipe_list[craft[i]],item_num);
-                if(ItemList_Combine(o_bl,recipe))
-                {
-                    free(craft);
-                    ItemList_Free(recipe);
-                    lite_region_FreeNameArray(recipe_list,recipe_num);
-                    return -1;
-                }
+                char* trans_name = Name_BlockTranslate(craft_list[i]);
+                if(trans_name)
+                    printf("[%d] %s \n",i,trans_name);
                 else
-                {
-                    ItemList_DeleteItem(o_bl,recipe_list[craft[i]]);
-                }
-                ItemList_Free(recipe);
+                    printf("[%d] %s\n",i,craft_list[i]);
+                free(trans_name);
             }
-            printf("Success!\n");
-            free(craft);
-            lite_region_FreeNameArray(recipe_list,recipe_num);
-            return 0;
+            int need_num = 0;
+            long* need_craft = NumArray_GetFromInput(&need_num,craft_num);
+            if(!need_craft)
+            {
+                lite_region_FreeNameArray(craft_list,craft_num);
+                return 0;
+            }
+            else
+            {   // combine itemlist
+                for(int i = 0 ; i < need_num ; i++)
+                {
+                    if(need_craft[i] < 0 || need_craft[i] >= craft_num)
+                    {
+                        perror("Unexpected num\n");
+                    }
+                    else
+                    {
+                        char* need_item = craft_list[need_craft[i]];
+                        int item_num = ItemList_GetItemNum(il,need_item);
+                        ItemList* recipe = ItemList_Recipe(need_item,item_num);
+                        ItemList_Combine(o_bl,recipe);
+                        ItemList_DeleteItem(o_bl,need_item);
+                        il = *o_bl;
+                    }
+                }
+            }
+            lite_region_FreeNameArray(craft_list,craft_num);
+            free(need_craft);
         }
+        il = *o_bl;
     }
-    else
-    {
-        printf("There's no item to combine.\n");
-        return 0;
-    }
+    while(1);
 }
 
 ItemList* ItemList_Recipe(char* block_name,int num)
@@ -276,4 +283,34 @@ char* Name_BlockTranslate(char* block_name)
     }
     else
         return NULL;
+}
+
+char** NameArray_CanCraft(int* num, ItemList *il)
+{
+    char** recipe_list = NULL;
+    ItemList* ild = il;
+    int recipe_num = 0;
+    while(ild)
+    {
+        ItemList* recipe = ItemList_Recipe(ild->name,0);
+        if(recipe)
+        {
+            recipe_num++;
+            char** temp_rl = realloc(recipe_list,recipe_num * sizeof(char*));
+            if(!temp_rl)
+            {
+                *num = 0;
+                perror("Allocate recipe list error\n");
+                lite_region_FreeNameArray(recipe_list,recipe_num);
+                return NULL;
+            }
+            recipe_list = temp_rl;
+            recipe_list[recipe_num - 1] = (char*)malloc(ild->len * sizeof(char));
+            strcpy(recipe_list[recipe_num - 1],ild->name);
+            ItemList_Free(recipe);
+        }
+        ild = ild->next;
+    }
+    *num = recipe_num;
+    return recipe_list;
 }

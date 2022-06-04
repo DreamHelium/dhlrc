@@ -409,3 +409,15 @@ void ReplaceList_Free(ReplaceList* rl)
     rl = NULL;
 }
 
+
+int ItemList_GetItemNum(ItemList *il, char *item_name)
+{
+    ItemList* ild = il;
+    while(ild)
+    {
+        if(!strcmp(item_name,ild->name))
+            return ild->num;
+        ild = ild->next;
+    }
+    return -1;
+}

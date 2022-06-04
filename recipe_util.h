@@ -14,7 +14,8 @@ ItemList* ItemList_Recipe(char* block_name,int num);
 #endif
 
 int ItemList_CombineRecipe(ItemList** o_bl);
-long *NumArray_GetFromInput(int *array_num);
+long *NumArray_GetFromInput(int *array_num, int max_num);
+char** NameArray_CanCraft(int* num, ItemList* il);
 
 char* Name_BlockTranslate(char* block_name);
 

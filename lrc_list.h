@@ -37,6 +37,7 @@ int ItemList_ScanRepeat(ItemList* bl,char* block_name);
 int ItemList_DeleteItem(ItemList** bl,char* block_name);
 void ItemList_DeleteZeroItem(ItemList** bl);
 int ItemList_Combine(ItemList** dest,ItemList* src);
+int ItemList_GetItemNum(ItemList* il, char* item_name);
 
 ItemList* ItemList_Init(char* block_name);
 BlackList* BlackList_Init();

@@ -6,6 +6,7 @@
 #include <string.h>
 #include "recipe_util.h"
 
+
 int main(int argc,char** argb)
 {
     //Test();
@@ -15,7 +16,7 @@ int main(int argc,char** argb)
         printf("%s\n",argb[1]);
 
     FILE* f = fopen(argb[1],"rb");
-    //FILE* f = fopen("/path/to/litematica_file","rb");
+    //FILE* f = fopen("/path/to/litematic","rb");
     if(!f)
     {
         printf("Read Error, exiting!\n");
@@ -52,7 +53,6 @@ int main(int argc,char** argb)
     }
     ItemList_DeleteZeroItem(&blockList0);
     ItemList_CombineRecipe(&blockList0);
-    ItemList_CombineRecipe(&blockList0);
     ItemList_Sort(&blockList0);
     printf("\n\nAfter Sorting Block list: \n");
     ItemList* block_list_read = blockList0;
@@ -60,9 +60,9 @@ int main(int argc,char** argb)
     {
         char* trans_name = Name_BlockTranslate(block_list_read->name);
         if(trans_name)
-            printf("%-50s,%d\n",trans_name,block_list_read->num);
+            printf("%s,%d\n",trans_name,block_list_read->num);
         else
-            printf("%-50s,%d\n",block_list_read->name,block_list_read->num);
+            printf("%s,%d\n",block_list_read->name,block_list_read->num);
         free(trans_name);
     }
     ItemList_Free(blockList0);
