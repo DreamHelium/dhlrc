@@ -7,13 +7,13 @@ SOURCES += \
            example.c \
            libnbt/nbt.c \
            litematica_region.c \
-           lrc_list.c \
+           dhlrc_list.c \
            recipe_util.c
 
 HEADERS += \
            libnbt/nbt.h \
            litematica_region.h \
-           lrc_list.h \
+           dhlrc_list.h \
            recipe_util.h
 
 

@@ -5,7 +5,7 @@ extern "C"{
 #endif
 
 #include "libnbt/nbt.h"
-#include "lrc_list.h"
+#include "dhlrc_list.h"
 
 // litematica processing stuff
 

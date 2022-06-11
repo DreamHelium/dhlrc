@@ -5,7 +5,7 @@
 extern "C"{
 #endif
 
-#include "lrc_list.h"
+#include "dhlrc_list.h"
 
 #ifdef LOAD_RECIPES
 #include <cjson/cJSON.h>

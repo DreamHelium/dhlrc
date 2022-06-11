@@ -1,5 +1,5 @@
-#ifndef LRC_LIST_H
-#define LRC_LIST_H
+#ifndef DHLRC_LIST_H
+#define DHLRC_LIST_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -59,4 +59,4 @@ void ReplaceList_Free(ReplaceList* rl);
 #ifdef __cplusplus
 }
 #endif
-#endif // LRC_LIST_H
+#endif // DHLRC_LIST_H
