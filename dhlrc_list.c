@@ -1,8 +1,26 @@
+/*  dhlrc_list - useful linked lists
+    Copyright (C) 2022 Dream Helium
+    This file is part of litematica_reader_c.
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Lesser General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Lesser General Public License for more details.
+
+    You should have received a copy of the GNU Lesser General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>. */
+
 #include "dhlrc_list.h"
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
 #include <cjson/cJSON.h>
+#include "recipe_util.h"
 
 void ItemList_Free(ItemList* target)
 {
@@ -89,7 +107,8 @@ int ItemList_InitNewItem(ItemList** oBlock,char* block_name)
         next_item->name = (char*)malloc(next_item->len * sizeof(char));
         strcpy(next_item->name,block_name);
         next_item->num = 0;
-        next_item->collectd = 0;
+        next_item->placed = 0;
+        next_item->available = 0;
         next_item->next = NULL;
         return 0;
     }
@@ -111,7 +130,8 @@ ItemList *ItemList_Init(char* block_name)
         bl->name = (char*)malloc(bl->len * sizeof(char));
         strcpy(bl->name,block_name);
         bl->num = 0;
-        bl->collectd = 0;
+        bl->placed = 0;
+        bl->available = 0;
         bl->next = NULL;
         return bl;
     }
@@ -253,7 +273,7 @@ BlackList* BlackList_Init()
             }
         }
         free(data);
-        cJSON_free(black_list);
+        cJSON_Delete(black_list);
         return bl;
     }
     else
@@ -334,14 +354,15 @@ ReplaceList* ReplaceList_Init()
         char* data = (char*)malloc(size* sizeof(char));
         fread(data,1,size,f);
         fclose(f);
-        cJSON* rlist = cJSON_ParseWithLength(data,size)->child;
+        cJSON* rlist_o = cJSON_ParseWithLength(data,size);
+        cJSON* rlist = rlist_o->child;
         while(rlist)
         {
             if(cJSON_IsString(rlist))
                 ReplaceList_Extend(rl,rlist->string,rlist->valuestring);
             rlist = rlist->next;
         }
-        cJSON_free(rlist);
+        cJSON_Delete(rlist_o);
         free(data);
         return rl;
     }
@@ -420,4 +441,23 @@ int ItemList_GetItemNum(ItemList *il, char *item_name)
         ild = ild->next;
     }
     return -1;
+}
+
+int ItemList_toCSVFile(char* pos,ItemList* il)
+{
+    FILE* f = fopen(pos,"wb");
+    fprintf(f,"\"Item\",\"Total\",\"Missing\",\"Available\"\n");
+    ItemList* ild = il;
+    while(ild)
+    {
+        char* trans = Name_BlockTranslate(ild->name);
+        if(trans)
+            fprintf(f,"\"%s\",%d,%d,%d\n",trans,ild->num,ild->num-ild->placed,ild->available);
+        else
+            fprintf(f,"%s,%d,%d,%d\n",ild->name,ild->num,ild->num-ild->placed,ild->available);
+        free(trans);
+        ild = ild->next;
+    }
+    fclose(f);
+    return 0;
 }

@@ -1,4 +1,4 @@
-/*  recipe_util - utilities to process recipes
+/*  file_util - file utilities
     Copyright (C) 2022 Dream Helium
     This file is part of litematica_reader_c.
 
@@ -15,29 +15,21 @@
     You should have received a copy of the GNU Lesser General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>. */
 
-#ifndef RECIPE_UTIL_H
-#define RECIPE_UTIL_H
+#ifndef FILE_UTIL_H
+#define FILE_UTIL_H
 
 #ifdef __cplusplus
 extern "C"{
 #endif
 
-#include "dhlrc_list.h"
+#include <stdio.h>
 
 
-#include <cjson/cJSON.h>
-//#include <dirent.h>
-ItemList* ItemList_Recipe(char* block_name,int num);
+int dhlrc_WriteFile(char* pos, char* content, size_t count);
 
-
-int ItemList_CombineRecipe(ItemList** o_bl);
-long *NumArray_GetFromInput(int *array_num, int max_num);
-char** NameArray_CanCraft(int* num, ItemList* il);
-
-char* Name_BlockTranslate(const char* block_name);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // RECIPE_UTIL_H
+#endif // FILE_UTIL_H

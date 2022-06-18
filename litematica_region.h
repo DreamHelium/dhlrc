@@ -1,3 +1,20 @@
+/*  litematica_region - the region utilities for litematic file
+    Copyright (C) 2022 Dream Helium
+    This file is part of litematica_reader_c.
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Lesser General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Lesser General Public License for more details.
+
+    You should have received a copy of the GNU Lesser General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>. */
+
 #ifndef LITEMATICA_REGION_H
 #define LITEMATICA_REGION_H
 #ifdef __cplusplus
@@ -14,6 +31,7 @@ extern "C"{
  * Get Region nums and names, processing blocks in the region.
  *************************************************************/
 
+/* Get region numbers in litematica file */
 int lite_region_Num(NBT* root);
 char** lite_region_Name(NBT* root, int rNum, int* err);
 void lite_region_FreeNameArray(char** region, int rNum);
@@ -34,6 +52,7 @@ ItemList* lite_region_ItemList(NBT* root,int r_num);
 ItemList* lite_region_ItemListExtend(NBT* root, int r_num, ItemList *oBlock);
 int lite_region_IsBlockWaterlogged(NBT* root,int r_num,int id);
 int lite_region_BlockLevel(NBT* root,int r_num,int id);
+char* lite_region_DoorHalf(NBT* root,int r_num,int id);
 
 
 #ifdef __cplusplus

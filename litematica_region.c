@@ -1,9 +1,26 @@
-#include "litematica_region.h"
+/*  litematica_region - the region utilities for litematic file
+    Copyright (C) 2022 Dream Helium
+    This file is part of litematica_reader_c.
 
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Lesser General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Lesser General Public License for more details.
+
+    You should have received a copy of the GNU Lesser General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>. */
+
+#include "litematica_region.h"
 #include "libnbt/nbt.h"
 #include <string.h>
 #include <stdlib.h>
 #include <math.h>
+
 
 
 int lite_region_Num(NBT* root)
@@ -170,6 +187,15 @@ uint64_t lite_region_BlockIndex(NBT* root, int r_num, int x, int y, int z)
     return index;
 }
 
+
+
+/* The function below uses the implement from another project:
+ * "litematica-tools" from KikuGie
+ * https://github.com/Kikugie/litematica-tools
+ * It uses MIT License, the license file could be found in config/
+ * since files in config/ are also from this project.
+ */
+
 int lite_region_BlockArrayPos(NBT* root, int r_num, uint64_t index)
 {
     uint64_t* state = lite_region_BlockStatesArray(root,r_num,NULL);
@@ -233,7 +259,9 @@ ItemList *lite_region_ItemListExtend(NBT* root, int r_num, ItemList* oBlock)
             if(ItemList_InitNewItem(&oBlock,i_block_name))
             {
                 BlackList_Free(bl);
+                bl = NULL;
                 ReplaceList_Free(rl);
+                rl = NULL;
                 lite_region_FreeNameArray(originBlockName,bNum);
                 return NULL;
             }
@@ -254,39 +282,56 @@ ItemList *lite_region_ItemListExtend(NBT* root, int r_num, ItemList* oBlock)
                 int id = lite_region_BlockArrayPos(root,r_num,index);
                 char* id_block_name = originBlockName[id];
                 id_block_name = ReplaceList_Replace(rl,id_block_name);
-                if(!BlackList_Scan(bl,id_block_name))
-                {
-                    if(ItemList_ScanRepeat(oBlock,id_block_name))  // search for item name
-                    {
-                        if(strstr(id_block_name,"_slab"))     // special for slab
-                        {
-                            if(!strcmp(lite_region_BlockType(root,r_num,id),"double"))
-                                ItemList_AddNum(oBlock,1,id_block_name);
-                        }
-                        if(lite_region_IsBlockWaterlogged(root,r_num,id))
-                        {
-                            if(!ItemList_ScanRepeat(oBlock,"minecraft_water_bucket"))
-                                ItemList_InitNewItem(&oBlock,"minecraft:water_bucket");
-                            ItemList_AddNum(oBlock,1,"minecraft:water_bucket");
-                        }
-                        if(!strcmp(id_block_name,"minecraft:water_bucket") ||
-                          !strcmp(id_block_name,"minecraft:lava_bucket"))
-                        {
-                            if(lite_region_BlockLevel(root,r_num,id) != 0)
-                                ItemList_AddNum(oBlock,-1,id_block_name);
-                        }
-                        ItemList_AddNum(oBlock,1,id_block_name);
-                    }
-                }
                 printf("[%c] Processing Blocks %ld/%d, (%3d,%3d,%3d)/(%3d,%3d,%3d)\r", process[id % 4] ,index+1,rSize[0] * rSize[1] * rSize[2],
                         x,y,z,rSize[0],rSize[1],rSize[2]);
                 fflush(stdout);
+                if(!BlackList_Scan(bl,id_block_name))
+                {
+                    // There is no need for searching repeat.
+//                    if(ItemList_ScanRepeat(oBlock,id_block_name))  // search for item name
+//                    {
+                    if(lite_region_IsBlockWaterlogged(root,r_num,id))
+                    {
+                        if(!ItemList_ScanRepeat(oBlock,"minecraft_water_bucket"))
+                            ItemList_InitNewItem(&oBlock,"minecraft:water_bucket");
+                        ItemList_AddNum(oBlock,1,"minecraft:water_bucket");
+                    }
+                    if(!strcmp(id_block_name,"minecraft:water_bucket") ||
+                      !strcmp(id_block_name,"minecraft:lava_bucket"))
+                    {
+                        if(lite_region_BlockLevel(root,r_num,id) != 0)
+                            continue;    // It's not source, so skip
+                    }
+                    if(strstr(id_block_name,"_slab"))     // special for slab
+                    {
+                        if(!strcmp(lite_region_BlockType(root,r_num,id),"double"))
+                        {   ItemList_AddNum(oBlock,2,id_block_name);
+                            continue;
+                        }
+                    }
+                    if(strstr(id_block_name,"_door"))
+                    {
+                        if(!strcmp(lite_region_DoorHalf(root,r_num,id),"upper"))
+                        {
+                            if(!strcmp(lite_region_DoorHalf(root,r_num,
+                                                            lite_region_BlockArrayPos(root,r_num,lite_region_BlockIndex(root,r_num,x,y-1,z))),"lower"))
+                                continue;
+                        }
+                    }
+
+
+                    ItemList_AddNum(oBlock,1,id_block_name);
+                    //}
+                }
+
             }
         }
     }
     printf("\n");
     BlackList_Free(bl);
+    bl = NULL;
     ReplaceList_Free(rl);
+    rl = NULL;
     lite_region_FreeNameArray(originBlockName,bNum);
     free(rSize);
     return oBlock;
@@ -313,4 +358,10 @@ int lite_region_BlockLevel(NBT* root,int r_num,int id)
         //printf("%d\n",atoi(level->value_a.value));
         return atoi(level->value_a.value);
     }
+}
+
+char* lite_region_DoorHalf(NBT* root,int r_num,int id)
+{
+    NBT* half = NBT_GetChild_Deep(lite_region_SpecificBlockStatePalette(root,r_num,id),"Properties","half",NULL);
+    return (char*)half->value_a.value;
 }
