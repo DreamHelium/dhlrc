@@ -1,0 +1,7 @@
+# qtcreator-generated files 
+
+*.pro.user*
+
+# Vim temporary files
+
+.*.swp
