@@ -26,6 +26,7 @@ extern "C"{
 
 
 int dhlrc_WriteFile(char* pos, char* content, size_t count);
+char* dhlrc_ReadFile(const char* filepos, int* size);
 
 
 #ifdef __cplusplus

@@ -22,6 +22,8 @@
 #include "libnbt/nbt.h"
 #include <string.h>
 #include "recipe_util.h"
+#include "file_util.h"
+#include "nbt_litereader.h"
 
 
 int main(int argc,char** argb)
@@ -33,23 +35,15 @@ int main(int argc,char** argb)
         printf("\n");
     }
 
-    FILE* f = fopen(argb[1],"rb");
-    //FILE* f = fopen("/file/to/litematic","rb");
-
-    if(!f)
+    int size = 0;
+    uint8_t* data = (uint8_t*)dhlrc_ReadFile(argb[1],&size);
+    //uint8_t* data = (uint8_t*)dhlrc_ReadFile("/path/to/litematic",&size);
+    if(!data)
     {
         if(argc != 1)
-            printf("Encounter error reading file or no file input at all!\n");
+            printf("Encounter error reading file!\n");
         return -10;
     }
-    fseek(f,0,SEEK_END);
-    int size = ftell(f);
-    fseek(f,0,SEEK_SET);
-
-    uint8_t* data = (uint8_t*)malloc(size * sizeof(uint8_t));
-    fread(data,1,size,f);
-    fclose(f);
-
     NBT* root = NBT_Parse(data,size);
     free(data);
 
@@ -58,6 +52,7 @@ int main(int argc,char** argb)
         printf("Not a vaild NBT file!\n");
         return -1;
     }
+    nbtlr_Start(root,NULL);
 
     int rNum = lite_region_Num(root);
     //printf("%d\n",rNum);

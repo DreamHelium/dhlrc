@@ -10,7 +10,7 @@ It uses [libnbt](https://github.com/djytw/libnbt) as the library to read litemat
 
 - [ ] Add config.json
 - [ ] Read litematica-generated csv
-- [ ] Simple NBT reader
+- [x] Simple NBT reader
 - [ ] Better support for reading litematica file (Currently it would still be incomplete and can't read item in containers)
 - [ ] Read region details (Ability to read exact block in a region is done in `litematica_region.h` and could be easily used but currently don't write in `example.c`, reading material list uses this ability.)
 - [ ] Ncurses or qt-based interface

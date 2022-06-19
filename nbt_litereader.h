@@ -1,4 +1,4 @@
-/*  file_util - file utilities
+/*  nbt_litereader - nbt lite reader
     Copyright (C) 2022 Dream Helium
     This file is part of litematica_reader_c.
 
@@ -15,34 +15,21 @@
     You should have received a copy of the GNU Lesser General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>. */
 
-#include "file_util.h"
-#include <stdlib.h>
+#ifndef NBT_LITEREADER_H
+#define NBT_LITEREADER_H
+#ifdef __cplusplus
+extern "C"{
+#endif
 
-int dhlrc_WriteFile(char* pos,char* content, size_t count)
-{
-    FILE* f = fopen(pos,"wb");
-    fwrite(content,1,count,f);
-    fclose(f);
-    return 0;
+#include "libnbt/nbt.h"
+
+int nbtlr_Start(NBT* root, NBT* parent);
+int nbtlr_List(NBT* given_nbt, NBT *parent);
+int nbtlr_ListItem(NBT* given_nbt);
+NBT* nbtlr_ToNextNBT(NBT* root, int n);
+
+#ifdef __cplusplus
 }
+#endif
 
-char *dhlrc_ReadFile(const char *filepos, int *size)
-{
-    FILE* f = fopen(filepos,"rb");
-    if(f)
-    {
-        fseek(f,0,SEEK_END);
-        *size = ftell(f);
-        fseek(f,0,SEEK_SET);
-
-        char* data = (char*)malloc(*size * sizeof(char));
-        fread(data,1,*size,f);
-        fclose(f);
-        return data;
-    }
-    else
-    {
-        *size = 0;
-        return NULL;
-    }
-}
+#endif // NBT_LITEREADER_H

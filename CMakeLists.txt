@@ -10,6 +10,8 @@ add_executable(litematica_reader_c
 	       libnbt/nbt.c
 	       litematica_region.c
 	       litematica_region.h
+	       nbt_litereader.h
+	       nbt_litereader.c
 	       dhlrc_list.h
 	       dhlrc_list.c
 	       recipe_util.h

@@ -5,3 +5,5 @@
 # Vim temporary files
 
 .*.swp
+
+build/
