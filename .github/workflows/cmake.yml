@@ -22,10 +22,13 @@ jobs:
       with:
         submodules: true
 
-    - name: Install cJSON
+    - name: Install cJSON from source
       run: |
-        sudo apt update
-        sudo apt install -y libcjson-dev
+        pwd
+        cd ${{github.workspace}}/cJSON && mkdir build
+        cd build
+        cmake ..
+        make && make install
 
     - name: Configure CMake
       # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.

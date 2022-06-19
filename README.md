@@ -46,14 +46,16 @@ If no release package is provided, then you should compile it yourself.
 
 libnbt needs zlib or libdeflate, see libnbt's project README for more details.
 
-This project also use [cJSON](https://github.com/DaveGamble/cJSON), if you are in Linux, it may be provided in software repos as `cJSON-devel` or other name, otherwise refer to the project's website.
+This project also use [cJSON](https://github.com/DaveGamble/cJSON), if you are in Linux, it may be provided in software repos as 
+
+`cJSON-devel` or `libcjson-dev`, otherwise refer to the project's website or use the submodule `cJSON` in this project (Since the package might be old in the repo).
 
 If there's qt creator in your computer, simply imports this project.
 
 Or you can directly compile by 
 
 ```bash
-gcc -DLOAD_RECIPES -lz -lcjson -lm example.c dhlrc_list.c litematica_region.c recipe_util.c file_util.c -o program_name 
+gcc -lz -lcjson -lm example.c dhlrc_list.c litematica_region.c recipe_util.c file_util.c -o program_name 
 ```
 
 if you're in Linux. If in other system, try to use the compiler that fits that system.
