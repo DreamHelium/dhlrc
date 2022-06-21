@@ -4,7 +4,8 @@ CONFIG -= app_bundle
 CONFIG -= qt
 
 SOURCES += \
-           example.c \
+           dh_string_util.c \
+           main.c \
            file_util.c \
            libnbt/nbt.c \
            litematica_region.c \
@@ -13,6 +14,7 @@ SOURCES += \
            recipe_util.c
 
 HEADERS += \
+           dh_string_util.h \
            file_util.h \
            libnbt/nbt.h \
            litematica_region.h \

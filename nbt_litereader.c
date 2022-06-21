@@ -19,6 +19,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+
 int nbtlr_Start(NBT *root, NBT *parent)
 {
     // The start entry is from main or "input number"
@@ -32,9 +33,9 @@ int nbtlr_Start(NBT *root, NBT *parent)
     // determine whether to read list or read value. With an exception,
     // call in the main.
 
-
     NBT* read_nbt = root;
     int continue_func = 1;
+    int gret = -2;
     while(continue_func){
         system("clear");
         printf("The NBT details are below:\n\n");
@@ -58,7 +59,7 @@ int nbtlr_Start(NBT *root, NBT *parent)
         printf("\nInput the number to continue, or p to parent NBT, q to quit: ");
         char* input = NULL;
         size_t size = 0;
-        while(getline(&input, &size, stdin) != -1)
+        while((gret = getline(&input, &size, stdin)) != -1)
         {
             char* inputl = input;
             while(inputl[0] == ' ')
@@ -120,6 +121,13 @@ int nbtlr_Start(NBT *root, NBT *parent)
                     break; // should be done otherwise you need to input again
                 }
             }
+            else
+                printf("No input or unrecognized string, please enter again: ");
+        }
+        if(gret == -1)
+        {
+            printf("Terminated input! The reader will exit!\n");
+            continue_func = 0;
         }
     }
     return 0;
@@ -244,4 +252,9 @@ NBT *nbtlr_ToNextNBT(NBT *root, int n)
     for(int i = 0 ; i < n ; i++)
         next_nbt = next_nbt->next;
     return next_nbt;
+}
+
+void nbtlr_Modifier_Start(NBT *root)
+{
+
 }

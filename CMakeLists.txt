@@ -5,7 +5,7 @@ if (NOT CMAKE_BUILD_TYPE)
 endif()
 
 add_executable(litematica_reader_c 
-	       example.c
+	       main.c
 	       libnbt/nbt.h
 	       libnbt/nbt.c
 	       litematica_region.c
@@ -14,6 +14,8 @@ add_executable(litematica_reader_c
 	       nbt_litereader.c
 	       dhlrc_list.h
 	       dhlrc_list.c
+	       dh_string_util.h
+	       dh_string_util.c
 	       recipe_util.h
 	       recipe_util.c
 	       file_util.h

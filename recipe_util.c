@@ -27,7 +27,7 @@ long* NumArray_GetFromInput(int* array_num, int max_num)
     int i = 0;
     char* input = NULL;
     size_t len = 0;
-    printf("Input nums directly, or type 'a' for all numbers:");
+    printf("Input nums directly, or type 'a' for all numbers: ");
     while(getline(&input,&len,stdin) != -1)
     {
         char* inputl = input;
@@ -48,28 +48,49 @@ long* NumArray_GetFromInput(int* array_num, int max_num)
                 return array;
             }
             else
-                printf("Unrecognized string %s, please write again:", input);
+                printf("Unrecognized string, please enter again: ");
         }
         else if(*inputl >= '0' && *inputl <= '9')
         { // when input is num
             while(1)
             {
-            char* end;
-            long value = strtol(inputl,&end,10);
-            if(inputl == end) break;
-            i++;
-            long* parray = realloc(array,i*sizeof(long));
-            if(!parray)
-            {
-                free(array);
-                free(input);
-                *array_num = 0;
-                return NULL;
-            }
-            array = parray;
-            array[i - 1] = value;
-            //printf("%ld ",value);
-            inputl = end;
+                char* end;
+                long value = strtol(inputl,&end,10);
+                if(inputl == end) break;
+
+                long* parray = realloc(array,(i+1)*sizeof(long));
+                if(!parray)
+                {
+                    free(array);
+                    free(input);
+                    *array_num = 0;
+                    return NULL;
+                }
+                array = parray;
+                while(*end == ' ')
+                    end++;
+                for(int j = 0 ; j < i ; j++)
+                {
+                    if( value == array[j] )
+                    {
+                        free(input);
+                        free(array);
+                        printf("Repeated number detected!\n");
+                        return NumArray_GetFromInput(array_num, max_num);
+                    }
+                }
+                if((value < 0 || value >= max_num) || !(*end == '\n' || isdigit(*end)) )
+                {
+                // hopefully this will work
+                    free(input);
+                    free(array);
+                    printf("Out of range! \n");
+                    return NumArray_GetFromInput(array_num, max_num);
+                }
+                array[i] = value;
+                //printf("%ld ",value);
+                inputl = end;
+                i++;
             }
             free(input);
             *array_num = i;
@@ -83,7 +104,7 @@ long* NumArray_GetFromInput(int* array_num, int max_num)
         }
         else
         {
-            printf("Unrecognized string %s, please write again:",input);
+            printf("Unrecognized string, please enter again: ");
         }
     }
     free(input);

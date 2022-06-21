@@ -1,4 +1,4 @@
-/*  nbt_litereader - nbt lite reader
+/*  dh_string_util - String utils by Dream Helium
     Copyright (C) 2022 Dream Helium
     This file is part of litematica_reader_c.
 
@@ -15,27 +15,25 @@
     You should have received a copy of the GNU Lesser General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>. */
 
-#ifndef NBT_LITEREADER_H
-#define NBT_LITEREADER_H
+#ifndef DH_STRING_UTIL_H
+#define DH_STRING_UTIL_H
+
 #ifdef __cplusplus
 extern "C"{
 #endif
 
-#include "libnbt/nbt.h"
-
-/** Just use this to start a reader instance.
- *  Please pass NULL in "parent" to start.
+/** Get a line input and return output (1 number or character) */
+char* InputLine_Get_OneOpt(int need_num, int min, int max, int arg_num, ...);
+/** Get a line input and return output (n numbers or character)
+ *  should pass like this: (nums): min and max, (char): char.
  */
-int nbtlr_Start(NBT* root, NBT* parent);
-int nbtlr_List(NBT* given_nbt, NBT *parent);
-int nbtlr_ListItem(NBT* given_nbt);
-NBT* nbtlr_ToNextNBT(NBT* root, int n);
-
-void nbtlr_Modifier_Start(NBT* root);
+char* InputLine_Get_MoreDigits(int need_nums, int arg_num, ...);
+/** Transform a String to number array */
+long* NumArray_From_String(const char* string, int* nums, int char_check);
 
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // NBT_LITEREADER_H
+#endif // DH_STRING_UTIL_H

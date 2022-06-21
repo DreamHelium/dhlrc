@@ -365,3 +365,8 @@ char* lite_region_DoorHalf(NBT* root,int r_num,int id)
     NBT* half = NBT_GetChild_Deep(lite_region_SpecificBlockStatePalette(root,r_num,id),"Properties","half",NULL);
     return (char*)half->value_a.value;
 }
+
+ItemList *lite_region_ItemList_WithoutNum(NBT *root, int r_num, ItemList *o_il)
+{
+    return NULL;
+}

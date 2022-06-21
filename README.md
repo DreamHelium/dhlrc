@@ -1,5 +1,7 @@
 # Litematica Reader in C language
 
+[中文文档](README_zh.md)
+
 ## Introduction
 
 Although it was named as `litematica_reader_c`, **it's not only intended to read litematica file**, but process the material list in blocks in a litematica file region. Reading litematica file is just the first step to process, or in other words **there should be a source of material list to process, and reading a litematica file is the most convenient.**
