@@ -45,4 +45,24 @@ cmake --build build
 ## 开发、学习、改进此程序时可以了解的细节
 
 * `nbt_litereader.h`中提供了NBT简易阅读器的入口，加载好NBT文件后通过`nbtlr_Start(NBT变量名, NULL);`即可进入此阅读器。
+* `dh_string_util.h`（由“梦氦”写的字符串处理工具，但其实是**针对输入的情况居多**）
+  - `InputLine_Get_OneOpt`得到一个数字或者不获取数字（含对**自然数**（即不含负数）的大小检查，暂时不支持关闭）且能检测对单个字符的检查（支持多种），对输入中断的异常处理。
+    - 定义
+      ```c
+      char* InputLine_Get_OneOpt(int need_num, int min, int max, int arg_num, ...);
+      ```
+    - 使用
+      `need_num`指定是否需要数字，0以禁用。
+      `min`与`max`为大小限定，`arg_num`是所需检查的字符数，后接需要的字符，如`'q','b'`。
+      成功时，数字则返回输入值，字符则为`malloc()`分配的可储存两字符内存的指针，失败返回NULL，成功返回的值均需`free()`释放。
+  - `InputLine_Get_MoreDigits`与上述函数类似，不过能处理更多的数字（与上述类似，同样不支持关闭大小检查且**需在可变参数处输入大小值限定后再紧跟字符**），对输入中断的异常处理。
+    - 使用
+      在上面写了……不过有一点注意，成功时数字不可能返回数字数组，由以下函数进行导出。
+  - `NumArray_From_String`从字符串中抽离数组
+    - 定义
+      ```c
+      long* NumArray_From_String(const char* string, int* nums, int char_check);
+      ```
+    - 使用
+      `nums`指向的值将会变为数组元素个数，`char_check`非零时进行字符检查，若出现非数字字符、非回车或‘\0’则返回NULL。
 * 懒得写了，其他先看英文版的（虽然不全，最近加了好多新函数）。
