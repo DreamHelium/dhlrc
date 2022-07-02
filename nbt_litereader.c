@@ -19,8 +19,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+int nbtlr_instance(NBT* root, NBT* parent);
 
-int nbtlr_Start(NBT *root, NBT *parent)
+int nbtlr_Start(NBT* root)
+{
+    return nbtlr_instance(root, NULL);
+}
+
+int nbtlr_instance(NBT *root, NBT *parent)
 {
     // The start entry is from main or "input number"
     // So parent should be NULL at first, then
@@ -53,7 +59,7 @@ int nbtlr_Start(NBT *root, NBT *parent)
         if(list <= 0) // also return to origin func
         {
             printf("\nNo deeper NBT, press any key to continue.");
-            getchar();
+            while(getchar() != '\n' && getchar() != EOF);
             return 1;
         }
         printf("\nInput the number to continue, or p to parent NBT, q to quit: ");
@@ -115,7 +121,7 @@ int nbtlr_Start(NBT *root, NBT *parent)
                     free(input);
                     NBT* next_root = nbtlr_ToNextNBT(read_nbt,value);
                     int ret = 0;
-                    ret = nbtlr_Start(next_root,next_root);
+                    ret = nbtlr_instance(next_root,next_root);
                     if(ret == 0) // break the program run
                         continue_func = 0; // use this to break
                     break; // should be done otherwise you need to input again
@@ -237,10 +243,16 @@ int nbtlr_List(NBT *given_nbt, NBT* parent)
         printf("%s\n",(char*)list_nbt->value_a.value);
         return -1;
     case TAG_Byte_Array:
+        for(int i = 0 ; i < list_nbt->value_a.len; i++)
+            printf("[%d] %d\n",i,((int8_t*)list_nbt->value_a.value)[i]);
+        return -1;
     case TAG_Int_Array:
+        for(int i = 0 ; i < list_nbt->value_a.len; i++)
+            printf("[%d] %d\n",i,((int32_t*)list_nbt->value_a.value)[i]);
+        return -1;
     case TAG_Long_Array:
         for(int i = 0 ; i < list_nbt->value_a.len; i++)
-            printf("%ld\n",((int64_t*)list_nbt->value_a.value)[i]);
+            printf("[%d] %ld\n",i,((int64_t*)list_nbt->value_a.value)[i]);
         return -1;
     default: return -3;
     }

@@ -1,0 +1,17 @@
+{
+    "dh.main.startWithoutOption":"Please select a option to start:\n[0] NBT lite reader with modifier\n[1] Litematica material list with recipe combine\n[2] Litematica block reader\n\nPlease enter a number or enter 'q' to exit the program (q): ",
+
+
+
+    "dhlrc.regionNum": "There are %d regions:\n",
+    "dhlrc.extend.enterRegionNum": "Enter the region number, or enter 'q' to exit program (q): ",
+    "dhlrc.extend.regionInfo": "You are reading region: [%2d] %s:\nThe size of the region is (%d, %d, %d)\n\n",
+    "dhlrc.extend.blockPosInfo": "The block in (%d, %d, %d) is %s.\n",
+    "dhlrc.extend.askRequest": "Please enter the coordination of the block (just numbers of x y z without addtional character).\nOr enter 'b' to choose another region, enter 'q' to exit the program (b): ",
+    "dhlrc.extend.askRequestTwice": "Please enter the coordination of the block again or enter 'b' to choose another region, enter 'q' to exit the program (b): ",
+
+
+    "dh.string.unrecognize": "Unrecognize string! Please enter again: ",
+    "dh.string.outOfRange": "Number out of range (or not enough memory to allocate), Please try to enter again: ",
+    "dh.string.outOfRangeOrUnrecognize": "Number out of range or unrecognize string! Please enter again: "
+}

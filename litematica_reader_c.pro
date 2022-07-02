@@ -2,6 +2,7 @@ TEMPLATE = app
 CONFIG += console
 CONFIG -= app_bundle
 CONFIG -= qt
+TARGET = litematica_reader_c
 
 SOURCES += \
            dh_string_util.c \
@@ -22,4 +23,13 @@ HEADERS += \
            nbt_litereader.h \
            recipe_util.h
 
+INCLUDEPATH += /usr/lib64/gcc/x86_64-suse-linux/12/include \
+               /usr/lib64/gcc/x86_64-suse-linux/12/include-fixed
+
+#DEFINES += DH_DEBUG_IN_IDE
+
 LIBS += -lz -lcjson
+
+DISTFILES += \
+    lang/en_US.json \
+    lang/zh_CN.json

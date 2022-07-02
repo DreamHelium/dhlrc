@@ -19,6 +19,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <ctype.h>
 #include "litematica_region.h"
 
 long* NumArray_GetFromInput(int* array_num, int max_num)

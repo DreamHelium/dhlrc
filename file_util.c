@@ -17,6 +17,9 @@
 
 #include "file_util.h"
 #include <stdlib.h>
+#include <cjson/cJSON.h>
+#include <string.h>
+#include "dh_string_util.h"
 
 int dhlrc_WriteFile(char* pos,char* content, size_t count)
 {
@@ -45,4 +48,59 @@ char *dhlrc_ReadFile(const char *filepos, int *size)
         *size = 0;
         return NULL;
     }
+}
+
+int dhlrc_mkconfig()
+{
+    cJSON* config = cJSON_CreateObject();
+    if(config)
+    {
+        cJSON_AddStringToObject(config, "OverrideLang", "");
+        cJSON_AddStringToObject(config, "SecondLang", "");
+        cJSON_AddStringToObject(config, "langDir", "lang/");
+        cJSON_AddStringToObject(config, "AdditionConfig", "config/");
+        cJSON_AddStringToObject(config, "RecipeConfig", "recipes/");
+        cJSON_AddStringToObject(config, "ItemTranslate", "translation.json");
+        char* config_char = cJSON_Print(config);
+        dhlrc_WriteFile("config.json", config_char, strlen(config_char));
+        free(config_char);
+        cJSON_Delete(config);
+        return 0;
+    }
+    else return -1;
+}
+
+int dhlrc_ConfigExist()
+{
+    FILE* f = fopen("config.json", "rb");
+    if(f)
+    {
+        fclose(f);
+        return 1;
+    }
+    else return 0;
+}
+
+char *dhlrc_ConfigContent(const char *str)
+{
+    if(dhlrc_ConfigExist())
+    {
+        int size;
+        char* json = dhlrc_ReadFile("config.json", &size);
+        if(json)
+        {
+            cJSON* json_content = cJSON_ParseWithLength(json, size);
+            cJSON* json_str = cJSON_GetObjectItem(json_content, str);
+            free(json);
+            if(cJSON_IsString(json_str))
+            {
+                char* ret = String_Copy(cJSON_GetStringValue(json_str));
+                cJSON_Delete(json_content);
+                return ret;
+            }
+            else return NULL; /** \todo add item*/
+        }
+        else return NULL;
+    }
+    else return NULL;
 }

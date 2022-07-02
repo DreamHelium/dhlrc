@@ -22,14 +22,77 @@
 extern "C"{
 #endif
 
-/** Get a line input and return output (1 number or character) */
-char* InputLine_Get_OneOpt(int need_num, int min, int max, int arg_num, ...);
+#include <stdint.h>
+
+/** The type of the dh_Line_IO */
+typedef enum dh_out_type{
+    Integer, Float, Double, Character, NumArray, String, Empty
+} dh_out_type;
+
+typedef struct dh_LineOut
+{
+    /** Return type */
+    dh_out_type type;
+
+    union{
+        /** Number value of the output */
+        int64_t num_i;
+        double num_f;
+
+        /** Character value of the output */
+        char val_c;
+
+        /** String or NumArray value or Empty */
+        struct{
+          void* val;
+          int len;
+        };
+    };
+
+    /** byte of the num value */
+    int byte;
+}
+dh_LineOut;
+
+typedef struct dh_StrArray{
+    char** val;
+    int num;
+} dh_StrArray;
+
+
+/** Get a line input and return output (1 number or character), return 64bit num by default */
+dh_LineOut* InputLine_Get_OneOpt(int range_check, int need_num, int arg_num, int min, int max, ...);
+dh_LineOut* InputLine_Get_OneOpt_WithByte(int byte, int range_check, int need_num, int arg_num, int min, int max, ...);
 /** Get a line input and return output (n numbers or character)
  *  should pass like this: (nums): min and max, (char): char.
  */
-char* InputLine_Get_MoreDigits(int need_nums, int arg_num, ...);
+dh_LineOut* InputLine_Get_MoreDigits(int range_check, int need_nums, int arg_num, ...);
+dh_LineOut* InputLine_Get_MoreDigits_WithByte(int byte, int range_check, int need_nums, int arg_num, ...);
 /** Transform a String to number array */
 long* NumArray_From_String(const char* string, int* nums, int char_check);
+
+dh_LineOut* dh_LineOut_CreateNum(int64_t num, int byte);
+dh_LineOut* dh_LineOut_CreateFloat(double num);
+dh_LineOut* dh_LineOut_CreateDouble(double num);
+dh_LineOut* dh_LineOut_CreateChar(char c);
+dh_LineOut* dh_LineOut_CreateNumArray(void* array, int len, int byte, int o_byte);
+dh_LineOut* dh_LineOut_CreateString(const char* str);
+dh_LineOut* dh_LineOut_CreateEmpty();
+
+void dh_LineOut_Free(dh_LineOut* lo);
+
+char* String_Translate(const char* str);
+void String_Translate_printfRaw(const char* str);
+void String_Translate_printfWithArgs(const char* str, ...);
+
+char* String_Copy(const char *o_str);
+
+dh_StrArray* dh_StrArray_Init(const char* str);
+
+int dh_StrArray_AddStr(dh_StrArray** arr ,const char* str);
+
+void dh_StrArray_Free(dh_StrArray* arr);
+
 
 
 #ifdef __cplusplus

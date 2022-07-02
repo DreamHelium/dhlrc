@@ -1,0 +1,15 @@
+{
+    "dh.main.startWithoutOption": "请选择一个选项以继续：\n[0] 小型NBT阅读器（带修改器）\n[1] 投影材料列表（带合成表合成功能）\n[2] 投影方块阅读器\n\n请输入一个数字以继续，或输入 “q” 以退出程序（q）： ",
+
+
+    "dhlrc.regionNum": "有%d个区域：\n",
+    "dhlrc.extend.enterRegionNum": "请输入区域前数字或输入 “q” 退出程序（q）： ",
+    "dhlrc.extend.regionInfo": "你正在读取区域： [%2d] %s:\n此区域的大小为(%d, %d, %d)\n\n",
+    "dhlrc.extend.blockPosInfo": "在(%d, %d, %d) 处的方块是%s。\n",
+    "dhlrc.extend.askRequest":"请输入坐标（以数字x y z的顺序且不能有任何其余字符），或者输入 “b” 以选择其他区域，输入 “q” 退出程序（b）： ",
+    "dhlrc.extend.askRequestTwice": "请再次输入坐标或者输入 “b” 以选择其他区域，输入 “q” 退出程序（b）： ",
+
+    "dh.string.unrecognize": "无法识别的字符，请再输入一次： ",
+    "dh.string.outOfRange": "数字越界（或无足够内存分配），请尝试再输入一次： ",
+    "dh.string.outOfRangeOrUnrecognize": "数字超过限定或无法识别的字符，请再输入一次： "
+}

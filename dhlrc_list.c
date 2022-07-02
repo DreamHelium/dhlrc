@@ -251,7 +251,7 @@ BlackList* BlackList_Init()
 {
     BlackList* bl = (BlackList*) malloc(sizeof(BlackList));
     bl->name = (char*)malloc(5*sizeof(char));
-    bl->name = "none";
+    strcpy(bl->name, "none");
     bl->next = NULL;
     FILE* f = fopen("config/ignored_blocks.json","rb");
     if(f)
@@ -291,6 +291,7 @@ BlackList* BlackList_Extend(BlackList* bl,const char* name)
 {
     if(!strcmp(bl->name,"none"))
     {
+        free(bl->name);
         bl->name = (char*)malloc((strlen(name) + 1) * sizeof(char));
         strcpy(bl->name,name);
         return bl;
@@ -310,15 +311,14 @@ BlackList* BlackList_Extend(BlackList* bl,const char* name)
 
 void BlackList_Free(BlackList* bl)
 {
+    free(bl->name);
+    bl->name = NULL;
     if(bl->next)
     {
         BlackList_Free(bl->next);
         bl->next = NULL;
     }
-    free(bl->name);
-    bl->name = NULL;
     free(bl);
-    bl = NULL;
 }
 
 int BlackList_Scan(BlackList* bl,const char* name)
@@ -379,6 +379,8 @@ ReplaceList* ReplaceList_Extend(ReplaceList* rl,const char* o_name,const char* r
 {
     if(!strcmp(rl->o_name,"none"))
     {
+        free(rl->o_name);
+        free(rl->r_name);
         rl->o_name = (char*)malloc((strlen(o_name)+1) * sizeof(char));
         rl->r_name = (char*)malloc((strlen(r_name)+1) * sizeof(char));
         strcpy(rl->o_name,o_name);
@@ -419,15 +421,16 @@ char* ReplaceList_Replace(ReplaceList* rl,char* o_name)
 
 void ReplaceList_Free(ReplaceList* rl)
 {
-    if(rl->next)
-        ReplaceList_Free(rl->next);
-    rl->next = NULL;
     free(rl->o_name);
     rl->o_name = NULL;
     free(rl->r_name);
     rl->r_name = NULL;
+    if(rl->next)
+    {
+        ReplaceList_Free(rl->next);
+        rl->next = NULL;
+    }
     free(rl);
-    rl = NULL;
 }
 
 

@@ -329,9 +329,7 @@ ItemList *lite_region_ItemListExtend(NBT* root, int r_num, ItemList* oBlock)
     }
     printf("\n");
     BlackList_Free(bl);
-    bl = NULL;
     ReplaceList_Free(rl);
-    rl = NULL;
     lite_region_FreeNameArray(originBlockName,bNum);
     free(rSize);
     return oBlock;

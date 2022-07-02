@@ -26,7 +26,7 @@ extern "C"{
 /** Just use this to start a reader instance.
  *  Please pass NULL in "parent" to start.
  */
-int nbtlr_Start(NBT* root, NBT* parent);
+int nbtlr_Start(NBT* root);
 int nbtlr_List(NBT* given_nbt, NBT *parent);
 int nbtlr_ListItem(NBT* given_nbt);
 NBT* nbtlr_ToNextNBT(NBT* root, int n);
