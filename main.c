@@ -26,6 +26,9 @@
 #include "file_util.h"
 #include "nbt_litereader.h"
 #include "dh_string_util.h"
+#include "dhlrc_config.h"
+#define _TOSTR(a) #a
+#define TOSTR(a) _TOSTR(a)
 
 enum option{Reader, Litematic_material_lister, Litematic_block_show,
         #ifdef DH_DEBUG_IN_IDE
@@ -44,9 +47,15 @@ int debug();
 
 int main(int argc,char** argb)
 {
+    //printf( TOSTR(dhlrc_VERSION_MAJOR) "." TOSTR(dhlrc_VERSION_MINOR) "." TOSTR(dhlrc_VERSION_PATCH) "\n" );
     if(argc == 1)
     {
-        printf("Usage: %s [file] \n",argb[0]);
+        char* trans = String_Translate("dh.main.usage");
+        if(!strcmp(trans,"dhlrc.usage"))
+            printf("Usage: %s [file] \n",argb[0]);
+        else printf(trans, argb[0]);
+        free(trans);
+        String_Translate_FreeLocale();
 #ifndef DH_DEBUG_IN_IDE
         return -1;
 #endif
@@ -61,7 +70,8 @@ int main(int argc,char** argb)
 #endif
     if(!data)
     {
-        printf("Encounter error reading file!\n");
+        String_Translate_printfRaw("dh.main.fileError");
+        String_Translate_FreeLocale();
         return -10;
     }
     NBT* root = NBT_Parse(data,size);
@@ -69,15 +79,17 @@ int main(int argc,char** argb)
 
     if(!root)
     {
-        printf("Not a vaild NBT file!\n");
+        String_Translate_printfRaw("dh.main.notValidNBT");
+        String_Translate_FreeLocale();
         return -1;
     }
     else
     {
         dhlrc_mkconfig();
-        printf("It's a valid NBT file, continue.\n");
+        String_Translate_printfRaw("dh.main.validNBT");
         start_func(root, start_without_option());
         NBT_Free(root);
+        String_Translate_FreeLocale();
         return 0;
     }
 }

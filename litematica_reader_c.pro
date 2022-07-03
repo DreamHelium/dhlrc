@@ -31,5 +31,6 @@ INCLUDEPATH += /usr/lib64/gcc/x86_64-suse-linux/12/include \
 LIBS += -lz -lcjson
 
 DISTFILES += \
+    CMakeLists.txt \
     lang/en_US.json \
     lang/zh_CN.json

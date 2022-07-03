@@ -23,13 +23,16 @@ extern "C"{
 #endif
 
 #include <stdio.h>
+#include <cjson/cJSON.h>
 
 
 int dhlrc_WriteFile(char* pos, char* content, size_t count);
 char* dhlrc_ReadFile(const char* filepos, int* size);
 int dhlrc_mkconfig();
 int dhlrc_ConfigExist();
+int dhlrc_FileExist(const char* filepos);
 char* dhlrc_ConfigContent(const char* str);
+cJSON* dhlrc_FileToJSON(const char* pos);
 
 
 #ifdef __cplusplus

@@ -15,11 +15,11 @@
     You should have received a copy of the GNU Lesser General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>. */
 
+#include "dh_string_util.h"
 #include "file_util.h"
 #include <stdlib.h>
-#include <cjson/cJSON.h>
 #include <string.h>
-#include "dh_string_util.h"
+
 
 int dhlrc_WriteFile(char* pos,char* content, size_t count)
 {
@@ -72,13 +72,7 @@ int dhlrc_mkconfig()
 
 int dhlrc_ConfigExist()
 {
-    FILE* f = fopen("config.json", "rb");
-    if(f)
-    {
-        fclose(f);
-        return 1;
-    }
-    else return 0;
+    return dhlrc_FileExist("config.json");
 }
 
 char *dhlrc_ConfigContent(const char *str)
@@ -100,6 +94,31 @@ char *dhlrc_ConfigContent(const char *str)
             }
             else return NULL; /** \todo add item*/
         }
+        else return NULL;
+    }
+    else return NULL;
+}
+
+int dhlrc_FileExist(const char *filepos)
+{
+    FILE* f = fopen(filepos, "rb");
+    if(f)
+    {
+        fclose(f);
+        return 1;
+    }
+    else return 0;
+}
+
+cJSON *dhlrc_FileToJSON(const char *pos)
+{
+    int size;
+    char* data = dhlrc_ReadFile(pos, &size);
+    if(data)
+    {
+        cJSON* json_data = cJSON_ParseWithLength(data, size);
+        free(data);
+        if(json_data) return json_data;
         else return NULL;
     }
     else return NULL;

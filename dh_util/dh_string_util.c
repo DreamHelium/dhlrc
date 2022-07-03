@@ -41,8 +41,10 @@ char* get_locale();
 int range_check(int64_t num, int byte);
 int float_check(double num);
 void* resize_array(int byte, int o_byte, void* array, int len);
+char* translation_pos();
 
-
+char* main_lang = NULL;
+char* secondary_lang = NULL;
 
 
 dh_LineOut *InputLine_Get_OneOpt_va(int byte, int range_check, int need_num, int arg_num, int min, int max, va_list va)
@@ -357,30 +359,21 @@ char *String_Copy(const char *o_str)
 
 char* String_Translate(const char* str)
 {
-//    printf("%s\n",setlocale(LC_ALL, ""));
-    char* lang = get_locale();
-    int size;
-    char* filepos = (char*)malloc( (sizeof("lang/") + strlen(lang) + sizeof(".json")) * sizeof(char) );
-    strcpy(filepos, "lang/");
-    strcat(filepos, lang);
-    strcat(filepos, ".json");
-    char* o_file = dhlrc_ReadFile(filepos,&size);
+    char* filepos = translation_pos();
+    cJSON* trans_json = dhlrc_FileToJSON(filepos);
     free(filepos);
-    free(lang);
-    if(o_file)
+    if(trans_json)
     {
-        cJSON* json = cJSON_ParseWithLength(o_file, size);
-        free(o_file);
-        cJSON* trans_item =cJSON_GetObjectItem(json, str);
+        cJSON* trans_item =cJSON_GetObjectItem(trans_json, str);
         if(cJSON_IsString(trans_item))
         {
             char* trans = cJSON_GetStringValue(trans_item);
             char* output = String_Copy(trans);
-            cJSON_Delete(json);
+            cJSON_Delete(trans_json);
             return output;
         }
         else{
-            cJSON_Delete(json);
+            cJSON_Delete(trans_json);
             return String_Copy(str);
         }
 
@@ -467,26 +460,50 @@ void dh_StrArray_Free(dh_StrArray *arr)
 
 char* get_locale()
 {
-    char* override_lang = dhlrc_ConfigContent("OverrideLang");
-    if(override_lang == NULL || !strcmp(override_lang,""))
+    if(!main_lang)
     {
-        free(override_lang);
-        char* lang = setlocale(LC_MESSAGES, "");
-        char* lang_copy = lang;
-        int point_pos = 0;
-        while(*lang_copy != '.' && *lang_copy != '\0' && *lang_copy != '@')
+        char* override_lang = dhlrc_ConfigContent("OverrideLang");
+        if(override_lang == NULL || !strcmp(override_lang,""))
         {
-            // For example "zh_CN.UTF-8", when it's "." , pos will be 5, so it's lang[5] = '.'.
-            lang_copy++;
-            point_pos++;
+            free(override_lang);
+            char* lang = setlocale(LC_MESSAGES, "");
+            char* lang_copy = lang;
+            int point_pos = 0;
+            while(*lang_copy != '.' && *lang_copy != '\0' && *lang_copy != '@')
+            {
+                // For example "zh_CN.UTF-8", when it's "." , pos will be 5, so it's lang[5] = '.'.
+                lang_copy++;
+                point_pos++;
+            }
+            char* ret = (char*)malloc((point_pos + sizeof("")) * sizeof(char));
+            for(int i = 0 ; i < point_pos; i++)
+                ret[i] = lang[i];
+            ret[point_pos] = '\0';
+            main_lang = String_Copy(ret);
+            free(ret);
         }
-        char* ret = (char*)malloc((point_pos + sizeof("")) * sizeof(char));
-        for(int i = 0 ; i < point_pos; i++)
-            ret[i] = lang[i];
-        ret[point_pos] = '\0';
-        return ret;
+        else
+        {
+            main_lang = String_Copy(override_lang);
+            free(override_lang);
+        }
+        // Determine translation file exists or fallback to en_US
+        char* filepos = translation_pos();
+        cJSON* trans_json = dhlrc_FileToJSON(filepos);
+        free(filepos);
+        if(trans_json)
+        {
+            cJSON_Delete(trans_json);
+            return main_lang;
+        }
+        else
+        {
+            free(main_lang);
+            main_lang = String_Copy("en_US");
+            return main_lang;
+        }
     }
-    else return override_lang;
+    else return main_lang;
 }
 
 int range_check(int64_t num, int byte)
@@ -804,4 +821,31 @@ dh_LineOut *InputLine_Get_MoreDigits_WithByte(int byte, int range_check, int nee
     dh_LineOut* out = InputLine_Get_MoreDigits_va(byte, range_check, need_nums, arg_num ,va);
     va_end(va);
     return out;
+}
+
+void String_Translate_FreeLocale()
+{
+    free(main_lang);
+    free(secondary_lang);
+}
+
+char* translation_pos()
+{
+    char* lang = get_locale();
+    char* dir = dhlrc_ConfigContent("langDir");
+    if(!dir || !strcmp(dir,""))
+    {
+        free(dir);
+        dir = String_Copy("lang/");
+    }
+    int len = strlen(dir) + strlen("/") + strlen(lang) + strlen(".json") + sizeof ("");
+    char* filepos = (char*)malloc( len * sizeof(char) );
+    // dir + / + lang + .json ( "lang/" "/" "en_US" ".json" )
+    filepos[0] = 0;
+    strcat( filepos, dir);
+    strcat( filepos, "/");
+    strcat( filepos, lang );
+    strcat( filepos, ".json");
+    free(dir);
+    return filepos;
 }

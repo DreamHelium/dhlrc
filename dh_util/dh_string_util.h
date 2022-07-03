@@ -84,6 +84,7 @@ void dh_LineOut_Free(dh_LineOut* lo);
 char* String_Translate(const char* str);
 void String_Translate_printfRaw(const char* str);
 void String_Translate_printfWithArgs(const char* str, ...);
+void String_Translate_FreeLocale();
 
 char* String_Copy(const char *o_str);
 

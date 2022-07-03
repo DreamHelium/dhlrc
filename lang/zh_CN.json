@@ -1,4 +1,8 @@
 {
+    "dh.main.usage":"用法：%s [文件]\n",
+    "dh.main.fileError":"在阅读文件时出错！\n",
+    "dh.main.notValidNBT":"不是一个有效的NBT文件\n",
+    "dh.main.validNBT":"有效的NBT文件！\n",
     "dh.main.startWithoutOption": "请选择一个选项以继续：\n[0] 小型NBT阅读器（带修改器）\n[1] 投影材料列表（带合成表合成功能）\n[2] 投影方块阅读器\n\n请输入一个数字以继续，或输入 “q” 以退出程序（q）： ",
 
 

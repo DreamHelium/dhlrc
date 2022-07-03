@@ -1,4 +1,5 @@
 {
+    "dh.main.usage":"Usage: %s [file]\n",
     "dh.main.startWithoutOption":"Please select a option to start:\n[0] NBT lite reader with modifier\n[1] Litematica material list with recipe combine\n[2] Litematica block reader\n\nPlease enter a number or enter 'q' to exit the program (q): ",
 
 

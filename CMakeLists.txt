@@ -1,12 +1,19 @@
-project(litematica_reader_c LANGUAGES C)
+cmake_minimum_required(VERSION 3.10)
+
+project(dhlrc LANGUAGES C VERSION 0.1.0)
 
 if (NOT CMAKE_BUILD_TYPE)
 	set(CMAKE_BUILD_TYPE Release)
 endif()
 
+
+configure_file(dhlrc_config.h.in dhlrc_config.h)
+
+add_subdirectory(dh_util)
+
 add_executable(litematica_reader_c 
 	       main.c
-	       libnbt/nbt.h
+               libnbt/nbt.h
 	       libnbt/nbt.c
 	       litematica_region.c
 	       litematica_region.h
@@ -14,11 +21,12 @@ add_executable(litematica_reader_c
 	       nbt_litereader.c
 	       dhlrc_list.h
 	       dhlrc_list.c
-	       dh_string_util.h
-	       dh_string_util.c
 	       recipe_util.h
 	       recipe_util.c
-	       file_util.h
-	       file_util.c)
+	       )
 
-       target_link_libraries(litematica_reader_c PUBLIC m z cjson)
+target_link_libraries(litematica_reader_c PUBLIC m z cjson dhutil)
+
+target_include_directories(litematica_reader_c PUBLIC
+	"${PROJECT_BINARY_DIR}"
+	)
