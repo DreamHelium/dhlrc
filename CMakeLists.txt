@@ -9,7 +9,7 @@ endif()
 
 configure_file(dhlrc_config.h.in dhlrc_config.h)
 
-add_subdirectory(dh_util)
+add_subdirectory(util)
 
 add_executable(litematica_reader_c 
 	       main.c

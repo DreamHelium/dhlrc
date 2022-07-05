@@ -55,8 +55,8 @@ int main(int argc,char** argb)
             printf("Usage: %s [file] \n",argb[0]);
         else printf(trans, argb[0]);
         free(trans);
-        String_Translate_FreeLocale();
 #ifndef DH_DEBUG_IN_IDE
+        String_Translate_FreeLocale();
         return -1;
 #endif
     }

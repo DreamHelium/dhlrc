@@ -61,8 +61,8 @@ typedef struct dh_StrArray{
 
 
 /** Get a line input and return output (1 number or character), return 64bit num by default */
-dh_LineOut* InputLine_Get_OneOpt(int range_check, int need_num, int arg_num, int min, int max, ...);
-dh_LineOut* InputLine_Get_OneOpt_WithByte(int byte, int range_check, int need_num, int arg_num, int min, int max, ...);
+dh_LineOut* InputLine_Get_OneOpt(int range_check, int need_num, int arg_num, ...);
+dh_LineOut* InputLine_Get_OneOpt_WithByte(int byte, int range_check, int need_num, int arg_num, ...);
 /** Get a line input and return output (n numbers or character)
  *  should pass like this: (nums): min and max, (char): char.
  */
