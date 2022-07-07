@@ -22,16 +22,17 @@ extern "C"{
 #endif
 
 #include "libnbt/nbt.h"
+#include "dh_string_util.h"
 
 /** Just use this to start a reader instance.
  *  Please pass NULL in "parent" to start.
  */
 int nbtlr_Start(NBT* root);
-int nbtlr_List(NBT* given_nbt, NBT *parent);
+int nbtlr_List(NBT* given_nbt, int read_next);
 int nbtlr_ListItem(NBT* given_nbt);
 NBT* nbtlr_ToNextNBT(NBT* root, int n);
 
-void nbtlr_Modifier_Start(NBT* root);
+dh_LineOut *nbtlr_Modifier_Start(NBT* root, int modify_list);
 
 
 #ifdef __cplusplus

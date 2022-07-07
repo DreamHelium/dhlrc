@@ -82,6 +82,13 @@ dh_LineOut* dh_LineOut_CreateEmpty();
 void dh_LineOut_Free(dh_LineOut* lo);
 
 char* String_Translate(const char* str);
+/** @brief Return Translation and also the err code \n
+  *        err -1: no translation file \n
+  *        err -2: no corresponding translation
+  *        @return Translation
+  *
+  */
+char* String_TranslateWithErrCode(const char* str, int* err);
 void String_Translate_printfRaw(const char* str);
 void String_Translate_printfWithArgs(const char* str, ...);
 void String_Translate_FreeLocale();

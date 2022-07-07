@@ -18,123 +18,146 @@
 #include "nbt_litereader.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 
-int nbtlr_instance(NBT* root, NBT* parent);
+int nbtlr_instance(NBT* root, int from_parent, int modify_mode);
+int nbtlr_Modifier_instance(NBT* root);
 
 int nbtlr_Start(NBT* root)
 {
-    return nbtlr_instance(root, NULL);
+    return nbtlr_instance(root, 0, 0);
 }
 
-int nbtlr_instance(NBT *root, NBT *parent)
+int nbtlr_instance(NBT *root, int from_parent, int modify_mode)
 {
-    // The start entry is from main or "input number"
-    // So parent should be NULL at first, then
-    // passed nbtlr_Start(root[i],root).
-    // After calling "parent" it should return to the old func. so how?
-    // And which is the parent? Just try to pass the same as parent.
-    // Firstly parent is null and then go to child.
-    // The parent should be the entry and the child is done in func.
-    // So parent is not needed in this func but in "List" since it will
-    // determine whether to read list or read value. With an exception,
-    // call in the main.
-
+    // from_parent shows that it is from a parent instance
+    // return : 1 : back to out instance
+    //          0 : exit
+    //          2 : to modify_mode ( unfinished )
     NBT* read_nbt = root;
     int continue_func = 1;
-    int gret = -2;
     while(continue_func){
         system("clear");
-        printf("The NBT details are below:\n\n");
+        String_Translate_printfWithArgs("dh.nbtlr.detail", root->key);
 
         /* Two cases:
-         * One is no parent NBT, just use the root.
+         * One is no parent NBT, just use the root. (default case)
          * One is reading content in the NBT, still just use the root.
          * If not the cases above, enter child and scan.
          */
 
-        if(parent)
+        // print nbt list, if into a non-list/compound nbt, goto child automatically
+
+        int list = 0;
+        if(from_parent)
+        {
             if(root->type == TAG_List || root->type == TAG_Compound)
+            {
                 read_nbt = root->child;
-        int list = nbtlr_List(read_nbt,parent);
-        if(list <= 0) // also return to origin func
-        {
-            printf("\nNo deeper NBT, press any key to continue.");
-            while(getchar() != '\n' && getchar() != EOF);
-            return 1;
+                list = nbtlr_List(read_nbt, 1); // reading all content
+            }
+            else list = nbtlr_List(read_nbt, 0); // reading content
         }
-        printf("\nInput the number to continue, or p to parent NBT, q to quit: ");
-        char* input = NULL;
-        size_t size = 0;
-        while((gret = getline(&input, &size, stdin)) != -1)
+        else list = nbtlr_List(read_nbt, 0); // default
+
+        /** after listing, if modify_mode, should enter modify mode
+         *
+         *  \todo return code
+         */
+
+        dh_LineOut* input = NULL; // compatable with the process
+        if( modify_mode )
         {
-            char* inputl = input;
-            while(inputl[0] == ' ')
-                inputl++;
-            if(*inputl == 'p')   // return to origin func, return 1
+            if(root != read_nbt)
+                input = nbtlr_Modifier_Start(read_nbt, 1); // could modify the lists in the nbt
+            else if( from_parent )
+                input = nbtlr_Modifier_Start(read_nbt, 0); // don't need to modify lists in the nbt
+            else if( list == 1 && root->type == TAG_Compound )
+                input = nbtlr_Modifier_Start(read_nbt, 0); // safety protection
+            else input = nbtlr_Modifier_Start(read_nbt, 1); // considered as a normal NBT, use the default mode
+        }
+
+        /** if the list is empty the situation will be slightly different, if modify_mode is true it could
+         *  refresh the value
+         */
+
+//        if(list <= 0) // also return to origin func
+//        {
+//            String_Translate_printfRaw("dh.nbtlr.noDeeperNBT");
+//            char gchar;
+//            while( (gchar = getchar()) )
+//                if(gchar == '\n' || gchar == EOF)
+//                    break;
+//            return 1;
+//        }
+
+
+        if(!modify_mode) // if modify_mode, the input is handled by Modifier instance
+        {
+            if(list > 0)
             {
-                inputl++;
-                while(*inputl == ' ')
-                    inputl++;
-                if(*inputl != '\n'){
-                    printf("Unrecognized string! Please enter again: ");
-                    continue;
-                }
-                if(!parent){
-                    printf("You are in root NBT, please choose again: ");
-                    continue;
-                }
-                free(input);
-                return 1;
-            }
-            else if(*inputl == 'q')   // finish the func, return 0
-            {
-                inputl++;
-                while(*inputl == ' ')
-                    inputl++;
-                if(*inputl != '\n'){
-                    printf("Unrecognized string! Please enter again: ");
-                    continue;
-                }
-                free(input);
-                return 0;
-            }
-            else if(*inputl >= '0' && *inputl <= '9')
-            {
-                char* end = NULL;
-                long value = strtol(inputl,&end,10);
-                if(inputl == end){
-                    printf("Unexpected string! Please enter again: ");
-                    continue;
-                }
-                while(*end == ' ')
-                    end++;
-                if(*end != '\n'){
-                    printf("Please just enter one num or 'p' or 'q': ");
-                    continue;
-                }
-                else if(value >= list){
-                    printf("Out of range! Please enter again: ");
-                    continue;
+                if(!from_parent){
+                    String_Translate_printfRaw("dh.nbtlr.askRequest");
+                    input = InputLine_Get_OneOpt(1, 1, 2, 0, list - 1, 'q', 'm');
                 }
                 else
                 {
-                    free(input);
-                    NBT* next_root = nbtlr_ToNextNBT(read_nbt,value);
-                    int ret = 0;
-                    ret = nbtlr_instance(next_root,next_root);
-                    if(ret == 0) // break the program run
-                        continue_func = 0; // use this to break
-                    break; // should be done otherwise you need to input again
+                    String_Translate_printfRaw("dh.nbtlr.askRequestTwice");
+                    input = InputLine_Get_OneOpt(1, 1, 3, 0, list - 1, 'q', 'p', 'm');
                 }
             }
             else
-                printf("No input or unrecognized string, please enter again: ");
+            {
+                String_Translate_printfRaw("dh.nbtlr.returnOrModify");
+                input = InputLine_Get_OneOpt(0, 0, 3, 'p', 'm', 'q');
+            }
         }
-        if(gret == -1)
+        if(input)
         {
-            printf("Terminated input! The reader will exit!\n");
-            continue_func = 0;
+            switch(input->type)
+            {
+            case Integer:
+            {
+                NBT* next_root = nbtlr_ToNextNBT(read_nbt, input->num_i);
+                dh_LineOut_Free(input);
+                int ret = nbtlr_instance(next_root, 1, modify_mode);
+                if(ret == 0)
+                    return 0; // end the instance
+                if(ret == 2)
+                    modify_mode = 1;
+                if(ret == 1)
+                    modify_mode = 0;
+                break; // jump out of switch (if = 1/2)
+            }
+            case Character:
+            {
+                char result = input->val_c;
+                dh_LineOut_Free(input);
+                if(result == 'q')
+                    return 0;
+                if(result == 'p')
+                {
+                    if(modify_mode) // return 2 to enter modify_mode in parent
+                        return 2;
+                    else return 1;
+                }
+                if(result == 'm')
+                    modify_mode = 1;
+                if(result == 'b')
+                    modify_mode = 0; // exit modify mode and refresh
+                break;
+            }
+            default:
+                dh_LineOut_Free(input);
+                if(from_parent)
+                {
+                    if(modify_mode) return 2;
+                    else return from_parent;
+                }
+                else return 0;
+            }
         }
+        else return 0;
     }
     return 0;
 }
@@ -216,11 +239,11 @@ int nbtlr_ListItem(NBT *given_nbt)
  *
  */
 
-int nbtlr_List(NBT *given_nbt, NBT* parent)
+int nbtlr_List(NBT *given_nbt, int read_next)
 {
     NBT* list_nbt = given_nbt;
-    if(parent)
-        if(parent->type == TAG_Compound || parent->type == TAG_List)
+    if(read_next)
+//        if(parent->type == TAG_Compound || parent->type == TAG_List)
             return nbtlr_ListItem(list_nbt);  // It's the first element in the child so pass to scan it
     switch(list_nbt->type){
     case TAG_Compound:
@@ -266,7 +289,73 @@ NBT *nbtlr_ToNextNBT(NBT *root, int n)
     return next_nbt;
 }
 
-void nbtlr_Modifier_Start(NBT *root)
+dh_LineOut* nbtlr_Modifier_Start(NBT *root, int modify_list)
 {
+    while(1)
+    {
+        if(modify_list) // modify all in the list
+        {
+            String_Translate_printfRaw("dh.nbtlr.modifier.notSupported");
+            fflush(stdout);
+            sleep(5);
+            return dh_LineOut_CreateChar('b');
+        }
+        else // only modify the item
+        {
+            if(root->type == TAG_Byte || root->type == TAG_Short || root->type == TAG_Int || root->type == TAG_Long)
+            {
+                int byte = 0;
+                switch(root->type)
+                {
+                case TAG_Byte:
+                    byte = 1;
+                    break;
+                case TAG_Short:
+                    byte = 2;
+                    break;
+                case TAG_Int:
+                    byte = 4;
+                    break;
+                case TAG_Long:
+                    byte = 8;
+                    break;
+                default: break;
+                }
+                String_Translate_printfRaw("dh.nbtlr.modifier.inputInteger");
+                dh_LineOut* out = InputLine_Get_OneOpt_WithByte(byte, 0, 1, 3, 'b', 'p', 'q');
+                if(out)
+                {
+                    if(out->type == Integer)
+                    {
+                        int64_t result = out->num_i;
+                        dh_LineOut_Free(out);
+                        out = NULL;
 
+                        String_Translate_printfWithArgs("dh.nbtlr.modifier.confirmInteger", result);
+                        dh_LineOut* confirm = InputLine_Get_OneOpt(0, 0, 2, 'y', 'n');
+                        if((confirm->type == Character && confirm->val_c == 'y') || confirm->type == Empty )
+                        {
+                            dh_LineOut_Free(confirm);
+                            root->value_i = result;
+                        }
+                        else
+                            dh_LineOut_Free(confirm);
+                    }
+                    else return out;
+                }
+                else return NULL;
+            }
+            else{
+                String_Translate_printfRaw("dh.nbtlr.modifier.notSupported");
+                fflush(stdout);
+                sleep(5);
+                return dh_LineOut_CreateChar('b');
+            }
+        }
+    }
+}
+
+int nbtlr_Modifier_instance(NBT* root)
+{
+    return 0;
 }

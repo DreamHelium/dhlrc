@@ -32,11 +32,12 @@
 ((int##bit##_t*)(new_array))[i] = ((int##o_bit##_t*)(array))[i];
 
 dh_LineOut* InputLine_Get_OneOpt_va(int byte, int range_check, int need_num, int arg_num, va_list va);
-dh_LineOut *InputLine_Get_MoreDigits_va(int byte, int range_check, int need_nums, int arg_num, va_list va);
+dh_LineOut *InputLine_Get_MoreDigits_va(int byte, int range_check, int need_nums, int arg_num, va_list va,
+                                        int same_range, int use_arr, int64_t **arr);
 int char_check(const char* str, char** end, char check_char);
 int multi_char_check(const char* str, int args, va_list char_list, char* result, int *err);
-int search_num(int byte, const char* str, char** end, int rc, int min, int max, int64_t *result, int* err);
-int64_t *num_array_check(const char* str, int range_check, int need_nums, va_list range);
+int search_num(int byte, const char* str, char** end, int rc, int64_t min, int64_t max, int64_t *result, int* err);
+int64_t *num_array_check(int byte, const char* str, int range_check, int need_nums, va_list range, int same_range, int use_arr, int64_t **arr, int *err);
 char* get_locale();
 int range_check(int64_t num, int byte);
 int float_check(double num);
@@ -65,7 +66,7 @@ void inputline_handler_printerr(int err)
         String_Translate_printfRaw("dh.string.outOfRange");
         break;
     case -3:
-        String_Translate_printfRaw("dh.string.outOfBtyeRange");
+        String_Translate_printfRaw("dh.string.outOfByteRange");
         break;
     case -4:
         String_Translate_printfRaw("dh.string.unrecognizeAfterwards");
@@ -79,8 +80,8 @@ void inputline_handler_printerr(int err)
 dh_LineOut* inputline_handler_nummode(const char* str, int byte, int range_check, int* err, va_list va)
 {
     int64_t result = 0;
-    int min = -1;
-    int max = -1;
+    int64_t min = -1;
+    int64_t max = -1;
     va_list va_num;
     va_copy(va_num, va);
     char* end = NULL;
@@ -147,7 +148,7 @@ dh_LineOut *InputLine_Get_OneOpt_va(int byte, int range_check, int need_num, int
             else if(err == 0)
                 err = -5;
         }
-        if(err == -1) // char process
+        if(err == -1 || !need_num) // char process
         {
             err = 0;
             int skip = 0;
@@ -189,77 +190,75 @@ dh_LineOut *InputLine_Get_OneOpt_va(int byte, int range_check, int need_num, int
 }
 
 
-dh_LineOut *InputLine_Get_MoreDigits_va(int byte, int range_check, int need_nums, int arg_num, va_list va)
+dh_LineOut *InputLine_Get_MoreDigits_va(int byte, int range_check, int need_nums, int arg_num, va_list va,
+                                        int same_range, int use_arr, int64_t** arr)
 {
     char* input = NULL;
     size_t size = 0;
     int gret = -2;
     int n_num = need_nums;
-    va_list va_o;
-    va_copy(va_o,va);
     while((gret = getline(&input, &size, stdin)) != -1)
     {
-        va_list va_num;
-        va_copy(va_num, va_o); // Init for num process
         char* inputl = input;
         // ignore blanket.
-        while(isspace(*inputl))
-              inputl++;
         if(need_nums <= 0)
             n_num = 0;
+        int err = 0;
         int64_t* num_array = NULL;
         // read and check numbers.
-        num_array = num_array_check(inputl, range_check, need_nums, va_num);
-        va_end(va_num); // num process finish
+        num_array = num_array_check(byte, input, range_check, n_num, va, same_range, use_arr, arr, &err);
         if( num_array )
         {
-            free(input);
             dh_LineOut* output = dh_LineOut_CreateNumArray(num_array, need_nums, byte, 64/8);
             free(num_array);
             if(output)
             {
-                va_end(va_o);
+                free(input);
                 return output;
             }
-            else
-                String_Translate_printfRaw("dh.string.outOfRangeOrUnrecognize");
+            else err = -5;
         }
-        else{
+        if(err == -1 || !n_num)
+        {
+            err = 0;
             // read character
-            va_list va_char;
-            va_copy(va_char, va_o);
+            int skip = n_num * 2; // default: range_check, not same_range, not use_arr
             if(range_check)
             {
-                for(int i = 0 ; i < (n_num * 2); i++)
-                {
-                    va_arg(va_char,int);
-                }
+                if(use_arr) skip = 0; // using arr doesn't need to skip
+                else if(same_range) skip = 2; // same_range and not use_arr is 2
             }
-            char output_char = 0;
-            if(multi_char_check(inputl, arg_num, va_char, &output_char,NULL))
+            else skip = 0; // not range_check, 0
+            dh_LineOut* out = inputline_handler_charmode(input, skip, arg_num, va, &err);
+            if(out)
             {
-                va_end(va_char);
-                va_end(va_o);
                 free(input);
-                return dh_LineOut_CreateChar(output_char);
+                return out;
             }
-            else if(*inputl == 0){
-                va_end(va_char);
-                va_end(va_o);
-                free(input);
-                return dh_LineOut_CreateEmpty();
-            }
-            else {
-                va_end(va_char);
-                String_Translate_printfRaw("dh.string.unrecognize");
-            }
+            else if(err == 0)
+                err = -5;
         }
+        if(err == -1)
+        {
+           while( isspace(*inputl) )
+               inputl++;
+           if(*inputl == 0)
+           {
+               dh_LineOut* out = dh_LineOut_CreateEmpty();
+               if(out)
+               {
+                   free(input);
+                   return out;
+               }
+               else err = -5;
+           }
+        }
+        inputline_handler_printerr(err);
     }
     if(gret == -1)
     {
         printf("Terminated output!\n");
         free(input);
-        va_end(va_o);
         return NULL;
     }
     return NULL;
@@ -350,7 +349,7 @@ int multi_char_check(const char* str, int args, va_list char_list, char* result,
     return 0;
 }
 
-int search_num(int byte, const char* str, char** end, int rc, int min, int max, int64_t* result, int *err)
+int search_num(int byte, const char* str, char** end, int rc, int64_t min, int64_t max, int64_t* result, int *err)
 {
     const char* str_in = str;
     while( isspace(*str_in) )
@@ -395,47 +394,97 @@ int search_num(int byte, const char* str, char** end, int rc, int min, int max, 
     }
 }
 
-int64_t* num_array_check(const char* str, int range_check, int need_nums, va_list range)
+int64_t* num_array_check(int byte, const char* str, int range_check, int need_nums, va_list range, int same_range, int use_arr, int64_t **arr, int* err)
 {
-    const char* str_in = str;
-    char* end = (char*)str_in;
-    int64_t* output = NULL;
-    int min = -1;
-    int max = -1;
-    for(int i = 0 ; i < need_nums ; i++)
+    if(need_nums > 0)
     {
-        if(range_check){
-            min = va_arg(range, int);
-            max = va_arg(range, int);
-        }
-        int64_t result;
-        if( search_num(sizeof(int64_t), end, &end , range_check, min, max, &result, NULL) )
+        const char* str_in = str;
+        char* end = (char*)str_in;
+        int64_t* output = NULL;
+        int64_t min = -1;
+        int64_t max = -1;
+        va_list va_range;
+        va_copy(va_range, range);
+        if(range_check)
         {
-            int64_t* output_p = (int64_t*)realloc( output, (i + 1) * sizeof(int64_t) );
-            if(!output_p)
+            if(same_range) // same range should just change min/max once
             {
-                free(output);
-                return NULL;
+                if(use_arr)
+                {
+                    min = arr[0][0];
+                    max = arr[1][0];
+                }
+                else  // va-listed range
+                {
+                    min = va_arg(va_range, int64_t);
+                    max = va_arg(va_range, int64_t);
+                }
+            }
+        }
+        for(int i = 0 ; i < need_nums ; i++)
+        {
+            if(range_check){
+                if(!same_range)
+                {
+                    if(use_arr)
+                    {
+                        min = arr[0][i];
+                        max = arr[1][i];
+                    }
+                    else
+                    {
+                        min = va_arg(va_range, int64_t);
+                        max = va_arg(va_range, int64_t);
+                    }
+                }
+            }
+            int64_t result;
+            if( i != 0 )
+            {
+                if( !isspace(*end) )
+                {
+                    if(err) *err = -4;
+                    free(output);
+                    va_end(va_range);
+                    return NULL;
+                }
+            }
+            if( search_num(byte, end, &end , range_check, min, max, &result, err) )
+            {
+                int64_t* output_p = (int64_t*)realloc( output, (i + 1) * sizeof(int64_t) );
+                if(!output_p)
+                {
+                    *err = -5;
+                    free(output);
+                    va_end(va_range);
+                    return NULL;
+                }
+                else
+                {
+                    output = output_p;
+                    output[i] = result;
+                }
             }
             else
             {
-                output = output_p;
-                output[i] = result;
+                va_end(va_range);
+                free(output);
+                return NULL;
             }
         }
-        else
+        va_end(va_range);
+        while( isspace(*end) )
+            end++;
+        if(*end != 0)
         {
+            if(err) *err = -4;
             free(output);
             return NULL;
         }
+        else
+            return output;
     }
-    if(*end != 0)
-    {
-        free(output);
-        return NULL;
-    }
-    else
-        return output;
+    else return NULL;
 }
 
 char *String_Copy(const char *o_str)
@@ -451,6 +500,11 @@ char *String_Copy(const char *o_str)
 
 char* String_Translate(const char* str)
 {
+    return String_TranslateWithErrCode(str, NULL);
+}
+
+char* String_TranslateWithErrCode(const char* str, int* err)
+{
     char* filepos = translation_pos();
     cJSON* trans_json = dhlrc_FileToJSON(filepos);
     free(filepos);
@@ -465,12 +519,16 @@ char* String_Translate(const char* str)
             return output;
         }
         else{
+            if(err) *err = -2; // no corresponding translate
             cJSON_Delete(trans_json);
             return String_Copy(str);
         }
 
     }
-    else return String_Copy(str);
+    else {
+        if(err) *err = -1; // no translation file
+        return String_Copy(str);
+    }
 }
 
 void dh_LineOut_Free(dh_LineOut *lo)
@@ -869,10 +927,13 @@ void String_Translate_printfRaw(const char *str)
 
 void String_Translate_printfWithArgs(const char *str, ...)
 {
-    char* trans = String_Translate(str);
+    int err = 0;
+    char* trans = String_TranslateWithErrCode(str, &err);
     va_list va;
     va_start(va,str);
-    vprintf(trans, va);
+    if(err == 0)
+        vprintf(trans, va);
+    else printf("%s", trans);
     va_end(va);
     free(trans);
 }
@@ -901,7 +962,7 @@ dh_LineOut *InputLine_Get_MoreDigits(int range_check, int need_nums, int arg_num
 {
     va_list va;
     va_start(va, arg_num);
-    dh_LineOut* out = InputLine_Get_MoreDigits_va(64/8, range_check, need_nums, arg_num, va);
+    dh_LineOut* out = InputLine_Get_MoreDigits_va(64/8, range_check, need_nums, arg_num, va, 0, 0 , NULL);
     va_end(va);
     return out;
 }
@@ -910,7 +971,7 @@ dh_LineOut *InputLine_Get_MoreDigits_WithByte(int byte, int range_check, int nee
 {
     va_list va;
     va_start(va, arg_num);
-    dh_LineOut* out = InputLine_Get_MoreDigits_va(byte, range_check, need_nums, arg_num ,va);
+    dh_LineOut* out = InputLine_Get_MoreDigits_va(byte, range_check, need_nums, arg_num ,va, 0, 0, NULL);
     va_end(va);
     return out;
 }

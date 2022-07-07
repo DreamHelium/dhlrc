@@ -1,8 +1,9 @@
 {
     "dh.main.usage":"Usage: %s [file]\n",
+    "dh.main.fileError":"Error when reading file!\n",
+    "dh.main.notValidNBT":"Not a valid NBT file!\n",
+    "dh.main.validNBT":"Valid NBT file!\n",
     "dh.main.startWithoutOption":"Please select a option to start:\n[0] NBT lite reader with modifier\n[1] Litematica material list with recipe combine\n[2] Litematica block reader\n\nPlease enter a number or enter 'q' to exit the program (q): ",
-
-
 
     "dhlrc.regionNum": "There are %d regions:\n",
     "dhlrc.extend.enterRegionNum": "Enter the region number, or enter 'q' to exit program (q): ",
@@ -12,7 +13,17 @@
     "dhlrc.extend.askRequestTwice": "Please enter the coordination of the block again or enter 'b' to choose another region, enter 'q' to exit the program (b): ",
 
 
-    "dh.string.unrecognize": "Unrecognize string! Please enter again: ",
-    "dh.string.outOfRange": "Number out of range (or not enough memory to allocate), Please try to enter again: ",
-    "dh.string.outOfRangeOrUnrecognize": "Number out of range or unrecognize string! Please enter again: "
+    "dh.string.unrecognize": "Unrecognized string, please enter again: ",
+    "dh.string.outOfRange": "Number out of range, please enter again: ",
+    "dh.string.outOfByteRange": "Number out of range of the integer, please enter again: ",
+    "dh.string.unrecognizeAfterwards": "Unrecognized character afterwards (or in the middle) or couldn't meet the need of the input, please enter again: ",
+    "dh.string.notEnoughMemory": "Out of memory? Maybe you should release the memory or take other measures and enter again: ",
+
+    "dh.nbtlr.detail": "The detail of NBT \"%s\" is listed below:\n\n",
+    "dh.nbtlr.askRequest":  "\nPlease enter a number to continue, or enter 'm' to modification mode, 'q' to exit the program (q)： ",
+    "dh.nbtlr.askRequestTwice": "\nPlease enter a number to continue, or enter 'p' to upper NBT, 'm' to modification mode, 'q' to exit the program (p): ",
+    "dh.nbtlr.returnOrModify": "\nNo deeper NBT, please enter 'p' to upper NBT, 'm' to modification mode, 'q' to exit the program (p): ",
+    "dh.nbtlr.modifier.inputInteger": "\nPlease enter an integer, or enter 'b' to exit modification mode, 'p' to upper NBT, 'q' to exit the program (p): ",
+    "dh.nbtlr.modifier.confirmInteger": "\nThe integer you input is %ld, Please confirm [y/n] (y): ",
+    "dh.nbtlr.modifier.notSupported": "\nUnsupported modification mode request, will exit to reading mode."
 }

@@ -14,6 +14,16 @@
     "dhlrc.extend.askRequestTwice": "请再次输入坐标或者输入 “b” 以选择其他区域，输入 “q” 退出程序（b）： ",
 
     "dh.string.unrecognize": "无法识别的字符，请再输入一次： ",
-    "dh.string.outOfRange": "数字越界（或无足够内存分配），请尝试再输入一次： ",
-    "dh.string.outOfRangeOrUnrecognize": "数字超过限定或无法识别的字符，请再输入一次： "
+    "dh.string.outOfRange": "数字超过范围限定，请再输入一次： ",
+    "dh.string.outOfByteRange": "数字越界（超过指定位数的限制），请再输入一次： ",
+    "dh.string.unrecognizeAfterwards": "在输入的字符其后（或其中）有非法字符或不能满足输入要求，请再输入一次： ",
+    "dh.string.notEnoughMemory": "空间不足？建议中止输出以结束程序或采取其它措施后再输入一次： ",
+
+    "dh.nbtlr.detail": "NBT \"%s\" 的细节如下：\n\n",
+    "dh.nbtlr.askRequest":  "\n请输入一个数字以继续，或输入 'm' 进入修改模式，输入 'q' 以退出程序（q）： ",
+    "dh.nbtlr.askRequestTwice": "\n请输入一个数字以继续，或输入 'p' 进入上层NBT， 'm' 进入修改模式， 'q' 以退出程序（p）： ",
+    "dh.nbtlr.returnOrModify": "\n没有子NBT数据，请输入 'p' 进入上层NBT， 'm' 进入修改模式， 'q' 以退出程序（p）： ",
+    "dh.nbtlr.modifier.inputInteger": "\n请输入整数，或输入 'b' 退出修改模式， 'p' 进入上层NBT， 'q' 以退出程序 （p）： ",
+    "dh.nbtlr.modifier.confirmInteger": "\n您输入的整数为%ld，请确认 [y/n] （y）： ",
+    "dh.nbtlr.modifier.notSupported": "\n不支持的修改模式请求，将退出到阅读模式。"
 }
