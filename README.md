@@ -8,62 +8,55 @@ Although it was named as `litematica_reader_c`, **it's not only intended to read
 
 It uses [libnbt](https://github.com/djytw/libnbt) as the library to read litematica file.
 
-## TODO
+## Dependencies
 
-- [ ] Add config.json
-- [ ] Read litematica-generated csv
-- [x] Simple NBT reader
-- [ ] Better support for reading litematica file (Currently it would still be incomplete and can't read item in containers)
-- [ ] Read region details (Ability to read exact block in a region is done in `litematica_region.h` and could be easily used but currently don't write in `example.c`, reading material list uses this ability.)
-- [ ] Ncurses or qt-based interface
-- [ ] Edit litematica file Utilities (Changing version etc.)
+- [libnbt](https://github.com/djytw/libnbt) (already in submodule of the repo)
+- `zlib`或`libdeflate` (See `README.md` in `libnbt`)
+- [cJSON](https://github.com/DaveGamble/cJSON) `>= 1.7.13`
 
-## Provided functions in code (partly)
+## Compile
 
- * Get litematica region information (provided in `litematica_region.h`)
-   * litematica region numbers and names;
-   * block nums in one region's BlockStatePalette;
-   * get index of block and block id in BlockStatePalette.
-   * create material list (use three linked list types in `dhlrc_list.h`)
- * Useful list types (provided in `dhlrc_list.h`)
-   * ItemList (In this program's early implement it was "Block" and was designed to use as a struct array)
-      - Full function implements for create, add item, change number,sort (by numbers), delete item, scan repeated item;
-      - unused "placed" and "available" member for upcoming litematica-generated csv file support (when adding item it would set to 0);
-      - Combining two lists (you should sort by yourself if needed).
-      - **Return 0 if no error occurs, if it's ScanRepeat, return 1 if there's the same item in the list.**
-      - ItemList to "litematica-generated csv"-like csv file.
-  * BlackList and RepeatList
-    - Directly initialize
-      - Read file `config/ignored_blocks.json` and `config/block_items.json`, if failed, use the list provided in code instead.
-      (These two files are from another project [litematica-tools](https://github.com/Kikugie/litematica-tools))
-    - Scan or replace item.
- * Get recipe and combine to original list (**Experimental**, in `recipes_util.h`)
-   - Read recipes (see instructions below).
-   - A dummy implement to combine recipe.
-   - Read vanilla translation file (`translation.json`) to translate item string. (If fails, return NULL.)
+Use `git` to get this repo, then get submodule.
+
+```bash
+git submodule update --init
+```
+
+Change `cJSON` directory to `cjson` manually (Or install `cJSON-devel`/`libcjson-dev` and confirm the version is no lesser than `1.7.13`).
+
+If version doesn't meet the needs, either compile `cJSON` and install or add `cjson/cJSON.h` and `cjson/cJSON.c` in `add_executable` in `CMakeLists.txt` and add repo root directory to `target_link_libraries`.
+
+If there's already CMake installed, just compile using command:
+
+```bash
+cmake -B build
+cmake --build build
+```
+
+If not, compile manually (not recommended).
+
+.pro could no longer be used.
+
+The program now may only POSIX-compatable (currently couldn't be compiled on Windows), if needed rewrite by yourself (The problem seems appear on `setlocale()` and `getline()` functions). For historical reasons it could not be rewrited now.
 
 ## Usage
 
-If no release package is provided, then you should compile it yourself.
+### Main Program
 
-libnbt needs zlib or libdeflate, see libnbt's project README for more details.
+Main program uses the new translation process, copy `lang/` in repo to the executable file's directory. Later version will throw a warning for the translation file not found (Since there's no content in the code, which will affect the normal use when it's no translation).
 
-This project also use [cJSON](https://github.com/DaveGamble/cJSON), if you are in Linux, it may be provided in software repos as 
+Function 1 (Litematica material list with recipe combination) currently doesn't use the translation process (translation there is only valid for block name), if could enter the program, enter 1 to enter this function.
 
-`cJSON-devel` or `libcjson-dev`, otherwise refer to the project's website or use the submodule `cJSON` in this project (Since the package might be old in the repo).
+### Litematica material list with recipe combination
 
-If there's qt creator in your computer, simply imports this project.
+If needed, copy `config/` directory to the executable file's directory to use black list and replace list in the directory (Instead of list in the code).
 
-Or you can directly compile by 
+Find translation file's object value in `.minecraft/assets/indexes`, find in `objects/` (directory with the first 2 characters), copy to executable file's directory and rename to `translation.json`. Program also runs without the file.
 
-```bash
-gcc -lz -lcjson -lm example.c dhlrc_list.c litematica_region.c recipe_util.c file_util.c -o program_name 
-```
+Unpack the jar file of the corresponding version and copy directory `data/minecraft/recipes` to `recipes` in the executable file's directory to use recipe combination.
 
-if you're in Linux. If in other system, try to use the compiler that fits that system.
+Code improvements and translation file of this part will be done in later version.
 
-**This example is also dummy, it process all regions and use dummy ways to combine recipe, you can rewrite it as you wish.**
+### NBT reader, modifier and litematica block reader
 
-**To use the functions in `recipe_util.h`, unpack minecraft client jar and move files in `data/minecraft/recipes` to the directory of the compiled program, put it in `recipes` directory.**
-
-**To use the translation, find translation file index in `.minecraft/assets/indexes/version.json`, and then find in objects, copy to program directory and rename to `translation.json`.**
+Please ensure there's translation file. Do as the request.

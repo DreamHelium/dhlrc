@@ -8,8 +8,9 @@
 
 ## 依赖
 
-- `zlib`
-- `cJSON >= 1.7.13`（~正好用上了两个这版本增加的函数~）
+- [libnbt](https://github.com/djytw/libnbt)（已在本项目中的submodule中）
+- `zlib`或`libdeflate`（参阅`libnbt`的README.md）
+- [cJSON](https://github.com/DaveGamble/cJSON) `>= 1.7.13`（~正好用上了两个这版本增加的函数~）
 
 ## 编译
 
@@ -19,7 +20,9 @@
 git submodule update --init
 ```
 
-然后手动将`cJSON`目录改为`cjson`（或者安装`cJSON-devel`/`libcjson-dev`并确保版本号大于1.7.13）。如果包版本不满足要求，在`CMakeLists.txt`中的`add_execuable`中添加`cjson/cJSON.h`和`cjson/cJSON.c`（因为安装cJSON开发包后目录是/usr/include/cjson，所以改目录以适应代码，~当然我懒得试~）。
+然后手动将`cJSON`目录改为`cjson`（或者安装`cJSON-devel`/`libcjson-dev`并确保版本号大于1.7.13）。
+
+如果包版本不满足要求，在`CMakeLists.txt`中的`add_execuable`中添加`cjson/cJSON.h`和`cjson/cJSON.c`并将项目根目录加入到`target_link_libraries`中（因为安装cJSON开发包后目录是/usr/include/cjson，所以改目录以适应代码，~当然我懒得试~）。
 
 如果有CMake，可以直接使用这下两行编译：
 
@@ -28,11 +31,21 @@ cmake -B build
 cmake --build build
 ```
 
-如果没有，就用老办法，记得**链接zlib和cJSON库就行（参考英文版）**
+如果没有，可自行手动编译（不推荐）。
 
-开发时用的是Qt Creator，所以你也可以打开里面的.pro文件，配置一下就能用了。
+.pro文件已经遗弃，不再使用。
+
+因为某些问题本程序可能只能确保POSIX兼容（现版本在Windows下编译失败），若有需要请进行适当改写（问题大概在确定语言和`getline`函数上），因历史原因还暂时不方便适配。
 
 ## 使用
+
+### 主程序
+
+本程序已经引入了新的翻译机制，将项目文件下的`lang/`复制到可执行目录后即可使用中文界面。后期的改写中将对无翻译进行警告（因为代码中已经没有硬编码进入的文字内容，没有翻译将严重影响使用）。
+
+功能1（投影材料列表和合成表合成功能）没有引入翻译机制（其中的翻译只针对方块名），若能进入程序，直接输入1进入此模式。
+
+### 投影材料列表和合成表合成功能
 
 现在暂时没有对未放置合适文件的警告说明，但是如果需要的话，将项目的`config/`文件夹放入到可执行文件目录中，以使用目录下的黑名单和替换表（而不是我之前调试时写的一些“算是常见的”）。
 
@@ -40,29 +53,9 @@ cmake --build build
 
 将对应的版本的jar包进行拆包后将`data/minecraft/recipes`文件夹的内容原封不动地放置到可执行文件目录下的`recipes`目录中，以使用**实验性的**配方表合成。
 
-现在已经提供了NBT阅读器、投影文件材料列表生成器兼实验性的配方合成功能及投影文件区域的方块阅读器（只能读方块，后续会加入即时启动阅读器并提供有用信息的功能）。
+针对本功能的代码优化和翻译适配将于晚期进行。
 
-## 开发、学习、改进此程序时可以了解的细节
+### NBT阅读器及修改器和投影方块阅读器
 
-* `nbt_litereader.h`中提供了NBT简易阅读器的入口，加载好NBT文件后通过`nbtlr_Start(NBT变量名, NULL);`即可进入此阅读器。
-* `dh_string_util.h`（由“梦氦”写的字符串处理工具，但其实是**针对输入的情况居多**）
-  - `InputLine_Get_OneOpt`得到一个数字或者不获取数字（含对**自然数**（即不含负数）的大小检查，暂时不支持关闭）且能检测对单个字符的检查（支持多种），对输入中断的异常处理。
-    - 定义
-      ```c
-      char* InputLine_Get_OneOpt(int need_num, int min, int max, int arg_num, ...);
-      ```
-    - 使用
-      `need_num`指定是否需要数字，0以禁用。
-      `min`与`max`为大小限定，`arg_num`是所需检查的字符数，后接需要的字符，如`'q','b'`。
-      成功时，数字则返回输入值，字符则为`malloc()`分配的可储存两字符内存的指针，失败返回NULL，成功返回的值均需`free()`释放。
-  - `InputLine_Get_MoreDigits`与上述函数类似，不过能处理更多的数字（与上述类似，同样不支持关闭大小检查且**需在可变参数处输入大小值限定后再紧跟字符**），对输入中断的异常处理。
-    - 使用
-      在上面写了……不过有一点注意，成功时数字不可能返回数字数组，由以下函数进行导出。
-  - `NumArray_From_String`从字符串中抽离数组
-    - 定义
-      ```c
-      long* NumArray_From_String(const char* string, int* nums, int char_check);
-      ```
-    - 使用
-      `nums`指向的值将会变为数组元素个数，`char_check`非零时进行字符检查，若出现非数字字符、非回车或‘\0’则返回NULL。
-* 懒得写了，其他先看英文版的（虽然不全，最近加了好多新函数）。
+请确保放置了翻译文件，以确保正常使用。按提示进行操作。
+

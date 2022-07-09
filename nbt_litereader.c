@@ -20,12 +20,234 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+typedef struct NBT_Pos
+{
+    /** The level of the pos in the NBT */
+    int level;
+    /** The pos of child in the NBT, len: level */
+    int* child;
+    /** NBT tree, len: level + 1 (include root as the first when level is 0) */
+    NBT** tree;
+    /** Current NBT */
+    NBT* current;
+    /** Represent the item in the latest tree */
+    int item;
+}
+NBT_Pos;
+
+NBT_Pos* NBT_Pos_init(NBT* root);
+int NBT_Pos_AddToTree(NBT_Pos* pos, int n);
+int NBT_Pos_DeleteLast(NBT_Pos* pos);
+void NBT_Pos_Free(NBT_Pos* pos);
 int nbtlr_instance(NBT* root, int from_parent, int modify_mode);
+int nbtlr_instance_ng(NBT_Pos* pos, int modify_mode);
 int nbtlr_Modifier_instance(NBT* root);
+
+NBT_Pos* NBT_Pos_init(NBT* root)
+{
+    if(root)
+    {
+        NBT_Pos* out = (NBT_Pos*)malloc(sizeof(NBT_Pos));
+        if(out)
+        {
+            out->level = 0;
+            out->tree = (NBT**)malloc(sizeof(NBT*));
+            out->tree[0] = root;
+            out->child = NULL;
+            out->current = root;
+            out->item = -1;
+            return out;
+        }
+        else return NULL;
+    }
+    else return NULL;
+}
+
+int NBT_Pos_AddToTree(NBT_Pos* pos, int n)
+{
+    NBT* current = nbtlr_ToNextNBT(pos->tree[pos->level], n); // Analyse what's next
+    if(current)
+    {
+        if(current->type == TAG_Compound || current->type == TAG_List)
+        {
+            current = current->child; // into the child, the root of the next tree.
+            pos->current = current;
+            pos->level++;
+            int* new_child = (int*)realloc(pos->child, pos->level * sizeof(int));
+            if(new_child)
+            {
+                pos->child = new_child;
+                pos->child[pos->level - 1] = n;
+                NBT** new_tree = (NBT**)realloc(pos->tree, (pos->level + 1) * sizeof(NBT*));
+                if(new_tree)
+                {
+                    pos->tree = new_tree;
+                    pos->tree[pos->level] = current;
+                    return 1;
+                }
+                else return 0;
+            }
+            else return 0;
+        }
+        else
+        {
+            // It's not tree
+            pos->current = current;
+            pos->item = n;
+            return 1;
+        }
+    }
+    else return 0; // current is null, which is unexpected
+}
+
+int NBT_Pos_DeleteLast(NBT_Pos* pos)
+{
+    if(pos->item != -1)
+    {
+        pos->item = -1;
+        pos->current = pos->tree[pos->level];
+        return 1;
+    }
+    else
+    {
+        pos->level--;
+        if(pos->level < 0)
+        {
+            return 0; // or libclang complain about garbage data
+        }
+        else
+        {
+            if(pos->level == 0)
+            {
+                free(pos->child);
+                pos->child = NULL;
+            }
+            else
+            {
+                int* new_child = (int*)realloc(pos->child, pos->level * sizeof(int));
+                if(new_child)
+                {
+                    pos->child = new_child;
+                }
+                else return 0;
+            }
+            NBT** new_tree = (NBT**)realloc(pos->tree, (pos->level + 1) * sizeof(NBT*));
+            if(new_tree)
+            {
+                pos->tree = new_tree;
+                pos->current = pos->tree[pos->level];
+                return 1;
+            }
+            else return 0;
+        }
+    }
+}
+
+void NBT_Pos_Free(NBT_Pos* pos)
+{
+    free(pos->child);
+    free(pos->tree);
+    free(pos);
+}
 
 int nbtlr_Start(NBT* root)
 {
-    return nbtlr_instance(root, 0, 0);
+    NBT_Pos* pos = NBT_Pos_init(root);
+    int ret = nbtlr_instance_ng(pos, 0);
+    NBT_Pos_Free(pos);
+    return ret;
+}
+
+int nbtlr_instance_ng(NBT_Pos* pos, int modify_mode)
+{
+    while(1)
+    {
+        system("clear");
+        char* key;
+        if(pos->level == 0 || pos->item != -1)
+            key = pos->current->key;
+        else
+            key = nbtlr_ToNextNBT( pos->tree[pos->level - 1] , pos->child[pos->level - 1])->key;
+        String_Translate_printfWithArgs("dh.nbtlr.detail", key);
+        int list = 0;
+
+        // Show list (pos->item = -1 represents that it's in the tree, read items)
+        list = nbtlr_List(pos->current, (pos->item == -1) );
+
+        // modify_mode option
+        dh_LineOut* input = NULL;
+        if(modify_mode)
+        {
+            input = nbtlr_Modifier_Start( pos->current, (pos->item == -1));
+//            if(pos->level == 0){
+//                if(pos->tree[0]->type == TAG_Compound)
+//                    input = nbtlr_Modifier_Start( pos->tree[0] , 0 ); // it's the root, so don't allow modifying list
+//                else input = nbtlr_Modifier_Start( pos->tree[0], 1 ); // but if it's not compound, considered as a normal NBT (Unexpected)
+//            }
+//            else if(read_nbt != o_nbt)
+//                input = nbtlr_Modifier_Start( read_nbt, 1); // enter child and edit the compound/list
+//            else input = nbtlr_Modifier_Start( read_nbt, 0);
+        }
+        else
+        {
+            if(list > 0)
+            {
+                if(pos->level == 0){
+                    String_Translate_printfRaw("dh.nbtlr.askRequest");
+                    input = InputLine_Get_OneOpt(1, 1, 2, 0, list - 1, 'q', 'm');
+                }
+                else
+                {
+                    String_Translate_printfRaw("dh.nbtlr.askRequestTwice");
+                    input = InputLine_Get_OneOpt(1, 1, 3, 0, list - 1, 'q', 'p', 'm');
+                }
+            }
+            else
+            {
+                String_Translate_printfRaw("dh.nbtlr.returnOrModify");
+                input = InputLine_Get_OneOpt(0, 0, 3, 'p', 'm', 'q');
+            }
+        }
+        if(input)
+        {
+            switch(input->type)
+            {
+            case Integer:
+            {
+                if(!NBT_Pos_AddToTree(pos, input->num_i))
+                {
+                    dh_LineOut_Free(input);
+                    return -1;
+                }
+                dh_LineOut_Free(input);
+                break;
+            }
+            case Character:
+            {
+                char opt = input->val_c;
+                dh_LineOut_Free(input);
+                if(opt == 'q')
+                    return 0;
+                if(opt == 'm')
+                    modify_mode = 1;
+                if(opt == 'b')
+                    modify_mode = 0;
+                if(opt == 'p')
+                    if(!NBT_Pos_DeleteLast(pos)) return -1;
+                break;
+            }
+            default:
+            {
+                dh_LineOut_Free(input);
+                if( pos->level == 0 )
+                    return 0;
+                else NBT_Pos_DeleteLast(pos);
+                break;
+            }
+            }
+        }
+        else return -1;
+    }
 }
 
 int nbtlr_instance(NBT *root, int from_parent, int modify_mode)
