@@ -25,7 +25,12 @@ add_executable(litematica_reader_c
 	       recipe_util.c
 	       )
 
-target_link_libraries(litematica_reader_c PUBLIC m z cjson dhutil)
+#add_definitions(-DLIBNBT_USE_LIBDEFLATE)
+#add_definitions(-DDH_DEBUG_IN_IDE)
+
+target_link_libraries(litematica_reader_c PUBLIC m z cjson dhutil
+#    deflate
+)
 
 target_include_directories(litematica_reader_c PUBLIC
 	"${PROJECT_BINARY_DIR}"

@@ -23,6 +23,7 @@ extern "C"{
 #endif
 
 #include <stdint.h>
+#include <stdio.h>
 
 /** The type of the dh_Line_IO */
 typedef enum dh_out_type{
@@ -100,6 +101,8 @@ dh_StrArray* dh_StrArray_Init(const char* str);
 int dh_StrArray_AddStr(dh_StrArray** arr ,const char* str);
 
 void dh_StrArray_Free(dh_StrArray* arr);
+
+ssize_t dh_string_getline(char** input, size_t* n, FILE* stream);
 
 
 

@@ -21,6 +21,7 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include "litematica_region.h"
+#include "dh_string_util.h"
 
 long* NumArray_GetFromInput(int* array_num, int max_num)
 {
@@ -29,7 +30,7 @@ long* NumArray_GetFromInput(int* array_num, int max_num)
     char* input = NULL;
     size_t len = 0;
     printf("Input nums directly, or type 'a' for all numbers: ");
-    while(getline(&input,&len,stdin) != -1)
+    while(dh_string_getline(&input,&len,stdin) != -1)
     {
         char* inputl = input;
         while(*inputl == ' ')

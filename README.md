@@ -11,7 +11,7 @@ It uses [libnbt](https://github.com/djytw/libnbt) as the library to read litemat
 ## Dependencies
 
 - [libnbt](https://github.com/djytw/libnbt) (already in submodule of the repo)
-- `zlib`或`libdeflate` (See `README.md` in `libnbt`)
+- `zlib` or `libdeflate` (See `README.md` in `libnbt`)
 - [cJSON](https://github.com/DaveGamble/cJSON) `>= 1.7.13`
 
 ## Compile
@@ -37,7 +37,7 @@ If not, compile manually (not recommended).
 
 .pro could no longer be used.
 
-The program now may only POSIX-compatable (currently couldn't be compiled on Windows), if needed rewrite by yourself (The problem seems appear on `setlocale()` and `getline()` functions). For historical reasons it could not be rewrited now.
+The implement now determines whether `getline()` could be used, if not then use the implement written by myself (In `dh_string_getline()`). In environment that don't provide `LC_MESSAGES`, it is replaced with `LC_ALL`. But due to a small problem I couldn't compile it on Windows (The msys environment in my computer may have some problems and couldn't link cjson).
 
 ## Usage
 

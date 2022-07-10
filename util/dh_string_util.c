@@ -134,7 +134,7 @@ dh_LineOut *InputLine_Get_OneOpt_va(int byte, int range_check, int need_num, int
     char* input = NULL;
     size_t size = 0;
     int gret = -2;
-    while((gret = getline(&input, &size, stdin)) != -1)
+    while((gret = dh_string_getline(&input, &size, stdin)) != -1)
     {
         int err = 0;
         if(need_num) // num process
@@ -197,7 +197,7 @@ dh_LineOut *InputLine_Get_MoreDigits_va(int byte, int range_check, int need_nums
     size_t size = 0;
     int gret = -2;
     int n_num = need_nums;
-    while((gret = getline(&input, &size, stdin)) != -1)
+    while((gret = dh_string_getline(&input, &size, stdin)) != -1)
     {
         char* inputl = input;
         // ignore blanket.
@@ -311,7 +311,24 @@ int char_check(const char* str, char** end, char check_char)
     const char* str_in = str;
     while( isspace(*str_in) )
         str_in++;
-    if(*str_in == check_char)
+    char lower_char = 0;
+    char upper_char = 0;
+    if(!isalpha(check_char))
+    {
+        if(end) *end = (char*)str_in;
+        return 0;
+    }
+    else if(islower(check_char))
+    {
+        lower_char = check_char;
+        upper_char = toupper(lower_char);
+    }
+    else if(isupper(check_char))
+    {
+        upper_char = check_char;
+        lower_char = tolower(upper_char);
+    }
+    if(*str_in == lower_char || *str_in == upper_char)
     {
         if(end)
         {
@@ -616,7 +633,11 @@ char* get_locale()
         if(override_lang == NULL || !strcmp(override_lang,""))
         {
             free(override_lang);
+#ifdef LC_MESSAGES
             char* lang = setlocale(LC_MESSAGES, "");
+#else
+            char* lang = setlocale(LC_ALL, "");
+#endif
             char* lang_copy = lang;
             int point_pos = 0;
             while(*lang_copy != '.' && *lang_copy != '\0' && *lang_copy != '@')
@@ -1003,4 +1024,68 @@ char* translation_pos()
     strcat( filepos, ".json");
     free(dir);
     return filepos;
+}
+
+ssize_t dh_string_getline(char** input, size_t* n, FILE* stream)
+{
+#if ((defined __STDC_ALLOC_LIB__ && __STDC_WANT_LIB_EXT2__ == 1 ) || (_POSIX_C_SOURCE - 0 ) >= 200809L)
+    return getline(input, n, stream); // If provide getline, recommend using this.
+#else // my own getline implement
+
+    if(!input || !n) // determine whether input/n is valid
+    {
+        errno = EINVAL;
+        return -1;
+    }
+
+    if(*n <= 0)
+        *n = 5; // Initize a 5-length buffer
+    char* new_input = (char*)realloc(*input, *n * sizeof(char));
+
+    if(new_input)
+    {
+        *input = new_input;
+        char read_char;
+        ssize_t char_num = 0;
+        while( (read_char = fgetc(stream)) != EOF )
+        {
+            if(char_num == *n) // not enough memory for input
+            {
+                *n += 5;
+                char* re_input = (char*)realloc(*input, *n * sizeof(char));
+                if(re_input)
+                    *input = re_input;
+                else
+                {
+                    *n -= 5;
+                    return -1;
+                }
+            }
+            (*input)[char_num] = read_char; // write the num in
+            char_num++;
+            if(read_char == '\n')
+                break; // Read finish
+        }
+        if(read_char != EOF)
+        {
+            if(char_num == *n)
+            {
+                *n += 5;
+                char* final_input = (char*)realloc(*input, *n * sizeof(char));
+                if(final_input)
+                    *input = final_input;
+                else
+                {
+                    *n -= 5;
+                    return -1;
+                }
+            }
+            (*input)[char_num] = '\0';
+            return char_num;
+        }
+        else return -1;
+    }
+    else return -1;
+
+#endif
 }
