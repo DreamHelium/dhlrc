@@ -60,6 +60,23 @@ typedef struct dh_StrArray{
     int num;
 } dh_StrArray;
 
+typedef struct dh_string_impl{
+
+    /** printf() replacement */
+    int (*printf_fn)(const char*, ...);
+
+    /** vprintf() replacement */
+    int (*vprintf_fn)(const char*, va_list);
+
+    /** getline() replacement (without FILE*), in some cases you need to code implement by yourself */
+    ssize_t (*getline_fn)(char**, size_t*);
+
+    /** free memory function used in getline() */
+    void (*getline_free)(void*);
+} dh_string_impl;
+
+/** Change implement of this string util, might be needed if using in GUI lib or other cases */
+void dh_string_ChangeImpl(dh_string_impl* impl);
 
 /** Get a line input and return output (1 number or character), return 64bit num by default */
 dh_LineOut* InputLine_Get_OneOpt(int range_check, int need_num, int arg_num, ...);
@@ -102,6 +119,7 @@ int dh_StrArray_AddStr(dh_StrArray** arr ,const char* str);
 
 void dh_StrArray_Free(dh_StrArray* arr);
 
+/** Use getline() if provided, otherwise use another implement */
 ssize_t dh_string_getline(char** input, size_t* n, FILE* stream);
 
 

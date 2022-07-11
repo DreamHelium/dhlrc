@@ -31,6 +31,20 @@
 #define ARR_COPY_TRANS(bit,o_bit,new_array,array,len) for(int i = 0 ; i < len ; i++) \
 ((int##bit##_t*)(new_array))[i] = ((int##o_bit##_t*)(array))[i];
 
+typedef struct internal_impl{
+    int (*printf_fn)(const char*, ...);
+    int (*vprintf_fn)(const char*, va_list);
+    ssize_t (*getline_fn)(char**, size_t*);
+    void (*getline_free)(void*);
+} internal_impl;
+
+ssize_t default_getline(char** input, size_t* n)
+{
+    return dh_string_getline(input, n, stdin);
+}
+
+static internal_impl global_impl = { printf, vprintf, default_getline, free };
+
 dh_LineOut* InputLine_Get_OneOpt_va(int byte, int range_check, int need_num, int arg_num, va_list va);
 dh_LineOut *InputLine_Get_MoreDigits_va(int byte, int range_check, int need_nums, int arg_num, va_list va,
                                         int same_range, int use_arr, int64_t **arr);
@@ -55,6 +69,36 @@ void inputline_handler_printerr(int err);
 
 char* main_lang = NULL;
 char* secondary_lang = NULL;
+
+// The thought of implement was from cJSON's cJSON_InitHooks()
+void dh_string_ChangeImpl(dh_string_impl* impl)
+{
+    if(impl == NULL)
+    {
+        // reset
+        global_impl.printf_fn = printf;
+        global_impl.vprintf_fn = vprintf;
+        global_impl.getline_fn = default_getline;
+        global_impl.getline_free = free;
+        return;
+    }
+
+    if(impl->printf_fn)
+        global_impl.printf_fn = impl->printf_fn;
+    else global_impl.printf_fn = printf;
+
+    if(impl->vprintf_fn)
+        global_impl.vprintf_fn = impl->vprintf_fn;
+    else global_impl.vprintf_fn = vprintf;
+
+    if(impl->getline_fn)
+        global_impl.getline_fn = impl->getline_fn;
+    else global_impl.getline_fn = default_getline;
+
+    if(impl->getline_free)
+        global_impl.getline_free = impl->getline_free;
+    else global_impl.getline_free = free;
+}
 
 void inputline_handler_printerr(int err)
 {
@@ -134,7 +178,7 @@ dh_LineOut *InputLine_Get_OneOpt_va(int byte, int range_check, int need_num, int
     char* input = NULL;
     size_t size = 0;
     int gret = -2;
-    while((gret = dh_string_getline(&input, &size, stdin)) != -1)
+    while((gret = global_impl.getline_fn(&input, &size)) != -1)
     {
         int err = 0;
         if(need_num) // num process
@@ -142,7 +186,7 @@ dh_LineOut *InputLine_Get_OneOpt_va(int byte, int range_check, int need_num, int
             dh_LineOut* num = inputline_handler_nummode(input, byte, range_check, &err, va);
             if(num)
             {
-                free(input);
+                global_impl.getline_free(input);
                 return num;
             }
             else if(err == 0)
@@ -156,7 +200,7 @@ dh_LineOut *InputLine_Get_OneOpt_va(int byte, int range_check, int need_num, int
             dh_LineOut* out = inputline_handler_charmode(input, skip, arg_num, va, &err);
             if(out)
             {
-                free(input);
+                global_impl.getline_free(input);
                 return out;
             }
             else if(err == 0)
@@ -172,7 +216,7 @@ dh_LineOut *InputLine_Get_OneOpt_va(int byte, int range_check, int need_num, int
                 dh_LineOut* out = dh_LineOut_CreateEmpty();
                 if(out)
                 {
-                    free(input);
+                    global_impl.getline_free(input);
                     return out;
                 }
                 else err = -5;
@@ -183,7 +227,7 @@ dh_LineOut *InputLine_Get_OneOpt_va(int byte, int range_check, int need_num, int
     if(gret == -1)
     {
         printf("Terminated output!\n");
-        free(input);
+        global_impl.getline_free(input);
         return NULL;
     }
     return NULL;
@@ -197,7 +241,7 @@ dh_LineOut *InputLine_Get_MoreDigits_va(int byte, int range_check, int need_nums
     size_t size = 0;
     int gret = -2;
     int n_num = need_nums;
-    while((gret = dh_string_getline(&input, &size, stdin)) != -1)
+    while((gret = global_impl.getline_fn(&input, &size)) != -1)
     {
         char* inputl = input;
         // ignore blanket.
@@ -213,7 +257,7 @@ dh_LineOut *InputLine_Get_MoreDigits_va(int byte, int range_check, int need_nums
             free(num_array);
             if(output)
             {
-                free(input);
+                global_impl.getline_free(input);
                 return output;
             }
             else err = -5;
@@ -232,7 +276,7 @@ dh_LineOut *InputLine_Get_MoreDigits_va(int byte, int range_check, int need_nums
             dh_LineOut* out = inputline_handler_charmode(input, skip, arg_num, va, &err);
             if(out)
             {
-                free(input);
+                global_impl.getline_free(input);
                 return out;
             }
             else if(err == 0)
@@ -247,7 +291,7 @@ dh_LineOut *InputLine_Get_MoreDigits_va(int byte, int range_check, int need_nums
                dh_LineOut* out = dh_LineOut_CreateEmpty();
                if(out)
                {
-                   free(input);
+                   global_impl.getline_free(input);
                    return out;
                }
                else err = -5;
@@ -258,7 +302,7 @@ dh_LineOut *InputLine_Get_MoreDigits_va(int byte, int range_check, int need_nums
     if(gret == -1)
     {
         printf("Terminated output!\n");
-        free(input);
+        global_impl.getline_free(input);
         return NULL;
     }
     return NULL;
@@ -942,7 +986,7 @@ dh_LineOut *dh_LineOut_CreateEmpty()
 void String_Translate_printfRaw(const char *str)
 {
     char* trans = String_Translate(str);
-    printf("%s",trans);
+    global_impl.printf_fn("%s",trans);
     free(trans);
 }
 
@@ -953,8 +997,8 @@ void String_Translate_printfWithArgs(const char *str, ...)
     va_list va;
     va_start(va,str);
     if(err == 0)
-        vprintf(trans, va);
-    else printf("%s", trans);
+        global_impl.vprintf_fn(trans, va);
+    else global_impl.printf_fn("%s", trans);
     va_end(va);
     free(trans);
 }
