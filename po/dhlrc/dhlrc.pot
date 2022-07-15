@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-07-15 23:41+0800\n"
+"POT-Creation-Date: 2022-07-16 00:28+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -90,4 +90,57 @@ msgstr ""
 msgid ""
 "Please enter the coordination of the block again, or enter 'b' to choose "
 "another region, enter 'q' to exit the program (b): "
+msgstr ""
+
+#: src/nbt_litereader.c:181
+#, c-format
+msgid ""
+"The detail of NBT \"%s\" is listed below:\n"
+"\n"
+msgstr ""
+
+#: src/nbt_litereader.c:208
+#, c-format
+msgid ""
+"\n"
+"Please enter a number to continue, or enter 'm' to modification mode, 's' to "
+"save NBT file, 'q' to exit the program (q): "
+msgstr ""
+
+#: src/nbt_litereader.c:214
+#, c-format
+msgid ""
+"\n"
+"Please enter a number to continue, or enter 'm' to modification mode, 'p' to "
+"upper NBT, 's' to save NBT file, 'q' to exit the program (p): "
+msgstr ""
+
+#: src/nbt_litereader.c:221
+#, c-format
+msgid ""
+"\n"
+"No deeper NBT, please enter 'm' to modification mode, 'p' to upper NBT, 's' "
+"to save NBT file, 'q' to exit the program (p): "
+msgstr ""
+
+#: src/nbt_litereader.c:544 src/nbt_litereader.c:596
+#, c-format
+msgid ""
+"\n"
+"Unsupported modification mode request, will exit to reading mode."
+msgstr ""
+
+#: src/nbt_litereader.c:570
+#, c-format
+msgid ""
+"\n"
+"Please enter an integer, or enter 'b' to exit modification mode, 'p' to "
+"upper NBT, 'q' to exit the program (p): "
+msgstr ""
+
+#: src/nbt_litereader.c:581
+#, c-format
+msgid ""
+"\n"
+"The integer you input is %ld, please confirm [Y/n] (Y): "
 msgstr ""

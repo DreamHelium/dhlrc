@@ -25,6 +25,8 @@
 #ifndef DH_DISABLE_TRANSLATION
 #include <libintl.h>
 #define _(str) gettext (str)
+#else
+#define _(str) str
 #endif
 
 typedef struct NBT_Pos
@@ -176,7 +178,7 @@ int nbtlr_instance_ng(NBT_Pos* pos, int modify_mode)
             key = pos->current->key;
         else
             key = nbtlr_ToNextNBT( pos->tree[pos->level - 1] , pos->child[pos->level - 1])->key;
-        String_Translate_printfWithArgs("dh.nbtlr.detail", key);
+        printf(_("The detail of NBT \"%s\" is listed below:\n\n"), key);
         int list = 0;
 
         // Show list (pos->item = -1 represents that it's in the tree, read items)
@@ -203,18 +205,21 @@ int nbtlr_instance_ng(NBT_Pos* pos, int modify_mode)
             if(list > 0)
             {
                 if(pos->level == 0){
-                    String_Translate_printfRaw("dh.nbtlr.askRequest");
+                    printf(_("\nPlease enter a number to continue, or enter 'm' to modification mode, \
+'s' to save NBT file, 'q' to exit the program (q): "));
                     input = InputLine_Get_OneOpt(1, 1, 3, 0, list - 1, 'q', 'm', 's');
                 }
                 else
                 {
-                    String_Translate_printfRaw("dh.nbtlr.askRequestTwice");
+                    printf(_("\nPlease enter a number to continue, or enter 'm' to modification mode, \
+'p' to upper NBT, 's' to save NBT file, 'q' to exit the program (p): "));
                     input = InputLine_Get_OneOpt(1, 1, 4, 0, list - 1, 'q', 'p', 'm', 's');
                 }
             }
             else
             {
-                String_Translate_printfRaw("dh.nbtlr.returnOrModify");
+                printf(_("\nNo deeper NBT, please enter 'm' to modification mode, 'p' to upper NBT, \
+'s' to save NBT file, 'q' to exit the program (p): "));
                 input = InputLine_Get_OneOpt(0, 0, 4, 'p', 'm', 'q', 's');
             }
         }
@@ -536,7 +541,7 @@ dh_LineOut* nbtlr_Modifier_Start(NBT *root, int modify_list)
     {
         if(modify_list) // modify all in the list
         {
-            String_Translate_printfRaw("dh.nbtlr.modifier.notSupported");
+            printf(_("\nUnsupported modification mode request, will exit to reading mode."));
             fflush(stdout);
             sleep(5);
             return dh_LineOut_CreateChar('b');
@@ -562,7 +567,8 @@ dh_LineOut* nbtlr_Modifier_Start(NBT *root, int modify_list)
                     break;
                 default: break;
                 }
-                String_Translate_printfRaw("dh.nbtlr.modifier.inputInteger");
+                printf(_("\nPlease enter an integer, or enter 'b' to exit modification mode, 'p' to upper NBT, \
+'q' to exit the program (p): "));
                 dh_LineOut* out = InputLine_Get_OneOpt_WithByte(byte, 0, 1, 3, 'b', 'p', 'q');
                 if(out)
                 {
@@ -572,7 +578,7 @@ dh_LineOut* nbtlr_Modifier_Start(NBT *root, int modify_list)
                         dh_LineOut_Free(out);
                         out = NULL;
 
-                        String_Translate_printfWithArgs("dh.nbtlr.modifier.confirmInteger", result);
+                        printf(_("\nThe integer you input is %ld, please confirm [Y/n] (Y): "), result);
                         dh_LineOut* confirm = InputLine_Get_OneOpt(0, 0, 2, 'y', 'n');
                         if((confirm->type == Character && confirm->val_c == 'y') || confirm->type == Empty )
                         {
@@ -587,7 +593,7 @@ dh_LineOut* nbtlr_Modifier_Start(NBT *root, int modify_list)
                 else return NULL;
             }
             else{
-                String_Translate_printfRaw("dh.nbtlr.modifier.notSupported");
+                printf(_("\nUnsupported modification mode request, will exit to reading mode."));
                 fflush(stdout);
                 sleep(5);
                 return dh_LineOut_CreateChar('b');
