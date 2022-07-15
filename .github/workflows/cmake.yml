@@ -25,7 +25,7 @@ jobs:
     - name: Install cJSON from source
       run: |
         pwd
-        cd ${{github.workspace}}/cJSON && mkdir build
+        cd ${{github.workspace}}/src/cJSON && mkdir build
         cd build
         cmake ..
         make

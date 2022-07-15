@@ -18,9 +18,6 @@
 #include "dh_string_util.h"
 #include "file_util.h"
 #include <stdlib.h>
-#include <stdio.h>
-#include <stdint.h>
-#include <stdarg.h>
 #include <string.h>
 #include <ctype.h>
 #include <cjson/cJSON.h>
@@ -28,17 +25,24 @@
 #include <errno.h>
 #include <float.h>
 
+#ifndef DH_DISABLE_TRANSLATION
+#include <libintl.h>
+#define _(str) dgettext ("dhutil", str)
+#else
+#define _(str) str
+#endif
+
 #define ARR_COPY_TRANS(bit,o_bit,new_array,array,len) for(int i = 0 ; i < len ; i++) \
 ((int##bit##_t*)(new_array))[i] = ((int##o_bit##_t*)(array))[i];
 
 typedef struct internal_impl{
     int (*printf_fn)(const char*, ...);
     int (*vprintf_fn)(const char*, va_list);
-    ssize_t (*getline_fn)(char**, size_t*);
+    __ssize_t (*getline_fn)(char**, size_t*);
     void (*getline_free)(void*);
 } internal_impl;
 
-ssize_t default_getline(char** input, size_t* n)
+__ssize_t default_getline(char** input, size_t* n)
 {
     return dh_string_getline(input, n, stdin);
 }
@@ -69,6 +73,7 @@ void inputline_handler_printerr(int err);
 
 char* main_lang = NULL;
 char* secondary_lang = NULL;
+static int translation_inited = 0;
 
 // The thought of implement was from cJSON's cJSON_InitHooks()
 void dh_string_ChangeImpl(dh_string_impl* impl)
@@ -100,23 +105,33 @@ void dh_string_ChangeImpl(dh_string_impl* impl)
     else global_impl.getline_free = free;
 }
 
+/* The only position to output error */
 void inputline_handler_printerr(int err)
 {
+#ifndef DH_DISABLE_TRANSLATION
+    if(!translation_inited) /*  */
+    {
+        bindtextdomain("dhutil", "locale");
+        translation_inited = 1;
+    }
+#endif
     switch (err) {
     case -1:
-        String_Translate_printfRaw("dh.string.unrecognize");
+        global_impl.printf_fn(_("Unrecognized string, please enter again: "));
         break;
     case -2:
-        String_Translate_printfRaw("dh.string.outOfRange");
+        global_impl.printf_fn(_("Number out of range, please enter again: "));
         break;
     case -3:
-        String_Translate_printfRaw("dh.string.outOfByteRange");
+        global_impl.printf_fn(_("Number out of range of the integer, please enter again: "));
         break;
     case -4:
-        String_Translate_printfRaw("dh.string.unrecognizeAfterwards");
+        global_impl.printf_fn(_("Unrecognized charater afterwards (or in the middle), or couldn't meet the need of the input. \
+please enter again: "));
         break;
     case -5:
-        String_Translate_printfRaw("dh.string.notEnoughMemory");
+        global_impl.printf_fn(_("Out of memory? Maybe you should take some measures to release the memory and \
+try to enter again: "));
         break;
     }
 }
@@ -550,6 +565,9 @@ int64_t* num_array_check(int byte, const char* str, int range_check, int need_nu
 
 char *String_Copy(const char *o_str)
 {
+#if (defined __STDC_VERSION__ && __STDC_VERSION__ > 201710L) || _POSIX_C_SOURCE >= 200809L
+    return strdup(o_str); // use strdup if provided
+#else
     char* str = malloc( (strlen(o_str) + sizeof("") ) * sizeof(char));
     if(str)
     {
@@ -557,6 +575,7 @@ char *String_Copy(const char *o_str)
         return str;
     }
     else return NULL;
+#endif
 }
 
 char* String_Translate(const char* str)
@@ -577,6 +596,7 @@ char* String_TranslateWithErrCode(const char* str, int* err)
             char* trans = cJSON_GetStringValue(trans_item);
             char* output = String_Copy(trans);
             cJSON_Delete(trans_json);
+            if(err) *err = 0;
             return output;
         }
         else{
@@ -677,12 +697,15 @@ char* get_locale()
         if(override_lang == NULL || !strcmp(override_lang,""))
         {
             free(override_lang);
-#ifdef LC_MESSAGES
+#if defined LC_MESSAGES
+            /* POSIX defined LC_MESSAGES, so when using standard C this is also available */
             char* lang = setlocale(LC_MESSAGES, "");
 #else
+            /* Tested in Windows, the language variable is not the same as POSIX, but just leave this to make it run (hopefully) */
             char* lang = setlocale(LC_ALL, "");
 #endif
             char* lang_copy = lang;
+            if(lang_copy){ /* In case the return value is NULL */
             int point_pos = 0;
             while(*lang_copy != '.' && *lang_copy != '\0' && *lang_copy != '@')
             {
@@ -696,13 +719,19 @@ char* get_locale()
             ret[point_pos] = '\0';
             main_lang = String_Copy(ret);
             free(ret);
+            }
+            else{
+                fprintf(stderr, "Not a valid language variable, will fallback to en_US.\n");
+                main_lang = String_Copy("en_US");
+            }
         }
         else
         {
             main_lang = String_Copy(override_lang);
             free(override_lang);
         }
-        // Determine translation file exists or fallback to en_US
+        /* Determine translation file exists or fallback to en_US
+         * But translation_pos need language variable, so main_lang shouldn't be null */
         char* filepos = translation_pos();
         cJSON* trans_json = dhlrc_FileToJSON(filepos);
         free(filepos);
@@ -1070,7 +1099,7 @@ char* translation_pos()
     return filepos;
 }
 
-ssize_t dh_string_getline(char** input, size_t* n, FILE* stream)
+__ssize_t dh_string_getline(char** input, size_t* n, FILE* stream)
 {
 #if ((defined __STDC_ALLOC_LIB__ && __STDC_WANT_LIB_EXT2__ == 1 ) || (_POSIX_C_SOURCE - 0 ) >= 200809L)
     return getline(input, n, stream); // If provide getline, recommend using this.
@@ -1090,7 +1119,7 @@ ssize_t dh_string_getline(char** input, size_t* n, FILE* stream)
     {
         *input = new_input;
         char read_char;
-        ssize_t char_num = 0;
+        __ssize_t char_num = 0;
         while( (read_char = fgetc(stream)) != EOF )
         {
             if(char_num == *n) // not enough memory for input

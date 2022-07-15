@@ -1,6 +1,6 @@
 [submodule "libnbt"]
-	path = libnbt
+	path = src/libnbt
 	url = https://github.com/djytw/libnbt.git
 [submodule "cJSON"]
-	path = cJSON
+	path = src/cJSON
 	url = https://github.com/DaveGamble/cJSON

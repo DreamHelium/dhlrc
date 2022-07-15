@@ -24,6 +24,7 @@ extern "C"{
 
 #include <stdint.h>
 #include <stdio.h>
+#include <stdarg.h>
 
 /** The type of the dh_Line_IO */
 typedef enum dh_out_type{
@@ -69,7 +70,7 @@ typedef struct dh_string_impl{
     int (*vprintf_fn)(const char*, va_list);
 
     /** getline() replacement (without FILE*), in some cases you need to code implement by yourself */
-    ssize_t (*getline_fn)(char**, size_t*);
+    __ssize_t (*getline_fn)(char**, size_t*);
 
     /** free memory function used in getline() */
     void (*getline_free)(void*);
@@ -99,12 +100,12 @@ dh_LineOut* dh_LineOut_CreateEmpty();
 
 void dh_LineOut_Free(dh_LineOut* lo);
 
+/* I'm porting this project to gettext, so these functions might be of no use. */
 char* String_Translate(const char* str);
 /** @brief Return Translation and also the err code \n
   *        err -1: no translation file \n
   *        err -2: no corresponding translation
   *        @return Translation
-  *
   */
 char* String_TranslateWithErrCode(const char* str, int* err);
 void String_Translate_printfRaw(const char* str);
@@ -120,7 +121,7 @@ int dh_StrArray_AddStr(dh_StrArray** arr ,const char* str);
 void dh_StrArray_Free(dh_StrArray* arr);
 
 /** Use getline() if provided, otherwise use another implement */
-ssize_t dh_string_getline(char** input, size_t* n, FILE* stream);
+__ssize_t dh_string_getline(char** input, size_t* n, FILE* stream);
 
 
 

@@ -2,9 +2,21 @@
 
 *.pro.user*
 *.txt.user*
+src/*.user*
 
 # Vim temporary files
 
 .*.swp
 
+# build test
+
 build/
+
+# kdevelop-generated files
+
+.kdev4/
+*.kdev4
+
+# po temporary
+
+po/*/*.po~

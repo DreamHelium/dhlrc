@@ -22,6 +22,11 @@
 #include <string.h>
 #include <unistd.h>
 
+#ifndef DH_DISABLE_TRANSLATION
+#include <libintl.h>
+#define _(str) gettext (str)
+#endif
+
 typedef struct NBT_Pos
 {
     /** The level of the pos in the NBT */

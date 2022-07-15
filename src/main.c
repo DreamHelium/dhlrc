@@ -26,7 +26,16 @@
 #include "file_util.h"
 #include "nbt_litereader.h"
 #include "dh_string_util.h"
-#include "dhlrc_config.h"
+/*#include "dhlrc_config.h"*/
+
+#ifndef DH_DISABLE_TRANSLATION
+#include <libintl.h>
+#include <locale.h>
+#define _(str) gettext (str)
+#else
+#define _(str) str
+#endif
+
 #define _TOSTR(a) #a
 #define TOSTR(a) _TOSTR(a)
 
@@ -47,14 +56,26 @@ int debug();
 
 int main(int argc,char** argb)
 {
+#ifndef DH_DISABLE_TRANSLATION
+    setlocale(LC_CTYPE, "");
+    setlocale(LC_MESSAGES, "");
+    bindtextdomain("dhlrc", "locale");
+    textdomain("dhlrc");
+#endif
     //printf( TOSTR(dhlrc_VERSION_MAJOR) "." TOSTR(dhlrc_VERSION_MINOR) "." TOSTR(dhlrc_VERSION_PATCH) "\n" );
     if(argc == 1)
     {
-        char* trans = String_Translate("dh.main.usage");
-        if(!strcmp(trans,"dhlrc.usage"))
+        /*
+        int err = 0;
+        char* trans = String_TranslateWithErrCode("dh.main.usage", &err);
+        if(err != 0)
             printf("Usage: %s [file] \n",argb[0]);
         else printf(trans, argb[0]);
         free(trans);
+        */
+
+
+        printf(_("Usage: %s [file]\n"), argb[0]);
 #ifndef DH_DEBUG_IN_IDE
         String_Translate_FreeLocale();
         return -1;
@@ -70,7 +91,7 @@ int main(int argc,char** argb)
 #endif
     if(!data)
     {
-        String_Translate_printfRaw("dh.main.fileError");
+        puts(_("Error when reading file."));
         String_Translate_FreeLocale();
         return -10;
     }
@@ -79,26 +100,38 @@ int main(int argc,char** argb)
 
     if(!root)
     {
-        String_Translate_printfRaw("dh.main.notValidNBT");
+        puts(_("Not a valid NBT file!"));
         String_Translate_FreeLocale();
         return -1;
     }
     else
     {
-        dhlrc_mkconfig();
-        String_Translate_printfRaw("dh.main.validNBT");
-        start_func(root, start_without_option());
+        if(!dhlrc_FileExist("config.json"))
+            dhlrc_mkconfig();
+        int err = 0;
+//        char* trans = String_TranslateWithErrCode("dh.main.validNBT", &err);
+//        if(err != 0) // err encounter
+//            printf("Error when loading translation file, although the program could still run, you may have no idea what to do next.\n"
+//                   "If you know how to operate, just continue. If not, you could enter 'q' to exit the program.\n");
+//        else printf("%s",trans);
+//        free(trans);
+//        trans = NULL;
+
+        puts(_("Valid NBT file!"));
+        int ret = start_func(root, start_without_option());
         NBT_Free(root);
         String_Translate_FreeLocale();
-        return 0;
+        return ret;
     }
 }
 
 enum option start_without_option()
 {
-    char* trans = String_Translate("dh.main.startWithoutOption");
-    printf("%s", trans);
-    free(trans);
+    printf(_("There are three functions:\n\
+[0] NBT lite reader with modifier\n\
+[1] Litematica material list with recipe combination\n\
+[2] Litematica block reader\n\n"));
+    printf(_("Please select an option, or enter 'q' to exit the program (q): "));
 #ifndef DH_DEBUG_IN_IDE
     dh_LineOut* output = InputLine_Get_OneOpt(1,1,1,0,2,'q');
 #else
@@ -155,7 +188,7 @@ void start_lrc_main(NBT *root)
     char** region_name = lite_region_Name(root,region_num,&err);
     if(region_name)
     {
-        printf("There are %d regions:\n",region_num);
+        printf(_("There are %d regions:\n"),region_num);
         for(int i = 0 ; i < region_num ; i++)
         {
             printf("[%2d] %s\n",i,region_name[i]);
@@ -167,7 +200,7 @@ void start_lrc_main(NBT *root)
         {
             for(int i = 0 ; i < process_num ; i++)
             {
-                printf("Processing: region %d / %d : [%ld] %s \n",
+                printf(_("Processing: region %d / %d : [%ld] %s \n"),
                        i,process_num,process_region_i[i],region_name[process_region_i[i]]);
                 il = lite_region_ItemListExtend(root, process_region_i[i], il);
             }
@@ -193,16 +226,13 @@ void start_lrc_extend(NBT* root)
         while(continue_func_out)
         {
             system("clear");
-            char* trans = String_Translate("dhlrc.regionNum");
-            printf(trans,region_num);
-            free(trans);
+            printf(_("There are %d regions:\n"),region_num);
             for(int i = 0 ; i < region_num ; i++)
             {
                 printf("[%2d] %s\n",i,region_name[i]);
             }
-            trans = String_Translate("dhlrc.extend.enterRegionNum");
-            printf("%s",trans);
-            free(trans);
+
+            printf(_("Enter the region number, or enter 'q' to exit program (q): "));
             dh_LineOut* output1 = InputLine_Get_OneOpt(1,1,1,0,region_num,'q');
             if(output1)
             {
@@ -215,14 +245,14 @@ void start_lrc_extend(NBT* root)
                     system("clear");
 
                     int* region_size = lite_region_SizeArray(root, read_region_num);
-                    char* trans = String_Translate("dhlrc.extend.regionInfo");
-                    printf(trans, read_region_num, region_name[read_region_num], region_size[0], region_size[1], region_size[2]);
-                    free(trans);
+                    printf(_("You are reading region: [%2d] %s:\nThe size of the region is (%d, %d, %d).\n\n")
+                           , read_region_num, region_name[read_region_num], region_size[0], region_size[1], region_size[2]);
 
-                    trans = String_Translate("dhlrc.extend.askRequest");
-                    printf("%s",trans);
-                    free(trans);
-                    dh_LineOut* output2 = InputLine_Get_MoreDigits(1, 3, 2, 0, region_size[0] - 1, 0, region_size[1] - 1, 0 ,region_size[2] - 1, 'b', 'q');
+                    printf(_("Please enter the coordination of the block (just numbers of x y z without additional character\n\
+or enter 'b' to choose another region, enter 'q' to exit the program (b): "));
+
+                    dh_LineOut* output2 = InputLine_Get_MoreDigits(1, 3, 2, 0,
+                                                                   region_size[0] - 1, 0, region_size[1] - 1, 0 ,region_size[2] - 1, 'b', 'q');
                     if(output2)
                     {
                         switch(output2->type)
@@ -287,15 +317,9 @@ int lrc_extend_instance(NBT* root, int r_num, int64_t *array)
     char** block_name = lite_region_BlockNameArray(root, r_num, block_num);
     int index = lite_region_BlockIndex(root, r_num, array[0], array[1], array[2]);
     int id = lite_region_BlockArrayPos(root, r_num, index);
-//    char lang[] = "en_us";
-    char* trans_first = String_Translate("dhlrc.extend.blockPosInfo");
-    if(strcmp(trans_first, "dhlrc.extend.blockPosInfo"))
-        printf(trans_first, array[0], array[1], array[2], block_name[id]);
-    else printf("Translation lost! But the block is %s.\n",block_name[id]);
-    free(trans_first);
-    trans_first = String_Translate("dhlrc.extend.askRequestTwice");
-    printf("%s", trans_first);
-    free(trans_first);
+    printf(_("The block in (%ld, %ld, %ld) is %s.\n"), array[0], array[1], array[2], block_name[id]);
+    printf(_("Please enter the coordination of the block again, or enter 'b' to choose another region, \
+enter 'q' to exit the program (b): "));
     int* region_size = lite_region_SizeArray(root, r_num);
     dh_LineOut* input = InputLine_Get_MoreDigits(1, 3, 2, 0, region_size[0] - 1, 0, region_size[1] - 1, 0, region_size[2] - 1, 'b', 'q');
     if(input){

@@ -1,0 +1,93 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the dhlrc package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: dhlrc\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2022-07-15 23:41+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: src/main.c:78
+#, c-format
+msgid "Usage: %s [file]\n"
+msgstr ""
+
+#: src/main.c:94
+msgid "Error when reading file."
+msgstr ""
+
+#: src/main.c:103
+msgid "Not a valid NBT file!"
+msgstr ""
+
+#: src/main.c:120
+msgid "Valid NBT file!"
+msgstr ""
+
+#: src/main.c:130
+#, c-format
+msgid ""
+"There are three functions:\n"
+"[0] NBT lite reader with modifier\n"
+"[1] Litematica material list with recipe combination\n"
+"[2] Litematica block reader\n"
+"\n"
+msgstr ""
+
+#: src/main.c:134
+#, c-format
+msgid "Please select an option, or enter 'q' to exit the program (q): "
+msgstr ""
+
+#: src/main.c:191 src/main.c:229
+#, c-format
+msgid "There are %d regions:\n"
+msgstr ""
+
+#: src/main.c:203
+#, c-format
+msgid "Processing: region %d / %d : [%ld] %s \n"
+msgstr ""
+
+#: src/main.c:235
+#, c-format
+msgid "Enter the region number, or enter 'q' to exit program (q): "
+msgstr ""
+
+#: src/main.c:248
+#, c-format
+msgid ""
+"You are reading region: [%2d] %s:\n"
+"The size of the region is (%d, %d, %d).\n"
+"\n"
+msgstr ""
+
+#: src/main.c:251
+#, c-format
+msgid ""
+"Please enter the coordination of the block (just numbers of x y z without "
+"additional character\n"
+"or enter 'b' to choose another region, enter 'q' to exit the program (b): "
+msgstr ""
+
+#: src/main.c:320
+#, c-format
+msgid "The block in (%ld, %ld, %ld) is %s.\n"
+msgstr ""
+
+#: src/main.c:321
+#, c-format
+msgid ""
+"Please enter the coordination of the block again, or enter 'b' to choose "
+"another region, enter 'q' to exit the program (b): "
+msgstr ""

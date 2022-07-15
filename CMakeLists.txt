@@ -1,37 +1,12 @@
-cmake_minimum_required(VERSION 3.10)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.1)
+PROJECT( dhlrc )
 
-project(dhlrc LANGUAGES C VERSION 0.1.0)
+find_package(Gettext REQUIRED)
 
-if (NOT CMAKE_BUILD_TYPE)
-	set(CMAKE_BUILD_TYPE Release)
-endif()
+include_directories(/usr/lib64/gcc/x86_64-suse-linux/12/include)
 
+add_subdirectory( src )
+add_subdirectory( po )
 
-configure_file(dhlrc_config.h.in dhlrc_config.h)
-
-add_subdirectory(util)
-
-add_executable(litematica_reader_c 
-	       main.c
-               libnbt/nbt.h
-	       libnbt/nbt.c
-	       litematica_region.c
-	       litematica_region.h
-	       nbt_litereader.h
-	       nbt_litereader.c
-	       dhlrc_list.h
-	       dhlrc_list.c
-	       recipe_util.h
-	       recipe_util.c
-	       )
-
-#add_definitions(-DLIBNBT_USE_LIBDEFLATE)
-#add_definitions(-DDH_DEBUG_IN_IDE)
-
-target_link_libraries(litematica_reader_c PUBLIC m z cjson dhutil
-#    deflate
-)
-
-target_include_directories(litematica_reader_c PUBLIC
-	"${PROJECT_BINARY_DIR}"
-	)
+file(COPY ${dhlrc_SOURCE_DIR}/lang DESTINATION ${dhlrc_BINARY_DIR}/src)
+file(COPY ${dhlrc_SOURCE_DIR}/config DESTINATION ${dhlrc_BINARY_DIR}/src)
