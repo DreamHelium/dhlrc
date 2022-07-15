@@ -3,12 +3,18 @@ PROJECT( dhlrc )
 
 find_package(Gettext)
 
+set(DH_ENABLE_TRANSLATION true)
+
 if(NOT GETTEXT_FOUND)
+    set(DH_ENABLE_TRANSLATION false)
+endif()
+
+if(NOT DH_ENABLE_TRANSLATION)
     add_definitions(-DDH_DISABLE_TRANSLATION)
 endif()
 
 add_subdirectory( src )
-if(NOT DEFINED DH_DISAABLE_TRANSLATION)
+if(DH_ENABLE_TRANSLATION)
     add_subdirectory( po )
 endif()
 
