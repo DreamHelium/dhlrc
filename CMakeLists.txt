@@ -1,7 +1,7 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 3.1)
 PROJECT( dhlrc )
 
-find_package(Gettext REQUIRED)
+find_package(Gettext)
 
 if(NOT GETTEXT_FOUND)
     add_definitions(-DDH_DISABLE_TRANSLATION)
