@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-07-15 22:13+0800\n"
+"POT-Creation-Date: 2022-07-18 00:33+0800\n"
 "PO-Revision-Date: 2022-07-15 23:35+0800\n"
 "Last-Translator: Dream Helium\n"
 "Language-Team: Chinese <>\n"
@@ -19,26 +19,43 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Lokalize 22.04.3\n"
 
-#: src/util/dh_string_util.c:120
+#: src/util/dh_string_util.c:138
 msgid "Unrecognized string, please enter again: "
 msgstr "无法识别的字符，请再输入一次： "
 
-#: src/util/dh_string_util.c:123
+#: src/util/dh_string_util.c:141
 msgid "Number out of range, please enter again: "
 msgstr "数字越界，请再输入一次： "
 
-#: src/util/dh_string_util.c:126
+#: src/util/dh_string_util.c:144
 msgid "Number out of range of the integer, please enter again: "
 msgstr "数字越界（超过指定位数的限制），请再输入一次： "
 
-#: src/util/dh_string_util.c:129
+#: src/util/dh_string_util.c:147
 msgid ""
 "Unrecognized charater afterwards (or in the middle), or couldn't meet the "
 "need of the input. please enter again: "
-msgstr "在输入的字符其后（或其中）有非法字符或不能满足输入要求，请再输入一次： "
+msgstr ""
+"在输入的字符其后（或其中）有非法字符或不能满足输入要求，请再输入一次： "
 
-#: src/util/dh_string_util.c:133
+#: src/util/dh_string_util.c:151
 msgid ""
 "Out of memory? Maybe you should take some measures to release the memory and "
 "try to enter again: "
 msgstr "内存不足？或许您需考虑采取措施释放内存然后再尝试输入： "
+
+#: src/util/dh_string_util.c:154
+msgid "Repeated number! please enter again: "
+msgstr ""
+
+#: src/util/dh_string_util.c:267 src/util/dh_string_util.c:359
+#, c-format
+msgid "Terminated output!\n"
+msgstr ""
+
+#: src/util/dh_string_util.c:644
+#, c-format
+msgid ""
+"An unsuitable range given! Although it's unexpected, the program would still "
+"run.\n"
+msgstr ""

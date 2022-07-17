@@ -51,7 +51,7 @@ void start_lrc_main(NBT* root);
 void start_lrc_extend(NBT* root);
 int lrc_extend_instance(NBT* root, int r_num, int64_t* array);
 #ifdef DH_DEBUG_IN_IDE
-int debug();
+int debug(NBT* root);
 #endif
 
 int main(int argc,char** argb)
@@ -77,7 +77,6 @@ int main(int argc,char** argb)
 
         printf(_("Usage: %s [file]\n"), argb[0]);
 #ifndef DH_DEBUG_IN_IDE
-        String_Translate_FreeLocale();
         return -1;
 #endif
     }
@@ -92,7 +91,6 @@ int main(int argc,char** argb)
     if(!data)
     {
         puts(_("Error when reading file."));
-        String_Translate_FreeLocale();
         return -10;
     }
     NBT* root = NBT_Parse(data,size);
@@ -101,14 +99,12 @@ int main(int argc,char** argb)
     if(!root)
     {
         puts(_("Not a valid NBT file!"));
-        String_Translate_FreeLocale();
         return -1;
     }
     else
     {
         if(!dhlrc_FileExist("config.json"))
             dhlrc_mkconfig();
-        int err = 0;
 //        char* trans = String_TranslateWithErrCode("dh.main.validNBT", &err);
 //        if(err != 0) // err encounter
 //            printf("Error when loading translation file, although the program could still run, you may have no idea what to do next.\n"
@@ -120,7 +116,6 @@ int main(int argc,char** argb)
         puts(_("Valid NBT file!"));
         int ret = start_func(root, start_without_option());
         NBT_Free(root);
-        String_Translate_FreeLocale();
         return ret;
     }
 }
@@ -172,7 +167,7 @@ int start_func(NBT *root, enum option opt)
         return 0;
 #ifdef DH_DEBUG_IN_IDE
     case Debug:
-        debug();
+        debug(root);
         return 0;
 #endif
     case Exit:
@@ -362,8 +357,11 @@ enter 'q' to exit the program (b): "));
 
 #ifdef DH_DEBUG_IN_IDE
 
-int debug()
+int debug(NBT* root)
 {
+    LiteRegion* lr = LiteRegion_Create(root, 5);
+    lite_region_BlockArrayPos(root, 5 , 0);
+    LiteRegion_Free(lr);
     return 0;
 }
 

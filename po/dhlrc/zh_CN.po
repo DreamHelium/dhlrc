@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-07-16 00:25+0800\n"
+"POT-Creation-Date: 2022-07-18 00:33+0800\n"
 "PO-Revision-Date: 2022-07-15 23:36+0800\n"
 "Last-Translator: Dream Helium\n"
 "Language-Team: Chinese <>\n"
@@ -24,19 +24,19 @@ msgstr ""
 msgid "Usage: %s [file]\n"
 msgstr "用法：%s [文件]\n"
 
-#: src/main.c:94
+#: src/main.c:93
 msgid "Error when reading file."
 msgstr "在读取文件时出错。"
 
-#: src/main.c:103
+#: src/main.c:101
 msgid "Not a valid NBT file!"
 msgstr "不是一个有效的NBT文件！"
 
-#: src/main.c:120
+#: src/main.c:116
 msgid "Valid NBT file!"
 msgstr "有效的NBT文件！"
 
-#: src/main.c:130
+#: src/main.c:125
 #, c-format
 msgid ""
 "There are three functions:\n"
@@ -51,27 +51,27 @@ msgstr ""
 "[2] 投影方块阅读器\n"
 "\n"
 
-#: src/main.c:134
+#: src/main.c:129
 #, c-format
 msgid "Please select an option, or enter 'q' to exit the program (q): "
 msgstr "请选择一个选项，或输入 “q” 退出程序 (q): "
 
-#: src/main.c:191 src/main.c:229
+#: src/main.c:186 src/main.c:224
 #, c-format
 msgid "There are %d regions:\n"
 msgstr "有 %d 个区域：\n"
 
-#: src/main.c:203
+#: src/main.c:198
 #, c-format
 msgid "Processing: region %d / %d : [%ld] %s \n"
 msgstr "处理区域 %d / %d : [%ld] %s 中……\n"
 
-#: src/main.c:235
+#: src/main.c:230
 #, c-format
 msgid "Enter the region number, or enter 'q' to exit program (q): "
 msgstr "输入区域号，或输入 “q” 退出程序 (q)： "
 
-#: src/main.c:248
+#: src/main.c:243
 #, c-format
 msgid ""
 "You are reading region: [%2d] %s:\n"
@@ -82,7 +82,7 @@ msgstr ""
 "这个区域的大小为 (%d, %d, %d)。\n"
 "\n"
 
-#: src/main.c:251
+#: src/main.c:246
 #, c-format
 msgid ""
 "Please enter the coordination of the block (just numbers of x y z without "
@@ -92,12 +92,12 @@ msgstr ""
 "请输入方块坐标（仅输入数字，不需要额外字符）\n"
 "或输入 “b” 选择其他区域，输入 “q” 退出程序 (b): "
 
-#: src/main.c:320
+#: src/main.c:315
 #, c-format
 msgid "The block in (%ld, %ld, %ld) is %s.\n"
 msgstr "在 (%ld, %ld, %ld) 处的方块是 %s 。\n"
 
-#: src/main.c:321
+#: src/main.c:316
 #, c-format
 msgid ""
 "Please enter the coordination of the block again, or enter 'b' to choose "
@@ -155,4 +155,9 @@ msgstr ""
 msgid ""
 "\n"
 "The integer you input is %ld, please confirm [Y/n] (Y): "
+msgstr ""
+
+#: src/litematica_region.c:401
+#, c-format
+msgid "[%.2f%%] Processing Blocks %lu/%lu, (%3d,%3d,%3d)/(%3d,%3d,%3d)\r"
 msgstr ""

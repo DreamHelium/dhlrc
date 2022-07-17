@@ -1,6 +1,8 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 3.1)
 PROJECT( dhlrc )
 
+set(CMAKE_BUILD_TYPE Release)
+
 find_package(Gettext)
 
 set(DH_ENABLE_TRANSLATION true)
@@ -12,6 +14,8 @@ endif()
 if(NOT DH_ENABLE_TRANSLATION)
     add_definitions(-DDH_DISABLE_TRANSLATION)
 endif()
+
+#add_definitions(-DDH_DEBUG_IN_IDE)
 
 add_subdirectory( src )
 if(DH_ENABLE_TRANSLATION)

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-07-16 00:28+0800\n"
+"POT-Creation-Date: 2022-07-18 00:33+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,26 +17,42 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: src/util/dh_string_util.c:120
+#: src/util/dh_string_util.c:138
 msgid "Unrecognized string, please enter again: "
 msgstr ""
 
-#: src/util/dh_string_util.c:123
+#: src/util/dh_string_util.c:141
 msgid "Number out of range, please enter again: "
 msgstr ""
 
-#: src/util/dh_string_util.c:126
+#: src/util/dh_string_util.c:144
 msgid "Number out of range of the integer, please enter again: "
 msgstr ""
 
-#: src/util/dh_string_util.c:129
+#: src/util/dh_string_util.c:147
 msgid ""
 "Unrecognized charater afterwards (or in the middle), or couldn't meet the "
 "need of the input. please enter again: "
 msgstr ""
 
-#: src/util/dh_string_util.c:133
+#: src/util/dh_string_util.c:151
 msgid ""
 "Out of memory? Maybe you should take some measures to release the memory and "
 "try to enter again: "
+msgstr ""
+
+#: src/util/dh_string_util.c:154
+msgid "Repeated number! please enter again: "
+msgstr ""
+
+#: src/util/dh_string_util.c:267 src/util/dh_string_util.c:359
+#, c-format
+msgid "Terminated output!\n"
+msgstr ""
+
+#: src/util/dh_string_util.c:644
+#, c-format
+msgid ""
+"An unsuitable range given! Although it's unexpected, the program would still "
+"run.\n"
 msgstr ""

@@ -49,30 +49,48 @@ __ssize_t default_getline(char** input, size_t* n)
 
 static internal_impl global_impl = { printf, vprintf, default_getline, free };
 
-dh_LineOut* InputLine_Get_OneOpt_va(int byte, int range_check, int need_num, int arg_num, va_list va);
-dh_LineOut *InputLine_Get_MoreDigits_va(int byte, int range_check, int need_nums, int arg_num, va_list va,
+
+static dh_LineOut* InputLine_Get_OneOpt_va(int byte, int range_check, int need_num, int arg_num, va_list va);
+static dh_LineOut* InputLine_Get_OneOpt_va_CharArg(int byte, int range_check, int need_num, char* arg, va_list va);
+static dh_LineOut *InputLine_Get_MoreDigits_va(int byte, int range_check, int need_nums, int arg_num, va_list va,
                                         int same_range, int use_arr, int64_t **arr);
-int char_check(const char* str, char** end, char check_char);
-int multi_char_check(const char* str, int args, va_list char_list, char* result, int *err);
-int search_num(int byte, const char* str, char** end, int rc, int64_t min, int64_t max, int64_t *result, int* err);
-int64_t *num_array_check(int byte, const char* str, int range_check, int need_nums, va_list range, int same_range, int use_arr, int64_t **arr, int *err);
-char* get_locale();
-int range_check(int64_t num, int byte);
-int float_check(double num);
-void* resize_array(int byte, int o_byte, void* array, int len);
-char* translation_pos();
+static int char_check(const char* str, char** end, char check_char);
+static int multi_char_check_CharArg(const char* str, char* args, char* result, int* err);
+static int search_num(int byte, const char* str, char** end, int rc, int64_t min, int64_t max, int64_t *result, int* err);
+static int64_t *num_array_check(int byte, const char* str, int range_check, int need_nums, va_list range, int same_range, int use_arr, int64_t **arr, int *err);
+static int64_t* line_numarray_check(int byte, int* array_len ,const char* str, int need_nums,
+                                    int range_nums, int64_t** range, int* err, int repeat_check);
+static int range_check(int64_t num, int byte);
+static int float_check(double num);
+static void* resize_array(int byte, int o_byte, void* array, int len);
+
 // err in the case:
 // -1 : Not expected character
 // -2 : Out of range (min and max)
 // -3 : Out of range (int64_t or byte-spec)
 // -4 : Not expected character afterwards
 // -5 : Memory not enough?
-dh_LineOut* inputline_handler_nummode(const char* str, int byte, int range_check, int* err, va_list va);
-dh_LineOut* inputline_handler_charmode(const char* str, int skip_va, int arg_num , va_list va, int *err);
-void inputline_handler_printerr(int err);
+static dh_LineOut* inputline_handler_nummode(const char* str, int byte, int range_check, int* err, va_list va);
+static dh_LineOut* inputline_handler_nummode_noVa(const char* str, int byte, int range_check, int* err, int min, int max);
+static dh_LineOut* inputline_handler_charmode(const char* str, int skip_va, int arg_num , va_list va, int *err);
+static dh_LineOut* inputline_handler_charmode_CharArg(const char* str, char* args, int* err);
+static void inputline_handler_printerr(int err);
 
-char* main_lang = NULL;
-char* secondary_lang = NULL;
+#define DH_NOT_EXPECTED (-1)
+#define DH_ERROR_RANGE  (-2)
+#define DH_ERROR_BYTE_RANGE (-3)
+#define DH_NOT_EXPECTED_AFTER   (-4)
+#define DH_NO_MEMORY    (-5)
+#define DH_REPEATED (-6)
+#define DH_GIVEN_RANGE_ERROR    (-7)
+
+#ifdef DH_USE_TRANSLATION_DEPRECATED
+static char* main_lang = NULL;
+static char* secondary_lang = NULL;
+static char* get_locale();
+static char* translation_pos();
+#endif
+
 static int translation_inited = 0;
 
 // The thought of implement was from cJSON's cJSON_InitHooks()
@@ -106,7 +124,7 @@ void dh_string_ChangeImpl(dh_string_impl* impl)
 }
 
 /* The only position to output error */
-void inputline_handler_printerr(int err)
+static void inputline_handler_printerr(int err)
 {
 #ifndef DH_DISABLE_TRANSLATION
     if(!translation_inited) /*  */
@@ -132,63 +150,70 @@ please enter again: "));
     case -5:
         global_impl.printf_fn(_("Out of memory? Maybe you should take some measures to release the memory and \
 try to enter again: "));
+    case DH_REPEATED:
+        global_impl.printf_fn(_("Repeated number! please enter again: "));
         break;
     }
 }
 
-dh_LineOut* inputline_handler_nummode(const char* str, int byte, int range_check, int* err, va_list va)
+static dh_LineOut* inputline_handler_nummode(const char* str, int byte, int range_check, int* err, va_list va)
 {
-    int64_t result = 0;
     int64_t min = -1;
     int64_t max = -1;
     va_list va_num;
     va_copy(va_num, va);
-    char* end = NULL;
     if(range_check) // update min and max
     {
         min = va_arg(va_num, int64_t);
         max = va_arg(va_num, int64_t);
     }
+    va_end(va_num);
+    return inputline_handler_nummode_noVa(str, byte, range_check, err, min, max);
+}
+
+static dh_LineOut* inputline_handler_nummode_noVa(const char* str, int byte, int range_check, int* err, int min, int max)
+{
+    char* end = NULL;
+    int64_t result;
     if(search_num(byte, str, &end, range_check, min, max, &result, err))
     {
         while( isspace(*end) )
             end++;
-        va_end(va_num);
-        if(*end == 0) // completely success
-            return dh_LineOut_CreateNum(result, byte);
-        else
-        {
-            if(err) *err = -4;
+        if(*end == 0)
+            return dh_LineOut_CreateNum(result , byte);
+        else{
+            if(err) *err = DH_NOT_EXPECTED_AFTER;
             return NULL;
         }
     }
-    else
-    {
-        va_end(va_num);
-        return NULL;
-    }
+    else return NULL;
 }
 
-dh_LineOut* inputline_handler_charmode(const char* str, int skip_va, int arg_num, va_list va, int* err)
+
+static dh_LineOut* inputline_handler_charmode(const char* str, int skip_va, int arg_num, va_list va, int* err)
 {
     va_list va_char;
     va_copy(va_char, va);
     for(int i = 0 ; i < skip_va ; i++)
         va_arg(va_char, int64_t);
-    char out;
-    if(multi_char_check(str, arg_num, va_char, &out, err))
-    {
-        va_end(va_char);
-        return dh_LineOut_CreateChar(out);
-    }
-    else
-    {
-        va_end(va_char);
-        return NULL;
-    }
+    char str_arg[arg_num + 1];
+    for(int i = 0 ; i < arg_num ; i++)
+        str_arg[i] = (char)va_arg( va_char , int);
+    str_arg[arg_num] = 0;
+    va_end(va_char);
+    return inputline_handler_charmode_CharArg(str, str_arg, err);
 }
 
-dh_LineOut *InputLine_Get_OneOpt_va(int byte, int range_check, int need_num, int arg_num, va_list va)
+static
+dh_LineOut* inputline_handler_charmode_CharArg(const char* str, char* args, int* err)
+{
+    char out = 0;
+    if(multi_char_check_CharArg(str, args, &out, err))
+        return dh_LineOut_CreateChar(out);
+    else return NULL;
+}
+
+static dh_LineOut* InputLine_Get_OneOpt_va_CharArg(int byte, int range_check, int need_num, char* arg, va_list va)
 {
     char* input = NULL;
     size_t size = 0;
@@ -210,9 +235,7 @@ dh_LineOut *InputLine_Get_OneOpt_va(int byte, int range_check, int need_num, int
         if(err == -1 || !need_num) // char process
         {
             err = 0;
-            int skip = 0;
-            if(range_check) skip = 2;
-            dh_LineOut* out = inputline_handler_charmode(input, skip, arg_num, va, &err);
+            dh_LineOut* out = inputline_handler_charmode_CharArg(input, arg, &err);
             if(out)
             {
                 global_impl.getline_free(input);
@@ -241,15 +264,32 @@ dh_LineOut *InputLine_Get_OneOpt_va(int byte, int range_check, int need_num, int
     }
     if(gret == -1)
     {
-        printf("Terminated output!\n");
+        printf(_("Terminated output!\n"));
         global_impl.getline_free(input);
         return NULL;
     }
     return NULL;
 }
 
+static dh_LineOut *InputLine_Get_OneOpt_va(int byte, int range_check, int need_num, int arg_num, va_list va)
+{
+    va_list va_char;
+    va_copy(va_char,va);
+    if(need_num && range_check)
+    {
+        va_arg(va_char,int64_t);
+        va_arg(va_char,int64_t);
+    }
+    char str_arg[arg_num + 1];
+    for(int i = 0 ; i < arg_num ; i++)
+        str_arg[i] = (char)va_arg(va_char, int);
+    str_arg[arg_num] = 0;
+    va_end(va_char);
+    return InputLine_Get_OneOpt_va_CharArg( byte, range_check, need_num, str_arg, va);
+}
 
-dh_LineOut *InputLine_Get_MoreDigits_va(int byte, int range_check, int need_nums, int arg_num, va_list va,
+
+static dh_LineOut *InputLine_Get_MoreDigits_va(int byte, int range_check, int need_nums, int arg_num, va_list va,
                                         int same_range, int use_arr, int64_t** arr)
 {
     char* input = NULL;
@@ -316,7 +356,7 @@ dh_LineOut *InputLine_Get_MoreDigits_va(int byte, int range_check, int need_nums
     }
     if(gret == -1)
     {
-        printf("Terminated output!\n");
+        printf(_("Terminated output!\n"));
         global_impl.getline_free(input);
         return NULL;
     }
@@ -365,7 +405,7 @@ long *NumArray_From_String(const char *string, int *nums, int char_check)
     return output;
 }
 
-int char_check(const char* str, char** end, char check_char)
+static int char_check(const char* str, char** end, char check_char)
 {
     const char* str_in = str;
     while( isspace(*str_in) )
@@ -401,23 +441,27 @@ int char_check(const char* str, char** end, char check_char)
     else return 0;
 }
 
-int multi_char_check(const char* str, int args, va_list char_list, char* result, int* err)
+static int multi_char_check_CharArg(const char* str, char* args, char* result, int* err)
 {
-    for(int i = 0 ; i < args; i++)
+    if(args)
     {
-        char check_char = (char)va_arg(char_list, int);
-        char* end = NULL;
-        if(char_check(str, &end, check_char))
+        int args_len = strlen(args);
+        for(int i = 0; i < args_len ; i++ )
         {
-            if(*end != 0)
+            char* end = NULL;
+            if(char_check(str, &end, args[i]))
             {
-                if(err) *err = -4;
-                return 0;
-            }
-            else
-            {
-                *result = check_char;
-                return 1;
+                if(*end != 0)
+                {
+                    if(err) *err = -4;
+                    return 0;
+                }
+                else
+                {
+                    if(result) *result = args[i];
+                        else return 0;
+                    return 1;
+                }
             }
         }
     }
@@ -425,7 +469,7 @@ int multi_char_check(const char* str, int args, va_list char_list, char* result,
     return 0;
 }
 
-int search_num(int byte, const char* str, char** end, int rc, int64_t min, int64_t max, int64_t* result, int *err)
+static int search_num(int byte, const char* str, char** end, int rc, int64_t min, int64_t max, int64_t* result, int *err)
 {
     const char* str_in = str;
     while( isspace(*str_in) )
@@ -470,7 +514,7 @@ int search_num(int byte, const char* str, char** end, int rc, int64_t min, int64
     }
 }
 
-int64_t* num_array_check(int byte, const char* str, int range_check, int need_nums, va_list range, int same_range, int use_arr, int64_t **arr, int* err)
+static int64_t* num_array_check(int byte, const char* str, int range_check, int need_nums, va_list range, int same_range, int use_arr, int64_t **arr, int* err)
 {
     if(need_nums > 0)
     {
@@ -563,6 +607,113 @@ int64_t* num_array_check(int byte, const char* str, int range_check, int need_nu
     else return NULL;
 }
 
+static int64_t* line_numarray_check(int byte, int* array_len, const char* str, int need_nums,
+                             int range_nums, int64_t ** range, int* err, int repeat_check)
+{
+    int64_t* out = NULL;
+    int arr_len = 0;
+    if(need_nums == 0) /* Don't need nums, so do nothing */
+        return NULL;
+    else
+    {
+        /* need_nums = -1 : auto mode
+         * If not switch to limited mode */
+        int range_check = 0;
+        int min = -1;
+        int max = -1;
+        if(range_nums > 0)
+            range_check = 1;
+        /* Just use one range */
+        if(range_nums == 1)
+        {
+            min = range[0][0];
+            max = range[0][1];
+        }
+        char* end = (char*)str;
+        /* Make the input skip space */
+        while(isspace(*end))
+            end++;
+        while(*end != 0) /* Break point */
+        {
+            /* Change range (if check range) */
+            if(range_nums > 1 && range_check)
+            {
+                if(arr_len >= range_nums)
+                {
+                    if(err) *err = DH_GIVEN_RANGE_ERROR; /* Even if error throwed, program try to process anyway */
+                    fprintf(stderr, _("An unsuitable range given! Although it's unexpected, the program would still run.\n"));
+                    range_check = 0;
+                }
+                else
+                {
+                    min = range[arr_len][0];
+                    max = range[arr_len][1];
+                }
+            }
+            int64_t result;
+            if(need_nums != -1)
+                if(arr_len >= need_nums)
+                {
+                    /* Not auto mode */
+                    if(err) *err = DH_NOT_EXPECTED_AFTER;
+                    goto arr_err;
+                }
+            if(search_num(byte, end, &end, range_check, min, max, &result, err))
+            {
+                if(repeat_check)
+                {
+                    for(int j = 0 ; j < arr_len ; j++)
+                    {
+                        if(out[j] == result) /* Find repeat */
+                        {
+                            if(err) *err = DH_NOT_EXPECTED;
+                            goto arr_err;
+                        }
+                    }
+                }
+                arr_len++;
+                int64_t* new_arr = (int64_t*)realloc(out, arr_len * sizeof(int64_t));
+                if(new_arr)
+                {
+                    out = new_arr;
+                    out[arr_len - 1] = result;
+                }
+                else /* Out of memory */
+                {
+                    if(err) *err = DH_NO_MEMORY;
+                    goto arr_err;
+                }
+            }
+            else /* search num fail */
+            {
+                if(err) *err = DH_NOT_EXPECTED_AFTER;
+                goto arr_err;
+            }
+            /* Check if end meet the needs */
+            if(!isspace(*end))
+            {
+                if(err) *err = DH_NOT_EXPECTED_AFTER;
+                goto arr_err;
+            }
+            while(isspace(*end))
+                end++;
+        }
+        if(need_nums != -1)
+            if(arr_len < need_nums)
+            {
+                if(err) *err = DH_NOT_EXPECTED;
+                goto arr_err;
+            }
+        *array_len = arr_len;
+        return out;
+    }
+arr_err:
+    free(out);
+    if(array_len) *array_len = 0;
+    return NULL;
+}
+
+
 char *String_Copy(const char *o_str)
 {
 #if (defined __STDC_VERSION__ && __STDC_VERSION__ > 201710L) || _POSIX_C_SOURCE >= 200809L
@@ -578,39 +729,7 @@ char *String_Copy(const char *o_str)
 #endif
 }
 
-char* String_Translate(const char* str)
-{
-    return String_TranslateWithErrCode(str, NULL);
-}
 
-char* String_TranslateWithErrCode(const char* str, int* err)
-{
-    char* filepos = translation_pos();
-    cJSON* trans_json = dhlrc_FileToJSON(filepos);
-    free(filepos);
-    if(trans_json)
-    {
-        cJSON* trans_item =cJSON_GetObjectItem(trans_json, str);
-        if(cJSON_IsString(trans_item))
-        {
-            char* trans = cJSON_GetStringValue(trans_item);
-            char* output = String_Copy(trans);
-            cJSON_Delete(trans_json);
-            if(err) *err = 0;
-            return output;
-        }
-        else{
-            if(err) *err = -2; // no corresponding translate
-            cJSON_Delete(trans_json);
-            return String_Copy(str);
-        }
-
-    }
-    else {
-        if(err) *err = -1; // no translation file
-        return String_Copy(str);
-    }
-}
 
 void dh_LineOut_Free(dh_LineOut *lo)
 {
@@ -689,68 +808,9 @@ void dh_StrArray_Free(dh_StrArray *arr)
     }
 }
 
-char* get_locale()
-{
-    if(!main_lang)
-    {
-        char* override_lang = dhlrc_ConfigContent("OverrideLang");
-        if(override_lang == NULL || !strcmp(override_lang,""))
-        {
-            free(override_lang);
-#if defined LC_MESSAGES
-            /* POSIX defined LC_MESSAGES, so when using standard C this is also available */
-            char* lang = setlocale(LC_MESSAGES, "");
-#else
-            /* Tested in Windows, the language variable is not the same as POSIX, but just leave this to make it run (hopefully) */
-            char* lang = setlocale(LC_ALL, "");
-#endif
-            char* lang_copy = lang;
-            if(lang_copy){ /* In case the return value is NULL */
-            int point_pos = 0;
-            while(*lang_copy != '.' && *lang_copy != '\0' && *lang_copy != '@')
-            {
-                // For example "zh_CN.UTF-8", when it's "." , pos will be 5, so it's lang[5] = '.'.
-                lang_copy++;
-                point_pos++;
-            }
-            char* ret = (char*)malloc((point_pos + sizeof("")) * sizeof(char));
-            for(int i = 0 ; i < point_pos; i++)
-                ret[i] = lang[i];
-            ret[point_pos] = '\0';
-            main_lang = String_Copy(ret);
-            free(ret);
-            }
-            else{
-                fprintf(stderr, "Not a valid language variable, will fallback to en_US.\n");
-                main_lang = String_Copy("en_US");
-            }
-        }
-        else
-        {
-            main_lang = String_Copy(override_lang);
-            free(override_lang);
-        }
-        /* Determine translation file exists or fallback to en_US
-         * But translation_pos need language variable, so main_lang shouldn't be null */
-        char* filepos = translation_pos();
-        cJSON* trans_json = dhlrc_FileToJSON(filepos);
-        free(filepos);
-        if(trans_json)
-        {
-            cJSON_Delete(trans_json);
-            return main_lang;
-        }
-        else
-        {
-            free(main_lang);
-            main_lang = String_Copy("en_US");
-            return main_lang;
-        }
-    }
-    else return main_lang;
-}
 
-int range_check(int64_t num, int byte)
+
+static int range_check(int64_t num, int byte)
 {
     // 8, 16, 32, 64 bit
     if(byte == 1)
@@ -796,7 +856,7 @@ dh_LineOut *dh_LineOut_CreateNum(int64_t num, int byte)
     else return NULL;
 }
 
-int float_check(double num)
+static int float_check(double num)
 {
     if(num < (-FLT_MAX) || num > (FLT_MAX))
         return 0;
@@ -878,7 +938,7 @@ dh_LineOut *dh_LineOut_CreateNumArray(void *array, int len, int byte, int o_byte
     else return NULL;
 }
 
-void* resize_array(int byte, int o_byte, void* array, int len)
+static void* resize_array(int byte, int o_byte, void* array, int len)
 {
     if((byte == 1 || byte == 2 || byte == 4 || byte == 8) &&
             (o_byte == 1 || o_byte == 2 || o_byte == 4 || o_byte == 8))
@@ -1012,25 +1072,7 @@ dh_LineOut *dh_LineOut_CreateEmpty()
     else return NULL;
 }
 
-void String_Translate_printfRaw(const char *str)
-{
-    char* trans = String_Translate(str);
-    global_impl.printf_fn("%s",trans);
-    free(trans);
-}
 
-void String_Translate_printfWithArgs(const char *str, ...)
-{
-    int err = 0;
-    char* trans = String_TranslateWithErrCode(str, &err);
-    va_list va;
-    va_start(va,str);
-    if(err == 0)
-        global_impl.vprintf_fn(trans, va);
-    else global_impl.printf_fn("%s", trans);
-    va_end(va);
-    free(trans);
-}
 
 dh_LineOut *InputLine_Get_OneOpt(int range_check, int need_num, int arg_num, ...)
 {
@@ -1070,6 +1112,8 @@ dh_LineOut *InputLine_Get_MoreDigits_WithByte(int byte, int range_check, int nee
     return out;
 }
 
+#ifdef DH_USE_TRANSLATION_DEPRECATED
+
 void String_Translate_FreeLocale()
 {
     free(main_lang);
@@ -1078,7 +1122,7 @@ void String_Translate_FreeLocale()
     secondary_lang = NULL;
 }
 
-char* translation_pos()
+static char* translation_pos()
 {
     char* lang = get_locale();
     char* dir = dhlrc_ConfigContent("langDir");
@@ -1098,6 +1142,125 @@ char* translation_pos()
     free(dir);
     return filepos;
 }
+
+
+void String_Translate_printfRaw(const char *str)
+{
+    char* trans = String_Translate(str);
+    global_impl.printf_fn("%s",trans);
+    free(trans);
+}
+
+void String_Translate_printfWithArgs(const char *str, ...)
+{
+    int err = 0;
+    char* trans = String_TranslateWithErrCode(str, &err);
+    va_list va;
+    va_start(va,str);
+    if(err == 0)
+        global_impl.vprintf_fn(trans, va);
+    else global_impl.printf_fn("%s", trans);
+    va_end(va);
+    free(trans);
+}
+
+static char* get_locale()
+{
+    if(!main_lang)
+    {
+        char* override_lang = dhlrc_ConfigContent("OverrideLang");
+        if(override_lang == NULL || !strcmp(override_lang,""))
+        {
+            free(override_lang);
+#if defined LC_MESSAGES
+            /* POSIX defined LC_MESSAGES, so when using standard C this is also available */
+            char* lang = setlocale(LC_MESSAGES, NULL);
+#else
+            /* Tested in Windows, the language variable is not the same as POSIX, but just leave this to make it run (hopefully) */
+            char* lang = setlocale(LC_ALL, NULL);
+#endif
+            char* lang_copy = lang;
+            if(lang_copy){ /* In case the return value is NULL */
+            int point_pos = 0;
+            while(*lang_copy != '.' && *lang_copy != '\0' && *lang_copy != '@')
+            {
+                // For example "zh_CN.UTF-8", when it's "." , pos will be 5, so it's lang[5] = '.'.
+                lang_copy++;
+                point_pos++;
+            }
+            char* ret = (char*)malloc((point_pos + sizeof("")) * sizeof(char));
+            for(int i = 0 ; i < point_pos; i++)
+                ret[i] = lang[i];
+            ret[point_pos] = '\0';
+            main_lang = String_Copy(ret);
+            free(ret);
+            }
+            else{
+                fprintf(stderr, "Not a valid language variable, will fallback to en_US.\n");
+                main_lang = String_Copy("en_US");
+            }
+        }
+        else
+        {
+            main_lang = String_Copy(override_lang);
+            free(override_lang);
+        }
+        /* Determine translation file exists or fallback to en_US
+         * But translation_pos need language variable, so main_lang shouldn't be null */
+        char* filepos = translation_pos();
+        cJSON* trans_json = dhlrc_FileToJSON(filepos);
+        free(filepos);
+        if(trans_json)
+        {
+            cJSON_Delete(trans_json);
+            return main_lang;
+        }
+        else
+        {
+            free(main_lang);
+            main_lang = String_Copy("en_US");
+            return main_lang;
+        }
+    }
+    else return main_lang;
+}
+
+
+char* String_Translate(const char* str)
+{
+    return String_TranslateWithErrCode(str, NULL);
+}
+
+char* String_TranslateWithErrCode(const char* str, int* err)
+{
+    char* filepos = translation_pos();
+    cJSON* trans_json = dhlrc_FileToJSON(filepos);
+    free(filepos);
+    if(trans_json)
+    {
+        cJSON* trans_item =cJSON_GetObjectItem(trans_json, str);
+        if(cJSON_IsString(trans_item))
+        {
+            char* trans = cJSON_GetStringValue(trans_item);
+            char* output = String_Copy(trans);
+            cJSON_Delete(trans_json);
+            if(err) *err = 0;
+            return output;
+        }
+        else{
+            if(err) *err = -2; // no corresponding translate
+            cJSON_Delete(trans_json);
+            return String_Copy(str);
+        }
+
+    }
+    else {
+        if(err) *err = -1; // no translation file
+        return String_Copy(str);
+    }
+}
+
+#endif
 
 __ssize_t dh_string_getline(char** input, size_t* n, FILE* stream)
 {

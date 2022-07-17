@@ -1,6 +1,7 @@
 set( DHLRC_MAIN_POT_FILE_DEPENDS 
         src/main.c
         src/nbt_litereader.c
+        src/litematica_region.c
 	PARENT_SCOPE
 )
 # Currently only this one need translate

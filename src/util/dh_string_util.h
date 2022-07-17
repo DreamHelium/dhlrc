@@ -100,7 +100,8 @@ dh_LineOut* dh_LineOut_CreateEmpty();
 
 void dh_LineOut_Free(dh_LineOut* lo);
 
-/* I'm porting this project to gettext, so these functions might be of no use. */
+#ifdef DH_USE_TRANSLATION_DEPRECATED
+/* I'm porting this project to gettext, so these functions are of no use. */
 char* String_Translate(const char* str);
 /** @brief Return Translation and also the err code \n
   *        err -1: no translation file \n
@@ -111,6 +112,7 @@ char* String_TranslateWithErrCode(const char* str, int* err);
 void String_Translate_printfRaw(const char* str);
 void String_Translate_printfWithArgs(const char* str, ...);
 void String_Translate_FreeLocale();
+#endif
 
 char* String_Copy(const char *o_str);
 
