@@ -28,7 +28,7 @@ extern "C"{
 
 /** The type of the dh_Line_IO */
 typedef enum dh_out_type{
-    Integer, Float, Double, Character, NumArray, String, Empty
+    Integer, Float, Double, Character, NumArray, String, DoubleArray, FloatArray ,Empty
 } dh_out_type;
 
 typedef struct dh_LineOut
@@ -70,11 +70,32 @@ typedef struct dh_string_impl{
     int (*vprintf_fn)(const char*, va_list);
 
     /** getline() replacement (without FILE*), in some cases you need to code implement by yourself */
-    __ssize_t (*getline_fn)(char**, size_t*);
+    int (*getline_fn)(char**, size_t*);
 
     /** free memory function used in getline() */
     void (*getline_free)(void*);
+
+    /** internal error print (Default: to stderr) */
+    int (*err_print_fn)(const char*);
 } dh_string_impl;
+
+typedef struct dh_limit{
+
+    /* type of the desired type */
+    dh_out_type type;
+    /* range of the desired numbers */
+    void** limit;
+    /* numbers of range */
+    int limit_num;
+    /* Only available for array mode, if = 1 is the same range in all controls */
+    int same_range;
+    /* Only available for array mode, if = 1 shows that it need unlimited numbers */
+    int unlimited_lens;
+    /* Only available for array mode, it's the numbers of needed numbers (if unlimited_lens = 1 it will be ignored) */
+    int lens;
+    /* Only available for array mode, if = 1 check for repeated numbers */
+    int check_repeated;
+} dh_limit;
 
 /** Change implement of this string util, might be needed if using in GUI lib or other cases */
 void dh_string_ChangeImpl(dh_string_impl* impl);
@@ -83,10 +104,11 @@ void dh_string_ChangeImpl(dh_string_impl* impl);
 dh_LineOut* InputLine_Get_OneOpt(int range_check, int need_num, int arg_num, ...);
 dh_LineOut* InputLine_Get_OneOpt_WithByte(int byte, int range_check, int need_num, int arg_num, ...);
 /** Get a line input and return output (n numbers or character)
- *  should pass like this: (nums): min and max, (char): char.
- */
+ *  should pass like this: (nums): min and max, (char): char. */
 dh_LineOut* InputLine_Get_MoreDigits(int range_check, int need_nums, int arg_num, ...);
 dh_LineOut* InputLine_Get_MoreDigits_WithByte(int byte, int range_check, int need_nums, int arg_num, ...);
+/** A better way to get output, byte will be ignored in Float/Double(or array) mode */
+dh_LineOut* InputLine_General(int byte, dh_limit* limit, int get_string, char* args, int allow_empty);
 /** Transform a String to number array */
 long* NumArray_From_String(const char* string, int* nums, int char_check);
 
@@ -123,8 +145,20 @@ int dh_StrArray_AddStr(dh_StrArray** arr ,const char* str);
 void dh_StrArray_Free(dh_StrArray* arr);
 
 /** Use getline() if provided, otherwise use another implement */
-__ssize_t dh_string_getline(char** input, size_t* n, FILE* stream);
+int dh_string_getline(char** input, size_t* n, FILE* stream);
 
+/** Initize a limit type
+ *  WARNING: Recommend that don't edit struct directly */
+dh_limit* dh_limit_Init(dh_out_type type);
+/** Change conditons of using array, lens = -1 : use unlimited lens
+ *  WARNING: You can edit the struct directly, but that's not recommended */
+int dh_limit_SetArrayArgs(dh_limit* limit, int lens, int same_range, int check_repeated);
+/** Add int num for limit */
+int dh_limit_AddInt(dh_limit* limit, int64_t min, int64_t max);
+/** Add double num for limit */
+int dh_limit_AddDouble(dh_limit* limit, double min, double max);
+/** Free dh_limit */
+void dh_limit_Free(dh_limit* limit);
 
 
 #ifdef __cplusplus

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-07-18 00:33+0800\n"
+"POT-Creation-Date: 2022-07-20 00:31+0800\n"
 "PO-Revision-Date: 2022-07-15 23:36+0800\n"
 "Last-Translator: Dream Helium\n"
 "Language-Team: Chinese <>\n"
@@ -159,5 +159,5 @@ msgstr ""
 
 #: src/litematica_region.c:401
 #, c-format
-msgid "[%.2f%%] Processing Blocks %lu/%lu, (%3d,%3d,%3d)/(%3d,%3d,%3d)\r"
+msgid "[%.2f%%] Processing Blocks %lu/%lu, (%3d,%3d,%3d)/(%3d,%3d,%3d)"
 msgstr ""

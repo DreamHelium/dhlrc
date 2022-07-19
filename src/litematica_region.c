@@ -398,8 +398,9 @@ ItemList *lite_region_ItemListExtend(NBT* root, int r_num, ItemList* oBlock)
                 int id = lite_region_BlockArrayPos_lr(lr,index);
                 char* id_block_name = lr->replaced_blocks->val[id];
                 float percent = ((float)(index + 1) / volume) * 100;
-                fprintf(stderr,_("[%.2f%%] Processing Blocks %lu/%lu, (%3d,%3d,%3d)/(%3d,%3d,%3d)\r"), percent ,index+1, volume ,
+                fprintf(stderr,_("[%.2f%%] Processing Blocks %lu/%lu, (%3d,%3d,%3d)/(%3d,%3d,%3d)"), percent ,index+1, volume ,
                         x,y,z,lr->region_size.x,lr->region_size.y,lr->region_size.z);
+                fprintf(stderr, "\r");
                 if(!BlackList_Scan(bl,id_block_name))
                 {
                     // There is no need for searching repeat.
