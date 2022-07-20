@@ -25,93 +25,68 @@
 
 long* NumArray_GetFromInput(int* array_num, int max_num)
 {
-    long* array = NULL;
-    int i = 0;
-    char* input = NULL;
-    size_t len = 0;
-    printf("Input nums directly, or type 'a' for all numbers: ");
-    while(dh_string_getline(&input,&len,stdin) != -1)
+    if(!array_num) return NULL;
+    printf("Input nums directly, or type 'a' for all numbers (a): ");
+    dh_limit* limit = dh_limit_Init(NumArray);
+    if(limit)
     {
-        char* inputl = input;
-        while(*inputl == ' ')
-            inputl++;
-        if(*inputl == 'a' || *inputl == 'A')
+        dh_limit_SetArrayArgs(limit, -1, 1, 1, 1);
+        if(!dh_limit_AddInt(limit, 0 , max_num - 1 ))
         {
-            char* after_a = inputl+1;
-            while(*after_a == ' ')
-                after_a++;
-            if(*after_a == '\n')
-            {
-                array = (long*)malloc(max_num * sizeof(long));
-                *array_num = max_num;
-                for(int i = 0 ; i < max_num ; i++)
-                    array[i] = i;
-                free(input);
-                return array;
-            }
-            else
-                printf("Unrecognized string, please enter again: ");
-        }
-        else if(*inputl >= '0' && *inputl <= '9')
-        { // when input is num
-            while(1)
-            {
-                char* end;
-                long value = strtol(inputl,&end,10);
-                if(inputl == end) break;
-
-                long* parray = realloc(array,(i+1)*sizeof(long));
-                if(!parray)
-                {
-                    free(array);
-                    free(input);
-                    *array_num = 0;
-                    return NULL;
-                }
-                array = parray;
-                while(*end == ' ')
-                    end++;
-                for(int j = 0 ; j < i ; j++)
-                {
-                    if( value == array[j] )
-                    {
-                        free(input);
-                        free(array);
-                        printf("Repeated number detected!\n");
-                        return NumArray_GetFromInput(array_num, max_num);
-                    }
-                }
-                if((value < 0 || value >= max_num) || !(*end == '\n' || isdigit(*end)) )
-                {
-                // hopefully this will work
-                    free(input);
-                    free(array);
-                    printf("Out of range! \n");
-                    return NumArray_GetFromInput(array_num, max_num);
-                }
-                array[i] = value;
-                //printf("%ld ",value);
-                inputl = end;
-                i++;
-            }
-            free(input);
-            *array_num = i;
-            return array;
-        }
-        else if(*inputl == '\n')
-        {
-            free(input);
+            dh_limit_Free(limit);
             *array_num = 0;
             return NULL;
         }
+    }
+    else
+    {
+        *array_num = 0;
+        return NULL;
+    }
+    dh_LineOut* dout = InputLine_General( sizeof(long), limit, 0, "a", 1);
+    dh_limit_Free(limit);
+    if(dout)
+    {
+        if(dout->type == NumArray)
+        {
+            long* out = (long*)malloc( dout->len * sizeof(long) );
+            if(out)
+            {
+                memcpy( out, dout->val, dout->len*sizeof(long) );
+                *array_num = dout->len;
+                dh_LineOut_Free(dout);
+                return out;
+            }
+            else
+            {
+                dh_LineOut_Free(dout);
+                *array_num = 0;
+                return NULL;
+            }
+        }
         else
         {
-            printf("Unrecognized string, please enter again: ");
+            dh_LineOut_Free(dout);
+            long* out = (long*)malloc( max_num * sizeof(long) );
+            if(out)
+            {
+                for(int i = 0 ; i < max_num ; i++ )
+                    out[i] = i;
+                *array_num = max_num;
+                return out;
+            }
+            else
+            {
+                *array_num = 0;
+                return NULL;
+            }
         }
     }
-    free(input);
-    *array_num = 0;
-    return NULL;
+    else
+    {
+        *array_num = 0;
+        return NULL;
+    }
 }
 
 int ItemList_CombineRecipe(ItemList** o_bl)

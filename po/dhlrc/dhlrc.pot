@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-07-20 00:31+0800\n"
+"POT-Creation-Date: 2022-07-20 21:23+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -49,22 +49,22 @@ msgstr ""
 msgid "Please select an option, or enter 'q' to exit the program (q): "
 msgstr ""
 
-#: src/main.c:186 src/main.c:224
+#: src/main.c:186 src/main.c:225
 #, c-format
 msgid "There are %d regions:\n"
 msgstr ""
 
-#: src/main.c:198
+#: src/main.c:199
 #, c-format
 msgid "Processing: region %d / %d : [%ld] %s \n"
 msgstr ""
 
-#: src/main.c:230
+#: src/main.c:232
 #, c-format
 msgid "Enter the region number, or enter 'q' to exit program (q): "
 msgstr ""
 
-#: src/main.c:243
+#: src/main.c:245
 #, c-format
 msgid ""
 "You are reading region: [%2d] %s:\n"
@@ -72,7 +72,7 @@ msgid ""
 "\n"
 msgstr ""
 
-#: src/main.c:246
+#: src/main.c:248
 #, c-format
 msgid ""
 "Please enter the coordination of the block (just numbers of x y z without "
@@ -80,12 +80,12 @@ msgid ""
 "or enter 'b' to choose another region, enter 'q' to exit the program (b): "
 msgstr ""
 
-#: src/main.c:315
+#: src/main.c:317
 #, c-format
 msgid "The block in (%ld, %ld, %ld) is %s.\n"
 msgstr ""
 
-#: src/main.c:316
+#: src/main.c:318
 #, c-format
 msgid ""
 "Please enter the coordination of the block again, or enter 'b' to choose "

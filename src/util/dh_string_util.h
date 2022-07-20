@@ -152,7 +152,7 @@ int dh_string_getline(char** input, size_t* n, FILE* stream);
 dh_limit* dh_limit_Init(dh_out_type type);
 /** Change conditons of using array, lens = -1 : use unlimited lens
  *  WARNING: You can edit the struct directly, but that's not recommended */
-int dh_limit_SetArrayArgs(dh_limit* limit, int lens, int same_range, int check_repeated);
+int dh_limit_SetArrayArgs(dh_limit* limit, int lens, int same_range, int check_repeated, int unlimited_lens);
 /** Add int num for limit */
 int dh_limit_AddInt(dh_limit* limit, int64_t min, int64_t max);
 /** Add double num for limit */

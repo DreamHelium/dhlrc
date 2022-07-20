@@ -188,6 +188,7 @@ void start_lrc_main(NBT *root)
         {
             printf("[%2d] %s\n",i,region_name[i]);
         }
+        printf("\n");
         int process_num = 0;
         long* process_region_i = NumArray_GetFromInput(&process_num, region_num);
         ItemList* il = NULL;
@@ -227,6 +228,7 @@ void start_lrc_extend(NBT* root)
                 printf("[%2d] %s\n",i,region_name[i]);
             }
 
+            printf("\n");
             printf(_("Enter the region number, or enter 'q' to exit program (q): "));
             dh_LineOut* output1 = InputLine_Get_OneOpt(1,1,1,0,region_num,'q');
             if(output1)

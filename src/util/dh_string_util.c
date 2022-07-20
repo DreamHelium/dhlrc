@@ -58,14 +58,14 @@ static internal_impl global_impl = { printf, vprintf, default_getline, free, int
 
 static dh_LineOut* InputLine_Get_OneOpt_va(int byte, int range_check, int need_num, int arg_num, va_list va);
 static dh_LineOut* InputLine_Get_OneOpt_va_CharArg(int byte, int range_check, int need_num, char* arg, va_list va);
-static dh_LineOut *InputLine_Get_MoreDigits_va(int byte, int range_check, int need_nums, int arg_num, va_list va,
-                                        int same_range, int use_arr, int64_t **arr);
+static dh_LineOut* InputLine_Get_MoreDigits_va ( int byte, int range_check, int need_nums, int arg_num, va_list va, int same_range );
 static int char_check(const char* str, char** end, char check_char);
 static int multi_char_check_CharArg(const char* str, char* args, char* result, int* err);
 static int search_num(int byte, const char* str, char** end, int rc, int64_t min, int64_t max, int64_t *result, int* err);
 static int64_t *num_array_check(int byte, const char* str, int range_check, int need_nums, va_list range, int same_range, int use_arr, int64_t **arr, int *err);
 static int64_t* line_numarray_check(int byte, int* array_len, const char* str, int need_nums, int range_nums,
-                                    int64_t** range, int* err, int repeat_check, int same_range);
+                                    int64_t** range, int* err, int repeat_check, int same_range,
+                                    int unlimited_lens);
 static int range_check(int64_t num, int byte);
 static int float_check(double num);
 static void* resize_array(int byte, int o_byte, void* array, int len);
@@ -84,7 +84,8 @@ static dh_LineOut* inputline_handler_charmode(const char* str, int skip_va, int 
 static dh_LineOut* inputline_handler_charmode_CharArg(const char* str, char* args, int* err);
 /** Integer Array mode (normal) */
 static dh_LineOut* inputline_handler_numarray(const char* str, int byte, int need_nums,
-                                              int range_nums, int64_t** range, int* err, int repeat_check, int same_range);
+                                              int range_nums, int64_t** range, int* err, int repeat_check, int same_range,
+                                              int unlimited_lens);
 /** Wrapper for integer array mode */
 static dh_LineOut* inputline_handler_numarray_limit(const char* str, int byte, dh_limit* limit, int* err);
 
@@ -173,6 +174,9 @@ try to enter again: "));
     case DH_REPEATED:
         global_impl.printf_fn(_("Repeated number! please enter again: "));
         break;
+    case DH_LIMIT_ERROR:
+        global_impl.printf_fn(_("Error in format of limit, consult the software developer!\n"));
+        break;
     default: break;
     }
 }
@@ -235,13 +239,19 @@ dh_LineOut* inputline_handler_charmode_CharArg(const char* str, char* args, int*
 }
 
 static dh_LineOut* inputline_handler_numarray(const char* str, int byte, int need_nums,
-                                              int range_nums, int64_t ** range, int* err, int repeat_check, int same_range)
+                                              int range_nums, int64_t ** range, int* err, int repeat_check, int same_range,
+                                              int unlimited_lens)
 {
     int array_len;
-    int64_t* out = line_numarray_check(byte, &array_len, str, need_nums, range_nums, range, err, repeat_check, same_range);
-    if(out)
-        return dh_LineOut_CreateNumArray(out, array_len, byte, sizeof(int64_t));
-    else return NULL;
+    int64_t* out = line_numarray_check(byte, &array_len, str, need_nums, range_nums, range, err, repeat_check, same_range, unlimited_lens);
+    if(out){
+        dh_LineOut* dout =  dh_LineOut_CreateNumArray(out, array_len, byte, sizeof(int64_t));
+        free(out);
+        return dout;
+    }
+    else {
+        return NULL;
+    }
 }
 
 static dh_LineOut* inputline_handler_numarray_limit(const char* str, int byte , dh_limit* limit, int* err)
@@ -254,7 +264,7 @@ static dh_LineOut* inputline_handler_numarray_limit(const char* str, int byte , 
     else
     {
         return inputline_handler_numarray( str, byte, limit->lens, limit->limit_num, (int64_t**)(limit->limit),
-                                           err, limit->check_repeated, limit->same_range);
+                                           err, limit->check_repeated, limit->same_range, limit->unlimited_lens);
     }
 }
 
@@ -429,92 +439,84 @@ static dh_LineOut *InputLine_Get_OneOpt_va(int byte, int range_check, int need_n
 {
     va_list va_char;
     va_copy(va_char,va);
-    if(need_num && range_check)
+    dh_limit* limit = dh_limit_Init(Integer);
+    if(limit)
     {
-        va_arg(va_char,int64_t);
-        va_arg(va_char,int64_t);
+        if(need_num && range_check)
+        {
+            int64_t min = va_arg(va_char,int64_t);
+            int64_t max = va_arg(va_char,int64_t);
+            if(!dh_limit_AddInt( limit, min, max ))
+            {
+                dh_limit_Free(limit);
+                va_end(va_char);
+                return NULL;
+            }
+        }
+    }
+    else {
+        va_end(va_char);
+        return NULL;
     }
     char str_arg[arg_num + 1];
     for(int i = 0 ; i < arg_num ; i++)
         str_arg[i] = (char)va_arg(va_char, int);
     str_arg[arg_num] = 0;
     va_end(va_char);
-    return InputLine_Get_OneOpt_va_CharArg( byte, range_check, need_num, str_arg, va);
+    dh_LineOut* dout = InputLine_General( byte, limit, 0, str_arg, 1);
+    dh_limit_Free(limit);
+    return dout;
 }
 
 
 static dh_LineOut *InputLine_Get_MoreDigits_va(int byte, int range_check, int need_nums, int arg_num, va_list va,
-                                        int same_range, int use_arr, int64_t** arr)
+                                        int same_range)
 {
-    char* input = NULL;
-    size_t size = 0;
-    int gret = -2;
-    int n_num = need_nums;
-    while((gret = global_impl.getline_fn(&input, &size)) != -1)
+    va_list va_cp;
+    va_copy(va_cp, va);
+    dh_limit* limit = dh_limit_Init(NumArray);
+    if(limit)
     {
-        char* inputl = input;
-        // ignore blanket.
-        if(need_nums <= 0)
-            n_num = 0;
-        int err = 0;
-        int64_t* num_array = NULL;
-        // read and check numbers.
-        num_array = num_array_check(byte, input, range_check, n_num, va, same_range, use_arr, arr, &err);
-        if( num_array )
+        dh_limit_SetArrayArgs(limit, need_nums, same_range, 0, -1);
+        if(range_check)
         {
-            dh_LineOut* output = dh_LineOut_CreateNumArray(num_array, need_nums, byte, 64/8);
-            free(num_array);
-            if(output)
-            {
-                global_impl.getline_free(input);
-                return output;
+            if(same_range){
+                int64_t min = va_arg(va_cp, int64_t);
+                int64_t max = va_arg(va_cp, int64_t);
+                if(!dh_limit_AddInt(limit, min, max))
+                {
+                    va_end(va_cp);
+                    dh_limit_Free(limit);
+                    return NULL;
+                }
             }
-            else err = -5;
-        }
-        if(err == -1 || !n_num)
-        {
-            err = 0;
-            // read character
-            int skip = n_num * 2; // default: range_check, not same_range, not use_arr
-            if(range_check)
-            {
-                if(use_arr) skip = 0; // using arr doesn't need to skip
-                else if(same_range) skip = 2; // same_range and not use_arr is 2
+            else{
+                for(int i = 0 ; i < need_nums ; i++ )
+                {
+                    int64_t min = va_arg(va_cp, int64_t);
+                    int64_t max = va_arg(va_cp, int64_t);
+                    if(!dh_limit_AddInt(limit, min, max))
+                    {
+                        va_end(va_cp);
+                        dh_limit_Free(limit);
+                        return NULL;
+                    }
+                }
             }
-            else skip = 0; // not range_check, 0
-            dh_LineOut* out = inputline_handler_charmode(input, skip, arg_num, va, &err);
-            if(out)
-            {
-                global_impl.getline_free(input);
-                return out;
-            }
-            else if(err == 0)
-                err = -5;
         }
-        if(err == -1)
-        {
-           while( isspace(*inputl) )
-               inputl++;
-           if(*inputl == 0)
-           {
-               dh_LineOut* out = dh_LineOut_CreateEmpty();
-               if(out)
-               {
-                   global_impl.getline_free(input);
-                   return out;
-               }
-               else err = -5;
-           }
-        }
-        inputline_handler_printerr(err);
     }
-    if(gret == -1)
-    {
-        printf(_("Terminated output!\n"));
-        global_impl.getline_free(input);
+    else{
+        va_end( va_cp );
         return NULL;
     }
-    return NULL;
+    char str_arg[arg_num + 1];
+    for(int i = 0 ; i < arg_num ; i++)
+        str_arg[i] = (char)va_arg(va_cp, int);
+    str_arg[arg_num] = 0;
+    va_end(va_cp);
+    dh_LineOut* dout = InputLine_General( byte, limit, 0, str_arg, 1);
+    dh_limit_Free(limit);
+    return dout;
 }
 
 long *NumArray_From_String(const char *string, int *nums, int char_check)
@@ -762,7 +764,8 @@ static int64_t* num_array_check(int byte, const char* str, int range_check, int 
 }
 
 static int64_t* line_numarray_check(int byte, int* array_len, const char* str, int need_nums,
-                             int range_nums, int64_t ** range, int* err, int repeat_check, int same_range)
+                             int range_nums, int64_t ** range, int* err, int repeat_check, int same_range,
+                                    int unlimited_lens)
 {
     int64_t* out = NULL;
     int arr_len = 0;
@@ -771,7 +774,7 @@ static int64_t* line_numarray_check(int byte, int* array_len, const char* str, i
         return NULL;
     else
     {
-        /* need_nums = -1 : auto mode
+        /* unlimited_lens = 1 : auto mode
          * If not switch to limited mode */
         int range_check = 0;
         int min = -1;
@@ -796,7 +799,7 @@ static int64_t* line_numarray_check(int byte, int* array_len, const char* str, i
                 if(arr_len >= range_nums)
                 {
                     /* Auto mode or not enough range */
-                    if(need_nums == -1 || range_nums < need_nums){
+                    if( unlimited_lens == 1 || need_nums == -1 || range_nums < need_nums){
                         if(err)
                             *err = DH_GIVEN_RANGE_ERROR; /* Even if error throwed, program try to process anyway */
                         if(warning == 0){
@@ -816,7 +819,7 @@ static int64_t* line_numarray_check(int byte, int* array_len, const char* str, i
             if(need_nums != -1)
                 if(arr_len >= need_nums)
                 {
-                    /* Not auto mode */
+                    /* Not auto mode or limited nums of unlimited lens */
                     if(err) *err = DH_NOT_EXPECTED_AFTER;
                     goto arr_err;
                 }
@@ -828,7 +831,7 @@ static int64_t* line_numarray_check(int byte, int* array_len, const char* str, i
                     {
                         if(out[j] == result) /* Find repeat */
                         {
-                            if(err) *err = DH_NOT_EXPECTED;
+                            if(err) *err = DH_REPEATED;
                             goto arr_err;
                         }
                     }
@@ -848,7 +851,6 @@ static int64_t* line_numarray_check(int byte, int* array_len, const char* str, i
             }
             else /* search num fail */
             {
-                if(err) *err = DH_NOT_EXPECTED_AFTER;
                 goto arr_err;
             }
             /* Check if end meet the needs */
@@ -860,13 +862,15 @@ static int64_t* line_numarray_check(int byte, int* array_len, const char* str, i
             while(isspace(*end))
                 end++;
         }
-        if(need_nums != -1)
+        if( !unlimited_lens )
             if(arr_len < need_nums)
             {
                 if(err) *err = DH_NOT_EXPECTED;
                 goto arr_err;
             }
         *array_len = arr_len;
+        if(arr_len == 0)
+            if(err) *err = DH_NOT_EXPECTED;
         return out;
     }
 arr_err:
@@ -1260,7 +1264,7 @@ dh_LineOut *InputLine_Get_MoreDigits(int range_check, int need_nums, int arg_num
 {
     va_list va;
     va_start(va, arg_num);
-    dh_LineOut* out = InputLine_Get_MoreDigits_va(64/8, range_check, need_nums, arg_num, va, 0, 0 , NULL);
+    dh_LineOut* out = InputLine_Get_MoreDigits_va(64/8, range_check, need_nums, arg_num, va, 0);
     va_end(va);
     return out;
 }
@@ -1269,7 +1273,7 @@ dh_LineOut *InputLine_Get_MoreDigits_WithByte(int byte, int range_check, int nee
 {
     va_list va;
     va_start(va, arg_num);
-    dh_LineOut* out = InputLine_Get_MoreDigits_va(byte, range_check, need_nums, arg_num ,va, 0, 0, NULL);
+    dh_LineOut* out = InputLine_Get_MoreDigits_va(byte, range_check, need_nums, arg_num ,va, 0);
     va_end(va);
     return out;
 }
@@ -1604,14 +1608,17 @@ void dh_limit_Free(dh_limit* limit)
     free(limit);
 }
 
-int dh_limit_SetArrayArgs(dh_limit* limit ,int lens, int same_range, int check_repeated)
+int dh_limit_SetArrayArgs(dh_limit* limit ,int lens, int same_range, int check_repeated, int unlimited_lens)
 {
+    /* lens < -1 is not valid */
     if(lens < -1 )
         return 0;
     if(limit->type == NumArray || limit->type == FloatArray || limit->type == DoubleArray )
     {
         /* Set unlimited mode */
-        if(lens == -1)
+        if((lens == -1 && unlimited_lens == -1) || unlimited_lens == 1)
+            /* let program decide whether using unlimited lens ( that when len == -1 )
+             * or when unlimited_lens = 1 use it */
         {
             limit->unlimited_lens = 1;
         }
