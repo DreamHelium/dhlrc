@@ -90,6 +90,7 @@ static dh_LineOut* inputline_handler_numarray(const char* str, int byte, int nee
 static dh_LineOut* inputline_handler_numarray_limit(const char* str, int byte, dh_limit* limit, int* err);
 
 static void inputline_handler_printerr(int err);
+static void translation_init();
 
 #define DH_NOT_EXPECTED (-1)
 #define DH_ERROR_RANGE  (-2)
@@ -143,15 +144,20 @@ void dh_string_ChangeImpl(dh_string_impl* impl)
     else global_impl.err_print_fn = internal_err_print;
 }
 
-/* The only position to output error */
-static void inputline_handler_printerr(int err)
+static void translation_init()
 {
-#ifndef DH_DISABLE_TRANSLATION
-    if(!translation_inited) /*  */
+    if(!translation_inited)
     {
         bindtextdomain("dhutil", "locale");
         translation_inited = 1;
     }
+}
+
+/* The only position to output error */
+static void inputline_handler_printerr(int err)
+{
+#ifndef DH_DISABLE_TRANSLATION
+    translation_init();
 #endif
     switch (err) {
     case -1:
@@ -270,6 +276,9 @@ static dh_LineOut* inputline_handler_numarray_limit(const char* str, int byte , 
 
 dh_LineOut * InputLine_General(int byte, dh_limit* limit, int get_string, char* args, int allow_empty)
 {
+#ifndef DH_DISABLE_TRANSLATION
+    translation_init();
+#endif
     char* input = NULL;
     size_t size = 0;
     int gret = -2;
@@ -370,6 +379,7 @@ dh_LineOut * InputLine_General(int byte, dh_limit* limit, int get_string, char* 
         }
         inputline_handler_printerr(err);
     }
+
     global_impl.printf_fn(_("Terminated input!\n"));
     global_impl.getline_free(input);
     return NULL;

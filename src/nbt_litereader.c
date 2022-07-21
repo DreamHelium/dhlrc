@@ -29,25 +29,6 @@
 #define _(str) str
 #endif
 
-typedef struct NBT_Pos
-{
-    /** The level of the pos in the NBT */
-    int level;
-    /** The pos of child in the NBT, len: level */
-    int* child;
-    /** NBT tree, len: level + 1 (include root as the first when level is 0) */
-    NBT** tree;
-    /** Current NBT */
-    NBT* current;
-    /** Represent the item in the latest tree */
-    int item;
-}
-NBT_Pos;
-
-NBT_Pos* NBT_Pos_init(NBT* root);
-int NBT_Pos_AddToTree(NBT_Pos* pos, int n);
-int NBT_Pos_DeleteLast(NBT_Pos* pos);
-void NBT_Pos_Free(NBT_Pos* pos);
 int nbtlr_instance(NBT* root, int from_parent, int modify_mode);
 int nbtlr_instance_ng(NBT_Pos* pos, int modify_mode);
 int nbtlr_Modifier_instance(NBT* root);
@@ -153,6 +134,136 @@ int NBT_Pos_DeleteLast(NBT_Pos* pos)
     }
 }
 
+int NBT_Pos_GetChild(NBT_Pos* pos, const char* key)
+{
+    if(pos)
+    {
+        if(key == NULL) return 1;
+        else{
+            NBT* current = pos->current;
+            /* Try to scan the list first */
+            int item = 0;
+            int success = 0;
+            while(current)
+            {
+                if(current->key){
+                    if(!strcmp(current->key, key))
+                    {
+                        success = 1;
+                        break;
+                    }
+                }
+                item++;
+                current = current->next;
+            }
+            if(success)
+                return NBT_Pos_AddToTree( pos, item );
+            else
+            {
+                /* Try to enter and scan */
+                int ret = NBT_Pos_AddToTree(pos, (pos->item == -1)? 0: pos->item);
+                if(ret)
+                {
+                    NBT* current = pos->current;
+                    int item = 0;
+                    int success = 0;
+                    while(current)
+                    {
+                        if(current->key){
+                            if(!strcmp(current->key, key))
+                            {
+                                success = 1;
+                                break;
+                            }
+                        }
+                        item++;
+                        current = current->next;
+                    }
+                    if(success)
+                        return NBT_Pos_AddToTree(pos, item);
+                    else return 0;
+                }
+                else return 0;
+            }
+        }
+    }
+    else return 0;
+}
+
+int NBT_Pos_GetChild_Deep(NBT_Pos* pos, ...)
+{
+    if(pos)
+    {
+        va_list va;
+        va_start(va, pos);
+        char* temp = NULL;
+        while( (temp = va_arg(va, char*)) != NULL )
+        {
+            if(!NBT_Pos_GetChild(pos, temp))
+            {
+                va_end(va);
+                return 0;
+            }
+        }
+        va_end(va);
+        return 1;
+    }
+    else return 0;
+}
+
+NBT_Pos * NBT_Pos_Copy(NBT_Pos* pos)
+{
+    NBT_Pos* new_pos = (NBT_Pos*)malloc(sizeof(NBT_Pos));
+    if(new_pos)
+    {
+        NBT** new_tree = (NBT**)malloc( (pos->level + 1) * sizeof(NBT*) );
+        if(new_tree)
+        {
+            int* new_child = (int*)malloc( (pos->level) * sizeof(int) );
+            if(new_child)
+            {
+                memcpy( new_tree, pos->tree, (pos->level + 1) * sizeof(NBT*) );
+                memcpy( new_child , pos->child, (pos->level) * sizeof(int) );
+                new_pos->child = new_child;
+                new_pos->tree = new_tree;
+                new_pos->current = pos->current;
+                new_pos->item = pos->item;
+                new_pos->level = pos->level;
+                return new_pos;
+            }
+            else
+            {
+                free(new_tree);
+                free(new_pos);
+                return NULL;
+            }
+        }
+        else{
+            free(new_pos);
+            return NULL;
+        }
+    }
+    else return NULL;
+}
+
+NBT * NBT_Pos_GetItem_NBT(NBT_Pos* pos, const char* key)
+{
+    if(key && pos)
+    {
+        NBT* current = pos->current;
+        while(current)
+        {
+            if(current->key)
+                if(!strcmp(current->key, key))
+                    return current;
+            current = current->next;
+        }
+        return NULL;
+    }
+    else return NULL;
+}
+
+
 void NBT_Pos_Free(NBT_Pos* pos)
 {
     free(pos->child);
@@ -166,6 +277,11 @@ int nbtlr_Start(NBT* root)
     int ret = nbtlr_instance_ng(pos, 0);
     NBT_Pos_Free(pos);
     return ret;
+}
+
+int nbtlr_Start_Pos(NBT_Pos* pos)
+{
+    return nbtlr_instance_ng(pos, 0);
 }
 
 int nbtlr_instance_ng(NBT_Pos* pos, int modify_mode)

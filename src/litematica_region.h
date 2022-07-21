@@ -24,6 +24,7 @@ extern "C"{
 #include "libnbt/nbt.h"
 #include "dhlrc_list.h"
 #include "dh_string_util.h"
+#include "nbt_litereader.h"
 
 // litematica processing stuff
 
@@ -49,6 +50,12 @@ typedef struct LiteRegion{
 
     /** Region NBT */
     NBT* region_nbt;
+
+    /** Block Properties */
+    NBT** block_properties;
+
+    /** Region NBT Pos variable */
+    NBT_Pos* region_pos;
 
     /** Block states */
     int64_t* states;
@@ -115,6 +122,8 @@ ItemList* lite_region_ItemListExtend(NBT* root, int r_num, ItemList *oBlock);
 int lite_region_IsBlockWaterlogged(NBT* root,int r_num,int id);
 int lite_region_BlockLevel(NBT* root,int r_num,int id);
 char* lite_region_DoorHalf(NBT* root,int r_num,int id);
+
+NBT* lite_region_BlockProperties(LiteRegion* lr, int id);
 
 
 #ifdef __cplusplus

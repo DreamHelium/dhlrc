@@ -81,12 +81,13 @@ int main(int argc,char** argb)
 #endif
     }
     int size = 0;
-#ifndef DH_DEBUG_IN_IDE
-    uint8_t* data = (uint8_t*)dhlrc_ReadFile(argb[1],&size);
-#else
+    uint8_t* data = NULL;
+    data = (uint8_t*)dhlrc_ReadFile(argb[1],&size);
+#ifdef DH_DEBUG_IN_IDE
     printf("You are in debug mode! Don't define \"DH_DEBUG_IN_IDE\" to use the normal program!\n");
     printf("Anyway, enter 3 in the following program (if success reading file) to enter debug function. \n\n");
-    uint8_t* data = (uint8_t*)dhlrc_ReadFile("/path/to/litematic",&size);
+    if(!data)
+        data = (uint8_t*)dhlrc_ReadFile("/path/to/litematic",&size);
 #endif
     if(!data)
     {
@@ -167,8 +168,7 @@ int start_func(NBT *root, enum option opt)
         return 0;
 #ifdef DH_DEBUG_IN_IDE
     case Debug:
-        debug(root);
-        return 0;
+        return debug(root);
 #endif
     case Exit:
         return 0;
@@ -361,10 +361,18 @@ enter 'q' to exit the program (b): "));
 
 int debug(NBT* root)
 {
-    LiteRegion* lr = LiteRegion_Create(root, 5);
-    lite_region_BlockArrayPos(root, 5 , 0);
-    LiteRegion_Free(lr);
-    return 0;
+    NBT_Pos* pos = NBT_Pos_init(root);
+    if(NBT_Pos_GetChild_Deep(pos,"Metadata","TimeCreated",NULL))
+    {
+        int ret = nbtlr_Start_Pos(pos);
+        NBT_Pos_Free(pos);
+        return ret;
+    }
+    else
+    {
+        NBT_Pos_Free(pos);
+        return -1;
+    }
 }
 
 

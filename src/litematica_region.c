@@ -32,19 +32,50 @@ LiteRegion* LiteRegion_Create(NBT* root, int r_num)
     LiteRegion* out = (LiteRegion*)malloc(sizeof(LiteRegion));
     if(out)
     {
+        NBT_Pos* pos = NBT_Pos_init(root);
+        if(pos)
+        {
+            NBT_Pos_GetChild(pos, "Regions");
+            NBT_Pos_AddToTree(pos, r_num);
+            out->region_pos = pos;
+        }
+        else
+        {
+            free(out);
+            return NULL;
+        }
+
         dh_StrArray* r_name = lite_region_Name_StrArray(root);
         if(r_num < r_name->num)
         {
             out->name = String_Copy( r_name->val[r_num] );
             dh_StrArray_Free(r_name);
+
             out->region_num = r_num;
             out->region_nbt = lite_region_RegionNBT( root, r_num );
+
             out->blocks = lite_region_BlockName_StrArray( root, r_num );
+
+            out->replaced_blocks = NULL;
+
+            NBT** properties = (NBT**)malloc( out->blocks->num * sizeof(NBT*));
+            if(properties)
+            {
+                for(int i = 0 ; i < out->blocks->num ; i++)
+                    properties[i] = lite_region_BlockProperties(out, i);
+            }
+            else{
+                LiteRegion_Free(out);
+                return NULL;
+            }
+
+            out->block_properties = properties;
             int* size = lite_region_SizeArray(root, r_num);
             out->region_size.x = size[0];
             out->region_size.y = size[1];
             out->region_size.z = size[2];
             free(size);
+
             NBT* states = NBT_GetChild(out->region_nbt, "BlockStates");
             out->states = states->value_a.value;
             out->states_num = states->value_a.len;
@@ -61,9 +92,7 @@ LiteRegion* LiteRegion_Create(NBT* root, int r_num)
             ReplaceList* rl = ReplaceList_Init();
             for(int i = 0 ; i < out->blocks->num ; i++)
             {
-
                 dh_StrArray_AddStr(&replaced_names, ReplaceList_Replace(rl, out->blocks->val[i]));
-
             }
             ReplaceList_Free(rl);
             out->replaced_blocks = replaced_names;
@@ -84,6 +113,7 @@ void LiteRegion_Free(LiteRegion* lr)
     free(lr->name);
     dh_StrArray_Free(lr->blocks);
     dh_StrArray_Free(lr->replaced_blocks);
+    NBT_Pos_Free(lr->region_pos);
     free(lr);
 }
 
@@ -509,3 +539,24 @@ dh_StrArray* lite_region_Name_StrArray(NBT* root)
     }
     return str_arr;
 }
+
+NBT * lite_region_BlockProperties(LiteRegion* lr, int id)
+{
+    NBT_Pos* pos_copy = NBT_Pos_Copy(lr->region_pos);
+    if(pos_copy)
+    {
+        NBT_Pos_GetChild( pos_copy, "BlockStatePalette" );
+        NBT_Pos_AddToTree( pos_copy, id);
+        if(NBT_Pos_GetChild( pos_copy, "Properties" )){
+            NBT* ret = pos_copy->current;
+            NBT_Pos_Free(pos_copy);
+            return ret;
+        }
+        else{
+            NBT_Pos_Free(pos_copy);
+            return NULL;
+        }
+    }
+    else return NULL;
+}
+
