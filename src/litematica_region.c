@@ -20,6 +20,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <math.h>
+#include <time.h>
 #ifndef DH_DISABLE_TRANSLATION
 #include <libintl.h>
 #define _(str) gettext (str)
@@ -399,6 +400,7 @@ ItemList *lite_region_ItemList(NBT* root, int r_num)
 
 ItemList *lite_region_ItemListExtend(NBT* root, int r_num, ItemList* oBlock, int print_process)
 {
+    clock_t start = clock();
     LiteRegion* lr = LiteRegion_Create(root, r_num);
     int bNum = lr->blocks->num;
 
@@ -428,11 +430,12 @@ ItemList *lite_region_ItemListExtend(NBT* root, int r_num, ItemList* oBlock, int
                 uint64_t index = lite_region_BlockIndex_lr(lr,x,y,z);
                 int id = lite_region_BlockArrayPos_lr(lr,index);
                 char* id_block_name = lr->replaced_blocks->val[id];
-                if(print_process){
-                float percent = ((float)(index + 1) / volume) * 100;
-                fprintf(stderr,_("[%.2f%%] Processing Blocks %lu/%lu, (%3d,%3d,%3d)/(%3d,%3d,%3d)"), percent ,index+1, volume ,
-                        x,y,z,lr->region_size.x,lr->region_size.y,lr->region_size.z);
-                fprintf(stderr, "\r");
+                int passed_ms = (double)(1000.0f * (clock() - start) / CLOCKS_PER_SEC);
+                if((print_process && (passed_ms % 500 == 0)) || (index + 1) == volume ){
+                    float percent = ((float)(index + 1) / volume) * 100;
+                    fprintf(stderr,_("[%.2f%%] Processing Blocks %lu/%lu, (%3d,%3d,%3d)/(%3d,%3d,%3d)"), percent ,index+1, volume ,
+                            x,y,z,lr->region_size.x,lr->region_size.y,lr->region_size.z);
+                    fprintf(stderr, "\r");
                 }
                 if(!BlackList_Scan(bl,id_block_name))
                 {
