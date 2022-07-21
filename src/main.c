@@ -198,7 +198,7 @@ void start_lrc_main(NBT *root)
             {
                 printf(_("Processing: region %d / %d : [%ld] %s \n"),
                        i,process_num,process_region_i[i],region_name[process_region_i[i]]);
-                il = lite_region_ItemListExtend(root, process_region_i[i], il);
+                il = lite_region_ItemListExtend(root, process_region_i[i], il, 0);
             }
             free(process_region_i);
             lite_region_FreeNameArray(region_name,region_num);

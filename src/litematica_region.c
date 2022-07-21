@@ -114,6 +114,7 @@ void LiteRegion_Free(LiteRegion* lr)
     dh_StrArray_Free(lr->blocks);
     dh_StrArray_Free(lr->replaced_blocks);
     NBT_Pos_Free(lr->region_pos);
+    free(lr->block_properties);
     free(lr);
 }
 
@@ -393,10 +394,10 @@ char* lite_region_BlockType(NBT* root, int r_num, int id)
 
 ItemList *lite_region_ItemList(NBT* root, int r_num)
 {
-    return lite_region_ItemListExtend(root,r_num,NULL);
+    return lite_region_ItemListExtend(root,r_num,NULL, 0);
 }
 
-ItemList *lite_region_ItemListExtend(NBT* root, int r_num, ItemList* oBlock)
+ItemList *lite_region_ItemListExtend(NBT* root, int r_num, ItemList* oBlock, int print_process)
 {
     LiteRegion* lr = LiteRegion_Create(root, r_num);
     int bNum = lr->blocks->num;
@@ -427,16 +428,18 @@ ItemList *lite_region_ItemListExtend(NBT* root, int r_num, ItemList* oBlock)
                 uint64_t index = lite_region_BlockIndex_lr(lr,x,y,z);
                 int id = lite_region_BlockArrayPos_lr(lr,index);
                 char* id_block_name = lr->replaced_blocks->val[id];
+                if(print_process){
                 float percent = ((float)(index + 1) / volume) * 100;
                 fprintf(stderr,_("[%.2f%%] Processing Blocks %lu/%lu, (%3d,%3d,%3d)/(%3d,%3d,%3d)"), percent ,index+1, volume ,
                         x,y,z,lr->region_size.x,lr->region_size.y,lr->region_size.z);
                 fprintf(stderr, "\r");
+                }
                 if(!BlackList_Scan(bl,id_block_name))
                 {
                     // There is no need for searching repeat.
 //                    if(ItemList_ScanRepeat(oBlock,id_block_name))  // search for item name
 //                    {
-                    if(lite_region_IsBlockWaterlogged(root,r_num,id))
+                    if(lite_region_BlockPropertiesCmp(lr, id, "waterlogged", "true"))
                     {
                         if(!ItemList_ScanRepeat(oBlock,"minecraft_water_bucket"))
                             ItemList_InitNewItem(&oBlock,"minecraft:water_bucket");
@@ -445,22 +448,24 @@ ItemList *lite_region_ItemListExtend(NBT* root, int r_num, ItemList* oBlock)
                     if(!strcmp(id_block_name,"minecraft:water_bucket") ||
                       !strcmp(id_block_name,"minecraft:lava_bucket"))
                     {
-                        if(lite_region_BlockLevel(root,r_num,id) != 0)
+                        if(!lite_region_BlockPropertiesCmp(lr, id, "level", "0"))
                             continue;    // It's not source, so skip
                     }
                     if(strstr(id_block_name,"_slab"))     // special for slab
                     {
-                        if(!strcmp(lite_region_BlockType(root,r_num,id),"double"))
-                        {   ItemList_AddNum(oBlock,2,id_block_name);
+                        if(lite_region_BlockPropertiesCmp(lr,id,"type","double"))
+                        {
+                            ItemList_AddNum(oBlock,2,id_block_name);
                             continue;
                         }
                     }
                     if(strstr(id_block_name,"_door"))
                     {
-                        if(!strcmp(lite_region_DoorHalf(root,r_num,id),"upper"))
+                        if(!lite_region_BlockPropertiesCmp(lr, id, "half" ,"upper"))
                         {
-                            if(!strcmp(lite_region_DoorHalf(root,r_num,
-                                                            lite_region_BlockArrayPos(root,r_num,lite_region_BlockIndex(root,r_num,x,y-1,z))),"lower"))
+                            if(!lite_region_BlockPropertiesCmp(lr,
+                                                            lite_region_BlockArrayPos_lr(lr,
+                                                            lite_region_BlockIndex_lr(lr,x,y-1,z)),"half","lower"))
                                 continue;
                         }
                     }
@@ -558,5 +563,23 @@ NBT * lite_region_BlockProperties(LiteRegion* lr, int id)
         }
     }
     else return NULL;
+}
+
+int lite_region_BlockPropertiesCmp(LiteRegion* lr, int id, char* key, char* val)
+{
+    NBT* current = (lr->block_properties)[id];
+    while(current)
+    {
+        if(current->key){
+            if(!strcmp(current->key, key)){ /* This item */
+                if(current->value_a.value)
+                    if(!strcmp(current->value_a.value, val))
+                        return 1;
+                return 0;
+            }
+        }
+        current = current -> next;
+    }
+    return 0;
 }
 

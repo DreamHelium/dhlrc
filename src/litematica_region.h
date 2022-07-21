@@ -118,13 +118,13 @@ char* lite_region_BlockType(NBT* root,int r_num, int id);
 ItemList* lite_region_ItemList(NBT* root,int r_num);
 /**  Make ItemList but not init item numbers (support extend) */
 ItemList* lite_region_ItemList_WithoutNum(LiteRegion* lr, ItemList *o_il);
-ItemList* lite_region_ItemListExtend(NBT* root, int r_num, ItemList *oBlock);
+ItemList* lite_region_ItemListExtend(NBT* root, int r_num, ItemList *oBlock, int print_process);
 int lite_region_IsBlockWaterlogged(NBT* root,int r_num,int id);
 int lite_region_BlockLevel(NBT* root,int r_num,int id);
 char* lite_region_DoorHalf(NBT* root,int r_num,int id);
 
 NBT* lite_region_BlockProperties(LiteRegion* lr, int id);
-
+int lite_region_BlockPropertiesCmp(LiteRegion* lr, int id, char* key, char* val);
 
 #ifdef __cplusplus
 }

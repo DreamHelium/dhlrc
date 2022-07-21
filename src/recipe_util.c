@@ -22,11 +22,18 @@
 #include <ctype.h>
 #include "litematica_region.h"
 #include "dh_string_util.h"
+#include "file_util.h"
+#ifndef DH_DISABLE_TRANSLATION
+#include <libintl.h>
+#define _(str) gettext (str)
+#else
+#define _(str) str
+#endif
 
 long* NumArray_GetFromInput(int* array_num, int max_num)
 {
     if(!array_num) return NULL;
-    printf("Input nums directly, or type 'a' for all numbers (a): ");
+    printf(_("Input numbers directly, or type 'a' for all numbers (a): "));
     dh_limit* limit = dh_limit_Init(NumArray);
     if(limit)
     {
@@ -159,121 +166,116 @@ ItemList* ItemList_Recipe(char* block_name,int num)
     strcat(directory,name);
     strcat(directory,".json");
     ItemList* out_recipe = NULL;
-    FILE* f = fopen(directory,"rb");
+    cJSON* block_data = dhlrc_FileToJSON(directory);
     free(directory);
-    if(f)
+    if(block_data){
+        char* type = cJSON_GetStringValue(cJSON_GetObjectItem(block_data,"type"));
+        if(strstr(type,"minecraft:crafting_shaped"))
         {
-            fseek(f,0,SEEK_END);
-            int size = ftell(f);
-            fseek(f,0,SEEK_SET);
-            char* data = (char*)malloc(size* sizeof(char));
-            fread(data,1,size,f);
-            fclose(f);
-
-            cJSON* block_data = cJSON_ParseWithLength(data,size);
-            free(data);
-            char* type = cJSON_GetStringValue(cJSON_GetObjectItem(block_data,"type"));
-            if(strstr(type,"minecraft:crafting_shaped"))
+            if(num == 0) // just return the origin name
             {
-                if(num == 0) // just return the origin name
+                cJSON_Delete(block_data);
+                return ItemList_Init(block_name);
+            }
+            // get the pattern and lines of recipe
+            cJSON* block_pattern = cJSON_GetObjectItem(block_data,"pattern");
+            int line = cJSON_GetArraySize(block_pattern);
+
+            // get result count
+            int count_num = 1;
+            if(cJSON_IsNumber(cJSON_GetObjectItem(cJSON_GetObjectItem(block_data,"result"),"count")))
+                count_num = cJSON_GetNumberValue(cJSON_GetObjectItem(cJSON_GetObjectItem(block_data,"result"),"count"));
+
+            //get craft numbers
+            int craft_num = 0;
+            if(num % count_num == 0) craft_num = num / count_num;
+            else craft_num = num / count_num + 1;
+
+            for(int i = 0 ; i < line ; i++)
+            {
+                cJSON* table = cJSON_GetArrayItem(block_pattern,i);
+                char* table_content = cJSON_GetStringValue(table);
+                for(int j = 0 ; j < strlen(table_content) ; j++)
                 {
-                    cJSON_Delete(block_data);
-                    return ItemList_Init(block_name);
-                }
-                // get the pattern and lines of recipe
-                cJSON* block_pattern = cJSON_GetObjectItem(block_data,"pattern");
-                int line = cJSON_GetArraySize(block_pattern);
-
-                // get result count
-                int count_num = 1;
-                if(cJSON_IsNumber(cJSON_GetObjectItem(cJSON_GetObjectItem(block_data,"result"),"count")))
-                    count_num = cJSON_GetNumberValue(cJSON_GetObjectItem(cJSON_GetObjectItem(block_data,"result"),"count"));
-
-                //get craft numbers
-                int craft_num = 0;
-                if(num % count_num == 0) craft_num = num / count_num;
-                else craft_num = num / count_num + 1;
-
-                for(int i = 0 ; i < line ; i++)
-                {
-                    cJSON* table = cJSON_GetArrayItem(block_pattern,i);
-                    char* table_content = cJSON_GetStringValue(table);
-                    for(int j = 0 ; j < strlen(table_content) ; j++)
+                    if(table_content[j] != ' ')
                     {
-                        if(table_content[j] != ' ')
+                        // find the item
+                        char item_key[2] = {table_content[j],'\0'};
+                        cJSON* key = cJSON_GetObjectItem(block_data,"key");
+                        cJSON* item = cJSON_GetObjectItem(key,item_key);
+                        char* item_name = NULL;
+                        if(cJSON_IsArray(item))
                         {
-                            // find the item
-                            char item_key[2] = {table_content[j],'\0'};
-                            cJSON* key = cJSON_GetObjectItem(block_data,"key");
-                            cJSON* item = cJSON_GetObjectItem(key,item_key);
-                            char* item_name = NULL;
-                            if(cJSON_IsArray(item))
+                            item_name = cJSON_GetStringValue(cJSON_GetObjectItem(cJSON_GetArrayItem(item,0),"item"));
+                            if(!item_name)
+                                item_name = cJSON_GetStringValue(cJSON_GetObjectItem(cJSON_GetArrayItem(item,0),"tag"));
+                        }
+                        else
+                        {
+                            item_name = cJSON_GetStringValue(cJSON_GetObjectItem(item,"item"));
+                            if(!item_name) item_name = cJSON_GetStringValue(cJSON_GetObjectItem(item,"tag"));
+                        }
+                            if(!ItemList_ScanRepeat(out_recipe,item_name))
                             {
-                                item_name = cJSON_GetStringValue(cJSON_GetObjectItem(cJSON_GetArrayItem(item,0),"item"));
-                                if(!item_name)
-                                    item_name = cJSON_GetStringValue(cJSON_GetObjectItem(cJSON_GetArrayItem(item,0),"tag"));
-                            }
-                            else
-                            {
-                                item_name = cJSON_GetStringValue(cJSON_GetObjectItem(item,"item"));
-                                if(!item_name) item_name = cJSON_GetStringValue(cJSON_GetObjectItem(item,"tag"));
-                            }
-                                if(!ItemList_ScanRepeat(out_recipe,item_name))
+                                if(ItemList_InitNewItem(&out_recipe,item_name))
                                 {
-                                    if(ItemList_InitNewItem(&out_recipe,item_name))
-                                    {
-                                        cJSON_Delete(block_data);
-                                        return NULL;
-                                    }
+                                    cJSON_Delete(block_data);
+                                    return NULL;
                                 }
-                                    ItemList_AddNum(out_recipe,craft_num,item_name);
-                           }
+                            }
+                                ItemList_AddNum(out_recipe,craft_num,item_name);
                         }
                     }
-                cJSON_Delete(block_data);
-                if(out_recipe)
-                    return out_recipe;
-                return NULL;
-            }
-            else
-            {
-                cJSON_Delete(block_data);
-                return NULL;
-            }
-
-            }
-    else
-    {
-        //printf("Couldn't find recipes, did you put the recipe in?\n");
-        return NULL;
+                }
+            cJSON_Delete(block_data);
+            if(out_recipe)
+                return out_recipe;
+            return NULL;
+        }
+        else
+        {
+            cJSON_Delete(block_data);
+            return NULL;
+        }
     }
+    else return NULL;
 }
 
 char* Name_BlockTranslate(const char *block_name)
 {
-    FILE* f = fopen("translation.json","rb");
-    if(f)
+    cJSON* trans_data = dhlrc_FileToJSON("translation.json");
+
+    char* pure_name = strchr(block_name,':') + 1;
+
+    int len = strlen(pure_name) + 1 + 5 + 10;
+
+    char* origin_name = (char*) malloc(len * sizeof(char));
+    strcpy(origin_name,"item.minecraft.");
+    strcat(origin_name,pure_name);
+    cJSON* trans_line = cJSON_GetObjectItem(trans_data,origin_name);
+    if(cJSON_IsString(trans_line))
     {
-        // read file
-        fseek(f,0,SEEK_END);
-        int size = ftell(f);
-        fseek(f,0,SEEK_SET);
-        char* data = (char*)malloc(size* sizeof(char));  // origin data
-        fread(data,1,size,f);
-        fclose(f);
-        // end of reading file
+        char* trans_name = cJSON_GetStringValue(trans_line);
+        free(origin_name);
+        origin_name = NULL;
 
-        cJSON* trans_data = cJSON_ParseWithLength(data,size);
-        free(data);
+        char* out = (char*)malloc((strlen(trans_name)+1)*sizeof(char));
+        strcpy(out,trans_name);
 
-        char* pure_name = strchr(block_name,':') + 1;
+        cJSON_Delete(trans_data);
 
-        int len = strlen(pure_name) + 1 + 5 + 10;
-
-        char* origin_name = (char*) malloc(len * sizeof(char));
-        strcpy(origin_name,"item.minecraft.");
+        return out;
+    }
+    else
+    {
+        len++;
+        free(origin_name);
+        origin_name = NULL;
+        origin_name = (char*)malloc(len * sizeof(char));
+        strcpy(origin_name,"block.minecraft.");
         strcat(origin_name,pure_name);
-        cJSON* trans_line = cJSON_GetObjectItem(trans_data,origin_name);
+        trans_line = cJSON_GetObjectItem(trans_data,origin_name);
+
         if(cJSON_IsString(trans_line))
         {
             char* trans_name = cJSON_GetStringValue(trans_line);
@@ -289,39 +291,11 @@ char* Name_BlockTranslate(const char *block_name)
         }
         else
         {
-            len++;
+            cJSON_Delete(trans_data);
             free(origin_name);
             origin_name = NULL;
-            origin_name = (char*)malloc(len * sizeof(char));
-            strcpy(origin_name,"block.minecraft.");
-            strcat(origin_name,pure_name);
-            trans_line = cJSON_GetObjectItem(trans_data,origin_name);
-
-            if(cJSON_IsString(trans_line))
-            {
-                char* trans_name = cJSON_GetStringValue(trans_line);
-                free(origin_name);
-                origin_name = NULL;
-
-                char* out = (char*)malloc((strlen(trans_name)+1)*sizeof(char));
-                strcpy(out,trans_name);
-
-                cJSON_Delete(trans_data);
-
-                return out;
-            }
-            else
-            {
-                cJSON_Delete(trans_data);
-                free(origin_name);
-                origin_name = NULL;
-                return NULL;
-            }
+            return NULL;
         }
-    }
-    else
-    {
-        return NULL;
     }
 }
 
