@@ -2,6 +2,7 @@ set( DHLRC_MAIN_POT_FILE_DEPENDS
         src/main.c
         src/nbt_litereader.c
         src/litematica_region.c
+        src/lrc_extend.c
 	PARENT_SCOPE
 )
 # Currently only this one need translate
@@ -14,7 +15,7 @@ set( DHUTIL_POT_FILE_DEPENDS ${DHUTIL_POT_FILE_DEPENDS} PARENT_SCOPE )
 
 add_executable(dhlrc
 	       main.c
-               libnbt/nbt.h
+	       libnbt/nbt.h
 	       libnbt/nbt.c
 	       litematica_region.c
 	       litematica_region.h
@@ -24,6 +25,8 @@ add_executable(dhlrc
 	       dhlrc_list.c
 	       recipe_util.h
 	       recipe_util.c
+	       lrc_extend.c
+	       lrc_extend.h
 )
 
 #add_definitions(-DLIBNBT_USE_LIBDEFLATE)

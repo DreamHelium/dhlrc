@@ -26,6 +26,7 @@
 #include "file_util.h"
 #include "nbt_litereader.h"
 #include "dh_string_util.h"
+#include "lrc_extend.h"
 /*#include "dhlrc_config.h"*/
 
 #ifndef DH_DISABLE_TRANSLATION
@@ -48,8 +49,6 @@ enum option{Reader, Litematic_material_lister, Litematic_block_show,
 enum option start_without_option();
 int start_func(NBT* root, enum option opt);
 void start_lrc_main(NBT* root);
-void start_lrc_extend(NBT* root);
-int lrc_extend_instance(NBT* root, int r_num, int64_t* array);
 #ifdef DH_DEBUG_IN_IDE
 int debug(NBT* root);
 #endif
@@ -211,151 +210,7 @@ void start_lrc_main(NBT *root)
     }
 }
 
-void start_lrc_extend(NBT* root)
-{
-    int region_num = lite_region_Num(root);
-    int err = 0;
-    char** region_name = lite_region_Name(root, region_num, &err);
-    int continue_func_out = 1;
-    if(region_name)
-    {
-        while(continue_func_out)
-        {
-            system("clear");
-            printf(_("There are %d regions:\n"),region_num);
-            for(int i = 0 ; i < region_num ; i++)
-            {
-                printf("[%2d] %s\n",i,region_name[i]);
-            }
 
-            printf("\n");
-            printf(_("Enter the region number, or enter 'q' to exit program (q): "));
-            dh_LineOut* output1 = InputLine_Get_OneOpt(1,1,1,0,region_num,'q');
-            if(output1)
-            {
-                switch(output1->type)
-                {
-                case Integer:
-                {
-                    int read_region_num = output1->num_i;
-                    dh_LineOut_Free(output1);
-                    system("clear");
-
-                    int* region_size = lite_region_SizeArray(root, read_region_num);
-                    printf(_("You are reading region: [%2d] %s:\nThe size of the region is (%d, %d, %d).\n\n")
-                           , read_region_num, region_name[read_region_num], region_size[0], region_size[1], region_size[2]);
-
-                    printf(_("Please enter the coordination of the block (just numbers of x y z without additional character\n\
-or enter 'b' to choose another region, enter 'q' to exit the program (b): "));
-
-                    dh_LineOut* output2 = InputLine_Get_MoreDigits(1, 3, 2, 0,
-                                                                   region_size[0] - 1, 0, region_size[1] - 1, 0 ,region_size[2] - 1, 'b', 'q');
-                    if(output2)
-                    {
-                        switch(output2->type)
-                        {
-                        case NumArray:
-                        {
-                            int ret = lrc_extend_instance(root, read_region_num, output2->val);
-                            dh_LineOut_Free(output2);
-                            free(region_size);
-                            if(ret == 0 || ret == -1)
-                            {
-                                // exit program
-                                lite_region_FreeNameArray(region_name, region_num);
-                                return;
-                            }
-                            else if(ret == 1)
-                                break;
-                            else break; // Silence warning
-                        }
-                        case Character:
-                        {
-                            if(output2->val_c == 'q')
-                            {
-                                free(region_size);
-                                dh_LineOut_Free(output2);
-                                lite_region_FreeNameArray(region_name, region_num);
-                                return;
-                            }
-                        }
-                        default: // default: back
-                            free(region_size);
-                            dh_LineOut_Free(output2);
-                            break;
-                        }
-                    }
-                    else // Second output (Enter coordination) failed
-                    {
-                        free(region_size);
-                        lite_region_FreeNameArray(region_name, region_num);
-                        return; // out of the instance
-                    }
-                    break; // Each case should follow a break.
-                }
-                default: // The first case. Character is the only second option
-                    dh_LineOut_Free(output1);
-                    lite_region_FreeNameArray(region_name, region_num);
-                    return;
-                }
-            }
-            else  // First output (entry) failed
-            {
-                lite_region_FreeNameArray(region_name, region_num);
-                break;
-            }
-        }
-    }
-}
-
-int lrc_extend_instance(NBT* root, int r_num, int64_t *array)
-{
-    int block_num = lite_region_BlockNum(root,r_num);
-    char** block_name = lite_region_BlockNameArray(root, r_num, block_num);
-    int index = lite_region_BlockIndex(root, r_num, array[0], array[1], array[2]);
-    int id = lite_region_BlockArrayPos(root, r_num, index);
-    printf(_("The block in (%ld, %ld, %ld) is %s.\n"), array[0], array[1], array[2], block_name[id]);
-    printf(_("Please enter the coordination of the block again, or enter 'b' to choose another region, \
-enter 'q' to exit the program (b): "));
-    int* region_size = lite_region_SizeArray(root, r_num);
-    dh_LineOut* input = InputLine_Get_MoreDigits(1, 3, 2, 0, region_size[0] - 1, 0, region_size[1] - 1, 0, region_size[2] - 1, 'b', 'q');
-    if(input){
-    switch (input->type) {
-    case Character:
-    {
-        free(region_size);
-        lite_region_FreeNameArray(block_name, block_num);
-        char opt = input->val_c;
-        dh_LineOut_Free(input);
-        if(opt == 'q')
-            return 0;
-        else if(opt == 'b')
-            return 1;
-        else return 0;  // Just use this to silence warning.
-    }
-    case NumArray:
-    {
-        free(region_size);
-        lite_region_FreeNameArray(block_name, block_num);
-        int ret = lrc_extend_instance(root, r_num, input->val); // This is the only entry to the next instance, so return value will stay same.
-        dh_LineOut_Free(input);
-        return ret;
-    }
-    default:
-        free(region_size);
-        lite_region_FreeNameArray(block_name, block_num);
-        dh_LineOut_Free(input);
-        return 1;  // Empty: back
-    }
-    }
-    else
-    {
-        free(region_size);
-        lite_region_FreeNameArray(block_name, block_num);
-        return -1;
-    }
-
-}
 
 #ifdef DH_DEBUG_IN_IDE
 
