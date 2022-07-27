@@ -27,6 +27,8 @@ add_executable(dhlrc
 	       recipe_util.c
 	       lrc_extend.c
 	       lrc_extend.h
+	       nbt_pos.c
+	       nbt_pos.h
 )
 
 #add_definitions(-DLIBNBT_USE_LIBDEFLATE)

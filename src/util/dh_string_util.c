@@ -57,12 +57,10 @@ static internal_impl global_impl = { printf, vprintf, default_getline, free, int
 
 
 static dh_LineOut* InputLine_Get_OneOpt_va(int byte, int range_check, int need_num, int arg_num, va_list va);
-static dh_LineOut* InputLine_Get_OneOpt_va_CharArg(int byte, int range_check, int need_num, char* arg, va_list va);
 static dh_LineOut* InputLine_Get_MoreDigits_va ( int byte, int range_check, int need_nums, int arg_num, va_list va, int same_range );
 static int char_check(const char* str, char** end, char check_char);
 static int multi_char_check_CharArg(const char* str, char* args, char* result, int* err);
 static int search_num(int byte, const char* str, char** end, int rc, int64_t min, int64_t max, int64_t *result, int* err);
-static int64_t *num_array_check(int byte, const char* str, int range_check, int need_nums, va_list range, int same_range, int use_arr, int64_t **arr, int *err);
 static int64_t* line_numarray_check(int byte, int* array_len, const char* str, int need_nums, int range_nums,
                                     int64_t** range, int* err, int repeat_check, int same_range,
                                     int unlimited_lens);
@@ -76,10 +74,10 @@ static void* resize_array(int byte, int o_byte, void* array, int len);
 // -3 : Out of range (int64_t or byte-spec)
 // -4 : Not expected character afterwards
 // -5 : Memory not enough?
-static dh_LineOut* inputline_handler_nummode(const char* str, int byte, int range_check, int* err, va_list va);
+
 /** Number mode (normal) */
 static dh_LineOut* inputline_handler_nummode_noVa(const char* str, int byte, int range_check, int* err, int min, int max);
-static dh_LineOut* inputline_handler_charmode(const char* str, int skip_va, int arg_num , va_list va, int *err);
+
 /** Character mode (normal) */
 static dh_LineOut* inputline_handler_charmode_CharArg(const char* str, char* args, int* err);
 /** Integer Array mode (normal) */
@@ -187,20 +185,6 @@ try to enter again: "));
     }
 }
 
-static dh_LineOut* inputline_handler_nummode(const char* str, int byte, int range_check, int* err, va_list va)
-{
-    int64_t min = -1;
-    int64_t max = -1;
-    va_list va_num;
-    va_copy(va_num, va);
-    if(range_check) // update min and max
-    {
-        min = va_arg(va_num, int64_t);
-        max = va_arg(va_num, int64_t);
-    }
-    va_end(va_num);
-    return inputline_handler_nummode_noVa(str, byte, range_check, err, min, max);
-}
 
 static dh_LineOut* inputline_handler_nummode_noVa(const char* str, int byte, int range_check, int* err, int min, int max)
 {
@@ -218,21 +202,6 @@ static dh_LineOut* inputline_handler_nummode_noVa(const char* str, int byte, int
         }
     }
     else return NULL;
-}
-
-
-static dh_LineOut* inputline_handler_charmode(const char* str, int skip_va, int arg_num, va_list va, int* err)
-{
-    va_list va_char;
-    va_copy(va_char, va);
-    for(int i = 0 ; i < skip_va ; i++)
-        va_arg(va_char, int64_t);
-    char str_arg[arg_num + 1];
-    for(int i = 0 ; i < arg_num ; i++)
-        str_arg[i] = (char)va_arg( va_char , int);
-    str_arg[arg_num] = 0;
-    va_end(va_char);
-    return inputline_handler_charmode_CharArg(str, str_arg, err);
 }
 
 static
@@ -281,8 +250,7 @@ dh_LineOut * InputLine_General(int byte, dh_limit* limit, int get_string, char* 
 #endif
     char* input = NULL;
     size_t size = 0;
-    int gret = -2;
-    while( (gret = global_impl.getline_fn(&input, &size)) != -1 )
+    while( global_impl.getline_fn(&input, &size) != -1 )
     {
         int err = 0;
         /* Number part */
@@ -380,70 +348,11 @@ dh_LineOut * InputLine_General(int byte, dh_limit* limit, int get_string, char* 
         inputline_handler_printerr(err);
     }
 
-    global_impl.printf_fn(_("Terminated input!\n"));
+    global_impl.printf_fn(_("Terminated input or unexpected situation!\n"));
     global_impl.getline_free(input);
     return NULL;
 }
 
-
-
-static dh_LineOut* InputLine_Get_OneOpt_va_CharArg(int byte, int range_check, int need_num, char* arg, va_list va)
-{
-    char* input = NULL;
-    size_t size = 0;
-    int gret = -2;
-    while((gret = global_impl.getline_fn(&input, &size)) != -1)
-    {
-        int err = 0;
-        if(need_num) // num process
-        {
-            dh_LineOut* num = inputline_handler_nummode(input, byte, range_check, &err, va);
-            if(num)
-            {
-                global_impl.getline_free(input);
-                return num;
-            }
-            else if(err == 0)
-                err = -5;
-        }
-        if(err == -1 || !need_num) // char process
-        {
-            err = 0;
-            dh_LineOut* out = inputline_handler_charmode_CharArg(input, arg, &err);
-            if(out)
-            {
-                global_impl.getline_free(input);
-                return out;
-            }
-            else if(err == 0)
-                err = -5;
-        }
-        if(err == -1)
-        {
-            char* inputl = input;
-            while( isspace(*inputl) )
-                inputl++;
-            if(*inputl == 0)
-            {
-                dh_LineOut* out = dh_LineOut_CreateEmpty();
-                if(out)
-                {
-                    global_impl.getline_free(input);
-                    return out;
-                }
-                else err = -5;
-            }
-        }
-        inputline_handler_printerr(err);
-    }
-    if(gret == -1)
-    {
-        printf(_("Terminated output!\n"));
-        global_impl.getline_free(input);
-        return NULL;
-    }
-    return NULL;
-}
 
 static dh_LineOut *InputLine_Get_OneOpt_va(int byte, int range_check, int need_num, int arg_num, va_list va)
 {
@@ -680,98 +589,6 @@ static int search_num(int byte, const char* str, char** end, int rc, int64_t min
     }
 }
 
-static int64_t* num_array_check(int byte, const char* str, int range_check, int need_nums, va_list range, int same_range, int use_arr, int64_t **arr, int* err)
-{
-    if(need_nums > 0)
-    {
-        const char* str_in = str;
-        char* end = (char*)str_in;
-        int64_t* output = NULL;
-        int64_t min = -1;
-        int64_t max = -1;
-        va_list va_range;
-        va_copy(va_range, range);
-        if(range_check)
-        {
-            if(same_range) // same range should just change min/max once
-            {
-                if(use_arr)
-                {
-                    min = arr[0][0];
-                    max = arr[1][0];
-                }
-                else  // va-listed range
-                {
-                    min = va_arg(va_range, int64_t);
-                    max = va_arg(va_range, int64_t);
-                }
-            }
-        }
-        for(int i = 0 ; i < need_nums ; i++)
-        {
-            if(range_check){
-                if(!same_range)
-                {
-                    if(use_arr)
-                    {
-                        min = arr[0][i];
-                        max = arr[1][i];
-                    }
-                    else
-                    {
-                        min = va_arg(va_range, int64_t);
-                        max = va_arg(va_range, int64_t);
-                    }
-                }
-            }
-            int64_t result;
-            if( i != 0 )
-            {
-                if( !isspace(*end) )
-                {
-                    if(err) *err = -4;
-                    free(output);
-                    va_end(va_range);
-                    return NULL;
-                }
-            }
-            if( search_num(byte, end, &end , range_check, min, max, &result, err) )
-            {
-                int64_t* output_p = (int64_t*)realloc( output, (i + 1) * sizeof(int64_t) );
-                if(!output_p)
-                {
-                    *err = -5;
-                    free(output);
-                    va_end(va_range);
-                    return NULL;
-                }
-                else
-                {
-                    output = output_p;
-                    output[i] = result;
-                }
-            }
-            else
-            {
-                va_end(va_range);
-                free(output);
-                return NULL;
-            }
-        }
-        va_end(va_range);
-        while( isspace(*end) )
-            end++;
-        if(*end != 0)
-        {
-            if(err) *err = -4;
-            free(output);
-            return NULL;
-        }
-        else
-            return output;
-    }
-    else return NULL;
-}
 
 static int64_t* line_numarray_check(int byte, int* array_len, const char* str, int need_nums,
                              int range_nums, int64_t ** range, int* err, int repeat_check, int same_range,

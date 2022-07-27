@@ -87,6 +87,7 @@ or enter 'b' to choose another region, enter 'q' to exit the program (b): "));
                                 dh_LineOut_Free(output2);
                                 free(region_size);
                                 lite_region_FreeNameArray(region_name, region_num);
+                                return;
                             }
                             int ret = lrc_extend_instance(lr, output2);
                             LiteRegion_Free(lr);
