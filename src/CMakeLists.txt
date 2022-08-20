@@ -1,11 +1,11 @@
 set( DHLRC_MAIN_POT_FILE_DEPENDS 
         src/main.c
+        src/main_isoc.c
         src/nbt_litereader.c
         src/litematica_region.c
         src/lrc_extend.c
 	PARENT_SCOPE
 )
-# Currently only this one need translate
 
 # configure_file(dhlrc_config.h.in dhlrc_config.h)
 
@@ -15,6 +15,9 @@ set( DHUTIL_POT_FILE_DEPENDS ${DHUTIL_POT_FILE_DEPENDS} PARENT_SCOPE )
 
 add_executable(dhlrc
 	       main.c
+	       main_isoc.c
+	       main.h
+	       translation.h
 	       libnbt/nbt.h
 	       libnbt/nbt.c
 	       litematica_region.c

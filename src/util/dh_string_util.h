@@ -28,7 +28,8 @@ extern "C"{
 
 /** The type of the dh_Line_IO */
 typedef enum dh_out_type{
-    Integer, Float, Double, Character, NumArray, String, DoubleArray, FloatArray ,Empty
+    Integer, Float, Double, Character, NumArray, String, DoubleArray, FloatArray,
+    Empty, Compound, Unsupported
 } dh_out_type;
 
 typedef struct dh_LineOut
@@ -49,6 +50,12 @@ typedef struct dh_LineOut
           void* val;
           int len;
         };
+
+        /** Compound value */
+        struct{
+            int type_num;
+            struct dh_LineOut* val_com;
+        };
     };
 
     /** byte of the num value */
@@ -62,10 +69,6 @@ typedef struct dh_StrArray{
 } dh_StrArray;
 
 typedef struct dh_string_impl{
-
-    /** printf() replacement */
-    int (*printf_fn)(const char*, ...);
-
     /** vprintf() replacement */
     int (*vprintf_fn)(const char*, va_list);
 

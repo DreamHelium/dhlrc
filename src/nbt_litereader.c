@@ -22,12 +22,7 @@
 #include <string.h>
 #include <unistd.h>
 
-#ifndef DH_DISABLE_TRANSLATION
-#include <libintl.h>
-#define _(str) gettext (str)
-#else
-#define _(str) str
-#endif
+#include "translation.h"
 
 int nbtlr_instance(NBT* root, int from_parent, int modify_mode);
 int nbtlr_instance_ng(NBT_Pos* pos, int modify_mode);

@@ -13,7 +13,7 @@ It uses [libnbt](https://github.com/djytw/libnbt) as the library to read litemat
 - [libnbt](https://github.com/djytw/libnbt) (already in submodule of the repo)
 - `zlib` or `libdeflate` (See `README.md` in `libnbt`)
 - [cJSON](https://github.com/DaveGamble/cJSON) `>= 1.7.13`
-- `gettext` (It's a part of `glibc` so you might not need to install it in GNU/Linux but other systems might need)
+- `gettext` (It's a part of `glibc` so you might not need to install it in GNU/Linux but other systems might need)(Optional -- if you need translation)
 
 ## Compile
 
@@ -44,9 +44,7 @@ The implement now determines whether `getline()` could be used, if not then use 
 
 ### Main Program
 
-Main program uses the new translation process, copy `lang/` in repo to the executable file's directory. Later version will throw a warning for the translation file not found (Since there's no content in the code, which will affect the normal use when it's no translation).
-
-**Update: The translation will use `gettext` anyway, after it's done the copy process is of no need and you could use the program even without translation.**
+**Update: The translation is using `gettext` anyway, you could use the program even without translation and it will detect whether you can use it.**
 
 Function 1 (Litematica material list with recipe combination) currently doesn't use the translation process (translation there is only valid for block name), if could enter the program, enter 1 to enter this function.
 

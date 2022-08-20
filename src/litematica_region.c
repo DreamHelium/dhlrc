@@ -21,12 +21,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <time.h>
-#ifndef DH_DISABLE_TRANSLATION
-#include <libintl.h>
-#define _(str) gettext (str)
-#else
-#define _(str) str
-#endif
+#include "translation.h"
 
 LiteRegion* LiteRegion_Create(NBT* root, int r_num)
 {

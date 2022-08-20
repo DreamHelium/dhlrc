@@ -53,12 +53,15 @@ static int internal_err_print(const char* str)
     return fprintf(stderr, "%s", str);
 }
 
-static internal_impl global_impl = { printf, vprintf, default_getline, free, internal_err_print };
+/** Change vprintf to printf */
+static int internal_printf(const char* str, ...);
+
+static internal_impl global_impl = { internal_printf, vprintf, default_getline, free, internal_err_print };
 
 
 static dh_LineOut* InputLine_Get_OneOpt_va(int byte, int range_check, int need_num, int arg_num, va_list va);
 static dh_LineOut* InputLine_Get_MoreDigits_va ( int byte, int range_check, int need_nums, int arg_num, va_list va, int same_range );
-static int char_check(const char* str, char** end, char check_char);
+static int char_check(const char* str, char** end, char check_char, int case_sensitive);
 static int multi_char_check_CharArg(const char* str, char* args, char* result, int* err);
 static int search_num(int byte, const char* str, char** end, int rc, int64_t min, int64_t max, int64_t *result, int* err);
 static int64_t* line_numarray_check(int byte, int* array_len, const char* str, int need_nums, int range_nums,
@@ -108,22 +111,24 @@ static char* translation_pos();
 
 static int translation_inited = 0;
 
+static int internal_printf(const char* str, ...)
+{
+    va_list va;
+    va_start(va, str);
+    return global_impl.vprintf_fn(str, va);
+}
+
 // The thought of implement was from cJSON's cJSON_InitHooks()
 void dh_string_ChangeImpl(dh_string_impl* impl)
 {
     if(impl == NULL)
     {
         // reset
-        global_impl.printf_fn = printf;
         global_impl.vprintf_fn = vprintf;
         global_impl.getline_fn = default_getline;
         global_impl.getline_free = free;
         return;
     }
-
-    if(impl->printf_fn)
-        global_impl.printf_fn = impl->printf_fn;
-    else global_impl.printf_fn = printf;
 
     if(impl->vprintf_fn)
         global_impl.vprintf_fn = impl->vprintf_fn;
@@ -480,7 +485,7 @@ long *NumArray_From_String(const char *string, int *nums, int char_check)
     return output;
 }
 
-static int char_check(const char* str, char** end, char check_char)
+static int char_check(const char* str, char** end, char check_char, int case_sensitive)
 {
     const char* str_in = str;
     while( isspace(*str_in) )
@@ -489,18 +494,27 @@ static int char_check(const char* str, char** end, char check_char)
     char upper_char = 0;
     if(!isalpha(check_char))
     {
+        /* Determine whether it's alpha */
         if(end) *end = (char*)str_in;
         return 0;
     }
-    else if(islower(check_char))
-    {
-        lower_char = check_char;
-        upper_char = toupper(lower_char);
+    else if(!case_sensitive){
+        /* Not case sensitive -- need upper and lower */
+        if(islower(check_char))
+        {
+            lower_char = check_char;
+            upper_char = toupper(lower_char);
+        }
+        else if(isupper(check_char))
+        {
+            upper_char = check_char;
+            lower_char = tolower(upper_char);
+        }
     }
-    else if(isupper(check_char))
-    {
+    else{
+        /* Case sensitive */
         upper_char = check_char;
-        lower_char = tolower(upper_char);
+        lower_char = check_char;
     }
     if(*str_in == lower_char || *str_in == upper_char)
     {
@@ -524,7 +538,7 @@ static int multi_char_check_CharArg(const char* str, char* args, char* result, i
         for(int i = 0; i < args_len ; i++ )
         {
             char* end = NULL;
-            if(char_check(str, &end, args[i]))
+            if(char_check(str, &end, args[i], 0))
             {
                 if(*end != 0)
                 {
