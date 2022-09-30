@@ -4,6 +4,9 @@ PROJECT( dhlrc )
 set(CMAKE_BUILD_TYPE Release)
 
 find_package(Gettext)
+find_package(PkgConfig)
+
+pkg_search_module(GLIB REQUIRED glib-2.0)
 
 set(DH_ENABLE_TRANSLATION true)
 

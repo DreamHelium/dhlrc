@@ -10,6 +10,7 @@
 - `zlib`或`libdeflate`（参阅`libnbt`的README.md）
 - [cJSON](https://github.com/DaveGamble/cJSON) `>= 1.7.13`（~正好用上了两个这版本增加的函数~）
 - `gettext` （其是`glibc`的一部分所以你大概不需要在GNU/Linux中进行额外安装，但是在其他系统可能需要）（可选——如果你需要翻译）
+- `glib`
 
 ## 编译
 

@@ -22,7 +22,8 @@
 extern "C" {
 #endif
 
-
+#include <gmodule.h>
+#include "util/dh_string_util.h"
 
 typedef struct ItemList{
     int len;
@@ -33,16 +34,9 @@ typedef struct ItemList{
     struct ItemList* next;
 } ItemList;
 
-typedef struct BlackList{
-    char* name;
-    struct BlackList* next;
-} BlackList;
+typedef GList BlackList;
 
-typedef struct ReplaceList{
-    char* o_name;
-    char* r_name;
-    struct ReplaceList* next;
-} ReplaceList;
+typedef GList ReplaceList;
 
 
 
@@ -68,8 +62,11 @@ int BlackList_Scan(BlackList* bl,const char* name);
 
 
 ReplaceList* ReplaceList_Init();
-ReplaceList* ReplaceList_Extend(ReplaceList* rl,const char* o_name,const char* r_name);
-char* ReplaceList_Replace(ReplaceList* rl,char* o_name);
+ReplaceList* ReplaceList_Extend(ReplaceList* rl, const char* o_name, const char* r_name);
+ReplaceList* ReplaceList_Extend_StrArray(ReplaceList* rl, const char* o_name, dh_StrArray* str);
+/** DEPRECATED */
+const char* ReplaceList_Replace(ReplaceList* rl, const char* o_name);
+dh_StrArray* ReplaceList_Replace_StrArray(ReplaceList* rl, const char* o_name);
 void ReplaceList_Free(ReplaceList* rl);
 
 //only for debug

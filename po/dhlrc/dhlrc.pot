@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-07-22 23:18+0800\n"
+"POT-Creation-Date: 2022-09-19 21:40+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,24 +17,29 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: src/main.c:77
+#: src/main.c:44
 #, c-format
-msgid "Usage: %s [file]\n"
+msgid ""
+"Usage: %s [options] [file]\n"
+"\n"
+"  -r, --reader\tEnter NBT reader mode\n"
+"  -b, --block\tEnter litematica block reader\n"
+"  -l, --list\tEnter litematica material list with recipe combination\n"
 msgstr ""
 
-#: src/main.c:93
+#: src/main_isoc.c:61
 msgid "Error when reading file."
 msgstr ""
 
-#: src/main.c:101
+#: src/main_isoc.c:69
 msgid "Not a valid NBT file!"
 msgstr ""
 
-#: src/main.c:116
+#: src/main_isoc.c:76
 msgid "Valid NBT file!"
 msgstr ""
 
-#: src/main.c:125
+#: src/main_isoc.c:86
 #, c-format
 msgid ""
 "There are three functions:\n"
@@ -44,29 +49,29 @@ msgid ""
 "\n"
 msgstr ""
 
-#: src/main.c:129
+#: src/main_isoc.c:90
 #, c-format
 msgid "Please select an option, or enter 'q' to exit the program (q): "
 msgstr ""
 
-#: src/main.c:185 src/lrc_extend.c:42
+#: src/main_isoc.c:146 src/lrc_extend.c:42
 #, c-format
 msgid "There are %d regions:\n"
 msgstr ""
 
-#: src/main.c:198
+#: src/main_isoc.c:159
 #, c-format
 msgid "Processing: region %d / %d : [%ld] %s \n"
 msgstr ""
 
-#: src/nbt_litereader.c:297
+#: src/nbt_litereader.c:57
 #, c-format
 msgid ""
 "The detail of NBT \"%s\" is listed below:\n"
 "\n"
 msgstr ""
 
-#: src/nbt_litereader.c:322
+#: src/nbt_litereader.c:82
 #, c-format
 msgid ""
 "\n"
@@ -74,7 +79,7 @@ msgid ""
 "save NBT file, 'q' to exit the program, 'e' to upper instance (q): "
 msgstr ""
 
-#: src/nbt_litereader.c:328
+#: src/nbt_litereader.c:88
 #, c-format
 msgid ""
 "\n"
@@ -83,7 +88,7 @@ msgid ""
 "instance (p): "
 msgstr ""
 
-#: src/nbt_litereader.c:336
+#: src/nbt_litereader.c:96
 #, c-format
 msgid ""
 "\n"
@@ -91,14 +96,14 @@ msgid ""
 "to save NBT file, 'q' to exit the program, 'e' to upper instance (p): "
 msgstr ""
 
-#: src/nbt_litereader.c:524 src/nbt_litereader.c:576
+#: src/nbt_litereader.c:285 src/nbt_litereader.c:337
 #, c-format
 msgid ""
 "\n"
 "Unsupported modification mode request, will exit to reading mode."
 msgstr ""
 
-#: src/nbt_litereader.c:550
+#: src/nbt_litereader.c:311
 #, c-format
 msgid ""
 "\n"
@@ -106,14 +111,14 @@ msgid ""
 "upper NBT, 'q' to exit the program (p): "
 msgstr ""
 
-#: src/nbt_litereader.c:561
+#: src/nbt_litereader.c:322
 #, c-format
 msgid ""
 "\n"
 "The integer you input is %ld, please confirm [Y/n] (Y): "
 msgstr ""
 
-#: src/litematica_region.c:436
+#: src/litematica_region.c:431
 #, c-format
 msgid "[%.2f%%] Processing Blocks %lu/%lu, (%3d,%3d,%3d)/(%3d,%3d,%3d)"
 msgstr ""
@@ -123,7 +128,7 @@ msgstr ""
 msgid "Enter the region number, or enter 'q' to exit program (q): "
 msgstr ""
 
-#: src/lrc_extend.c:65 src/lrc_extend.c:151
+#: src/lrc_extend.c:65 src/lrc_extend.c:152
 #, c-format
 msgid ""
 "You are reading region: [%2d] %s:\n"
@@ -139,17 +144,17 @@ msgid ""
 "or enter 'b' to choose another region, enter 'q' to exit the program (b): "
 msgstr ""
 
-#: src/lrc_extend.c:159
+#: src/lrc_extend.c:160
 #, c-format
 msgid "The block in (%ld, %ld, %ld) is %s.\n"
 msgstr ""
 
-#: src/lrc_extend.c:160
+#: src/lrc_extend.c:161
 #, c-format
 msgid "The block's position in BlockStatePalette is %d.\n"
 msgstr ""
 
-#: src/lrc_extend.c:161
+#: src/lrc_extend.c:162
 #, c-format
 msgid ""
 "Please enter the coordination of the block again, or enter 'b' to choose "

@@ -21,6 +21,24 @@
 #include <stdio.h>
 #include <cjson/cJSON.h>
 #include "recipe_util.h"
+#include "util/file_util.h"
+
+typedef struct RListData{
+    char* o_name;
+    dh_StrArray* r_name;
+} RListData;
+
+static int internal_strcmp(gconstpointer a, gconstpointer b)
+{
+    return strcmp(a,b);
+}
+
+static int rlistdata_strcmp(gconstpointer a, gconstpointer b)
+{
+    /* The first argument is GList Element data */
+    return strcmp( ((RListData*)a)->o_name , b );
+}
+
 
 void ItemList_Free(ItemList* target)
 {
@@ -249,76 +267,42 @@ int ItemList_Combine(ItemList** dest, ItemList* src)
 
 BlackList* BlackList_Init()
 {
-    BlackList* bl = (BlackList*) malloc(sizeof(BlackList));
-    bl->name = (char*)malloc(5*sizeof(char));
-    strcpy(bl->name, "none");
-    bl->next = NULL;
-    FILE* f = fopen("config/ignored_blocks.json","rb");
-    if(f)
+    GList* bl = NULL;
+    cJSON* black_list = dhlrc_FileToJSON( "config/ignored_blocks.json" );
+    if(black_list)
     {
-        fseek(f,0,SEEK_END);
-        int size = ftell(f);
-        fseek(f,0,SEEK_SET);
-        char* data = (char*)malloc(size* sizeof(char));
-        fread(data,1,size,f);
-        fclose(f);
-        cJSON* black_list = cJSON_ParseWithLength(data,size);
         if(cJSON_IsArray(black_list))
         {
             int n = cJSON_GetArraySize(black_list);
             for(int i = 0 ; i < n ; i++)
             {
                 char* item = cJSON_GetStringValue(cJSON_GetArrayItem(black_list,i));
-                BlackList_Extend(bl,item);
+                bl = BlackList_Extend(bl,item);
             }
         }
-        free(data);
         cJSON_Delete(black_list);
         return bl;
     }
     else
     {
-    BlackList_Extend(bl,"minecraft:air");
-    BlackList_Extend(bl,"minecraft:piston_head");
-    BlackList_Extend(bl,"minecraft:fire");
-    BlackList_Extend(bl,"minecraft:soul_fire");
-    BlackList_Extend(bl,"minecraft:bubble_column");
+        bl = BlackList_Extend(bl,"minecraft:air");
+        bl = BlackList_Extend(bl,"minecraft:piston_head");
+        bl = BlackList_Extend(bl,"minecraft:fire");
+        bl = BlackList_Extend(bl,"minecraft:soul_fire");
+        bl = BlackList_Extend(bl,"minecraft:bubble_column");
     return bl;
     }
 }
 
 BlackList* BlackList_Extend(BlackList* bl,const char* name)
 {
-    if(!strcmp(bl->name,"none"))
-    {
-        free(bl->name);
-        bl->name = (char*)malloc((strlen(name) + 1) * sizeof(char));
-        strcpy(bl->name,name);
-        return bl;
-    }
-    else
-    {
-        BlackList* bld = bl;
-        while(bld->next != NULL)
-            bld = bld->next;
-        bld->next = (BlackList*)malloc(sizeof(BlackList));
-        bld->next->name = (char*)malloc((strlen(name) + 1) * sizeof(char));
-        strcpy(bld->next->name,name);
-        bld->next->next = NULL;
-        return bl;
-    }
+    bl = g_list_prepend(bl, String_Copy(name));
+    return bl;
 }
 
 void BlackList_Free(BlackList* bl)
 {
-    free(bl->name);
-    bl->name = NULL;
-    if(bl->next)
-    {
-        BlackList_Free(bl->next);
-        bl->next = NULL;
-    }
-    free(bl);
+    g_list_free_full(bl, free);
 }
 
 int BlackList_Scan(BlackList* bl,const char* name)
@@ -327,110 +311,103 @@ int BlackList_Scan(BlackList* bl,const char* name)
         return 0;
     else
     {
-        BlackList* bld = bl;
-        while(bld)
-        {
-            if(!strcmp(name,bld->name)) return 1;
-            bld = bld->next;
-        }
-        return 0;
+        GList* gl = g_list_find_custom(bl, name, internal_strcmp);
+        if(gl) return 1;
+        else return 0;
     }
 }
 
 ReplaceList* ReplaceList_Init()
 {
-    ReplaceList* rl = (ReplaceList*)malloc(sizeof(ReplaceList));
-    rl->o_name = (char*)malloc(5 * sizeof(char));
-    rl->r_name = (char*)malloc(5 * sizeof(char));
-    strcpy(rl->o_name,"none");
-    strcpy(rl->r_name,"none");
-    rl->next = NULL;
-    FILE* f = fopen("config/block_items.json","rb");
-    if(f)
+    ReplaceList* rl = NULL;
+    cJSON* rlist_o = dhlrc_FileToJSON("config/block_items.json");
+    if(rlist_o)
     {
-        fseek(f,0,SEEK_END);
-        int size = ftell(f);
-        fseek(f,0,SEEK_SET);
-        char* data = (char*)malloc(size* sizeof(char));
-        fread(data,1,size,f);
-        fclose(f);
-        cJSON* rlist_o = cJSON_ParseWithLength(data,size);
         cJSON* rlist = rlist_o->child;
         while(rlist)
         {
             if(cJSON_IsString(rlist))
-                ReplaceList_Extend(rl,rlist->string,rlist->valuestring);
+                rl = ReplaceList_Extend(rl,rlist->string,rlist->valuestring);
+            else if(cJSON_IsArray(rlist))
+            {
+                int size = cJSON_GetArraySize(rlist);
+                dh_StrArray* str = NULL;
+                for(int i = 0; i < size ; i++)
+                {
+                    char* r_name = cJSON_GetStringValue( cJSON_GetArrayItem(rlist, i) );
+                    dh_StrArray_AddStr( &str, r_name);
+                }
+                rl = ReplaceList_Extend_StrArray(rl, rlist->string, str);
+            }
             rlist = rlist->next;
         }
         cJSON_Delete(rlist_o);
-        free(data);
         return rl;
     }
     else
     {
-        ReplaceList_Extend(rl,"minecraft:water","minecraft:water_bucket");
-        ReplaceList_Extend(rl,"minecraft:lava","minecraft:lava_bucket");
-        ReplaceList_Extend(rl,"minecraft:redstone_wall_torch","minecraft:redstone_torch");
+        rl = ReplaceList_Extend(rl,"minecraft:water","minecraft:water_bucket");
+        rl = ReplaceList_Extend(rl,"minecraft:lava","minecraft:lava_bucket");
+        rl = ReplaceList_Extend(rl,"minecraft:redstone_wall_torch","minecraft:redstone_torch");
         return rl;
     }
 }
 
 ReplaceList* ReplaceList_Extend(ReplaceList* rl,const char* o_name,const char* r_name)
 {
-    if(!strcmp(rl->o_name,"none"))
-    {
-        free(rl->o_name);
-        free(rl->r_name);
-        rl->o_name = (char*)malloc((strlen(o_name)+1) * sizeof(char));
-        rl->r_name = (char*)malloc((strlen(r_name)+1) * sizeof(char));
-        strcpy(rl->o_name,o_name);
-        strcpy(rl->r_name,r_name);
-        return rl;
-    }
-    else
-    {
-        ReplaceList* rld = rl;
-        while(rld->next) rld = rld->next;
-        rld->next = (ReplaceList*)malloc(sizeof(ReplaceList));
-        rld = rld->next;
-        rld->o_name = (char*)malloc((strlen(o_name)+1) * sizeof(char));
-        rld->r_name = (char*)malloc((strlen(r_name)+1) * sizeof(char));
-        strcpy(rld->o_name,o_name);
-        strcpy(rld->r_name,r_name);
-        rld->next = NULL;
-        return rl;
-    }
+    RListData* rld = (RListData*) malloc(sizeof(RListData));
+    dh_StrArray* str = dh_StrArray_Init( r_name );
+    rld->o_name = String_Copy(o_name);
+    rld->r_name = str;
+    rl = g_list_prepend(rl, rld);
+    return rl;
 }
 
-char* ReplaceList_Replace(ReplaceList* rl,char* o_name)
+ReplaceList * ReplaceList_Extend_StrArray(ReplaceList* rl, const char* o_name, dh_StrArray* str)
+{
+    RListData* rld = (RListData*) malloc(sizeof(RListData));
+    rld->o_name = String_Copy(o_name);
+    rld->r_name = str;
+    rl = g_list_prepend(rl, rld);
+    return rl;
+}
+
+
+const char* ReplaceList_Replace(ReplaceList* rl, const char* o_name)
+{
+    dh_StrArray* str = ReplaceList_Replace_StrArray(rl, o_name);
+    if(str)
+        return (str->val)[0];
+    else return o_name;
+}
+
+dh_StrArray * ReplaceList_Replace_StrArray(ReplaceList* rl, const char* o_name)
 {
     if(rl)
     {
-        ReplaceList* rld = rl;
-        while(rld)
+        GList* gl =  g_list_find_custom(rl, o_name, rlistdata_strcmp);
+        if(gl)
         {
-            if(!strcmp(o_name,rld->o_name))
-            {
-                return rld->r_name;
-            }
-            else rld = rld->next;
+            RListData* rld = gl->data;
+            return rld->r_name;
         }
+        else return NULL;
     }
-    return o_name;
+    else return NULL;
 }
+
 
 void ReplaceList_Free(ReplaceList* rl)
 {
-    free(rl->o_name);
-    rl->o_name = NULL;
-    free(rl->r_name);
-    rl->r_name = NULL;
-    if(rl->next)
+    ReplaceList* rld = rl;
+    for( ; rld ; rld = rld->next)
     {
-        ReplaceList_Free(rl->next);
-        rl->next = NULL;
+        RListData* rldata = rld->data;
+        dh_StrArray_Free(rldata->r_name);
+        free(rldata->o_name);
+        free(rldata);
     }
-    free(rl);
+    g_list_free(rl);
 }
 
 

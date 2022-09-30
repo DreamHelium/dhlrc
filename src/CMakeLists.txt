@@ -38,10 +38,12 @@ add_executable(dhlrc
 #add_definitions(-DDH_DEBUG_IN_IDE)
 
 target_link_libraries(dhlrc PUBLIC m z cjson dhutil
+	"${GLIB_LIBRARIES}"
 #    deflate
 )
 
 target_include_directories(dhlrc PUBLIC
 	"${PROJECT_BINARY_DIR}"
+	"${GLIB_INCLUDE_DIRS}"
 )
 

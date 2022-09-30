@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-07-22 20:47+0800\n"
+"POT-Creation-Date: 2022-09-19 21:39+0800\n"
 "PO-Revision-Date: 2022-07-22 20:52+0800\n"
 "Last-Translator: Dream Helium\n"
 "Language-Team: Chinese <>\n"
@@ -19,24 +19,29 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Lokalize 22.04.3\n"
 
-#: src/main.c:77
+#: src/main.c:44
 #, c-format
-msgid "Usage: %s [file]\n"
-msgstr "用法：%s [文件]\n"
+msgid ""
+"Usage: %s [options] [file]\n"
+"\n"
+"  -r, --reader\tEnter NBT reader mode\n"
+"  -b, --block\tEnter litematica block reader\n"
+"  -l, --list\tEnter litematica material list with recipe combination\n"
+msgstr ""
 
-#: src/main.c:93
+#: src/main_isoc.c:61
 msgid "Error when reading file."
 msgstr "在读取文件时出错。"
 
-#: src/main.c:101
+#: src/main_isoc.c:69
 msgid "Not a valid NBT file!"
 msgstr "不是一个有效的NBT文件！"
 
-#: src/main.c:116
+#: src/main_isoc.c:76
 msgid "Valid NBT file!"
 msgstr "有效的NBT文件！"
 
-#: src/main.c:125
+#: src/main_isoc.c:86
 #, c-format
 msgid ""
 "There are three functions:\n"
@@ -51,22 +56,22 @@ msgstr ""
 "[2] 投影方块阅读器\n"
 "\n"
 
-#: src/main.c:129
+#: src/main_isoc.c:90
 #, c-format
 msgid "Please select an option, or enter 'q' to exit the program (q): "
 msgstr "请选择一个选项，或输入 “q” 退出程序 (q): "
 
-#: src/main.c:185 src/lrc_extend.c:42
+#: src/main_isoc.c:146 src/lrc_extend.c:42
 #, c-format
 msgid "There are %d regions:\n"
 msgstr "有 %d 个区域：\n"
 
-#: src/main.c:198
+#: src/main_isoc.c:159
 #, c-format
 msgid "Processing: region %d / %d : [%ld] %s \n"
 msgstr "处理区域 %d / %d : [%ld] %s 中……\n"
 
-#: src/nbt_litereader.c:297
+#: src/nbt_litereader.c:57
 #, c-format
 msgid ""
 "The detail of NBT \"%s\" is listed below:\n"
@@ -75,15 +80,18 @@ msgstr ""
 "NBT \"%s\" 的细节如下：\n"
 "\n"
 
-#: src/nbt_litereader.c:322
+#: src/nbt_litereader.c:82
 #, c-format
 msgid ""
 "\n"
 "Please enter a number to continue, or enter 'm' to modification mode, 's' to "
 "save NBT file, 'q' to exit the program, 'e' to upper instance (q): "
-msgstr "\n请输入数字以继续，或输入 “m” 进入修改模式，“s” 保存NBT文件，“q” 退出程序，“e” 至上层实例 (q): "
+msgstr ""
+"\n"
+"请输入数字以继续，或输入 “m” 进入修改模式，“s” 保存NBT文件，“q” 退出程"
+"序，“e” 至上层实例 (q): "
 
-#: src/nbt_litereader.c:328
+#: src/nbt_litereader.c:88
 #, c-format
 msgid ""
 "\n"
@@ -91,18 +99,22 @@ msgid ""
 "upper NBT, 's' to save NBT file, 'q' to exit the program, 'e' to upper "
 "instance (p): "
 msgstr ""
-"\n请输入数字以继续，或输入 “m” 进入修改模式，“p” 至上层NBT，“s” 保存NBT文件，“q” 退出程序，“e” 至上层实例 (p)： "
+"\n"
+"请输入数字以继续，或输入 “m” 进入修改模式，“p” 至上层NBT，“s” 保存NBT文"
+"件，“q” 退出程序，“e” 至上层实例 (p)： "
 
-#: src/nbt_litereader.c:336
+#: src/nbt_litereader.c:96
 #, c-format
 msgid ""
 "\n"
 "No deeper NBT, please enter 'm' to modification mode, 'p' to upper NBT, 's' "
 "to save NBT file, 'q' to exit the program, 'e' to upper instance (p): "
 msgstr ""
-"\n没有子NBT数据，请输入 “m” 进入修改模式，“p” 至上层NBT，“s” 保存NBT文件，“q” 退出程序，“e” 至上层实例 (p): "
+"\n"
+"没有子NBT数据，请输入 “m” 进入修改模式，“p” 至上层NBT，“s” 保存NBT文件，“q” "
+"退出程序，“e” 至上层实例 (p): "
 
-#: src/nbt_litereader.c:524 src/nbt_litereader.c:576
+#: src/nbt_litereader.c:285 src/nbt_litereader.c:337
 #, c-format
 msgid ""
 "\n"
@@ -111,7 +123,7 @@ msgstr ""
 "\n"
 "不支持的修改模式请求，将退回至阅读模式。"
 
-#: src/nbt_litereader.c:550
+#: src/nbt_litereader.c:311
 #, c-format
 msgid ""
 "\n"
@@ -121,7 +133,7 @@ msgstr ""
 "\n"
 "请输入一个整数，或输入 “b” 退出修改模式，“p” 至上层NBT，“q” 退出程序 (p): "
 
-#: src/nbt_litereader.c:561
+#: src/nbt_litereader.c:322
 #, c-format
 msgid ""
 "\n"
@@ -130,7 +142,7 @@ msgstr ""
 "\n"
 "您输入的整数为%ld，请确认 [Y/n] (Y)： "
 
-#: src/litematica_region.c:436
+#: src/litematica_region.c:431
 #, c-format
 msgid "[%.2f%%] Processing Blocks %lu/%lu, (%3d,%3d,%3d)/(%3d,%3d,%3d)"
 msgstr "[%.2f%%] 处理方块中 %lu/%lu, (%3d,%3d,%3d)/(%3d,%3d,%3d) ……"
@@ -140,7 +152,7 @@ msgstr "[%.2f%%] 处理方块中 %lu/%lu, (%3d,%3d,%3d)/(%3d,%3d,%3d) ……"
 msgid "Enter the region number, or enter 'q' to exit program (q): "
 msgstr "输入区域号，或输入 “q” 退出程序 (q)： "
 
-#: src/lrc_extend.c:65 src/lrc_extend.c:151
+#: src/lrc_extend.c:65 src/lrc_extend.c:152
 #, c-format
 msgid ""
 "You are reading region: [%2d] %s:\n"
@@ -161,23 +173,29 @@ msgstr ""
 "请输入方块坐标（仅输入数字，不需要额外字符）\n"
 "或输入 “b” 选择其他区域，输入 “q” 退出程序 (b): "
 
-#: src/lrc_extend.c:159
+#: src/lrc_extend.c:160
 #, c-format
 msgid "The block in (%ld, %ld, %ld) is %s.\n"
 msgstr "在 (%ld, %ld, %ld) 处的方块是 %s 。\n"
 
-#: src/lrc_extend.c:160
+#: src/lrc_extend.c:161
 #, c-format
 msgid "The block's position in BlockStatePalette is %d.\n"
 msgstr "此方块在 BlockStatePalette 中的位置为%d。\n"
 
-#: src/lrc_extend.c:161
+#: src/lrc_extend.c:162
 #, c-format
 msgid ""
 "Please enter the coordination of the block again, or enter 'b' to choose "
 "another region, enter 'r' to read the detail of the block, enter 'q' to exit "
 "the program (b): "
-msgstr "请再次输入方块的坐标，或输入 “b” 选择其他区域，输入 “r” 阅读方块的细节，输入 “q” 退出程序 (b): "
+msgstr ""
+"请再次输入方块的坐标，或输入 “b” 选择其他区域，输入 “r” 阅读方块的细节，输入 "
+"“q” 退出程序 (b): "
+
+#, c-format
+#~ msgid "Usage: %s [file]\n"
+#~ msgstr "用法：%s [文件]\n"
 
 #, c-format
 #~ msgid ""

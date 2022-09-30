@@ -17,7 +17,6 @@
 
 #include "lrc_extend.h"
 #include "litematica_region.h"
-#include "winctl.h"
 #include <stdio.h>
 #include <stdlib.h>
 #ifndef DH_DISABLE_TRANSLATION
