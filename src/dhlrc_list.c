@@ -28,6 +28,13 @@ typedef struct RListData{
     dh_StrArray* r_name;
 } RListData;
 
+typedef struct IListData{
+    gchar* name;
+    guint total;
+    guint placed;
+    guint available;
+} IListData;
+
 static int internal_strcmp(gconstpointer a, gconstpointer b)
 {
     return strcmp(a,b);
@@ -39,215 +46,134 @@ static int rlistdata_strcmp(gconstpointer a, gconstpointer b)
     return strcmp( ((RListData*)a)->o_name , b );
 }
 
+static int ilistdata_strcmp(gconstpointer a, gconstpointer b)
+{
+    return strcmp( ((IListData*)a)->name, b );
+}
+
+static int ilistdata_compare_by_total(gconstpointer a, gconstpointer b)
+{
+    return (((IListData*)a)->total - ((IListData*)b)->total);
+}
+
+static int ilistdata_iszero(gconstpointer a, gconstpointer b)
+{
+    b = NULL;
+    return (((IListData*)a)->total - 0);
+}
+
+static IListData* ilistdata_init(const char* name)
+{
+    IListData* ildata = (IListData*)malloc(sizeof(IListData));
+    ildata->name = String_Copy(name);
+    ildata->total = 0;
+    ildata->placed = 0;
+    ildata->available = 0;
+    return ildata;
+}
 
 void ItemList_Free(ItemList* target)
 {
-    if(target->next)
-        ItemList_Free(target->next);
-    target->next = NULL;
-    free(target->name);
-    target->name = NULL;
-    free(target);
-    target = NULL;
+    GList* gld = target;
+    for(; gld ; gld = gld->next)
+    {
+        IListData* ildata = gld->data;
+        free(ildata->name);
+        free(ildata);
+    }
+    g_list_free(target);
 }
 
 void ItemList_Sort(ItemList** oBlock)
 {
-    ItemList* head = *oBlock;
-    ItemList* prev = NULL;
-    ItemList* before_head = NULL;
-    while(head)
-    {
-        ItemList* head_next = head->next;
-        ItemList* temp = NULL;             // store bl before max num
-        ItemList* temp_next = NULL;        // store bl on max num, then exchange to max num
-        int max = head->num;
-        ItemList* forward = head;  // staging forward
-
-        while(forward->next)        // scan all
-        {
-            if(forward->next->num > max)
-            {
-                max = forward->next->num;
-                temp = forward;
-            }
-            forward = forward->next;
-        }
-        // temp stores bl before max num, then a before head is created
-        // it would be the before of the origin head
-        if(temp)
-        {
-            if(temp == head) // two are besides
-            {
-                ItemList* temp_next_next = temp->next->next; //actually it's the head's next
-                before_head = temp->next;   //actually head next, the max pos
-                before_head->next = head;   //head is smaller one
-                head->next = temp_next_next;
-            }
-            else
-            {
-                ItemList* temp_next_next = temp->next->next;
-                temp_next = temp->next;
-                before_head = temp_next; //it's on max bl.
-                before_head->next = head_next;  // max num next point to the head's next since head would be moved
-                temp->next = head; // head exchange to temp's next
-                head->next = temp_next_next; // head's next is origin temp's next next
-            }
-            if(!prev)
-            {
-                *oBlock = before_head;
-            }
-            head = before_head;
-            if(prev)
-                prev->next = head;
-        }
-        prev = head;
-        head = head->next;
-    }
+    /* Originally this sort function compares total.
+     * After update, this will still sort by total */
+    ItemList* iln = ItemList_Sort_ByTotal(*oBlock);
+    *oBlock = iln;
 }
+
+ItemList * ItemList_Sort_ByTotal(ItemList* il)
+{
+    return g_list_sort(il, ilistdata_compare_by_total);
+}
+
 
 int ItemList_InitNewItem(ItemList** oBlock,char* block_name)
 {
-    if(*oBlock == NULL)
-    {
-        *oBlock = ItemList_Init(block_name);
-        if(*oBlock) return 0;
-        else return -1;
-    }
-    ItemList* next_item = *oBlock;
-    while(next_item->next)
-        next_item = next_item->next;
-    next_item->next = (ItemList*)malloc(sizeof(ItemList));
-    if(next_item->next)
-    {
-        next_item = next_item->next;
-        next_item->len = strlen(block_name) + 1;
-        next_item->name = (char*)malloc(next_item->len * sizeof(char));
-        strcpy(next_item->name,block_name);
-        next_item->num = 0;
-        next_item->placed = 0;
-        next_item->available = 0;
-        next_item->next = NULL;
-        return 0;
-    }
-    else
-    {
-        ItemList_Free(*oBlock);
-        *oBlock = NULL;
-        return -1;
-    }
-
+    //fprintf(stderr, "Item created!\n");
+    GList* gl = *oBlock;
+    IListData* ildata = ilistdata_init(block_name);
+    gl = g_list_prepend(gl, ildata);
+    *oBlock = gl;
+    return 0;
 }
 
 ItemList *ItemList_Init(char* block_name)
 {
-    ItemList* bl = (ItemList*)malloc(sizeof(ItemList));
-    if(bl)
+    ItemList* il = NULL;
+    ItemList_InitNewItem(&il, block_name);
+    return il;
+}
+
+int ItemList_AddNum(ItemList** bl,int num,char* block_name)
+{
+    ItemList* item = g_list_find_custom(*bl, block_name, ilistdata_strcmp);
+    if(item)
     {
-        bl->len = strlen(block_name) + 1;
-        bl->name = (char*)malloc(bl->len * sizeof(char));
-        strcpy(bl->name,block_name);
-        bl->num = 0;
-        bl->placed = 0;
-        bl->available = 0;
-        bl->next = NULL;
-        return bl;
+        IListData* ildata = item->data;
+        ildata->total = ildata->total + num;
+        return 0;
     }
     else
     {
-        free(bl);
-        return NULL;
-    }
-}
-
-int ItemList_AddNum(ItemList* bl,int num,char* block_name)
-{
-    while(bl)
-    {
-        if(!strcmp(bl->name,block_name))
+        /* In this new implement we could create item for it first */
+        ItemList* il = *bl;
+        ItemList_InitNewItem( &il, block_name);
+        *bl = il;
+        item = g_list_find_custom(il, block_name, ilistdata_strcmp);
+        if(item)
         {
-            bl->num += num;
+            IListData* ildata = item->data;
+            ildata->total = ildata->total + num;
             return 0;
         }
-        bl = bl->next;
+        else return -1;
     }
-    return -1;
 }
 
 int ItemList_ScanRepeat(ItemList* bl,char* block_name)
 {
-    while(bl)
-    {
-        if(!strcmp(bl->name,block_name))
-            return 1;
-        bl = bl->next;
-    }
-    return 0;
+    ItemList* item = g_list_find_custom(bl, block_name, ilistdata_strcmp);
+    if(item) return 1;
+    else return 0;
 }
 
 int ItemList_DeleteItem(ItemList** bl,char* block_name)
 {
-    ItemList* head = *bl;
-    while(head)
+    ItemList* il = *bl;
+    GList* item = g_list_find_custom(il, block_name, ilistdata_strcmp);
+    if(item)
     {
-        if(head == *bl && !strcmp(head->name,block_name))
-        {
-            free(head->name);
-            head->name = NULL;
-            ItemList* head_next = head->next;
-            free(head);
-            head = NULL;
-            *bl = head_next;
-            return 0;
-        }
-        if(head->next)
-        {
-            if(!strcmp(head->next->name,block_name))
-            {
-                ItemList* head_next = head->next;
-                ItemList* head_next_next = head->next->next;
-                free(head_next->name);
-                head_next->name = NULL;
-                free(head_next);
-                head_next = NULL;
-                head->next = head_next_next;
-                return 0;
-            }
-        }
-        head = head->next;
+        il = g_list_remove(il, item->data);
+        *bl = il;
+        return 0;
     }
-    return -1;
+    else return -1;
 }
 
 void ItemList_DeleteZeroItem(ItemList** bl)
 {
     ItemList* head = *bl;
-    ItemList* prev = NULL;
-    while(head)
+    gint have_zero = 1;
+    while(have_zero)
     {
-        if(head->num == 0)
+        GList* item = g_list_find_custom(head, GINT_TO_POINTER(0), ilistdata_iszero);
+        if(item)
         {
-            free(head->name);
-            head->name = NULL;
-            ItemList* head_next = head->next;
-            free(head);
-            head = NULL;
-            if(!prev)
-            {
-                head = head_next;
-                *bl = head;
-            }
-            else
-            {
-                head = head_next;
-                prev->next = head;
-            }
+            head = g_list_remove(head, item->data);
+            *bl = head;
         }
-        else
-        {
-            prev = head;
-            head = head->next;
-        }
+        else have_zero = 0;
     }
 }
 
@@ -256,10 +182,8 @@ int ItemList_Combine(ItemList** dest, ItemList* src)
     ItemList* s = src;
     while(s)
     {
-        if(!ItemList_ScanRepeat(*dest,s->name))
-            if(ItemList_InitNewItem(dest,s->name))
-                return -1;
-        ItemList_AddNum(*dest,s->num,s->name);
+        IListData* ildata = s->data;
+        ItemList_AddNum(dest, ildata->total, ildata->name);
         s = s->next;
     }
     return 0;
@@ -413,14 +337,13 @@ void ReplaceList_Free(ReplaceList* rl)
 
 int ItemList_GetItemNum(ItemList *il, char *item_name)
 {
-    ItemList* ild = il;
-    while(ild)
+    GList* item = g_list_find_custom(il, item_name, ilistdata_strcmp);
+    if(item)
     {
-        if(!strcmp(item_name,ild->name))
-            return ild->num;
-        ild = ild->next;
+        IListData* ildata = item->data;
+        return ildata->total;
     }
-    return -1;
+    else return -1;
 }
 
 int ItemList_toCSVFile(char* pos,ItemList* il)
@@ -430,14 +353,26 @@ int ItemList_toCSVFile(char* pos,ItemList* il)
     ItemList* ild = il;
     while(ild)
     {
-        char* trans = Name_BlockTranslate(ild->name);
+        IListData* ildata = ild->data;
+        char* trans = Name_BlockTranslate(ildata->name);
         if(trans)
-            fprintf(f,"\"%s\",%d,%d,%d\n",trans,ild->num,ild->num-ild->placed,ild->available);
+            fprintf(f,"\"%s\",%d,%d,%d\n",trans,ildata->total,ildata->total-ildata->placed,ildata->available);
         else
-            fprintf(f,"%s,%d,%d,%d\n",ild->name,ild->num,ild->num-ild->placed,ild->available);
+            fprintf(f,"%s,%d,%d,%d\n",ildata->name,ildata->total,ildata->total-ildata->placed,ildata->available);
         free(trans);
         ild = ild->next;
     }
     fclose(f);
     return 0;
 }
+
+const char * ItemList_ItemName(ItemList* il)
+{
+    if(il)
+    {
+        IListData* ildata = il->data;
+        return ildata->name;
+    }
+    else return NULL;
+}
+

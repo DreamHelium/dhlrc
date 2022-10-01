@@ -223,7 +223,7 @@ ItemList* ItemList_Recipe(char* block_name,int num)
                                     return NULL;
                                 }
                             }
-                                ItemList_AddNum(out_recipe,craft_num,item_name);
+                                ItemList_AddNum(&out_recipe,craft_num,item_name);
                         }
                     }
                 }
@@ -306,7 +306,7 @@ char** NameArray_CanCraft(int* num, ItemList *il)
     int recipe_num = 0;
     while(ild)
     {
-        ItemList* recipe = ItemList_Recipe(ild->name,0);
+        ItemList* recipe = ItemList_Recipe(ItemList_ItemName(ild),0);
         if(recipe)
         {
             recipe_num++;
@@ -320,8 +320,7 @@ char** NameArray_CanCraft(int* num, ItemList *il)
                 return NULL;
             }
             recipe_list = temp_rl;
-            recipe_list[recipe_num - 1] = (char*)malloc(ild->len * sizeof(char));
-            strcpy(recipe_list[recipe_num - 1],ild->name);
+            recipe_list[recipe_num - 1] = String_Copy(ItemList_ItemName(ild));
             ItemList_Free(recipe);
         }
         ild = ild->next;

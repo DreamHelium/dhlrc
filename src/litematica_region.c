@@ -439,9 +439,7 @@ ItemList *lite_region_ItemListExtend(NBT* root, int r_num, ItemList* oBlock, int
 //                    {
                     if(lite_region_BlockPropertiesCmp(lr, id, "waterlogged", "true"))
                     {
-                        if(!ItemList_ScanRepeat(oBlock,"minecraft_water_bucket"))
-                            ItemList_InitNewItem(&oBlock,"minecraft:water_bucket");
-                        ItemList_AddNum(oBlock,1,"minecraft:water_bucket");
+                        ItemList_AddNum(&oBlock,1,"minecraft:water_bucket");
                     }
                     if(!strcmp(id_block_name,"minecraft:water_bucket") ||
                       !strcmp(id_block_name,"minecraft:lava_bucket"))
@@ -453,7 +451,7 @@ ItemList *lite_region_ItemListExtend(NBT* root, int r_num, ItemList* oBlock, int
                     {
                         if(lite_region_BlockPropertiesCmp(lr,id,"type","double"))
                         {
-                            ItemList_AddNum(oBlock,2,id_block_name);
+                            ItemList_AddNum(&oBlock,2,id_block_name);
                             continue;
                         }
                     }
@@ -467,9 +465,7 @@ ItemList *lite_region_ItemListExtend(NBT* root, int r_num, ItemList* oBlock, int
                                 continue;
                         }
                     }
-
-
-                    ItemList_AddNum(oBlock,1,id_block_name);
+                    ItemList_AddNum(&oBlock,1,id_block_name);
                     //}
                 }
 
