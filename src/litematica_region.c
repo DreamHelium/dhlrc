@@ -23,6 +23,15 @@
 #include <time.h>
 #include "translation.h"
 
+static int* id_to_index(dh_StrArray* str, ItemList* il)
+{
+    int* sheet = (int*)malloc( (str->num + 1) * sizeof(int) );
+    for(int i = 0 ; i < str->num ; i++ )
+        sheet[i] = ItemList_ItemIndex( il, str->val[i]);
+    sheet[str->num] = ItemList_ItemIndex(il, "minecraft:water_bucket");
+    return sheet;
+}
+
 LiteRegion* LiteRegion_Create(NBT* root, int r_num)
 {
     LiteRegion* out = (LiteRegion*)malloc(sizeof(LiteRegion));
@@ -405,7 +414,6 @@ ItemList *lite_region_ItemListExtend(NBT* root, int r_num, ItemList* oBlock, int
         return NULL;
     }
 
-
     oBlock = lite_region_ItemList_WithoutNum(lr, oBlock);
     if(!oBlock)
         return NULL;
@@ -416,6 +424,7 @@ ItemList *lite_region_ItemListExtend(NBT* root, int r_num, ItemList* oBlock, int
 
     //char process[] = "-\\|/";
     uint64_t volume = lr->region_size.x * lr->region_size.y * lr->region_size.z;
+    int* map = id_to_index( lr->replaced_blocks, oBlock);
     for(int y = 0 ; y < lr->region_size.y ; y++)
     {
         for(int z = 0 ; z < lr->region_size.z ; z++)
@@ -434,9 +443,8 @@ ItemList *lite_region_ItemListExtend(NBT* root, int r_num, ItemList* oBlock, int
                 }
                 if(!BlackList_Scan(bl,id_block_name))
                 {
-                    // There is no need for searching repeat.
-//                    if(ItemList_ScanRepeat(oBlock,id_block_name))  // search for item name
-//                    {
+                    /* The worst situation is that we need water_bucket
+                     * To optimize speed we try to add it first */
                     if(lite_region_BlockPropertiesCmp(lr, id, "waterlogged", "true"))
                     {
                         ItemList_AddNum(&oBlock,1,"minecraft:water_bucket");
@@ -466,12 +474,12 @@ ItemList *lite_region_ItemListExtend(NBT* root, int r_num, ItemList* oBlock, int
                         }
                     }
                     ItemList_AddNum(&oBlock,1,id_block_name);
-                    //}
                 }
 
             }
         }
     }
+    free(map);
     printf("\n");
     BlackList_Free(bl);
     LiteRegion_Free(lr);
@@ -523,6 +531,8 @@ ItemList *lite_region_ItemList_WithoutNum(LiteRegion* lr, ItemList *o_il)
             }
         }
     }
+    if(!ItemList_ScanRepeat(o_il, "minecraft:water_bucket"))
+        ItemList_InitNewItem(&o_il, "minecraft:water_bucket");
     BlackList_Free(bl);
     return o_il;
 }

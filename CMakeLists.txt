@@ -1,12 +1,13 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 3.1)
 PROJECT( dhlrc )
 
-set(CMAKE_BUILD_TYPE Release)
+set(CMAKE_BUILD_TYPE Debug)
 
 find_package(Gettext)
 find_package(PkgConfig)
 
 pkg_search_module(GLIB REQUIRED glib-2.0)
+pkg_search_module(GIO REQUIRED gio-2.0)
 
 set(DH_ENABLE_TRANSLATION true)
 

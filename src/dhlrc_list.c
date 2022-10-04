@@ -141,6 +141,26 @@ int ItemList_AddNum(ItemList** bl,int num,char* block_name)
     }
 }
 
+void ItemList_AddNum_ByIndex(ItemList* il, gint num, gint index)
+{
+    ItemList* item = g_list_nth(il, index);
+    if(item)
+    {
+        IListData* ildata = item->data;
+        ildata->total = ildata->total + num;
+    }
+    else return;
+}
+
+gint ItemList_ItemIndex(ItemList* il, const char* item_name)
+{
+    ItemList* item = g_list_find_custom(il, item_name, ilistdata_strcmp);
+    if(item)
+        return g_list_position(il, item);
+    else return -1;
+}
+
+
 int ItemList_ScanRepeat(ItemList* bl,char* block_name)
 {
     ItemList* item = g_list_find_custom(bl, block_name, ilistdata_strcmp);

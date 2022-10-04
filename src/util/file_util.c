@@ -19,7 +19,19 @@
 #include "file_util.h"
 #include <stdlib.h>
 #include <string.h>
+#include <gio/gio.h>
 
+static int internal_strcmp(gconstpointer a, gconstpointer b)
+{
+    return strcmp(a, b);
+}
+
+static int strstr_to_int(gconstpointer element, gconstpointer user_data)
+{
+    char* ret = strstr(element, user_data);
+    if(ret) return 0;
+    else return -1;
+}
 
 int dhlrc_WriteFile(char* pos,char* content, size_t count)
 {
@@ -122,4 +134,65 @@ cJSON *dhlrc_FileToJSON(const char *pos)
         else return NULL;
     }
     else return NULL;
+}
+
+GList* dh_FileList_Create(const char* pos)
+{
+    GFile* dir = g_file_new_for_path(pos);
+    GError* err = NULL;
+
+    GFileEnumerator* gfe = g_file_enumerate_children(dir, NULL, G_FILE_QUERY_INFO_NONE, NULL, &err);
+    if(gfe == NULL)
+    {
+        g_object_unref(dir);
+        return NULL;
+    }
+    GList* list = NULL;
+    GFileInfo* info = NULL;
+    while((info = g_file_enumerator_next_file(gfe, NULL, &err)) != NULL)
+    {
+        list = g_list_prepend(list, String_Copy(g_file_info_get_name(info)));
+        g_object_unref(info);
+    }
+    g_file_enumerator_close(gfe, NULL, &err);
+    g_object_unref(dir);
+    g_object_unref(gfe);
+    list = g_list_sort(list, internal_strcmp);
+    return list;
+}
+
+GList *dh_FileList_SearchInDir(const char *pos, const char *name)
+{
+    GList* filelist = dh_FileList_Create(pos);
+    if(filelist == NULL)
+        return NULL;
+    GList* result = NULL;
+    GList* first = g_list_find_custom(filelist, name, strstr_to_int);
+    if(first == NULL)
+    {
+        g_list_free_full(filelist, free);
+        return NULL;
+    }
+    else
+    {
+        result = g_list_append(result, String_Copy(first->data));
+        first = first->next;
+        while(first)
+        {
+            /*
+            char* compare_result = strstr(first->data, name);
+            if(compare_result != NULL)
+                result = g_list_append(result, String_Copy(first->data));
+            first = first->next;
+            */
+            first = g_list_find_custom(first, name, strstr_to_int);
+            if(first)
+            {
+                result = g_list_append(result, String_Copy(first->data));
+                first = first->next;
+            }
+        }
+        g_list_free_full(filelist, free);
+        return result;
+    }
 }

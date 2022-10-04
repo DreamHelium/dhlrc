@@ -24,6 +24,7 @@ extern "C"{
 
 #include <stdio.h>
 #include <cjson/cJSON.h>
+#include <gmodule.h>
 
 
 int dhlrc_WriteFile(char* pos, char* content, size_t count);
@@ -33,6 +34,8 @@ int dhlrc_ConfigExist();
 int dhlrc_FileExist(const char* filepos);
 char* dhlrc_ConfigContent(const char* str);
 cJSON* dhlrc_FileToJSON(const char* pos);
+GList* dh_FileList_Create(const char* pos);
+GList* dh_FileList_SearchInDir(const char* pos, const char* name);
 
 
 #ifdef __cplusplus

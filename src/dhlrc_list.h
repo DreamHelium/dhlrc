@@ -47,6 +47,8 @@ int ItemList_GetItemNum(ItemList* il, char* item_name);
 ItemList* ItemList_Init(char* block_name);
 int ItemList_toCSVFile(char* pos,ItemList* il);
 const char* ItemList_ItemName(ItemList* il);
+void ItemList_AddNum_ByIndex(ItemList* il, gint num, gint index);
+gint ItemList_ItemIndex(ItemList* il, const char* item_name);
 
 
 BlackList* BlackList_Init();
