@@ -21,8 +21,8 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include "litematica_region.h"
-#include "dh_string_util.h"
-#include "file_util.h"
+#include <dhelium/dh_string_util.h>
+#include <dhelium/file_util.h>
 #ifndef DH_DISABLE_TRANSLATION
 #include <libintl.h>
 #define _(str) gettext (str)
@@ -320,7 +320,7 @@ char** NameArray_CanCraft(int* num, ItemList *il)
                 return NULL;
             }
             recipe_list = temp_rl;
-            recipe_list[recipe_num - 1] = String_Copy(ItemList_ItemName(ild));
+            recipe_list[recipe_num - 1] = dh_strdup(ItemList_ItemName(ild));
             ItemList_Free(recipe);
         }
         ild = ild->next;

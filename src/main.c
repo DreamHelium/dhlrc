@@ -23,9 +23,9 @@
 #include <string.h>
 #include <ctype.h>
 #include "recipe_util.h"
-#include "file_util.h"
+#include <dhelium/file_util.h>
 #include "nbt_litereader.h"
-#include "dh_string_util.h"
+#include <dhelium/dh_string_util.h>
 #include "lrc_extend.h"
 /*#include "dhlrc_config.h"*/
 #include "main.h"

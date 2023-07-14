@@ -9,10 +9,6 @@ set( DHLRC_MAIN_POT_FILE_DEPENDS
 
 # configure_file(dhlrc_config.h.in dhlrc_config.h)
 
-add_subdirectory(util)
-
-set( DHUTIL_POT_FILE_DEPENDS ${DHUTIL_POT_FILE_DEPENDS} PARENT_SCOPE )
-
 add_executable(dhlrc
 	       main.c
 	       main_isoc.c
@@ -35,9 +31,9 @@ add_executable(dhlrc
 )
 
 #add_definitions(-DLIBNBT_USE_LIBDEFLATE)
-add_definitions(-DDH_DEBUG_IN_IDE)
+#add_definitions(-DDH_DEBUG_IN_IDE)
 
-target_link_libraries(dhlrc PUBLIC m z cjson dhutil
+target_link_libraries(dhlrc PUBLIC m z dhutil cjson
 	"${GLIB_LIBRARIES}" "${GIO_LIBRARIES}"
 #    deflate
 )

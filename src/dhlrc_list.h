@@ -23,7 +23,7 @@ extern "C" {
 #endif
 
 #include <gmodule.h>
-#include "util/dh_string_util.h"
+#include <dhelium/dh_string_util.h>
 
 typedef GList ItemList;
 typedef GList BlackList;

@@ -53,7 +53,7 @@ LiteRegion* LiteRegion_Create(NBT* root, int r_num)
         dh_StrArray* r_name = lite_region_Name_StrArray(root);
         if(r_num < r_name->num)
         {
-            out->name = String_Copy( r_name->val[r_num] );
+            out->name = dh_strdup( r_name->val[r_num] );
             dh_StrArray_Free(r_name);
 
             out->region_num = r_num;

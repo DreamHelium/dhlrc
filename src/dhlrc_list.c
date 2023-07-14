@@ -21,7 +21,7 @@
 #include <stdio.h>
 #include <cjson/cJSON.h>
 #include "recipe_util.h"
-#include "util/file_util.h"
+#include <dhelium/file_util.h>
 
 typedef struct RListData{
     char* o_name;
@@ -65,7 +65,7 @@ static int ilistdata_iszero(gconstpointer a, gconstpointer b)
 static IListData* ilistdata_init(const char* name)
 {
     IListData* ildata = (IListData*)malloc(sizeof(IListData));
-    ildata->name = String_Copy(name);
+    ildata->name = dh_strdup(name);
     ildata->total = 0;
     ildata->placed = 0;
     ildata->available = 0;
@@ -240,7 +240,7 @@ BlackList* BlackList_Init()
 
 BlackList* BlackList_Extend(BlackList* bl,const char* name)
 {
-    bl = g_list_prepend(bl, String_Copy(name));
+    bl = g_list_prepend(bl, dh_strdup(name));
     return bl;
 }
 
@@ -301,7 +301,7 @@ ReplaceList* ReplaceList_Extend(ReplaceList* rl,const char* o_name,const char* r
 {
     RListData* rld = (RListData*) malloc(sizeof(RListData));
     dh_StrArray* str = dh_StrArray_Init( r_name );
-    rld->o_name = String_Copy(o_name);
+    rld->o_name = dh_strdup(o_name);
     rld->r_name = str;
     rl = g_list_prepend(rl, rld);
     return rl;
@@ -310,7 +310,7 @@ ReplaceList* ReplaceList_Extend(ReplaceList* rl,const char* o_name,const char* r
 ReplaceList * ReplaceList_Extend_StrArray(ReplaceList* rl, const char* o_name, dh_StrArray* str)
 {
     RListData* rld = (RListData*) malloc(sizeof(RListData));
-    rld->o_name = String_Copy(o_name);
+    rld->o_name = dh_strdup(o_name);
     rld->r_name = str;
     rl = g_list_prepend(rl, rld);
     return rl;

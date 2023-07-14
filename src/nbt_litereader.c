@@ -16,7 +16,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>. */
 
 #include "nbt_litereader.h"
-#include "file_util.h"
+#include <dhelium/file_util.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
