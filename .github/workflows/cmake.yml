@@ -33,6 +33,7 @@ jobs:
 
     - name: Install dhutil from source
       run: |
+        sudo apt install gettext
         git clone https://github.com/DreamHelium/dhutil
         cd dhutil
         cmake -B build
