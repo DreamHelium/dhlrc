@@ -24,12 +24,21 @@ jobs:
 
     - name: Install cJSON from source
       run: |
-        pwd
-        cd ${{github.workspace}}/src/cJSON && mkdir build
-        cd build
-        cmake ..
-        make
-        sudo make install
+        git clone https://github.com/DaveGamble/cJSON
+        cd cJSON
+        cmake -B build
+        cmake --build build
+        sudo cmake --install build
+        cd ..
+
+    - name: Install dhutil from source
+      run: |
+        git clone https://github.com/DreamHelium/dhutil
+        cd dhutil
+        cmake -B build
+        cmake --build build
+        sudo cmake --install build
+        cd ..
 
     - name: Configure CMake
       # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
