@@ -26,11 +26,11 @@ extern "C"{
 
 
 #include <cjson/cJSON.h>
-//#include <dirent.h>
-ItemList* ItemList_Recipe(char* block_name,int num);
+#include <dh/dh_generaliface.h>
 
 
-int ItemList_CombineRecipe(ItemList** o_bl);
+/** Get recipes and combine to ItemList (discard all the items) */
+int ItemList_CombineRecipe(ItemList** o_bl, const char* dirpos, DhGeneral* general);
 long *NumArray_GetFromInput(int *array_num, int max_num);
 char** NameArray_CanCraft(int* num, ItemList* il);
 

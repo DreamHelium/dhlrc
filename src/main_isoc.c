@@ -15,6 +15,7 @@
     You should have received a copy of the GNU Lesser General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>. */
 
+#include "dhlrc_list.h"
 #include "main.h"
 #include "translation.h"
 #include <dhelium/file_util.h>
@@ -25,7 +26,8 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
-
+#include <glib.h>
+#include <dh/dh_general_isoc.h>
 
 enum option{Reader, Litematic_material_lister, Litematic_block_show,
         #ifdef DH_DEBUG_IN_IDE
@@ -37,7 +39,7 @@ static enum option start_without_option();
 static int start_func(NBT* root, enum option opt);
 static void start_lrc_main(NBT* root);
 #ifdef DH_DEBUG_IN_IDE
-int debug(NBT* root);
+int debug();
 #endif
 
 
@@ -128,7 +130,7 @@ static int start_func(NBT *root, enum option opt)
         return 0;
 #ifdef DH_DEBUG_IN_IDE
     case Debug:
-        return debug(root);
+        return debug();
 #endif
     case Exit:
         return 0;
@@ -163,7 +165,13 @@ static void start_lrc_main(NBT *root)
             free(process_region_i);
             lite_region_FreeNameArray(region_name,region_num);
             ItemList_DeleteZeroItem(&il);
-            ItemList_CombineRecipe(&il);
+
+            DhIsoc* isoc = dh_general_isoc_new();
+            g_message("%d", DH_IS_GENERAL(isoc));
+
+            ItemList_CombineRecipe(&il, "recipes", DH_GENERAL(isoc));
+            g_object_unref(isoc);
+
             ItemList_Sort(&il);
             ItemList_toCSVFile("test.csv",il);
             ItemList_Free(il);
@@ -175,20 +183,15 @@ static void start_lrc_main(NBT *root)
 
 #ifdef DH_DEBUG_IN_IDE
 
-int debug(NBT* root)
+int debug()
 {
-    NBT_Pos* pos = NBT_Pos_init(root);
-    if(NBT_Pos_GetChild_Deep(pos,"Metadata","TimeCreated",NULL))
+    GList* list = dh_FileList_Create("lang");
+    while(list)
     {
-        int ret = nbtlr_Start_Pos(pos);
-        NBT_Pos_Free(pos);
-        return ret;
+        printf("%s\n", list->data);
+        list = list -> next;
     }
-    else
-    {
-        NBT_Pos_Free(pos);
-        return -1;
-    }
+    return 0;
 }
 
 

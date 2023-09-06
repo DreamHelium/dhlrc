@@ -23,11 +23,13 @@ extern "C" {
 #endif
 
 #include <gmodule.h>
-#include <dhelium/dh_string_util.h>
+#include <dh/dh_string_util.h>
+#include <dh/dh_generaliface.h>
 
 typedef GList ItemList;
 typedef GList BlackList;
 typedef GList ReplaceList;
+typedef GList RecipeList;
 
 
 /* ItemList utils */
@@ -37,18 +39,21 @@ void ItemList_Sort(ItemList **oBlock);
 ItemList* ItemList_Sort_ByTotal(ItemList* il);
 
 
-int ItemList_InitNewItem(ItemList **oBlock, char* block_name);
+int ItemList_InitNewItem(ItemList **oBlock, const char* block_name);
+int ItemList_InitNewItemWithTag(ItemList **oBlock, const char* block_name, gboolean is_tag);
 int ItemList_AddNum(ItemList** bl, int num , char* block_name);
 int ItemList_ScanRepeat(ItemList* bl,char* block_name);
 int ItemList_DeleteItem(ItemList** bl,char* block_name);
 void ItemList_DeleteZeroItem(ItemList** bl);
 int ItemList_Combine(ItemList** dest,ItemList* src);
 int ItemList_GetItemNum(ItemList* il, char* item_name);
-ItemList* ItemList_Init(char* block_name);
+ItemList* ItemList_Init(const char* block_name);
+ItemList* ItemList_InitWithTag(const char* block_name, gboolean is_tag);
 int ItemList_toCSVFile(char* pos,ItemList* il);
 const char* ItemList_ItemName(ItemList* il);
 void ItemList_AddNum_ByIndex(ItemList* il, gint num, gint index);
 gint ItemList_ItemIndex(ItemList* il, const char* item_name);
+ItemList* ItemList_Recipe(RecipeList* rcl, int num, const char* item_name, DhGeneral* general);
 
 
 BlackList* BlackList_Init();
@@ -66,6 +71,13 @@ const char* ReplaceList_Replace(ReplaceList* rl, const char* o_name);
 dh_StrArray* ReplaceList_Replace_StrArray(ReplaceList* rl, const char* o_name);
 void ReplaceList_Free(ReplaceList* rl);
 
+void RecipeList_EnableFeature(gboolean shaped, gboolean smelting, gboolean shapeless);
+RecipeList* RecipeList_Init(const char* dir, ItemList* il);
+void RecipeList_Free(RecipeList* rcl);
+char* RecipeList_Filename(RecipeList* rcl);
+char* RecipeList_ItemName(RecipeList* rcl);
+dh_StrArray* RecipeList_ItemNames(RecipeList* rcl);
+dh_StrArray* RecipeList_ItemNamesWithNamespace(RecipeList* rcl);
 //only for debug
 //int Test();
 

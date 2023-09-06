@@ -20,7 +20,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
-#include "litematica_region.h"
+#include "dhlrc_list.h"
 #include <dhelium/dh_string_util.h>
 #include <dhelium/file_util.h>
 #ifndef DH_DISABLE_TRANSLATION
@@ -33,7 +33,7 @@
 long* NumArray_GetFromInput(int* array_num, int max_num)
 {
     if(!array_num) return NULL;
-    printf(_("Input numbers directly, or type 'a' for all numbers (a): "));
+    printf(_("Input numbers directly, or type 'a' for all numbers, 'q' to quit (a): "));
     dh_limit* limit = dh_limit_Init(NumArray);
     if(limit)
     {
@@ -50,7 +50,7 @@ long* NumArray_GetFromInput(int* array_num, int max_num)
         *array_num = 0;
         return NULL;
     }
-    dh_LineOut* dout = InputLine_General( sizeof(long), limit, 0, "a", 1);
+    dh_LineOut* dout = InputLine_General( sizeof(long), limit, 0, "aq", 1);
     dh_limit_Free(limit);
     if(dout)
     {
@@ -71,7 +71,7 @@ long* NumArray_GetFromInput(int* array_num, int max_num)
                 return NULL;
             }
         }
-        else
+        else if(dout->type == Empty || (dout->type == Character && dout->val_c == 'a'))
         {
             dh_LineOut_Free(dout);
             long* out = (long*)malloc( max_num * sizeof(long) );
@@ -88,6 +88,12 @@ long* NumArray_GetFromInput(int* array_num, int max_num)
                 return NULL;
             }
         }
+        else
+        {
+            dh_LineOut_Free(dout);
+            *array_num = 0;
+            return NULL;
+        }
     }
     else
     {
@@ -96,149 +102,40 @@ long* NumArray_GetFromInput(int* array_num, int max_num)
     }
 }
 
-int ItemList_CombineRecipe(ItemList** o_bl)
+int ItemList_CombineRecipe(ItemList** o_bl, const char* dirpos, DhGeneral* general)
 {
-    ItemList* il = *o_bl;
-    do
+    /* Get item names */
+    RecipeList* rcl = RecipeList_Init(dirpos, *o_bl);
+    dh_StrArray* item_names = RecipeList_ItemNamesWithNamespace(rcl);
+
+    dh_printf(general, _("There are some items to craft:\n"));
+    for(int i = 0 ; i < item_names->num; i++)
     {
-        int craft_num = 0;
-        char** craft_list = NameArray_CanCraft(&craft_num,il);
-        if(!craft_list)
-        {
-            printf("There is no items to craft.\n");
-            return 0;
-        }
-        else
-        {
-            printf("Please select recipes to combine: \n");
-            for(int i = 0 ; i < craft_num ; i++)
-            {
-                char* trans_name = Name_BlockTranslate(craft_list[i]);
-                if(trans_name)
-                    printf("[%d] %s \n",i,trans_name);
-                else
-                    printf("[%d] %s\n",i,craft_list[i]);
-                free(trans_name);
-                trans_name = NULL;
-            }
-            int need_num = 0;
-            long* need_craft = NumArray_GetFromInput(&need_num,craft_num);
-            if(!need_craft)
-            {
-                lite_region_FreeNameArray(craft_list,craft_num);
-                return 0;
-            }
-            else
-            {
-                // combine itemlist
-                for(int i = 0 ; i < need_num ; i++)
-                {
-                    if(need_craft[i] < 0 || need_craft[i] >= craft_num)
-                    {
-                        perror("Unexpected num\n");
-                    }
-                    else
-                    {
-                        char* need_item = craft_list[need_craft[i]];
-                        int item_num = ItemList_GetItemNum(il,need_item);
-                        ItemList* recipe = ItemList_Recipe(need_item,item_num);
-                        ItemList_Combine(o_bl,recipe);
-                        ItemList_DeleteItem(o_bl,need_item);
-                        ItemList_Free(recipe);
-                        il = *o_bl;
-                    }
-                }
-            }
-            lite_region_FreeNameArray(craft_list,craft_num);
-            free(need_craft);
-        }
-        il = *o_bl;
+        dh_option_printer(general, i, (item_names->val)[i]);
     }
-    while(1);
-}
 
-ItemList* ItemList_Recipe(char* block_name,int num)
-{
-    //d = opendir("recipes");
-    char* name = strchr(block_name,':') + 1;
-    char* directory = (char*)malloc((14 + strlen(name))*sizeof(char));
-    strcpy(directory,"recipes/");
-    strcat(directory,name);
-    strcat(directory,".json");
-    ItemList* out_recipe = NULL;
-    cJSON* block_data = dhlrc_FileToJSON(directory);
-    free(directory);
-    if(block_data){
-        char* type = cJSON_GetStringValue(cJSON_GetObjectItem(block_data,"type"));
-        if(strstr(type,"minecraft:crafting_shaped"))
+    int arr_num = 0;
+    long* num_arr = NumArray_GetFromInput(&arr_num, item_names->num);
+    if(num_arr == NULL)
+    {
+        RecipeList_Free(rcl);
+        dh_StrArray_Free(item_names);
+        return 0;
+    }
+
+    for(int i = 0 ; i < arr_num ; i++)
+    {
+        char* item_name = (item_names->val)[i];
+        ItemList* return_recipe = ItemList_Recipe(rcl, ItemList_GetItemNum(*o_bl, item_name),item_name, general);
+        if(return_recipe)
         {
-            if(num == 0) // just return the origin name
-            {
-                cJSON_Delete(block_data);
-                return ItemList_Init(block_name);
-            }
-            // get the pattern and lines of recipe
-            cJSON* block_pattern = cJSON_GetObjectItem(block_data,"pattern");
-            int line = cJSON_GetArraySize(block_pattern);
-
-            // get result count
-            int count_num = 1;
-            if(cJSON_IsNumber(cJSON_GetObjectItem(cJSON_GetObjectItem(block_data,"result"),"count")))
-                count_num = cJSON_GetNumberValue(cJSON_GetObjectItem(cJSON_GetObjectItem(block_data,"result"),"count"));
-
-            //get craft numbers
-            int craft_num = 0;
-            if(num % count_num == 0) craft_num = num / count_num;
-            else craft_num = num / count_num + 1;
-
-            for(int i = 0 ; i < line ; i++)
-            {
-                cJSON* table = cJSON_GetArrayItem(block_pattern,i);
-                char* table_content = cJSON_GetStringValue(table);
-                for(int j = 0 ; j < strlen(table_content) ; j++)
-                {
-                    if(table_content[j] != ' ')
-                    {
-                        // find the item
-                        char item_key[2] = {table_content[j],'\0'};
-                        cJSON* key = cJSON_GetObjectItem(block_data,"key");
-                        cJSON* item = cJSON_GetObjectItem(key,item_key);
-                        char* item_name = NULL;
-                        if(cJSON_IsArray(item))
-                        {
-                            item_name = cJSON_GetStringValue(cJSON_GetObjectItem(cJSON_GetArrayItem(item,0),"item"));
-                            if(!item_name)
-                                item_name = cJSON_GetStringValue(cJSON_GetObjectItem(cJSON_GetArrayItem(item,0),"tag"));
-                        }
-                        else
-                        {
-                            item_name = cJSON_GetStringValue(cJSON_GetObjectItem(item,"item"));
-                            if(!item_name) item_name = cJSON_GetStringValue(cJSON_GetObjectItem(item,"tag"));
-                        }
-                            if(!ItemList_ScanRepeat(out_recipe,item_name))
-                            {
-                                if(ItemList_InitNewItem(&out_recipe,item_name))
-                                {
-                                    cJSON_Delete(block_data);
-                                    return NULL;
-                                }
-                            }
-                                ItemList_AddNum(&out_recipe,craft_num,item_name);
-                        }
-                    }
-                }
-            cJSON_Delete(block_data);
-            if(out_recipe)
-                return out_recipe;
-            return NULL;
-        }
-        else
-        {
-            cJSON_Delete(block_data);
-            return NULL;
+            ItemList_Combine(o_bl, return_recipe);
+            ItemList_DeleteItem(o_bl, item_name);
         }
     }
-    else return NULL;
+    RecipeList_Free(rcl);
+    dh_StrArray_Free(item_names);
+    return 1;
 }
 
 char* Name_BlockTranslate(const char *block_name)
@@ -301,30 +198,5 @@ char* Name_BlockTranslate(const char *block_name)
 
 char** NameArray_CanCraft(int* num, ItemList *il)
 {
-    char** recipe_list = NULL;
-    ItemList* ild = il;
-    int recipe_num = 0;
-    while(ild)
-    {
-        ItemList* recipe = ItemList_Recipe(ItemList_ItemName(ild),0);
-        if(recipe)
-        {
-            recipe_num++;
-            char** temp_rl = realloc(recipe_list,recipe_num * sizeof(char*));
-            if(!temp_rl)
-            {
-                ItemList_Free(recipe);
-                *num = 0;
-                perror("Allocate recipe list error\n");
-                lite_region_FreeNameArray(recipe_list,recipe_num);
-                return NULL;
-            }
-            recipe_list = temp_rl;
-            recipe_list[recipe_num - 1] = dh_strdup(ItemList_ItemName(ild));
-            ItemList_Free(recipe);
-        }
-        ild = ild->next;
-    }
-    *num = recipe_num;
-    return recipe_list;
+    return NULL;
 }

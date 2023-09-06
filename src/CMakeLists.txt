@@ -31,14 +31,15 @@ add_executable(dhlrc
 )
 
 #add_definitions(-DLIBNBT_USE_LIBDEFLATE)
-#add_definitions(-DDH_DEBUG_IN_IDE)
+add_definitions(-DDH_DEBUG_IN_IDE)
 
-target_link_libraries(dhlrc PUBLIC m z dhutil cjson
+target_link_libraries(dhlrc PUBLIC m z ${dhutil_LIBRARIES} cjson
 	"${GLIB_LIBRARIES}" "${GIO_LIBRARIES}"
 #    deflate
 )
 
 target_include_directories(dhlrc PUBLIC
-	"${PROJECT_BINARY_DIR}" "${GLIB_INCLUDE_DIRS}" "${GIO_INCLUDE_DIRS}"
+	"${PROJECT_BINARY_DIR}" "${GLIB_INCLUDE_DIRS}" "${GIO_INCLUDE_DIRS}" "${dhutil_INCLUDE_DIRS}"
 )
 
+target_link_directories(dhlrc PUBLIC "${dhutil_LIBRARY_DIRS}")

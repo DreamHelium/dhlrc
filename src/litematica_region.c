@@ -387,8 +387,8 @@ NBT* lite_region_SpecificBlockStatePalette(NBT* root, int r_num, int id)
 {
     NBT* a = lite_region_BlockStatePalette(root,r_num);
     if(a)
-    for(int i = 0; i < id; i++)
-        a = a->next;
+        for(int i = 0; i < id; i++)
+            a = a->next;
     return a;
 }
 
@@ -494,7 +494,7 @@ int lite_region_IsBlockWaterlogged(NBT* root,int r_num,int id)
     else
         if(!strcmp((char*)status->value_a.value,"true"))
             return 1;
-    else return 0;
+        else return 0;
 }
 
 int lite_region_BlockLevel(NBT* root,int r_num,int id)
