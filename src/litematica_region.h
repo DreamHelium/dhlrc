@@ -23,7 +23,7 @@ extern "C"{
 
 #include "libnbt/nbt.h"
 #include "dhlrc_list.h"
-#include <dhelium/dh_string_util.h>
+#include <dh/dh_string_util.h>
 #include "nbt_litereader.h"
 
 // litematica processing stuff

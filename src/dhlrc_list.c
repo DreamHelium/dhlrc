@@ -708,6 +708,7 @@ static void rlbasedata_free(gpointer data)
 
 ItemList* ItemList_Recipe(RecipeList* rcl, int num, const char* item_name, DhGeneral* general)
 {
+    dh_printf(general, _("Processing %s.\n"), item_name);
     RecipeList* item_recipes = dh_search_in_list_custom(rcl, item_name, rcldata_issame);
     RecipeList* option_recipe = item_recipes;
 
@@ -781,7 +782,10 @@ static ItemList* analyse_shapeless(guint num, const char* filename, DhGeneral* s
 {
     cJSON* json = dhlrc_FileToJSON(filename);
     g_return_val_if_fail(json != NULL, NULL);
-    int num2 = cJSON_GetNumberValue( cJSON_GetObjectItem(cJSON_GetObjectItem(json, "result"), "count"));
+    int num2 = 1;
+    cJSON* count = cJSON_GetObjectItem(cJSON_GetObjectItem(json, "result"), "count");
+    if(cJSON_IsNumber(count))
+        num2 = cJSON_GetNumberValue( count );
 
     ItemList* list = NULL;
     guint division = mod_decide(num, num2, self);
@@ -820,7 +824,11 @@ static ItemList* analyse_shaped(guint num, const char* filename, DhGeneral* self
 {
     cJSON* json = dhlrc_FileToJSON(filename);
     g_return_val_if_fail(json != NULL, NULL);
-    int num2 = cJSON_GetNumberValue( cJSON_GetObjectItem(cJSON_GetObjectItem(json, "result"), "count"));
+
+    int num2 =  1;
+    cJSON* count = cJSON_GetObjectItem(cJSON_GetObjectItem(json, "result"), "count");
+    if(cJSON_IsNumber(count))
+        num2 = cJSON_GetNumberValue( count );
 
     ItemList* list = NULL;
     guint division = mod_decide(num, num2, self);
@@ -832,7 +840,6 @@ static ItemList* analyse_shaped(guint num, const char* filename, DhGeneral* self
         for(int i = 0 ; i < pattern_size ; i++)
         {
             char* str = cJSON_GetStringValue(cJSON_GetArrayItem(pattern, i));
-            g_message(str);
             dh_StrArray_AddStr(&pattern_stra, str);
         }
         char* pattern_string = dh_StrArray_cat(pattern_stra);
@@ -844,10 +851,10 @@ static ItemList* analyse_shaped(guint num, const char* filename, DhGeneral* self
         for(int i = 0 ; i < key_num ; i++)
         {
             cJSON* key = cJSON_GetArrayItem(keys, i);
-            g_message(key->string);
             guint item_num = get_key_nums(pattern_string, *(key->string));
+            g_message("%s key corresponding %d nums.", key->string, item_num);
             if(cJSON_IsObject(key))
-                analyse_object(item_num * num, key, &list);
+                analyse_object(item_num * division, key, &list);
             else if(cJSON_IsArray(key))
             {
                 dh_printf(self, _("There are some ingredients to choose:\n"));
@@ -862,7 +869,7 @@ static ItemList* analyse_shaped(guint num, const char* filename, DhGeneral* self
                     return NULL;
                 }
                 else {
-                    analyse_object(division, cJSON_GetArrayItem(key, option), &list);
+                    analyse_object(item_num * division, cJSON_GetArrayItem(key, option), &list);
                 }
             }
 
@@ -883,6 +890,7 @@ static void analyse_object(guint num, cJSON* object, ItemList** list)
     {
         ItemList_InitNewItem(list, cJSON_GetStringValue(item));
         ItemList_AddNum(list, num, cJSON_GetStringValue(item));
+        g_message("Analyse and save: %d",ItemList_GetItemNum(*list, cJSON_GetStringValue(item)));
     }
     else {
         cJSON* tag = cJSON_GetObjectItem(object, "tag");
@@ -902,11 +910,11 @@ static guint mod_decide(guint num1, guint num2, DhGeneral* self)
     int mod = num1 % num2;
     if(mod)
     {
-        dh_printf(self, _("There is a remainder."));
-        int choice = dh_selector(self, _("Enter 'd' to discard the result, or enter to continue: ") ,0, " d", _("&Continue"), _("&Discard"));
+        dh_printf(self, _("There is a remainder with %d and %d.\n"), num1, num2);
+        int choice = dh_selector(self, _("Enter 'd' to discard the result, or enter 'c' to continue (c): ") ,0, "cd", _("&Continue"), _("&Discard"));
         if(choice == 0 || choice == -1) /* Return division number. */
         {
-            return (num1 / num2);
+            return (num1 / num2) + 1;
         }
         else return 0;
     }
@@ -934,11 +942,14 @@ static char* get_array_item_name(cJSON* json, int num)
 
 static guint get_key_nums(const char* str, char key)
 {
+    g_message("String is %s", str);
+    const char* str_d = str;
     guint i = 0;
-    while(*str)
+    while(*str_d)
     {
-        if(*str == key) i++;
-        str++;
+        if(*str_d == key) i++;
+        g_message("Processing %c", *str_d);
+        str_d++;
     }
     return i;
 }

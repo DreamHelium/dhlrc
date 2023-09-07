@@ -22,7 +22,7 @@ extern "C"{
 #endif
 
 #include "libnbt/nbt.h"
-#include <dhelium/dh_string_util.h>
+#include <dh/dh_string_util.h>
 #include "nbt_pos.h"
 
 

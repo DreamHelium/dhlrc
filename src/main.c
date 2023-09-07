@@ -16,17 +16,12 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>. */
 
 #include <stdio.h>
-#include "litematica_region.h"
 #include <stdint.h>
 #include <stdlib.h>
-#include "libnbt/nbt.h"
 #include <string.h>
 #include <ctype.h>
-#include "recipe_util.h"
-#include <dhelium/file_util.h>
-#include "nbt_litereader.h"
-#include <dhelium/dh_string_util.h>
-#include "lrc_extend.h"
+#include <dh/file_util.h>
+#include <dh/dh_string_util.h>
 /*#include "dhlrc_config.h"*/
 #include "main.h"
 #include "translation.h"

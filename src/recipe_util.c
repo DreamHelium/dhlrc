@@ -125,7 +125,7 @@ int ItemList_CombineRecipe(ItemList** o_bl, const char* dirpos, DhGeneral* gener
 
     for(int i = 0 ; i < arr_num ; i++)
     {
-        char* item_name = (item_names->val)[i];
+        char* item_name = (item_names->val)[num_arr[i]];
         ItemList* return_recipe = ItemList_Recipe(rcl, ItemList_GetItemNum(*o_bl, item_name),item_name, general);
         if(return_recipe)
         {
