@@ -20,3 +20,7 @@ build/
 # po temporary
 
 po/*/*.po~
+
+#c clangd temporary
+
+.cache/*

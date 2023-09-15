@@ -107,6 +107,7 @@ int dh_mod_decide(guint num1, guint num2, DhGeneral* self)
     int mod = num1 % num2;
     if(mod)
     {
+        dh_new_win(self, FALSE);
         dh_printf(self, _("There is a remainder with %d and %d.\n"), num1, num2);
         int choice = dh_selector(self, _("Enter 'd' to discard the result, or enter 'c' to continue (c): ") ,0, "cd", _("&Continue"), _("&Discard"));
         if(choice == 0 || choice == -1) /* Return division number. */

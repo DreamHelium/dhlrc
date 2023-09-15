@@ -32,6 +32,12 @@ add_executable(dhlrc
 	       nbt_pos.h
 	       recipe_class/recipe_general.h
 	       recipe_class/recipe_general.c
+	       recipe_class/recipe_shaped.h
+	       recipe_class/recipe_shaped.c
+	       recipe_class/recipe_shapeless.h
+	       recipe_class/recipe_shapeless.c
+	       recipe_class/recipe_smelting.h
+	       recipe_class/recipe_smelting.c
 )
 
 #add_definitions(-DLIBNBT_USE_LIBDEFLATE)

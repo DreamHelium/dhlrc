@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-07-14 22:22+0800\n"
+"POT-Creation-Date: 2023-09-14 17:40+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: src/main.c:44
+#: src/main.c:39
 #, c-format
 msgid ""
 "Usage: %s [options] [file]\n"
@@ -27,19 +27,19 @@ msgid ""
 "  -l, --list\tEnter litematica material list with recipe combination\n"
 msgstr ""
 
-#: src/main_isoc.c:61
+#: src/main_isoc.c:63
 msgid "Error when reading file."
 msgstr ""
 
-#: src/main_isoc.c:69
+#: src/main_isoc.c:71
 msgid "Not a valid NBT file!"
 msgstr ""
 
-#: src/main_isoc.c:76
+#: src/main_isoc.c:78
 msgid "Valid NBT file!"
 msgstr ""
 
-#: src/main_isoc.c:86
+#: src/main_isoc.c:88
 #, c-format
 msgid ""
 "There are three functions:\n"
@@ -49,17 +49,17 @@ msgid ""
 "\n"
 msgstr ""
 
-#: src/main_isoc.c:90
+#: src/main_isoc.c:92
 #, c-format
 msgid "Please select an option, or enter 'q' to exit the program (q): "
 msgstr ""
 
-#: src/main_isoc.c:146 src/lrc_extend.c:42
+#: src/main_isoc.c:147 src/lrc_extend.c:42
 #, c-format
 msgid "There are %d regions:\n"
 msgstr ""
 
-#: src/main_isoc.c:159
+#: src/main_isoc.c:160
 #, c-format
 msgid "Processing: region %d / %d : [%ld] %s \n"
 msgstr ""
@@ -160,4 +160,56 @@ msgid ""
 "Please enter the coordination of the block again, or enter 'b' to choose "
 "another region, enter 'r' to read the detail of the block, enter 'q' to exit "
 "the program (b): "
+msgstr ""
+
+#: src/recipe_util.c:34
+#, c-format
+msgid "Input numbers directly, or type 'a' for all numbers, 'q' to quit (a): "
+msgstr ""
+
+#: src/recipe_util.c:109
+msgid "There are some items to craft:\n"
+msgstr ""
+
+#: src/dhlrc_list.c:710
+#, c-format
+msgid "Processing %s.\n"
+msgstr ""
+
+#: src/dhlrc_list.c:716
+#, c-format
+msgid "There are %d corresponding files to the item %s:\n"
+msgstr ""
+
+#: src/dhlrc_list.c:723
+msgid "Please select an option, or 'd' to discard (d): "
+msgstr ""
+
+#: src/dhlrc_list.c:723 src/dhlrc_list.c:920
+msgid "&Discard"
+msgstr ""
+
+#: src/dhlrc_list.c:803 src/dhlrc_list.c:867
+msgid "There are some ingredients to choose:\n"
+msgstr ""
+
+#: src/dhlrc_list.c:807 src/dhlrc_list.c:871
+msgid "Please select an item/tag, or enter 'a' to give up selecting (a): "
+msgstr ""
+
+#: src/dhlrc_list.c:807 src/dhlrc_list.c:871
+msgid "&Abort"
+msgstr ""
+
+#: src/dhlrc_list.c:919
+#, c-format
+msgid "There is a remainder with %d and %d.\n"
+msgstr ""
+
+#: src/dhlrc_list.c:920
+msgid "Enter 'd' to discard the result, or enter 'c' to continue (c): "
+msgstr ""
+
+#: src/dhlrc_list.c:920
+msgid "&Continue"
 msgstr ""
