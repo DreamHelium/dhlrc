@@ -21,9 +21,12 @@
 #ifndef DH_DISABLE_TRANSLATION
 #include <libintl.h>
 #include <locale.h>
+#include "recipe_util.h"
 #define _(str) gettext (str)
+#define trm(str) Name_BlockTranslate (str)
 #else
 #define _(str) str
+#define trm(str) str
 #endif
 
 #endif

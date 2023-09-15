@@ -459,12 +459,11 @@ int ItemList_toCSVFile(char* pos,ItemList* il)
     while(ild)
     {
         IListData* ildata = ild->data;
-        char* trans = Name_BlockTranslate(ildata->name);
+        const char* trans = Name_BlockTranslate(ildata->name);
         if(trans)
             fprintf(f,"\"%s\",%d,%d,%d\n",trans,ildata->total,ildata->total-ildata->placed,ildata->available);
         else
             fprintf(f,"%s,%d,%d,%d\n",ildata->name,ildata->total,ildata->total-ildata->placed,ildata->available);
-        free(trans);
         ild = ild->next;
     }
     fclose(f);
@@ -708,13 +707,13 @@ static void rlbasedata_free(gpointer data)
 
 ItemList* ItemList_Recipe(RecipeList* rcl, int num, const char* item_name, DhGeneral* general)
 {
-    dh_printf(general, _("Processing %s.\n"), item_name);
+    dh_printf(general, _("Processing %s.\n"), trm(item_name));
     RecipeList* item_recipes = dh_search_in_list_custom(rcl, item_name, rcldata_issame);
     RecipeList* option_recipe = item_recipes;
 
     if(g_list_length(item_recipes) > 1)
     {
-        dh_printf(general, _("There are %d corresponding files to the item %s:\n"), g_list_length(item_recipes), item_name);
+        dh_printf(general, _("There are %d corresponding files to the item %s:\n"), g_list_length(item_recipes), trm(item_name));
         RecipeList* item_recipes_d = item_recipes;
         while(item_recipes_d)
         {
@@ -727,7 +726,8 @@ ItemList* ItemList_Recipe(RecipeList* rcl, int num, const char* item_name, DhGen
             g_list_free(item_recipes);
             return NULL;
         }
-        else option_recipe = g_list_nth(item_recipes, option);
+        else
+            option_recipe = g_list_nth(item_recipes, option);
     }
 
     /* Analyse */
@@ -810,7 +810,10 @@ static ItemList* analyse_shapeless(guint num, const char* filename, DhGeneral* s
                 analyse_object(division, cJSON_GetArrayItem(ingredient, option), &list);
             }
         }
-        else return NULL;
+        else{
+            cJSON_Delete(json);
+            return NULL;
+        }
     }
     else {
         cJSON_Delete(json);
@@ -852,7 +855,7 @@ static ItemList* analyse_shaped(guint num, const char* filename, DhGeneral* self
         {
             cJSON* key = cJSON_GetArrayItem(keys, i);
             guint item_num = get_key_nums(pattern_string, *(key->string));
-            g_message("%s key corresponding %d nums.", key->string, item_num);
+            /* g_message("%s key corresponding %d nums.", key->string, item_num); */
             if(cJSON_IsObject(key))
                 analyse_object(item_num * division, key, &list);
             else if(cJSON_IsArray(key))
@@ -864,6 +867,7 @@ static ItemList* analyse_shaped(guint num, const char* filename, DhGeneral* self
                 int option = dh_selector(self, _("Please select an item/tag, or enter 'a' to give up selecting (a): "), size, "a", _("&Abort"));
                 if(option == -1)
                 {
+                    free(pattern_string);
                     cJSON_Delete(json);
                     ItemList_Free(list);
                     return NULL;
@@ -872,8 +876,8 @@ static ItemList* analyse_shaped(guint num, const char* filename, DhGeneral* self
                     analyse_object(item_num * division, cJSON_GetArrayItem(key, option), &list);
                 }
             }
-
         }
+        free(pattern_string);
     }
     else {
         cJSON_Delete(json);
@@ -888,15 +892,13 @@ static void analyse_object(guint num, cJSON* object, ItemList** list)
     cJSON* item = cJSON_GetObjectItem(object, "item");
     if(item)
     {
-        ItemList_InitNewItem(list, cJSON_GetStringValue(item));
         ItemList_AddNum(list, num, cJSON_GetStringValue(item));
-        g_message("Analyse and save: %d",ItemList_GetItemNum(*list, cJSON_GetStringValue(item)));
+        /* g_message("Analyse and save: %d",ItemList_GetItemNum(*list, cJSON_GetStringValue(item))); */
     }
     else {
         cJSON* tag = cJSON_GetObjectItem(object, "tag");
         if(tag)
         {
-            ItemList_InitNewItemWithTag(list, cJSON_GetStringValue(tag), TRUE);
             ItemList_AddNum(list, num, cJSON_GetStringValue(tag));
         }
     }
@@ -942,13 +944,13 @@ static char* get_array_item_name(cJSON* json, int num)
 
 static guint get_key_nums(const char* str, char key)
 {
-    g_message("String is %s", str);
+    /* g_message("String is %s", str); */
     const char* str_d = str;
     guint i = 0;
     while(*str_d)
     {
         if(*str_d == key) i++;
-        g_message("Processing %c", *str_d);
+        /* g_message("Processing %c", *str_d); */
         str_d++;
     }
     return i;

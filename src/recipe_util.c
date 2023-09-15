@@ -16,19 +16,17 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>. */
 
 #include "recipe_util.h"
+#include <cjson/cJSON.h>
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
 #include "dhlrc_list.h"
-#include <dhelium/dh_string_util.h>
-#include <dhelium/file_util.h>
-#ifndef DH_DISABLE_TRANSLATION
-#include <libintl.h>
-#define _(str) gettext (str)
-#else
-#define _(str) str
-#endif
+#include <dh/dh_string_util.h>
+#include <dh/file_util.h>
+#include "translation.h"
+
+static cJSON* translation_json = NULL;
 
 long* NumArray_GetFromInput(int* array_num, int max_num)
 {
@@ -111,7 +109,7 @@ int ItemList_CombineRecipe(ItemList** o_bl, const char* dirpos, DhGeneral* gener
     dh_printf(general, _("There are some items to craft:\n"));
     for(int i = 0 ; i < item_names->num; i++)
     {
-        dh_option_printer(general, i, (item_names->val)[i]);
+        dh_option_printer(general, i, trm((item_names->val)[i]));
     }
 
     int arr_num = 0;
@@ -131,16 +129,24 @@ int ItemList_CombineRecipe(ItemList** o_bl, const char* dirpos, DhGeneral* gener
         {
             ItemList_Combine(o_bl, return_recipe);
             ItemList_DeleteItem(o_bl, item_name);
+            ItemList_Free(return_recipe);
         }
     }
+    free(num_arr);
     RecipeList_Free(rcl);
     dh_StrArray_Free(item_names);
     return 1;
 }
 
-char* Name_BlockTranslate(const char *block_name)
+const char* Name_BlockTranslate(const char *block_name)
 {
-    cJSON* trans_data = dhlrc_FileToJSON("translation.json");
+    if(!translation_json)
+    {
+        cJSON* trans_data = dhlrc_FileToJSON("translation.json");
+        translation_json = trans_data;
+    }
+    if(!translation_json)
+        return block_name;
 
     char* pure_name = strchr(block_name,':') + 1;
 
@@ -149,19 +155,13 @@ char* Name_BlockTranslate(const char *block_name)
     char* origin_name = (char*) malloc(len * sizeof(char));
     strcpy(origin_name,"item.minecraft.");
     strcat(origin_name,pure_name);
-    cJSON* trans_line = cJSON_GetObjectItem(trans_data,origin_name);
+    cJSON* trans_line = cJSON_GetObjectItem(translation_json,origin_name);
     if(cJSON_IsString(trans_line))
     {
         char* trans_name = cJSON_GetStringValue(trans_line);
         free(origin_name);
-        origin_name = NULL;
 
-        char* out = (char*)malloc((strlen(trans_name)+1)*sizeof(char));
-        strcpy(out,trans_name);
-
-        cJSON_Delete(trans_data);
-
-        return out;
+        return trans_name;
     }
     else
     {
@@ -171,32 +171,26 @@ char* Name_BlockTranslate(const char *block_name)
         origin_name = (char*)malloc(len * sizeof(char));
         strcpy(origin_name,"block.minecraft.");
         strcat(origin_name,pure_name);
-        trans_line = cJSON_GetObjectItem(trans_data,origin_name);
+        trans_line = cJSON_GetObjectItem(translation_json,origin_name);
 
         if(cJSON_IsString(trans_line))
         {
             char* trans_name = cJSON_GetStringValue(trans_line);
             free(origin_name);
-            origin_name = NULL;
 
-            char* out = (char*)malloc((strlen(trans_name)+1)*sizeof(char));
-            strcpy(out,trans_name);
-
-            cJSON_Delete(trans_data);
-
-            return out;
+            return trans_name;
         }
         else
         {
-            cJSON_Delete(trans_data);
             free(origin_name);
-            origin_name = NULL;
-            return NULL;
+
+            return block_name;
         }
     }
 }
 
-char** NameArray_CanCraft(int* num, ItemList *il)
+int dh_exit()
 {
-    return NULL;
+    cJSON_Delete(translation_json);
+    return 0;
 }

@@ -4,6 +4,8 @@ set( DHLRC_MAIN_POT_FILE_DEPENDS
         src/nbt_litereader.c
         src/litematica_region.c
         src/lrc_extend.c
+        src/recipe_util.c
+        src/dhlrc_list.c
 	PARENT_SCOPE
 )
 
@@ -28,6 +30,8 @@ add_executable(dhlrc
 	       lrc_extend.h
 	       nbt_pos.c
 	       nbt_pos.h
+	       recipe_class/recipe_general.h
+	       recipe_class/recipe_general.c
 )
 
 #add_definitions(-DLIBNBT_USE_LIBDEFLATE)

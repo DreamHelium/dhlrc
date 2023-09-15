@@ -3,13 +3,13 @@
 # Copyright (C) 2022 THE dhlrc'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the dhlrc package.
 #
-# 孟小氦 <dream_he@localhost.localdomain>, 2022.
+# 孟小氦 <dream_he@localhost.localdomain>, 2022, 2023.
 msgid ""
 msgstr ""
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-07-13 18:09+0800\n"
-"PO-Revision-Date: 2022-07-22 20:52+0800\n"
+"POT-Creation-Date: 2023-09-14 17:40+0800\n"
+"PO-Revision-Date: 2023-09-08 17:15+0800\n"
 "Last-Translator: Dream Helium\n"
 "Language-Team: Chinese <>\n"
 "Language: zh_CN\n"
@@ -17,9 +17,9 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Lokalize 22.04.3\n"
+"X-Generator: Lokalize 23.04.3\n"
 
-#: src/main.c:44
+#: src/main.c:39
 #, c-format
 msgid ""
 "Usage: %s [options] [file]\n"
@@ -29,19 +29,19 @@ msgid ""
 "  -l, --list\tEnter litematica material list with recipe combination\n"
 msgstr ""
 
-#: src/main_isoc.c:61
+#: src/main_isoc.c:63
 msgid "Error when reading file."
 msgstr "在读取文件时出错。"
 
-#: src/main_isoc.c:69
+#: src/main_isoc.c:71
 msgid "Not a valid NBT file!"
 msgstr "不是一个有效的NBT文件！"
 
-#: src/main_isoc.c:76
+#: src/main_isoc.c:78
 msgid "Valid NBT file!"
 msgstr "有效的NBT文件！"
 
-#: src/main_isoc.c:86
+#: src/main_isoc.c:88
 #, c-format
 msgid ""
 "There are three functions:\n"
@@ -56,17 +56,17 @@ msgstr ""
 "[2] 投影方块阅读器\n"
 "\n"
 
-#: src/main_isoc.c:90
+#: src/main_isoc.c:92
 #, c-format
 msgid "Please select an option, or enter 'q' to exit the program (q): "
 msgstr "请选择一个选项，或输入 “q” 退出程序 (q): "
 
-#: src/main_isoc.c:146 src/lrc_extend.c:42
+#: src/main_isoc.c:147 src/lrc_extend.c:42
 #, c-format
 msgid "There are %d regions:\n"
 msgstr "有 %d 个区域：\n"
 
-#: src/main_isoc.c:159
+#: src/main_isoc.c:160
 #, c-format
 msgid "Processing: region %d / %d : [%ld] %s \n"
 msgstr "处理区域 %d / %d : [%ld] %s 中……\n"
@@ -192,6 +192,58 @@ msgid ""
 msgstr ""
 "请再次输入方块的坐标，或输入 “b” 选择其他区域，输入 “r” 阅读方块的细节，输入 "
 "“q” 退出程序 (b): "
+
+#: src/recipe_util.c:34
+#, c-format
+msgid "Input numbers directly, or type 'a' for all numbers, 'q' to quit (a): "
+msgstr "请直接输入数字，或输入“a”选择所有数字，“q”以退出 (a): "
+
+#: src/recipe_util.c:109
+msgid "There are some items to craft:\n"
+msgstr "有一些配方需要合成：\n"
+
+#: src/dhlrc_list.c:710
+#, c-format
+msgid "Processing %s.\n"
+msgstr "处理%s中。\n"
+
+#: src/dhlrc_list.c:716
+#, c-format
+msgid "There are %d corresponding files to the item %s:\n"
+msgstr "有%d个对应%s的文件：\n"
+
+#: src/dhlrc_list.c:723
+msgid "Please select an option, or 'd' to discard (d): "
+msgstr "请输入一个选项，或“d”以放弃 (d): "
+
+#: src/dhlrc_list.c:723 src/dhlrc_list.c:920
+msgid "&Discard"
+msgstr ""
+
+#: src/dhlrc_list.c:803 src/dhlrc_list.c:867
+msgid "There are some ingredients to choose:\n"
+msgstr "有一些配方供选择：\n"
+
+#: src/dhlrc_list.c:807 src/dhlrc_list.c:871
+msgid "Please select an item/tag, or enter 'a' to give up selecting (a): "
+msgstr "请输入一个物品/标识，或者输入“a”放弃选择 (a): "
+
+#: src/dhlrc_list.c:807 src/dhlrc_list.c:871
+msgid "&Abort"
+msgstr ""
+
+#: src/dhlrc_list.c:919
+#, c-format
+msgid "There is a remainder with %d and %d.\n"
+msgstr "%d除以%d有余数。\n"
+
+#: src/dhlrc_list.c:920
+msgid "Enter 'd' to discard the result, or enter 'c' to continue (c): "
+msgstr "输入“d”舍弃结果，或输入“c”继续 (c): "
+
+#: src/dhlrc_list.c:920
+msgid "&Continue"
+msgstr ""
 
 #, c-format
 #~ msgid "Usage: %s [file]\n"

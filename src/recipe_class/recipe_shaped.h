@@ -1,5 +1,5 @@
-/*  recipe_util - utilities to process recipes
-    Copyright (C) 2022 Dream Helium
+/*  recipe_shaped - Recipe Shaped Object and class
+    Copyright (C) 2023 Dream Helium
     This file is part of litematica_reader_c.
 
     This program is free software: you can redistribute it and/or modify
@@ -15,29 +15,16 @@
     You should have received a copy of the GNU Lesser General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>. */
 
-#ifndef RECIPE_UTIL_H
-#define RECIPE_UTIL_H
+#ifndef RECIPE_SHAPED_H
+#define RECIPE_SHAPED_H
 
-#ifdef __cplusplus
-extern "C"{
-#endif
+#include "recipe_general.h"
 
-#include "dhlrc_list.h"
+G_BEGIN_DECLS
 
+#define RECIPE_TYPE_SHAPED recipe_shaped_get_type()
+G_DECLARE_FINAL_TYPE(RecipeShaped, recipe_shaped, RECIPE, SHAPED, RecipeGeneral)
 
-#include <cjson/cJSON.h>
-#include <dh/dh_generaliface.h>
+G_END_DECLS
 
-
-/** Get recipes and combine to ItemList (discard all the items) */
-int ItemList_CombineRecipe(ItemList** o_bl, const char* dirpos, DhGeneral* general);
-long *NumArray_GetFromInput(int *array_num, int max_num);
-
-const char* Name_BlockTranslate(const char* block_name);
-int dh_exit();
-
-#ifdef __cplusplus
-}
-#endif
-
-#endif // RECIPE_UTIL_H
+#endif /* RECIPE_SHAPED_H */

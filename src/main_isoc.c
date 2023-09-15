@@ -37,7 +37,7 @@ enum option{Reader, Litematic_material_lister, Litematic_block_show,
 
 static enum option start_without_option();
 static int start_func(NBT* root, enum option opt);
-static void start_lrc_main(NBT* root);
+static int start_lrc_main(NBT* root);
 #ifdef DH_DEBUG_IN_IDE
 int debug();
 #endif
@@ -123,8 +123,7 @@ static int start_func(NBT *root, enum option opt)
         nbtlr_Start(root);
         return 0;
     case Litematic_material_lister:
-        start_lrc_main(root);
-        return 0;
+        return start_lrc_main(root);
     case Litematic_block_show:
         start_lrc_extend(root);
         return 0;
@@ -138,7 +137,7 @@ static int start_func(NBT *root, enum option opt)
     }
 }
 
-static void start_lrc_main(NBT *root)
+static int start_lrc_main(NBT *root)
 {
     int region_num = lite_region_Num(root);
     int err = 0;
@@ -177,6 +176,7 @@ static void start_lrc_main(NBT *root)
             ItemList_Free(il);
         }
     }
+    return dh_exit();
 }
 
 
@@ -185,12 +185,7 @@ static void start_lrc_main(NBT *root)
 
 int debug()
 {
-    GList* list = dh_FileList_Create("lang");
-    while(list)
-    {
-        printf("%s\n", list->data);
-        list = list -> next;
-    }
+    printf("%d\n", g_str_has_suffix("minecraft:stonecutting","smelting"));
     return 0;
 }
 
