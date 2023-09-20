@@ -19,6 +19,7 @@
 #include "recipe_general.h"
 #include <cjson/cJSON.h>
 #include <dh/dh_string_util.h>
+#include "../translation.h"
 
 typedef struct KeyIng{
     char key;
@@ -114,6 +115,41 @@ static void rpsd_set_content(RecipeGeneral* self, cJSON* json)
     shaped_recipe->key = key_arr;
 }
 
+static ItemList* rpsd_get_recipe(RecipeGeneral* self, guint num, DhGeneral* dh_general)
+{
+    RecipeShaped* shaped_recipe = RECIPE_SHAPED(self);
+    int division_num = dh_mod_decide(num, shaped_recipe->result, dh_general);
+    if(division_num == 0 || division_num == -1)
+        return NULL;
+
+    ItemList* recipe = NULL;
+    for(int i = 0 ; i < shaped_recipe->key->len ; i++)
+    {
+        KeyIng* keying = shaped_recipe->key->pdata[i];
+        guint key_num = dh_StrArray_FindChar(shaped_recipe->pattern, keying->key);
+
+        GPtrArray* ingredient = keying->ingredients;
+        if(ingredient->len == 1)
+            ItemList_ProcessIngCtr(&recipe, ingredient->pdata[0], division_num * key_num);
+        else{
+            dh_new_win(dh_general, FALSE);
+            dh_printf(dh_general, _("There are some ingredients to choose:\n"));
+            guint size = ingredient->len;
+            for(int j = 0 ; j < size ; j++)
+            {
+                char* name = ((IngContainer*)(ingredient->pdata[j]))->ingredient;
+                dh_option_printer(dh_general, j, name);
+            }
+            int option = dh_selector(dh_general, _("Please select an item/tag, or enter 'a' to give up selecting (a): "), size, "a", _("&Abort"));
+            if(option == -1 || option == -100)
+                return NULL;
+            else
+                ItemList_ProcessIngCtr(&recipe, ingredient->pdata[option], division_num * key_num);
+        }
+    }
+    return recipe;
+}
+
 G_DEFINE_FINAL_TYPE(RecipeShaped, recipe_shaped, RECIPE_TYPE_GENERAL)
 
 static void recipe_shaped_finalize(GObject* object)
@@ -127,6 +163,7 @@ static void recipe_shaped_finalize(GObject* object)
 static void recipe_shaped_class_init(RecipeShapedClass* klass)
 {
     RECIPE_GENERAL_CLASS(klass)->set_content = rpsd_set_content;
+    RECIPE_GENERAL_CLASS(klass)->get_recipe = rpsd_get_recipe;
     G_OBJECT_CLASS(klass)->finalize = recipe_shaped_finalize;
 }
 

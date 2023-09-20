@@ -100,42 +100,93 @@ long* NumArray_GetFromInput(int* array_num, int max_num)
     }
 }
 
-int ItemList_CombineRecipe(ItemList** o_bl, const char* dirpos, DhGeneral* general)
+static int ItemList_CombineRecipe_ng(ItemList** il, const char* dirpos, DhGeneral* general)
 {
-    /* Get item names */
-    RecipeList* rcl = RecipeList_Init(dirpos, *o_bl);
-    dh_StrArray* item_names = RecipeList_ItemNamesWithNamespace(rcl);
-
-    dh_printf(general, _("There are some items to craft:\n"));
-    for(int i = 0 ; i < item_names->num; i++)
+    gboolean processing = TRUE;
+    while(processing)
     {
-        dh_option_printer(general, i, trm((item_names->val)[i]));
-    }
+        /* Get item names */
+        RecipeList* rcl = RecipeList_Init(dirpos, *il);
+        dh_StrArray* item_names = RecipeList_ItemNamesWithNamespace(rcl);
 
-    int arr_num = 0;
-    long* num_arr = NumArray_GetFromInput(&arr_num, item_names->num);
-    if(num_arr == NULL)
-    {
+        /* If no items need processing just return */
+        if(item_names == NULL)
+            return 1;
+        for(int i = 0 ; i < item_names->num; i++)
+        {
+single_process_start:
+            dh_printf(general, _("Processing %s with %d items, continue or read item list? [Y/n/q/r] :"), trm(item_names->val[i]), ItemList_GetItemNum(*il, item_names->val[i]));
+            int option = dh_selector(general, "", 0, "Ynqr");
+
+            if(option == 0 || option == -1)
+            {
+                char* item_name = (item_names->val)[i];
+                ItemList* return_recipe = ItemList_Recipe(rcl, ItemList_GetItemNum(*il, item_name),item_name, general);
+                if(return_recipe)
+                {
+                    ItemList_Combine(il, return_recipe);
+                    ItemList_DeleteItem(il, item_name);
+                    ItemList_Free(return_recipe);
+                }
+            }
+            else if(option == -3 || option == -100)
+            {
+                RecipeList_Free(rcl);
+                dh_StrArray_Free(item_names);
+                return 1;
+            }
+            else if(option == -2)
+                ;
+            else if(option == -4)
+            {
+                ItemList_Read(*il, general);
+                goto single_process_start;
+            }
+        }
         RecipeList_Free(rcl);
         dh_StrArray_Free(item_names);
-        return 0;
     }
-
-    for(int i = 0 ; i < arr_num ; i++)
-    {
-        char* item_name = (item_names->val)[num_arr[i]];
-        ItemList* return_recipe = ItemList_Recipe(rcl, ItemList_GetItemNum(*o_bl, item_name),item_name, general);
-        if(return_recipe)
-        {
-            ItemList_Combine(o_bl, return_recipe);
-            ItemList_DeleteItem(o_bl, item_name);
-            ItemList_Free(return_recipe);
-        }
-    }
-    free(num_arr);
-    RecipeList_Free(rcl);
-    dh_StrArray_Free(item_names);
     return 1;
+}
+
+int ItemList_CombineRecipe(ItemList** o_bl, const char* dirpos, DhGeneral* general)
+{
+    return ItemList_CombineRecipe_ng(o_bl, dirpos, general);
+    // /* Get item names */
+    // RecipeList* rcl = RecipeList_Init(dirpos, *o_bl);
+    // dh_StrArray* item_names = RecipeList_ItemNamesWithNamespace(rcl);
+    //
+    // /* TODO: A newer function for combine recipe */
+    // dh_printf(general, _("There are some items to craft:\n"));
+    // for(int i = 0 ; i < item_names->num; i++)
+    // {
+    //     dh_option_printer(general, i,"%s, %d" ,trm((item_names->val)[i]), ItemList_GetItemNum(*o_bl, item_names->val[i]));
+    // }
+    //
+    // int arr_num = 0;
+    // long* num_arr = NumArray_GetFromInput(&arr_num, item_names->num);
+    // if(num_arr == NULL)
+    // {
+    //     RecipeList_Free(rcl);
+    //     dh_StrArray_Free(item_names);
+    //     return 0;
+    // }
+    //
+    // for(int i = 0 ; i < arr_num ; i++)
+    // {
+    //     char* item_name = (item_names->val)[num_arr[i]];
+    //     ItemList* return_recipe = ItemList_Recipe(rcl, ItemList_GetItemNum(*o_bl, item_name),item_name, general);
+    //     if(return_recipe)
+    //     {
+    //         ItemList_Combine(o_bl, return_recipe);
+    //         ItemList_DeleteItem(o_bl, item_name);
+    //         ItemList_Free(return_recipe);
+    //     }
+    // }
+    // free(num_arr);
+    // RecipeList_Free(rcl);
+    // dh_StrArray_Free(item_names);
+    // return 1;
 }
 
 const char* Name_BlockTranslate(const char *block_name)

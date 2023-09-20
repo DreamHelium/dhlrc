@@ -16,6 +16,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>. */
 
 #include "dhlrc_list.h"
+#include "recipe_class/recipe_general.h"
 #include <dh/dh_string_util.h>
 #include <stdlib.h>
 #include <string.h>
@@ -137,6 +138,17 @@ static IListData* ilistdata_init_with_tag(const char* name, gboolean is_tag)
 static IListData* ilistdata_init(const char* name)
 {
     return ilistdata_init_with_tag(name, FALSE);
+}
+
+void ItemList_Read(ItemList* il, DhGeneral* general)
+{
+    dh_printf(general, _("Name\t\tTotal\tPlaced\tAvailable\tIs tag\n"));
+    while(il)
+    {
+        IListData* data = il->data;
+        dh_printf(general, "%s\t\t%d\t%d\t%d\t%d\n", trm(data->name), data->total, data->placed, data->available, data->is_tag);
+        il = il->next;
+    }
 }
 
 void ItemList_Free(ItemList* target)
@@ -496,7 +508,7 @@ RecipeList* RecipeList_Init(const char* dir, ItemList* il)
 
     /********     Remove unsupported files    ****************/
     gboolean has_unsupported = TRUE;
-    if(has_unsupported)
+    while(has_unsupported)
     {
         GList* item = g_list_find_custom(list, NULL, rlbasedata_isfalse);
         if(item)
@@ -732,196 +744,202 @@ ItemList* ItemList_Recipe(RecipeList* rcl, int num, const char* item_name, DhGen
 
     /* Analyse */
     ItemList* ret = NULL;
-    char* type = ((RecipeListBaseData*)(option_recipe->data))->recipe_type;
-    if(enable_shaped)
-    {
-        if(g_str_has_suffix(type, "crafting_shaped"))
-            ret = analyse_shaped(num,RecipeList_Filename(option_recipe) ,general );
-    }
-    if(enable_smelting)
-    {
-        if(g_str_has_suffix(type, "blasting") || g_str_has_suffix(type, "smelting"))
-            ret = analyse_smelting(num, RecipeList_Filename(option_recipe));
-    }
-    if(enable_shapeless)
-    {
-        if(g_str_has_suffix(type, "crafting_shapeless"))
-            ret = analyse_shapeless(num, RecipeList_Filename(option_recipe), general);
-    }
+    RecipeGeneral* recipe_general = recipe_general_new(RecipeList_Filename(option_recipe));
+    RecipeGeneralClass* klass = RECIPE_GENERAL_GET_CLASS(recipe_general);
+
+    ret = klass->get_recipe(recipe_general, num, general);
+
+
+    // char* type = ((RecipeListBaseData*)(option_recipe->data))->recipe_type;
+    // if(enable_shaped)
+    // {
+    //     if(g_str_has_suffix(type, "crafting_shaped"))
+    //         ret = analyse_shaped(num,RecipeList_Filename(option_recipe) ,general );
+    // }
+    // if(enable_smelting)
+    // {
+    //     if(g_str_has_suffix(type, "blasting") || g_str_has_suffix(type, "smelting"))
+    //         ret = analyse_smelting(num, RecipeList_Filename(option_recipe));
+    // }
+    // if(enable_shapeless)
+    // {
+    //     if(g_str_has_suffix(type, "crafting_shapeless"))
+    //         ret = analyse_shapeless(num, RecipeList_Filename(option_recipe), general);
+    // }
     g_list_free(item_recipes);
     return ret;
 }
-
-/* Reference: https://minecraft.fandom.com/wiki/Recipe
- * And recipe files */
-
-static ItemList* analyse_smelting(guint num, const char* filename)
-{
-    cJSON* json = dhlrc_FileToJSON(filename);
-    g_return_val_if_fail(json != NULL, NULL);
-    ItemList* list = NULL;
-    cJSON* ingredient = cJSON_GetObjectItem(json, "ingredient");
-
-    if(cJSON_IsObject(ingredient))
-        analyse_object(num, ingredient, &list);
-    else if(cJSON_IsArray(ingredient))
-    {
-        /* Hopefully it works */
-        guint arr_num = cJSON_GetArraySize(ingredient);
-        for(int i = 0 ; i < arr_num ; i++)
-        {
-            cJSON* object = cJSON_GetArrayItem(ingredient, i);
-            analyse_object(num, object, &list);
-        }
-    }
-    cJSON_Delete(json);
-    return list;
-}
-
-static ItemList* analyse_shapeless(guint num, const char* filename, DhGeneral* self)
-{
-    cJSON* json = dhlrc_FileToJSON(filename);
-    g_return_val_if_fail(json != NULL, NULL);
-    int num2 = 1;
-    cJSON* count = cJSON_GetObjectItem(cJSON_GetObjectItem(json, "result"), "count");
-    if(cJSON_IsNumber(count))
-        num2 = cJSON_GetNumberValue( count );
-
-    ItemList* list = NULL;
-    guint division = mod_decide(num, num2, self);
-    if(division)
-    {
-        cJSON* ingredient = cJSON_GetObjectItem(json, "ingredient");
-        if(cJSON_IsObject(ingredient))
-            analyse_object(division, ingredient, &list);
-        else if(cJSON_IsArray(ingredient))
-        {
-            dh_printf(self, _("There are some ingredients to choose:\n"));
-            guint size = cJSON_GetArraySize(ingredient);
-            for(int i = 0 ; i < size ; i++)
-                dh_option_printer(self, i, get_array_item_name(ingredient, i));
-            int option = dh_selector(self, _("Please select an item/tag, or enter 'a' to give up selecting (a): "), size, "a", _("&Abort"));
-            if(option == -1)
-            {
-                cJSON_Delete(json);
-                return NULL;
-            }
-            else {
-                analyse_object(division, cJSON_GetArrayItem(ingredient, option), &list);
-            }
-        }
-        else{
-            cJSON_Delete(json);
-            return NULL;
-        }
-    }
-    else {
-        cJSON_Delete(json);
-        return NULL;
-    }
-    cJSON_Delete(json);
-    return list;
-}
-
-static ItemList* analyse_shaped(guint num, const char* filename, DhGeneral* self)
-{
-    cJSON* json = dhlrc_FileToJSON(filename);
-    g_return_val_if_fail(json != NULL, NULL);
-
-    int num2 =  1;
-    cJSON* count = cJSON_GetObjectItem(cJSON_GetObjectItem(json, "result"), "count");
-    if(cJSON_IsNumber(count))
-        num2 = cJSON_GetNumberValue( count );
-
-    ItemList* list = NULL;
-    guint division = mod_decide(num, num2, self);
-    if(self)
-    {
-        cJSON* pattern = cJSON_GetObjectItem(json, "pattern");
-        guint pattern_size = cJSON_GetArraySize(pattern);
-        dh_StrArray* pattern_stra = NULL;
-        for(int i = 0 ; i < pattern_size ; i++)
-        {
-            char* str = cJSON_GetStringValue(cJSON_GetArrayItem(pattern, i));
-            dh_StrArray_AddStr(&pattern_stra, str);
-        }
-        char* pattern_string = dh_StrArray_cat(pattern_stra);
-        dh_StrArray_Free(pattern_stra);
-
-        /* Get keys */
-        cJSON* keys = cJSON_GetObjectItem(json, "key");
-        guint key_num = cJSON_GetArraySize(keys);
-        for(int i = 0 ; i < key_num ; i++)
-        {
-            cJSON* key = cJSON_GetArrayItem(keys, i);
-            guint item_num = get_key_nums(pattern_string, *(key->string));
-            /* g_message("%s key corresponding %d nums.", key->string, item_num); */
-            if(cJSON_IsObject(key))
-                analyse_object(item_num * division, key, &list);
-            else if(cJSON_IsArray(key))
-            {
-                dh_printf(self, _("There are some ingredients to choose:\n"));
-                guint size = cJSON_GetArraySize(key);
-                for(int i = 0 ; i < size ; i++)
-                    dh_option_printer(self, i, get_array_item_name(key, i));
-                int option = dh_selector(self, _("Please select an item/tag, or enter 'a' to give up selecting (a): "), size, "a", _("&Abort"));
-                if(option == -1)
-                {
-                    free(pattern_string);
-                    cJSON_Delete(json);
-                    ItemList_Free(list);
-                    return NULL;
-                }
-                else {
-                    analyse_object(item_num * division, cJSON_GetArrayItem(key, option), &list);
-                }
-            }
-        }
-        free(pattern_string);
-    }
-    else {
-        cJSON_Delete(json);
-        return NULL;
-    }
-    cJSON_Delete(json);
-    return list;
-}
-
-static void analyse_object(guint num, cJSON* object, ItemList** list)
-{
-    cJSON* item = cJSON_GetObjectItem(object, "item");
-    if(item)
-    {
-        ItemList_AddNum(list, num, cJSON_GetStringValue(item));
-        /* g_message("Analyse and save: %d",ItemList_GetItemNum(*list, cJSON_GetStringValue(item))); */
-    }
-    else {
-        cJSON* tag = cJSON_GetObjectItem(object, "tag");
-        if(tag)
-        {
-            ItemList_AddNum(list, num, cJSON_GetStringValue(tag));
-        }
-    }
-}
-
+//
+// /* Reference: https://minecraft.fandom.com/wiki/Recipe
+//  * And recipe files */
+//
+// static ItemList* analyse_smelting(guint num, const char* filename)
+// {
+//     cJSON* json = dhlrc_FileToJSON(filename);
+//     g_return_val_if_fail(json != NULL, NULL);
+//     ItemList* list = NULL;
+//     cJSON* ingredient = cJSON_GetObjectItem(json, "ingredient");
+//
+//     if(cJSON_IsObject(ingredient))
+//         analyse_object(num, ingredient, &list);
+//     else if(cJSON_IsArray(ingredient))
+//     {
+//         /* Hopefully it works */
+//         guint arr_num = cJSON_GetArraySize(ingredient);
+//         for(int i = 0 ; i < arr_num ; i++)
+//         {
+//             cJSON* object = cJSON_GetArrayItem(ingredient, i);
+//             analyse_object(num, object, &list);
+//         }
+//     }
+//     cJSON_Delete(json);
+//     return list;
+// }
+//
+// static ItemList* analyse_shapeless(guint num, const char* filename, DhGeneral* self)
+// {
+//     cJSON* json = dhlrc_FileToJSON(filename);
+//     g_return_val_if_fail(json != NULL, NULL);
+//     int num2 = 1;
+//     cJSON* count = cJSON_GetObjectItem(cJSON_GetObjectItem(json, "result"), "count");
+//     if(cJSON_IsNumber(count))
+//         num2 = cJSON_GetNumberValue( count );
+//
+//     ItemList* list = NULL;
+//     guint division = mod_decide(num, num2, self);
+//     if(division)
+//     {
+//         cJSON* ingredient = cJSON_GetObjectItem(json, "ingredient");
+//         if(cJSON_IsObject(ingredient))
+//             analyse_object(division, ingredient, &list);
+//         else if(cJSON_IsArray(ingredient))
+//         {
+//             dh_printf(self, _("There are some ingredients to choose:\n"));
+//             guint size = cJSON_GetArraySize(ingredient);
+//             for(int i = 0 ; i < size ; i++)
+//                 dh_option_printer(self, i, get_array_item_name(ingredient, i));
+//             int option = dh_selector(self, _("Please select an item/tag, or enter 'a' to give up selecting (a): "), size, "a", _("&Abort"));
+//             if(option == -1)
+//             {
+//                 cJSON_Delete(json);
+//                 return NULL;
+//             }
+//             else {
+//                 analyse_object(division, cJSON_GetArrayItem(ingredient, option), &list);
+//             }
+//         }
+//         else{
+//             cJSON_Delete(json);
+//             return NULL;
+//         }
+//     }
+//     else {
+//         cJSON_Delete(json);
+//         return NULL;
+//     }
+//     cJSON_Delete(json);
+//     return list;
+// }
+//
+// static ItemList* analyse_shaped(guint num, const char* filename, DhGeneral* self)
+// {
+//     cJSON* json = dhlrc_FileToJSON(filename);
+//     g_return_val_if_fail(json != NULL, NULL);
+//
+//     int num2 =  1;
+//     cJSON* count = cJSON_GetObjectItem(cJSON_GetObjectItem(json, "result"), "count");
+//     if(cJSON_IsNumber(count))
+//         num2 = cJSON_GetNumberValue( count );
+//
+//     ItemList* list = NULL;
+//     guint division = mod_decide(num, num2, self);
+//     if(self)
+//     {
+//         cJSON* pattern = cJSON_GetObjectItem(json, "pattern");
+//         guint pattern_size = cJSON_GetArraySize(pattern);
+//         dh_StrArray* pattern_stra = NULL;
+//         for(int i = 0 ; i < pattern_size ; i++)
+//         {
+//             char* str = cJSON_GetStringValue(cJSON_GetArrayItem(pattern, i));
+//             dh_StrArray_AddStr(&pattern_stra, str);
+//         }
+//         char* pattern_string = dh_StrArray_cat(pattern_stra);
+//         dh_StrArray_Free(pattern_stra);
+//
+//         /* Get keys */
+//         cJSON* keys = cJSON_GetObjectItem(json, "key");
+//         guint key_num = cJSON_GetArraySize(keys);
+//         for(int i = 0 ; i < key_num ; i++)
+//         {
+//             cJSON* key = cJSON_GetArrayItem(keys, i);
+//             guint item_num = get_key_nums(pattern_string, *(key->string));
+//             /* g_message("%s key corresponding %d nums.", key->string, item_num); */
+//             if(cJSON_IsObject(key))
+//                 analyse_object(item_num * division, key, &list);
+//             else if(cJSON_IsArray(key))
+//             {
+//                 dh_printf(self, _("There are some ingredients to choose:\n"));
+//                 guint size = cJSON_GetArraySize(key);
+//                 for(int i = 0 ; i < size ; i++)
+//                     dh_option_printer(self, i, get_array_item_name(key, i));
+//                 int option = dh_selector(self, _("Please select an item/tag, or enter 'a' to give up selecting (a): "), size, "a", _("&Abort"));
+//                 if(option == -1)
+//                 {
+//                     free(pattern_string);
+//                     cJSON_Delete(json);
+//                     ItemList_Free(list);
+//                     return NULL;
+//                 }
+//                 else {
+//                     analyse_object(item_num * division, cJSON_GetArrayItem(key, option), &list);
+//                 }
+//             }
+//         }
+//         free(pattern_string);
+//     }
+//     else {
+//         cJSON_Delete(json);
+//         return NULL;
+//     }
+//     cJSON_Delete(json);
+//     return list;
+// }
+//
+// static void analyse_object(guint num, cJSON* object, ItemList** list)
+// {
+//     cJSON* item = cJSON_GetObjectItem(object, "item");
+//     if(item)
+//     {
+//         ItemList_AddNum(list, num, cJSON_GetStringValue(item));
+//     }
+//     else {
+//         cJSON* tag = cJSON_GetObjectItem(object, "tag");
+//         if(tag)
+//         {
+//             ItemList_AddNum(list, num, cJSON_GetStringValue(tag));
+//         }
+//     }
+// }
 
 
-static guint mod_decide(guint num1, guint num2, DhGeneral* self)
-{
-    if(num2 == 0) return 0;
-    int mod = num1 % num2;
-    if(mod)
-    {
-        dh_printf(self, _("There is a remainder with %d and %d.\n"), num1, num2);
-        int choice = dh_selector(self, _("Enter 'd' to discard the result, or enter 'c' to continue (c): ") ,0, "cd", _("&Continue"), _("&Discard"));
-        if(choice == 0 || choice == -1) /* Return division number. */
-        {
-            return (num1 / num2) + 1;
-        }
-        else return 0;
-    }
-    else return (num1 / num2);
-}
+
+// static guint mod_decide(guint num1, guint num2, DhGeneral* self)
+// {
+//     if(num2 == 0) return 0;
+//     int mod = num1 % num2;
+//     if(mod)
+//     {
+//         dh_printf(self, _("There is a remainder with %d and %d.\n"), num1, num2);
+//         int choice = dh_selector(self, _("Enter 'd' to discard the result, or enter 'c' to continue (c): ") ,0, "cd", _("&Continue"), _("&Discard"));
+//         if(choice == 0 || choice == -1) /* Return division number. */
+//         {
+//             return (num1 / num2) + 1;
+//         }
+//         else return 0;
+//     }
+//     else return (num1 / num2);
+// }
+
 
 static char* get_array_item_name(cJSON* json, int num)
 {

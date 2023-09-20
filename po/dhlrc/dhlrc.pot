@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-14 17:40+0800\n"
+"POT-Creation-Date: 2023-09-21 00:30+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: src/main.c:39
+#: src/main.c:45
 #, c-format
 msgid ""
 "Usage: %s [options] [file]\n"
@@ -167,49 +167,54 @@ msgstr ""
 msgid "Input numbers directly, or type 'a' for all numbers, 'q' to quit (a): "
 msgstr ""
 
-#: src/recipe_util.c:109
-msgid "There are some items to craft:\n"
+#: src/recipe_util.c:118
+#, c-format
+msgid "Processing %s with %d items, continue or read item list? [Y/n/q/r] :"
 msgstr ""
 
-#: src/dhlrc_list.c:710
+#: src/dhlrc_list.c:145
+msgid "Name\t\tTotal\tPlaced\tAvailable\tIs tag\n"
+msgstr ""
+
+#: src/dhlrc_list.c:722
 #, c-format
 msgid "Processing %s.\n"
 msgstr ""
 
-#: src/dhlrc_list.c:716
+#: src/dhlrc_list.c:728
 #, c-format
 msgid "There are %d corresponding files to the item %s:\n"
 msgstr ""
 
-#: src/dhlrc_list.c:723
+#: src/dhlrc_list.c:735
 msgid "Please select an option, or 'd' to discard (d): "
 msgstr ""
 
-#: src/dhlrc_list.c:723 src/dhlrc_list.c:920
+#: src/dhlrc_list.c:735 src/recipe_class/recipe_general.c:112
 msgid "&Discard"
 msgstr ""
 
-#: src/dhlrc_list.c:803 src/dhlrc_list.c:867
-msgid "There are some ingredients to choose:\n"
-msgstr ""
-
-#: src/dhlrc_list.c:807 src/dhlrc_list.c:871
-msgid "Please select an item/tag, or enter 'a' to give up selecting (a): "
-msgstr ""
-
-#: src/dhlrc_list.c:807 src/dhlrc_list.c:871
-msgid "&Abort"
-msgstr ""
-
-#: src/dhlrc_list.c:919
+#: src/recipe_class/recipe_general.c:111
 #, c-format
 msgid "There is a remainder with %d and %d.\n"
 msgstr ""
 
-#: src/dhlrc_list.c:920
+#: src/recipe_class/recipe_general.c:112
 msgid "Enter 'd' to discard the result, or enter 'c' to continue (c): "
 msgstr ""
 
-#: src/dhlrc_list.c:920
+#: src/recipe_class/recipe_general.c:112
 msgid "&Continue"
+msgstr ""
+
+#: src/recipe_class/recipe_shaped.c:136
+msgid "There are some ingredients to choose:\n"
+msgstr ""
+
+#: src/recipe_class/recipe_shaped.c:143
+msgid "Please select an item/tag, or enter 'a' to give up selecting (a): "
+msgstr ""
+
+#: src/recipe_class/recipe_shaped.c:143
+msgid "&Abort"
 msgstr ""

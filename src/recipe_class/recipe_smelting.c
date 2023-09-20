@@ -59,7 +59,7 @@ static void rsmt_set_content(RecipeGeneral* self, cJSON* json)
     }
 }
 
-ItemList* rsmt_get_recipe(RecipeGeneral* self, guint num, DhGeneral* dh_general)
+static ItemList* rsmt_get_recipe(RecipeGeneral* self, guint num, DhGeneral* dh_general)
 {
     RecipeSmelting* smelting_recipe = RECIPE_SMELTING(self);
     ItemList* recipe = NULL;

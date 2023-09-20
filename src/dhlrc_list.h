@@ -34,6 +34,8 @@ typedef GList RecipeList;
 
 /* ItemList utils */
 
+
+void ItemList_Read(ItemList* il, DhGeneral* general);
 void ItemList_Free(ItemList* target);
 void ItemList_Sort(ItemList **oBlock);
 ItemList* ItemList_Sort_ByTotal(ItemList* il);

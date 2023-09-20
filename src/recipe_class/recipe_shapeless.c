@@ -88,19 +88,23 @@ static ItemList* rspl_get_recipe(RecipeGeneral* self, guint num, DhGeneral* dh_g
         ItemList_ProcessIngCtr(&recipe, shapeless_recipe->ingredient->pdata[0], division_num);
     }
     else {
-        dh_new_win(dh_general, FALSE);
-        dh_printf(dh_general, _("There are some ingredients to choose:\n"));
-        guint size = shapeless_recipe->ingredient->len;
-        for(int i = 0 ; i < size ; i++)
+        // dh_new_win(dh_general, FALSE);
+        // dh_printf(dh_general, _("There are some ingredients to choose:\n"));
+        // guint size = shapeless_recipe->ingredient->len;
+        // for(int i = 0 ; i < size ; i++)
+        // {
+        //     char* name = ((IngContainer*)(shapeless_recipe->ingredient->pdata[i]))->ingredient;
+        //     dh_option_printer(dh_general, i, name);
+        // }
+        // int option = dh_selector(dh_general, _("Please select an item/tag, or enter 'a' to give up selecting (a): "), size, "a", _("&Abort"));
+        // if(option == -1 || option == -100)
+        //     return NULL;
+        // else
+        //     ItemList_ProcessIngCtr(&recipe, shapeless_recipe->ingredient->pdata[option], division_num);
+        for(int i = 0 ; i < shapeless_recipe->ingredient->len; i++)
         {
-            char* name = ((IngContainer*)(shapeless_recipe->ingredient->pdata[i]))->ingredient;
-            dh_option_printer(dh_general, i, name);
+            ItemList_ProcessIngCtr(&recipe, shapeless_recipe->ingredient->pdata[i], division_num);
         }
-        int option = dh_selector(dh_general, _("Please select an item/tag, or enter 'a' to give up selecting (a): "), size, "a", _("&Abort"));
-        if(option == -1 || option == -100)
-            return NULL;
-        else
-            ItemList_ProcessIngCtr(&recipe, shapeless_recipe->ingredient->pdata[option], division_num);
     }
     return recipe;
 }

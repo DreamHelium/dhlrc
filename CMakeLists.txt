@@ -27,5 +27,4 @@ if(DH_ENABLE_TRANSLATION)
     add_subdirectory( po )
 endif()
 
-file(COPY ${dhlrc_SOURCE_DIR}/lang DESTINATION ${dhlrc_BINARY_DIR}/src)
 file(COPY ${dhlrc_SOURCE_DIR}/config DESTINATION ${dhlrc_BINARY_DIR}/src)

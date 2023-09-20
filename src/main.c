@@ -16,12 +16,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>. */
 
 #include <stdio.h>
-#include <stdint.h>
-#include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
-#include <dh/file_util.h>
-#include <dh/dh_string_util.h>
+#include <glib.h>
 /*#include "dhlrc_config.h"*/
 #include "main.h"
 #include "translation.h"
@@ -29,7 +24,11 @@
 int main(int argc,char** argb)
 {
 #ifndef DH_DISABLE_TRANSLATION
+#ifdef G_OS_WIN32
+    setlocale(LC_CTYPE, ".UTF-8");
+#else
     setlocale(LC_CTYPE, "");
+#endif /* G_OS_WIN32 */
     setlocale(LC_MESSAGES, "");
     bindtextdomain("dhlrc", "locale");
     textdomain("dhlrc");

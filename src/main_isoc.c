@@ -166,7 +166,6 @@ static int start_lrc_main(NBT *root)
             ItemList_DeleteZeroItem(&il);
 
             DhIsoc* isoc = dh_general_isoc_new();
-            g_message("%d", DH_IS_GENERAL(isoc));
 
             ItemList_CombineRecipe(&il, "recipes", DH_GENERAL(isoc));
             g_object_unref(isoc);

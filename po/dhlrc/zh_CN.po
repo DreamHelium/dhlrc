@@ -1,4 +1,4 @@
-# Chinese translations for dhlrc package
+# SPDX-FileCopyrightText: 2023 Chinese translations for dhlrc package
 # dhlrc 软件包的简体中文翻译.
 # Copyright (C) 2022 THE dhlrc'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the dhlrc package.
@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-14 17:40+0800\n"
-"PO-Revision-Date: 2023-09-08 17:15+0800\n"
+"POT-Creation-Date: 2023-09-21 00:28+0800\n"
+"PO-Revision-Date: 2023-09-21 00:30+0800\n"
 "Last-Translator: Dream Helium\n"
 "Language-Team: Chinese <>\n"
 "Language: zh_CN\n"
@@ -17,9 +17,9 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Lokalize 23.04.3\n"
+"X-Generator: Lokalize 23.08.1\n"
 
-#: src/main.c:39
+#: src/main.c:45
 #, c-format
 msgid ""
 "Usage: %s [options] [file]\n"
@@ -198,52 +198,60 @@ msgstr ""
 msgid "Input numbers directly, or type 'a' for all numbers, 'q' to quit (a): "
 msgstr "请直接输入数字，或输入“a”选择所有数字，“q”以退出 (a): "
 
-#: src/recipe_util.c:109
-msgid "There are some items to craft:\n"
-msgstr "有一些配方需要合成：\n"
+#: src/recipe_util.c:118
+#, c-format
+msgid "Processing %s with %d items, continue or read item list? [Y/n/q/r] :"
+msgstr "处理%s（含有%d个物品），继续或阅读物品列表？ [Y/n/q/r] : "
 
-#: src/dhlrc_list.c:710
+#: src/dhlrc_list.c:145
+msgid "Name\t\tTotal\tPlaced\tAvailable\tIs tag\n"
+msgstr "名称\t\t总计\t已放置\t可用\t是否为标签\n"
+
+#: src/dhlrc_list.c:722
 #, c-format
 msgid "Processing %s.\n"
 msgstr "处理%s中。\n"
 
-#: src/dhlrc_list.c:716
+#: src/dhlrc_list.c:728
 #, c-format
 msgid "There are %d corresponding files to the item %s:\n"
 msgstr "有%d个对应%s的文件：\n"
 
-#: src/dhlrc_list.c:723
+#: src/dhlrc_list.c:735
 msgid "Please select an option, or 'd' to discard (d): "
 msgstr "请输入一个选项，或“d”以放弃 (d): "
 
-#: src/dhlrc_list.c:723 src/dhlrc_list.c:920
+#: src/dhlrc_list.c:735 src/recipe_class/recipe_general.c:112
 msgid "&Discard"
 msgstr ""
 
-#: src/dhlrc_list.c:803 src/dhlrc_list.c:867
-msgid "There are some ingredients to choose:\n"
-msgstr "有一些配方供选择：\n"
-
-#: src/dhlrc_list.c:807 src/dhlrc_list.c:871
-msgid "Please select an item/tag, or enter 'a' to give up selecting (a): "
-msgstr "请输入一个物品/标识，或者输入“a”放弃选择 (a): "
-
-#: src/dhlrc_list.c:807 src/dhlrc_list.c:871
-msgid "&Abort"
-msgstr ""
-
-#: src/dhlrc_list.c:919
+#: src/recipe_class/recipe_general.c:111
 #, c-format
 msgid "There is a remainder with %d and %d.\n"
 msgstr "%d除以%d有余数。\n"
 
-#: src/dhlrc_list.c:920
+#: src/recipe_class/recipe_general.c:112
 msgid "Enter 'd' to discard the result, or enter 'c' to continue (c): "
 msgstr "输入“d”舍弃结果，或输入“c”继续 (c): "
 
-#: src/dhlrc_list.c:920
+#: src/recipe_class/recipe_general.c:112
 msgid "&Continue"
 msgstr ""
+
+#: src/recipe_class/recipe_shaped.c:136
+msgid "There are some ingredients to choose:\n"
+msgstr "有一些配方供选择：\n"
+
+#: src/recipe_class/recipe_shaped.c:143
+msgid "Please select an item/tag, or enter 'a' to give up selecting (a): "
+msgstr "请输入一个物品/标识，或者输入“a”放弃选择 (a): "
+
+#: src/recipe_class/recipe_shaped.c:143
+msgid "&Abort"
+msgstr ""
+
+#~ msgid "There are some items to craft:\n"
+#~ msgstr "有一些配方需要合成：\n"
 
 #, c-format
 #~ msgid "Usage: %s [file]\n"
@@ -285,3 +293,4 @@ msgstr ""
 #~ "another region, enter 'q' to exit the program (b): "
 #~ msgstr ""
 #~ "请再次输入方块的坐标，或输入 “b” 选择其他区域，输入 “q” 退出程序 (b): "
+
