@@ -13,9 +13,8 @@ set( DHLRC_MAIN_POT_FILE_DEPENDS
 
 # configure_file(dhlrc_config.h.in dhlrc_config.h)
 
-add_executable(dhlrc
+add_library(dhlrc SHARED
 	       main.c
-	       main_isoc.c
 	       main.h
 	       translation.h
 	       libnbt/nbt.h
@@ -43,7 +42,7 @@ add_executable(dhlrc
 )
 
 #add_definitions(-DLIBNBT_USE_LIBDEFLATE)
-add_definitions(-DDH_DEBUG_IN_IDE)
+#add_definitions(-DDH_DEBUG_IN_IDE)
 
 target_link_libraries(dhlrc PUBLIC m z ${dhutil_LIBRARIES} cjson
 	"${GLIB_LIBRARIES}" "${GIO_LIBRARIES}"
@@ -55,3 +54,7 @@ target_include_directories(dhlrc PUBLIC
 )
 
 target_link_directories(dhlrc PUBLIC "${dhutil_LIBRARY_DIRS}")
+
+add_executable(dhlrc_isoc main_isoc.c)
+
+target_link_libraries(dhlrc_isoc PUBLIC dhlrc)
