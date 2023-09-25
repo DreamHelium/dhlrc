@@ -8,15 +8,16 @@ set( DHLRC_MAIN_POT_FILE_DEPENDS
         src/dhlrc_list.c
         src/recipe_class/recipe_general.c
         src/recipe_class/recipe_shaped.c
+        src/qt/mainwindow.cpp
 	PARENT_SCOPE
 )
 
 # configure_file(dhlrc_config.h.in dhlrc_config.h)
 
 add_library(dhlrc SHARED
-	       main.c
 	       main.h
-	       translation.h
+               translation.h
+               translation.c
 	       libnbt/nbt.h
 	       libnbt/nbt.c
 	       litematica_region.c
@@ -39,6 +40,7 @@ add_library(dhlrc SHARED
 	       recipe_class/recipe_shapeless.c
 	       recipe_class/recipe_smelting.h
 	       recipe_class/recipe_smelting.c
+
 )
 
 #add_definitions(-DLIBNBT_USE_LIBDEFLATE)
@@ -55,6 +57,8 @@ target_include_directories(dhlrc PUBLIC
 
 target_link_directories(dhlrc PUBLIC "${dhutil_LIBRARY_DIRS}")
 
-add_executable(dhlrc_isoc main_isoc.c)
+add_executable(dhlrc_isoc main_isoc.c main.c)
 
 target_link_libraries(dhlrc_isoc PUBLIC dhlrc)
+
+add_subdirectory(qt)

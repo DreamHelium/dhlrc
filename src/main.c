@@ -23,16 +23,7 @@
 
 int main(int argc,char** argb)
 {
-#ifndef DH_DISABLE_TRANSLATION
-#ifdef G_OS_WIN32
-    setlocale(LC_CTYPE, ".UTF-8");
-#else
-    setlocale(LC_CTYPE, "");
-#endif /* G_OS_WIN32 */
-    setlocale(LC_MESSAGES, "");
-    bindtextdomain("dhlrc", "locale");
-    textdomain("dhlrc");
-#endif
+    translation_init();
     if(argc == 1)
     {
         printf(_("Usage: %s [options] [file]\n\n"

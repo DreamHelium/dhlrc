@@ -2,6 +2,8 @@ CMAKE_MINIMUM_REQUIRED(VERSION 3.1)
 PROJECT( dhlrc )
 
 set(CMAKE_BUILD_TYPE Debug)
+set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR})
+set(LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR})
 
 find_package(Gettext)
 find_package(PkgConfig)

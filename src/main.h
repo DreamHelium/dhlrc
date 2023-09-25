@@ -19,5 +19,6 @@
 #define MAIN_H
 
 int main_isoc(int argc, char** argv);
+int main_qt(int argc, char** argv);
 
 #endif // MAIN_H

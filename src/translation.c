@@ -15,26 +15,22 @@
     You should have received a copy of the GNU Lesser General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>. */
 
-#ifndef TRANSLATION_H
-#define TRANSLATION_H
-
-#ifdef __cplusplus
-extern "C"{
-#endif
-void translation_init();
+#include "translation.h"
+#include <glib.h>
+static gboolean translation_inited = FALSE;
+void translation_init()
+{
+    if(!translation_inited)
+    {
 #ifndef DH_DISABLE_TRANSLATION
-#include <libintl.h>
-#include <locale.h>
-#include "recipe_util.h"
-#define _(str) gettext (str)
-#define trm(str) Name_BlockTranslate (str)
+#ifdef G_OS_WIN32
+        setlocale(LC_CTYPE, ".UTF-8");
 #else
-#define _(str) str
-#define trm(str) str
+        setlocale(LC_CTYPE, "");
+#endif /* G_OS_WIN32 */
+        setlocale(LC_MESSAGES, "");
+        bindtextdomain("dhlrc", "locale");
+        textdomain("dhlrc");
 #endif
-
-#ifdef __cplusplus
+    }
 }
-#endif
-
-#endif

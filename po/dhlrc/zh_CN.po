@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-21 00:28+0800\n"
-"PO-Revision-Date: 2023-09-21 00:30+0800\n"
+"POT-Creation-Date: 2023-09-25 22:46+0800\n"
+"PO-Revision-Date: 2023-09-25 22:50+0800\n"
 "Last-Translator: Dream Helium\n"
 "Language-Team: Chinese <>\n"
 "Language: zh_CN\n"
@@ -19,7 +19,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Lokalize 23.08.1\n"
 
-#: src/main.c:45
+#: src/main.c:29
 #, c-format
 msgid ""
 "Usage: %s [options] [file]\n"
@@ -249,6 +249,30 @@ msgstr "请输入一个物品/标识，或者输入“a”放弃选择 (a): "
 #: src/recipe_class/recipe_shaped.c:143
 msgid "&Abort"
 msgstr ""
+
+#: src/qt/mainwindow.cpp:17
+msgid "Litematica reader"
+msgstr "投影文件阅读器"
+
+#: src/qt/mainwindow.cpp:31
+msgid "&File"
+msgstr "文件(&F)"
+
+#: src/qt/mainwindow.cpp:34
+msgid "&Open"
+msgstr "打开(&O)"
+
+#: src/qt/mainwindow.cpp:35
+msgid "&Quit"
+msgstr "退出(&Q)"
+
+#: src/qt/mainwindow.cpp:42
+msgid "Select a file"
+msgstr "选择一个文件"
+
+#: src/qt/mainwindow.cpp:42
+msgid "Litematic file (*.litematic)"
+msgstr "投影文件 (*.litematic)"
 
 #~ msgid "There are some items to craft:\n"
 #~ msgstr "有一些配方需要合成：\n"

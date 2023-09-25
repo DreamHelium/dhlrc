@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-21 00:30+0800\n"
+"POT-Creation-Date: 2023-09-25 22:50+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: src/main.c:45
+#: src/main.c:29
 #, c-format
 msgid ""
 "Usage: %s [options] [file]\n"
@@ -217,4 +217,28 @@ msgstr ""
 
 #: src/recipe_class/recipe_shaped.c:143
 msgid "&Abort"
+msgstr ""
+
+#: src/qt/mainwindow.cpp:17
+msgid "Litematica reader"
+msgstr ""
+
+#: src/qt/mainwindow.cpp:31
+msgid "&File"
+msgstr ""
+
+#: src/qt/mainwindow.cpp:34
+msgid "&Open"
+msgstr ""
+
+#: src/qt/mainwindow.cpp:35
+msgid "&Quit"
+msgstr ""
+
+#: src/qt/mainwindow.cpp:42
+msgid "Select a file"
+msgstr ""
+
+#: src/qt/mainwindow.cpp:42
+msgid "Litematic file (*.litematic)"
 msgstr ""
