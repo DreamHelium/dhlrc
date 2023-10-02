@@ -4,8 +4,10 @@
 #include <QVBoxLayout>
 #include <QCheckBox>
 #include <dh/dh_string_util.h>
+#include "lrcfunctionui.h"
 
 static dh_StrArray* region_name = nullptr;
+ItemList* il = nullptr;
 extern NBT* root;
 
 ProcessUI::ProcessUI(QWidget *parent) :
@@ -27,7 +29,8 @@ void ProcessUI::initUI()
     hLayout = new QHBoxLayout();
     if(region_name)
     {
-        label = new QLabel("...",this);
+        label = new QLabel();
+        label2 = new QLabel();
         label->setText(QString::asprintf(_("There are %d regions:\n"), region_name->num));
 
         checkbox = new QCheckBox[region_name->num];
@@ -46,9 +49,27 @@ void ProcessUI::initUI()
         for(int i = 0 ; i < region_name->num ; i++)
             vLayout->addWidget(&checkbox[i]);
         vLayout->addStretch();
+        vLayout->addWidget(label2);
         vLayout->addLayout(hLayout);
 
         this->setLayout(vLayout);
         QObject::connect(closeBtn, SIGNAL(clicked()), this, SLOT(close()));
+        QObject::connect(okBtn, SIGNAL(clicked()), this, SLOT(okBtn_clicked()));
     }
+}
+
+void ProcessUI::okBtn_clicked()
+{
+    for(int i = 0 ; i < region_name->num ; i++)
+    {
+        if(checkbox[i].isChecked())
+        {
+            label2->setText(QString::asprintf(_("Processing: region [%d] %s \n"),
+                                                          i,region_name->val[i]));
+            il = lite_region_ItemListExtend(root, i, il, 1);
+        }
+    }
+    this->close();
+    lrcFunctionUI* fui = new lrcFunctionUI();
+    fui->show();
 }

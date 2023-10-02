@@ -31,6 +31,13 @@ typedef GList BlackList;
 typedef GList ReplaceList;
 typedef GList RecipeList;
 
+typedef struct IListData{
+    gchar* name;
+    guint total;
+    guint placed;
+    guint available;
+    gboolean is_tag;
+} IListData;
 
 /* ItemList utils */
 

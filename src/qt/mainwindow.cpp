@@ -36,8 +36,8 @@ void MainWindow::initUI()
     toolBar = new QToolBar(this);
     this->addToolBar(toolBar);
 
-    openAction = new QAction(QIcon::fromTheme("document-open"), _("&Open"));
-    quitAction = new QAction(QIcon::fromTheme("application-exit"), _("&Quit"));
+    openAction = new QAction(QIcon::fromTheme("document-open"), _("&Open"), this);
+    quitAction = new QAction(QIcon::fromTheme("application-exit"), _("&Quit"), this);
     fileMenu->addAction(openAction);
     fileMenu->addAction(quitAction);
     toolBar->addAction(openAction);
@@ -77,7 +77,7 @@ void MainWindow::initInternalUI()
         label2 = new QLabel(_("There are three functions:"));
 
         /* Add RadioButtons */
-        radioButtonGroup = new QButtonGroup();
+        radioButtonGroup = new QButtonGroup(this);
         nbtReaderBtn = new QRadioButton(_("NBT lite &reader with modifier"));
         lrcBtn = new QRadioButton(_("Litematica material &list with recipe combination"));
         lrcExtendBtn = new QRadioButton(_("Litematica &block reader"));
@@ -119,7 +119,7 @@ void MainWindow::okBtn_clicked()
     qDebug() << this->radioButtonGroup->checkedId();
     if(this->radioButtonGroup->checkedId() == 1)
     {
-        ProcessUI* pui = new ProcessUI;
+        ProcessUI *pui = new ProcessUI();
         pui->show();
     }
 }

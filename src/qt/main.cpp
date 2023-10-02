@@ -5,6 +5,7 @@
 
 #include <QApplication>
 extern NBT* root;
+extern ItemList* il;
 
 int main(int argc, char *argv[])
 {
@@ -14,6 +15,7 @@ int main(int argc, char *argv[])
     w.show();
     int ret = a.exec();
     if(root) NBT_Free(root);
+    if(il)   ItemList_Free(il);
     return ret;
 }
 

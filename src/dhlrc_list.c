@@ -45,14 +45,6 @@ typedef struct RListData{
     dh_StrArray* r_name;
 } RListData;
 
-typedef struct IListData{
-    gchar* name;
-    guint total;
-    guint placed;
-    guint available;
-    gboolean is_tag;
-} IListData;
-
 typedef struct RecipeListBaseData{
     char* filename;
     char* namespace;

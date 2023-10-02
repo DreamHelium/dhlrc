@@ -23,12 +23,16 @@ public:
 
 private:
     QLabel* label;
+    QLabel* label2;
     QCheckBox* checkbox;
     QPushButton* okBtn;
     QPushButton* closeBtn;
     QHBoxLayout* hLayout;
     QVBoxLayout* vLayout;
     void initUI();
+
+private Q_SLOTS:
+    void okBtn_clicked();
 };
 
 #endif // PROCESSUI_H
