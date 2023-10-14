@@ -33,6 +33,12 @@ typedef struct IngredientContainer{
     gboolean is_tag;
 } IngContainer;
 
+typedef struct Recipe{
+    guint result;
+    dh_StrArray* pattern;
+    GPtrArray* arr;
+}Recipe;
+
 struct _RecipeGeneralClass{
     GObjectClass parent_class;
 
@@ -40,6 +46,7 @@ struct _RecipeGeneralClass{
     void (*set_type)(RecipeGeneral* general, const char* str);
     void (*set_content)(RecipeGeneral* self, cJSON* json);
     ItemList* (*get_recipe)(RecipeGeneral* self, guint num, DhGeneral* dh_general);
+    Recipe* (*get_raw_recipe)(RecipeGeneral* self);
 };
 
 IngContainer* IngCtr_new(cJSON* object);

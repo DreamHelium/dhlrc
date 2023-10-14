@@ -85,7 +85,7 @@ static int ilistdata_strcmp(gconstpointer a, gconstpointer b)
 
 static int ilistdata_compare_by_total(gconstpointer a, gconstpointer b)
 {
-    return (((IListData*)a)->total - ((IListData*)b)->total);
+    return -(((IListData*)a)->total - ((IListData*)b)->total);
 }
 
 static int ilistdata_iszero(gconstpointer a, gconstpointer b)
@@ -134,11 +134,13 @@ static IListData* ilistdata_init(const char* name)
 
 void ItemList_Read(ItemList* il, DhGeneral* general)
 {
+    dh_new_win(general, FALSE);
     dh_printf(general, _("Name\t\tTotal\tPlaced\tAvailable\tIs tag\n"));
     while(il)
     {
         IListData* data = il->data;
         dh_printf(general, "%s\t\t%d\t%d\t%d\t%d\n", trm(data->name), data->total, data->placed, data->available, data->is_tag);
+        // g_message("%ld", strlen(trm(data->name)));
         il = il->next;
     }
 }
@@ -711,12 +713,13 @@ static void rlbasedata_free(gpointer data)
 
 ItemList* ItemList_Recipe(RecipeList* rcl, int num, const char* item_name, DhGeneral* general)
 {
-    dh_printf(general, _("Processing %s.\n"), trm(item_name));
+    /*dh_*/printf(/*general, */_("Processing %s.\n"), trm(item_name));
     RecipeList* item_recipes = dh_search_in_list_custom(rcl, item_name, rcldata_issame);
     RecipeList* option_recipe = item_recipes;
 
     if(g_list_length(item_recipes) > 1)
     {
+        dh_new_win(general, FALSE);
         dh_printf(general, _("There are %d corresponding files to the item %s:\n"), g_list_length(item_recipes), trm(item_name));
         RecipeList* item_recipes_d = item_recipes;
         while(item_recipes_d)

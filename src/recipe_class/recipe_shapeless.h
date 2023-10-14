@@ -18,7 +18,6 @@
 #ifndef RECIPE_SHAPELESS_H
 #define RECIPE_SHAPELESS_H
 
-#include <glib-object.h>
 #include "recipe_general.h"
 
 G_BEGIN_DECLS

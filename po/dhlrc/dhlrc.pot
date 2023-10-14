@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-25 22:50+0800\n"
+"POT-Creation-Date: 2023-10-14 00:29+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -35,7 +35,7 @@ msgstr ""
 msgid "Not a valid NBT file!"
 msgstr ""
 
-#: src/main_isoc.c:78
+#: src/main_isoc.c:78 src/qt/mainwindow.cpp:76
 msgid "Valid NBT file!"
 msgstr ""
 
@@ -167,78 +167,146 @@ msgstr ""
 msgid "Input numbers directly, or type 'a' for all numbers, 'q' to quit (a): "
 msgstr ""
 
-#: src/recipe_util.c:118
+#: src/recipe_util.c:119
 #, c-format
 msgid "Processing %s with %d items, continue or read item list? [Y/n/q/r] :"
 msgstr ""
 
-#: src/dhlrc_list.c:145
+#: src/recipe_util.c:121
+msgid "&Yes"
+msgstr ""
+
+#: src/recipe_util.c:121
+msgid "&No"
+msgstr ""
+
+#: src/recipe_util.c:121 src/qt/mainwindow.cpp:40
+msgid "&Quit"
+msgstr ""
+
+#: src/recipe_util.c:121
+msgid "&Read"
+msgstr ""
+
+#: src/dhlrc_list.c:138
 msgid "Name\t\tTotal\tPlaced\tAvailable\tIs tag\n"
 msgstr ""
 
-#: src/dhlrc_list.c:722
+#: src/dhlrc_list.c:716
 #, c-format
 msgid "Processing %s.\n"
 msgstr ""
 
-#: src/dhlrc_list.c:728
+#: src/dhlrc_list.c:723
 #, c-format
 msgid "There are %d corresponding files to the item %s:\n"
 msgstr ""
 
-#: src/dhlrc_list.c:735
+#: src/dhlrc_list.c:730
 msgid "Please select an option, or 'd' to discard (d): "
 msgstr ""
 
-#: src/dhlrc_list.c:735 src/recipe_class/recipe_general.c:112
+#: src/dhlrc_list.c:730 src/recipe_class/recipe_general.c:113
 msgid "&Discard"
 msgstr ""
 
-#: src/recipe_class/recipe_general.c:111
+#: src/recipe_class/recipe_general.c:112
 #, c-format
 msgid "There is a remainder with %d and %d.\n"
 msgstr ""
 
-#: src/recipe_class/recipe_general.c:112
+#: src/recipe_class/recipe_general.c:113
 msgid "Enter 'd' to discard the result, or enter 'c' to continue (c): "
 msgstr ""
 
-#: src/recipe_class/recipe_general.c:112
+#: src/recipe_class/recipe_general.c:113
 msgid "&Continue"
 msgstr ""
 
-#: src/recipe_class/recipe_shaped.c:136
+#: src/recipe_class/recipe_shaped.c:132
 msgid "There are some ingredients to choose:\n"
 msgstr ""
 
-#: src/recipe_class/recipe_shaped.c:143
+#: src/recipe_class/recipe_shaped.c:139
 msgid "Please select an item/tag, or enter 'a' to give up selecting (a): "
 msgstr ""
 
-#: src/recipe_class/recipe_shaped.c:143
+#: src/recipe_class/recipe_shaped.c:139
 msgid "&Abort"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:17
+#: src/qt/mainwindow.cpp:21 src/qt/lrcfunctionui.cpp:11
 msgid "Litematica reader"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:31
+#: src/qt/mainwindow.cpp:33
 msgid "&File"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:34
+#: src/qt/mainwindow.cpp:39
 msgid "&Open"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:35
-msgid "&Quit"
-msgstr ""
-
-#: src/qt/mainwindow.cpp:42
+#: src/qt/mainwindow.cpp:49
 msgid "Select a file"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:42
+#: src/qt/mainwindow.cpp:49
 msgid "Litematic file (*.litematic)"
+msgstr ""
+
+#: src/qt/mainwindow.cpp:77
+msgid "There are three functions:"
+msgstr ""
+
+#: src/qt/mainwindow.cpp:81
+msgid "NBT lite &reader with modifier"
+msgstr ""
+
+#: src/qt/mainwindow.cpp:82
+msgid "Litematica material &list with recipe combination"
+msgstr ""
+
+#: src/qt/mainwindow.cpp:83
+msgid "Litematica &block reader"
+msgstr ""
+
+#: src/qt/mainwindow.cpp:91 src/qt/lrcfunctionui.cpp:18
+msgid "&OK"
+msgstr ""
+
+#: src/qt/mainwindow.cpp:92 src/qt/lrcfunctionui.cpp:19
+msgid "&Close"
+msgstr ""
+
+#: src/qt/ilreaderui.cpp:14
+msgid "Name"
+msgstr ""
+
+#: src/qt/ilreaderui.cpp:14
+msgid "Total"
+msgstr ""
+
+#: src/qt/ilreaderui.cpp:14
+msgid "Placed"
+msgstr ""
+
+#: src/qt/ilreaderui.cpp:15
+msgid "Available"
+msgstr ""
+
+#: src/qt/ilreaderui.cpp:15
+msgid "isTag"
+msgstr ""
+
+#: src/qt/lrcfunctionui.cpp:12
+msgid "Please select a function:"
+msgstr ""
+
+#: src/qt/lrcfunctionui.cpp:14
+msgid "&Item list reader and modifier"
+msgstr ""
+
+#: src/qt/lrcfunctionui.cpp:15
+msgid "&Recipe combiner"
 msgstr ""

@@ -115,8 +115,10 @@ static int ItemList_CombineRecipe_ng(ItemList** il, const char* dirpos, DhGenera
         for(int i = 0 ; i < item_names->num; i++)
         {
 single_process_start:
-            dh_printf(general, _("Processing %s with %d items, continue or read item list? [Y/n/q/r] :"), trm(item_names->val[i]), ItemList_GetItemNum(*il, item_names->val[i]));
-            int option = dh_selector(general, "", 0, "Ynqr");
+            dh_new_win(general, FALSE);
+            dh_printf(general, _("Processing %s with %d items, continue or read item list? [Y/n/q/r] :"),
+                      trm(item_names->val[i]), ItemList_GetItemNum(*il, item_names->val[i]));
+            int option = dh_selector(general, "", 0, "Ynqr", _("&Yes"), _("&No"), _("&Quit"), _("&Read"));
 
             if(option == 0 || option == -1)
             {

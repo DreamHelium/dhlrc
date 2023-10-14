@@ -24,6 +24,7 @@ public:
 private:
     QLabel* label;
     QLabel* label2;
+    QCheckBox* allCheck;
     QCheckBox* checkbox;
     QPushButton* okBtn;
     QPushButton* closeBtn;
@@ -33,6 +34,8 @@ private:
 
 private Q_SLOTS:
     void okBtn_clicked();
+    void checkbox_clicked();
+    void allCheck_clicked(bool c);
 };
 
 #endif // PROCESSUI_H

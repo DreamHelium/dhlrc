@@ -18,7 +18,6 @@
 #ifndef RECIPE_SMELTING_H
 #define RECIPE_SMELTING_H
 
-#include <glib-object.h>
 #include "recipe_general.h"
 
 G_BEGIN_DECLS

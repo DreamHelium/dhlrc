@@ -41,4 +41,5 @@ ilReaderUI::ilReaderUI(QWidget *parent)
 
 ilReaderUI::~ilReaderUI()
 {
+    tableWidget->clearContents();
 }

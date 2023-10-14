@@ -71,6 +71,16 @@ static ItemList* rsmt_get_recipe(RecipeGeneral* self, guint num, DhGeneral* dh_g
     return recipe;
 }
 
+static Recipe* rsmt_get_raw_recipe(RecipeGeneral* self)
+{
+    RecipeSmelting* rsmt = RECIPE_SMELTING(self);
+    Recipe* recipe = malloc(sizeof(Recipe));
+    recipe->result = 1;
+    recipe->arr = rsmt->ingredient;
+    recipe->pattern = NULL;
+    return recipe;
+}
+
 static void recipe_smelting_finalize(GObject* object)
 {
     RecipeSmelting* smlt = RECIPE_SMELTING(object);
@@ -83,6 +93,7 @@ static void recipe_smelting_class_init(RecipeSmeltingClass* klass)
     RecipeGeneralClass* general_klass = RECIPE_GENERAL_CLASS(klass);
     general_klass->set_content = rsmt_set_content;
     general_klass->get_recipe = rsmt_get_recipe;
+    general_klass->get_raw_recipe = rsmt_get_raw_recipe;
 
     GObjectClass* object_klass = G_OBJECT_CLASS(klass);
     object_klass->finalize = recipe_smelting_finalize;

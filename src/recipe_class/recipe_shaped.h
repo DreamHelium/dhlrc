@@ -25,6 +25,11 @@ G_BEGIN_DECLS
 #define RECIPE_TYPE_SHAPED recipe_shaped_get_type()
 G_DECLARE_FINAL_TYPE(RecipeShaped, recipe_shaped, RECIPE, SHAPED, RecipeGeneral)
 
+typedef struct KeyIng{
+    char key;
+    GPtrArray* ingredients;
+} KeyIng;
+
 G_END_DECLS
 
 #endif /* RECIPE_SHAPED_H */

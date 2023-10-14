@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-25 22:46+0800\n"
-"PO-Revision-Date: 2023-09-25 22:50+0800\n"
+"POT-Creation-Date: 2023-10-13 19:06+0800\n"
+"PO-Revision-Date: 2023-10-08 23:43+0800\n"
 "Last-Translator: Dream Helium\n"
 "Language-Team: Chinese <>\n"
 "Language: zh_CN\n"
@@ -37,7 +37,7 @@ msgstr "在读取文件时出错。"
 msgid "Not a valid NBT file!"
 msgstr "不是一个有效的NBT文件！"
 
-#: src/main_isoc.c:78
+#: src/main_isoc.c:78 src/qt/mainwindow.cpp:76
 msgid "Valid NBT file!"
 msgstr "有效的NBT文件！"
 
@@ -198,81 +198,149 @@ msgstr ""
 msgid "Input numbers directly, or type 'a' for all numbers, 'q' to quit (a): "
 msgstr "请直接输入数字，或输入“a”选择所有数字，“q”以退出 (a): "
 
-#: src/recipe_util.c:118
+#: src/recipe_util.c:119
 #, c-format
 msgid "Processing %s with %d items, continue or read item list? [Y/n/q/r] :"
 msgstr "处理%s（含有%d个物品），继续或阅读物品列表？ [Y/n/q/r] : "
 
-#: src/dhlrc_list.c:145
+#: src/recipe_util.c:121
+msgid "&Yes"
+msgstr ""
+
+#: src/recipe_util.c:121
+msgid "&No"
+msgstr ""
+
+#: src/recipe_util.c:121 src/qt/mainwindow.cpp:40
+msgid "&Quit"
+msgstr "退出(&Q)"
+
+#: src/recipe_util.c:121
+msgid "&Read"
+msgstr ""
+
+#: src/dhlrc_list.c:138
 msgid "Name\t\tTotal\tPlaced\tAvailable\tIs tag\n"
 msgstr "名称\t\t总计\t已放置\t可用\t是否为标签\n"
 
-#: src/dhlrc_list.c:722
+#: src/dhlrc_list.c:716
 #, c-format
 msgid "Processing %s.\n"
 msgstr "处理%s中。\n"
 
-#: src/dhlrc_list.c:728
+#: src/dhlrc_list.c:723
 #, c-format
 msgid "There are %d corresponding files to the item %s:\n"
 msgstr "有%d个对应%s的文件：\n"
 
-#: src/dhlrc_list.c:735
+#: src/dhlrc_list.c:730
 msgid "Please select an option, or 'd' to discard (d): "
 msgstr "请输入一个选项，或“d”以放弃 (d): "
 
-#: src/dhlrc_list.c:735 src/recipe_class/recipe_general.c:112
+#: src/dhlrc_list.c:730 src/recipe_class/recipe_general.c:113
 msgid "&Discard"
 msgstr ""
 
-#: src/recipe_class/recipe_general.c:111
+#: src/recipe_class/recipe_general.c:112
 #, c-format
 msgid "There is a remainder with %d and %d.\n"
 msgstr "%d除以%d有余数。\n"
 
-#: src/recipe_class/recipe_general.c:112
+#: src/recipe_class/recipe_general.c:113
 msgid "Enter 'd' to discard the result, or enter 'c' to continue (c): "
 msgstr "输入“d”舍弃结果，或输入“c”继续 (c): "
 
-#: src/recipe_class/recipe_general.c:112
+#: src/recipe_class/recipe_general.c:113
 msgid "&Continue"
 msgstr ""
 
-#: src/recipe_class/recipe_shaped.c:136
+#: src/recipe_class/recipe_shaped.c:132
 msgid "There are some ingredients to choose:\n"
 msgstr "有一些配方供选择：\n"
 
-#: src/recipe_class/recipe_shaped.c:143
+#: src/recipe_class/recipe_shaped.c:139
 msgid "Please select an item/tag, or enter 'a' to give up selecting (a): "
 msgstr "请输入一个物品/标识，或者输入“a”放弃选择 (a): "
 
-#: src/recipe_class/recipe_shaped.c:143
+#: src/recipe_class/recipe_shaped.c:139
 msgid "&Abort"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:17
+#: src/qt/mainwindow.cpp:21 src/qt/lrcfunctionui.cpp:11
 msgid "Litematica reader"
 msgstr "投影文件阅读器"
 
-#: src/qt/mainwindow.cpp:31
+#: src/qt/mainwindow.cpp:33
 msgid "&File"
 msgstr "文件(&F)"
 
-#: src/qt/mainwindow.cpp:34
+#: src/qt/mainwindow.cpp:39
 msgid "&Open"
 msgstr "打开(&O)"
 
-#: src/qt/mainwindow.cpp:35
-msgid "&Quit"
-msgstr "退出(&Q)"
-
-#: src/qt/mainwindow.cpp:42
+#: src/qt/mainwindow.cpp:49
 msgid "Select a file"
 msgstr "选择一个文件"
 
-#: src/qt/mainwindow.cpp:42
+#: src/qt/mainwindow.cpp:49
 msgid "Litematic file (*.litematic)"
 msgstr "投影文件 (*.litematic)"
+
+#: src/qt/mainwindow.cpp:77
+msgid "There are three functions:"
+msgstr "有三个功能："
+
+#: src/qt/mainwindow.cpp:81
+msgid "NBT lite &reader with modifier"
+msgstr "NBT小型阅读器及修改器(&R)"
+
+#: src/qt/mainwindow.cpp:82
+msgid "Litematica material &list with recipe combination"
+msgstr "投影材料列表及合成表合成功能(&L)"
+
+#: src/qt/mainwindow.cpp:83
+msgid "Litematica &block reader"
+msgstr "投影方块阅读器(&B)"
+
+#: src/qt/mainwindow.cpp:91 src/qt/lrcfunctionui.cpp:18
+msgid "&OK"
+msgstr "确定(&O)"
+
+#: src/qt/mainwindow.cpp:92 src/qt/lrcfunctionui.cpp:19
+msgid "&Close"
+msgstr "关闭(&C)"
+
+#: src/qt/ilreaderui.cpp:14
+msgid "Name"
+msgstr "名称"
+
+#: src/qt/ilreaderui.cpp:14
+msgid "Total"
+msgstr "总计"
+
+#: src/qt/ilreaderui.cpp:14
+msgid "Placed"
+msgstr "已放置"
+
+#: src/qt/ilreaderui.cpp:15
+msgid "Available"
+msgstr "可用"
+
+#: src/qt/ilreaderui.cpp:15
+msgid "isTag"
+msgstr "是否为标签"
+
+#: src/qt/lrcfunctionui.cpp:12
+msgid "Please select a function:"
+msgstr "请选择一项功能："
+
+#: src/qt/lrcfunctionui.cpp:14
+msgid "&Item list reader and modifier"
+msgstr "物品列表阅读器和修改器(&I)"
+
+#: src/qt/lrcfunctionui.cpp:15
+msgid "&Recipe combiner"
+msgstr "材料列表合成功能(&R)"
 
 #~ msgid "There are some items to craft:\n"
 #~ msgstr "有一些配方需要合成：\n"
@@ -317,4 +385,3 @@ msgstr "投影文件 (*.litematic)"
 #~ "another region, enter 'q' to exit the program (b): "
 #~ msgstr ""
 #~ "请再次输入方块的坐标，或输入 “b” 选择其他区域，输入 “q” 退出程序 (b): "
-

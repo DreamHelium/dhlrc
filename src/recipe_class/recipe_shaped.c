@@ -21,10 +21,6 @@
 #include <dh/dh_string_util.h>
 #include "../translation.h"
 
-typedef struct KeyIng{
-    char key;
-    GPtrArray* ingredients;
-} KeyIng;
 
 static void KeyIng_free(gpointer data)
 {
@@ -150,6 +146,16 @@ static ItemList* rpsd_get_recipe(RecipeGeneral* self, guint num, DhGeneral* dh_g
     return recipe;
 }
 
+static Recipe* rpsd_get_raw_recipe(RecipeGeneral* self)
+{
+    RecipeShaped* rpsd = RECIPE_SHAPED(self);
+    Recipe* recipe = malloc(sizeof(Recipe));
+    recipe->result = rpsd->result;
+    recipe->arr = rpsd->key;
+    recipe->pattern = rpsd->pattern;
+    return recipe;
+}
+
 G_DEFINE_FINAL_TYPE(RecipeShaped, recipe_shaped, RECIPE_TYPE_GENERAL)
 
 static void recipe_shaped_finalize(GObject* object)
@@ -164,6 +170,7 @@ static void recipe_shaped_class_init(RecipeShapedClass* klass)
 {
     RECIPE_GENERAL_CLASS(klass)->set_content = rpsd_set_content;
     RECIPE_GENERAL_CLASS(klass)->get_recipe = rpsd_get_recipe;
+    RECIPE_GENERAL_CLASS(klass)->get_raw_recipe = rpsd_get_raw_recipe;
     G_OBJECT_CLASS(klass)->finalize = recipe_shaped_finalize;
 }
 

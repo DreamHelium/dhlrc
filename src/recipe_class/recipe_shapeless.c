@@ -109,11 +109,22 @@ static ItemList* rspl_get_recipe(RecipeGeneral* self, guint num, DhGeneral* dh_g
     return recipe;
 }
 
+static Recipe* rpsl_get_raw_recipe(RecipeGeneral* self)
+{
+    RecipeShapeless* rpsd = RECIPE_SHAPELESS(self);
+    Recipe* recipe = malloc(sizeof(Recipe));
+    recipe->result = rpsd->result;
+    recipe->arr = rpsd->ingredient;
+    recipe->pattern = NULL;
+    return recipe;
+}
+
 static void recipe_shapeless_class_init(RecipeShapelessClass* klass)
 {
     RecipeGeneralClass* general_klass = RECIPE_GENERAL_CLASS(klass);
     general_klass->set_content = rspl_set_content;
     general_klass->get_recipe = rspl_get_recipe;
+    general_klass->get_raw_recipe = rpsl_get_raw_recipe;
     G_OBJECT_CLASS(klass)->finalize = recipe_shapeless_finalize;
 }
 

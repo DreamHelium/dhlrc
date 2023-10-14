@@ -91,6 +91,8 @@ void MainWindow::initInternalUI()
         okBtn = new QPushButton(_("&OK"));
         closeBtn = new QPushButton(_("&Close"));
 
+        okBtn->setChecked(true);
+
         QHBoxLayout* hLayout = new QHBoxLayout();
         hLayout->addStretch();
         hLayout->addWidget(okBtn);

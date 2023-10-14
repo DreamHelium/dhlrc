@@ -55,6 +55,7 @@ static void recipe_general_class_init(RecipeGeneralClass* klass)
     klass->set_type = rp_set_type;
     klass->set_content = NULL;
     klass->get_recipe = NULL;
+    klass->get_raw_recipe = NULL;
 
     GObjectClass* object_klass = G_OBJECT_CLASS(klass);
     object_klass->finalize = recipe_general_finalize;

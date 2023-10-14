@@ -9,6 +9,8 @@ set( DHLRC_MAIN_POT_FILE_DEPENDS
         src/recipe_class/recipe_general.c
         src/recipe_class/recipe_shaped.c
         src/qt/mainwindow.cpp
+        src/qt/ilreaderui.cpp
+        src/qt/lrcfunctionui.cpp
 	PARENT_SCOPE
 )
 
