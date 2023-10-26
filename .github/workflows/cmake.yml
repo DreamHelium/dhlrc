@@ -33,13 +33,18 @@ jobs:
 
     - name: Install dhutil from source
       run: |
-        sudo apt install -y gettext qt5-default
+        sudo apt install -y gettext
         git clone https://github.com/DreamHelium/dhutil
         cd dhutil
         cmake -B build
         cmake --build build
         sudo cmake --install build
         cd ..
+
+    - name: Install Qt
+      uses: jurplel/install-qt-action@v3.3.0
+      with:
+        version: 5
 
     - name: Configure CMake
       # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
