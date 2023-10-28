@@ -18,8 +18,7 @@
 #include "dhlrc_list.h"
 #include "main.h"
 #include "translation.h"
-#include <dh/file_util.h>
-#include <dh/dh_string_util.h>
+#include <dh/dhutil.h>
 #include "litematica_region.h"
 #include "recipe_util.h"
 #include "lrc_extend.h"
@@ -27,7 +26,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <glib.h>
-#include <dh/dh_general_isoc.h>
 
 enum option{Reader, Litematic_material_lister, Litematic_block_show,
         #ifdef DH_DEBUG_IN_IDE

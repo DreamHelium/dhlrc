@@ -5,7 +5,7 @@
 #include <QFileDialog>
 #include <QDebug>
 #include "../libnbt/nbt.h"
-#include <dh/file_util.h>
+#include <dh/dhutil.h>
 #include <string>
 #include "processui.h"
 

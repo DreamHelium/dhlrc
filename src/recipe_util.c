@@ -22,8 +22,7 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include "dhlrc_list.h"
-#include <dh/dh_string_util.h>
-#include <dh/file_util.h>
+#include <dh/dhutil.h>
 #include "translation.h"
 
 static cJSON* translation_json = NULL;

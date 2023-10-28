@@ -20,8 +20,7 @@
 #include "recipe_shapeless.h"
 #include "recipe_smelting.h"
 #include <cjson/cJSON.h>
-#include <dh/dh_string_util.h>
-#include <dh/file_util.h>
+#include <dh/dhutil.h>
 #include "../translation.h"
 
 typedef struct{

@@ -23,10 +23,8 @@
 #include <stdio.h>
 #include <cjson/cJSON.h>
 #include "recipe_util.h"
-#include <dh/file_util.h>
-#include <dh/list_util.h>
+#include <dh/dhutil.h>
 #include "translation.h"
-#include <dh/dh_generaliface.h>
 
 static gboolean enable_shaped = TRUE;
 static gboolean enable_smelting = TRUE;

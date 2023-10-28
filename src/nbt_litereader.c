@@ -16,7 +16,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>. */
 
 #include "nbt_litereader.h"
-#include <dh/file_util.h>
+#include <dh/dhutil.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
