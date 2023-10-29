@@ -30,9 +30,9 @@ static int lrc_extend_instance(LiteRegion* lr, dh_LineOut* dout);
 
 void start_lrc_extend(NBT* root)
 {
-    int region_num = lite_region_Num(root);
+    int region_num = lite_region_num(root);
     int err = 0;
-    char** region_name = lite_region_Name(root, region_num, &err);
+    char** region_name = lite_region_names(root, region_num, &err);
     int continue_func_out = 1;
     if(region_name)
     {
@@ -61,7 +61,7 @@ void start_lrc_extend(NBT* root)
                     dh_LineOut_Free(output1);
                     system("clear");
 
-                    int* region_size = lite_region_SizeArray(root, read_region_num);
+                    int* region_size = lite_region_size_array(root, read_region_num);
                     printf(_("You are reading region: [%2d] %s:\nThe size of the region is (%d, %d, %d).\n\n")
                            , read_region_num, region_name[read_region_num], region_size[0], region_size[1], region_size[2]);
 
@@ -81,21 +81,21 @@ or enter 'b' to choose another region, enter 'q' to exit the program (b): "));
                         {
                         case NumArray:
                         {
-                            LiteRegion* lr = LiteRegion_Create(root, read_region_num);
+                            LiteRegion* lr = lite_region_create(root, read_region_num);
                             if(!lr)
                             {
                                 dh_LineOut_Free(output2);
                                 free(region_size);
-                                lite_region_FreeNameArray(region_name, region_num);
+                                lite_region_free_names(region_name, region_num);
                                 return;
                             }
                             int ret = lrc_extend_instance(lr, output2);
-                            LiteRegion_Free(lr);
+                            lite_region_free(lr);
                             free(region_size);
                             if(ret == 0 || ret == -1)
                             {
                                 // exit program
-                                lite_region_FreeNameArray(region_name, region_num);
+                                lite_region_free_names(region_name, region_num);
                                 return;
                             }
                             else if(ret == 1)
@@ -108,7 +108,7 @@ or enter 'b' to choose another region, enter 'q' to exit the program (b): "));
                             {
                                 free(region_size);
                                 dh_LineOut_Free(output2);
-                                lite_region_FreeNameArray(region_name, region_num);
+                                lite_region_free_names(region_name, region_num);
                                 return;
                             }
                         }
@@ -121,20 +121,20 @@ or enter 'b' to choose another region, enter 'q' to exit the program (b): "));
                     else // Second output (Enter coordination) failed
                     {
                         free(region_size);
-                        lite_region_FreeNameArray(region_name, region_num);
+                        lite_region_free_names(region_name, region_num);
                         return; // out of the instance
                     }
                     break; // Each case should follow a break.
                 }
                 default: // The first case. Character is the only second option
                     dh_LineOut_Free(output1);
-                    lite_region_FreeNameArray(region_name, region_num);
+                    lite_region_free_names(region_name, region_num);
                     return;
                 }
             }
             else  // First output (entry) failed
             {
-                lite_region_FreeNameArray(region_name, region_num);
+                lite_region_free_names(region_name, region_num);
                 break;
             }
         }
@@ -155,8 +155,8 @@ static int lrc_extend_instance(LiteRegion* lr, dh_LineOut* dout)
         }
         int64_t* array = dout->val;
         char** block_name = lr->blocks->val;
-        int index = lite_region_BlockIndex_lr(lr, array[0], array[1], array[2]);
-        int id = lite_region_BlockArrayPos_lr(lr, index);
+        int index = lite_region_block_index(lr, array[0], array[1], array[2]);
+        int id = lite_region_block_id(lr, index);
         printf(_("The block in (%ld, %ld, %ld) is %s.\n"), array[0], array[1], array[2], block_name[id]);
         printf(_("The block's position in BlockStatePalette is %d.\n"), id);
         printf(_("Please enter the coordination of the block again, or enter 'b' to choose another region, \

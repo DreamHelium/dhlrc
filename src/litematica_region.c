@@ -32,7 +32,7 @@ static int* id_to_index(dh_StrArray* str, ItemList* il)
     return sheet;
 }
 
-LiteRegion* LiteRegion_Create(NBT* root, int r_num)
+LiteRegion* lite_region_create(NBT* root, int r_num)
 {
     LiteRegion* out = (LiteRegion*)malloc(sizeof(LiteRegion));
     if(out)
@@ -50,16 +50,16 @@ LiteRegion* LiteRegion_Create(NBT* root, int r_num)
             return NULL;
         }
 
-        dh_StrArray* r_name = lite_region_Name_StrArray(root);
+        dh_StrArray* r_name = lite_region_name_array(root);
         if(r_num < r_name->num)
         {
             out->name = dh_strdup( r_name->val[r_num] );
             dh_StrArray_Free(r_name);
 
             out->region_num = r_num;
-            out->region_nbt = lite_region_RegionNBT( root, r_num );
+            out->region_nbt = lite_region_nbt_region( root, r_num );
 
-            out->blocks = lite_region_BlockName_StrArray( root, r_num );
+            out->blocks = lite_region_block_name_array( root, r_num );
 
             out->replaced_blocks = NULL;
 
@@ -67,15 +67,15 @@ LiteRegion* LiteRegion_Create(NBT* root, int r_num)
             if(properties)
             {
                 for(int i = 0 ; i < out->blocks->num ; i++)
-                    properties[i] = lite_region_BlockProperties(out, i);
+                    properties[i] = lite_region_nbt_block_properties(out, i);
             }
             else{
-                LiteRegion_Free(out);
+                lite_region_free(out);
                 return NULL;
             }
 
             out->block_properties = properties;
-            int* size = lite_region_SizeArray(root, r_num);
+            int* size = lite_region_size_array(root, r_num);
             out->region_size.x = size[0];
             out->region_size.y = size[1];
             out->region_size.z = size[2];
@@ -113,7 +113,7 @@ LiteRegion* LiteRegion_Create(NBT* root, int r_num)
     else return NULL;
 }
 
-void LiteRegion_Free(LiteRegion* lr)
+void lite_region_free(LiteRegion* lr)
 {
     free(lr->name);
     dh_StrArray_Free(lr->blocks);
@@ -123,7 +123,7 @@ void LiteRegion_Free(LiteRegion* lr)
     free(lr);
 }
 
-int lite_region_Num(NBT* root)
+int lite_region_num(NBT* root)
 {
     NBT* regionParent = NBT_GetChild_Deep(root,"Regions",NULL);
     if(regionParent->child)
@@ -143,7 +143,7 @@ int lite_region_Num(NBT* root)
     }
 }
 
-char** lite_region_Name(NBT* root, int rNum, int* err)
+char** lite_region_names(NBT* root, int rNum, int* err)
 {
     NBT* regionParent = NBT_GetChild(root,"Regions");
     char** region = (char**)malloc(rNum * sizeof(char*));
@@ -163,7 +163,7 @@ char** lite_region_Name(NBT* root, int rNum, int* err)
             }
             else
             {
-                lite_region_FreeNameArray(region,i);
+                lite_region_free_names(region,i);
                 *err = -2;
                 return NULL;
             }
@@ -180,7 +180,7 @@ char** lite_region_Name(NBT* root, int rNum, int* err)
     return region;
 }
 
-void lite_region_FreeNameArray(char** region,int rNum)
+void lite_region_free_names(char** region,int rNum)
 {
     for(int i = 0; i < rNum ; i++)
         free(region[i]);
@@ -188,7 +188,7 @@ void lite_region_FreeNameArray(char** region,int rNum)
     region = NULL;
 }
 
-NBT* lite_region_RegionNBT(NBT* root, int r_num)
+NBT* lite_region_nbt_region(NBT* root, int r_num)
 {
     NBT* OutRegion = NBT_GetChild(root,"Regions")->child; //region 0
     for(int i = 0; i < r_num ; i++)
@@ -201,17 +201,17 @@ NBT* lite_region_RegionNBT(NBT* root, int r_num)
     return OutRegion;
 }
 
-NBT* lite_region_BlockStatePalette(NBT* root, int r_num)
+NBT* lite_region_nbt_block_state_palette(NBT* root, int r_num)
 {
-    NBT* region_nbt = lite_region_RegionNBT(root, r_num);
+    NBT* region_nbt = lite_region_nbt_region(root, r_num);
     if(region_nbt)
         return NBT_GetChild(region_nbt , "BlockStatePalette") -> child;
     else return NULL;
 }
 
-int lite_region_BlockNum(NBT* root, int r_num)
+int lite_region_block_num(NBT* root, int r_num)
 {
-    NBT* palette = lite_region_BlockStatePalette(root,r_num);
+    NBT* palette = lite_region_nbt_block_state_palette(root,r_num);
     if(palette)
     {
         int i = 0;
@@ -223,9 +223,9 @@ int lite_region_BlockNum(NBT* root, int r_num)
         return 0;
 }
 
-char** lite_region_BlockNameArray(NBT* root, int r_num ,int bNum)
+char** lite_region_block_names(NBT* root, int r_num ,int bNum)
 {
-    NBT* palette = lite_region_BlockStatePalette(root,r_num);
+    NBT* palette = lite_region_nbt_block_state_palette(root,r_num);
     if(bNum == 0) return NULL;
     char** l = (char**)malloc(bNum * sizeof(char*));
     int i = 0;
@@ -245,7 +245,7 @@ char** lite_region_BlockNameArray(NBT* root, int r_num ,int bNum)
             }
             else
             {
-                lite_region_FreeNameArray(l,i);
+                lite_region_free_names(l,i);
                 return NULL;
             }
 
@@ -260,9 +260,9 @@ char** lite_region_BlockNameArray(NBT* root, int r_num ,int bNum)
     return l;
 }
 
-dh_StrArray* lite_region_BlockName_StrArray(NBT* root, int r_num)
+dh_StrArray* lite_region_block_name_array(NBT* root, int r_num)
 {
-    NBT* palette = lite_region_BlockStatePalette(root, r_num);
+    NBT* palette = lite_region_nbt_block_state_palette(root, r_num);
     dh_StrArray* name = NULL;
     while(palette)
     {
@@ -280,40 +280,31 @@ dh_StrArray* lite_region_BlockName_StrArray(NBT* root, int r_num)
 
 }
 
-uint64_t* lite_region_BlockStatesArray(NBT* root, int r_num, int* len)
+uint64_t* lite_region_block_states_array(NBT* root, int r_num, int* len)
 {
-    NBT* state = NBT_GetChild(lite_region_RegionNBT(root,r_num),"BlockStates");
+    NBT* state = NBT_GetChild(lite_region_nbt_region(root,r_num),"BlockStates");
     if(len)
         *len = state->value_a.len;
     return (uint64_t*)state->value_a.value;
 }
 
-int* lite_region_SizeArray(NBT* root,int r_num)
+int* lite_region_size_array(NBT* root,int r_num)
 {
-    NBT* size_state = NBT_GetChild(lite_region_RegionNBT(root,r_num),"Size");
+    NBT* size_state = NBT_GetChild(lite_region_nbt_region(root,r_num),"Size");
     int* a = malloc(3*sizeof(int));
     int x = NBT_GetChild(size_state,"x")->value_i;
     int y = NBT_GetChild(size_state,"y")->value_i;
     int z = NBT_GetChild(size_state,"z")->value_i;
-    a[0] = abs(x);
-    a[1] = abs(y);
-    a[2] = abs(z);
+    a[0] = ABS(x);
+    a[1] = ABS(y);
+    a[2] = ABS(z);
     return a;
 }
 
-uint64_t lite_region_BlockIndex(NBT* root, int r_num, int x, int y, int z)
-{
-    int* a = lite_region_SizeArray(root,r_num);
-    // block_y * region_x * region_y + block_z * region_x + block_x
-    int index = (a[0]) * (a[2]) * y + z * (a[0]) + x;
-    free(a);
-    return index;
-}
-
-uint64_t lite_region_BlockIndex_lr(LiteRegion* lr, int x, int y, int z)
+uint64_t lite_region_block_index(LiteRegion* lr, int x, int y, int z)
 {
     if( x >= lr->region_size.x || y >= lr->region_size.y || z >= lr->region_size.z )
-        return -1;
+        g_error("Coordination out of range.");
     else
         return lr->region_size.x * lr->region_size.z * y + lr->region_size.x * z + x;
 }
@@ -325,13 +316,10 @@ uint64_t lite_region_BlockIndex_lr(LiteRegion* lr, int x, int y, int z)
  * since files in config/ are also from this project.
  */
 
-int lite_region_BlockArrayPos(NBT* root, int r_num, uint64_t index)
+int lite_region_block_id(LiteRegion* lr, uint64_t index)
 {
-    uint64_t* state = lite_region_BlockStatesArray(root,r_num,NULL);
-    int bits = log2(lite_region_BlockNum(root,r_num));
-    if(lite_region_BlockNum(root,r_num) > ((1 << bits)))
-        bits++;
-    if(bits < 2) bits = 2;
+    int64_t* state = lr->states;
+    int bits = lr->move_bits;
     uint64_t start_bit = index * bits;
     int start_state = start_bit / 64;
     int and_num = (1 << bits) - 1;
@@ -339,73 +327,46 @@ int lite_region_BlockArrayPos(NBT* root, int r_num, uint64_t index)
     int end_num = start_bit % 64 + bits;
     int id = 0;
     if(end_num <= 64)
-        id = (uint64_t)state[start_state] >> move_num & and_num;
+        id = (uint64_t)(state[start_state]) >> move_num & and_num;
     else
     {
         int move_num_2 = 64 - move_num;
+        if( start_state + 1 >= lr->states_num)
+            g_error("Out of range!");
         id = ((uint64_t)state[start_state] >> move_num | state[start_state + 1] << move_num_2)& and_num;
     }
     return id;
 }
 
-int lite_region_BlockArrayPos_lr(LiteRegion* lr, uint64_t index)
+int lite_region_block_id_xyz(LiteRegion* lr, int x, int y, int z)
 {
-    if(index >= 0)
-    {
-        int64_t* state = lr->states;
-        int bits = lr->move_bits;
-        uint64_t start_bit = index * bits;
-        int start_state = start_bit / 64;
-        int and_num = (1 << bits) - 1;
-        int move_num = start_bit & 63;
-        int end_num = start_bit % 64 + bits;
-        int id = 0;
-        if(end_num <= 64)
-            id = (uint64_t)(state[start_state]) >> move_num & and_num;
-        else
-        {
-            int move_num_2 = 64 - move_num;
-            id = ((uint64_t)state[start_state] >> move_num | state[start_state + 1] << move_num_2)& and_num;
-            if( start_state + 1 >= lr->states_num)
-                printf("??? with start_bit %ld, bits %d\n", start_bit, bits);
-        }
-        return id;
-    }
-    else return -1;
+    uint64_t index = lite_region_block_index(lr, x, y, z);
+    return lite_region_block_id(lr, index);
 }
 
-int lite_region_BlockArrayPos_ByCoordination(LiteRegion* lr, int x, int y, int z)
+NBT* lite_region_nbt_specific_block_state_palette(NBT* root, int r_num, int id)
 {
-    uint64_t index = lite_region_BlockIndex_lr(lr, x, y, z);
-    if(index == -1)
-        return -1;
-    else
-        return lite_region_BlockArrayPos_lr(lr, index);
-}
-
-NBT* lite_region_SpecificBlockStatePalette(NBT* root, int r_num, int id)
-{
-    NBT* a = lite_region_BlockStatePalette(root,r_num);
+    NBT* a = lite_region_nbt_block_state_palette(root,r_num);
     if(a)
         for(int i = 0; i < id; i++)
             a = a->next;
     return a;
 }
 
-char* lite_region_BlockType(NBT* root, int r_num, int id)
+char* lite_region_block_type(NBT* root, int r_num, int id)
 {
-    return (char*)NBT_GetChild_Deep(lite_region_SpecificBlockStatePalette(root,r_num,id),"Properties","type",NULL)->value_a.value;
+    return (char*)NBT_GetChild_Deep(lite_region_nbt_specific_block_state_palette(root,r_num,id),"Properties","type",NULL)->value_a.value;
 }
 
-ItemList *lite_region_ItemList(NBT* root, int r_num)
+ItemList *lite_region_item_list(NBT* root, int r_num)
 {
-    return lite_region_ItemListExtend(root,r_num,NULL, 0);
+    return lite_region_item_list_extend(root,r_num,NULL, 0);
 }
 
-ItemList *lite_region_ItemListExtend(NBT* root, int r_num, ItemList* oBlock, int print_process)
+ItemList *lite_region_item_list_extend(NBT* root, int r_num, ItemList* oBlock, int print_process)
 {
     clock_t start = clock();
-    LiteRegion* lr = LiteRegion_Create(root, r_num);
+    LiteRegion* lr = lite_region_create(root, r_num);
     int bNum = lr->blocks->num;
 
     // First, read originBlockName and compare it to oBlock, add Blocks to it
@@ -414,7 +375,7 @@ ItemList *lite_region_ItemListExtend(NBT* root, int r_num, ItemList* oBlock, int
         return NULL;
     }
 
-    oBlock = lite_region_ItemList_WithoutNum(lr, oBlock);
+    oBlock = lite_region_item_list_without_num(lr, oBlock);
     if(!oBlock)
         return NULL;
 
@@ -431,8 +392,8 @@ ItemList *lite_region_ItemListExtend(NBT* root, int r_num, ItemList* oBlock, int
         {
             for(int x = 0 ; x < lr->region_size.x ; x++)
             {
-                uint64_t index = lite_region_BlockIndex_lr(lr,x,y,z);
-                int id = lite_region_BlockArrayPos_lr(lr,index);
+                uint64_t index = lite_region_block_index(lr,x,y,z);
+                int id = lite_region_block_id(lr,index);
                 char* id_block_name = lr->replaced_blocks->val[id];
                 int passed_ms = (double)(1000.0f * (clock() - start) / CLOCKS_PER_SEC);
                 if((print_process && (passed_ms % 500 == 0)) || (index + 1) == volume ){
@@ -445,19 +406,19 @@ ItemList *lite_region_ItemListExtend(NBT* root, int r_num, ItemList* oBlock, int
                 {
                     /* The worst situation is that we need water_bucket
                      * To optimize speed we try to add it first */
-                    if(lite_region_BlockPropertiesCmp(lr, id, "waterlogged", "true"))
+                    if(lite_region_block_properties_equal(lr, id, "waterlogged", "true"))
                     {
                         ItemList_AddNum(&oBlock,1,"minecraft:water_bucket");
                     }
                     if(!strcmp(id_block_name,"minecraft:water_bucket") ||
                       !strcmp(id_block_name,"minecraft:lava_bucket"))
                     {
-                        if(!lite_region_BlockPropertiesCmp(lr, id, "level", "0"))
+                        if(!lite_region_block_properties_equal(lr, id, "level", "0"))
                             continue;    // It's not source, so skip
                     }
                     if(strstr(id_block_name,"_slab"))     // special for slab
                     {
-                        if(lite_region_BlockPropertiesCmp(lr,id,"type","double"))
+                        if(lite_region_block_properties_equal(lr,id,"type","double"))
                         {
                             ItemList_AddNum(&oBlock,2,id_block_name);
                             continue;
@@ -465,11 +426,11 @@ ItemList *lite_region_ItemListExtend(NBT* root, int r_num, ItemList* oBlock, int
                     }
                     if(strstr(id_block_name,"_door"))
                     {
-                        if(!lite_region_BlockPropertiesCmp(lr, id, "half" ,"upper"))
+                        if(!lite_region_block_properties_equal(lr, id, "half" ,"upper"))
                         {
-                            if(!lite_region_BlockPropertiesCmp(lr,
-                                                            lite_region_BlockArrayPos_lr(lr,
-                                                            lite_region_BlockIndex_lr(lr,x,y-1,z)),"half","lower"))
+                            if(!lite_region_block_properties_equal(lr,
+                                lite_region_block_id_xyz(lr,x,y-1,z)
+                                ,"half","lower"))
                                 continue;
                         }
                     }
@@ -482,40 +443,11 @@ ItemList *lite_region_ItemListExtend(NBT* root, int r_num, ItemList* oBlock, int
     free(map);
     printf("\n");
     BlackList_Free(bl);
-    LiteRegion_Free(lr);
+    lite_region_free(lr);
     return oBlock;
 }
 
-int lite_region_IsBlockWaterlogged(NBT* root,int r_num,int id)
-{
-    NBT* status = NBT_GetChild_Deep(lite_region_SpecificBlockStatePalette(root,r_num,id),"Properties","waterlogged",NULL);
-    if(!status)
-        return 0;
-    else
-        if(!strcmp((char*)status->value_a.value,"true"))
-            return 1;
-        else return 0;
-}
-
-int lite_region_BlockLevel(NBT* root,int r_num,int id)
-{
-    NBT* level = NBT_GetChild_Deep(lite_region_SpecificBlockStatePalette(root,r_num,id),"Properties","level",NULL);
-    if(!level)
-        return -1;
-    else
-    {
-        //printf("%d\n",atoi(level->value_a.value));
-        return atoi(level->value_a.value);
-    }
-}
-
-char* lite_region_DoorHalf(NBT* root,int r_num,int id)
-{
-    NBT* half = NBT_GetChild_Deep(lite_region_SpecificBlockStatePalette(root,r_num,id),"Properties","half",NULL);
-    return (char*)half->value_a.value;
-}
-
-ItemList *lite_region_ItemList_WithoutNum(LiteRegion* lr, ItemList *o_il)
+ItemList *lite_region_item_list_without_num(LiteRegion* lr, ItemList *o_il)
 {
     BlackList* bl = BlackList_Init();
     /* Scan block lists and add blocks to itemlist */
@@ -537,7 +469,7 @@ ItemList *lite_region_ItemList_WithoutNum(LiteRegion* lr, ItemList *o_il)
     return o_il;
 }
 
-dh_StrArray* lite_region_Name_StrArray(NBT* root)
+dh_StrArray* lite_region_name_array(NBT* root)
 {
     NBT* region_nbt = NBT_GetChild(root, "Regions")->child;
     dh_StrArray* str_arr = NULL;
@@ -549,7 +481,7 @@ dh_StrArray* lite_region_Name_StrArray(NBT* root)
     return str_arr;
 }
 
-NBT * lite_region_BlockProperties(LiteRegion* lr, int id)
+NBT * lite_region_nbt_block_properties(LiteRegion* lr, int id)
 {
     NBT_Pos* pos_copy = NBT_Pos_Copy(lr->region_pos);
     if(pos_copy)
@@ -569,21 +501,20 @@ NBT * lite_region_BlockProperties(LiteRegion* lr, int id)
     else return NULL;
 }
 
-int lite_region_BlockPropertiesCmp(LiteRegion* lr, int id, char* key, char* val)
+gboolean lite_region_block_properties_equal(LiteRegion* lr, int id, char* key, char* val)
 {
     NBT* current = (lr->block_properties)[id];
     while(current)
     {
-        if(current->key){
-            if(!strcmp(current->key, key)){ /* This item */
-                if(current->value_a.value)
-                    if(!strcmp(current->value_a.value, val))
-                        return 1;
-                return 0;
-            }
+        if(current->key && current->value_a.value
+            && g_str_equal(current->key, key))
+        {   /* This item */
+            if(g_str_equal(current->value_a.value, val))
+                return TRUE;
+            return FALSE;
         }
         current = current -> next;
     }
-    return 0;
+    return FALSE;
 }
 

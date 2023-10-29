@@ -24,7 +24,7 @@ ProcessUI::~ProcessUI()
 
 void ProcessUI::initUI()
 {
-    region_name = lite_region_Name_StrArray(root);
+    region_name = lite_region_name_array(root);
     vLayout = new QVBoxLayout();
     hLayout = new QHBoxLayout();
     if(region_name)
@@ -73,7 +73,7 @@ void ProcessUI::okBtn_clicked()
         {
             label2->setText(QString::asprintf(_("Processing: region [%d] %s \n"),
                                                           i,region_name->val[i]));
-            il = lite_region_ItemListExtend(root, i, il, 1);
+            il = lite_region_item_list_extend(root, i, il, 1);
         }
     }
     ItemList_DeleteZeroItem(&il);

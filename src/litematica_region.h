@@ -26,8 +26,6 @@ extern "C"{
 #include <dh/dh_string_util.h>
 #include "nbt_litereader.h"
 
-// litematica processing stuff
-
 /*************************************************************
  * Region Processing Stuff:
  * Get Region nums and names, processing blocks in the region.
@@ -74,57 +72,48 @@ typedef struct LiteRegion{
 
 } LiteRegion;
 
-LiteRegion* LiteRegion_Create(NBT* root, int r_num);
-void LiteRegion_Free(LiteRegion* lr);
+LiteRegion* lite_region_create(NBT* root, int r_num);
+void        lite_region_free(LiteRegion* lr);
 
 /** Get region numbers in litematica file */
-int lite_region_Num(NBT* root);
-char** lite_region_Name(NBT* root, int rNum, int* err);
+int          lite_region_num(NBT* root);
+G_DEPRECATED_FOR(lite_region_name_array)
+char**       lite_region_names(NBT* root, int rNum, int* err);
+G_DEPRECATED
+void         lite_region_free_names(char** region, int rNum);
 /** Improved version to get region name */
-dh_StrArray* lite_region_Name_StrArray(NBT* root);
+dh_StrArray* lite_region_name_array(NBT* root);
 
-
-void lite_region_FreeNameArray(char** region, int rNum);
-NBT* lite_region_RegionNBT(NBT* root,int r_num);
+NBT*         lite_region_nbt_region(NBT* root,int r_num);
+NBT*         lite_region_nbt_block_state_palette(NBT* root, int r_num);
+NBT*         lite_region_nbt_specific_block_state_palette(NBT* root,int r_num,int id);
+NBT*         lite_region_nbt_block_properties(LiteRegion* lr, int id);
 
 /** Get block numbers in a region */
-int lite_region_BlockNum(NBT* root, int r_num);
-char** lite_region_BlockNameArray(NBT* root, int r_num ,int bNum);
+int           lite_region_block_num(NBT* root, int r_num);
+G_DEPRECATED_FOR(lite_region_block_name_array)
+char**        lite_region_block_names(NBT* root, int r_num ,int bNum);
 /** Improved version to get block name */
-dh_StrArray* lite_region_BlockName_StrArray(NBT* root, int r_num);
+dh_StrArray*  lite_region_block_name_array(NBT* root, int r_num);
 
 /** Directly into the BlockStatePalette (Do not need to go to child) */
-NBT* lite_region_BlockStatePalette(NBT* root, int r_num);
 
-uint64_t* lite_region_BlockStatesArray(NBT* root, int r_num, int* len);
+uint64_t* lite_region_block_states_array(NBT* root, int r_num, int* len);
 
-/** Get Block Position in array */
-int lite_region_BlockArrayPos(NBT* root, int r_num, uint64_t index);
-/** Improved version of getting blockarraypos */
-int lite_region_BlockArrayPos_lr(LiteRegion* lr, uint64_t index);
-/** A better way to get blockarraypos */
-int lite_region_BlockArrayPos_ByCoordination(LiteRegion* lr, int x, int y, int z);
+/** Improved version of getting id */
+int  lite_region_block_id(LiteRegion* lr, uint64_t index);
+/** A better way to get id */
+int  lite_region_block_id_xyz(LiteRegion* lr, int x, int y, int z);
+int* lite_region_size_array(NBT* root,int r_num);
 
-
-int* lite_region_SizeArray(NBT* root,int r_num);
-
-/** Get block index */
-uint64_t lite_region_BlockIndex(NBT* root, int r_num,int x, int y, int z);
 /** Improved version of getting index */
-uint64_t lite_region_BlockIndex_lr(LiteRegion* lr, int x, int y, int z);
-
-NBT* lite_region_SpecificBlockStatePalette(NBT* root,int r_num,int id);
-char* lite_region_BlockType(NBT* root,int r_num, int id);
-ItemList* lite_region_ItemList(NBT* root,int r_num);
+uint64_t  lite_region_block_index(LiteRegion* lr, int x, int y, int z);
+char*     lite_region_block_type(NBT* root,int r_num, int id);
+ItemList* lite_region_item_list(NBT* root,int r_num);
 /**  Make ItemList but not init item numbers (support extend) */
-ItemList* lite_region_ItemList_WithoutNum(LiteRegion* lr, ItemList *o_il);
-ItemList* lite_region_ItemListExtend(NBT* root, int r_num, ItemList *oBlock, int print_process);
-int lite_region_IsBlockWaterlogged(NBT* root,int r_num,int id);
-int lite_region_BlockLevel(NBT* root,int r_num,int id);
-char* lite_region_DoorHalf(NBT* root,int r_num,int id);
-
-NBT* lite_region_BlockProperties(LiteRegion* lr, int id);
-int lite_region_BlockPropertiesCmp(LiteRegion* lr, int id, char* key, char* val);
+ItemList* lite_region_item_list_without_num(LiteRegion* lr, ItemList *o_il);
+ItemList* lite_region_item_list_extend(NBT* root, int r_num, ItemList *oBlock, int print_process);
+gboolean  lite_region_block_properties_equal(LiteRegion* lr, int id, char* key, char* val);
 
 #ifdef __cplusplus
 }

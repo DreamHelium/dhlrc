@@ -137,9 +137,9 @@ static int start_func(NBT *root, enum option opt)
 
 static int start_lrc_main(NBT *root)
 {
-    int region_num = lite_region_Num(root);
+    int region_num = lite_region_num(root);
     int err = 0;
-    char** region_name = lite_region_Name(root,region_num,&err);
+    char** region_name = lite_region_names(root,region_num,&err);
     if(region_name)
     {
         printf(_("There are %d regions:\n"),region_num);
@@ -157,10 +157,10 @@ static int start_lrc_main(NBT *root)
             {
                 printf(_("Processing: region %d / %d : [%ld] %s \n"),
                        i,process_num,process_region_i[i],region_name[process_region_i[i]]);
-                il = lite_region_ItemListExtend(root, process_region_i[i], il, 1);
+                il = lite_region_item_list_extend(root, process_region_i[i], il, 1);
             }
             free(process_region_i);
-            lite_region_FreeNameArray(region_name,region_num);
+            lite_region_free_names(region_name,region_num);
             ItemList_DeleteZeroItem(&il);
 
             DhIsoc* isoc = dh_general_isoc_new();
