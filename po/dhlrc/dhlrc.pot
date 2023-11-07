@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-10-14 00:29+0800\n"
+"POT-Creation-Date: 2023-11-07 21:02+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -27,19 +27,19 @@ msgid ""
 "  -l, --list\tEnter litematica material list with recipe combination\n"
 msgstr ""
 
-#: src/main_isoc.c:63
+#: src/main_isoc.c:61
 msgid "Error when reading file."
 msgstr ""
 
-#: src/main_isoc.c:71
+#: src/main_isoc.c:69
 msgid "Not a valid NBT file!"
 msgstr ""
 
-#: src/main_isoc.c:78 src/qt/mainwindow.cpp:76
+#: src/main_isoc.c:76 src/qt/mainwindow.cpp:76
 msgid "Valid NBT file!"
 msgstr ""
 
-#: src/main_isoc.c:88
+#: src/main_isoc.c:86
 #, c-format
 msgid ""
 "There are three functions:\n"
@@ -49,17 +49,17 @@ msgid ""
 "\n"
 msgstr ""
 
-#: src/main_isoc.c:92
+#: src/main_isoc.c:90
 #, c-format
 msgid "Please select an option, or enter 'q' to exit the program (q): "
 msgstr ""
 
-#: src/main_isoc.c:147 src/lrc_extend.c:42
+#: src/main_isoc.c:145 src/lrc_extend.c:42
 #, c-format
 msgid "There are %d regions:\n"
 msgstr ""
 
-#: src/main_isoc.c:160
+#: src/main_isoc.c:158
 #, c-format
 msgid "Processing: region %d / %d : [%ld] %s \n"
 msgstr ""
@@ -118,7 +118,7 @@ msgid ""
 "The integer you input is %ld, please confirm [Y/n] (Y): "
 msgstr ""
 
-#: src/litematica_region.c:440
+#: src/litematica_region.c:401
 #, c-format
 msgid "[%.2f%%] Processing Blocks %lu/%lu, (%3d,%3d,%3d)/(%3d,%3d,%3d)"
 msgstr ""
@@ -162,64 +162,64 @@ msgid ""
 "the program (b): "
 msgstr ""
 
-#: src/recipe_util.c:34
+#: src/recipe_util.c:33
 #, c-format
 msgid "Input numbers directly, or type 'a' for all numbers, 'q' to quit (a): "
 msgstr ""
 
-#: src/recipe_util.c:119
+#: src/recipe_util.c:118
 #, c-format
 msgid "Processing %s with %d items, continue or read item list? [Y/n/q/r] :"
 msgstr ""
 
-#: src/recipe_util.c:121
+#: src/recipe_util.c:120
 msgid "&Yes"
 msgstr ""
 
-#: src/recipe_util.c:121
+#: src/recipe_util.c:120
 msgid "&No"
 msgstr ""
 
-#: src/recipe_util.c:121 src/qt/mainwindow.cpp:40
+#: src/recipe_util.c:120 src/qt/mainwindow.cpp:40
 msgid "&Quit"
 msgstr ""
 
-#: src/recipe_util.c:121
+#: src/recipe_util.c:120
 msgid "&Read"
 msgstr ""
 
-#: src/dhlrc_list.c:138
+#: src/dhlrc_list.c:136
 msgid "Name\t\tTotal\tPlaced\tAvailable\tIs tag\n"
 msgstr ""
 
-#: src/dhlrc_list.c:716
+#: src/dhlrc_list.c:714
 #, c-format
 msgid "Processing %s.\n"
 msgstr ""
 
-#: src/dhlrc_list.c:723
+#: src/dhlrc_list.c:721
 #, c-format
 msgid "There are %d corresponding files to the item %s:\n"
 msgstr ""
 
-#: src/dhlrc_list.c:730
+#: src/dhlrc_list.c:728
 msgid "Please select an option, or 'd' to discard (d): "
 msgstr ""
 
-#: src/dhlrc_list.c:730 src/recipe_class/recipe_general.c:113
+#: src/dhlrc_list.c:728 src/recipe_class/recipe_general.c:112
 msgid "&Discard"
 msgstr ""
 
-#: src/recipe_class/recipe_general.c:112
+#: src/recipe_class/recipe_general.c:111
 #, c-format
 msgid "There is a remainder with %d and %d.\n"
 msgstr ""
 
-#: src/recipe_class/recipe_general.c:113
+#: src/recipe_class/recipe_general.c:112
 msgid "Enter 'd' to discard the result, or enter 'c' to continue (c): "
 msgstr ""
 
-#: src/recipe_class/recipe_general.c:113
+#: src/recipe_class/recipe_general.c:112
 msgid "&Continue"
 msgstr ""
 

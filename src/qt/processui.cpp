@@ -76,8 +76,8 @@ void ProcessUI::okBtn_clicked()
             il = lite_region_item_list_extend(root, i, il, 1);
         }
     }
-    ItemList_DeleteZeroItem(&il);
-    ItemList_Sort(&il);
+    item_list_delete_zero_item(&il);
+    item_list_sort(&il);
     this->close();
     lrcFunctionUI* fui = new lrcFunctionUI();
     fui->setAttribute(Qt::WA_DeleteOnClose);

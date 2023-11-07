@@ -58,18 +58,18 @@ static void rspl_set_content(RecipeGeneral* self, cJSON* json)
     cJSON* ingredient = cJSON_GetObjectItem(json, "ingredients");
     if(cJSON_IsObject(ingredient))
     {
-        shapeless_recipe->ingredient = g_ptr_array_new_full(1, IngCtr_free);
-        IngContainer* ctr = IngCtr_new(ingredient);
+        shapeless_recipe->ingredient = g_ptr_array_new_full(1, ing_ctr_free);
+        IngContainer* ctr = ing_ctr_new(ingredient);
         g_ptr_array_add(shapeless_recipe->ingredient, ctr);
     }
     else if(cJSON_IsArray(ingredient))
     {
         guint arr_num = cJSON_GetArraySize(ingredient);
-        shapeless_recipe->ingredient = g_ptr_array_new_full(arr_num, IngCtr_free);
+        shapeless_recipe->ingredient = g_ptr_array_new_full(arr_num, ing_ctr_free);
         for(int i = 0 ; i < arr_num ; i++)
         {
             cJSON* object = cJSON_GetArrayItem(ingredient, i);
-            IngContainer* ctr = IngCtr_new(object);
+            IngContainer* ctr = ing_ctr_new(object);
             g_ptr_array_add(shapeless_recipe->ingredient, ctr);
         }
     }
@@ -85,7 +85,7 @@ static ItemList* rspl_get_recipe(RecipeGeneral* self, guint num, DhGeneral* dh_g
     ItemList* recipe = NULL;
     if(shapeless_recipe->ingredient->len == 1)
     {
-        ItemList_ProcessIngCtr(&recipe, shapeless_recipe->ingredient->pdata[0], division_num);
+        item_list_process_ing_ctr(&recipe, shapeless_recipe->ingredient->pdata[0], division_num);
     }
     else {
         // dh_new_win(dh_general, FALSE);
@@ -103,7 +103,7 @@ static ItemList* rspl_get_recipe(RecipeGeneral* self, guint num, DhGeneral* dh_g
         //     ItemList_ProcessIngCtr(&recipe, shapeless_recipe->ingredient->pdata[option], division_num);
         for(int i = 0 ; i < shapeless_recipe->ingredient->len; i++)
         {
-            ItemList_ProcessIngCtr(&recipe, shapeless_recipe->ingredient->pdata[i], division_num);
+            item_list_process_ing_ctr(&recipe, shapeless_recipe->ingredient->pdata[i], division_num);
         }
     }
     return recipe;

@@ -49,12 +49,12 @@ struct _RecipeGeneralClass{
     Recipe* (*get_raw_recipe)(RecipeGeneral* self);
 };
 
-IngContainer* IngCtr_new(cJSON* object);
-void IngCtr_free(gpointer data);
-void ItemList_ProcessIngCtr(ItemList** list, IngContainer* ctr, guint num);
-int dh_mod_decide(guint num1, guint num2, DhGeneral* self);
-RecipeGeneral* recipe_general_new(const char* filename);
-gboolean recipe_is_supported(const char* filename);
+IngContainer*   ing_ctr_new(cJSON* object);
+void            ing_ctr_free(gpointer data);
+void            item_list_process_ing_ctr(ItemList** list, IngContainer* ctr, guint num);
+int             dh_mod_decide(guint num1, guint num2, DhGeneral* self);
+RecipeGeneral*  recipe_general_new(const char* filename);
+gboolean        recipe_is_supported(const char* filename);
 
 G_END_DECLS
 

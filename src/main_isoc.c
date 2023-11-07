@@ -118,7 +118,7 @@ static int start_func(NBT *root, enum option opt)
 {
     switch (opt) {
     case Reader:
-        nbtlr_Start(root);
+        nbtlr_start(root);
         return 0;
     case Litematic_material_lister:
         return start_lrc_main(root);
@@ -149,7 +149,7 @@ static int start_lrc_main(NBT *root)
         }
         printf("\n");
         int process_num = 0;
-        long* process_region_i = NumArray_GetFromInput(&process_num, region_num);
+        long* process_region_i = num_array_get_from_input(&process_num, region_num);
         ItemList* il = NULL;
         if(process_region_i)
         {
@@ -161,16 +161,16 @@ static int start_lrc_main(NBT *root)
             }
             free(process_region_i);
             lite_region_free_names(region_name,region_num);
-            ItemList_DeleteZeroItem(&il);
+            item_list_delete_zero_item(&il);
 
             DhIsoc* isoc = dh_general_isoc_new();
 
-            ItemList_CombineRecipe(&il, "recipes", DH_GENERAL(isoc));
+            item_list_combine_recipe(&il, "recipes", DH_GENERAL(isoc));
             g_object_unref(isoc);
 
-            ItemList_Sort(&il);
-            ItemList_toCSVFile("test.csv",il);
-            ItemList_Free(il);
+            item_list_sort(&il);
+            item_list_to_csv("test.csv",il);
+            item_list_free(il);
         }
     }
     return dh_exit();

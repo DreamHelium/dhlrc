@@ -27,7 +27,7 @@ void translation_init();
 #include <locale.h>
 #include "recipe_util.h"
 #define _(str) gettext (str)
-#define trm(str) Name_BlockTranslate (str)
+#define trm(str) name_block_translate (str)
 #else
 #define _(str) str
 #define trm(str) str

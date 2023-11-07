@@ -66,7 +66,7 @@ static void recipe_general_init(RecipeGeneral* self)
     priv->type = NULL;
 }
 
-IngContainer* IngCtr_new(cJSON* object)
+IngContainer* ing_ctr_new(cJSON* object)
 {
     IngContainer* ctr = malloc(sizeof(IngContainer));
     g_return_val_if_fail(ctr != NULL, NULL);
@@ -88,17 +88,17 @@ IngContainer* IngCtr_new(cJSON* object)
     return ctr;
 }
 
-void IngCtr_free(gpointer data)
+void ing_ctr_free(gpointer data)
 {
     IngContainer* data_d = (IngContainer*)data;
     free(data_d->ingredient);
     free(data_d);
 }
 
-void ItemList_ProcessIngCtr(ItemList** list, IngContainer* ctr, guint num)
+void item_list_process_ing_ctr(ItemList** list, IngContainer* ctr, guint num)
 {
-    ItemList_InitNewItemWithTag(list, ctr->ingredient, ctr->is_tag);
-    ItemList_AddNum(list, num, ctr->ingredient);
+    item_list_init_new_item_with_tag(list, ctr->ingredient, ctr->is_tag);
+    item_list_add_num(list, num, ctr->ingredient);
 }
 
 int dh_mod_decide(guint num1, guint num2, DhGeneral* self)

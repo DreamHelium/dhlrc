@@ -21,7 +21,7 @@
 
 #include "libnbt/nbt.h"
 
-typedef struct NBT_Pos
+typedef struct NbtPos
 {
     /** The level of the pos in the NBT */
     int level;
@@ -34,16 +34,16 @@ typedef struct NBT_Pos
     /** Represent the item in the latest tree */
     int item;
 }
-NBT_Pos;
+NbtPos;
 
-NBT_Pos* NBT_Pos_init(NBT* root);
-int NBT_Pos_AddToTree(NBT_Pos* pos, int n);
-int NBT_Pos_DeleteLast(NBT_Pos* pos);
+NbtPos* nbt_pos_init(NBT* root);
+int     nbt_pos_add_to_tree(NbtPos* pos, int n);
+int     nbt_pos_delete_last(NbtPos* pos);
 /* It might be slightly different from libnbt's get child */
-int NBT_Pos_GetChild(NBT_Pos* pos, const char* key);
-int NBT_Pos_GetChild_Deep(NBT_Pos* pos, ...);
-NBT_Pos* NBT_Pos_Copy(NBT_Pos* pos);
-void NBT_Pos_Free(NBT_Pos* pos);
-NBT* NBT_Pos_GetItem_NBT(NBT_Pos* pos, const char* key);
+int     nbt_pos_get_child(NbtPos* pos, const char* key);
+int     nbt_pos_get_child_deep(NbtPos* pos, ...);
+NbtPos* nbt_pos_copy(NbtPos* pos);
+void    nbt_pos_free(NbtPos* pos);
+NBT*    nbt_pos_get_item_nbt(NbtPos* pos, const char* key);
 
 #endif // NBT_POS_H

@@ -53,7 +53,7 @@ typedef struct LiteRegion{
     NBT** block_properties;
 
     /** Region NBT Pos variable */
-    NBT_Pos* region_pos;
+    NbtPos* region_pos;
 
     /** Block states */
     int64_t* states;

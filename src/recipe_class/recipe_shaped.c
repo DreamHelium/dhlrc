@@ -90,17 +90,17 @@ static void rpsd_set_content(RecipeGeneral* self, cJSON* json)
         GPtrArray* intctr_arr = NULL;
         if(cJSON_IsObject(key))
         {
-            intctr_arr = g_ptr_array_new_full(1, IngCtr_free);
-            IngContainer* ctr = IngCtr_new(key);
+            intctr_arr = g_ptr_array_new_full(1, ing_ctr_free);
+            IngContainer* ctr = ing_ctr_new(key);
             g_ptr_array_add(intctr_arr, ctr);
         }
         else if(cJSON_IsArray(key))
         {
             guint key_size = cJSON_GetArraySize(key);
-            intctr_arr = g_ptr_array_new_full(key_size, IngCtr_free);
+            intctr_arr = g_ptr_array_new_full(key_size, ing_ctr_free);
             for(int j = 0 ; j < key_size; j++)
             {
-                IngContainer* ctr = IngCtr_new(cJSON_GetArrayItem(key, j));
+                IngContainer* ctr = ing_ctr_new(cJSON_GetArrayItem(key, j));
                 g_ptr_array_add(intctr_arr, ctr);
             }
         }
@@ -126,7 +126,7 @@ static ItemList* rpsd_get_recipe(RecipeGeneral* self, guint num, DhGeneral* dh_g
 
         GPtrArray* ingredient = keying->ingredients;
         if(ingredient->len == 1)
-            ItemList_ProcessIngCtr(&recipe, ingredient->pdata[0], division_num * key_num);
+            item_list_process_ing_ctr(&recipe, ingredient->pdata[0], division_num * key_num);
         else{
             dh_new_win(dh_general, FALSE);
             dh_printf(dh_general, _("There are some ingredients to choose:\n"));
@@ -140,7 +140,7 @@ static ItemList* rpsd_get_recipe(RecipeGeneral* self, guint num, DhGeneral* dh_g
             if(option == -1 || option == -100)
                 return NULL;
             else
-                ItemList_ProcessIngCtr(&recipe, ingredient->pdata[option], division_num * key_num);
+                item_list_process_ing_ctr(&recipe, ingredient->pdata[option], division_num * key_num);
         }
     }
     return recipe;

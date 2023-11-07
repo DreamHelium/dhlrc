@@ -59,6 +59,6 @@ void lrcFunctionUI::okBtn_clicked()
 //        dh_selector(gqtG, "", 1, "Y", "&Yes");
         DhGeneralQt* dgqt = dh_general_qt_new();
         DhGeneral* general = DH_GENERAL(dgqt);
-        ItemList_CombineRecipe(&il, "/home/dream_he/litematica_reader_c/build/recipes", general);
+        item_list_combine_recipe(&il, "/home/dream_he/litematica_reader_c/build/recipes", general);
     }
 }

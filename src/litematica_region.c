@@ -27,8 +27,8 @@ static int* id_to_index(dh_StrArray* str, ItemList* il)
 {
     int* sheet = (int*)malloc( (str->num + 1) * sizeof(int) );
     for(int i = 0 ; i < str->num ; i++ )
-        sheet[i] = ItemList_ItemIndex( il, str->val[i]);
-    sheet[str->num] = ItemList_ItemIndex(il, "minecraft:water_bucket");
+        sheet[i] = item_list_item_index( il, str->val[i]);
+    sheet[str->num] = item_list_item_index(il, "minecraft:water_bucket");
     return sheet;
 }
 
@@ -37,11 +37,11 @@ LiteRegion* lite_region_create(NBT* root, int r_num)
     LiteRegion* out = (LiteRegion*)malloc(sizeof(LiteRegion));
     if(out)
     {
-        NBT_Pos* pos = NBT_Pos_init(root);
+        NbtPos* pos = nbt_pos_init(root);
         if(pos)
         {
-            NBT_Pos_GetChild(pos, "Regions");
-            NBT_Pos_AddToTree(pos, r_num);
+            nbt_pos_get_child(pos, "Regions");
+            nbt_pos_add_to_tree(pos, r_num);
             out->region_pos = pos;
         }
         else
@@ -94,12 +94,12 @@ LiteRegion* lite_region_create(NBT* root, int r_num)
 
             /* Replace name of block here so you don't have to do it in the following step */
             dh_StrArray* replaced_names = NULL;
-            ReplaceList* rl = ReplaceList_Init();
+            ReplaceList* rl = replace_list_init();
             for(int i = 0 ; i < out->blocks->num ; i++)
             {
-                dh_StrArray_AddStr(&replaced_names, ReplaceList_Replace(rl, out->blocks->val[i]));
+                dh_StrArray_AddStr(&replaced_names, replace_list_replace(rl, out->blocks->val[i]));
             }
-            ReplaceList_Free(rl);
+            replace_list_free(rl);
             out->replaced_blocks = replaced_names;
 
             return out;
@@ -118,7 +118,7 @@ void lite_region_free(LiteRegion* lr)
     free(lr->name);
     dh_StrArray_Free(lr->blocks);
     dh_StrArray_Free(lr->replaced_blocks);
-    NBT_Pos_Free(lr->region_pos);
+    nbt_pos_free(lr->region_pos);
     free(lr->block_properties);
     free(lr);
 }
@@ -381,7 +381,7 @@ ItemList *lite_region_item_list_extend(NBT* root, int r_num, ItemList* oBlock, i
 
     // Second, read BlockStates and add number to oBlock.num
 
-    BlackList* bl = BlackList_Init();
+    BlackList* bl = black_list_init();
 
     //char process[] = "-\\|/";
     uint64_t volume = lr->region_size.x * lr->region_size.y * lr->region_size.z;
@@ -402,13 +402,13 @@ ItemList *lite_region_item_list_extend(NBT* root, int r_num, ItemList* oBlock, i
                             x,y,z,lr->region_size.x,lr->region_size.y,lr->region_size.z);
                     fprintf(stderr, "\r");
                 }
-                if(!BlackList_Scan(bl,id_block_name))
+                if(!black_list_scan(bl,id_block_name))
                 {
                     /* The worst situation is that we need water_bucket
                      * To optimize speed we try to add it first */
                     if(lite_region_block_properties_equal(lr, id, "waterlogged", "true"))
                     {
-                        ItemList_AddNum(&oBlock,1,"minecraft:water_bucket");
+                        item_list_add_num(&oBlock,1,"minecraft:water_bucket");
                     }
                     if(!strcmp(id_block_name,"minecraft:water_bucket") ||
                       !strcmp(id_block_name,"minecraft:lava_bucket"))
@@ -420,7 +420,7 @@ ItemList *lite_region_item_list_extend(NBT* root, int r_num, ItemList* oBlock, i
                     {
                         if(lite_region_block_properties_equal(lr,id,"type","double"))
                         {
-                            ItemList_AddNum(&oBlock,2,id_block_name);
+                            item_list_add_num(&oBlock,2,id_block_name);
                             continue;
                         }
                     }
@@ -434,7 +434,7 @@ ItemList *lite_region_item_list_extend(NBT* root, int r_num, ItemList* oBlock, i
                                 continue;
                         }
                     }
-                    ItemList_AddNum(&oBlock,1,id_block_name);
+                    item_list_add_num(&oBlock,1,id_block_name);
                 }
 
             }
@@ -442,30 +442,30 @@ ItemList *lite_region_item_list_extend(NBT* root, int r_num, ItemList* oBlock, i
     }
     free(map);
     printf("\n");
-    BlackList_Free(bl);
+    black_list_free(bl);
     lite_region_free(lr);
     return oBlock;
 }
 
 ItemList *lite_region_item_list_without_num(LiteRegion* lr, ItemList *o_il)
 {
-    BlackList* bl = BlackList_Init();
+    BlackList* bl = black_list_init();
     /* Scan block lists and add blocks to itemlist */
     for(int i = 0 ; i < lr->blocks->num ; i++)
     {
         char* r_block_name = lr->replaced_blocks->val[i];
-        if( !BlackList_Scan(bl, r_block_name) && !ItemList_ScanRepeat(o_il, r_block_name) )
+        if( !black_list_scan(bl, r_block_name) && !item_list_scan_repeated(o_il, r_block_name) )
         {
-            if(ItemList_InitNewItem(&o_il, r_block_name))
+            if(item_list_init_new_item(&o_il, r_block_name))
             {
-                BlackList_Free(bl);
+                black_list_free(bl);
                 return NULL;
             }
         }
     }
-    if(!ItemList_ScanRepeat(o_il, "minecraft:water_bucket"))
-        ItemList_InitNewItem(&o_il, "minecraft:water_bucket");
-    BlackList_Free(bl);
+    if(!item_list_scan_repeated(o_il, "minecraft:water_bucket"))
+        item_list_init_new_item(&o_il, "minecraft:water_bucket");
+    black_list_free(bl);
     return o_il;
 }
 
@@ -483,18 +483,18 @@ dh_StrArray* lite_region_name_array(NBT* root)
 
 NBT * lite_region_nbt_block_properties(LiteRegion* lr, int id)
 {
-    NBT_Pos* pos_copy = NBT_Pos_Copy(lr->region_pos);
+    NbtPos* pos_copy = nbt_pos_copy(lr->region_pos);
     if(pos_copy)
     {
-        NBT_Pos_GetChild( pos_copy, "BlockStatePalette" );
-        NBT_Pos_AddToTree( pos_copy, id);
-        if(NBT_Pos_GetChild( pos_copy, "Properties" )){
+        nbt_pos_get_child( pos_copy, "BlockStatePalette" );
+        nbt_pos_add_to_tree( pos_copy, id);
+        if(nbt_pos_get_child( pos_copy, "Properties" )){
             NBT* ret = pos_copy->current;
-            NBT_Pos_Free(pos_copy);
+            nbt_pos_free(pos_copy);
             return ret;
         }
         else{
-            NBT_Pos_Free(pos_copy);
+            nbt_pos_free(pos_copy);
             return NULL;
         }
     }

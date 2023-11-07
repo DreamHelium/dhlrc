@@ -15,7 +15,7 @@ int main(int argc, char *argv[])
     w.show();
     int ret = a.exec();
     if(root) NBT_Free(root);
-    if(il)   ItemList_Free(il);
+    if(il)   item_list_free(il);
     return ret;
 }
 

@@ -25,26 +25,26 @@
 #include "translation.h"
 
 int nbtlr_instance(NBT* root, int from_parent, int modify_mode);
-int nbtlr_instance_ng(NBT_Pos* pos, int modify_mode);
+int nbtlr_instance_ng(NbtPos* pos, int modify_mode);
 int nbtlr_Modifier_instance(NBT* root);
 int nbtlr_save(NBT* root);
 
 
 
-int nbtlr_Start(NBT* root)
+int nbtlr_start(NBT* root)
 {
-    NBT_Pos* pos = NBT_Pos_init(root);
+    NbtPos* pos = nbt_pos_init(root);
     int ret = nbtlr_instance_ng(pos, 0);
-    NBT_Pos_Free(pos);
+    nbt_pos_free(pos);
     return ret;
 }
 
-int nbtlr_Start_Pos(NBT_Pos* pos)
+int nbtlr_start_pos(NbtPos* pos)
 {
     return nbtlr_instance_ng(pos, 0);
 }
 
-int nbtlr_instance_ng(NBT_Pos* pos, int modify_mode)
+int nbtlr_instance_ng(NbtPos* pos, int modify_mode)
 {
     while(1)
     {
@@ -53,20 +53,20 @@ int nbtlr_instance_ng(NBT_Pos* pos, int modify_mode)
         if(pos->level == 0 || pos->item != -1)
             key = pos->current->key;
         else
-            key = nbtlr_ToNextNBT( pos->tree[pos->level - 1] , pos->child[pos->level - 1])->key;
+            key = nbtlr_to_next_nbt( pos->tree[pos->level - 1] , pos->child[pos->level - 1])->key;
         printf(_("The detail of NBT \"%s\" is listed below:\n\n"), key);
         int list = 0;
 
         // Show list (pos->item = -1 represents that it's in the tree, read items)
-        list = nbtlr_List(pos->current, (pos->item == -1) );
+        list = nbtlr_list(pos->current, (pos->item == -1) );
 
         // modify_mode option
         dh_LineOut* input = NULL;
         if(modify_mode)
         {
             if(pos->level == 0 && list == 1 && pos->current->type == TAG_Compound)
-                input = nbtlr_Modifier_Start(pos->current, 0);
-            else input = nbtlr_Modifier_Start( pos->current, (pos->item == -1));
+                input = nbtlr_modifier_start(pos->current, 0);
+            else input = nbtlr_modifier_start( pos->current, (pos->item == -1));
         }
         else
         {
@@ -104,7 +104,7 @@ int nbtlr_instance_ng(NBT_Pos* pos, int modify_mode)
             {
             case Integer:
             {
-                if(!NBT_Pos_AddToTree(pos, input->num_i))
+                if(!nbt_pos_add_to_tree(pos, input->num_i))
                 {
                     dh_LineOut_Free(input);
                     return -1;
@@ -125,7 +125,7 @@ int nbtlr_instance_ng(NBT_Pos* pos, int modify_mode)
                 if(opt == 'b')
                     modify_mode = 0;
                 if(opt == 'p')
-                    if(!NBT_Pos_DeleteLast(pos)) return -1;
+                    if(!nbt_pos_delete_last(pos)) return -1;
                 if(opt == 's')
                 {
                     if(nbtlr_save(pos->tree[0]))
@@ -139,7 +139,7 @@ int nbtlr_instance_ng(NBT_Pos* pos, int modify_mode)
                 dh_LineOut_Free(input);
                 if( pos->level == 0 )
                     return 0;
-                else NBT_Pos_DeleteLast(pos);
+                else nbt_pos_delete_last(pos);
                 break;
             }
             }
@@ -148,7 +148,7 @@ int nbtlr_instance_ng(NBT_Pos* pos, int modify_mode)
     }
 }
 
-int nbtlr_ListItem(NBT *given_nbt)
+int nbtlr_list_item(NBT *given_nbt)
 {
     NBT* list_nbt = given_nbt;
     int item = 0;
@@ -225,16 +225,16 @@ int nbtlr_ListItem(NBT *given_nbt)
  *
  */
 
-int nbtlr_List(NBT *given_nbt, int read_next)
+int nbtlr_list(NBT *given_nbt, int read_next)
 {
     NBT* list_nbt = given_nbt;
     if(read_next)
 //        if(parent->type == TAG_Compound || parent->type == TAG_List)
-            return nbtlr_ListItem(list_nbt);  // It's the first element in the child so pass to scan it
+            return nbtlr_list_item(list_nbt);  // It's the first element in the child so pass to scan it
     switch(list_nbt->type){
     case TAG_Compound:
     case TAG_List:
-        return nbtlr_ListItem(list_nbt);
+        return nbtlr_list_item(list_nbt);
     case TAG_End:
         printf("?\n");
         return -2;
@@ -267,7 +267,7 @@ int nbtlr_List(NBT *given_nbt, int read_next)
     }
 }
 
-NBT *nbtlr_ToNextNBT(NBT *root, int n)
+NBT *nbtlr_to_next_nbt(NBT *root, int n)
 {
     NBT* next_nbt = root;
     /* Protection for "NULL" situation */
@@ -276,7 +276,7 @@ NBT *nbtlr_ToNextNBT(NBT *root, int n)
     return next_nbt;
 }
 
-dh_LineOut* nbtlr_Modifier_Start(NBT *root, int modify_list)
+dh_LineOut* nbtlr_modifier_start(NBT *root, int modify_list)
 {
     while(1)
     {

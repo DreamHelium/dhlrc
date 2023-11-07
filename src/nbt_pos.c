@@ -20,11 +20,11 @@
 #include <stdlib.h>
 #include <string.h>
 
-NBT_Pos* NBT_Pos_init(NBT* root)
+NbtPos* nbt_pos_init(NBT* root)
 {
     if(root)
     {
-        NBT_Pos* out = (NBT_Pos*)malloc(sizeof(NBT_Pos));
+        NbtPos* out = (NbtPos*)malloc(sizeof(NbtPos));
         if(out)
         {
             out->level = 0;
@@ -40,9 +40,9 @@ NBT_Pos* NBT_Pos_init(NBT* root)
     else return NULL;
 }
 
-int NBT_Pos_AddToTree(NBT_Pos* pos, int n)
+int nbt_pos_add_to_tree(NbtPos* pos, int n)
 {
-    NBT* current = nbtlr_ToNextNBT(pos->tree[pos->level], n); // Analyse what's next
+    NBT* current = nbtlr_to_next_nbt(pos->tree[pos->level], n); // Analyse what's next
     if(current)
     {
         if(current->type == TAG_Compound || current->type == TAG_List)
@@ -79,7 +79,7 @@ int NBT_Pos_AddToTree(NBT_Pos* pos, int n)
     else return 0; // current is null, which is unexpected
 }
 
-int NBT_Pos_DeleteLast(NBT_Pos* pos)
+int nbt_pos_delete_last(NbtPos* pos)
 {
     if(pos->item != -1)
     {
@@ -122,7 +122,7 @@ int NBT_Pos_DeleteLast(NBT_Pos* pos)
     }
 }
 
-int NBT_Pos_GetChild(NBT_Pos* pos, const char* key)
+int nbt_pos_get_child(NbtPos* pos, const char* key)
 {
     if(pos)
     {
@@ -145,11 +145,11 @@ int NBT_Pos_GetChild(NBT_Pos* pos, const char* key)
                 current = current->next;
             }
             if(success)
-                return NBT_Pos_AddToTree( pos, item );
+                return nbt_pos_add_to_tree( pos, item );
             else
             {
                 /* Try to enter and scan */
-                int ret = NBT_Pos_AddToTree(pos, (pos->item == -1)? 0: pos->item);
+                int ret = nbt_pos_add_to_tree(pos, (pos->item == -1)? 0: pos->item);
                 if(ret)
                 {
                     NBT* current = pos->current;
@@ -168,7 +168,7 @@ int NBT_Pos_GetChild(NBT_Pos* pos, const char* key)
                         current = current->next;
                     }
                     if(success)
-                        return NBT_Pos_AddToTree(pos, item);
+                        return nbt_pos_add_to_tree(pos, item);
                     else return 0;
                 }
                 else return 0;
@@ -178,7 +178,7 @@ int NBT_Pos_GetChild(NBT_Pos* pos, const char* key)
     else return 0;
 }
 
-int NBT_Pos_GetChild_Deep(NBT_Pos* pos, ...)
+int nbt_pos_get_child_deep(NbtPos* pos, ...)
 {
     if(pos)
     {
@@ -187,7 +187,7 @@ int NBT_Pos_GetChild_Deep(NBT_Pos* pos, ...)
         char* temp = NULL;
         while( (temp = va_arg(va, char*)) != NULL )
         {
-            if(!NBT_Pos_GetChild(pos, temp))
+            if(!nbt_pos_get_child(pos, temp))
             {
                 va_end(va);
                 return 0;
@@ -199,9 +199,9 @@ int NBT_Pos_GetChild_Deep(NBT_Pos* pos, ...)
     else return 0;
 }
 
-NBT_Pos * NBT_Pos_Copy(NBT_Pos* pos)
+NbtPos * nbt_pos_copy(NbtPos* pos)
 {
-    NBT_Pos* new_pos = (NBT_Pos*)malloc(sizeof(NBT_Pos));
+    NbtPos* new_pos = (NbtPos*)malloc(sizeof(NbtPos));
     if(new_pos)
     {
         NBT** new_tree = (NBT**)malloc( (pos->level + 1) * sizeof(NBT*) );
@@ -234,7 +234,7 @@ NBT_Pos * NBT_Pos_Copy(NBT_Pos* pos)
     else return NULL;
 }
 
-NBT * NBT_Pos_GetItem_NBT(NBT_Pos* pos, const char* key)
+NBT * nbt_pos_get_item_nbt(NbtPos* pos, const char* key)
 {
     if(key && pos)
     {
@@ -252,7 +252,7 @@ NBT * NBT_Pos_GetItem_NBT(NBT_Pos* pos, const char* key)
 }
 
 
-void NBT_Pos_Free(NBT_Pos* pos)
+void nbt_pos_free(NbtPos* pos)
 {
     free(pos->child);
     free(pos->tree);

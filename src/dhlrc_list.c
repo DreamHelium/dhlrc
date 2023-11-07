@@ -31,7 +31,7 @@ static gboolean enable_smelting = TRUE;
 static gboolean enable_shapeless = TRUE;
 static gboolean type_is_supported(const char* type);
 
-void RecipeList_EnableFeature(gboolean shaped, gboolean smelting,gboolean shapeless)
+void recipe_list_enable_feature(gboolean shaped, gboolean smelting,gboolean shapeless)
 {
     enable_shaped = shaped;
     enable_smelting = smelting;
@@ -130,7 +130,7 @@ static IListData* ilistdata_init(const char* name)
     return ilistdata_init_with_tag(name, FALSE);
 }
 
-void ItemList_Read(ItemList* il, DhGeneral* general)
+void item_list_read(ItemList* il, DhGeneral* general)
 {
     dh_new_win(general, FALSE);
     dh_printf(general, _("Name\t\tTotal\tPlaced\tAvailable\tIs tag\n"));
@@ -143,7 +143,7 @@ void ItemList_Read(ItemList* il, DhGeneral* general)
     }
 }
 
-void ItemList_Free(ItemList* target)
+void item_list_free(ItemList* target)
 {
     g_return_if_fail(target != NULL);
     GList* gld = target;
@@ -156,26 +156,26 @@ void ItemList_Free(ItemList* target)
     g_list_free(target);
 }
 
-void ItemList_Sort(ItemList** oBlock)
+void item_list_sort(ItemList** oBlock)
 {
     /* Originally this sort function compares total.
      * After update, this will still sort by total */
-    ItemList* iln = ItemList_Sort_ByTotal(*oBlock);
+    ItemList* iln = item_list_sort_by_total(*oBlock);
     *oBlock = iln;
 }
 
-ItemList * ItemList_Sort_ByTotal(ItemList* il)
+ItemList * item_list_sort_by_total(ItemList* il)
 {
     return g_list_sort(il, ilistdata_compare_by_total);
 }
 
 
-int ItemList_InitNewItem(ItemList** oBlock,const char* block_name)
+int item_list_init_new_item(ItemList** oBlock,const char* block_name)
 {
-    return ItemList_InitNewItemWithTag(oBlock, block_name, FALSE);
+    return item_list_init_new_item_with_tag(oBlock, block_name, FALSE);
 }
 
-int ItemList_InitNewItemWithTag(ItemList **oBlock, const char* block_name, gboolean is_tag)
+int item_list_init_new_item_with_tag(ItemList **oBlock, const char* block_name, gboolean is_tag)
 {
     GList* gl = *oBlock;
     IListData* ildata = ilistdata_init_with_tag(block_name, is_tag);
@@ -184,21 +184,21 @@ int ItemList_InitNewItemWithTag(ItemList **oBlock, const char* block_name, gbool
     return 0;
 }
 
-ItemList *ItemList_Init(const char* block_name)
+ItemList *item_list_init(const char* block_name)
 {
     ItemList* il = NULL;
-    ItemList_InitNewItem(&il, block_name);
+    item_list_init_new_item(&il, block_name);
     return il;
 }
 
-ItemList* ItemList_InitWithTag(const char* block_name, gboolean is_tag)
+ItemList* item_list_init_with_tag(const char* block_name, gboolean is_tag)
 {
     ItemList* il = NULL;
-    ItemList_InitNewItemWithTag(&il, block_name, is_tag);
+    item_list_init_new_item_with_tag(&il, block_name, is_tag);
     return il;
 }
 
-int ItemList_AddNum(ItemList** bl,int num,char* block_name)
+int item_list_add_num(ItemList** bl,int num,char* block_name)
 {
     ItemList* item = g_list_find_custom(*bl, block_name, ilistdata_strcmp);
     if(item)
@@ -211,7 +211,7 @@ int ItemList_AddNum(ItemList** bl,int num,char* block_name)
     {
         /* In this new implement we could create item for it first */
         ItemList* il = *bl;
-        ItemList_InitNewItem( &il, block_name);
+        item_list_init_new_item( &il, block_name);
         *bl = il;
         item = g_list_find_custom(il, block_name, ilistdata_strcmp);
         if(item)
@@ -224,7 +224,7 @@ int ItemList_AddNum(ItemList** bl,int num,char* block_name)
     }
 }
 
-void ItemList_AddNum_ByIndex(ItemList* il, gint num, gint index)
+void item_list_add_num_by_index(ItemList* il, gint num, gint index)
 {
     ItemList* item = g_list_nth(il, index);
     if(item)
@@ -235,7 +235,7 @@ void ItemList_AddNum_ByIndex(ItemList* il, gint num, gint index)
     else return;
 }
 
-gint ItemList_ItemIndex(ItemList* il, const char* item_name)
+gint item_list_item_index(ItemList* il, const char* item_name)
 {
     ItemList* item = g_list_find_custom(il, item_name, ilistdata_strcmp);
     if(item)
@@ -244,14 +244,14 @@ gint ItemList_ItemIndex(ItemList* il, const char* item_name)
 }
 
 
-int ItemList_ScanRepeat(ItemList* bl,char* block_name)
+int item_list_scan_repeated(ItemList* bl,char* block_name)
 {
     ItemList* item = g_list_find_custom(bl, block_name, ilistdata_strcmp);
     if(item) return 1;
     else return 0;
 }
 
-int ItemList_DeleteItem(ItemList** bl,char* block_name)
+int item_list_delete_item(ItemList** bl,char* block_name)
 {
     ItemList* il = *bl;
     GList* item = g_list_find_custom(il, block_name, ilistdata_strcmp);
@@ -267,7 +267,7 @@ int ItemList_DeleteItem(ItemList** bl,char* block_name)
     else return -1;
 }
 
-void ItemList_DeleteZeroItem(ItemList** bl)
+void item_list_delete_zero_item(ItemList** bl)
 {
     ItemList* head = *bl;
     gint have_zero = 1;
@@ -286,19 +286,19 @@ void ItemList_DeleteZeroItem(ItemList** bl)
     }
 }
 
-int ItemList_Combine(ItemList** dest, ItemList* src)
+int item_list_combine(ItemList** dest, ItemList* src)
 {
     ItemList* s = src;
     while(s)
     {
         IListData* ildata = s->data;
-        ItemList_AddNum(dest, ildata->total, ildata->name);
+        item_list_add_num(dest, ildata->total, ildata->name);
         s = s->next;
     }
     return 0;
 }
 
-BlackList* BlackList_Init()
+BlackList* black_list_init()
 {
     GList* bl = NULL;
     cJSON* black_list = dhlrc_FileToJSON( "config/ignored_blocks.json" );
@@ -310,7 +310,7 @@ BlackList* BlackList_Init()
             for(int i = 0 ; i < n ; i++)
             {
                 char* item = cJSON_GetStringValue(cJSON_GetArrayItem(black_list,i));
-                bl = BlackList_Extend(bl,item);
+                bl = black_list_extend(bl,item);
             }
         }
         cJSON_Delete(black_list);
@@ -318,27 +318,27 @@ BlackList* BlackList_Init()
     }
     else
     {
-        bl = BlackList_Extend(bl,"minecraft:air");
-        bl = BlackList_Extend(bl,"minecraft:piston_head");
-        bl = BlackList_Extend(bl,"minecraft:fire");
-        bl = BlackList_Extend(bl,"minecraft:soul_fire");
-        bl = BlackList_Extend(bl,"minecraft:bubble_column");
+        bl = black_list_extend(bl,"minecraft:air");
+        bl = black_list_extend(bl,"minecraft:piston_head");
+        bl = black_list_extend(bl,"minecraft:fire");
+        bl = black_list_extend(bl,"minecraft:soul_fire");
+        bl = black_list_extend(bl,"minecraft:bubble_column");
     return bl;
     }
 }
 
-BlackList* BlackList_Extend(BlackList* bl,const char* name)
+BlackList* black_list_extend(BlackList* bl,const char* name)
 {
     bl = g_list_prepend(bl, dh_strdup(name));
     return bl;
 }
 
-void BlackList_Free(BlackList* bl)
+void black_list_free(BlackList* bl)
 {
     g_list_free_full(bl, free);
 }
 
-int BlackList_Scan(BlackList* bl,const char* name)
+int black_list_scan(BlackList* bl,const char* name)
 {
     if(!bl)
         return 0;
@@ -350,7 +350,7 @@ int BlackList_Scan(BlackList* bl,const char* name)
     }
 }
 
-ReplaceList* ReplaceList_Init()
+ReplaceList* replace_list_init()
 {
     ReplaceList* rl = NULL;
     cJSON* rlist_o = dhlrc_FileToJSON("config/block_items.json");
@@ -360,7 +360,7 @@ ReplaceList* ReplaceList_Init()
         while(rlist)
         {
             if(cJSON_IsString(rlist))
-                rl = ReplaceList_Extend(rl,rlist->string,rlist->valuestring);
+                rl = replace_list_extend(rl,rlist->string,rlist->valuestring);
             else if(cJSON_IsArray(rlist))
             {
                 int size = cJSON_GetArraySize(rlist);
@@ -370,7 +370,7 @@ ReplaceList* ReplaceList_Init()
                     char* r_name = cJSON_GetStringValue( cJSON_GetArrayItem(rlist, i) );
                     dh_StrArray_AddStr( &str, r_name);
                 }
-                rl = ReplaceList_Extend_StrArray(rl, rlist->string, str);
+                rl = replace_list_extend_str_array(rl, rlist->string, str);
             }
             rlist = rlist->next;
         }
@@ -379,14 +379,14 @@ ReplaceList* ReplaceList_Init()
     }
     else
     {
-        rl = ReplaceList_Extend(rl,"minecraft:water","minecraft:water_bucket");
-        rl = ReplaceList_Extend(rl,"minecraft:lava","minecraft:lava_bucket");
-        rl = ReplaceList_Extend(rl,"minecraft:redstone_wall_torch","minecraft:redstone_torch");
+        rl = replace_list_extend(rl,"minecraft:water","minecraft:water_bucket");
+        rl = replace_list_extend(rl,"minecraft:lava","minecraft:lava_bucket");
+        rl = replace_list_extend(rl,"minecraft:redstone_wall_torch","minecraft:redstone_torch");
         return rl;
     }
 }
 
-ReplaceList* ReplaceList_Extend(ReplaceList* rl,const char* o_name,const char* r_name)
+ReplaceList* replace_list_extend(ReplaceList* rl,const char* o_name,const char* r_name)
 {
     RListData* rld = (RListData*) malloc(sizeof(RListData));
     dh_StrArray* str = dh_StrArray_Init( r_name );
@@ -396,7 +396,7 @@ ReplaceList* ReplaceList_Extend(ReplaceList* rl,const char* o_name,const char* r
     return rl;
 }
 
-ReplaceList * ReplaceList_Extend_StrArray(ReplaceList* rl, const char* o_name, dh_StrArray* str)
+ReplaceList * replace_list_extend_str_array(ReplaceList* rl, const char* o_name, dh_StrArray* str)
 {
     RListData* rld = (RListData*) malloc(sizeof(RListData));
     rld->o_name = dh_strdup(o_name);
@@ -406,15 +406,15 @@ ReplaceList * ReplaceList_Extend_StrArray(ReplaceList* rl, const char* o_name, d
 }
 
 
-const char* ReplaceList_Replace(ReplaceList* rl, const char* o_name)
+const char* replace_list_replace(ReplaceList* rl, const char* o_name)
 {
-    dh_StrArray* str = ReplaceList_Replace_StrArray(rl, o_name);
+    dh_StrArray* str = replace_list_replace_str_array(rl, o_name);
     if(str)
         return (str->val)[0];
     else return o_name;
 }
 
-dh_StrArray * ReplaceList_Replace_StrArray(ReplaceList* rl, const char* o_name)
+dh_StrArray * replace_list_replace_str_array(ReplaceList* rl, const char* o_name)
 {
     if(rl)
     {
@@ -430,7 +430,7 @@ dh_StrArray * ReplaceList_Replace_StrArray(ReplaceList* rl, const char* o_name)
 }
 
 
-void ReplaceList_Free(ReplaceList* rl)
+void replace_list_free(ReplaceList* rl)
 {
     ReplaceList* rld = rl;
     for( ; rld ; rld = rld->next)
@@ -444,7 +444,7 @@ void ReplaceList_Free(ReplaceList* rl)
 }
 
 
-int ItemList_GetItemNum(ItemList *il, char *item_name)
+int item_list_get_item_num(ItemList *il, char *item_name)
 {
     GList* item = g_list_find_custom(il, item_name, ilistdata_strcmp);
     if(item)
@@ -455,7 +455,7 @@ int ItemList_GetItemNum(ItemList *il, char *item_name)
     else return -1;
 }
 
-int ItemList_toCSVFile(char* pos,ItemList* il)
+int item_list_to_csv(char* pos,ItemList* il)
 {
     FILE* f = fopen(pos,"wb");
     fprintf(f,"\"Item\",\"Total\",\"Missing\",\"Available\"\n");
@@ -463,7 +463,7 @@ int ItemList_toCSVFile(char* pos,ItemList* il)
     while(ild)
     {
         IListData* ildata = ild->data;
-        const char* trans = Name_BlockTranslate(ildata->name);
+        const char* trans = name_block_translate(ildata->name);
         if(trans)
             fprintf(f,"\"%s\",%d,%d,%d\n",trans,ildata->total,ildata->total-ildata->placed,ildata->available);
         else
@@ -474,7 +474,7 @@ int ItemList_toCSVFile(char* pos,ItemList* il)
     return 0;
 }
 
-const char * ItemList_ItemName(ItemList* il)
+const char * item_list_item_name(ItemList* il)
 {
     if(il)
     {
@@ -484,7 +484,7 @@ const char * ItemList_ItemName(ItemList* il)
     else return NULL;
 }
 
-RecipeList* RecipeList_Init(const char* dir, ItemList* il)
+RecipeList* recipe_list_init(const char* dir, ItemList* il)
 {
     GList* filenames = recipe_filenames(dir,il );
     RecipeList* list = NULL;
@@ -607,7 +607,7 @@ static GList* recipe_filenames(const char* dir, ItemList* il)
     GList* recipe_file_names = NULL;
     ItemList* ild = il;
     while (ild) {
-        const char* item_name = ItemList_ItemName(ild);
+        const char* item_name = item_list_item_name(ild);
         while(*item_name != ':') item_name++;
         item_name++;
         GList* single_recipe_filename = dh_search_in_list(filenames, item_name );
@@ -648,12 +648,12 @@ static GList* recipe_filenames(const char* dir, ItemList* il)
     return recipe_file_names;
 }
 
-char* RecipeList_Filename(RecipeList* rcl)
+char* recipe_list_filename(RecipeList* rcl)
 {
     return ((RecipeListBaseData*)(rcl->data))->filename;
 }
 
-char* RecipeList_ItemName(RecipeList* rcl)
+char* recipe_list_item_name(RecipeList* rcl)
 {
     return ((RecipeListBaseData*)(rcl->data))->item_name;
 }
@@ -663,12 +663,12 @@ static char* rcl_namespace(RecipeList* rcl)
     return ((RecipeListBaseData*)(rcl->data))->namespace;
 }
 
-dh_StrArray* RecipeList_ItemNames(RecipeList* rcl)
+dh_StrArray* recipe_list_item_names(RecipeList* rcl)
 {
     dh_StrArray* arr = NULL;
     while(rcl)
     {
-        char* item_name = RecipeList_ItemName(rcl);
+        char* item_name = recipe_list_item_name(rcl);
         if(!dh_StrArray_FindRepeated(arr, item_name))
             dh_StrArray_AddStr(&arr, item_name);
         rcl = rcl->next;
@@ -676,12 +676,12 @@ dh_StrArray* RecipeList_ItemNames(RecipeList* rcl)
     return arr;
 }
 
-dh_StrArray* RecipeList_ItemNamesWithNamespace(RecipeList* rcl)
+dh_StrArray* recipe_list_item_names_with_namespace(RecipeList* rcl)
 {
     dh_StrArray* arr = NULL;
     while(rcl)
     {
-        char* item_name = RecipeList_ItemName(rcl);
+        char* item_name = recipe_list_item_name(rcl);
         char* namespace = rcl_namespace(rcl);
 
         gchar* full_name_g = g_strconcat(namespace, ":", item_name , NULL);
@@ -694,7 +694,7 @@ dh_StrArray* RecipeList_ItemNamesWithNamespace(RecipeList* rcl)
     return arr;
 }
 
-void RecipeList_Free(RecipeList* rcl)
+void recipe_list_free(RecipeList* rcl)
 {
     g_list_free_full(rcl, rlbasedata_free);
 }
@@ -709,7 +709,7 @@ static void rlbasedata_free(gpointer data)
     free(data_d);
 }
 
-ItemList* ItemList_Recipe(RecipeList* rcl, int num, const char* item_name, DhGeneral* general)
+ItemList* item_list_recipe(RecipeList* rcl, int num, const char* item_name, DhGeneral* general)
 {
     /*dh_*/printf(/*general, */_("Processing %s.\n"), trm(item_name));
     RecipeList* item_recipes = dh_search_in_list_custom(rcl, item_name, rcldata_issame);
@@ -722,7 +722,7 @@ ItemList* ItemList_Recipe(RecipeList* rcl, int num, const char* item_name, DhGen
         RecipeList* item_recipes_d = item_recipes;
         while(item_recipes_d)
         {
-            dh_option_printer(general, g_list_index(item_recipes, item_recipes_d->data), RecipeList_Filename(item_recipes_d));
+            dh_option_printer(general, g_list_index(item_recipes, item_recipes_d->data), recipe_list_filename(item_recipes_d));
             item_recipes_d = item_recipes_d->next;
         }
         int option = dh_selector(general, _("Please select an option, or 'd' to discard (d): "), g_list_length(item_recipes), "d", _("&Discard"));
@@ -737,7 +737,7 @@ ItemList* ItemList_Recipe(RecipeList* rcl, int num, const char* item_name, DhGen
 
     /* Analyse */
     ItemList* ret = NULL;
-    RecipeGeneral* recipe_general = recipe_general_new(RecipeList_Filename(option_recipe));
+    RecipeGeneral* recipe_general = recipe_general_new(recipe_list_filename(option_recipe));
     RecipeGeneralClass* klass = RECIPE_GENERAL_GET_CLASS(recipe_general);
 
     ret = klass->get_recipe(recipe_general, num, general);

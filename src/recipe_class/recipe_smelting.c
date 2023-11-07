@@ -42,18 +42,18 @@ static void rsmt_set_content(RecipeGeneral* self, cJSON* json)
     cJSON* ingredient = cJSON_GetObjectItem(json, "ingredient");
     if(cJSON_IsObject(ingredient))
     {
-        smelting_recipe->ingredient = g_ptr_array_new_full(1, IngCtr_free);
-        IngContainer* ctr = IngCtr_new(ingredient);
+        smelting_recipe->ingredient = g_ptr_array_new_full(1, ing_ctr_free);
+        IngContainer* ctr = ing_ctr_new(ingredient);
         g_ptr_array_add(smelting_recipe->ingredient, ctr);
     }
     else if(cJSON_IsArray(ingredient))
     {
         guint arr_num = cJSON_GetArraySize(ingredient);
-        smelting_recipe->ingredient = g_ptr_array_new_full(arr_num, IngCtr_free);
+        smelting_recipe->ingredient = g_ptr_array_new_full(arr_num, ing_ctr_free);
         for(int i = 0 ; i < arr_num ; i++)
         {
             cJSON* object = cJSON_GetArrayItem(ingredient, i);
-            IngContainer* ctr = IngCtr_new(object);
+            IngContainer* ctr = ing_ctr_new(object);
             g_ptr_array_add(smelting_recipe->ingredient, ctr);
         }
     }
@@ -66,7 +66,7 @@ static ItemList* rsmt_get_recipe(RecipeGeneral* self, guint num, DhGeneral* dh_g
     for(int i = 0 ; i < (smelting_recipe->ingredient->len);i++)
     {
         IngContainer* ctr = (smelting_recipe->ingredient->pdata)[i];
-        ItemList_ProcessIngCtr(&recipe, ctr, num);
+        item_list_process_ing_ctr(&recipe, ctr, num);
     }
     return recipe;
 }

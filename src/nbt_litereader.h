@@ -29,14 +29,14 @@ extern "C"{
 
 /** Just use this to start a reader instance.
  *  Please pass NULL in "parent" to start. */
-int nbtlr_Start(NBT* root);
+int         nbtlr_start(NBT* root);
 
-int nbtlr_Start_Pos(NBT_Pos* pos);
-int nbtlr_List(NBT* given_nbt, int read_next);
-int nbtlr_ListItem(NBT* given_nbt);
-NBT* nbtlr_ToNextNBT(NBT* root, int n);
+int         nbtlr_start_pos(NbtPos* pos);
+int         nbtlr_list(NBT* given_nbt, int read_next);
+int         nbtlr_list_item(NBT* given_nbt);
+NBT*        nbtlr_to_next_nbt(NBT* root, int n);
 
-dh_LineOut *nbtlr_Modifier_Start(NBT* root, int modify_list);
+dh_LineOut *nbtlr_modifier_start(NBT* root, int modify_list);
 
 
 #ifdef __cplusplus

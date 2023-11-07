@@ -177,11 +177,11 @@ enter 'r' to read the detail of the block, enter 'q' to exit the program (b): ")
 
             if(opt == 'r')
             {
-                NBT_Pos* n_pos = NBT_Pos_Copy(lr->region_pos);
-                NBT_Pos_GetChild(n_pos, "BlockStatePalette");
-                NBT_Pos_AddToTree(n_pos, id);
-                int ret = nbtlr_Start_Pos(n_pos);
-                NBT_Pos_Free(n_pos);
+                NbtPos* n_pos = nbt_pos_copy(lr->region_pos);
+                nbt_pos_get_child(n_pos, "BlockStatePalette");
+                nbt_pos_add_to_tree(n_pos, id);
+                int ret = nbtlr_start_pos(n_pos);
+                nbt_pos_free(n_pos);
                 come_back = 1;
                 if(ret == 1)
                     continue;

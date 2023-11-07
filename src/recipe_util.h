@@ -30,11 +30,11 @@ extern "C"{
 
 
 /** Get recipes and combine to ItemList (discard all the items) */
-int ItemList_CombineRecipe(ItemList** o_bl, const char* dirpos, DhGeneral* general);
-long *NumArray_GetFromInput(int *array_num, int max_num);
+int         item_list_combine_recipe(ItemList** o_bl, const char* dirpos, DhGeneral* general);
+long *      num_array_get_from_input(int *array_num, int max_num);
 
-const char* Name_BlockTranslate(const char* block_name);
-int dh_exit();
+const char* name_block_translate(const char* block_name);
+int         dh_exit();
 
 #ifdef __cplusplus
 }

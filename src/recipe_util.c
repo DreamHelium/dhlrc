@@ -27,7 +27,7 @@
 
 static cJSON* translation_json = NULL;
 
-long* NumArray_GetFromInput(int* array_num, int max_num)
+long* num_array_get_from_input(int* array_num, int max_num)
 {
     if(!array_num) return NULL;
     printf(_("Input numbers directly, or type 'a' for all numbers, 'q' to quit (a): "));
@@ -105,8 +105,8 @@ static int ItemList_CombineRecipe_ng(ItemList** il, const char* dirpos, DhGenera
     while(processing)
     {
         /* Get item names */
-        RecipeList* rcl = RecipeList_Init(dirpos, *il);
-        dh_StrArray* item_names = RecipeList_ItemNamesWithNamespace(rcl);
+        RecipeList* rcl = recipe_list_init(dirpos, *il);
+        dh_StrArray* item_names = recipe_list_item_names_with_namespace(rcl);
 
         /* If no items need processing just return */
         if(item_names == NULL)
@@ -116,23 +116,23 @@ static int ItemList_CombineRecipe_ng(ItemList** il, const char* dirpos, DhGenera
 single_process_start:
             dh_new_win(general, FALSE);
             dh_printf(general, _("Processing %s with %d items, continue or read item list? [Y/n/q/r] :"),
-                      trm(item_names->val[i]), ItemList_GetItemNum(*il, item_names->val[i]));
+                      trm(item_names->val[i]), item_list_get_item_num(*il, item_names->val[i]));
             int option = dh_selector(general, "", 0, "Ynqr", _("&Yes"), _("&No"), _("&Quit"), _("&Read"));
 
             if(option == 0 || option == -1)
             {
                 char* item_name = (item_names->val)[i];
-                ItemList* return_recipe = ItemList_Recipe(rcl, ItemList_GetItemNum(*il, item_name),item_name, general);
+                ItemList* return_recipe = item_list_recipe(rcl, item_list_get_item_num(*il, item_name),item_name, general);
                 if(return_recipe)
                 {
-                    ItemList_Combine(il, return_recipe);
-                    ItemList_DeleteItem(il, item_name);
-                    ItemList_Free(return_recipe);
+                    item_list_combine(il, return_recipe);
+                    item_list_delete_item(il, item_name);
+                    item_list_free(return_recipe);
                 }
             }
             else if(option == -3 || option == -100)
             {
-                RecipeList_Free(rcl);
+                recipe_list_free(rcl);
                 dh_StrArray_Free(item_names);
                 return 1;
             }
@@ -140,17 +140,17 @@ single_process_start:
                 ;
             else if(option == -4)
             {
-                ItemList_Read(*il, general);
+                item_list_read(*il, general);
                 goto single_process_start;
             }
         }
-        RecipeList_Free(rcl);
+        recipe_list_free(rcl);
         dh_StrArray_Free(item_names);
     }
     return 1;
 }
 
-int ItemList_CombineRecipe(ItemList** o_bl, const char* dirpos, DhGeneral* general)
+int item_list_combine_recipe(ItemList** o_bl, const char* dirpos, DhGeneral* general)
 {
     return ItemList_CombineRecipe_ng(o_bl, dirpos, general);
     // /* Get item names */
@@ -190,7 +190,7 @@ int ItemList_CombineRecipe(ItemList** o_bl, const char* dirpos, DhGeneral* gener
     // return 1;
 }
 
-const char* Name_BlockTranslate(const char *block_name)
+const char* name_block_translate(const char *block_name)
 {
     if(!translation_json)
     {

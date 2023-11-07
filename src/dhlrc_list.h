@@ -42,51 +42,47 @@ typedef struct IListData{
 /* ItemList utils */
 
 
-void ItemList_Read(ItemList* il, DhGeneral* general);
-void ItemList_Free(ItemList* target);
-void ItemList_Sort(ItemList **oBlock);
-ItemList* ItemList_Sort_ByTotal(ItemList* il);
+void        item_list_read(ItemList* il, DhGeneral* general);
+void        item_list_free(ItemList* target);
+void        item_list_sort(ItemList **oBlock);
+ItemList*   item_list_sort_by_total(ItemList* il);
+int         item_list_init_new_item(ItemList **oBlock, const char* block_name);
+int         item_list_init_new_item_with_tag(ItemList **oBlock, const char* block_name, gboolean is_tag);
+int         item_list_add_num(ItemList** bl, int num , char* block_name);
+int         item_list_scan_repeated(ItemList* bl,char* block_name);
+int         item_list_delete_item(ItemList** bl,char* block_name);
+void        item_list_delete_zero_item(ItemList** bl);
+int         item_list_combine(ItemList** dest,ItemList* src);
+int         item_list_get_item_num(ItemList* il, char* item_name);
+ItemList*   item_list_init(const char* block_name);
+ItemList*   item_list_init_with_tag(const char* block_name, gboolean is_tag);
+int         item_list_to_csv(char* pos,ItemList* il);
+const char* item_list_item_name(ItemList* il);
+void        item_list_add_num_by_index(ItemList* il, gint num, gint index);
+gint        item_list_item_index(ItemList* il, const char* item_name);
+ItemList*   item_list_recipe(RecipeList* rcl, int num, const char* item_name, DhGeneral* general);
 
 
-int ItemList_InitNewItem(ItemList **oBlock, const char* block_name);
-int ItemList_InitNewItemWithTag(ItemList **oBlock, const char* block_name, gboolean is_tag);
-int ItemList_AddNum(ItemList** bl, int num , char* block_name);
-int ItemList_ScanRepeat(ItemList* bl,char* block_name);
-int ItemList_DeleteItem(ItemList** bl,char* block_name);
-void ItemList_DeleteZeroItem(ItemList** bl);
-int ItemList_Combine(ItemList** dest,ItemList* src);
-int ItemList_GetItemNum(ItemList* il, char* item_name);
-ItemList* ItemList_Init(const char* block_name);
-ItemList* ItemList_InitWithTag(const char* block_name, gboolean is_tag);
-int ItemList_toCSVFile(char* pos,ItemList* il);
-const char* ItemList_ItemName(ItemList* il);
-void ItemList_AddNum_ByIndex(ItemList* il, gint num, gint index);
-gint ItemList_ItemIndex(ItemList* il, const char* item_name);
-ItemList* ItemList_Recipe(RecipeList* rcl, int num, const char* item_name, DhGeneral* general);
+BlackList*  black_list_init();
+void        black_list_free(BlackList* bl);
+BlackList*  black_list_extend(BlackList* bl, const char* name);
+int         black_list_scan(BlackList* bl,const char* name);
 
+ReplaceList*    replace_list_init();
+ReplaceList*    replace_list_extend(ReplaceList* rl, const char* o_name, const char* r_name);
+ReplaceList*    replace_list_extend_str_array(ReplaceList* rl, const char* o_name, dh_StrArray* str);
+G_DEPRECATED_FOR(replace_list_replace_str_array)
+const char*     replace_list_replace(ReplaceList* rl, const char* o_name);
+dh_StrArray*    replace_list_replace_str_array(ReplaceList* rl, const char* o_name);
+void            replace_list_free(ReplaceList* rl);
 
-BlackList* BlackList_Init();
-void BlackList_Free(BlackList* bl);
-BlackList* BlackList_Extend(BlackList* bl, const char* name);
-int BlackList_Scan(BlackList* bl,const char* name);
-
-
-
-ReplaceList* ReplaceList_Init();
-ReplaceList* ReplaceList_Extend(ReplaceList* rl, const char* o_name, const char* r_name);
-ReplaceList* ReplaceList_Extend_StrArray(ReplaceList* rl, const char* o_name, dh_StrArray* str);
-/** DEPRECATED */
-const char* ReplaceList_Replace(ReplaceList* rl, const char* o_name);
-dh_StrArray* ReplaceList_Replace_StrArray(ReplaceList* rl, const char* o_name);
-void ReplaceList_Free(ReplaceList* rl);
-
-void RecipeList_EnableFeature(gboolean shaped, gboolean smelting, gboolean shapeless);
-RecipeList* RecipeList_Init(const char* dir, ItemList* il);
-void RecipeList_Free(RecipeList* rcl);
-char* RecipeList_Filename(RecipeList* rcl);
-char* RecipeList_ItemName(RecipeList* rcl);
-dh_StrArray* RecipeList_ItemNames(RecipeList* rcl);
-dh_StrArray* RecipeList_ItemNamesWithNamespace(RecipeList* rcl);
+void            recipe_list_enable_feature(gboolean shaped, gboolean smelting, gboolean shapeless);
+RecipeList*     recipe_list_init(const char* dir, ItemList* il);
+void            recipe_list_free(RecipeList* rcl);
+char*           recipe_list_filename(RecipeList* rcl);
+char*           recipe_list_item_name(RecipeList* rcl);
+dh_StrArray*    recipe_list_item_names(RecipeList* rcl);
+dh_StrArray*    recipe_list_item_names_with_namespace(RecipeList* rcl);
 //only for debug
 //int Test();
 
