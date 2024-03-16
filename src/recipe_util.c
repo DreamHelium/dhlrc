@@ -27,6 +27,8 @@
 
 static cJSON* translation_json = NULL;
 
+static gchar* find_transfile();
+
 long* num_array_get_from_input(int* array_num, int max_num)
 {
     if(!array_num) return NULL;
@@ -192,10 +194,12 @@ int item_list_combine_recipe(ItemList** o_bl, const char* dirpos, DhGeneral* gen
 
 const char* name_block_translate(const char *block_name)
 {
+    gchar* filename = find_transfile();
     if(!translation_json)
     {
-        cJSON* trans_data = dhlrc_FileToJSON("translation.json");
+        cJSON* trans_data = dhlrc_FileToJSON(filename);
         translation_json = trans_data;
+        g_free(filename);
     }
     if(!translation_json)
         return block_name;
@@ -237,6 +241,36 @@ const char* name_block_translate(const char *block_name)
             free(origin_name);
 
             return block_name;
+        }
+    }
+}
+
+static gchar* find_transfile()
+{
+    if(dhlrc_FileExist("translation.json"))
+        return g_strdup("translation.json");
+    else
+    {
+        /* Analyse .minecraft filepos */
+        gchar* index_file = g_strconcat(g_get_home_dir(), "/.minecraft/assets/indexes/1.18.json" , NULL);
+        if(dhlrc_FileExist(index_file))
+        {
+            cJSON* index = dhlrc_FileToJSON(index_file);
+            g_free(index_file);
+            /* Analyse index file */
+            cJSON* objects = cJSON_GetObjectItem(index, "objects");
+            cJSON* translation_file = cJSON_GetObjectItem(objects, "minecraft/lang/de_de.json");
+            cJSON* hash = cJSON_GetObjectItem(translation_file, "hash");
+            gchar* hash_name = cJSON_GetStringValue(hash);
+            gchar hash_name_pre[3] = {hash_name[0], hash_name[1] ,0};
+            gchar* transfile = g_strconcat(g_get_home_dir(), "/.minecraft/assets/objects/", hash_name_pre, "/", hash_name, NULL);
+            cJSON_Delete(index);
+            return transfile;
+        }
+        else
+        {
+            g_free(index_file);
+            return NULL;
         }
     }
 }
