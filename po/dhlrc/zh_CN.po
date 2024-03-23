@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: 2023 Chinese translations for dhlrc package
+# SPDX-FileCopyrightText: 2023, 2024 Chinese translations for dhlrc package
 # dhlrc 软件包的简体中文翻译.
 # Copyright (C) 2022 THE dhlrc'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the dhlrc package.
@@ -8,26 +8,40 @@ msgid ""
 msgstr ""
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-10-29 23:59+0800\n"
-"PO-Revision-Date: 2023-10-08 23:43+0800\n"
-"Last-Translator: Dream Helium\n"
-"Language-Team: Chinese <>\n"
+"POT-Creation-Date: 2024-03-24 00:34+0800\n"
+"PO-Revision-Date: 2024-03-24 00:35+0800\n"
+"Last-Translator: dream_he\n"
+"Language-Team: Chinese <kde-i18n-doc@kde.org>\n"
 "Language: zh_CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Lokalize 23.08.1\n"
+"X-Generator: Lokalize 24.02.0\n"
 
-#: src/main.c:29
-#, c-format
-msgid ""
-"Usage: %s [options] [file]\n"
-"\n"
-"  -r, --reader\tEnter NBT reader mode\n"
-"  -b, --block\tEnter litematica block reader\n"
-"  -l, --list\tEnter litematica material list with recipe combination\n"
-msgstr ""
+#: src/main.c:33
+msgid "Enter NBT reader mode."
+msgstr "进入NBT阅读器模式。"
+
+#: src/main.c:34
+msgid "Enter litematica block reader."
+msgstr "进入投影方块阅读器。"
+
+#: src/main.c:35
+msgid "Enter litematica material list with recipe combination."
+msgstr "进入投影材料列表及合成表合成功能。"
+
+#: src/main.c:36
+msgid "Output log file to FILE"
+msgstr "输出日志文件至FILE"
+
+#: src/main.c:42
+msgid "[FILE] - Read a litematic file."
+msgstr "[文件] - 读取一个投影文件。"
+
+#: src/main.c:62
+msgid "Only one option can be chosen!\n"
+msgstr "只有一个选项可选！\n"
 
 #: src/main_isoc.c:61
 msgid "Error when reading file."
@@ -193,51 +207,51 @@ msgstr ""
 "请再次输入方块的坐标，或输入 “b” 选择其他区域，输入 “r” 阅读方块的细节，输入 "
 "“q” 退出程序 (b): "
 
-#: src/recipe_util.c:33
+#: src/recipe_util.c:35
 #, c-format
 msgid "Input numbers directly, or type 'a' for all numbers, 'q' to quit (a): "
 msgstr "请直接输入数字，或输入“a”选择所有数字，“q”以退出 (a): "
 
-#: src/recipe_util.c:118
+#: src/recipe_util.c:120
 #, c-format
 msgid "Processing %s with %d items, continue or read item list? [Y/n/q/r] :"
 msgstr "处理%s（含有%d个物品），继续或阅读物品列表？ [Y/n/q/r] : "
 
-#: src/recipe_util.c:120
+#: src/recipe_util.c:122
 msgid "&Yes"
 msgstr ""
 
-#: src/recipe_util.c:120
+#: src/recipe_util.c:122
 msgid "&No"
 msgstr ""
 
-#: src/recipe_util.c:120 src/qt/mainwindow.cpp:40
+#: src/recipe_util.c:122 src/qt/mainwindow.cpp:40
 msgid "&Quit"
 msgstr "退出(&Q)"
 
-#: src/recipe_util.c:120
+#: src/recipe_util.c:122
 msgid "&Read"
 msgstr ""
 
-#: src/dhlrc_list.c:136
+#: src/dhlrc_list.c:134
 msgid "Name\t\tTotal\tPlaced\tAvailable\tIs tag\n"
 msgstr "名称\t\t总计\t已放置\t可用\t是否为标签\n"
 
-#: src/dhlrc_list.c:714
+#: src/dhlrc_list.c:712
 #, c-format
 msgid "Processing %s.\n"
 msgstr "处理%s中。\n"
 
-#: src/dhlrc_list.c:721
+#: src/dhlrc_list.c:719
 #, c-format
 msgid "There are %d corresponding files to the item %s:\n"
 msgstr "有%d个对应%s的文件：\n"
 
-#: src/dhlrc_list.c:728
+#: src/dhlrc_list.c:726
 msgid "Please select an option, or 'd' to discard (d): "
 msgstr "请输入一个选项，或“d”以放弃 (d): "
 
-#: src/dhlrc_list.c:728 src/recipe_class/recipe_general.c:112
+#: src/dhlrc_list.c:726 src/recipe_class/recipe_general.c:112
 msgid "&Discard"
 msgstr ""
 
@@ -385,3 +399,4 @@ msgstr "材料列表合成功能(&R)"
 #~ "another region, enter 'q' to exit the program (b): "
 #~ msgstr ""
 #~ "请再次输入方块的坐标，或输入 “b” 选择其他区域，输入 “q” 退出程序 (b): "
+

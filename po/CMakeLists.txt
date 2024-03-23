@@ -13,8 +13,7 @@ foreach(_currentDepends ${DHLRC_MAIN_POT_FILE_DEPENDS})
 endforeach()
 
 if(XGETTEXT_EXECUTABLE)
-	set( XGETTEXT_FIRST_OPTIONS -k_ --default-domain=${FIRST_POT_NAME} --package-name=${FIRST_POT_NAME} )
-	set( XGETTEXT_SECOND_OPTIONS -k_ --default-domain=${SECOND_POT_NAME} )
+	set( XGETTEXT_FIRST_OPTIONS -k_ -kN_ --default-domain=${FIRST_POT_NAME} --package-name=${FIRST_POT_NAME} )
         add_custom_target( dhlrc_mkpot ALL
             COMMAND "${XGETTEXT_EXECUTABLE}" ${XGETTEXT_FIRST_OPTIONS} --output=${FIRST_POT_FILE} ${DHLRC_MAIN_POT_FILE_DEPENDS}
             WORKING_DIRECTORY ${dhlrc_SOURCE_DIR}

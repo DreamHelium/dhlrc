@@ -17,13 +17,11 @@
 
 #include "dhlrc_list.h"
 #include "recipe_class/recipe_general.h"
-#include <dh/dh_string_util.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
 #include <cjson/cJSON.h>
 #include "recipe_util.h"
-#include <dh/dhutil.h>
 #include "translation.h"
 
 static gboolean enable_shaped = TRUE;

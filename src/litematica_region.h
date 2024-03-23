@@ -23,7 +23,7 @@ extern "C"{
 
 #include "libnbt/nbt.h"
 #include "dhlrc_list.h"
-#include <dh/dh_string_util.h>
+#include <dh/dhutil.h>
 #include "nbt_litereader.h"
 
 /*************************************************************

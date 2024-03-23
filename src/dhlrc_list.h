@@ -23,8 +23,7 @@ extern "C" {
 #endif
 
 #include <gmodule.h>
-#include <dh/dh_string_util.h>
-#include <dh/dh_generaliface.h>
+#include <dh/dhutil.h>
 
 typedef GList ItemList;
 typedef GList BlackList;

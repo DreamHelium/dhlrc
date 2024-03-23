@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-11-07 21:02+0800\n"
+"POT-Creation-Date: 2024-03-24 00:35+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,14 +17,28 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: src/main.c:29
-#, c-format
-msgid ""
-"Usage: %s [options] [file]\n"
-"\n"
-"  -r, --reader\tEnter NBT reader mode\n"
-"  -b, --block\tEnter litematica block reader\n"
-"  -l, --list\tEnter litematica material list with recipe combination\n"
+#: src/main.c:33
+msgid "Enter NBT reader mode."
+msgstr ""
+
+#: src/main.c:34
+msgid "Enter litematica block reader."
+msgstr ""
+
+#: src/main.c:35
+msgid "Enter litematica material list with recipe combination."
+msgstr ""
+
+#: src/main.c:36
+msgid "Output log file to FILE"
+msgstr ""
+
+#: src/main.c:42
+msgid "[FILE] - Read a litematic file."
+msgstr ""
+
+#: src/main.c:62
+msgid "Only one option can be chosen!\n"
 msgstr ""
 
 #: src/main_isoc.c:61
@@ -162,51 +176,51 @@ msgid ""
 "the program (b): "
 msgstr ""
 
-#: src/recipe_util.c:33
+#: src/recipe_util.c:35
 #, c-format
 msgid "Input numbers directly, or type 'a' for all numbers, 'q' to quit (a): "
 msgstr ""
 
-#: src/recipe_util.c:118
+#: src/recipe_util.c:120
 #, c-format
 msgid "Processing %s with %d items, continue or read item list? [Y/n/q/r] :"
 msgstr ""
 
-#: src/recipe_util.c:120
+#: src/recipe_util.c:122
 msgid "&Yes"
 msgstr ""
 
-#: src/recipe_util.c:120
+#: src/recipe_util.c:122
 msgid "&No"
 msgstr ""
 
-#: src/recipe_util.c:120 src/qt/mainwindow.cpp:40
+#: src/recipe_util.c:122 src/qt/mainwindow.cpp:40
 msgid "&Quit"
 msgstr ""
 
-#: src/recipe_util.c:120
+#: src/recipe_util.c:122
 msgid "&Read"
 msgstr ""
 
-#: src/dhlrc_list.c:136
+#: src/dhlrc_list.c:134
 msgid "Name\t\tTotal\tPlaced\tAvailable\tIs tag\n"
 msgstr ""
 
-#: src/dhlrc_list.c:714
+#: src/dhlrc_list.c:712
 #, c-format
 msgid "Processing %s.\n"
 msgstr ""
 
-#: src/dhlrc_list.c:721
+#: src/dhlrc_list.c:719
 #, c-format
 msgid "There are %d corresponding files to the item %s:\n"
 msgstr ""
 
-#: src/dhlrc_list.c:728
+#: src/dhlrc_list.c:726
 msgid "Please select an option, or 'd' to discard (d): "
 msgstr ""
 
-#: src/dhlrc_list.c:728 src/recipe_class/recipe_general.c:112
+#: src/dhlrc_list.c:726 src/recipe_class/recipe_general.c:112
 msgid "&Discard"
 msgstr ""
 

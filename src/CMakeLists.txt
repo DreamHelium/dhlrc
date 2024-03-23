@@ -47,6 +47,9 @@ add_library(dhlrc SHARED
 
 #add_definitions(-DLIBNBT_USE_LIBDEFLATE)
 #add_definitions(-DDH_DEBUG_IN_IDE)
+add_definitions(-DDH_USE_OLD_INPUT_LINE_FUNC)
+add_definitions(-DDH_USE_DEPRECATED_FUNCNAMES)
+add_definitions(-DDH_USE_DHLRC_FILE_UTIL)
 
 target_link_libraries(dhlrc PUBLIC m z ${dhutil_LIBRARIES} cjson
 	"${GLIB_LIBRARIES}" "${GIO_LIBRARIES}"
