@@ -6,6 +6,7 @@
 #include <QApplication>
 extern NBT* root;
 extern ItemList* il;
+int verbose_level = 0;
 
 int main(int argc, char *argv[])
 {

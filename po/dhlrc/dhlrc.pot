@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-03-24 00:35+0800\n"
+"POT-Creation-Date: 2024-03-25 21:36+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,43 +17,55 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: src/main.c:33
+#: src/main.c:34
 msgid "Enter NBT reader mode."
 msgstr ""
 
-#: src/main.c:34
+#: src/main.c:35
 msgid "Enter litematica block reader."
 msgstr ""
 
-#: src/main.c:35
+#: src/main.c:36
 msgid "Enter litematica material list with recipe combination."
 msgstr ""
 
-#: src/main.c:36
+#: src/main.c:37
 msgid "Output log file to FILE"
 msgstr ""
 
-#: src/main.c:42
+#: src/main.c:38
+msgid ""
+"Set verbose level to N.\n"
+"\t\t\tLevel 1: See process.\n"
+"\t\t\tLevel 2: See details except block processing.\n"
+"\t\t\tLevel 3: See all the details (Not recommended!)."
+msgstr ""
+
+#: src/main.c:44
 msgid "[FILE] - Read a litematic file."
 msgstr ""
 
-#: src/main.c:62
+#: src/main.c:67
 msgid "Only one option can be chosen!\n"
 msgstr ""
 
-#: src/main_isoc.c:61
+#: src/main.c:73
+msgid "A level below 3 is allowed!\n"
+msgstr ""
+
+#: src/main_isoc.c:81
 msgid "Error when reading file."
 msgstr ""
 
-#: src/main_isoc.c:69
+#: src/main_isoc.c:96
 msgid "Not a valid NBT file!"
 msgstr ""
 
-#: src/main_isoc.c:76 src/qt/mainwindow.cpp:76
+#: src/main_isoc.c:103 src/qt/mainwindow.cpp:76
 msgid "Valid NBT file!"
 msgstr ""
 
-#: src/main_isoc.c:86
+#: src/main_isoc.c:114
 #, c-format
 msgid ""
 "There are three functions:\n"
@@ -63,19 +75,19 @@ msgid ""
 "\n"
 msgstr ""
 
-#: src/main_isoc.c:90
+#: src/main_isoc.c:118
 #, c-format
 msgid "Please select an option, or enter 'q' to exit the program (q): "
 msgstr ""
 
-#: src/main_isoc.c:145 src/lrc_extend.c:42
+#: src/main_isoc.c:173 src/lrc_extend.c:42
 #, c-format
 msgid "There are %d regions:\n"
 msgstr ""
 
-#: src/main_isoc.c:158
+#: src/main_isoc.c:186
 #, c-format
-msgid "Processing: region %d / %d : [%ld] %s \n"
+msgid "Processing: region %d / %d : [%ld] %s"
 msgstr ""
 
 #: src/nbt_litereader.c:57
@@ -132,9 +144,14 @@ msgid ""
 "The integer you input is %ld, please confirm [Y/n] (Y): "
 msgstr ""
 
-#: src/litematica_region.c:401
+#: src/litematica_region.c:403
 #, c-format
 msgid "[%.2f%%] Processing Blocks %lu/%lu, (%3d,%3d,%3d)/(%3d,%3d,%3d)"
+msgstr ""
+
+#: src/litematica_region.c:409
+#, c-format
+msgid "Processing Blocks %lu/%lu, (%3d,%3d,%3d)/(%3d,%3d,%3d) %s"
 msgstr ""
 
 #: src/lrc_extend.c:49

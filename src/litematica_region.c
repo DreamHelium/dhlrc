@@ -23,6 +23,8 @@
 #include <time.h>
 #include "translation.h"
 
+extern int verbose_level;
+
 static int* id_to_index(dh_StrArray* str, ItemList* il)
 {
     int* sheet = (int*)malloc( (str->num + 1) * sizeof(int) );
@@ -401,7 +403,11 @@ ItemList *lite_region_item_list_extend(NBT* root, int r_num, ItemList* oBlock, i
                     fprintf(stderr,_("[%.2f%%] Processing Blocks %lu/%lu, (%3d,%3d,%3d)/(%3d,%3d,%3d)"), percent ,index+1, volume ,
                             x,y,z,lr->region_size.x,lr->region_size.y,lr->region_size.z);
                     fprintf(stderr, "\r");
+
                 }
+                if(verbose_level == 3)
+                        g_message(_("Processing Blocks %lu/%lu, (%3d,%3d,%3d)/(%3d,%3d,%3d)"" %s"), index+1, volume ,
+                            x,y,z,lr->region_size.x,lr->region_size.y,lr->region_size.z, trm(id_block_name));
                 if(!black_list_scan(bl,id_block_name))
                 {
                     /* The worst situation is that we need water_bucket

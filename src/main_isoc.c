@@ -40,6 +40,26 @@ static int start_lrc_main(NBT* root);
 int debug();
 #endif
 
+extern gchar* log_filename;
+extern int verbose_level;
+static FILE* log_file = NULL;
+
+static void write_log(const gchar* log_domain, GLogLevelFlags log_level, const gchar* message, gpointer user_data)
+{
+    if(log_file && (log_level != G_LOG_LEVEL_CRITICAL))
+    {
+        GDateTime* time = g_date_time_new_now_local();
+        gchar* time_literal = g_date_time_format(time, "%T");
+        fprintf(log_file, "%s.%d ", time_literal, g_date_time_get_microsecond(time));
+        fprintf(log_file, "%s" ,message);
+        fprintf(log_file, "\n");
+
+        g_free(time_literal);
+        g_date_time_unref(time);
+    }
+    else
+        g_log_default_handler(log_domain, log_level, message, user_data);
+}
 
 int main_isoc(int argc, char** argv)
 {
@@ -61,6 +81,13 @@ int main_isoc(int argc, char** argv)
         puts(_("Error when reading file."));
         return -10;
     }
+    /* Set log system */
+    if(log_filename)
+    {
+        log_file = fopen(log_filename, "wb");
+        g_log_set_default_handler(write_log, NULL);
+    }
+
     NBT* root = NBT_Parse(data,size);
     free(data);
 
@@ -76,6 +103,7 @@ int main_isoc(int argc, char** argv)
         puts(_("Valid NBT file!"));
         int ret = start_func(root, start_without_option());
         NBT_Free(root);
+        fclose(log_file);
         return ret;
     }
 }
@@ -155,7 +183,7 @@ static int start_lrc_main(NBT *root)
         {
             for(int i = 0 ; i < process_num ; i++)
             {
-                printf(_("Processing: region %d / %d : [%ld] %s \n"),
+                g_message(_("Processing: region %d / %d : [%ld] %s"),
                        i,process_num,process_region_i[i],region_name[process_region_i[i]]);
                 il = lite_region_item_list_extend(root, process_region_i[i], il, 1);
             }
