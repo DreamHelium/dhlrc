@@ -2,6 +2,8 @@
 #include "../translation.h"
 #include "ilreaderui.h"
 #include "genericui.h"
+#include "recipesui.h"
+#include <qnamespace.h>
 
 extern ItemList* il;
 
@@ -49,16 +51,13 @@ void lrcFunctionUI::okBtn_clicked()
     }
     else if(recipeBtn->isChecked())
     {
-        /* The code below is a test for GenericUI */
-//        DhGeneralQt* gqt = dh_general_qt_new();
-//        DhGeneral* gqtG = DH_GENERAL(gqt);
-//        dh_new_win(gqtG, FALSE);
-//        dh_printf(gqtG,"%s", "test");
-//        for(int i = 0 ; i < 4 ; i++)
-//            dh_option_printer(gqtG, i, "%d", i);
-//        dh_selector(gqtG, "", 1, "Y", "&Yes");
+        /*
         DhGeneralQt* dgqt = dh_general_qt_new();
         DhGeneral* general = DH_GENERAL(dgqt);
         item_list_combine_recipe(&il, "/home/dream_he/litematica_reader_c/build/recipes", general);
+        */
+        RecipesUI* rui = new RecipesUI();
+        rui->setAttribute(Qt::WA_DeleteOnClose);
+        rui->show();
     }
 }

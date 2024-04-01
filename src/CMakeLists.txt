@@ -42,7 +42,14 @@ add_library(dhlrc SHARED
 	       recipe_class/recipe_shapeless.c
 	       recipe_class/recipe_smelting.h
 	       recipe_class/recipe_smelting.c
-
+	       recipe_class_ng/recipes_general.h
+	       recipe_class_ng/recipes_general.c
+	       recipe_class_ng/recipes_shaped.h
+	       recipe_class_ng/recipes_shaped.c
+	       recipe_class_ng/recipes_shapeless.h
+	       recipe_class_ng/recipes_shapeless.c
+	       recipe_class_ng/recipes_smelting.h
+	       recipe_class_ng/recipes_smelting.c
 )
 
 #add_definitions(-DLIBNBT_USE_LIBDEFLATE)

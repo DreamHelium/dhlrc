@@ -43,7 +43,7 @@ typedef struct RListData{
 
 typedef struct RecipeListBaseData{
     char* filename;
-    char* namespace;
+    char* inamespace;
     char* item_name;
     char* recipe_type;
     gboolean supported;
@@ -105,7 +105,7 @@ static int rcldata_issame(gconstpointer a, gconstpointer b)
     char* item_name = NULL;
     get_name_from_name(str, &namespace, &item_name);
     int ret = -1;
-    if(g_str_equal(namespace, data->namespace) && g_str_equal(item_name, data->item_name))
+    if(g_str_equal(namespace, data->inamespace) && g_str_equal(item_name, data->item_name))
         ret = 0;
     free(namespace);
     free(item_name);
@@ -530,7 +530,7 @@ static RecipeListBaseData* rlbasedata_init(const char* dir, const char* filename
             cJSON_GetObjectItem(json_object, "type")
         ));
 
-        get_name(json_object, &(data->namespace), &(data->item_name));
+        get_name(json_object, &(data->inamespace), &(data->item_name));
         cJSON_Delete(json_object);
         g_free(full_filename);
         return data;
@@ -658,7 +658,7 @@ char* recipe_list_item_name(RecipeList* rcl)
 
 static char* rcl_namespace(RecipeList* rcl)
 {
-    return ((RecipeListBaseData*)(rcl->data))->namespace;
+    return ((RecipeListBaseData*)(rcl->data))->inamespace;
 }
 
 dh_StrArray* recipe_list_item_names(RecipeList* rcl)
@@ -702,7 +702,7 @@ static void rlbasedata_free(gpointer data)
     RecipeListBaseData* data_d = data;
     free(data_d->filename);
     free(data_d->item_name);
-    free(data_d->namespace);
+    free(data_d->inamespace);
     free(data_d->recipe_type);
     free(data_d);
 }

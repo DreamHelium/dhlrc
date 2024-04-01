@@ -7,10 +7,12 @@
 #include "../libnbt/nbt.h"
 #include <dh/dhutil.h>
 #include <string>
+#include "ilreaderui.h"
 #include "processui.h"
 
 NBT* root = nullptr;
 static bool nbtRead = false;
+extern ItemList* il;
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -81,10 +83,14 @@ void MainWindow::initInternalUI()
         nbtReaderBtn = new QRadioButton(_("NBT lite &reader with modifier"));
         lrcBtn = new QRadioButton(_("Litematica material &list with recipe combination"));
         lrcExtendBtn = new QRadioButton(_("Litematica &block reader"));
+        ilreaderBtn = new QRadioButton(_("Item list reader"));
+        clearBtn = new QRadioButton(_("Clear Item list"));
 
         radioButtonGroup->addButton(nbtReaderBtn, 0);
         radioButtonGroup->addButton(lrcBtn, 1);
         radioButtonGroup->addButton(lrcExtendBtn, 2);
+        radioButtonGroup->addButton(ilreaderBtn, 3);
+        radioButtonGroup->addButton(clearBtn, 4);
         nbtReaderBtn->setChecked(true);
 
         /* Add PushButtons */
@@ -105,6 +111,8 @@ void MainWindow::initInternalUI()
         vLayout->addWidget(nbtReaderBtn);
         vLayout->addWidget(lrcBtn);
         vLayout->addWidget(lrcExtendBtn);
+        vLayout->addWidget(ilreaderBtn);
+        vLayout->addWidget(clearBtn);
         vLayout->addStretch();
         vLayout->addLayout(hLayout);
 
@@ -118,10 +126,23 @@ void MainWindow::initInternalUI()
 
 void MainWindow::okBtn_clicked()
 {
-    qDebug() << this->radioButtonGroup->checkedId();
     if(this->radioButtonGroup->checkedId() == 1)
     {
         ProcessUI *pui = new ProcessUI();
         pui->show();
+    }
+    else if(this->radioButtonGroup->checkedId() == 3)
+    {
+        if(il)
+        {
+            ilReaderUI* iui = new ilReaderUI();
+            iui->setAttribute(Qt::WA_DeleteOnClose);
+            iui->show();
+        }
+    }
+    else if(this->radioButtonGroup->checkedId() == 4)
+    {
+        item_list_free(il);
+        il = nullptr;
     }
 }

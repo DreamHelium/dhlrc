@@ -34,6 +34,8 @@ private:
     QRadioButton* nbtReaderBtn;
     QRadioButton* lrcBtn;
     QRadioButton* lrcExtendBtn;
+    QRadioButton* ilreaderBtn;
+    QRadioButton* clearBtn;
     QPushButton*  okBtn;
     QPushButton*  closeBtn;
     QWidget* widget;

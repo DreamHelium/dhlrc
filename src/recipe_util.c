@@ -259,7 +259,7 @@ static gchar* find_transfile()
             g_free(index_file);
             /* Analyse index file */
             cJSON* objects = cJSON_GetObjectItem(index, "objects");
-            cJSON* translation_file = cJSON_GetObjectItem(objects, "minecraft/lang/de_de.json");
+            cJSON* translation_file = cJSON_GetObjectItem(objects, "minecraft/lang/zh_cn.json");
             cJSON* hash = cJSON_GetObjectItem(translation_file, "hash");
             gchar* hash_name = cJSON_GetStringValue(hash);
             gchar hash_name_pre[3] = {hash_name[0], hash_name[1] ,0};

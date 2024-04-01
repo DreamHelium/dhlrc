@@ -18,12 +18,12 @@
 #ifndef DHLRC_LIST_H
 #define DHLRC_LIST_H
 
+#include <gmodule.h>
+#include <dh/dhutil.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include <gmodule.h>
-#include <dh/dhutil.h>
 
 typedef GList ItemList;
 typedef GList BlackList;
