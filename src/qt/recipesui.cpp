@@ -90,41 +90,43 @@ void RecipesUI::initUI()
 
     area->setWidgetResizable(true);
 
-    checkBox = new QCheckBox[list.length()];
-    slider = new QSlider[list.length()];
-    textEdit = new QLineEdit[list.length()];
-    comboBox = new QComboBox[list.length()];
-    recipesLayout = new QHBoxLayout[list.length()];
-    recipesWidget = new QWidget[list.length()];
+    rpl = new rp[list.length()];
 
     for(int i = 0 ; i < list.length() ; i++)
     {
         QString str = trm(list[i].itemName.toStdString().c_str());
         str += " ";
         str += QString::number(list[i].num);
-        checkBox[i].setText(str);
-        allLayout->addWidget(&checkBox[i]);
 
-        slider[i].setOrientation(Qt::Horizontal);
-        slider[i].setMinimum(0);
-        slider[i].setMaximum(list[i].num);
-        textEdit[i].setText("0");
+        rpl[i].checkBox = new QCheckBox();
+        rpl[i].slider = new QSlider(Qt::Horizontal);
+        rpl[i].textEdit = new QLineEdit();
+        rpl[i].comboBox = new QComboBox();
+        rpl[i].recipesLayout = new QHBoxLayout();
+        rpl[i].recipesWidget = new QWidget();
+
+        rpl[i].checkBox->setText(str);
+        allLayout->addWidget(rpl[i].checkBox);
+
+        rpl[i].slider->setMinimum(0);
+        rpl[i].slider->setMaximum(list[i].num);
+        rpl[i].textEdit->setText("0");
         QValidator* validator = new QIntValidator(0, list[i].num, this);
-        textEdit[i].setValidator(validator);
+        rpl[i].textEdit->setValidator(validator);
 
-        comboBox[i].addItems(list[i].filenames);
+        rpl[i].comboBox->addItems(list[i].filenames);
 
-        recipesLayout[i].addWidget(&slider[i]);
-        recipesLayout[i].addWidget(&textEdit[i]);
-        recipesLayout[i].addWidget(&comboBox[i]);
-        recipesWidget[i].setLayout(&recipesLayout[i]);
+        rpl[i].recipesLayout->addWidget(rpl[i].slider);
+        rpl[i].recipesLayout->addWidget(rpl[i].textEdit);
+        rpl[i].recipesLayout->addWidget(rpl[i].comboBox);
+        rpl[i].recipesWidget->setLayout(rpl[i].recipesLayout);
 
 
-        allLayout->addWidget(&recipesWidget[i]);
-        recipesWidget[i].hide();
-        QObject::connect(&checkBox[i], SIGNAL(clicked()), this, SLOT(checkbox_clicked()));
-        QObject::connect(&slider[i], SIGNAL(valueChanged(int)), this, SLOT(slider_changed(int)));
-        QObject::connect(&textEdit[i], &QLineEdit::textChanged, this, &RecipesUI::text_changed);
+        allLayout->addWidget(rpl[i].recipesWidget);
+        rpl[i].recipesWidget->hide();
+        QObject::connect(rpl[i].checkBox, SIGNAL(clicked()), this, SLOT(checkbox_clicked()));
+        QObject::connect(rpl[i].slider, SIGNAL(valueChanged(int)), this, SLOT(slider_changed(int)));
+        QObject::connect(rpl[i].textEdit, &QLineEdit::textChanged, this, &RecipesUI::text_changed);
     }
     area->setWidget(widget);
 
@@ -145,22 +147,22 @@ void RecipesUI::checkbox_clicked()
 {
     for(int i = 0 ; i < list.length() ; i++)
     {
-        if(checkBox[i].isChecked())
-            recipesWidget[i].show();
-        else recipesWidget[i].hide();
+        if(rpl[i].checkBox->isChecked())
+            rpl[i].recipesWidget->show();
+        else rpl[i].recipesWidget->hide();
     }
 }
 
 void RecipesUI::slider_changed(int a)
 {
     for(int i = 0 ; i < list.length() ; i++)
-        textEdit[i].setText(QString::number(slider[i].value()));
+        rpl[i].textEdit->setText(QString::number(rpl[i].slider->value()));
 }
 
 void RecipesUI::text_changed(const QString &a)
 {
     for(int i = 0 ; i < list.length() ; i++)
-        slider[i].setSliderPosition(textEdit[i].text().toUInt());
+        rpl[i].slider->setSliderPosition(rpl[i].textEdit->text().toUInt());
 }
 
 void RecipesUI::okbtn_clicked()
@@ -168,10 +170,10 @@ void RecipesUI::okbtn_clicked()
     ItemList* new_il = nullptr;
     for(int i = 0 ; i < list.length() ; i++)
     {
-        if(checkBox[i].isChecked())
+        if(rpl[i].checkBox->isChecked())
         {
             /* Process Recipes */
-            ItemList* processd_il = recipesProcess(list[i].itemName.toStdString().c_str(), comboBox[i].currentText().toStdString().c_str(), slider[i].value());
+            ItemList* processd_il = recipesProcess(list[i].itemName.toStdString().c_str(), rpl[i].comboBox->currentText().toStdString().c_str(), rpl[i].slider->value());
             item_list_combine(&new_il, processd_il);
             item_list_free(processd_il);
         }
@@ -218,7 +220,7 @@ ItemList* RecipesUI::recipesProcess(const char* item, const char* filepos ,quint
         else
         {
             guint item_num = dh_str_array_find_char(r->pattern, r->pt[i].pattern);
-            item_list_add_num(&new_il, item_num * write_num, r->pt[i].item_string->val[1]);
+            item_list_add_num(&new_il, item_num * write_num, r->pt[i].item_string->val[0]);
         }
     }
     return new_il;

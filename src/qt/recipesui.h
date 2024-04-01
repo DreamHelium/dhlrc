@@ -12,9 +12,15 @@
 #include <QScrollArea>
 #include "../dhlrc_list.h"
 
-typedef struct RP{
-
-}RP;
+typedef struct rp{
+    /* Recipes part */
+    QCheckBox* checkBox;
+    QSlider* slider;
+    QLineEdit* textEdit;
+    QComboBox* comboBox;
+    QHBoxLayout* recipesLayout;
+    QWidget* recipesWidget;
+}rp;
 
 namespace Ui {
 class RecipesUI;
@@ -31,13 +37,7 @@ public:
 private:
     QLabel* label1;
 
-    /* Recipes part */
-    QCheckBox* checkBox;
-    QSlider* slider;
-    QLineEdit* textEdit;
-    QComboBox* comboBox;
-    QHBoxLayout* recipesLayout;
-    QWidget* recipesWidget;
+    rp* rpl;
 
     QVBoxLayout* allLayout;
     QHBoxLayout* buttonLayout;
