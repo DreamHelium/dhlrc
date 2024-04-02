@@ -4,6 +4,17 @@
 #include <QWidget>
 #include <QTableWidget>
 #include <QVBoxLayout>
+#include <QMenuBar>
+#include <QAction>
+#include <QTableWidget>
+
+typedef struct TableItems{
+    QTableWidgetItem* item0;
+    QTableWidgetItem* item1;
+    QTableWidgetItem* item2;
+    QTableWidgetItem* item3;
+    QTableWidgetItem* item4;
+} TableItems;
 
 class ilReaderUI : public QWidget
 {
@@ -15,7 +26,14 @@ public:
 private:
     QVBoxLayout* vLayout;
     QTableWidget* tableWidget;
+    QMenuBar* menuBar;
+    QMenu* fileMenu;
 
+    QAction* saveAction;
+    TableItems* ti;
+
+private Q_SLOTS:
+    void saveAction_triggered();
 };
 
 #endif // ILREADERUI_H

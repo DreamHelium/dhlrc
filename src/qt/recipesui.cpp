@@ -6,12 +6,13 @@
 #include <QMessageBox>
 #include "../translation.h"
 #include "../recipe_class_ng/recipes_general.h"
+#include "recipesshowui.h"
 
 extern ItemList* il;
 
 typedef struct RecipesInternal{
     QString itemName;
-    quint32 num;
+    qint32 num;
     QStringList filenames;
 }RecipesInternal;
 
@@ -35,6 +36,7 @@ RecipesUI::RecipesUI(QWidget *parent) :
 RecipesUI::~RecipesUI()
 {
     list.clear();
+    delete[] rpl;
 }
 
 void RecipesUI::recipesInit()
@@ -104,21 +106,26 @@ void RecipesUI::initUI()
         rpl[i].comboBox = new QComboBox();
         rpl[i].recipesLayout = new QHBoxLayout();
         rpl[i].recipesWidget = new QWidget();
+        rpl[i].recipesBtn = new QPushButton(_("Show recipe"));
 
         rpl[i].checkBox->setText(str);
         allLayout->addWidget(rpl[i].checkBox);
 
         rpl[i].slider->setMinimum(0);
         rpl[i].slider->setMaximum(list[i].num);
+        rpl[i].slider->setFixedWidth(100);
+
         rpl[i].textEdit->setText("0");
         QValidator* validator = new QIntValidator(0, list[i].num, this);
         rpl[i].textEdit->setValidator(validator);
+        rpl[i].textEdit->setFixedWidth(50);
 
         rpl[i].comboBox->addItems(list[i].filenames);
 
         rpl[i].recipesLayout->addWidget(rpl[i].slider);
         rpl[i].recipesLayout->addWidget(rpl[i].textEdit);
         rpl[i].recipesLayout->addWidget(rpl[i].comboBox);
+        rpl[i].recipesLayout->addWidget(rpl[i].recipesBtn);
         rpl[i].recipesWidget->setLayout(rpl[i].recipesLayout);
 
 
@@ -127,6 +134,7 @@ void RecipesUI::initUI()
         QObject::connect(rpl[i].checkBox, SIGNAL(clicked()), this, SLOT(checkbox_clicked()));
         QObject::connect(rpl[i].slider, SIGNAL(valueChanged(int)), this, SLOT(slider_changed(int)));
         QObject::connect(rpl[i].textEdit, &QLineEdit::textChanged, this, &RecipesUI::text_changed);
+        QObject::connect(rpl[i].recipesBtn, &QPushButton::pressed, this, &RecipesUI::recipesbtn_clicked);
     }
     area->setWidget(widget);
 
@@ -165,6 +173,22 @@ void RecipesUI::text_changed(const QString &a)
         rpl[i].slider->setSliderPosition(rpl[i].textEdit->text().toUInt());
 }
 
+void RecipesUI::recipesbtn_clicked()
+{
+    int btnId = -1;
+    for(int i = 0 ; i < list.length() ; i++)
+    {
+        if(rpl[i].recipesBtn->isDown())
+        {
+            btnId = i;
+            break;
+        }
+    }
+    RecipesShowUI* rsui = new RecipesShowUI(rpl[btnId].comboBox->currentText());
+    rsui->setAttribute(Qt::WA_DeleteOnClose);
+    rsui->show();
+}
+
 void RecipesUI::okbtn_clicked()
 {
     ItemList* new_il = nullptr;
@@ -174,8 +198,13 @@ void RecipesUI::okbtn_clicked()
         {
             /* Process Recipes */
             ItemList* processd_il = recipesProcess(list[i].itemName.toStdString().c_str(), rpl[i].comboBox->currentText().toStdString().c_str(), rpl[i].slider->value());
-            item_list_combine(&new_il, processd_il);
-            item_list_free(processd_il);
+            if(processd_il)
+            {
+                item_list_add_num(&il, -rpl[i].slider->value(), (char*)list[i].itemName.toStdString().c_str());
+                item_list_delete_zero_item(&il);
+                item_list_combine(&new_il, processd_il);
+                item_list_free(processd_il);
+            }
         }
     }
     item_list_combine(&il, new_il);

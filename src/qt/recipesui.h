@@ -19,6 +19,7 @@ typedef struct rp{
     QLineEdit* textEdit;
     QComboBox* comboBox;
     QHBoxLayout* recipesLayout;
+    QPushButton* recipesBtn;
     QWidget* recipesWidget;
 }rp;
 
@@ -37,7 +38,7 @@ public:
 private:
     QLabel* label1;
 
-    rp* rpl;
+    rp* rpl = nullptr;
 
     QVBoxLayout* allLayout;
     QHBoxLayout* buttonLayout;
@@ -55,6 +56,7 @@ private Q_SLOTS:
     void okbtn_clicked();
     void slider_changed(int a);
     void text_changed(const QString &a);
+    void recipesbtn_clicked();
 };
 
 

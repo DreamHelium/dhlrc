@@ -48,7 +48,7 @@ void MainWindow::initUI()
 
 void MainWindow::openAction_triggered()
 {
-    QString fileName = QFileDialog::getOpenFileName(this, _("Select a file"), QDir::homePath(), _("Litematic file (*.litematic)"));
+    QString fileName = QFileDialog::getOpenFileName(this, _("Select a file"), nullptr, _("Litematic file (*.litematic)"));
     if(!fileName.isEmpty())
     {
         if(root) NBT_Free(root);

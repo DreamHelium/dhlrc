@@ -627,9 +627,19 @@ static GList* recipe_filenames(const char* dir, ItemList* il)
                 json_file = g_strconcat(item_name, "_from", NULL);
                 GList* recipe_from_filenames = dh_search_in_list(single_recipe_filename_d, json_file);
                 /* The "recipe_for_filenames" are the newly assigned memory,
-                * so just concat here  */
+                 * so just concat here  */
+                /* Maybe not because _from might have a wrong prefix */
                 if(recipe_from_filenames)
-                    recipe_file_names = g_list_concat(recipe_file_names, recipe_from_filenames);
+                {
+                    GList* recipe_from_filenames_d = recipe_from_filenames;
+                    while(recipe_from_filenames_d)
+                    {
+                        if(g_str_has_prefix(recipe_from_filenames_d->data, json_file))
+                            recipe_file_names = g_list_prepend(recipe_file_names, dh_strdup(recipe_from_filenames_d->data));
+                        recipe_from_filenames_d = recipe_from_filenames_d->next;
+                    }
+                    g_list_free_full(recipe_from_filenames, free);
+                }
                 break;
             }
             single_recipe_filename_d = single_recipe_filename_d -> next;
