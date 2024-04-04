@@ -21,6 +21,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
+#include "config.h"
 #include "dhlrc_list.h"
 #include <dh/dhutil.h>
 #include "translation.h"
@@ -194,9 +195,9 @@ int item_list_combine_recipe(ItemList** o_bl, const char* dirpos, DhGeneral* gen
 
 const char* name_block_translate(const char *block_name)
 {
-    gchar* filename = find_transfile();
     if(!translation_json)
     {
+        gchar* filename = find_transfile();
         cJSON* trans_data = dhlrc_FileToJSON(filename);
         translation_json = trans_data;
         g_free(filename);
@@ -251,8 +252,15 @@ static gchar* find_transfile()
         return g_strdup("translation.json");
     else
     {
+        gchar* game_dir = NULL;
+        gchar* index_file = NULL;
         /* Analyse .minecraft filepos */
-        gchar* index_file = g_strconcat(g_get_home_dir(), "/.minecraft/assets/indexes/1.18.json" , NULL);
+        if(dh_get_game_dir())
+        {
+            game_dir = dh_get_game_dir();
+            index_file = g_strconcat(game_dir, "/assets/indexes/1.18.json" , NULL);
+        }
+        else index_file = g_strconcat(g_get_home_dir(), "/.minecraft/assets/indexes/1.18.json", NULL);
         if(dhlrc_FileExist(index_file))
         {
             cJSON* index = dhlrc_FileToJSON(index_file);

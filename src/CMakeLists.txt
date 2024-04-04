@@ -18,8 +18,8 @@ set( DHLRC_MAIN_POT_FILE_DEPENDS
 
 add_library(dhlrc SHARED
 	       main.h
-               translation.h
-               translation.c
+		   translation.h
+		   translation.c
 	       libnbt/nbt.h
 	       libnbt/nbt.c
 	       litematica_region.c
@@ -34,6 +34,8 @@ add_library(dhlrc SHARED
 	       lrc_extend.h
 	       nbt_pos.c
 	       nbt_pos.h
+	       config.c
+	       config.h
 	       recipe_class/recipe_general.h
 	       recipe_class/recipe_general.c
 	       recipe_class/recipe_shaped.h

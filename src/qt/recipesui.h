@@ -59,6 +59,4 @@ private Q_SLOTS:
     void recipesbtn_clicked();
 };
 
-
-
 #endif /* RECIPESUI_H */

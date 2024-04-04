@@ -19,6 +19,7 @@
 #include <stdio.h>
 #include <glib.h>
 /*#include "dhlrc_config.h"*/
+#include "config.h"
 #include "main.h"
 #include "translation.h"
 
@@ -40,6 +41,7 @@ static GOptionEntry entries[] =
 
 int main(int argc,char** argb)
 {
+    dhlrc_make_config();
     translation_init();
     GOptionContext *context = g_option_context_new(_("[FILE] - Read a litematic file."));
     //GOptionGroup* verbose_group = g_option_group_new("v", "Unfinished", "See level", NULL, NULL);

@@ -22,6 +22,7 @@
 #include "litematica_region.h"
 #include "recipe_util.h"
 #include "lrc_extend.h"
+#include "config.h"
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -65,7 +66,10 @@ int main_isoc(int argc, char** argv)
 {
 #ifndef DH_DEBUG_IN_IDE
     if(argc == 1)
+    {
+        g_strfreev(argv);
         return -1;
+    }
 #endif
     int size = 0;
     uint8_t* data = NULL;
@@ -79,6 +83,7 @@ int main_isoc(int argc, char** argv)
     if(!data)
     {
         puts(_("Error when reading file."));
+        g_strfreev(argv);
         return -10;
     }
     /* Set log system */
@@ -94,6 +99,7 @@ int main_isoc(int argc, char** argv)
     if(!root)
     {
         puts(_("Not a valid NBT file!"));
+        g_strfreev(argv);
         return -1;
     }
     else
@@ -103,7 +109,10 @@ int main_isoc(int argc, char** argv)
         puts(_("Valid NBT file!"));
         int ret = start_func(root, start_without_option());
         NBT_Free(root);
-        fclose(log_file);
+        if(log_file)
+            fclose(log_file);
+        g_strfreev(argv);
+        dh_exit1();
         return ret;
     }
 }

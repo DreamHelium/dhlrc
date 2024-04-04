@@ -5,7 +5,9 @@
 #include <QFileDialog>
 #include <QDebug>
 #include "../libnbt/nbt.h"
+#include "../config.h"
 #include <dh/dhutil.h>
+#include <qnamespace.h>
 #include <string>
 #include "ilreaderui.h"
 #include "processui.h"
@@ -25,6 +27,8 @@ MainWindow::MainWindow(QWidget *parent)
 
 MainWindow::~MainWindow()
 {
+    dh_exit();
+    dh_exit1();
 }
 
 void MainWindow::initUI()
@@ -129,6 +133,7 @@ void MainWindow::okBtn_clicked()
     if(this->radioButtonGroup->checkedId() == 1)
     {
         ProcessUI *pui = new ProcessUI();
+        pui->setAttribute(Qt::WA_DeleteOnClose);
         pui->show();
     }
     else if(this->radioButtonGroup->checkedId() == 3)

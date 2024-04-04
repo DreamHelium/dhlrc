@@ -15,6 +15,7 @@
     You should have received a copy of the GNU Lesser General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>. */
 
+#include "dh_string_util.h"
 #include "recipes_general.h"
 #include "recipes_shapeless.h"
 
@@ -47,8 +48,7 @@ static Recipes* rspl_get_recipes(RecipesGeneral* self, cJSON* json)
     /* Set recipes data */
     Recipes* recipes = g_new0(Recipes, 1);
     recipes->x = 1;
-    recipes->y = 1;
-    dh_str_array_add_str(&(recipes->pattern), "x");
+    recipes->y = 0;
 
     /* Get result number */
     cJSON* count = cJSON_GetObjectItem(cJSON_GetObjectItem(json, "result"), "count");
@@ -59,7 +59,21 @@ static Recipes* rspl_get_recipes(RecipesGeneral* self, cJSON* json)
     /* Get ingredient */
     cJSON* ingredient = cJSON_GetObjectItem(json, "ingredients");
     recipes->pt = g_new0(PatternTranslator, 1);
-    recipes->pt->pattern = 'x';
     pattern_translator_writer(recipes->pt, ingredient);
+    recipes->pt_num = recipes->pt->item_string->num;
+    DhStrArray* old_pt = recipes->pt->item_string;
+    /* Rewrite ingredient */
+    recipes->pt->item_string = NULL;
+    recipes->pt = g_renew(PatternTranslator, recipes->pt, recipes->pt_num);
+    for(int i = 0 ; i < recipes->pt_num ; i++)
+    {
+        recipes->pt[i].item_string = NULL;
+        recipes->pt[i].pattern = 'A' + i;
+        (recipes->y)++;
+        char p[2] = { 'A'+i , 0};
+        dh_str_array_add_str(&(recipes->pattern), p);
+        dh_str_array_add_str(&(recipes->pt[i].item_string), old_pt->val[i]);
+    }
+    dh_str_array_free(old_pt);
     return recipes;
 }

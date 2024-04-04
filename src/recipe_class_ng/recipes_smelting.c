@@ -59,9 +59,10 @@ static Recipes* rsmt_get_recipes(RecipesGeneral* self, cJSON* json)
     **/
 
     /* Get ingredient */
-    cJSON* ingredient = cJSON_GetObjectItem(json, "ingredients");
+    cJSON* ingredient = cJSON_GetObjectItem(json, "ingredient");
     recipes->pt = g_new0(PatternTranslator, 1);
     recipes->pt->pattern = 'x';
+    recipes->pt_num = 1;
     pattern_translator_writer(recipes->pt, ingredient);
     return recipes;
 }

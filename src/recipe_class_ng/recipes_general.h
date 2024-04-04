@@ -52,6 +52,7 @@ struct _RecipesGeneralClass{
 
 gboolean recipes_is_supported(const char* filename);
 RecipesGeneral* recipes_general_new(const char* filename);
+Recipes* recipes_get_recipes(const char* filename);
 void pattern_translator_writer(PatternTranslator* pt, cJSON* json);
 void pattern_translator_free(PatternTranslator* pt);
 void recipes_free(Recipes* r);

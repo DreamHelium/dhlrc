@@ -19,6 +19,7 @@
 #include "recipes_shaped.h"
 #include "recipes_shapeless.h"
 #include "recipes_smelting.h"
+#include <cjson/cJSON.h>
 
 static void pt_writer_item_tag(PatternTranslator* pt, cJSON* json);
 
@@ -57,7 +58,7 @@ RecipesGeneral* recipes_general_new(const char* filename)
     g_return_val_if_fail(recipes_is_supported(filename), NULL);
     RecipesGeneral* self = NULL;
 
-    cJSON* json = dhlrc_FileToJSON(filename);
+    cJSON* json = dhlrc_file_to_json(filename);
     char* type = cJSON_GetStringValue(cJSON_GetObjectItem(json, "type"));
 
     /* Create object */
@@ -72,6 +73,7 @@ RecipesGeneral* recipes_general_new(const char* filename)
         cJSON_Delete(json);
         return NULL;
     }
+    cJSON_Delete(json);
     return self;
 }
 
@@ -111,4 +113,14 @@ void recipes_free(Recipes* r)
     dh_str_array_free(r->pattern);
     pattern_translator_free(r->pt);
     g_free(r);
+}
+
+Recipes* recipes_get_recipes(const char* filename)
+{
+    RecipesGeneral* rg = recipes_general_new(filename);
+    cJSON* json = dhlrc_file_to_json(filename);
+    Recipes* r = RECIPES_GENERAL_GET_CLASS(rg)->get_recipes(rg, json);
+    cJSON_Delete(json);
+    g_object_unref(rg);
+    return r;
 }

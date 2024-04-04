@@ -4,6 +4,7 @@
 #include <QVBoxLayout>
 #include <QCheckBox>
 #include <dh/dh_string_util.h>
+#include <qcheckbox.h>
 #include "lrcfunctionui.h"
 
 static dh_StrArray* region_name = nullptr;
@@ -29,16 +30,16 @@ void ProcessUI::initUI()
     hLayout = new QHBoxLayout();
     if(region_name)
     {
-        label = new QLabel();
-        label2 = new QLabel();
+        label = new QLabel(this);
+        label2 = new QLabel(this);
         label->setText(QString::asprintf(_("There are %d regions:\n"), region_name->num));
 
-        checkbox = new QCheckBox[region_name->num];
+        checkboxGroup = new cbg[region_name->num];
 
         allCheck = new QCheckBox(_("&All"));
 
         for(int i = 0 ; i < region_name->num ; i++)
-            checkbox[i].setText(region_name->val[i]);
+            checkboxGroup[i].checkbox = new QCheckBox(region_name->val[i]);
 
         okBtn = new QPushButton(_("&OK"));
         closeBtn = new QPushButton(_("&Close"));
@@ -51,8 +52,8 @@ void ProcessUI::initUI()
         vLayout->addWidget(allCheck);
         for(int i = 0 ; i < region_name->num ; i++)
         {
-            vLayout->addWidget(&checkbox[i]);
-            QObject::connect(&checkbox[i], SIGNAL(clicked()), this, SLOT(checkbox_clicked()));
+            vLayout->addWidget(checkboxGroup[i].checkbox);
+            QObject::connect(checkboxGroup[i].checkbox, SIGNAL(clicked()), this, SLOT(checkbox_clicked()));
         }
         vLayout->addStretch();
         vLayout->addWidget(label2);
@@ -69,7 +70,7 @@ void ProcessUI::okBtn_clicked()
 {
     for(int i = 0 ; i < region_name->num ; i++)
     {
-        if(checkbox[i].isChecked())
+        if(checkboxGroup[i].checkbox->isChecked())
         {
             label2->setText(QString::asprintf(_("Processing: region [%d] %s \n"),
                                                           i,region_name->val[i]));
@@ -89,7 +90,7 @@ void ProcessUI::checkbox_clicked()
     bool allTrue = true;
     for(int i = 0 ; i < region_name->num ; i++)
     {
-        if(!checkbox[i].isChecked())
+        if(!checkboxGroup[i].checkbox->isChecked())
             allTrue = false;
     }
     if(allTrue)
@@ -100,5 +101,5 @@ void ProcessUI::checkbox_clicked()
 void ProcessUI::allCheck_clicked(bool c)
 {
     for(int i = 0 ; i < region_name->num; i++)
-        checkbox[i].setChecked(c);
+        checkboxGroup[i].checkbox->setChecked(c);
 }

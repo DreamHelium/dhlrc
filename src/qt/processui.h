@@ -13,6 +13,10 @@ namespace Ui {
 class ProcessUI;
 }
 
+typedef struct cbg{
+    QCheckBox* checkbox;
+} cbg;
+
 class ProcessUI : public QWidget
 {
     Q_OBJECT
@@ -25,7 +29,7 @@ private:
     QLabel* label;
     QLabel* label2;
     QCheckBox* allCheck;
-    QCheckBox* checkbox;
+    cbg* checkboxGroup;
     QPushButton* okBtn;
     QPushButton* closeBtn;
     QHBoxLayout* hLayout;

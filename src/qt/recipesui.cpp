@@ -214,9 +214,7 @@ void RecipesUI::okbtn_clicked()
 
 ItemList* RecipesUI::recipesProcess(const char* item, const char* filepos ,quint32 num)
 {
-    RecipesGeneral* rg = recipes_general_new(filepos);
-    Recipes* r = RECIPES_GENERAL_GET_CLASS(rg)->get_recipes(rg, dhlrc_file_to_json(filepos));
-    g_object_unref(rg);
+    Recipes* r = recipes_get_recipes(filepos);
 
     ItemList* new_il = nullptr;
 
@@ -252,5 +250,6 @@ ItemList* RecipesUI::recipesProcess(const char* item, const char* filepos ,quint
             item_list_add_num(&new_il, item_num * write_num, r->pt[i].item_string->val[0]);
         }
     }
+    recipes_free(r);
     return new_il;
 }
