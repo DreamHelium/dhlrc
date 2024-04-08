@@ -24,18 +24,18 @@ add_library(dhlrc SHARED
 	       libnbt/nbt.c
 	       litematica_region.c
 	       litematica_region.h
-	       nbt_litereader.h
-	       nbt_litereader.c
 	       dhlrc_list.h
 	       dhlrc_list.c
 	       recipe_util.h
 	       recipe_util.c
-	       lrc_extend.c
-	       lrc_extend.h
 	       nbt_pos.c
 	       nbt_pos.h
 	       config.c
 	       config.h
+	       uncompress.c
+	       uncompress.h
+	       nbt_litereader.h
+	       nbt_litereader.c
 	       recipe_class/recipe_general.h
 	       recipe_class/recipe_general.c
 	       recipe_class/recipe_shaped.h
@@ -59,9 +59,12 @@ add_library(dhlrc SHARED
 add_definitions(-DDH_USE_OLD_INPUT_LINE_FUNC)
 add_definitions(-DDH_USE_DEPRECATED_FUNCNAMES)
 add_definitions(-DDH_USE_DHLRC_FILE_UTIL)
+add_definitions(-DBUILD_SHARED_LIBS)
+
+add_subdirectory(minizip-ng)
 
 target_link_libraries(dhlrc PUBLIC m z ${dhutil_LIBRARIES} cjson
-	"${GLIB_LIBRARIES}" "${GIO_LIBRARIES}"
+	"${GLIB_LIBRARIES}" "${GIO_LIBRARIES}" minizip
 #    deflate
 )
 
@@ -71,7 +74,7 @@ target_include_directories(dhlrc PUBLIC
 
 target_link_directories(dhlrc PUBLIC "${dhutil_LIBRARY_DIRS}")
 
-add_executable(dhlrc_isoc main_isoc.c main.c)
+add_executable(dhlrc_isoc main_isoc.c main.c  lrc_extend.c lrc_extend.h)
 
 target_link_libraries(dhlrc_isoc PUBLIC dhlrc)
 

@@ -217,9 +217,11 @@ static int start_lrc_main(NBT *root)
 
 #ifdef DH_DEBUG_IN_IDE
 
+#include "uncompress.h"
+
 int debug()
 {
-    printf("%d\n", g_str_has_suffix("minecraft:stonecutting","smelting"));
+    dhlrc_extract("/home/dream_he/.minecraft/versions/1.18.2/1.18.2.jar", "test");
     return 0;
 }
 
