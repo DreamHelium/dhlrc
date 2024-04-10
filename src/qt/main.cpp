@@ -5,7 +5,9 @@
 
 #include <QApplication>
 extern NBT* root;
-extern ItemList* il;
+ItemList* il = nullptr;
+IlInfo info;
+bool infoR = false;
 int verbose_level = 0;
 
 int main(int argc, char *argv[])
@@ -16,7 +18,6 @@ int main(int argc, char *argv[])
     w.show();
     int ret = a.exec();
     if(root) NBT_Free(root);
-    if(il)   item_list_free(il);
     return ret;
 }
 

@@ -5,11 +5,14 @@
 #include <QCheckBox>
 #include <dh/dh_string_util.h>
 #include <qcheckbox.h>
+#include <qdatetime.h>
 #include "lrcfunctionui.h"
+#include "mainwindow.h"
 
 static dh_StrArray* region_name = nullptr;
-ItemList* il = nullptr;
+extern ItemList* il;
 extern NBT* root;
+extern QList<IlInfo> ilList;
 
 ProcessUI::ProcessUI(QWidget *parent) :
     QWidget(parent)
@@ -68,17 +71,21 @@ void ProcessUI::initUI()
 
 void ProcessUI::okBtn_clicked()
 {
+    ItemList* new_il = nullptr;
     for(int i = 0 ; i < region_name->num ; i++)
     {
         if(checkboxGroup[i].checkbox->isChecked())
         {
             label2->setText(QString::asprintf(_("Processing: region [%d] %s \n"),
                                                           i,region_name->val[i]));
-            il = lite_region_item_list_extend(root, i, il, 1);
+            new_il = lite_region_item_list_extend(root, i, new_il, 1);
         }
     }
-    item_list_delete_zero_item(&il);
-    item_list_sort(&il);
+    item_list_delete_zero_item(&new_il);
+    item_list_sort(&new_il);
+    QString str = QString(_("Generated from litematic."));
+    IlInfo info = {.name = str , .il = new_il, .time = QDateTime::currentDateTime()};
+    ilList.append(info);
     this->close();
     lrcFunctionUI* fui = new lrcFunctionUI();
     fui->setAttribute(Qt::WA_DeleteOnClose);

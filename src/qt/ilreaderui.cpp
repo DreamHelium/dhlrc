@@ -1,19 +1,75 @@
 #include "ilreaderui.h"
+#include "ilchooseui.h"
 #include "../translation.h"
+#include "mainwindow.h"
 #include <QTableWidget>
 #include <QFileDialog>
+#include <glib.h>
 
-extern ItemList* il;
+extern QList<IlInfo> ilList;
+extern IlInfo info;
+extern bool infoR;
 
 ilReaderUI::ilReaderUI(QWidget *parent)
     : QWidget{parent}
 {
+    ilChooseUI* iui = new ilChooseUI();
+    iui->setAttribute(Qt::WA_DeleteOnClose);
+    iui->exec();
+
+    if(infoR){
+        showTable();
+
+        menuBar = new QMenuBar(this);
+        fileMenu = new QMenu(_("&File"), menuBar);
+        menuBar->addAction(fileMenu->menuAction());
+
+        saveAction = new QAction(QIcon::fromTheme("document-save"), _("&Save"), this);
+        saveAction->setShortcut(QKeySequence("Ctrl+S"));
+        fileMenu->addAction(saveAction);
+        QObject::connect(saveAction, SIGNAL(triggered()), this, SLOT(saveAction_triggered()));
+    }
+    else
+        ; /* It seems that this window must exists? */
+}
+
+ilReaderUI::~ilReaderUI()
+{
+    if(infoR){
+        tableWidget->clearContents();
+        delete[] ti;
+    }
+}
+
+void ilReaderUI::saveAction_triggered()
+{
+    ItemList* il = info.il;
+    ItemList* ild = il;
+    int i = 0;
+    while(ild)
+    {
+        IListData* data = (IListData*)ild->data;
+        data->total = ti[i].item1->text().toInt();
+        data->placed = ti[i].item2->text().toInt();
+        data->available = ti[i].item3->text().toInt();
+
+        ild = ild->next;
+        i++;
+    }
+    QString fileName = QFileDialog::getSaveFileName(this, _("Save file"), nullptr ,_("CSV file (*.csv)"));
+    if(!fileName.isEmpty())
+        item_list_to_csv((char*)fileName.toStdString().c_str(), il);
+}
+
+void ilReaderUI::showTable()
+{
+    ItemList* il = info.il;
     int rows = g_list_length(il);
 
     vLayout = new QVBoxLayout(this);
     tableWidget = new QTableWidget(rows, 5, this);
     tableWidget->setHorizontalHeaderLabels(QStringList() << _("Name") << _("Total") << _("Placed")
-                                           << _("Available") << _("isTag"));
+                                        << _("Available") << _("isTag"));
     ItemList* ild = il;
     int i = 0;
     ti = new TableItems[g_list_length(ild)];
@@ -44,38 +100,4 @@ ilReaderUI::ilReaderUI(QWidget *parent)
         ild = ild->next;
     }
     vLayout->addWidget(tableWidget);
-
-    menuBar = new QMenuBar(this);
-    fileMenu = new QMenu(_("&File"), menuBar);
-    menuBar->addAction(fileMenu->menuAction());
-
-    saveAction = new QAction(QIcon::fromTheme("document-save"), _("&Save"), this);
-    saveAction->setShortcut(QKeySequence("Ctrl+S"));
-    fileMenu->addAction(saveAction);
-    QObject::connect(saveAction, SIGNAL(triggered()), this, SLOT(saveAction_triggered()));
-}
-
-ilReaderUI::~ilReaderUI()
-{
-    tableWidget->clearContents();
-    delete[] ti;
-}
-
-void ilReaderUI::saveAction_triggered()
-{
-    ItemList* ild = il;
-    int i = 0;
-    while(ild)
-    {
-        IListData* data = (IListData*)ild->data;
-        data->total = ti[i].item1->text().toInt();
-        data->placed = ti[i].item2->text().toInt();
-        data->available = ti[i].item3->text().toInt();
-
-        ild = ild->next;
-        i++;
-    }
-    QString fileName = QFileDialog::getSaveFileName(this, _("Save file"), nullptr ,_("CSV file (*.csv)"));
-    if(!fileName.isEmpty())
-        item_list_to_csv((char*)fileName.toStdString().c_str(), il);
 }

@@ -6,9 +6,13 @@
 #include <QMessageBox>
 #include "../translation.h"
 #include "../recipe_class_ng/recipes_general.h"
+#include "mainwindow.h"
 #include "recipesshowui.h"
+#include "ilchooseui.h"
 
-extern ItemList* il;
+extern bool infoR;
+extern IlInfo info;
+extern QList<IlInfo> ilList;
 
 typedef struct RecipesInternal{
     QString itemName;
@@ -16,7 +20,7 @@ typedef struct RecipesInternal{
     QStringList filenames;
 }RecipesInternal;
 
-QList<RecipesInternal> list;
+static QList<RecipesInternal> list;
 
 typedef struct RecipeListBaseData{
     char* filename;
@@ -29,8 +33,13 @@ typedef struct RecipeListBaseData{
 RecipesUI::RecipesUI(QWidget *parent) :
     QWidget(parent)
 {
-    recipesInit();
-    initUI();
+    ilChooseUI* iui = new ilChooseUI();
+    iui->setAttribute(Qt::WA_DeleteOnClose);
+    iui->exec();
+    if(infoR){
+        recipesInit();
+        initUI();
+    }
 }
 
 RecipesUI::~RecipesUI()
@@ -41,6 +50,7 @@ RecipesUI::~RecipesUI()
 
 void RecipesUI::recipesInit()
 {
+    ItemList* il = info.il;
     RecipeList* rcl = recipe_list_init("recipes", il);
     RecipeList* rcl_d = rcl;
     while(rcl_d)
@@ -113,9 +123,10 @@ void RecipesUI::initUI()
 
         rpl[i].slider->setMinimum(0);
         rpl[i].slider->setMaximum(list[i].num);
+        rpl[i].slider->setValue(list[i].num);
         rpl[i].slider->setFixedWidth(100);
 
-        rpl[i].textEdit->setText("0");
+        rpl[i].textEdit->setText(QString::number(list[i].num));
         QValidator* validator = new QIntValidator(0, list[i].num, this);
         rpl[i].textEdit->setValidator(validator);
         rpl[i].textEdit->setFixedWidth(50);
@@ -200,15 +211,16 @@ void RecipesUI::okbtn_clicked()
             ItemList* processd_il = recipesProcess(list[i].itemName.toStdString().c_str(), rpl[i].comboBox->currentText().toStdString().c_str(), rpl[i].slider->value());
             if(processd_il)
             {
-                item_list_add_num(&il, -rpl[i].slider->value(), (char*)list[i].itemName.toStdString().c_str());
-                item_list_delete_zero_item(&il);
+                item_list_add_num(&info.il, -rpl[i].slider->value(), (char*)list[i].itemName.toStdString().c_str());
+                item_list_delete_zero_item(&info.il);
                 item_list_combine(&new_il, processd_il);
                 item_list_free(processd_il);
             }
         }
     }
-    item_list_combine(&il, new_il);
-    item_list_free(new_il);
+    QString str = QString(_("Generated from material combiner."));
+    IlInfo info = {.name = str , .il = new_il, .time = QDateTime::currentDateTime()};
+    ilList.append(info);
     this->close();
 }
 
@@ -223,7 +235,6 @@ ItemList* RecipesUI::recipesProcess(const char* item, const char* filepos ,quint
     /* Read r */
     if(num % r-> num != 0)
     {
-
         QMessageBox::StandardButton result = QMessageBox::question(this, _("Mod decide"), QString::asprintf(_("There's a remainder with %d and %d, continue?"), num, r->num));
         switch (result) {
             case QMessageBox::Yes:

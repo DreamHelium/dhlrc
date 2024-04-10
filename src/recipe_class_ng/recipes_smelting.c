@@ -50,13 +50,11 @@ static Recipes* rsmt_get_recipes(RecipesGeneral* self, cJSON* json)
     recipes->y = 1;
     dh_str_array_add_str(&(recipes->pattern), "x");
 
-    /**
-    * Get result number *
+    /* Get result number */
     cJSON* count = cJSON_GetObjectItem(cJSON_GetObjectItem(json, "result"), "count");
     if(cJSON_IsNumber(count))
         recipes->num = cJSON_GetNumberValue(count);
     else recipes->num = 1;
-    **/
 
     /* Get ingredient */
     cJSON* ingredient = cJSON_GetObjectItem(json, "ingredient");

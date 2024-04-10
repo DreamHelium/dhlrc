@@ -9,16 +9,21 @@
 #include <dh/dhutil.h>
 #include <qnamespace.h>
 #include <string>
+#include "ilchooseui.h"
 #include "ilreaderui.h"
 #include "processui.h"
 
 NBT* root = nullptr;
 static bool nbtRead = false;
 extern ItemList* il;
+QList<IlInfo> ilList;
+extern bool infoR;
+extern IlInfo info;
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
+    ilList.clear();
     translation_init();
     initUI();
     initSignalSlots();
@@ -27,6 +32,8 @@ MainWindow::MainWindow(QWidget *parent)
 
 MainWindow::~MainWindow()
 {
+    for(int i = 0 ; i < ilList.length() ; i++)
+        item_list_free(ilList[i].il);
     dh_exit();
     dh_exit1();
 }
@@ -138,16 +145,26 @@ void MainWindow::okBtn_clicked()
     }
     else if(this->radioButtonGroup->checkedId() == 3)
     {
-        if(il)
-        {
-            ilReaderUI* iui = new ilReaderUI();
-            iui->setAttribute(Qt::WA_DeleteOnClose);
-            iui->show();
-        }
+        ilReaderUI* iui = new ilReaderUI();
+        iui->setAttribute(Qt::WA_DeleteOnClose);
+        iui->show();
     }
     else if(this->radioButtonGroup->checkedId() == 4)
     {
-        item_list_free(il);
-        il = nullptr;
+        ilChooseUI* icui = new ilChooseUI();
+        icui->setAttribute(Qt::WA_DeleteOnClose);
+        icui->exec();
+        if(infoR){
+            int index = ilList.indexOf(info);
+            item_list_free(ilList[index].il);
+            ilList.remove(index);
+        }
     }
+}
+
+bool operator== (const IlInfo info1, const IlInfo info2)
+{
+    if((info1.il == info2.il) && (info1.name == info2.name) && (info1.time == info2.time))
+        return true;
+    else return false;
 }

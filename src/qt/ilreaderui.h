@@ -32,6 +32,8 @@ private:
     QAction* saveAction;
     TableItems* ti;
 
+    void showTable();
+
 private Q_SLOTS:
     void saveAction_triggered();
 };
