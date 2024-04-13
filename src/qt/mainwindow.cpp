@@ -12,6 +12,7 @@
 #include "ilchooseui.h"
 #include "ilreaderui.h"
 #include "processui.h"
+#include "recipesui.h"
 
 NBT* root = nullptr;
 static bool nbtRead = false;
@@ -94,14 +95,16 @@ void MainWindow::initInternalUI()
         nbtReaderBtn = new QRadioButton(_("NBT lite &reader with modifier"));
         lrcBtn = new QRadioButton(_("Litematica material &list with recipe combination"));
         lrcExtendBtn = new QRadioButton(_("Litematica &block reader"));
-        ilreaderBtn = new QRadioButton(_("Item list reader"));
-        clearBtn = new QRadioButton(_("Clear Item list"));
+        ilreaderBtn = new QRadioButton(_("&Item list reader and modifier"));
+        recipeBtn = new  QRadioButton(_("&Recipe combiner"));
+        clearBtn = new QRadioButton(_("&Clear Item list"));
 
         radioButtonGroup->addButton(nbtReaderBtn, 0);
         radioButtonGroup->addButton(lrcBtn, 1);
         radioButtonGroup->addButton(lrcExtendBtn, 2);
         radioButtonGroup->addButton(ilreaderBtn, 3);
-        radioButtonGroup->addButton(clearBtn, 4);
+        radioButtonGroup->addButton(recipeBtn, 4);
+        radioButtonGroup->addButton(clearBtn, 5);
         nbtReaderBtn->setChecked(true);
 
         /* Add PushButtons */
@@ -123,6 +126,7 @@ void MainWindow::initInternalUI()
         vLayout->addWidget(lrcBtn);
         vLayout->addWidget(lrcExtendBtn);
         vLayout->addWidget(ilreaderBtn);
+        vLayout->addWidget(recipeBtn);
         vLayout->addWidget(clearBtn);
         vLayout->addStretch();
         vLayout->addLayout(hLayout);
@@ -137,19 +141,25 @@ void MainWindow::initInternalUI()
 
 void MainWindow::okBtn_clicked()
 {
-    if(this->radioButtonGroup->checkedId() == 1)
+    if(this->radioButtonGroup->checkedId() == 1) /* lrc - Litematica material list with recipe combination */
     {
-        ProcessUI *pui = new ProcessUI();
+        ProcessUI* pui = new ProcessUI();
         pui->setAttribute(Qt::WA_DeleteOnClose);
         pui->show();
     }
-    else if(this->radioButtonGroup->checkedId() == 3)
+    else if(this->radioButtonGroup->checkedId() == 3) /* Item list */
     {
         ilReaderUI* iui = new ilReaderUI();
         iui->setAttribute(Qt::WA_DeleteOnClose);
         iui->show();
     }
-    else if(this->radioButtonGroup->checkedId() == 4)
+    else if(this->radioButtonGroup->checkedId() == 4) /* Recipe function */
+    {
+        RecipesUI* rui = new RecipesUI();
+        rui->setAttribute(Qt::WA_DeleteOnClose);
+        rui->show();
+    }
+    else if(this->radioButtonGroup->checkedId() == 5) /* clear item list */
     {
         ilChooseUI* icui = new ilChooseUI();
         icui->setAttribute(Qt::WA_DeleteOnClose);

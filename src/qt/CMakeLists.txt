@@ -29,7 +29,6 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         MANUAL_FINALIZATION
         ${PROJECT_SOURCES}
         processui.h processui.cpp
-        lrcfunctionui.h lrcfunctionui.cpp
         ilreaderui.h ilreaderui.cpp
         genericui.h genericui.cpp
 

@@ -10,7 +10,6 @@ set( DHLRC_MAIN_POT_FILE_DEPENDS
         src/recipe_class/recipe_shaped.c
         src/qt/mainwindow.cpp
         src/qt/ilreaderui.cpp
-        src/qt/lrcfunctionui.cpp
 	PARENT_SCOPE
 )
 
@@ -59,7 +58,7 @@ add_library(dhlrc SHARED
 add_definitions(-DDH_USE_OLD_INPUT_LINE_FUNC)
 add_definitions(-DDH_USE_DEPRECATED_FUNCNAMES)
 add_definitions(-DDH_USE_DHLRC_FILE_UTIL)
-add_definitions(-DBUILD_SHARED_LIBS)
+set(BUILD_SHARED_LIBS ON)
 
 add_subdirectory(minizip-ng)
 

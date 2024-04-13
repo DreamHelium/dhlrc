@@ -6,7 +6,6 @@
 #include <dh/dh_string_util.h>
 #include <qcheckbox.h>
 #include <qdatetime.h>
-#include "lrcfunctionui.h"
 #include "mainwindow.h"
 
 static dh_StrArray* region_name = nullptr;
@@ -87,9 +86,9 @@ void ProcessUI::okBtn_clicked()
     IlInfo info = {.name = str , .il = new_il, .time = QDateTime::currentDateTime()};
     ilList.append(info);
     this->close();
-    lrcFunctionUI* fui = new lrcFunctionUI();
-    fui->setAttribute(Qt::WA_DeleteOnClose);
-    fui->show();
+    // lrcFunctionUI* fui = new lrcFunctionUI();
+    // fui->setAttribute(Qt::WA_DeleteOnClose);
+    // fui->show();
 }
 
 void ProcessUI::checkbox_clicked()
