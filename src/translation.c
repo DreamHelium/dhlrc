@@ -23,10 +23,10 @@ void translation_init()
     if(!translation_inited)
     {
 #ifndef DH_DISABLE_TRANSLATION
-#ifdef G_OS_WIN32
-        setlocale(LC_CTYPE, ".UTF-8");
-#else
         setlocale(LC_CTYPE, "");
+#ifdef G_OS_WIN32
+        SetConsoleOutputCP(65001);  
+        /* On mingw64 setlocale(LC_CTYPE, ".UTF-8") didn't work. */
 #endif /* G_OS_WIN32 */
         setlocale(LC_MESSAGES, "");
         bindtextdomain("dhlrc", "locale");
