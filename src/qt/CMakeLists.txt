@@ -22,6 +22,8 @@ set(PROJECT_SOURCES
         recipesshowui.h
         ilchooseui.cpp
         ilchooseui.h
+        regionselectui.cpp
+        regionselectui.h
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)

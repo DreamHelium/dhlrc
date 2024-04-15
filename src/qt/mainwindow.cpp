@@ -13,6 +13,7 @@
 #include "ilreaderui.h"
 #include "processui.h"
 #include "recipesui.h"
+#include "regionselectui.h"
 
 NBT* root = nullptr;
 static bool nbtRead = false;
@@ -146,6 +147,12 @@ void MainWindow::okBtn_clicked()
         ProcessUI* pui = new ProcessUI();
         pui->setAttribute(Qt::WA_DeleteOnClose);
         pui->show();
+    }
+    else if(this->radioButtonGroup->checkedId() == 2)
+    {
+        RegionSelectUI* rsui = new RegionSelectUI();
+        int ret = rsui->exec_r();
+        qDebug() << ret;
     }
     else if(this->radioButtonGroup->checkedId() == 3) /* Item list */
     {
