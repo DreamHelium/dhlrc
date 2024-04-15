@@ -17,20 +17,79 @@
 
 #include "translation.h"
 #include <glib.h>
+#include <locale.h>
+
+static gboolean set_locale_to_utf8();
+
 static gboolean translation_inited = FALSE;
 void translation_init()
 {
     if(!translation_inited)
     {
 #ifndef DH_DISABLE_TRANSLATION
-        setlocale(LC_CTYPE, "");
-#ifdef G_OS_WIN32
-        SetConsoleOutputCP(65001);  
-        /* On mingw64 setlocale(LC_CTYPE, ".UTF-8") didn't work. */
-#endif /* G_OS_WIN32 */
-        setlocale(LC_MESSAGES, "");
+        set_locale_to_utf8();
+
         bindtextdomain("dhlrc", "locale");
+        /* Force the output for UTF-8 */
+        bind_textdomain_codeset("dhlrc", "UTF-8");
         textdomain("dhlrc");
 #endif
+    }
+}
+
+static gboolean set_locale_to_utf8()
+{
+    /* First get the locale of the current environment */
+    gchar* current_locale = setlocale(LC_CTYPE, "");
+    if(g_str_has_suffix(current_locale, "UTF-8") ||
+        g_str_has_suffix(current_locale, "utf-8") ||
+        g_str_has_suffix(current_locale, ".65001")
+    )
+    {
+        /* We don't need to change anything */
+        setlocale(LC_MESSAGES, "");
+        return TRUE;
+    }
+    else
+    {
+        current_locale = g_strdup(current_locale);
+        gchar* current_locale_d = current_locale;
+        while(current_locale_d)
+        {
+            if(*current_locale_d == '.' || *current_locale_d == 0)
+                break;
+            current_locale_d++;
+        }
+        if(*current_locale_d == '.')
+            *current_locale_d = 0;
+        /* Set new locale */
+        gchar* new_locale = NULL;
+#ifdef G_OS_WIN32
+        new_locale = g_strconcat(current_locale, ".65001", NULL);
+#else
+        new_locale = g_strconcat(current_locale, ".UTF-8", NULL);
+#endif
+        g_free(current_locale);
+        current_locale = setlocale(LC_CTYPE, new_locale);
+
+        /* confirm success */
+        if(current_locale)
+        {
+            if(g_str_equal(current_locale, new_locale))
+            {
+                setlocale(LC_MESSAGES, "");
+                g_free(new_locale);
+                return TRUE;
+            }
+            else {
+                g_free(new_locale);
+                return FALSE;
+            }
+        }
+        else
+        {
+            g_free(new_locale);
+            return FALSE;
+        }
     }
 }

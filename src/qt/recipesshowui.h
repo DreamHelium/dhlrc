@@ -35,6 +35,7 @@ private:
 
     void recipesInit(QString filename);
     void initUI();
+    QString getPicFilename(const char* item);
 
 private Q_SLOTS:
 
