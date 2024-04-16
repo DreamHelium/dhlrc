@@ -3,17 +3,18 @@
 #include <QMenuBar>
 #include <QToolBar>
 #include <QFileDialog>
+#include <QMessageBox>
 #include <QDebug>
 #include "../libnbt/nbt.h"
 #include "../config.h"
 #include <dh/dhutil.h>
-#include <qnamespace.h>
 #include <string>
 #include "ilchooseui.h"
 #include "ilreaderui.h"
 #include "processui.h"
 #include "recipesui.h"
 #include "regionselectui.h"
+#include "blockreaderui.h"
 
 NBT* root = nullptr;
 static bool nbtRead = false;
@@ -148,11 +149,22 @@ void MainWindow::okBtn_clicked()
         pui->setAttribute(Qt::WA_DeleteOnClose);
         pui->show();
     }
-    else if(this->radioButtonGroup->checkedId() == 2)
+    else if(this->radioButtonGroup->checkedId() == 2) /* block reader */
     {
         RegionSelectUI* rsui = new RegionSelectUI();
         int ret = rsui->exec_r();
-        qDebug() << ret;
+        if( ret == -1 )
+        {
+            /* Warning */
+            QMessageBox::warning(this, _("Error!"), _("No selected region!"));
+        }
+        else
+        {
+            /* Popup a normal window */
+            BlockReaderUI* brui = new BlockReaderUI(ret);
+            brui->setAttribute(Qt::WA_DeleteOnClose);
+            brui->show();
+        }
     }
     else if(this->radioButtonGroup->checkedId() == 3) /* Item list */
     {
