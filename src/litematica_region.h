@@ -17,14 +17,17 @@
 
 #ifndef LITEMATICA_REGION_H
 #define LITEMATICA_REGION_H
-#ifdef __cplusplus
-extern "C"{
-#endif
 
 #include "libnbt/nbt.h"
 #include "dhlrc_list.h"
 #include <dh/dhutil.h>
 #include "nbt_litereader.h"
+
+#ifdef __cplusplus
+extern "C"{
+#endif
+
+
 
 /*************************************************************
  * Region Processing Stuff:
@@ -41,10 +44,10 @@ typedef struct LiteRegion{
     int region_num;
 
     /** Block names and nums */
-    dh_StrArray* blocks;
+    DhStrArray* blocks;
 
     /** Replaced name of blocks */
-    dh_StrArray* replaced_blocks;
+    DhStrArray* replaced_blocks;
 
     /** Region NBT */
     NBT* region_nbt;
@@ -82,7 +85,7 @@ char**       lite_region_names(NBT* root, int rNum, int* err);
 G_DEPRECATED
 void         lite_region_free_names(char** region, int rNum);
 /** Improved version to get region name */
-dh_StrArray* lite_region_name_array(NBT* root);
+DhStrArray* lite_region_name_array(NBT* root);
 
 NBT*         lite_region_nbt_region(NBT* root,int r_num);
 NBT*         lite_region_nbt_block_state_palette(NBT* root, int r_num);
@@ -94,7 +97,7 @@ int           lite_region_block_num(NBT* root, int r_num);
 G_DEPRECATED_FOR(lite_region_block_name_array)
 char**        lite_region_block_names(NBT* root, int r_num ,int bNum);
 /** Improved version to get block name */
-dh_StrArray*  lite_region_block_name_array(NBT* root, int r_num);
+DhStrArray*  lite_region_block_name_array(NBT* root, int r_num);
 
 /** Directly into the BlockStatePalette (Do not need to go to child) */
 

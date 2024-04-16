@@ -20,6 +20,7 @@
 #include "recipes_shapeless.h"
 #include "recipes_smelting.h"
 #include <cjson/cJSON.h>
+#include "../json_util.h"
 
 static void pt_writer_item_tag(PatternTranslator* pt, cJSON* json);
 

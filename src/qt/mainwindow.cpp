@@ -7,7 +7,7 @@
 #include <QDebug>
 #include "../libnbt/nbt.h"
 #include "../config.h"
-#include <dh/dhutil.h>
+#include <dhutil.h>
 #include <string>
 #include "ilchooseui.h"
 #include "ilreaderui.h"
@@ -67,7 +67,7 @@ void MainWindow::openAction_triggered()
     {
         if(root) NBT_Free(root);
         int size = 0;
-        quint8 *data = (quint8*)dhlrc_ReadFile(fileName.toStdString().c_str(), &size);
+        quint8 *data = (quint8*)dhlrc_read_file(fileName.toStdString().c_str(), &size);
         root = NBT_Parse(data, size);
         free(data);
         initInternalUI();

@@ -16,6 +16,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>. */
 
 #include "recipe_util.h"
+#include "json_util.h"
 #include <cjson/cJSON.h>
 #include <string.h>
 #include <stdio.h>
@@ -23,7 +24,7 @@
 #include <ctype.h>
 #include "config.h"
 #include "dhlrc_list.h"
-#include <dh/dhutil.h>
+#include <dhutil.h>
 #include "translation.h"
 
 static cJSON* translation_json = NULL;
@@ -109,7 +110,7 @@ static int ItemList_CombineRecipe_ng(ItemList** il, const char* dirpos, DhGenera
     {
         /* Get item names */
         RecipeList* rcl = recipe_list_init(dirpos, *il);
-        dh_StrArray* item_names = recipe_list_item_names_with_namespace(rcl);
+        DhStrArray* item_names = recipe_list_item_names_with_namespace(rcl);
 
         /* If no items need processing just return */
         if(item_names == NULL)
@@ -136,7 +137,7 @@ single_process_start:
             else if(option == -3 || option == -100)
             {
                 recipe_list_free(rcl);
-                dh_StrArray_Free(item_names);
+                dh_str_array_free(item_names);
                 return 1;
             }
             else if(option == -2)
@@ -148,7 +149,7 @@ single_process_start:
             }
         }
         recipe_list_free(rcl);
-        dh_StrArray_Free(item_names);
+        dh_str_array_free(item_names);
     }
     return 1;
 }
@@ -198,7 +199,7 @@ const char* name_block_translate(const char *block_name)
     if(!translation_json)
     {
         gchar* filename = find_transfile();
-        cJSON* trans_data = dhlrc_FileToJSON(filename);
+        cJSON* trans_data = dhlrc_file_to_json(filename);
         translation_json = trans_data;
         g_free(filename);
     }
@@ -248,7 +249,7 @@ const char* name_block_translate(const char *block_name)
 
 static gchar* find_transfile()
 {
-    if(dhlrc_FileExist("translation.json"))
+    if(dhlrc_file_exist("translation.json"))
         return g_strdup("translation.json");
     else
     {
@@ -261,9 +262,9 @@ static gchar* find_transfile()
             index_file = g_strconcat(game_dir, "/assets/indexes/1.18.json" , NULL);
         }
         else index_file = g_strconcat(g_get_home_dir(), "/.minecraft/assets/indexes/1.18.json", NULL);
-        if(dhlrc_FileExist(index_file))
+        if(dhlrc_file_exist(index_file))
         {
-            cJSON* index = dhlrc_FileToJSON(index_file);
+            cJSON* index = dhlrc_file_to_json(index_file);
             g_free(index_file);
             /* Analyse index file */
             cJSON* objects = cJSON_GetObjectItem(index, "objects");

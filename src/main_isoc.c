@@ -18,7 +18,7 @@
 #include "dhlrc_list.h"
 #include "main.h"
 #include "translation.h"
-#include <dh/dhutil.h>
+#include <dhutil.h>
 #include "litematica_region.h"
 #include "recipe_util.h"
 #include "lrc_extend.h"
@@ -73,7 +73,7 @@ int main_isoc(int argc, char** argv)
 #endif
     int size = 0;
     uint8_t* data = NULL;
-    data = (uint8_t*)dhlrc_ReadFile(argv[1],&size);
+    data = (uint8_t*)dhlrc_read_file(argv[1],&size);
 #ifdef DH_DEBUG_IN_IDE
     printf("You are in debug mode! Don't define \"DH_DEBUG_IN_IDE\" to use the normal program!\n");
     printf("Anyway, enter 3 in the following program (if success reading file) to enter debug function. \n\n");
@@ -104,8 +104,6 @@ int main_isoc(int argc, char** argv)
     }
     else
     {
-        if(!dhlrc_FileExist("config.json"))
-            dhlrc_mkconfig();
         puts(_("Valid NBT file!"));
         int ret = start_func(root, start_without_option());
         NBT_Free(root);

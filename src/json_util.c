@@ -1,4 +1,4 @@
-/*  recipe_util - utilities to process recipes
+/*  json_util - cJSON utils
     Copyright (C) 2022 Dream Helium
     This file is part of litematica_reader_c.
 
@@ -15,24 +15,19 @@
     You should have received a copy of the GNU Lesser General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>. */
 
-#ifndef RECIPE_UTIL_H
-#define RECIPE_UTIL_H
-#include "dhlrc_list.h"
-#include <cjson/cJSON.h>
-#include <dh/dh_generaliface.h>
-#ifdef __cplusplus
-extern "C"{
-#endif
+#include "json_util.h"
+#include <dhutil.h>
 
-/** Get recipes and combine to ItemList (discard all the items) */
-int         item_list_combine_recipe(ItemList** o_bl, const char* dirpos, DhGeneral* general);
-long *      num_array_get_from_input(int *array_num, int max_num);
-
-const char* name_block_translate(const char* block_name);
-int         dh_exit();
-
-#ifdef __cplusplus
+cJSON* dhlrc_file_to_json(const char* pos)
+{
+    int size;
+    char* data = dhlrc_read_file(pos, &size);
+    if(data)
+    {
+        cJSON* json_data = cJSON_ParseWithLength(data, size);
+        free(data);
+        if(json_data) return json_data;
+        else return NULL;
+    }
+    else return NULL;
 }
-#endif
-
-#endif // RECIPE_UTIL_H

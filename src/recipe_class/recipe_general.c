@@ -20,8 +20,9 @@
 #include "recipe_shapeless.h"
 #include "recipe_smelting.h"
 #include <cjson/cJSON.h>
-#include <dh/dhutil.h>
+#include <dhutil.h>
 #include "../translation.h"
+#include "../json_util.h"
 
 typedef struct{
     char* type;
@@ -124,7 +125,7 @@ RecipeGeneral* recipe_general_new(const char* filename)
 {
     g_return_val_if_fail(recipe_is_supported(filename), NULL);
     RecipeGeneral* self = NULL;
-    cJSON* json = dhlrc_FileToJSON(filename);
+    cJSON* json = dhlrc_file_to_json(filename);
     char* type = cJSON_GetStringValue(cJSON_GetObjectItem(json, "type"));
 
     /* Create object */
@@ -147,7 +148,7 @@ RecipeGeneral* recipe_general_new(const char* filename)
 
 gboolean recipe_is_supported(const char* filename)
 {
-    cJSON* json = dhlrc_FileToJSON(filename);
+    cJSON* json = dhlrc_file_to_json(filename);
     g_return_val_if_fail(json != NULL, FALSE);
     char* type = cJSON_GetStringValue(cJSON_GetObjectItem(json, "type"));
     if(

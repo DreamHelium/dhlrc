@@ -23,6 +23,7 @@
 #include <cjson/cJSON.h>
 #include "recipe_util.h"
 #include "translation.h"
+#include "json_util.h"
 
 static gboolean enable_shaped = TRUE;
 static gboolean enable_smelting = TRUE;
@@ -38,7 +39,7 @@ void recipe_list_enable_feature(gboolean shaped, gboolean smelting,gboolean shap
 
 typedef struct RListData{
     char* o_name;
-    dh_StrArray* r_name;
+    DhStrArray* r_name;
 } RListData;
 
 typedef struct RecipeListBaseData{
@@ -299,7 +300,7 @@ int item_list_combine(ItemList** dest, ItemList* src)
 BlackList* black_list_init()
 {
     GList* bl = NULL;
-    cJSON* black_list = dhlrc_FileToJSON( "config/ignored_blocks.json" );
+    cJSON *black_list = dhlrc_file_to_json("config/ignored_blocks.json");
     if(black_list)
     {
         if(cJSON_IsArray(black_list))
@@ -351,7 +352,7 @@ int black_list_scan(BlackList* bl,const char* name)
 ReplaceList* replace_list_init()
 {
     ReplaceList* rl = NULL;
-    cJSON* rlist_o = dhlrc_FileToJSON("config/block_items.json");
+    cJSON* rlist_o = dhlrc_file_to_json("config/block_items.json");
     if(rlist_o)
     {
         cJSON* rlist = rlist_o->child;
@@ -362,11 +363,11 @@ ReplaceList* replace_list_init()
             else if(cJSON_IsArray(rlist))
             {
                 int size = cJSON_GetArraySize(rlist);
-                dh_StrArray* str = NULL;
+                DhStrArray* str = NULL;
                 for(int i = 0; i < size ; i++)
                 {
                     char* r_name = cJSON_GetStringValue( cJSON_GetArrayItem(rlist, i) );
-                    dh_StrArray_AddStr( &str, r_name);
+                    dh_str_array_add_str( &str, r_name);
                 }
                 rl = replace_list_extend_str_array(rl, rlist->string, str);
             }
@@ -387,14 +388,14 @@ ReplaceList* replace_list_init()
 ReplaceList* replace_list_extend(ReplaceList* rl,const char* o_name,const char* r_name)
 {
     RListData* rld = (RListData*) malloc(sizeof(RListData));
-    dh_StrArray* str = dh_StrArray_Init( r_name );
+    DhStrArray* str = dh_str_array_init( r_name );
     rld->o_name = dh_strdup(o_name);
     rld->r_name = str;
     rl = g_list_prepend(rl, rld);
     return rl;
 }
 
-ReplaceList * replace_list_extend_str_array(ReplaceList* rl, const char* o_name, dh_StrArray* str)
+ReplaceList * replace_list_extend_str_array(ReplaceList* rl, const char* o_name, DhStrArray* str)
 {
     RListData* rld = (RListData*) malloc(sizeof(RListData));
     rld->o_name = dh_strdup(o_name);
@@ -406,13 +407,13 @@ ReplaceList * replace_list_extend_str_array(ReplaceList* rl, const char* o_name,
 
 const char* replace_list_replace(ReplaceList* rl, const char* o_name)
 {
-    dh_StrArray* str = replace_list_replace_str_array(rl, o_name);
+    DhStrArray* str = replace_list_replace_str_array(rl, o_name);
     if(str)
         return (str->val)[0];
     else return o_name;
 }
 
-dh_StrArray * replace_list_replace_str_array(ReplaceList* rl, const char* o_name)
+DhStrArray * replace_list_replace_str_array(ReplaceList* rl, const char* o_name)
 {
     if(rl)
     {
@@ -434,7 +435,7 @@ void replace_list_free(ReplaceList* rl)
     for( ; rld ; rld = rld->next)
     {
         RListData* rldata = rld->data;
-        dh_StrArray_Free(rldata->r_name);
+        dh_str_array_free(rldata->r_name);
         free(rldata->o_name);
         free(rldata);
     }
@@ -518,7 +519,7 @@ static RecipeListBaseData* rlbasedata_init(const char* dir, const char* filename
 
     /* For example, "recipe", "/", "torch.json" */
     char* full_filename = g_strconcat(dir, "/",filename , NULL);
-    cJSON* json_object = dhlrc_FileToJSON(full_filename);
+    cJSON* json_object = dhlrc_file_to_json(full_filename);
     if(json_object)
     {
         gboolean supported = type_is_supported( cJSON_GetStringValue(
@@ -599,7 +600,7 @@ static void get_name_from_name(const char* name, char** namespace, char** item_n
 static GList* recipe_filenames(const char* dir, ItemList* il)
 {
     /* Get file names */
-    GList* filenames = dh_FileList_Create(dir);
+    GList* filenames = dh_file_list_create(dir);
     g_return_val_if_fail(filenames != NULL , NULL);
     /* Get corresponding recipe file */
     GList* recipe_file_names = NULL;
@@ -671,22 +672,22 @@ static char* rcl_namespace(RecipeList* rcl)
     return ((RecipeListBaseData*)(rcl->data))->inamespace;
 }
 
-dh_StrArray* recipe_list_item_names(RecipeList* rcl)
+DhStrArray* recipe_list_item_names(RecipeList* rcl)
 {
-    dh_StrArray* arr = NULL;
+    DhStrArray* arr = NULL;
     while(rcl)
     {
         char* item_name = recipe_list_item_name(rcl);
-        if(!dh_StrArray_FindRepeated(arr, item_name))
-            dh_StrArray_AddStr(&arr, item_name);
+        if(!dh_str_array_find_repeated(arr, item_name))
+            dh_str_array_add_str(&arr, item_name);
         rcl = rcl->next;
     }
     return arr;
 }
 
-dh_StrArray* recipe_list_item_names_with_namespace(RecipeList* rcl)
+DhStrArray* recipe_list_item_names_with_namespace(RecipeList* rcl)
 {
-    dh_StrArray* arr = NULL;
+    DhStrArray* arr = NULL;
     while(rcl)
     {
         char* item_name = recipe_list_item_name(rcl);
@@ -694,8 +695,8 @@ dh_StrArray* recipe_list_item_names_with_namespace(RecipeList* rcl)
 
         gchar* full_name_g = g_strconcat(namespace, ":", item_name , NULL);
 
-        if(!dh_StrArray_FindRepeated(arr, full_name_g))
-            dh_StrArray_AddStr(&arr, full_name_g);
+        if(!dh_str_array_find_repeated(arr, full_name_g))
+            dh_str_array_add_str(&arr, full_name_g);
         g_free(full_name_g);
         rcl = rcl->next;
     }
@@ -858,14 +859,14 @@ ItemList* item_list_recipe(RecipeList* rcl, int num, const char* item_name, DhGe
 //     {
 //         cJSON* pattern = cJSON_GetObjectItem(json, "pattern");
 //         guint pattern_size = cJSON_GetArraySize(pattern);
-//         dh_StrArray* pattern_stra = NULL;
+//         DhStrArray* pattern_stra = NULL;
 //         for(int i = 0 ; i < pattern_size ; i++)
 //         {
 //             char* str = cJSON_GetStringValue(cJSON_GetArrayItem(pattern, i));
-//             dh_StrArray_AddStr(&pattern_stra, str);
+//             DhStrArray_AddStr(&pattern_stra, str);
 //         }
-//         char* pattern_string = dh_StrArray_cat(pattern_stra);
-//         dh_StrArray_Free(pattern_stra);
+//         char* pattern_string = DhStrArray_cat(pattern_stra);
+//         DhStrArray_Free(pattern_stra);
 //
 //         /* Get keys */
 //         cJSON* keys = cJSON_GetObjectItem(json, "key");

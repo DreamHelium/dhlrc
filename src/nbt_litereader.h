@@ -17,15 +17,14 @@
 
 #ifndef NBT_LITEREADER_H
 #define NBT_LITEREADER_H
+
+#include "libnbt/nbt.h"
+#include <dhutil.h>
+#include "nbt_pos.h"
+
 #ifdef __cplusplus
 extern "C"{
 #endif
-
-#include "libnbt/nbt.h"
-#include <dh/dh_string_util.h>
-#include "nbt_pos.h"
-
-
 
 /** Just use this to start a reader instance.
  *  Please pass NULL in "parent" to start. */

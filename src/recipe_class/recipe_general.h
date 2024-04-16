@@ -35,7 +35,7 @@ typedef struct IngredientContainer{
 
 typedef struct Recipe{
     guint result;
-    dh_StrArray* pattern;
+    DhStrArray* pattern;
     GPtrArray* arr;
 }Recipe;
 

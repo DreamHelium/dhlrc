@@ -25,7 +25,7 @@
 
 extern int verbose_level;
 
-static int* id_to_index(dh_StrArray* str, ItemList* il)
+static int* id_to_index(DhStrArray* str, ItemList* il)
 {
     int* sheet = (int*)malloc( (str->num + 1) * sizeof(int) );
     for(int i = 0 ; i < str->num ; i++ )
@@ -52,11 +52,11 @@ LiteRegion* lite_region_create(NBT* root, int r_num)
             return NULL;
         }
 
-        dh_StrArray* r_name = lite_region_name_array(root);
+        DhStrArray* r_name = lite_region_name_array(root);
         if(r_num < r_name->num)
         {
             out->name = dh_strdup( r_name->val[r_num] );
-            dh_StrArray_Free(r_name);
+            dh_str_array_free(r_name);
 
             out->region_num = r_num;
             out->region_nbt = lite_region_nbt_region( root, r_num );
@@ -95,11 +95,11 @@ LiteRegion* lite_region_create(NBT* root, int r_num)
             out->move_bits = bits;
 
             /* Replace name of block here so you don't have to do it in the following step */
-            dh_StrArray* replaced_names = NULL;
+            DhStrArray* replaced_names = NULL;
             ReplaceList* rl = replace_list_init();
             for(int i = 0 ; i < out->blocks->num ; i++)
             {
-                dh_StrArray_AddStr(&replaced_names, replace_list_replace(rl, out->blocks->val[i]));
+                dh_str_array_add_str(&replaced_names, replace_list_replace(rl, out->blocks->val[i]));
             }
             replace_list_free(rl);
             out->replaced_blocks = replaced_names;
@@ -118,8 +118,8 @@ LiteRegion* lite_region_create(NBT* root, int r_num)
 void lite_region_free(LiteRegion* lr)
 {
     free(lr->name);
-    dh_StrArray_Free(lr->blocks);
-    dh_StrArray_Free(lr->replaced_blocks);
+    dh_str_array_free(lr->blocks);
+    dh_str_array_free(lr->replaced_blocks);
     nbt_pos_free(lr->region_pos);
     free(lr->block_properties);
     free(lr);
@@ -262,18 +262,18 @@ char** lite_region_block_names(NBT* root, int r_num ,int bNum)
     return l;
 }
 
-dh_StrArray* lite_region_block_name_array(NBT* root, int r_num)
+DhStrArray* lite_region_block_name_array(NBT* root, int r_num)
 {
     NBT* palette = lite_region_nbt_block_state_palette(root, r_num);
-    dh_StrArray* name = NULL;
+    DhStrArray* name = NULL;
     while(palette)
     {
         NBT* block_nbt = NBT_GetChild( palette, "Name" );
         if(block_nbt)
-            dh_StrArray_AddStr( &name, block_nbt->value_a.value );
+            dh_str_array_add_str( &name, block_nbt->value_a.value );
         else
         {
-            dh_StrArray_Free(name);
+            dh_str_array_free(name);
             return NULL;
         }
         palette = palette -> next;
@@ -475,13 +475,13 @@ ItemList *lite_region_item_list_without_num(LiteRegion* lr, ItemList *o_il)
     return o_il;
 }
 
-dh_StrArray* lite_region_name_array(NBT* root)
+DhStrArray* lite_region_name_array(NBT* root)
 {
     NBT* region_nbt = NBT_GetChild(root, "Regions")->child;
-    dh_StrArray* str_arr = NULL;
+    DhStrArray* str_arr = NULL;
     while(region_nbt)
     {
-        dh_StrArray_AddStr( &str_arr, region_nbt->key);
+        dh_str_array_add_str( &str_arr, region_nbt->key);
         region_nbt = region_nbt->next;
     }
     return str_arr;

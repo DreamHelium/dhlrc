@@ -378,7 +378,7 @@ int nbtlr_save(NBT* root)
             {
                 int str_len = strlen(input);
                 input[str_len - 1] = 0;
-                dhlrc_WriteFile(input, data, len);
+                dhlrc_write_file(input, data, len);
                 free(data);
                 free(input);
                 return 1;

@@ -35,6 +35,8 @@ add_library(dhlrc SHARED
 	       uncompress.h
 	       nbt_litereader.h
 	       nbt_litereader.c
+		   json_util.c
+		   json_util.h
 	       recipe_class/recipe_general.h
 	       recipe_class/recipe_general.c
 	       recipe_class/recipe_shaped.h

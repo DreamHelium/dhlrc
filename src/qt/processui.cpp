@@ -8,7 +8,7 @@
 #include <qdatetime.h>
 #include "mainwindow.h"
 
-static dh_StrArray* region_name = nullptr;
+static DhStrArray* region_name = nullptr;
 extern ItemList* il;
 extern NBT* root;
 extern QList<IlInfo> ilList;
@@ -22,7 +22,7 @@ ProcessUI::ProcessUI(QWidget *parent) :
 
 ProcessUI::~ProcessUI()
 {
-    dh_StrArray_Free(region_name);
+    dh_str_array_free(region_name);
 }
 
 void ProcessUI::initUI()

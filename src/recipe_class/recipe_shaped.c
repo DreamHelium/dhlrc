@@ -18,7 +18,7 @@
 #include "recipe_shaped.h"
 #include "recipe_general.h"
 #include <cjson/cJSON.h>
-#include <dh/dh_string_util.h>
+#include <dhutil.h>
 #include "../translation.h"
 
 
@@ -42,7 +42,7 @@ struct _RecipeShaped
     RecipeGeneral parent_instance;
 
     guint result;
-    dh_StrArray* pattern;
+    DhStrArray* pattern;
     GPtrArray* key;
 };
 
@@ -66,11 +66,11 @@ static void rpsd_set_content(RecipeGeneral* self, cJSON* json)
     /* Get pattern */
     cJSON* pattern = cJSON_GetObjectItem(json, "pattern");
     guint pattern_size = cJSON_GetArraySize(pattern);
-    dh_StrArray* pattern_strv = NULL;
+    DhStrArray* pattern_strv = NULL;
     for(int i = 0 ; i < pattern_size; i++)
     {
         char* str = cJSON_GetStringValue(cJSON_GetArrayItem(pattern, i));
-        dh_StrArray_AddStr(&pattern_strv, str);
+        dh_str_array_add_str(&pattern_strv, str);
     }
     shaped_recipe->pattern = pattern_strv;
 
@@ -122,7 +122,7 @@ static ItemList* rpsd_get_recipe(RecipeGeneral* self, guint num, DhGeneral* dh_g
     for(int i = 0 ; i < shaped_recipe->key->len ; i++)
     {
         KeyIng* keying = shaped_recipe->key->pdata[i];
-        guint key_num = dh_StrArray_FindChar(shaped_recipe->pattern, keying->key);
+        guint key_num = dh_str_array_find_char(shaped_recipe->pattern, keying->key);
 
         GPtrArray* ingredient = keying->ingredients;
         if(ingredient->len == 1)
@@ -162,7 +162,7 @@ static void recipe_shaped_finalize(GObject* object)
 {
     RecipeShaped* spd = RECIPE_SHAPED(object);
     g_ptr_array_unref(spd->key);
-    dh_StrArray_Free(spd->pattern);
+    dh_str_array_free(spd->pattern);
     G_OBJECT_CLASS(recipe_shaped_parent_class)->finalize(object);
 }
 

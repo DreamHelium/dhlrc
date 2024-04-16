@@ -19,7 +19,7 @@
 #define DHLRC_LIST_H
 
 #include <gmodule.h>
-#include <dh/dhutil.h>
+#include <dhutil.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -69,10 +69,10 @@ int         black_list_scan(BlackList* bl,const char* name);
 
 ReplaceList*    replace_list_init();
 ReplaceList*    replace_list_extend(ReplaceList* rl, const char* o_name, const char* r_name);
-ReplaceList*    replace_list_extend_str_array(ReplaceList* rl, const char* o_name, dh_StrArray* str);
+ReplaceList*    replace_list_extend_str_array(ReplaceList* rl, const char* o_name, DhStrArray* str);
 G_DEPRECATED_FOR(replace_list_replace_str_array)
 const char*     replace_list_replace(ReplaceList* rl, const char* o_name);
-dh_StrArray*    replace_list_replace_str_array(ReplaceList* rl, const char* o_name);
+DhStrArray*    replace_list_replace_str_array(ReplaceList* rl, const char* o_name);
 void            replace_list_free(ReplaceList* rl);
 
 void            recipe_list_enable_feature(gboolean shaped, gboolean smelting, gboolean shapeless);
@@ -80,8 +80,8 @@ RecipeList*     recipe_list_init(const char* dir, ItemList* il);
 void            recipe_list_free(RecipeList* rcl);
 char*           recipe_list_filename(RecipeList* rcl);
 char*           recipe_list_item_name(RecipeList* rcl);
-dh_StrArray*    recipe_list_item_names(RecipeList* rcl);
-dh_StrArray*    recipe_list_item_names_with_namespace(RecipeList* rcl);
+DhStrArray*    recipe_list_item_names(RecipeList* rcl);
+DhStrArray*    recipe_list_item_names_with_namespace(RecipeList* rcl);
 //only for debug
 //int Test();
 
