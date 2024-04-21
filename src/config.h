@@ -29,6 +29,9 @@ void dhlrc_make_config();
 void dhlrc_reread_config();
 void dh_exit1();
 char* dh_get_game_dir();
+char* dh_get_cache_dir();
+char* dh_get_version();
+char* dh_get_recipe_dir();
 
 
 #ifdef __cplusplus

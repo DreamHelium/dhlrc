@@ -18,6 +18,7 @@
 #ifndef RECIPES_GENERAL_H
 #define RECIPES_GENERAL_H
 
+#undef signals
 #include <glib-object.h>
 #include <cjson/cJSON.h>
 #include <dh/dhutil.h>

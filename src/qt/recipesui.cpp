@@ -9,6 +9,8 @@
 #include "mainwindow.h"
 #include "recipesshowui.h"
 #include "ilchooseui.h"
+#include "../config.h"
+#include "../uncompress.h"
 
 extern bool infoR;
 extern IlInfo info;
@@ -51,7 +53,33 @@ RecipesUI::~RecipesUI()
 void RecipesUI::recipesInit()
 {
     ItemList* il = info.il;
-    RecipeList* rcl = recipe_list_init("recipes", il);
+    gchar* recipeDir = dh_get_recipe_dir();
+    qDebug() << recipeDir;
+    RecipeList* rcl = recipe_list_init(recipeDir, il);
+    if(!rcl)
+    {
+        /* Extract file from game dir */
+        char* gameDir = dh_get_game_dir();
+        char* version = dh_get_version();
+        QString originGameJar = gameDir;
+        originGameJar += "/versions/";
+        originGameJar += version;
+        originGameJar += "/";
+        originGameJar += version;
+        originGameJar += ".jar";
+        char* cacheDir = dh_get_cache_dir();
+        QString destDir = cacheDir;
+        destDir += "/";
+        destDir += version;
+        destDir += "/extracted/";
+        dh_file_create(destDir.toStdString().c_str(), FALSE);
+        dhlrc_extract(originGameJar.toStdString().c_str(), destDir.toStdString().c_str());
+        g_free(gameDir);
+        g_free(version);
+        g_free(cacheDir);
+        rcl = recipe_list_init(recipeDir, il);
+    }
+    g_free(recipeDir);
     RecipeList* rcl_d = rcl;
     while(rcl_d)
     {

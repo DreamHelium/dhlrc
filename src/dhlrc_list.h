@@ -18,7 +18,8 @@
 #ifndef DHLRC_LIST_H
 #define DHLRC_LIST_H
 
-#include <gmodule.h>
+#undef signals
+#include <glib.h>
 #include <dhutil.h>
 
 #ifdef __cplusplus

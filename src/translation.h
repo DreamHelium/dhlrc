@@ -18,14 +18,13 @@
 #ifndef TRANSLATION_H
 #define TRANSLATION_H
 
-#ifdef __cplusplus
-extern "C"{
-#endif
-void translation_init();
 #ifndef DH_DISABLE_TRANSLATION
+
+#undef signals
 #include <libintl.h>
 #include <locale.h>
 #include "recipe_util.h"
+
 #define _(str) gettext (str)
 #define N_(str) str
 #define trm(str) name_block_translate (str)
@@ -33,6 +32,12 @@ void translation_init();
 #define _(str) str
 #define trm(str) str
 #endif
+
+#ifdef __cplusplus
+extern "C"{
+#endif
+
+void translation_init();
 
 #ifdef __cplusplus
 }

@@ -17,9 +17,11 @@
 
 #ifndef RECIPE_UTIL_H
 #define RECIPE_UTIL_H
+
 #include "dhlrc_list.h"
 #include <cjson/cJSON.h>
-#include <dh/dh_generaliface.h>
+#include <dhutil.h>
+
 #ifdef __cplusplus
 extern "C"{
 #endif
