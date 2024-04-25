@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-03-25 21:36+0800\n"
+"POT-Creation-Date: 2024-04-25 22:05+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,23 +17,23 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: src/main.c:34
+#: src/main.c:35
 msgid "Enter NBT reader mode."
 msgstr ""
 
-#: src/main.c:35
+#: src/main.c:36
 msgid "Enter litematica block reader."
 msgstr ""
 
-#: src/main.c:36
+#: src/main.c:37
 msgid "Enter litematica material list with recipe combination."
 msgstr ""
 
-#: src/main.c:37
+#: src/main.c:38
 msgid "Output log file to FILE"
 msgstr ""
 
-#: src/main.c:38
+#: src/main.c:39
 msgid ""
 "Set verbose level to N.\n"
 "\t\t\tLevel 1: See process.\n"
@@ -41,31 +41,31 @@ msgid ""
 "\t\t\tLevel 3: See all the details (Not recommended!)."
 msgstr ""
 
-#: src/main.c:44
+#: src/main.c:46
 msgid "[FILE] - Read a litematic file."
 msgstr ""
 
-#: src/main.c:67
+#: src/main.c:69
 msgid "Only one option can be chosen!\n"
 msgstr ""
 
-#: src/main.c:73
+#: src/main.c:75
 msgid "A level below 3 is allowed!\n"
 msgstr ""
 
-#: src/main_isoc.c:81
+#: src/main_isoc.c:85
 msgid "Error when reading file."
 msgstr ""
 
-#: src/main_isoc.c:96
+#: src/main_isoc.c:101
 msgid "Not a valid NBT file!"
 msgstr ""
 
-#: src/main_isoc.c:103 src/qt/mainwindow.cpp:76
+#: src/main_isoc.c:107 src/qt/mainwindow.cpp:92
 msgid "Valid NBT file!"
 msgstr ""
 
-#: src/main_isoc.c:114
+#: src/main_isoc.c:121
 #, c-format
 msgid ""
 "There are three functions:\n"
@@ -75,73 +75,97 @@ msgid ""
 "\n"
 msgstr ""
 
-#: src/main_isoc.c:118
+#: src/main_isoc.c:125
 #, c-format
 msgid "Please select an option, or enter 'q' to exit the program (q): "
 msgstr ""
 
-#: src/main_isoc.c:173 src/lrc_extend.c:42
+#: src/main_isoc.c:180 src/lrc_extend.c:42
 #, c-format
 msgid "There are %d regions:\n"
 msgstr ""
 
-#: src/main_isoc.c:186
+#: src/main_isoc.c:193
 #, c-format
 msgid "Processing: region %d / %d : [%ld] %s"
 msgstr ""
 
-#: src/nbt_litereader.c:57
+#: src/nbt_litereader.c:61
 #, c-format
 msgid ""
 "The detail of NBT \"%s\" is listed below:\n"
 "\n"
 msgstr ""
 
-#: src/nbt_litereader.c:82
-#, c-format
-msgid ""
-"\n"
-"Please enter a number to continue, or enter 'm' to modification mode, 's' to "
-"save NBT file, 'q' to exit the program, 'e' to upper instance (q): "
+#: src/nbt_litereader.c:92 src/nbt_litereader.c:114 src/nbt_litereader.c:134
+#: src/nbt_litereader.c:349
+msgid "Quit application"
 msgstr ""
 
-#: src/nbt_litereader.c:88
-#, c-format
-msgid ""
-"\n"
-"Please enter a number to continue, or enter 'm' to modification mode, 'p' to "
-"upper NBT, 's' to save NBT file, 'q' to exit the program, 'e' to upper "
-"instance (p): "
+#: src/nbt_litereader.c:93 src/nbt_litereader.c:115 src/nbt_litereader.c:135
+msgid "Enter modification mode"
 msgstr ""
 
-#: src/nbt_litereader.c:96
-#, c-format
-msgid ""
-"\n"
-"No deeper NBT, please enter 'm' to modification mode, 'p' to upper NBT, 's' "
-"to save NBT file, 'q' to exit the program, 'e' to upper instance (p): "
+#: src/nbt_litereader.c:94 src/nbt_litereader.c:116 src/nbt_litereader.c:136
+msgid "Save NBT file"
 msgstr ""
 
-#: src/nbt_litereader.c:285 src/nbt_litereader.c:337
+#: src/nbt_litereader.c:95 src/nbt_litereader.c:117 src/nbt_litereader.c:137
+msgid "Enter upper instance"
+msgstr ""
+
+#: src/nbt_litereader.c:101
+msgid ""
+"\n"
+"Please enter a number or choose option to continue [Q/m/s/e/?]: "
+msgstr ""
+
+#: src/nbt_litereader.c:113 src/nbt_litereader.c:133 src/nbt_litereader.c:348
+msgid "Enter upper NBT"
+msgstr ""
+
+#: src/nbt_litereader.c:118
+msgid ""
+"\n"
+"Please enter a number or choose option to continue [P/q/m/s/e/?]: "
+msgstr ""
+
+#: src/nbt_litereader.c:138
+msgid ""
+"\n"
+"No deeper NBT, please choose option to continue [P/q/m/s/e/?]: "
+msgstr ""
+
+#: src/nbt_litereader.c:308 src/nbt_litereader.c:407
 #, c-format
 msgid ""
 "\n"
 "Unsupported modification mode request, will exit to reading mode."
 msgstr ""
 
-#: src/nbt_litereader.c:311
-#, c-format
-msgid ""
-"\n"
-"Please enter an integer, or enter 'b' to exit modification mode, 'p' to "
-"upper NBT, 'q' to exit the program (p): "
+#: src/nbt_litereader.c:350
+msgid "Exit modification mode"
 msgstr ""
 
-#: src/nbt_litereader.c:322
+#: src/nbt_litereader.c:356
+msgid ""
+"\n"
+"Please enter an integer or choose an option [P/q/b/?]: "
+msgstr ""
+
+#: src/nbt_litereader.c:370
 #, c-format
 msgid ""
 "\n"
-"The integer you input is %ld, please confirm [Y/n] (Y): "
+"The integer you input is %ld, please confirm [Y/n/?]:"
+msgstr ""
+
+#: src/nbt_litereader.c:372
+msgid "Yes"
+msgstr ""
+
+#: src/nbt_litereader.c:373
+msgid "No"
 msgstr ""
 
 #: src/litematica_region.c:403
@@ -193,64 +217,64 @@ msgid ""
 "the program (b): "
 msgstr ""
 
-#: src/recipe_util.c:35
+#: src/recipe_util.c:37
 #, c-format
 msgid "Input numbers directly, or type 'a' for all numbers, 'q' to quit (a): "
 msgstr ""
 
-#: src/recipe_util.c:120
+#: src/recipe_util.c:122
 #, c-format
 msgid "Processing %s with %d items, continue or read item list? [Y/n/q/r] :"
 msgstr ""
 
-#: src/recipe_util.c:122
+#: src/recipe_util.c:124
 msgid "&Yes"
 msgstr ""
 
-#: src/recipe_util.c:122
+#: src/recipe_util.c:124
 msgid "&No"
 msgstr ""
 
-#: src/recipe_util.c:122 src/qt/mainwindow.cpp:40
+#: src/recipe_util.c:124 src/qt/mainwindow.cpp:56
 msgid "&Quit"
 msgstr ""
 
-#: src/recipe_util.c:122
+#: src/recipe_util.c:124
 msgid "&Read"
 msgstr ""
 
-#: src/dhlrc_list.c:134
+#: src/dhlrc_list.c:135
 msgid "Name\t\tTotal\tPlaced\tAvailable\tIs tag\n"
 msgstr ""
 
-#: src/dhlrc_list.c:712
+#: src/dhlrc_list.c:723
 #, c-format
 msgid "Processing %s.\n"
 msgstr ""
 
-#: src/dhlrc_list.c:719
+#: src/dhlrc_list.c:730
 #, c-format
 msgid "There are %d corresponding files to the item %s:\n"
 msgstr ""
 
-#: src/dhlrc_list.c:726
+#: src/dhlrc_list.c:737
 msgid "Please select an option, or 'd' to discard (d): "
 msgstr ""
 
-#: src/dhlrc_list.c:726 src/recipe_class/recipe_general.c:112
+#: src/dhlrc_list.c:737 src/recipe_class/recipe_general.c:113
 msgid "&Discard"
 msgstr ""
 
-#: src/recipe_class/recipe_general.c:111
+#: src/recipe_class/recipe_general.c:112
 #, c-format
 msgid "There is a remainder with %d and %d.\n"
 msgstr ""
 
-#: src/recipe_class/recipe_general.c:112
+#: src/recipe_class/recipe_general.c:113
 msgid "Enter 'd' to discard the result, or enter 'c' to continue (c): "
 msgstr ""
 
-#: src/recipe_class/recipe_general.c:112
+#: src/recipe_class/recipe_general.c:113
 msgid "&Continue"
 msgstr ""
 
@@ -266,78 +290,98 @@ msgstr ""
 msgid "&Abort"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:21 src/qt/lrcfunctionui.cpp:11
+#: src/qt/mainwindow.cpp:33
 msgid "Litematica reader"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:33
+#: src/qt/mainwindow.cpp:49 src/qt/ilreaderui.cpp:24
 msgid "&File"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:39
+#: src/qt/mainwindow.cpp:55
 msgid "&Open"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:49
+#: src/qt/mainwindow.cpp:65
 msgid "Select a file"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:49
+#: src/qt/mainwindow.cpp:65
 msgid "Litematic file (*.litematic)"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:77
+#: src/qt/mainwindow.cpp:93
 msgid "There are three functions:"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:81
+#: src/qt/mainwindow.cpp:97
 msgid "NBT lite &reader with modifier"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:82
+#: src/qt/mainwindow.cpp:98
 msgid "Litematica material &list with recipe combination"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:83
+#: src/qt/mainwindow.cpp:99
 msgid "Litematica &block reader"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:91 src/qt/lrcfunctionui.cpp:18
-msgid "&OK"
-msgstr ""
-
-#: src/qt/mainwindow.cpp:92 src/qt/lrcfunctionui.cpp:19
-msgid "&Close"
-msgstr ""
-
-#: src/qt/ilreaderui.cpp:14
-msgid "Name"
-msgstr ""
-
-#: src/qt/ilreaderui.cpp:14
-msgid "Total"
-msgstr ""
-
-#: src/qt/ilreaderui.cpp:14
-msgid "Placed"
-msgstr ""
-
-#: src/qt/ilreaderui.cpp:15
-msgid "Available"
-msgstr ""
-
-#: src/qt/ilreaderui.cpp:15
-msgid "isTag"
-msgstr ""
-
-#: src/qt/lrcfunctionui.cpp:12
-msgid "Please select a function:"
-msgstr ""
-
-#: src/qt/lrcfunctionui.cpp:14
+#: src/qt/mainwindow.cpp:100
 msgid "&Item list reader and modifier"
 msgstr ""
 
-#: src/qt/lrcfunctionui.cpp:15
+#: src/qt/mainwindow.cpp:101
 msgid "&Recipe combiner"
+msgstr ""
+
+#: src/qt/mainwindow.cpp:102
+msgid "&Clear Item list"
+msgstr ""
+
+#: src/qt/mainwindow.cpp:113
+msgid "&OK"
+msgstr ""
+
+#: src/qt/mainwindow.cpp:114
+msgid "&Close"
+msgstr ""
+
+#: src/qt/mainwindow.cpp:159
+msgid "Error!"
+msgstr ""
+
+#: src/qt/mainwindow.cpp:159
+msgid "No selected region!"
+msgstr ""
+
+#: src/qt/ilreaderui.cpp:27
+msgid "&Save"
+msgstr ""
+
+#: src/qt/ilreaderui.cpp:59
+msgid "Save file"
+msgstr ""
+
+#: src/qt/ilreaderui.cpp:59
+msgid "CSV file (*.csv)"
+msgstr ""
+
+#: src/qt/ilreaderui.cpp:71
+msgid "Name"
+msgstr ""
+
+#: src/qt/ilreaderui.cpp:71
+msgid "Total"
+msgstr ""
+
+#: src/qt/ilreaderui.cpp:71
+msgid "Placed"
+msgstr ""
+
+#: src/qt/ilreaderui.cpp:72
+msgid "Available"
+msgstr ""
+
+#: src/qt/ilreaderui.cpp:72
+msgid "isTag"
 msgstr ""

@@ -16,12 +16,12 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>. */
 
 #include "nbt_litereader.h"
-#include <dh/dhutil.h>
+#include <dhutil.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-
+#include <dh_validator.h>
 #include "translation.h"
 
 int nbtlr_instance(NBT* root, int from_parent, int modify_mode);
@@ -48,12 +48,16 @@ int nbtlr_instance_ng(NbtPos* pos, int modify_mode)
 {
     while(1)
     {
+#ifdef G_OS_WIN32
+        system("cls");
+#else
         system("clear");
+#endif
         char* key;
         if(pos->level == 0 || pos->item != -1)
             key = pos->current->key;
         else
-            key = nbtlr_to_next_nbt( pos->tree[pos->level - 1] , pos->child[pos->level - 1])->key;
+            key = nbtlr_to_next_nbt(pos->tree[pos->level - 1] , pos->child[pos->level - 1])->key;
         printf(_("The detail of NBT \"%s\" is listed below:\n\n"), key);
         int list = 0;
 
@@ -61,90 +65,109 @@ int nbtlr_instance_ng(NbtPos* pos, int modify_mode)
         list = nbtlr_list(pos->current, (pos->item == -1) );
 
         // modify_mode option
-        dh_LineOut* input = NULL;
+        GValue ret = {0};
+        DhOut* out = dh_out_new();
         if(modify_mode)
         {
             if(pos->level == 0 && list == 1 && pos->current->type == TAG_Compound)
-                input = nbtlr_modifier_start(pos->current, 0);
-            else input = nbtlr_modifier_start( pos->current, (pos->item == -1));
+                nbtlr_modifier_start(pos->current, 0, &ret);
+            else nbtlr_modifier_start( pos->current, (pos->item == -1), &ret);
         }
         else
         {
             if(list > 0)
             {
+                /* Old implement
                 dh_limit* limit = dh_limit_Init(Integer);
                 if(limit)
                 {
                     dh_limit_AddInt(limit, 0, list-1);
                 }
-                else return -1;
+                else return -1;*/
+                /* New implement */
+
+                DhIntValidator* validator = dh_int_validator_new(0, list - 1);
                 if(pos->level == 0){
+                    DhArgInfo* arg = dh_arg_info_new();
+                    dh_arg_info_add_arg(arg, 'q', "quit", N_("Quit application"));
+                    dh_arg_info_add_arg(arg, 'm', "modify", N_("Enter modification mode"));
+                    dh_arg_info_add_arg(arg, 's', "save", N_("Save NBT file"));
+                    dh_arg_info_add_arg(arg, 'e', "upins", N_("Enter upper instance"));
+                    /*
                     printf(_("\nPlease enter a number to continue, or enter 'm' to modification mode, \
 's' to save NBT file, 'q' to exit the program, 'e' to upper instance (q): "));
                     input = InputLine_General(sizeof(int64_t), limit, 0, "qmse", 1);
+                    */
+                    dh_out_read_and_output(out, N_("\nPlease enter a number or choose option to continue [Q/m/s/e/?]: "), "dhlrc", arg, DH_VALIDATOR(validator), FALSE, &ret);
+                    g_object_unref(out);
+                    g_object_unref(arg);
                 }
                 else
                 {
+                    /*
                     printf(_("\nPlease enter a number to continue, or enter 'm' to modification mode, \
 'p' to upper NBT, 's' to save NBT file, 'q' to exit the program, 'e' to upper instance (p): "));
                     input = InputLine_General(sizeof(int64_t), limit, 0, "pqmse", 1);
+                    */
+                    DhArgInfo* arg = dh_arg_info_new();
+                    dh_arg_info_add_arg(arg, 'p', "upper", N_("Enter upper NBT"));
+                    dh_arg_info_add_arg(arg, 'q', "quit", N_("Quit application"));
+                    dh_arg_info_add_arg(arg, 'm', "modify", N_("Enter modification mode"));
+                    dh_arg_info_add_arg(arg, 's', "save", N_("Save NBT file"));
+                    dh_arg_info_add_arg(arg, 'e', "upins", N_("Enter upper instance"));
+                    dh_out_read_and_output(out, N_("\nPlease enter a number or choose option to continue [P/q/m/s/e/?]: "), "dhlrc", arg, DH_VALIDATOR(validator), FALSE, &ret);
+                    g_object_unref(out);
+                    g_object_unref(arg);
+
                 }
-                dh_limit_Free(limit);
+                g_object_unref(validator);
             }
             else
             {
+                /*
                 printf(_("\nNo deeper NBT, please enter 'm' to modification mode, 'p' to upper NBT, \
 's' to save NBT file, 'q' to exit the program, 'e' to upper instance (p): "));
                 input = InputLine_General(0, NULL, 0, "pqmse", 1);
+                */
+                DhArgInfo* arg = dh_arg_info_new();
+                dh_arg_info_add_arg(arg, 'p', "upper", N_("Enter upper NBT"));
+                dh_arg_info_add_arg(arg, 'q', "quit", N_("Quit application"));
+                dh_arg_info_add_arg(arg, 'm', "modify", N_("Enter modification mode"));
+                dh_arg_info_add_arg(arg, 's', "save", N_("Save NBT file"));
+                dh_arg_info_add_arg(arg, 'e', "upins", N_("Enter upper instance"));
+                dh_out_read_and_output(out, N_("\nNo deeper NBT, please choose option to continue [P/q/m/s/e/?]: "), "dhlrc", arg, NULL, FALSE, &ret);
+                g_object_unref(out);
+                g_object_unref(arg);
             }
         }
-        if(input)
+        /* Analyse ret */
+        if(G_VALUE_HOLDS_INT64(&ret))
         {
-            switch(input->type)
+            if(!nbt_pos_add_to_tree(pos, g_value_get_int64(&ret)))
+                return -1;
+        }
+        else if(G_VALUE_HOLDS_CHAR(&ret))
+        {
+            char opt = g_value_get_schar(&ret);
+            if(opt == 'q')
+                return 0;
+            if(opt == 'e')
+                return 1;
+            if(opt == 'm')
+                modify_mode = 1;
+            if(opt == 'b')
+                modify_mode = 0;
+            if(opt == 'p')
+                if(!nbt_pos_delete_last(pos)) return -1;
+            if(opt == 's')
             {
-            case Integer:
-            {
-                if(!nbt_pos_add_to_tree(pos, input->num_i))
-                {
-                    dh_LineOut_Free(input);
-                    return -1;
-                }
-                dh_LineOut_Free(input);
-                break;
-            }
-            case Character:
-            {
-                char opt = input->val_c;
-                dh_LineOut_Free(input);
-                if(opt == 'q')
+                if(nbtlr_save(pos->tree[0]))
                     return 0;
-                if(opt == 'e')
-                    return 1;
-                if(opt == 'm')
-                    modify_mode = 1;
-                if(opt == 'b')
-                    modify_mode = 0;
-                if(opt == 'p')
-                    if(!nbt_pos_delete_last(pos)) return -1;
-                if(opt == 's')
-                {
-                    if(nbtlr_save(pos->tree[0]))
-                        return 0;
-                    else return -1;
-                }
-                break;
-            }
-            default:
-            {
-                dh_LineOut_Free(input);
-                if( pos->level == 0 )
-                    return 0;
-                else nbt_pos_delete_last(pos);
-                break;
-            }
+                else return -1;
             }
         }
-        else return -1;
+        else if(g_value_get_gtype(&ret) == G_TYPE_NONE)
+            return -1;
     }
 }
 
@@ -276,7 +299,7 @@ NBT *nbtlr_to_next_nbt(NBT *root, int n)
     return next_nbt;
 }
 
-dh_LineOut* nbtlr_modifier_start(NBT *root, int modify_list)
+void nbtlr_modifier_start(NBT *root, int modify_list, GValue* value)
 {
     while(1)
     {
@@ -285,41 +308,73 @@ dh_LineOut* nbtlr_modifier_start(NBT *root, int modify_list)
             printf(_("\nUnsupported modification mode request, will exit to reading mode."));
             fflush(stdout);
             sleep(5);
-            return dh_LineOut_CreateChar('b');
+            GValue tmp = {0};
+            g_value_init(&tmp, G_TYPE_CHAR);
+            g_value_set_schar(&tmp, 'b');
+            *value = tmp;
+            return;
         }
         else // only modify the item
         {
+            DhOut* out = dh_out_new();
+            gint64 min = 0;
+            gint64 max = 0;
             if(root->type == TAG_Byte || root->type == TAG_Short || root->type == TAG_Int || root->type == TAG_Long)
             {
+                DhIntValidator* validator = g_object_new(TYPE_DH_INT_VALIDATOR, NULL);
                 int byte = 0;
                 switch(root->type)
                 {
                 case TAG_Byte:
-                    byte = 1;
+                    min = G_MININT8;
+                    max = G_MAXINT8;
                     break;
                 case TAG_Short:
-                    byte = 2;
+                    min = G_MININT16;
+                    max = G_MAXINT16;
                     break;
                 case TAG_Int:
-                    byte = 4;
+                    min = G_MININT32;
+                    max = G_MAXINT32;
                     break;
                 case TAG_Long:
-                    byte = 8;
+                    min = G_MININT64;
+                    max = G_MAXINT64;
                     break;
                 default: break;
                 }
+                dh_validator_set_range(DH_VALIDATOR(validator), &min, &max);
+                DhArgInfo* arg = dh_arg_info_new();
+                dh_arg_info_add_arg(arg, 'p', "upper", N_("Enter upper NBT"));
+                dh_arg_info_add_arg(arg, 'q', "quit", N_("Quit application"));
+                dh_arg_info_add_arg(arg, 'b', "back", N_("Exit modification mode"));
+                /*
                 printf(_("\nPlease enter an integer, or enter 'b' to exit modification mode, 'p' to upper NBT, \
 'q' to exit the program (p): "));
                 dh_LineOut* out = InputLine_Get_OneOpt_WithByte(byte, 0, 1, 3, 'b', 'p', 'q');
-                if(out)
+                */
+                dh_out_read_and_output(out, N_("\nPlease enter an integer or choose an option [P/q/b/?]: "), "dhlrc", arg, DH_VALIDATOR(validator), FALSE, value);
+                g_object_unref(arg);
+                g_object_unref(validator);
+                if(g_value_get_gtype(value) == G_TYPE_NONE)
                 {
-                    if(out->type == Integer)
+                    g_object_unref(out);
+                    return;
+                }
+                else
+                {
+                    if(G_VALUE_HOLDS_INT64(value))
                     {
-                        int64_t result = out->num_i;
-                        dh_LineOut_Free(out);
-                        out = NULL;
+                        int64_t result = g_value_get_int64(value);
 
-                        printf(_("\nThe integer you input is %ld, please confirm [Y/n] (Y): "), result);
+                        gchar* str = g_strdup_printf(_("\nThe integer you input is %ld, please confirm [Y/n/?]:"), result);
+                        DhArgInfo* arg = dh_arg_info_new();
+                        dh_arg_info_add_arg(arg, 'y', "yes", N_("Yes"));
+                        dh_arg_info_add_arg(arg, 'n', "no", N_("No"));
+                        GValue tmp;
+                        dh_out_read_and_output(out, str, "dhlrc", arg, NULL, FALSE, &tmp);
+                        g_free(str);
+                        /*
                         dh_LineOut* confirm = InputLine_Get_OneOpt(0, 0, 2, 'y', 'n');
                         if((confirm->type == Character && confirm->val_c == 'y') || confirm->type == Empty )
                         {
@@ -328,16 +383,35 @@ dh_LineOut* nbtlr_modifier_start(NBT *root, int modify_list)
                         }
                         else
                             dh_LineOut_Free(confirm);
+                        */
+                        if(G_VALUE_HOLDS_CHAR(&tmp) && g_value_get_schar(&tmp) == 'y')
+                        {
+                            root->value_i = result;
+                            g_object_unref(arg);
+                            g_object_unref(out);
+                        }
+                        else
+                        {
+                            g_object_unref(arg);
+                            g_object_unref(out);
+                        }
                     }
-                    else return out;
+                    else
+                    {
+                        g_object_unref(out);
+                        return;
+                    }
                 }
-                else return NULL;
             }
             else{
                 printf(_("\nUnsupported modification mode request, will exit to reading mode."));
                 fflush(stdout);
                 sleep(5);
-                return dh_LineOut_CreateChar('b');
+                GValue tmp = {0};
+                g_value_init(&tmp, G_TYPE_CHAR);
+                g_value_set_schar(&tmp, 'b');
+                *value = tmp;
+                return;
             }
         }
     }
@@ -374,7 +448,7 @@ int nbtlr_save(NBT* root)
 #endif
             char* input = NULL;
             size_t size = 0;
-            if(dh_string_getline(&input, &size, stdin) != -1)
+            if(dh_getline(&input, &size, stdin) != -1)
             {
                 int str_len = strlen(input);
                 input[str_len - 1] = 0;

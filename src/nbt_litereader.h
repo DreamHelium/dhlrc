@@ -35,7 +35,7 @@ int         nbtlr_list(NBT* given_nbt, int read_next);
 int         nbtlr_list_item(NBT* given_nbt);
 NBT*        nbtlr_to_next_nbt(NBT* root, int n);
 
-dh_LineOut *nbtlr_modifier_start(NBT* root, int modify_list);
+void nbtlr_modifier_start(NBT* root, int modify_list, GValue* value);
 
 
 #ifdef __cplusplus

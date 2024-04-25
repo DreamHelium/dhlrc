@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-03-24 00:34+0800\n"
-"PO-Revision-Date: 2024-03-24 00:35+0800\n"
+"POT-Creation-Date: 2024-04-25 21:43+0800\n"
+"PO-Revision-Date: 2024-04-25 22:05+0800\n"
 "Last-Translator: dream_he\n"
 "Language-Team: Chinese <kde-i18n-doc@kde.org>\n"
 "Language: zh_CN\n"
@@ -17,45 +17,57 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Lokalize 24.02.0\n"
+"X-Generator: Lokalize 24.02.2\n"
 
-#: src/main.c:33
+#: src/main.c:35
 msgid "Enter NBT reader mode."
 msgstr "进入NBT阅读器模式。"
 
-#: src/main.c:34
+#: src/main.c:36
 msgid "Enter litematica block reader."
 msgstr "进入投影方块阅读器。"
 
-#: src/main.c:35
+#: src/main.c:37
 msgid "Enter litematica material list with recipe combination."
 msgstr "进入投影材料列表及合成表合成功能。"
 
-#: src/main.c:36
+#: src/main.c:38
 msgid "Output log file to FILE"
 msgstr "输出日志文件至FILE"
 
-#: src/main.c:42
+#: src/main.c:39
+msgid ""
+"Set verbose level to N.\n"
+"\t\t\tLevel 1: See process.\n"
+"\t\t\tLevel 2: See details except block processing.\n"
+"\t\t\tLevel 3: See all the details (Not recommended!)."
+msgstr ""
+
+#: src/main.c:46
 msgid "[FILE] - Read a litematic file."
 msgstr "[文件] - 读取一个投影文件。"
 
-#: src/main.c:62
+#: src/main.c:69
 msgid "Only one option can be chosen!\n"
 msgstr "只有一个选项可选！\n"
 
-#: src/main_isoc.c:61
+#: src/main.c:75
+msgid "A level below 3 is allowed!\n"
+msgstr ""
+
+#: src/main_isoc.c:85
 msgid "Error when reading file."
 msgstr "在读取文件时出错。"
 
-#: src/main_isoc.c:69
+#: src/main_isoc.c:101
 msgid "Not a valid NBT file!"
 msgstr "不是一个有效的NBT文件！"
 
-#: src/main_isoc.c:76 src/qt/mainwindow.cpp:76
+#: src/main_isoc.c:107 src/qt/mainwindow.cpp:92
 msgid "Valid NBT file!"
 msgstr "有效的NBT文件！"
 
-#: src/main_isoc.c:86
+#: src/main_isoc.c:121
 #, c-format
 msgid ""
 "There are three functions:\n"
@@ -70,22 +82,22 @@ msgstr ""
 "[2] 投影方块阅读器\n"
 "\n"
 
-#: src/main_isoc.c:90
+#: src/main_isoc.c:125
 #, c-format
 msgid "Please select an option, or enter 'q' to exit the program (q): "
 msgstr "请选择一个选项，或输入 “q” 退出程序 (q): "
 
-#: src/main_isoc.c:145 src/lrc_extend.c:42
+#: src/main_isoc.c:180 src/lrc_extend.c:42
 #, c-format
 msgid "There are %d regions:\n"
 msgstr "有 %d 个区域：\n"
 
-#: src/main_isoc.c:158
+#: src/main_isoc.c:193
 #, c-format
-msgid "Processing: region %d / %d : [%ld] %s \n"
-msgstr "处理区域 %d / %d : [%ld] %s 中……\n"
+msgid "Processing: region %d / %d : [%ld] %s"
+msgstr ""
 
-#: src/nbt_litereader.c:57
+#: src/nbt_litereader.c:61
 #, c-format
 msgid ""
 "The detail of NBT \"%s\" is listed below:\n"
@@ -94,41 +106,52 @@ msgstr ""
 "NBT \"%s\" 的细节如下：\n"
 "\n"
 
-#: src/nbt_litereader.c:82
-#, c-format
+#: src/nbt_litereader.c:92 src/nbt_litereader.c:114 src/nbt_litereader.c:134
+#: src/nbt_litereader.c:349
+msgid "Quit application"
+msgstr "退出程序"
+
+#: src/nbt_litereader.c:93 src/nbt_litereader.c:115 src/nbt_litereader.c:135
+msgid "Enter modification mode"
+msgstr "进入修改模式"
+
+#: src/nbt_litereader.c:94 src/nbt_litereader.c:116 src/nbt_litereader.c:136
+msgid "Save NBT file"
+msgstr "保存NBT文件"
+
+#: src/nbt_litereader.c:95 src/nbt_litereader.c:117 src/nbt_litereader.c:137
+msgid "Enter upper instance"
+msgstr "进入上层实例"
+
+#: src/nbt_litereader.c:101
 msgid ""
 "\n"
-"Please enter a number to continue, or enter 'm' to modification mode, 's' to "
-"save NBT file, 'q' to exit the program, 'e' to upper instance (q): "
+"Please enter a number or choose option to continue [Q/m/s/e/?]: "
 msgstr ""
 "\n"
-"请输入数字以继续，或输入 “m” 进入修改模式，“s” 保存NBT文件，“q” 退出程"
-"序，“e” 至上层实例 (q): "
+"请输入一个数字或选择选项以继续 [Q/m/s/e/?]： "
 
-#: src/nbt_litereader.c:88
-#, c-format
+#: src/nbt_litereader.c:113 src/nbt_litereader.c:133 src/nbt_litereader.c:348
+msgid "Enter upper NBT"
+msgstr "进入上层NBT"
+
+#: src/nbt_litereader.c:118
 msgid ""
 "\n"
-"Please enter a number to continue, or enter 'm' to modification mode, 'p' to "
-"upper NBT, 's' to save NBT file, 'q' to exit the program, 'e' to upper "
-"instance (p): "
+"Please enter a number or choose option to continue [P/q/m/s/e/?]: "
 msgstr ""
 "\n"
-"请输入数字以继续，或输入 “m” 进入修改模式，“p” 至上层NBT，“s” 保存NBT文"
-"件，“q” 退出程序，“e” 至上层实例 (p)： "
+"请输入一个数字或选择选项以继续 [P/q/m/s/e/?]： "
 
-#: src/nbt_litereader.c:96
-#, c-format
+#: src/nbt_litereader.c:138
 msgid ""
 "\n"
-"No deeper NBT, please enter 'm' to modification mode, 'p' to upper NBT, 's' "
-"to save NBT file, 'q' to exit the program, 'e' to upper instance (p): "
+"No deeper NBT, please choose option to continue [P/q/m/s/e/?]: "
 msgstr ""
 "\n"
-"没有子NBT数据，请输入 “m” 进入修改模式，“p” 至上层NBT，“s” 保存NBT文件，“q” "
-"退出程序，“e” 至上层实例 (p): "
+"没有深层NBT，请选择选项以继续 [P/q/m/s/e/?]： "
 
-#: src/nbt_litereader.c:285 src/nbt_litereader.c:337
+#: src/nbt_litereader.c:308 src/nbt_litereader.c:407
 #, c-format
 msgid ""
 "\n"
@@ -137,29 +160,40 @@ msgstr ""
 "\n"
 "不支持的修改模式请求，将退回至阅读模式。"
 
-#: src/nbt_litereader.c:311
+#: src/nbt_litereader.c:350
+msgid "Exit modification mode"
+msgstr "退出修改模式"
+
+#: src/nbt_litereader.c:356
+msgid ""
+"\n"
+"Please enter an integer or choose an option [P/q/b/?]: "
+msgstr ""
+
+#: src/nbt_litereader.c:370
 #, c-format
 msgid ""
 "\n"
-"Please enter an integer, or enter 'b' to exit modification mode, 'p' to "
-"upper NBT, 'q' to exit the program (p): "
+"The integer you input is %ld, please confirm [Y/n/?]:"
 msgstr ""
-"\n"
-"请输入一个整数，或输入 “b” 退出修改模式，“p” 至上层NBT，“q” 退出程序 (p): "
 
-#: src/nbt_litereader.c:322
-#, c-format
-msgid ""
-"\n"
-"The integer you input is %ld, please confirm [Y/n] (Y): "
-msgstr ""
-"\n"
-"您输入的整数为%ld，请确认 [Y/n] (Y)： "
+#: src/nbt_litereader.c:372
+msgid "Yes"
+msgstr "是"
 
-#: src/litematica_region.c:401
+#: src/nbt_litereader.c:373
+msgid "No"
+msgstr "否"
+
+#: src/litematica_region.c:403
 #, c-format
 msgid "[%.2f%%] Processing Blocks %lu/%lu, (%3d,%3d,%3d)/(%3d,%3d,%3d)"
 msgstr "[%.2f%%] 处理方块中 %lu/%lu, (%3d,%3d,%3d)/(%3d,%3d,%3d) ……"
+
+#: src/litematica_region.c:409
+#, c-format
+msgid "Processing Blocks %lu/%lu, (%3d,%3d,%3d)/(%3d,%3d,%3d) %s"
+msgstr ""
 
 #: src/lrc_extend.c:49
 #, c-format
@@ -207,64 +241,64 @@ msgstr ""
 "请再次输入方块的坐标，或输入 “b” 选择其他区域，输入 “r” 阅读方块的细节，输入 "
 "“q” 退出程序 (b): "
 
-#: src/recipe_util.c:35
+#: src/recipe_util.c:37
 #, c-format
 msgid "Input numbers directly, or type 'a' for all numbers, 'q' to quit (a): "
 msgstr "请直接输入数字，或输入“a”选择所有数字，“q”以退出 (a): "
 
-#: src/recipe_util.c:120
+#: src/recipe_util.c:122
 #, c-format
 msgid "Processing %s with %d items, continue or read item list? [Y/n/q/r] :"
 msgstr "处理%s（含有%d个物品），继续或阅读物品列表？ [Y/n/q/r] : "
 
-#: src/recipe_util.c:122
+#: src/recipe_util.c:124
 msgid "&Yes"
 msgstr ""
 
-#: src/recipe_util.c:122
+#: src/recipe_util.c:124
 msgid "&No"
 msgstr ""
 
-#: src/recipe_util.c:122 src/qt/mainwindow.cpp:40
+#: src/recipe_util.c:124 src/qt/mainwindow.cpp:56
 msgid "&Quit"
 msgstr "退出(&Q)"
 
-#: src/recipe_util.c:122
+#: src/recipe_util.c:124
 msgid "&Read"
 msgstr ""
 
-#: src/dhlrc_list.c:134
+#: src/dhlrc_list.c:135
 msgid "Name\t\tTotal\tPlaced\tAvailable\tIs tag\n"
 msgstr "名称\t\t总计\t已放置\t可用\t是否为标签\n"
 
-#: src/dhlrc_list.c:712
+#: src/dhlrc_list.c:723
 #, c-format
 msgid "Processing %s.\n"
 msgstr "处理%s中。\n"
 
-#: src/dhlrc_list.c:719
+#: src/dhlrc_list.c:730
 #, c-format
 msgid "There are %d corresponding files to the item %s:\n"
 msgstr "有%d个对应%s的文件：\n"
 
-#: src/dhlrc_list.c:726
+#: src/dhlrc_list.c:737
 msgid "Please select an option, or 'd' to discard (d): "
 msgstr "请输入一个选项，或“d”以放弃 (d): "
 
-#: src/dhlrc_list.c:726 src/recipe_class/recipe_general.c:112
+#: src/dhlrc_list.c:737 src/recipe_class/recipe_general.c:113
 msgid "&Discard"
 msgstr ""
 
-#: src/recipe_class/recipe_general.c:111
+#: src/recipe_class/recipe_general.c:112
 #, c-format
 msgid "There is a remainder with %d and %d.\n"
 msgstr "%d除以%d有余数。\n"
 
-#: src/recipe_class/recipe_general.c:112
+#: src/recipe_class/recipe_general.c:113
 msgid "Enter 'd' to discard the result, or enter 'c' to continue (c): "
 msgstr "输入“d”舍弃结果，或输入“c”继续 (c): "
 
-#: src/recipe_class/recipe_general.c:112
+#: src/recipe_class/recipe_general.c:113
 msgid "&Continue"
 msgstr ""
 
@@ -280,81 +314,156 @@ msgstr "请输入一个物品/标识，或者输入“a”放弃选择 (a): "
 msgid "&Abort"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:21 src/qt/lrcfunctionui.cpp:11
+#: src/qt/mainwindow.cpp:33
 msgid "Litematica reader"
 msgstr "投影文件阅读器"
 
-#: src/qt/mainwindow.cpp:33
+#: src/qt/mainwindow.cpp:49 src/qt/ilreaderui.cpp:24
 msgid "&File"
 msgstr "文件(&F)"
 
-#: src/qt/mainwindow.cpp:39
+#: src/qt/mainwindow.cpp:55
 msgid "&Open"
 msgstr "打开(&O)"
 
-#: src/qt/mainwindow.cpp:49
+#: src/qt/mainwindow.cpp:65
 msgid "Select a file"
 msgstr "选择一个文件"
 
-#: src/qt/mainwindow.cpp:49
+#: src/qt/mainwindow.cpp:65
 msgid "Litematic file (*.litematic)"
 msgstr "投影文件 (*.litematic)"
 
-#: src/qt/mainwindow.cpp:77
+#: src/qt/mainwindow.cpp:93
 msgid "There are three functions:"
 msgstr "有三个功能："
 
-#: src/qt/mainwindow.cpp:81
+#: src/qt/mainwindow.cpp:97
 msgid "NBT lite &reader with modifier"
 msgstr "NBT小型阅读器及修改器(&R)"
 
-#: src/qt/mainwindow.cpp:82
+#: src/qt/mainwindow.cpp:98
 msgid "Litematica material &list with recipe combination"
 msgstr "投影材料列表及合成表合成功能(&L)"
 
-#: src/qt/mainwindow.cpp:83
+#: src/qt/mainwindow.cpp:99
 msgid "Litematica &block reader"
 msgstr "投影方块阅读器(&B)"
 
-#: src/qt/mainwindow.cpp:91 src/qt/lrcfunctionui.cpp:18
-msgid "&OK"
-msgstr "确定(&O)"
-
-#: src/qt/mainwindow.cpp:92 src/qt/lrcfunctionui.cpp:19
-msgid "&Close"
-msgstr "关闭(&C)"
-
-#: src/qt/ilreaderui.cpp:14
-msgid "Name"
-msgstr "名称"
-
-#: src/qt/ilreaderui.cpp:14
-msgid "Total"
-msgstr "总计"
-
-#: src/qt/ilreaderui.cpp:14
-msgid "Placed"
-msgstr "已放置"
-
-#: src/qt/ilreaderui.cpp:15
-msgid "Available"
-msgstr "可用"
-
-#: src/qt/ilreaderui.cpp:15
-msgid "isTag"
-msgstr "是否为标签"
-
-#: src/qt/lrcfunctionui.cpp:12
-msgid "Please select a function:"
-msgstr "请选择一项功能："
-
-#: src/qt/lrcfunctionui.cpp:14
+#: src/qt/mainwindow.cpp:100
 msgid "&Item list reader and modifier"
 msgstr "物品列表阅读器和修改器(&I)"
 
-#: src/qt/lrcfunctionui.cpp:15
+#: src/qt/mainwindow.cpp:101
 msgid "&Recipe combiner"
 msgstr "材料列表合成功能(&R)"
+
+#: src/qt/mainwindow.cpp:102
+msgid "&Clear Item list"
+msgstr ""
+
+#: src/qt/mainwindow.cpp:113
+msgid "&OK"
+msgstr "确定(&O)"
+
+#: src/qt/mainwindow.cpp:114
+msgid "&Close"
+msgstr "关闭(&C)"
+
+#: src/qt/mainwindow.cpp:159
+msgid "Error!"
+msgstr ""
+
+#: src/qt/mainwindow.cpp:159
+msgid "No selected region!"
+msgstr ""
+
+#: src/qt/ilreaderui.cpp:27
+msgid "&Save"
+msgstr ""
+
+#: src/qt/ilreaderui.cpp:59
+msgid "Save file"
+msgstr ""
+
+#: src/qt/ilreaderui.cpp:59
+msgid "CSV file (*.csv)"
+msgstr ""
+
+#: src/qt/ilreaderui.cpp:71
+msgid "Name"
+msgstr "名称"
+
+#: src/qt/ilreaderui.cpp:71
+msgid "Total"
+msgstr "总计"
+
+#: src/qt/ilreaderui.cpp:71
+msgid "Placed"
+msgstr "已放置"
+
+#: src/qt/ilreaderui.cpp:72
+msgid "Available"
+msgstr "可用"
+
+#: src/qt/ilreaderui.cpp:72
+msgid "isTag"
+msgstr "是否为标签"
+
+#, c-format
+#~ msgid ""
+#~ "\n"
+#~ "Please enter an integer, or enter 'b' to exit modification mode, 'p' to "
+#~ "upper NBT, 'q' to exit the program (p): "
+#~ msgstr ""
+#~ "\n"
+#~ "请输入一个整数，或输入 “b” 退出修改模式，“p” 至上层NBT，“q” 退出程序 (p): "
+
+#, c-format
+#~ msgid ""
+#~ "\n"
+#~ "The integer you input is %ld, please confirm [Y/n] (Y): "
+#~ msgstr ""
+#~ "\n"
+#~ "您输入的整数为%ld，请确认 [Y/n] (Y)： "
+
+#, c-format
+#~ msgid ""
+#~ "\n"
+#~ "Please enter a number to continue, or enter 'm' to modification mode, 's' "
+#~ "to save NBT file, 'q' to exit the program, 'e' to upper instance (q): "
+#~ msgstr ""
+#~ "\n"
+#~ "请输入数字以继续，或输入 “m” 进入修改模式，“s” 保存NBT文件，“q” 退出程"
+#~ "序，“e” 至上层实例 (q): "
+
+#, c-format
+#~ msgid ""
+#~ "\n"
+#~ "Please enter a number to continue, or enter 'm' to modification mode, 'p' "
+#~ "to upper NBT, 's' to save NBT file, 'q' to exit the program, 'e' to upper "
+#~ "instance (p): "
+#~ msgstr ""
+#~ "\n"
+#~ "请输入数字以继续，或输入 “m” 进入修改模式，“p” 至上层NBT，“s” 保存NBT文"
+#~ "件，“q” 退出程序，“e” 至上层实例 (p)： "
+
+#, c-format
+#~ msgid ""
+#~ "\n"
+#~ "No deeper NBT, please enter 'm' to modification mode, 'p' to upper NBT, "
+#~ "'s' to save NBT file, 'q' to exit the program, 'e' to upper instance (p): "
+#~ msgstr ""
+#~ "\n"
+#~ "没有子NBT数据，请输入 “m” 进入修改模式，“p” 至上层NBT，“s” 保存NBT文"
+#~ "件，“q” 退出程序，“e” 至上层实例 (p): "
+
+#~ msgid "Please select a function:"
+#~ msgstr "请选择一项功能："
+
+#, c-format
+#~ msgid "Processing: region %d / %d : [%ld] %s \n"
+#~ msgstr "处理区域 %d / %d : [%ld] %s 中……\n"
 
 #~ msgid "There are some items to craft:\n"
 #~ msgstr "有一些配方需要合成：\n"
