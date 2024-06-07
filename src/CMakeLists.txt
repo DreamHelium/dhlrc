@@ -71,7 +71,7 @@ target_link_libraries(dhlrc PUBLIC m z "${dhutil_LIBRARIES}" cjson minizip
 message("${dhutil_INCLUDE_DIRS}")
 
 target_include_directories(dhlrc PUBLIC
-	"${PROJECT_BINARY_DIR}" "${dhutil_INCLUDE_DIRS}"
+	"${PROJECT_BINARY_DIR}" "${dhutil_INCLUDE_DIRS}" "${GIO_INCLUDE_DIRS}"
 )
 
 target_link_directories(dhlrc PUBLIC "${dhutil_LIBRARY_DIRS}")

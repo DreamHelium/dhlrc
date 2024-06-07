@@ -11,6 +11,7 @@ find_package(Gettext)
 find_package(PkgConfig)
 
 pkg_search_module(dhutil REQUIRED libdhutil)
+pkg_search_module(GIO REQUIRED gio-2.0)
 
 set(DH_ENABLE_TRANSLATION true)
 
