@@ -66,7 +66,7 @@ int nbtlr_instance_ng(NbtPos* pos, int modify_mode)
 
         // modify_mode option
         GValue ret = {0};
-        DhOut* out = dh_out_new();
+        DhOut* out = NULL;
         if(modify_mode)
         {
             if(pos->level == 0 && list == 1 && pos->current->type == TAG_Compound)
@@ -75,70 +75,35 @@ int nbtlr_instance_ng(NbtPos* pos, int modify_mode)
         }
         else
         {
+            out = dh_out_new();
+            DhArgInfo* arg = dh_arg_info_new();
+            /* Some same argument */
+            dh_arg_info_add_arg(arg, 'q', "quit", N_("Quit application"));
+            dh_arg_info_add_arg(arg, 'm', "modify", N_("Enter modification mode"));
+            dh_arg_info_add_arg(arg, 's', "save", N_("Save NBT file"));
+            dh_arg_info_add_arg(arg, 'e', "upins", N_("Enter upper instance"));
             if(list > 0)
             {
-                /* Old implement
-                dh_limit* limit = dh_limit_Init(Integer);
-                if(limit)
-                {
-                    dh_limit_AddInt(limit, 0, list-1);
-                }
-                else return -1;*/
-                /* New implement */
-
                 DhIntValidator* validator = dh_int_validator_new(0, list - 1);
                 if(pos->level == 0){
-                    DhArgInfo* arg = dh_arg_info_new();
-                    dh_arg_info_add_arg(arg, 'q', "quit", N_("Quit application"));
-                    dh_arg_info_add_arg(arg, 'm', "modify", N_("Enter modification mode"));
-                    dh_arg_info_add_arg(arg, 's', "save", N_("Save NBT file"));
-                    dh_arg_info_add_arg(arg, 'e', "upins", N_("Enter upper instance"));
-                    /*
-                    printf(_("\nPlease enter a number to continue, or enter 'm' to modification mode, \
-'s' to save NBT file, 'q' to exit the program, 'e' to upper instance (q): "));
-                    input = InputLine_General(sizeof(int64_t), limit, 0, "qmse", 1);
-                    */
                     dh_out_read_and_output(out, N_("\nPlease enter a number or choose option to continue [Q/m/s/e/?]: "), "dhlrc", arg, DH_VALIDATOR(validator), FALSE, &ret);
-                    g_object_unref(out);
-                    g_object_unref(arg);
                 }
                 else
                 {
-                    /*
-                    printf(_("\nPlease enter a number to continue, or enter 'm' to modification mode, \
-'p' to upper NBT, 's' to save NBT file, 'q' to exit the program, 'e' to upper instance (p): "));
-                    input = InputLine_General(sizeof(int64_t), limit, 0, "pqmse", 1);
-                    */
-                    DhArgInfo* arg = dh_arg_info_new();
                     dh_arg_info_add_arg(arg, 'p', "upper", N_("Enter upper NBT"));
-                    dh_arg_info_add_arg(arg, 'q', "quit", N_("Quit application"));
-                    dh_arg_info_add_arg(arg, 'm', "modify", N_("Enter modification mode"));
-                    dh_arg_info_add_arg(arg, 's', "save", N_("Save NBT file"));
-                    dh_arg_info_add_arg(arg, 'e', "upins", N_("Enter upper instance"));
+                    dh_arg_info_change_default_arg(arg, 'p');
                     dh_out_read_and_output(out, N_("\nPlease enter a number or choose option to continue [P/q/m/s/e/?]: "), "dhlrc", arg, DH_VALIDATOR(validator), FALSE, &ret);
-                    g_object_unref(out);
-                    g_object_unref(arg);
-
                 }
                 g_object_unref(validator);
             }
             else
             {
-                /*
-                printf(_("\nNo deeper NBT, please enter 'm' to modification mode, 'p' to upper NBT, \
-'s' to save NBT file, 'q' to exit the program, 'e' to upper instance (p): "));
-                input = InputLine_General(0, NULL, 0, "pqmse", 1);
-                */
-                DhArgInfo* arg = dh_arg_info_new();
                 dh_arg_info_add_arg(arg, 'p', "upper", N_("Enter upper NBT"));
-                dh_arg_info_add_arg(arg, 'q', "quit", N_("Quit application"));
-                dh_arg_info_add_arg(arg, 'm', "modify", N_("Enter modification mode"));
-                dh_arg_info_add_arg(arg, 's', "save", N_("Save NBT file"));
-                dh_arg_info_add_arg(arg, 'e', "upins", N_("Enter upper instance"));
+                dh_arg_info_change_default_arg(arg, 'p');
                 dh_out_read_and_output(out, N_("\nNo deeper NBT, please choose option to continue [P/q/m/s/e/?]: "), "dhlrc", arg, NULL, FALSE, &ret);
-                g_object_unref(out);
-                g_object_unref(arg);
             }
+            g_object_unref(out);
+            g_object_unref(arg);
         }
         /* Analyse ret */
         if(G_VALUE_HOLDS_INT64(&ret))
