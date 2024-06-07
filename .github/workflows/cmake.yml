@@ -59,7 +59,7 @@ jobs:
     - name: Install
       run: |
         cmake --install ${{github.workspace}}/build
-        rm ${{github.workspace}}/pack/usr/bin/dhlrc_qt
+        rm ${{github.workspace}}/pack/bin/dhlrc_qt
 
     - name: Install LinuxDeploy
       uses: miurahr/install-linuxdeploy-action@v1
