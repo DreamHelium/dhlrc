@@ -64,7 +64,7 @@ jobs:
     - name: Install LinuxDeploy
       uses: miurahr/install-linuxdeploy-action@v1
       with:
-        dir: ${{ github.workspace }
+        dir: ${{ github.workspace }}
 
     - name: Pack
       run : | 
