@@ -69,7 +69,7 @@ jobs:
     - name: Pack
       run : | 
         sudo apt install appstream libfuse2
-        ./linuxdeploy-x86_64.AppImage --appdir ${{github.workspace}}/pack --executable ${{github.workspace}}/build/dhlrc_qt -d ${{github.workspace}}/dhlrc_qt.desktop -i ${{github.workspace}}/dhlrc_qt.png --output appimage
+        ./linuxdeploy-x86_64.AppImage --appdir ${{github.workspace}}/pack --plugin qt --executable ${{github.workspace}}/build/dhlrc_qt -d ${{github.workspace}}/dhlrc_qt.desktop -i ${{github.workspace}}/dhlrc_qt.png --output appimage
 
     - name: Upload
       uses: actions/upload-artifact@v4.3.3
