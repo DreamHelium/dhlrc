@@ -30,3 +30,4 @@ if(DH_ENABLE_TRANSLATION)
 endif()
 
 file(COPY ${dhlrc_SOURCE_DIR}/config DESTINATION ${dhlrc_BINARY_DIR})
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/locale/zh_CN/LC_MESSAGES/dhlrc.mo" DESTINATION "${CMAKE_INSTALL_PREFIX}/bin/locale/zh_CN/LC_MESSAGES/")

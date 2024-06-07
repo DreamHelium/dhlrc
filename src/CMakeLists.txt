@@ -80,4 +80,10 @@ add_executable(dhlrc_isoc main_isoc.c main.c  lrc_extend.c lrc_extend.h)
 
 target_link_libraries(dhlrc_isoc PUBLIC dhlrc)
 
+install(TARGETS dhlrc
+    BUNDLE DESTINATION .
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+)
+
 add_subdirectory(qt)

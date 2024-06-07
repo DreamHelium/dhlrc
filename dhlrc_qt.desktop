@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=dhlrc_qt
+Comment=
+Exec=dhlrc_qt
+Terminal=false
+Type=Application
+Categories=Application;
+Icon=dhlrc_qt
