@@ -68,7 +68,7 @@ jobs:
 
     - name: Pack
       run : | 
-        apt install appstream libfuse2
+        sudo apt install appstream libfuse2
         ./linuxdeploy-x86_64.AppImage --appdir ${{github.workspace}}/pack --executable ${{github.workspace}}/build/dhlrc_qt -d ${{github.workspace}}/dhlrc_qt.desktop -i ${{github.workspace}}/dhlrc_qt.png --output appimage
 
     - name: Upload
