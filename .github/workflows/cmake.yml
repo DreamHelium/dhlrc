@@ -55,22 +55,4 @@ jobs:
     - name: Build
       # Build your program with the given configuration
       run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
-
-    - name: Install
-      run: |
-        cmake --install ${{github.workspace}}/build
-        rm ${{github.workspace}}/pack/bin/dhlrc_qt
-
-    - name: Pack
-      run : | 
-        sudo apt install appstream libfuse2
-        wget https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases/download/1-alpha-20240109-1/linuxdeploy-plugin-qt-x86_64.AppImage
-        chmod +x ./linuxdeploy-plugin-qt-x86_64.AppImage
-        ./linuxdeploy-plugin-qt-x86_64.AppImage --appdir ${{github.workspace}}/pack --plugin qt --executable ${{github.workspace}}/build/dhlrc_qt -d ${{github.workspace}}/dhlrc_qt.desktop -i ${{github.workspace}}/dhlrc_qt.png --output appimage
-
-    - name: Upload
-      uses: actions/upload-artifact@v4.3.3
-      with:
-          name: dhlrc_qt-x86_64.AppImage
-          path: dhlrc_qt-x86_64.AppImage
       
