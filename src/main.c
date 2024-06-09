@@ -21,7 +21,10 @@
 /*#include "dhlrc_config.h"*/
 #include "config.h"
 #include "main.h"
+#include "dh_file_util.h"
+#include "dh_validator.h"
 #include "translation.h"
+#include <dhutil.h>
 
 static gboolean reader_mode = FALSE;
 static gboolean block_mode = FALSE;
@@ -29,6 +32,8 @@ static gboolean list_mode = FALSE;
 gchar* log_filename = NULL;
 static guint mode_num = 0;
 int verbose_level = 0;
+
+static gchar* get_filename();
 
 static GOptionEntry entries[] =
 {
@@ -39,7 +44,7 @@ static GOptionEntry entries[] =
     {"verbose", 'v', 0, G_OPTION_ARG_INT, &verbose_level, N_("Set verbose level to N.\n""\t\t\t""Level 1: See process.\n""\t\t\t""Level 2: See details except block processing.\n""\t\t\t""Level 3: See all the details (Not recommended!)."), "N"}
 };
 
-int main(int argc,char** argb)
+int main(int argc, char** argb)
 {
     dhlrc_make_config();
     translation_init();
@@ -78,10 +83,35 @@ int main(int argc,char** argb)
 
     if(argc == 1)
     {
-        g_print("%s" ,g_option_context_get_help(context, TRUE, NULL));
+        /* Enter interactive mode */
+        gchar* filename = get_filename();
+        if(filename)
+        {
+            args = g_realloc(args, 3 * sizeof(gchar*));
+            argc = 2;
+            args[1] = filename;
+            args[2] = NULL;
+        }
     }
 
     //g_option_group_unref(verbose_group);
     g_option_context_free(context);
     return main_isoc(argc, args);
+}
+
+static gchar* get_filename()
+{
+    gchar* filename = NULL;
+    gchar* game_dir = dh_get_game_dir();
+    gchar* schematics_dir = g_strconcat(game_dir, "/schematics", NULL);
+    g_free(game_dir);
+    GList* file_list = dh_file_list_create(schematics_dir);
+    if(file_list)
+    {
+        GList* file_list_d = file_list;
+        DhOut* out = dh_out_new();
+        
+    }
+    g_free(schematics_dir);
+    return filename;
 }

@@ -32,7 +32,8 @@ static cJSON* get_content();
 
 void dhlrc_make_config()
 {
-    config_file = g_strconcat(g_get_user_config_dir(), "/dhlrc/config.json" , NULL);
+    if(!config_file)
+        config_file = g_strconcat(g_get_user_config_dir(), "/dhlrc/config.json" , NULL);
     if(!dh_file_exist(config_file))
     {
 #ifdef __APPLE__
