@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-04-25 22:05+0800\n"
+"POT-Creation-Date: 2024-06-11 01:00+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,23 +17,23 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: src/main.c:35
+#: src/main.c:40
 msgid "Enter NBT reader mode."
 msgstr ""
 
-#: src/main.c:36
+#: src/main.c:41
 msgid "Enter litematica block reader."
 msgstr ""
 
-#: src/main.c:37
+#: src/main.c:42
 msgid "Enter litematica material list with recipe combination."
 msgstr ""
 
-#: src/main.c:38
+#: src/main.c:43
 msgid "Output log file to FILE"
 msgstr ""
 
-#: src/main.c:39
+#: src/main.c:44
 msgid ""
 "Set verbose level to N.\n"
 "\t\t\tLevel 1: See process.\n"
@@ -41,16 +41,24 @@ msgid ""
 "\t\t\tLevel 3: See all the details (Not recommended!)."
 msgstr ""
 
-#: src/main.c:46
+#: src/main.c:51
 msgid "[FILE] - Read a litematic file."
 msgstr ""
 
-#: src/main.c:69
+#: src/main.c:74
 msgid "Only one option can be chosen!\n"
 msgstr ""
 
-#: src/main.c:75
+#: src/main.c:80
 msgid "A level below 3 is allowed!\n"
+msgstr ""
+
+#: src/main.c:122
+msgid "directory"
+msgstr ""
+
+#: src/main.c:123
+msgid "file"
 msgstr ""
 
 #: src/main_isoc.c:85
@@ -97,74 +105,73 @@ msgid ""
 "\n"
 msgstr ""
 
-#: src/nbt_litereader.c:92 src/nbt_litereader.c:114 src/nbt_litereader.c:134
-#: src/nbt_litereader.c:349
+#: src/nbt_litereader.c:81 src/nbt_litereader.c:314
 msgid "Quit application"
 msgstr ""
 
-#: src/nbt_litereader.c:93 src/nbt_litereader.c:115 src/nbt_litereader.c:135
+#: src/nbt_litereader.c:82
 msgid "Enter modification mode"
 msgstr ""
 
-#: src/nbt_litereader.c:94 src/nbt_litereader.c:116 src/nbt_litereader.c:136
+#: src/nbt_litereader.c:83
 msgid "Save NBT file"
 msgstr ""
 
-#: src/nbt_litereader.c:95 src/nbt_litereader.c:117 src/nbt_litereader.c:137
+#: src/nbt_litereader.c:84
 msgid "Enter upper instance"
 msgstr ""
 
-#: src/nbt_litereader.c:101
+#: src/nbt_litereader.c:89
 msgid ""
 "\n"
 "Please enter a number or choose option to continue [Q/m/s/e/?]: "
 msgstr ""
 
-#: src/nbt_litereader.c:113 src/nbt_litereader.c:133 src/nbt_litereader.c:348
+#: src/nbt_litereader.c:93 src/nbt_litereader.c:101 src/nbt_litereader.c:313
 msgid "Enter upper NBT"
 msgstr ""
 
-#: src/nbt_litereader.c:118
+#: src/nbt_litereader.c:95
 msgid ""
 "\n"
 "Please enter a number or choose option to continue [P/q/m/s/e/?]: "
 msgstr ""
 
-#: src/nbt_litereader.c:138
+#: src/nbt_litereader.c:103
 msgid ""
 "\n"
 "No deeper NBT, please choose option to continue [P/q/m/s/e/?]: "
 msgstr ""
 
-#: src/nbt_litereader.c:308 src/nbt_litereader.c:407
+#: src/nbt_litereader.c:273 src/nbt_litereader.c:372
 #, c-format
 msgid ""
 "\n"
 "Unsupported modification mode request, will exit to reading mode."
 msgstr ""
 
-#: src/nbt_litereader.c:350
+#: src/nbt_litereader.c:315
 msgid "Exit modification mode"
 msgstr ""
 
-#: src/nbt_litereader.c:356
+#: src/nbt_litereader.c:321
 msgid ""
 "\n"
 "Please enter an integer or choose an option [P/q/b/?]: "
 msgstr ""
 
-#: src/nbt_litereader.c:370
+#: src/nbt_litereader.c:335
 #, c-format
 msgid ""
 "\n"
 "The integer you input is %ld, please confirm [Y/n/?]:"
 msgstr ""
 
-#: src/nbt_litereader.c:372
+#: src/nbt_litereader.c:337
 msgid "Yes"
 msgstr ""
 
-#: src/nbt_litereader.c:373
+#: src/nbt_litereader.c:338
 msgid "No"
 msgstr ""
 

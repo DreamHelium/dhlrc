@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-04-25 21:43+0800\n"
+"POT-Creation-Date: 2024-06-11 00:49+0800\n"
 "PO-Revision-Date: 2024-04-25 22:05+0800\n"
 "Last-Translator: dream_he\n"
 "Language-Team: Chinese <kde-i18n-doc@kde.org>\n"
@@ -19,23 +19,23 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Lokalize 24.02.2\n"
 
-#: src/main.c:35
+#: src/main.c:40
 msgid "Enter NBT reader mode."
 msgstr "进入NBT阅读器模式。"
 
-#: src/main.c:36
+#: src/main.c:41
 msgid "Enter litematica block reader."
 msgstr "进入投影方块阅读器。"
 
-#: src/main.c:37
+#: src/main.c:42
 msgid "Enter litematica material list with recipe combination."
 msgstr "进入投影材料列表及合成表合成功能。"
 
-#: src/main.c:38
+#: src/main.c:43
 msgid "Output log file to FILE"
 msgstr "输出日志文件至FILE"
 
-#: src/main.c:39
+#: src/main.c:44
 msgid ""
 "Set verbose level to N.\n"
 "\t\t\tLevel 1: See process.\n"
@@ -43,16 +43,20 @@ msgid ""
 "\t\t\tLevel 3: See all the details (Not recommended!)."
 msgstr ""
 
-#: src/main.c:46
+#: src/main.c:51
 msgid "[FILE] - Read a litematic file."
 msgstr "[文件] - 读取一个投影文件。"
 
-#: src/main.c:69
+#: src/main.c:74
 msgid "Only one option can be chosen!\n"
 msgstr "只有一个选项可选！\n"
 
-#: src/main.c:75
+#: src/main.c:80
 msgid "A level below 3 is allowed!\n"
+msgstr ""
+
+#: src/main.c:117
+msgid "file"
 msgstr ""
 
 #: src/main_isoc.c:85
@@ -106,24 +110,23 @@ msgstr ""
 "NBT \"%s\" 的细节如下：\n"
 "\n"
 
-#: src/nbt_litereader.c:92 src/nbt_litereader.c:114 src/nbt_litereader.c:134
-#: src/nbt_litereader.c:349
+#: src/nbt_litereader.c:81 src/nbt_litereader.c:314
 msgid "Quit application"
 msgstr "退出程序"
 
-#: src/nbt_litereader.c:93 src/nbt_litereader.c:115 src/nbt_litereader.c:135
+#: src/nbt_litereader.c:82
 msgid "Enter modification mode"
 msgstr "进入修改模式"
 
-#: src/nbt_litereader.c:94 src/nbt_litereader.c:116 src/nbt_litereader.c:136
+#: src/nbt_litereader.c:83
 msgid "Save NBT file"
 msgstr "保存NBT文件"
 
-#: src/nbt_litereader.c:95 src/nbt_litereader.c:117 src/nbt_litereader.c:137
+#: src/nbt_litereader.c:84
 msgid "Enter upper instance"
 msgstr "进入上层实例"
 
-#: src/nbt_litereader.c:101
+#: src/nbt_litereader.c:89
 msgid ""
 "\n"
 "Please enter a number or choose option to continue [Q/m/s/e/?]: "
@@ -131,11 +134,11 @@ msgstr ""
 "\n"
 "请输入一个数字或选择选项以继续 [Q/m/s/e/?]： "
 
-#: src/nbt_litereader.c:113 src/nbt_litereader.c:133 src/nbt_litereader.c:348
+#: src/nbt_litereader.c:93 src/nbt_litereader.c:101 src/nbt_litereader.c:313
 msgid "Enter upper NBT"
 msgstr "进入上层NBT"
 
-#: src/nbt_litereader.c:118
+#: src/nbt_litereader.c:95
 msgid ""
 "\n"
 "Please enter a number or choose option to continue [P/q/m/s/e/?]: "
@@ -143,7 +146,7 @@ msgstr ""
 "\n"
 "请输入一个数字或选择选项以继续 [P/q/m/s/e/?]： "
 
-#: src/nbt_litereader.c:138
+#: src/nbt_litereader.c:103
 msgid ""
 "\n"
 "No deeper NBT, please choose option to continue [P/q/m/s/e/?]: "
@@ -151,7 +154,7 @@ msgstr ""
 "\n"
 "没有深层NBT，请选择选项以继续 [P/q/m/s/e/?]： "
 
-#: src/nbt_litereader.c:308 src/nbt_litereader.c:407
+#: src/nbt_litereader.c:273 src/nbt_litereader.c:372
 #, c-format
 msgid ""
 "\n"
@@ -160,28 +163,28 @@ msgstr ""
 "\n"
 "不支持的修改模式请求，将退回至阅读模式。"
 
-#: src/nbt_litereader.c:350
+#: src/nbt_litereader.c:315
 msgid "Exit modification mode"
 msgstr "退出修改模式"
 
-#: src/nbt_litereader.c:356
+#: src/nbt_litereader.c:321
 msgid ""
 "\n"
 "Please enter an integer or choose an option [P/q/b/?]: "
 msgstr ""
 
-#: src/nbt_litereader.c:370
+#: src/nbt_litereader.c:335
 #, c-format
 msgid ""
 "\n"
 "The integer you input is %ld, please confirm [Y/n/?]:"
 msgstr ""
 
-#: src/nbt_litereader.c:372
+#: src/nbt_litereader.c:337
 msgid "Yes"
 msgstr "是"
 
-#: src/nbt_litereader.c:373
+#: src/nbt_litereader.c:338
 msgid "No"
 msgstr "否"
 
@@ -508,4 +511,3 @@ msgstr "是否为标签"
 #~ "another region, enter 'q' to exit the program (b): "
 #~ msgstr ""
 #~ "请再次输入方块的坐标，或输入 “b” 选择其他区域，输入 “q” 退出程序 (b): "
-

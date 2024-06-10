@@ -110,7 +110,25 @@ static gchar* get_filename()
     {
         GList* file_list_d = file_list;
         DhOut* out = dh_out_new();
-        
+        dh_out_output_match_string_than_arg(out);
+        DhArgInfo* arg = dh_arg_info_new();
+        for(int i = 0 ; i < g_list_length(file_list_d) ; i++)
+        {
+            gchar* filename_d = g_strconcat(schematics_dir, "/", g_list_nth_data(file_list_d, i) ,NULL);
+            GFile* file = g_file_new_for_path(filename_d);
+            GFileType type = g_file_query_file_type(file, G_FILE_QUERY_INFO_NONE , NULL);
+            gchar* type_name = NULL;
+            if(type == G_FILE_TYPE_DIRECTORY)
+                type_name = N_("directory");
+            else type_name = N_("file");
+            dh_arg_info_add_arg(arg, 0, g_list_nth_data(file_list_d, i), type_name);
+            g_free(filename_d);
+            g_object_unref(file);
+        }
+        GValue val = {0};
+        dh_out_read_and_output(out, "test", "dhlrc", arg, NULL, FALSE, &val);
+        g_object_unref(out);
+        g_object_unref(arg);
     }
     g_free(schematics_dir);
     return filename;
