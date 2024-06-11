@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-06-11 01:00+0800\n"
+"POT-Creation-Date: 2024-06-12 04:22+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -53,11 +53,11 @@ msgstr ""
 msgid "A level below 3 is allowed!\n"
 msgstr ""
 
-#: src/main.c:122
+#: src/main.c:128
 msgid "directory"
 msgstr ""
 
-#: src/main.c:123
+#: src/main.c:129
 msgid "file"
 msgstr ""
 
@@ -69,7 +69,7 @@ msgstr ""
 msgid "Not a valid NBT file!"
 msgstr ""
 
-#: src/main_isoc.c:107 src/qt/mainwindow.cpp:92
+#: src/main_isoc.c:107 src/qt/mainwindow.cpp:93
 msgid "Valid NBT file!"
 msgstr ""
 
@@ -242,7 +242,7 @@ msgstr ""
 msgid "&No"
 msgstr ""
 
-#: src/recipe_util.c:124 src/qt/mainwindow.cpp:56
+#: src/recipe_util.c:124 src/qt/mainwindow.cpp:57
 msgid "&Quit"
 msgstr ""
 
@@ -297,67 +297,67 @@ msgstr ""
 msgid "&Abort"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:33
+#: src/qt/mainwindow.cpp:34
 msgid "Litematica reader"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:49 src/qt/ilreaderui.cpp:24
+#: src/qt/mainwindow.cpp:50 src/qt/ilreaderui.cpp:24
 msgid "&File"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:55
+#: src/qt/mainwindow.cpp:56
 msgid "&Open"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:65
+#: src/qt/mainwindow.cpp:66
 msgid "Select a file"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:65
+#: src/qt/mainwindow.cpp:66
 msgid "Litematic file (*.litematic)"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:93
+#: src/qt/mainwindow.cpp:94
 msgid "There are three functions:"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:97
+#: src/qt/mainwindow.cpp:98
 msgid "NBT lite &reader with modifier"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:98
+#: src/qt/mainwindow.cpp:99
 msgid "Litematica material &list with recipe combination"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:99
+#: src/qt/mainwindow.cpp:100
 msgid "Litematica &block reader"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:100
+#: src/qt/mainwindow.cpp:101
 msgid "&Item list reader and modifier"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:101
+#: src/qt/mainwindow.cpp:102
 msgid "&Recipe combiner"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:102
+#: src/qt/mainwindow.cpp:103
 msgid "&Clear Item list"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:113
+#: src/qt/mainwindow.cpp:114
 msgid "&OK"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:114
+#: src/qt/mainwindow.cpp:115
 msgid "&Close"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:159
+#: src/qt/mainwindow.cpp:160
 msgid "Error!"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:159
+#: src/qt/mainwindow.cpp:160
 msgid "No selected region!"
 msgstr ""
 

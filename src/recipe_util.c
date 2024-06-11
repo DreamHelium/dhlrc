@@ -249,7 +249,7 @@ const char* name_block_translate(const char *block_name)
 
 static gchar* find_transfile()
 {
-    if(dhlrc_file_exist("translation.json"))
+    if(dh_file_exist("translation.json"))
         return g_strdup("translation.json");
     else
     {
@@ -262,7 +262,7 @@ static gchar* find_transfile()
             index_file = g_strconcat(game_dir, "/assets/indexes/1.18.json" , NULL);
         }
         else index_file = g_strconcat(g_get_home_dir(), "/.minecraft/assets/indexes/1.18.json", NULL);
-        if(dhlrc_file_exist(index_file))
+        if(dh_file_exist(index_file))
         {
             cJSON* index = dhlrc_file_to_json(index_file);
             g_free(index_file);

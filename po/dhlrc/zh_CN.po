@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-06-11 00:49+0800\n"
+"POT-Creation-Date: 2024-06-12 04:16+0800\n"
 "PO-Revision-Date: 2024-04-25 22:05+0800\n"
 "Last-Translator: dream_he\n"
 "Language-Team: Chinese <kde-i18n-doc@kde.org>\n"
@@ -55,7 +55,11 @@ msgstr "只有一个选项可选！\n"
 msgid "A level below 3 is allowed!\n"
 msgstr ""
 
-#: src/main.c:117
+#: src/main.c:128
+msgid "directory"
+msgstr ""
+
+#: src/main.c:129
 msgid "file"
 msgstr ""
 
@@ -67,7 +71,7 @@ msgstr "在读取文件时出错。"
 msgid "Not a valid NBT file!"
 msgstr "不是一个有效的NBT文件！"
 
-#: src/main_isoc.c:107 src/qt/mainwindow.cpp:92
+#: src/main_isoc.c:107 src/qt/mainwindow.cpp:93
 msgid "Valid NBT file!"
 msgstr "有效的NBT文件！"
 
@@ -262,7 +266,7 @@ msgstr ""
 msgid "&No"
 msgstr ""
 
-#: src/recipe_util.c:124 src/qt/mainwindow.cpp:56
+#: src/recipe_util.c:124 src/qt/mainwindow.cpp:57
 msgid "&Quit"
 msgstr "退出(&Q)"
 
@@ -317,67 +321,67 @@ msgstr "请输入一个物品/标识，或者输入“a”放弃选择 (a): "
 msgid "&Abort"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:33
+#: src/qt/mainwindow.cpp:34
 msgid "Litematica reader"
 msgstr "投影文件阅读器"
 
-#: src/qt/mainwindow.cpp:49 src/qt/ilreaderui.cpp:24
+#: src/qt/mainwindow.cpp:50 src/qt/ilreaderui.cpp:24
 msgid "&File"
 msgstr "文件(&F)"
 
-#: src/qt/mainwindow.cpp:55
+#: src/qt/mainwindow.cpp:56
 msgid "&Open"
 msgstr "打开(&O)"
 
-#: src/qt/mainwindow.cpp:65
+#: src/qt/mainwindow.cpp:66
 msgid "Select a file"
 msgstr "选择一个文件"
 
-#: src/qt/mainwindow.cpp:65
+#: src/qt/mainwindow.cpp:66
 msgid "Litematic file (*.litematic)"
 msgstr "投影文件 (*.litematic)"
 
-#: src/qt/mainwindow.cpp:93
+#: src/qt/mainwindow.cpp:94
 msgid "There are three functions:"
 msgstr "有三个功能："
 
-#: src/qt/mainwindow.cpp:97
+#: src/qt/mainwindow.cpp:98
 msgid "NBT lite &reader with modifier"
 msgstr "NBT小型阅读器及修改器(&R)"
 
-#: src/qt/mainwindow.cpp:98
+#: src/qt/mainwindow.cpp:99
 msgid "Litematica material &list with recipe combination"
 msgstr "投影材料列表及合成表合成功能(&L)"
 
-#: src/qt/mainwindow.cpp:99
+#: src/qt/mainwindow.cpp:100
 msgid "Litematica &block reader"
 msgstr "投影方块阅读器(&B)"
 
-#: src/qt/mainwindow.cpp:100
+#: src/qt/mainwindow.cpp:101
 msgid "&Item list reader and modifier"
 msgstr "物品列表阅读器和修改器(&I)"
 
-#: src/qt/mainwindow.cpp:101
+#: src/qt/mainwindow.cpp:102
 msgid "&Recipe combiner"
 msgstr "材料列表合成功能(&R)"
 
-#: src/qt/mainwindow.cpp:102
+#: src/qt/mainwindow.cpp:103
 msgid "&Clear Item list"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:113
+#: src/qt/mainwindow.cpp:114
 msgid "&OK"
 msgstr "确定(&O)"
 
-#: src/qt/mainwindow.cpp:114
+#: src/qt/mainwindow.cpp:115
 msgid "&Close"
 msgstr "关闭(&C)"
 
-#: src/qt/mainwindow.cpp:159
+#: src/qt/mainwindow.cpp:160
 msgid "Error!"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:159
+#: src/qt/mainwindow.cpp:160
 msgid "No selected region!"
 msgstr ""
 

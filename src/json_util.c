@@ -21,7 +21,7 @@
 cJSON* dhlrc_file_to_json(const char* pos)
 {
     int size;
-    char* data = dhlrc_read_file(pos, &size);
+    char* data = dh_read_file(pos, &size);
     if(data)
     {
         cJSON* json_data = cJSON_ParseWithLength(data, size);
