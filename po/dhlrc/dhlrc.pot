@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-06-12 04:22+0800\n"
+"POT-Creation-Date: 2024-06-18 23:35+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -175,14 +175,19 @@ msgstr ""
 msgid "No"
 msgstr ""
 
-#: src/litematica_region.c:403
+#: src/litematica_region.c:436
 #, c-format
 msgid "[%.2f%%] Processing Blocks %lu/%lu, (%3d,%3d,%3d)/(%3d,%3d,%3d)"
 msgstr ""
 
-#: src/litematica_region.c:409
+#: src/litematica_region.c:442
 #, c-format
 msgid "Processing Blocks %lu/%lu, (%3d,%3d,%3d)/(%3d,%3d,%3d) %s"
+msgstr ""
+
+#: src/litematica_region.c:492
+#, c-format
+msgid "Add %d items from region."
 msgstr ""
 
 #: src/lrc_extend.c:49
@@ -250,25 +255,30 @@ msgstr ""
 msgid "&Read"
 msgstr ""
 
-#: src/dhlrc_list.c:135
+#: src/dhlrc_list.c:143
 msgid "Name\t\tTotal\tPlaced\tAvailable\tIs tag\n"
 msgstr ""
 
-#: src/dhlrc_list.c:723
+#: src/dhlrc_list.c:328
+#, c-format
+msgid "Combined %d items to the new item list."
+msgstr ""
+
+#: src/dhlrc_list.c:757
 #, c-format
 msgid "Processing %s.\n"
 msgstr ""
 
-#: src/dhlrc_list.c:730
+#: src/dhlrc_list.c:764
 #, c-format
 msgid "There are %d corresponding files to the item %s:\n"
 msgstr ""
 
-#: src/dhlrc_list.c:737
+#: src/dhlrc_list.c:771
 msgid "Please select an option, or 'd' to discard (d): "
 msgstr ""
 
-#: src/dhlrc_list.c:737 src/recipe_class/recipe_general.c:113
+#: src/dhlrc_list.c:771 src/recipe_class/recipe_general.c:113
 msgid "&Discard"
 msgstr ""
 
@@ -301,7 +311,7 @@ msgstr ""
 msgid "Litematica reader"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:50 src/qt/ilreaderui.cpp:24
+#: src/qt/mainwindow.cpp:50 src/qt/ilreaderui.cpp:25
 msgid "&File"
 msgstr ""
 
@@ -361,34 +371,42 @@ msgstr ""
 msgid "No selected region!"
 msgstr ""
 
-#: src/qt/ilreaderui.cpp:27
+#: src/qt/ilreaderui.cpp:28
 msgid "&Save"
 msgstr ""
 
-#: src/qt/ilreaderui.cpp:59
+#: src/qt/ilreaderui.cpp:60
 msgid "Save file"
 msgstr ""
 
-#: src/qt/ilreaderui.cpp:59
+#: src/qt/ilreaderui.cpp:60
 msgid "CSV file (*.csv)"
 msgstr ""
 
-#: src/qt/ilreaderui.cpp:71
+#: src/qt/ilreaderui.cpp:72
 msgid "Name"
 msgstr ""
 
-#: src/qt/ilreaderui.cpp:71
+#: src/qt/ilreaderui.cpp:72
 msgid "Total"
 msgstr ""
 
-#: src/qt/ilreaderui.cpp:71
+#: src/qt/ilreaderui.cpp:72
 msgid "Placed"
 msgstr ""
 
-#: src/qt/ilreaderui.cpp:72
+#: src/qt/ilreaderui.cpp:73
 msgid "Available"
 msgstr ""
 
-#: src/qt/ilreaderui.cpp:72
+#: src/qt/ilreaderui.cpp:73
 msgid "isTag"
+msgstr ""
+
+#: src/qt/ilreaderui.cpp:73
+msgid "Track"
+msgstr ""
+
+#: src/qt/ilreaderui.cpp:91
+msgid "Show history"
 msgstr ""

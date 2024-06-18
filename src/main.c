@@ -141,6 +141,11 @@ static gchar* get_filename()
             {
                 pure_filename = g_value_steal_string(&val);
             }
+            else 
+            {
+                /* TODO: key binding */
+                break;
+            }
             gchar* tmp_filename = NULL;
             if(pure_filename)
                 tmp_filename = g_strconcat(schematics_dir, "/", pure_filename, NULL);

@@ -31,12 +31,19 @@ typedef GList BlackList;
 typedef GList ReplaceList;
 typedef GList RecipeList;
 
+typedef struct ItemTrack{
+    gchar* description;
+    guint num;
+    GDateTime* time;
+} ItemTrack;
+
 typedef struct IListData{
     gchar* name;
     guint total;
     guint placed;
     guint available;
     gboolean is_tag;
+    ItemTrack** track_info;
 } IListData;
 
 /* ItemList utils */
@@ -48,7 +55,9 @@ void        item_list_sort(ItemList **oBlock);
 ItemList*   item_list_sort_by_total(ItemList* il);
 int         item_list_init_new_item(ItemList **oBlock, const char* block_name);
 int         item_list_init_new_item_with_tag(ItemList **oBlock, const char* block_name, gboolean is_tag);
+G_DEPRECATED_FOR(item_list_add_item)
 int         item_list_add_num(ItemList** bl, int num , char* block_name);
+ItemList*   item_list_add_item(ItemList**il, guint num, gchar* item_name, gchar* description);
 int         item_list_scan_repeated(ItemList* bl,char* block_name);
 int         item_list_delete_item(ItemList** bl,char* block_name);
 void        item_list_delete_zero_item(ItemList** bl);
@@ -58,7 +67,7 @@ ItemList*   item_list_init(const char* block_name);
 ItemList*   item_list_init_with_tag(const char* block_name, gboolean is_tag);
 int         item_list_to_csv(char* pos,ItemList* il);
 const char* item_list_item_name(ItemList* il);
-void        item_list_add_num_by_index(ItemList* il, gint num, gint index);
+
 gint        item_list_item_index(ItemList* il, const char* item_name);
 ItemList*   item_list_recipe(RecipeList* rcl, int num, const char* item_name, DhGeneral* general);
 

@@ -7,6 +7,7 @@
 #include <QMenuBar>
 #include <QAction>
 #include <QTableWidget>
+#include <QPushButton>
 
 typedef struct TableItems{
     QTableWidgetItem* item0;
@@ -14,6 +15,7 @@ typedef struct TableItems{
     QTableWidgetItem* item2;
     QTableWidgetItem* item3;
     QTableWidgetItem* item4;
+    QPushButton* item5;
 } TableItems;
 
 class ilReaderUI : public QWidget

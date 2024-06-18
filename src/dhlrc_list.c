@@ -113,20 +113,28 @@ static int rcldata_issame(gconstpointer a, gconstpointer b)
     return ret;
 }
 
-static IListData* ilistdata_init_with_tag(const char* name, gboolean is_tag)
+static ItemTrack* item_track_init(const gchar* description, guint num)
 {
-    IListData* ildata = (IListData*)malloc(sizeof(IListData));
-    ildata->name = dh_strdup(name);
-    ildata->total = 0;
+    ItemTrack* it = g_new0(ItemTrack, 1);
+    it->description = g_strdup(description);
+    it->num = num;
+    it->time = g_date_time_new_now_local();
+    return it;
+}
+
+static IListData* ilistdata_init_full(const gchar* name, gboolean is_tag, guint num, 
+                                    const gchar* description)
+{
+    IListData* ildata = g_new0(IListData, 1);
+    ildata->name = g_strdup(name);
+    ildata->total = num;
     ildata->placed = 0;
     ildata->available = 0;
     ildata->is_tag = is_tag;
+    ildata->track_info = g_new0(ItemTrack*, 2);
+    ildata->track_info[0] = item_track_init(description, num);
+    ildata->track_info[1] = NULL;
     return ildata;
-}
-
-static IListData* ilistdata_init(const char* name)
-{
-    return ilistdata_init_with_tag(name, FALSE);
 }
 
 void item_list_read(ItemList* il, DhGeneral* general)
@@ -142,6 +150,19 @@ void item_list_read(ItemList* il, DhGeneral* general)
     }
 }
 
+static void item_track_free(ItemTrack** it)
+{
+    ItemTrack** itd = it;
+    for(; *itd; itd++)
+    {
+        ItemTrack* itcon = *itd;
+        g_free(itcon->description);
+        g_free(itcon->time);
+        g_free(itcon);
+    }
+    g_free(it);
+}
+
 void item_list_free(ItemList* target)
 {
     g_return_if_fail(target != NULL);
@@ -149,8 +170,9 @@ void item_list_free(ItemList* target)
     for(; gld ; gld = gld->next)
     {
         IListData* ildata = gld->data;
-        free(ildata->name);
-        free(ildata);
+        g_free(ildata->name);
+        item_track_free(ildata->track_info);
+        g_free(ildata);
     }
     g_list_free(target);
 }
@@ -174,14 +196,21 @@ int item_list_init_new_item(ItemList** oBlock,const char* block_name)
     return item_list_init_new_item_with_tag(oBlock, block_name, FALSE);
 }
 
-int item_list_init_new_item_with_tag(ItemList **oBlock, const char* block_name, gboolean is_tag)
+static int item_list_init_new_item_with_tag_num_des(ItemList **o_block, const char *block_name, gboolean is_tag, guint num, gchar* description)
 {
-    GList* gl = *oBlock;
-    IListData* ildata = ilistdata_init_with_tag(block_name, is_tag);
+    GList* gl = *o_block;
+    IListData* ildata = ilistdata_init_full(block_name, is_tag, num, description);
     gl = g_list_prepend(gl, ildata);
-    *oBlock = gl;
+    *o_block = gl;
     return 0;
 }
+
+int item_list_init_new_item_with_tag(ItemList **oBlock, const char* block_name, gboolean is_tag)
+{
+    return item_list_init_new_item_with_tag_num_des(oBlock, block_name, is_tag, 0, NULL);
+}
+
+
 
 ItemList *item_list_init(const char* block_name)
 {
@@ -199,39 +228,42 @@ ItemList* item_list_init_with_tag(const char* block_name, gboolean is_tag)
 
 int item_list_add_num(ItemList** bl,int num,char* block_name)
 {
-    ItemList* item = g_list_find_custom(*bl, block_name, ilistdata_strcmp);
-    if(item)
-    {
-        IListData* ildata = item->data;
-        ildata->total = ildata->total + num;
-        return 0;
-    }
-    else
-    {
-        /* In this new implement we could create item for it first */
-        ItemList* il = *bl;
-        item_list_init_new_item( &il, block_name);
-        *bl = il;
-        item = g_list_find_custom(il, block_name, ilistdata_strcmp);
-        if(item)
-        {
-            IListData* ildata = item->data;
-            ildata->total = ildata->total + num;
-            return 0;
-        }
-        else return -1;
-    }
+    item_list_add_item(bl, num, block_name, NULL);
+    return 0;
 }
 
-void item_list_add_num_by_index(ItemList* il, gint num, gint index)
+static ItemTrack** item_track_add_track(gchar* description, guint num, ItemTrack** o_track)
 {
-    ItemList* item = g_list_nth(il, index);
+    ItemTrack** p_track = o_track;
+    guint track_num = 0;
+    for(; *p_track ; p_track++){
+        track_num++;
+    }
+    o_track = (ItemTrack**)g_realloc(o_track, (track_num + 2)  * sizeof(ItemTrack*));
+    ItemTrack* it = g_new0(ItemTrack, 1);
+    it->description = g_strdup(description);
+    it->num = num;
+    it->time = g_date_time_new_now_local();
+    o_track[track_num] = it;
+    o_track[track_num + 1] = NULL;
+    return o_track;
+}
+
+ItemList* item_list_add_item(ItemList **il, guint num, gchar *item_name, gchar *description)
+{
+    ItemList* item = g_list_find_custom(*il, item_name, ilistdata_strcmp);
     if(item)
     {
-        IListData* ildata = item->data;
-        ildata->total = ildata->total + num;
+        IListData* data = item->data;
+        data->total = data->total + num;
+        data->track_info = item_track_add_track(description, num, data->track_info);
+        return *il;
     }
-    else return;
+    else 
+    {
+        item_list_init_new_item_with_tag_num_des(il, item_name, FALSE, num, description);
+        return *il;
+    }
 }
 
 gint item_list_item_index(ItemList* il, const char* item_name)
@@ -257,8 +289,9 @@ int item_list_delete_item(ItemList** bl,char* block_name)
     if(item)
     {
         IListData* data = item->data;
-        free(data->name);
-        free(data);
+        g_free(data->name);
+        item_track_free(data->track_info);
+        g_free(data);
         il = g_list_remove(il, item->data);
         *bl = il;
         return 0;
@@ -276,8 +309,9 @@ void item_list_delete_zero_item(ItemList** bl)
         if(item)
         {
             IListData* data = item->data;
-            free(data->name);
-            free(data);
+            g_free(data->name);
+            item_track_free(data->track_info);
+            g_free(data);
             head = g_list_remove(head, item->data);
             *bl = head;
         }
@@ -291,7 +325,7 @@ int item_list_combine(ItemList** dest, ItemList* src)
     while(s)
     {
         IListData* ildata = s->data;
-        item_list_add_num(dest, ildata->total, ildata->name);
+        item_list_add_item(dest, ildata->total, ildata->name, _("Combined %d items to the new item list."));
         s = s->next;
     }
     return 0;
@@ -751,197 +785,9 @@ ItemList* item_list_recipe(RecipeList* rcl, int num, const char* item_name, DhGe
 
     ret = klass->get_recipe(recipe_general, num, general);
 
-
-    // char* type = ((RecipeListBaseData*)(option_recipe->data))->recipe_type;
-    // if(enable_shaped)
-    // {
-    //     if(g_str_has_suffix(type, "crafting_shaped"))
-    //         ret = analyse_shaped(num,RecipeList_Filename(option_recipe) ,general );
-    // }
-    // if(enable_smelting)
-    // {
-    //     if(g_str_has_suffix(type, "blasting") || g_str_has_suffix(type, "smelting"))
-    //         ret = analyse_smelting(num, RecipeList_Filename(option_recipe));
-    // }
-    // if(enable_shapeless)
-    // {
-    //     if(g_str_has_suffix(type, "crafting_shapeless"))
-    //         ret = analyse_shapeless(num, RecipeList_Filename(option_recipe), general);
-    // }
     g_list_free(item_recipes);
     return ret;
 }
-//
-// /* Reference: https://minecraft.fandom.com/wiki/Recipe
-//  * And recipe files */
-//
-// static ItemList* analyse_smelting(guint num, const char* filename)
-// {
-//     cJSON* json = dhlrc_FileToJSON(filename);
-//     g_return_val_if_fail(json != NULL, NULL);
-//     ItemList* list = NULL;
-//     cJSON* ingredient = cJSON_GetObjectItem(json, "ingredient");
-//
-//     if(cJSON_IsObject(ingredient))
-//         analyse_object(num, ingredient, &list);
-//     else if(cJSON_IsArray(ingredient))
-//     {
-//         /* Hopefully it works */
-//         guint arr_num = cJSON_GetArraySize(ingredient);
-//         for(int i = 0 ; i < arr_num ; i++)
-//         {
-//             cJSON* object = cJSON_GetArrayItem(ingredient, i);
-//             analyse_object(num, object, &list);
-//         }
-//     }
-//     cJSON_Delete(json);
-//     return list;
-// }
-//
-// static ItemList* analyse_shapeless(guint num, const char* filename, DhGeneral* self)
-// {
-//     cJSON* json = dhlrc_FileToJSON(filename);
-//     g_return_val_if_fail(json != NULL, NULL);
-//     int num2 = 1;
-//     cJSON* count = cJSON_GetObjectItem(cJSON_GetObjectItem(json, "result"), "count");
-//     if(cJSON_IsNumber(count))
-//         num2 = cJSON_GetNumberValue( count );
-//
-//     ItemList* list = NULL;
-//     guint division = mod_decide(num, num2, self);
-//     if(division)
-//     {
-//         cJSON* ingredient = cJSON_GetObjectItem(json, "ingredient");
-//         if(cJSON_IsObject(ingredient))
-//             analyse_object(division, ingredient, &list);
-//         else if(cJSON_IsArray(ingredient))
-//         {
-//             dh_printf(self, _("There are some ingredients to choose:\n"));
-//             guint size = cJSON_GetArraySize(ingredient);
-//             for(int i = 0 ; i < size ; i++)
-//                 dh_option_printer(self, i, get_array_item_name(ingredient, i));
-//             int option = dh_selector(self, _("Please select an item/tag, or enter 'a' to give up selecting (a): "), size, "a", _("&Abort"));
-//             if(option == -1)
-//             {
-//                 cJSON_Delete(json);
-//                 return NULL;
-//             }
-//             else {
-//                 analyse_object(division, cJSON_GetArrayItem(ingredient, option), &list);
-//             }
-//         }
-//         else{
-//             cJSON_Delete(json);
-//             return NULL;
-//         }
-//     }
-//     else {
-//         cJSON_Delete(json);
-//         return NULL;
-//     }
-//     cJSON_Delete(json);
-//     return list;
-// }
-//
-// static ItemList* analyse_shaped(guint num, const char* filename, DhGeneral* self)
-// {
-//     cJSON* json = dhlrc_FileToJSON(filename);
-//     g_return_val_if_fail(json != NULL, NULL);
-//
-//     int num2 =  1;
-//     cJSON* count = cJSON_GetObjectItem(cJSON_GetObjectItem(json, "result"), "count");
-//     if(cJSON_IsNumber(count))
-//         num2 = cJSON_GetNumberValue( count );
-//
-//     ItemList* list = NULL;
-//     guint division = mod_decide(num, num2, self);
-//     if(self)
-//     {
-//         cJSON* pattern = cJSON_GetObjectItem(json, "pattern");
-//         guint pattern_size = cJSON_GetArraySize(pattern);
-//         DhStrArray* pattern_stra = NULL;
-//         for(int i = 0 ; i < pattern_size ; i++)
-//         {
-//             char* str = cJSON_GetStringValue(cJSON_GetArrayItem(pattern, i));
-//             DhStrArray_AddStr(&pattern_stra, str);
-//         }
-//         char* pattern_string = DhStrArray_cat(pattern_stra);
-//         DhStrArray_Free(pattern_stra);
-//
-//         /* Get keys */
-//         cJSON* keys = cJSON_GetObjectItem(json, "key");
-//         guint key_num = cJSON_GetArraySize(keys);
-//         for(int i = 0 ; i < key_num ; i++)
-//         {
-//             cJSON* key = cJSON_GetArrayItem(keys, i);
-//             guint item_num = get_key_nums(pattern_string, *(key->string));
-//             /* g_message("%s key corresponding %d nums.", key->string, item_num); */
-//             if(cJSON_IsObject(key))
-//                 analyse_object(item_num * division, key, &list);
-//             else if(cJSON_IsArray(key))
-//             {
-//                 dh_printf(self, _("There are some ingredients to choose:\n"));
-//                 guint size = cJSON_GetArraySize(key);
-//                 for(int i = 0 ; i < size ; i++)
-//                     dh_option_printer(self, i, get_array_item_name(key, i));
-//                 int option = dh_selector(self, _("Please select an item/tag, or enter 'a' to give up selecting (a): "), size, "a", _("&Abort"));
-//                 if(option == -1)
-//                 {
-//                     free(pattern_string);
-//                     cJSON_Delete(json);
-//                     ItemList_Free(list);
-//                     return NULL;
-//                 }
-//                 else {
-//                     analyse_object(item_num * division, cJSON_GetArrayItem(key, option), &list);
-//                 }
-//             }
-//         }
-//         free(pattern_string);
-//     }
-//     else {
-//         cJSON_Delete(json);
-//         return NULL;
-//     }
-//     cJSON_Delete(json);
-//     return list;
-// }
-//
-// static void analyse_object(guint num, cJSON* object, ItemList** list)
-// {
-//     cJSON* item = cJSON_GetObjectItem(object, "item");
-//     if(item)
-//     {
-//         ItemList_AddNum(list, num, cJSON_GetStringValue(item));
-//     }
-//     else {
-//         cJSON* tag = cJSON_GetObjectItem(object, "tag");
-//         if(tag)
-//         {
-//             ItemList_AddNum(list, num, cJSON_GetStringValue(tag));
-//         }
-//     }
-// }
-
-
-
-// static guint mod_decide(guint num1, guint num2, DhGeneral* self)
-// {
-//     if(num2 == 0) return 0;
-//     int mod = num1 % num2;
-//     if(mod)
-//     {
-//         dh_printf(self, _("There is a remainder with %d and %d.\n"), num1, num2);
-//         int choice = dh_selector(self, _("Enter 'd' to discard the result, or enter 'c' to continue (c): ") ,0, "cd", _("&Continue"), _("&Discard"));
-//         if(choice == 0 || choice == -1) /* Return division number. */
-//         {
-//             return (num1 / num2) + 1;
-//         }
-//         else return 0;
-//     }
-//     else return (num1 / num2);
-// }
-
 
 static char* get_array_item_name(cJSON* json, int num)
 {

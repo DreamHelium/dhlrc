@@ -16,6 +16,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>. */
 
 #include "litematica_region.h"
+#include "dhlrc_list.h"
 #include "libnbt/nbt.h"
 #include <string.h>
 #include <stdlib.h>
@@ -25,13 +26,45 @@
 
 extern int verbose_level;
 
-static int* id_to_index(DhStrArray* str, ItemList* il)
+typedef struct TmpItem{
+    gchar* name;
+    guint total;
+} TmpItem;
+
+typedef GList TmpItemList;
+
+static int tmpitem_strcmp(gconstpointer a, gconstpointer b)
 {
-    int* sheet = (int*)malloc( (str->num + 1) * sizeof(int) );
-    for(int i = 0 ; i < str->num ; i++ )
-        sheet[i] = item_list_item_index( il, str->val[i]);
-    sheet[str->num] = item_list_item_index(il, "minecraft:water_bucket");
-    return sheet;
+    return strcmp( ((TmpItem*)a)->name , b );
+}
+
+static void tmp_item_list_add_num(TmpItemList** til, char* item_name)
+{
+    TmpItemList* il = g_list_find_custom(*til, item_name, tmpitem_strcmp);
+    if(il)
+    {
+        TmpItem* ti = il->data;
+        ti->total++;
+    }
+    else
+    {
+        TmpItem* ti = g_new0(TmpItem, 1);
+        ti->name = g_strdup(item_name);
+        ti->total = 1;
+        *til = g_list_prepend(*til, ti);
+    }
+} 
+
+static void tmpitem_free(gpointer ti)
+{
+    TmpItem* item = ti;
+    g_free(item->name);
+    g_free(item);
+}
+
+static void tmpitem_list_free(TmpItemList* til)
+{
+    g_list_free_full(til, tmpitem_free);
 }
 
 LiteRegion* lite_region_create(NBT* root, int r_num)
@@ -369,17 +402,18 @@ ItemList *lite_region_item_list_extend(NBT* root, int r_num, ItemList* oBlock, i
 {
     clock_t start = clock();
     LiteRegion* lr = lite_region_create(root, r_num);
-    int bNum = lr->blocks->num;
+    int block_num = lr->blocks->num;
 
     // First, read originBlockName and compare it to oBlock, add Blocks to it
-    if(bNum == 0)
+
+    /* If no blocks there's no need to add items */
+    if(block_num == 0)
     {
-        return NULL;
+        lite_region_free(lr);
+        return oBlock;
     }
 
-    oBlock = lite_region_item_list_without_num(lr, oBlock);
-    if(!oBlock)
-        return NULL;
+    TmpItemList* til = NULL;
 
     // Second, read BlockStates and add number to oBlock.num
 
@@ -387,7 +421,6 @@ ItemList *lite_region_item_list_extend(NBT* root, int r_num, ItemList* oBlock, i
 
     //char process[] = "-\\|/";
     uint64_t volume = lr->region_size.x * lr->region_size.y * lr->region_size.z;
-    int* map = id_to_index( lr->replaced_blocks, oBlock);
     for(int y = 0 ; y < lr->region_size.y ; y++)
     {
         for(int z = 0 ; z < lr->region_size.z ; z++)
@@ -410,11 +443,10 @@ ItemList *lite_region_item_list_extend(NBT* root, int r_num, ItemList* oBlock, i
                             x,y,z,lr->region_size.x,lr->region_size.y,lr->region_size.z, trm(id_block_name));
                 if(!black_list_scan(bl,id_block_name))
                 {
-                    /* The worst situation is that we need water_bucket
-                     * To optimize speed we try to add it first */
                     if(lite_region_block_properties_equal(lr, id, "waterlogged", "true"))
                     {
-                        item_list_add_num(&oBlock,1,"minecraft:water_bucket");
+                        tmp_item_list_add_num(&til, "minecraft:water_bucket");
+                        // item_list_add_num(&oBlock,1,"minecraft:water_bucket");
                     }
                     if(!strcmp(id_block_name,"minecraft:water_bucket") ||
                       !strcmp(id_block_name,"minecraft:lava_bucket"))
@@ -426,8 +458,10 @@ ItemList *lite_region_item_list_extend(NBT* root, int r_num, ItemList* oBlock, i
                     {
                         if(lite_region_block_properties_equal(lr,id,"type","double"))
                         {
-                            item_list_add_num(&oBlock,2,id_block_name);
-                            continue;
+                            // item_list_add_num(&oBlock,2,id_block_name);
+                            /* Add once then once */
+                            tmp_item_list_add_num(&til, id_block_name);
+                            // continue;
                         }
                     }
                     if(strstr(id_block_name,"_door"))
@@ -440,16 +474,24 @@ ItemList *lite_region_item_list_extend(NBT* root, int r_num, ItemList* oBlock, i
                                 continue;
                         }
                     }
-                    item_list_add_num(&oBlock,1,id_block_name);
+                    tmp_item_list_add_num(&til, id_block_name);
+                    // item_list_add_num(&oBlock,1,id_block_name);
                 }
 
             }
         }
     }
-    free(map);
     printf("\n");
     black_list_free(bl);
     lite_region_free(lr);
+
+    /* Copy items to the ItemList */
+    for(TmpItemList* tild = til; tild ; tild = tild->next)
+    {
+        TmpItem* data = tild->data;
+        oBlock = item_list_add_item(&oBlock, data->total, data->name, _("Add %d items from region."));
+    }
+    tmpitem_list_free(til);
     return oBlock;
 }
 
