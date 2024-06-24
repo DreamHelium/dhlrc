@@ -5,7 +5,10 @@
 #include <QTableWidget>
 #include <QFileDialog>
 #include <glib.h>
+#include <qbuttongroup.h>
+#include <qnamespace.h>
 #include <qpushbutton.h>
+#include "showtrackui.h"
 
 extern QList<IlInfo> ilList;
 extern IlInfo info;
@@ -75,6 +78,8 @@ void ilReaderUI::showTable()
     int i = 0;
     ti = new TableItems[g_list_length(ild)];
 
+    group = new QButtonGroup();
+
     while(ild)
     {
         IListData* data = (IListData*)(ild->data);
@@ -94,13 +99,25 @@ void ilReaderUI::showTable()
         tableWidget->setItem(i, 1, ti[i].item1);
         tableWidget->setItem(i, 2, ti[i].item2);
         tableWidget->setItem(i, 3, ti[i].item3);
-        tableWidget->setCellWidget(i, 5, ti[i].item5);
-
+        
         /* Prevent tag from changing */
         ti[i].item4->setFlags(ti[i].item4->flags() & (~Qt::ItemIsEditable));
         tableWidget->setItem(i, 4, ti[i].item4);
+
+        tableWidget->setCellWidget(i, 5, ti[i].item5);
+        group->addButton(ti[i].item5, i);
+
         i++;
         ild = ild->next;
     }
     vLayout->addWidget(tableWidget);
+    QObject::connect(group, &QButtonGroup::idClicked, this, &ilReaderUI::buttonClicked);
+}
+
+int ilReaderUI::buttonClicked(int id)
+{
+    ShowTrackUI* stui = new ShowTrackUI((IListData*)g_list_nth_data(info.il, id));
+    stui->setAttribute(Qt::WA_DeleteOnClose);
+    stui->show();
+    return 0;
 }

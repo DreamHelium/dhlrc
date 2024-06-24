@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-06-18 23:34+0800\n"
-"PO-Revision-Date: 2024-04-25 22:05+0800\n"
+"POT-Creation-Date: 2024-06-24 19:18+0800\n"
+"PO-Revision-Date: 2024-06-24 19:23+0800\n"
 "Last-Translator: dream_he\n"
 "Language-Team: Chinese <kde-i18n-doc@kde.org>\n"
 "Language: zh_CN\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Lokalize 24.02.2\n"
+"X-Generator: Lokalize 24.05.1\n"
 
 #: src/main.c:40
 msgid "Enter NBT reader mode."
@@ -202,10 +202,10 @@ msgstr "[%.2f%%] 处理方块中 %lu/%lu, (%3d,%3d,%3d)/(%3d,%3d,%3d) ……"
 msgid "Processing Blocks %lu/%lu, (%3d,%3d,%3d)/(%3d,%3d,%3d) %s"
 msgstr ""
 
-#: src/litematica_region.c:492
+#: src/litematica_region.c:485
 #, c-format
-msgid "Add %d items from region."
-msgstr ""
+msgid "Add %%d items from region %s"
+msgstr "从区域%s添加%%d物品"
 
 #: src/lrc_extend.c:49
 #, c-format
@@ -335,7 +335,7 @@ msgstr ""
 msgid "Litematica reader"
 msgstr "投影文件阅读器"
 
-#: src/qt/mainwindow.cpp:50 src/qt/ilreaderui.cpp:25
+#: src/qt/mainwindow.cpp:50 src/qt/ilreaderui.cpp:28
 msgid "&File"
 msgstr "文件(&F)"
 
@@ -389,51 +389,51 @@ msgstr "关闭(&C)"
 
 #: src/qt/mainwindow.cpp:160
 msgid "Error!"
-msgstr ""
+msgstr "错误！"
 
 #: src/qt/mainwindow.cpp:160
 msgid "No selected region!"
-msgstr ""
+msgstr "没有选择的区域！"
 
-#: src/qt/ilreaderui.cpp:28
+#: src/qt/ilreaderui.cpp:31
 msgid "&Save"
-msgstr ""
+msgstr "保存 (&S)"
 
-#: src/qt/ilreaderui.cpp:60
+#: src/qt/ilreaderui.cpp:63
 msgid "Save file"
-msgstr ""
+msgstr "保存文件"
 
-#: src/qt/ilreaderui.cpp:60
+#: src/qt/ilreaderui.cpp:63
 msgid "CSV file (*.csv)"
 msgstr ""
 
-#: src/qt/ilreaderui.cpp:72
+#: src/qt/ilreaderui.cpp:75
 msgid "Name"
 msgstr "名称"
 
-#: src/qt/ilreaderui.cpp:72
+#: src/qt/ilreaderui.cpp:75
 msgid "Total"
 msgstr "总计"
 
-#: src/qt/ilreaderui.cpp:72
+#: src/qt/ilreaderui.cpp:75
 msgid "Placed"
 msgstr "已放置"
 
-#: src/qt/ilreaderui.cpp:73
+#: src/qt/ilreaderui.cpp:76
 msgid "Available"
 msgstr "可用"
 
-#: src/qt/ilreaderui.cpp:73
+#: src/qt/ilreaderui.cpp:76
 msgid "isTag"
 msgstr "是否为标签"
 
-#: src/qt/ilreaderui.cpp:73
+#: src/qt/ilreaderui.cpp:76
 msgid "Track"
-msgstr ""
+msgstr "追踪"
 
-#: src/qt/ilreaderui.cpp:91
+#: src/qt/ilreaderui.cpp:96
 msgid "Show history"
-msgstr ""
+msgstr "展示历史"
 
 #, c-format
 #~ msgid ""
@@ -533,3 +533,4 @@ msgstr ""
 #~ "another region, enter 'q' to exit the program (b): "
 #~ msgstr ""
 #~ "请再次输入方块的坐标，或输入 “b” 选择其他区域，输入 “q” 退出程序 (b): "
+

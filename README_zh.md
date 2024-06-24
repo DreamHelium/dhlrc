@@ -11,6 +11,7 @@
 - [cJSON](https://github.com/DaveGamble/cJSON) `>= 1.7.13`（~正好用上了两个这版本增加的函数~）
 - `gettext` （其是`glibc`的一部分所以你大概不需要在GNU/Linux中进行额外安装，但是在其他系统可能需要）（可选——如果你需要翻译）
 - `glib`
+- [dhutil](https://github.com/DreamHelium/dhutil)
 
 ## 编译
 
@@ -20,18 +21,12 @@
 git submodule update --init
 ```
 
-然后手动将`cJSON`目录改为`cjson`（或者安装`cJSON-devel`/`libcjson-dev`并确保版本号大于1.7.13）。
-
-如果包版本不满足要求，在`CMakeLists.txt`中的`add_execuable`中添加`cjson/cJSON.h`和`cjson/cJSON.c`并将项目根目录加入到`target_link_libraries`中（因为安装cJSON开发包后目录是/usr/include/cjson，所以改目录以适应代码，~当然我懒得试~）。
-
 如果有CMake，可以直接使用这下两行编译：
 
 ```bash
 cmake -B build
 cmake --build build
 ```
-
-如果没有，可自行手动编译（不推荐）。
 
 .pro文件已经遗弃，不再使用。
 

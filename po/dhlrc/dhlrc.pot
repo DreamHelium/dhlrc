@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-06-18 23:35+0800\n"
+"POT-Creation-Date: 2024-06-24 19:23+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -185,9 +185,9 @@ msgstr ""
 msgid "Processing Blocks %lu/%lu, (%3d,%3d,%3d)/(%3d,%3d,%3d) %s"
 msgstr ""
 
-#: src/litematica_region.c:492
+#: src/litematica_region.c:485
 #, c-format
-msgid "Add %d items from region."
+msgid "Add %%d items from region %s"
 msgstr ""
 
 #: src/lrc_extend.c:49
@@ -311,7 +311,7 @@ msgstr ""
 msgid "Litematica reader"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:50 src/qt/ilreaderui.cpp:25
+#: src/qt/mainwindow.cpp:50 src/qt/ilreaderui.cpp:28
 msgid "&File"
 msgstr ""
 
@@ -371,42 +371,42 @@ msgstr ""
 msgid "No selected region!"
 msgstr ""
 
-#: src/qt/ilreaderui.cpp:28
+#: src/qt/ilreaderui.cpp:31
 msgid "&Save"
 msgstr ""
 
-#: src/qt/ilreaderui.cpp:60
+#: src/qt/ilreaderui.cpp:63
 msgid "Save file"
 msgstr ""
 
-#: src/qt/ilreaderui.cpp:60
+#: src/qt/ilreaderui.cpp:63
 msgid "CSV file (*.csv)"
 msgstr ""
 
-#: src/qt/ilreaderui.cpp:72
+#: src/qt/ilreaderui.cpp:75
 msgid "Name"
 msgstr ""
 
-#: src/qt/ilreaderui.cpp:72
+#: src/qt/ilreaderui.cpp:75
 msgid "Total"
 msgstr ""
 
-#: src/qt/ilreaderui.cpp:72
+#: src/qt/ilreaderui.cpp:75
 msgid "Placed"
 msgstr ""
 
-#: src/qt/ilreaderui.cpp:73
+#: src/qt/ilreaderui.cpp:76
 msgid "Available"
 msgstr ""
 
-#: src/qt/ilreaderui.cpp:73
+#: src/qt/ilreaderui.cpp:76
 msgid "isTag"
 msgstr ""
 
-#: src/qt/ilreaderui.cpp:73
+#: src/qt/ilreaderui.cpp:76
 msgid "Track"
 msgstr ""
 
-#: src/qt/ilreaderui.cpp:91
+#: src/qt/ilreaderui.cpp:96
 msgid "Show history"
 msgstr ""

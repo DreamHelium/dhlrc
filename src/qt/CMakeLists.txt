@@ -26,6 +26,8 @@ set(PROJECT_SOURCES
         regionselectui.h
         blockreaderui.cpp
         blockreaderui.h
+        showtrackui.cpp
+        showtrackui.h
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)

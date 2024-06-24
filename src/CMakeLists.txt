@@ -74,7 +74,7 @@ target_include_directories(dhlrc PUBLIC
 	"${PROJECT_BINARY_DIR}" "${dhutil_INCLUDE_DIRS}" "${GIO_INCLUDE_DIRS}"
 )
 
-target_link_directories(dhlrc PUBLIC "${dhutil_LIBRARY_DIRS}")
+target_link_directories(dhlrc PUBLIC "${dhutil_LIBRARY_DIRS}" "${GIO_LIBRARY_DIRS}")
 
 add_executable(dhlrc_isoc main_isoc.c main.c  lrc_extend.c lrc_extend.h)
 

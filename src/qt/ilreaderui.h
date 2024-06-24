@@ -8,6 +8,7 @@
 #include <QAction>
 #include <QTableWidget>
 #include <QPushButton>
+#include <qbuttongroup.h>
 
 typedef struct TableItems{
     QTableWidgetItem* item0;
@@ -30,6 +31,7 @@ private:
     QTableWidget* tableWidget;
     QMenuBar* menuBar;
     QMenu* fileMenu;
+    QButtonGroup* group;
 
     QAction* saveAction;
     TableItems* ti;
@@ -38,6 +40,7 @@ private:
 
 private Q_SLOTS:
     void saveAction_triggered();
+    int buttonClicked(int id);
 };
 
 #endif // ILREADERUI_H

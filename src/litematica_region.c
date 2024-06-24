@@ -482,14 +482,17 @@ ItemList *lite_region_item_list_extend(NBT* root, int r_num, ItemList* oBlock, i
         }
     }
     printf("\n");
+    gchar* description = g_strdup_printf(_("Add %%d items from region %s"), lr->name );
     black_list_free(bl);
     lite_region_free(lr);
+
+    
 
     /* Copy items to the ItemList */
     for(TmpItemList* tild = til; tild ; tild = tild->next)
     {
         TmpItem* data = tild->data;
-        oBlock = item_list_add_item(&oBlock, data->total, data->name, _("Add %d items from region."));
+        oBlock = item_list_add_item(&oBlock, data->total, data->name, description);
     }
     tmpitem_list_free(til);
     return oBlock;

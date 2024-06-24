@@ -11,10 +11,11 @@ It uses [libnbt](https://github.com/djytw/libnbt) as the library to read litemat
 ## Dependencies
 
 - [libnbt](https://github.com/djytw/libnbt) (already in submodule of the repo)
-- `zlib` or `libdeflate` (See `README.md` in `libnbt`)
+- `zlib`
 - [cJSON](https://github.com/DaveGamble/cJSON) `>= 1.7.13`
 - `gettext` (It's a part of `glibc` so you might not need to install it in GNU/Linux but other systems might need)(Optional -- if you need translation)
-- `glib`
+- `glib2`
+- [dhutil](https://github.com/DreamHelium/dhutil)
 
 ## Compile
 
