@@ -78,6 +78,6 @@ target_link_directories(dhlrc PUBLIC "${dhutil_LIBRARY_DIRS}" "${GIO_LIBRARY_DIR
 
 add_executable(dhlrc_isoc main_isoc.c main.c  lrc_extend.c lrc_extend.h)
 
-target_link_libraries(dhlrc_isoc PUBLIC dhlrc "${dhutil_LIBRARIES}")
+target_link_libraries(dhlrc_isoc PUBLIC dhlrc)
 
 add_subdirectory(qt)
