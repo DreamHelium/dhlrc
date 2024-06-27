@@ -4,6 +4,14 @@
 #include <QList>
 #include <QValidator>
 #include <QMessageBox>
+#include <qboxlayout.h>
+#include <qcheckbox.h>
+#include <qcombobox.h>
+#include <qfontmetrics.h>
+#include <qlabel.h>
+#include <qline.h>
+#include <qlineedit.h>
+#include <qnamespace.h>
 #include "../translation.h"
 #include "../recipe_class_ng/recipes_general.h"
 #include "mainwindow.h"
@@ -115,7 +123,7 @@ void RecipesUI::recipesInit()
 
 void RecipesUI::initUI()
 {
-    QVBoxLayout* al = new QVBoxLayout();
+    al = new QVBoxLayout();
 
     area = new QScrollArea(this);
     QWidget* widget = new QWidget(this);
@@ -161,6 +169,10 @@ void RecipesUI::initUI()
 
         rpl[i].comboBox->addItems(list[i].filenames);
 
+        QSize size = fontMetrics().size(Qt::TextSingleLine, rpl[i].recipesBtn->text());
+
+        rpl[i].recipesBtn->setFixedWidth(size.width() + 10);
+
         rpl[i].recipesLayout->addWidget(rpl[i].slider);
         rpl[i].recipesLayout->addWidget(rpl[i].textEdit);
         rpl[i].recipesLayout->addWidget(rpl[i].comboBox);
@@ -177,6 +189,23 @@ void RecipesUI::initUI()
     }
     area->setWidget(widget);
 
+    askLayout = new QVBoxLayout();
+    askForCombineBox = new QCheckBox(_("Combine items to this item list."));
+    askLayout->addWidget(askForCombineBox);
+    des1 = new QLabel(_("Item track information:"));
+    des2 = new QLabel(_("New item list name:"));
+    des1Edit = new QLineEdit();
+    des2Edit = new QLineEdit();
+    des1Layout = new QHBoxLayout();
+    des1Layout->addWidget(des1);
+    des1Layout->addWidget(des1Edit);
+    des2Layout = new QHBoxLayout();
+    des2Layout->addWidget(des2);
+    des2Layout->addWidget(des2Edit);
+    askLayout->addLayout(des1Layout);
+    askLayout->addLayout(des2Layout);
+    al->addLayout(askLayout);
+
     okBtn = new QPushButton(_("&OK"));
     closeBtn = new QPushButton(_("&Close"));
     buttonLayout = new QHBoxLayout();
@@ -187,6 +216,7 @@ void RecipesUI::initUI()
     al->addLayout(buttonLayout);
     QObject::connect(closeBtn, SIGNAL(clicked()), this, SLOT(close()));
     QObject::connect(okBtn, &QPushButton::clicked, this, &RecipesUI::okbtn_clicked);
+    QObject::connect(askForCombineBox, &QCheckBox::clicked, this, &RecipesUI::afcb_clicked);
     this->setLayout(al);
 }
 
@@ -291,4 +321,27 @@ ItemList* RecipesUI::recipesProcess(const char* item, const char* filepos ,quint
     }
     recipes_free(r);
     return new_il;
+}
+
+void RecipesUI::resizeEvent(QResizeEvent* event)
+{
+    for(int i = 0 ; i < list.length() ; i++)
+    {
+        int cbWidth = area->width() - 150 - rpl[i].recipesBtn->width() - 60;
+        rpl[i].comboBox->setFixedWidth(cbWidth > 0 ? cbWidth : 0);
+    }
+}
+
+void RecipesUI::afcb_clicked(bool checked)
+{
+    if(checked)
+    {
+        des2->hide();
+        des2Edit->hide();
+    }
+    else
+    {
+        des2->show();
+        des2Edit->show();
+    }
 }
