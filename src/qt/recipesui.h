@@ -47,9 +47,6 @@ private:
     QHBoxLayout* buttonLayout;
     QVBoxLayout* askLayout;
     QCheckBox* askForCombineBox;
-    QLabel* des1;
-    QLineEdit* des1Edit;
-    QHBoxLayout* des1Layout;
     QLabel* des2;
     QLineEdit* des2Edit;
     QHBoxLayout* des2Layout;

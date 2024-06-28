@@ -8,6 +8,7 @@ extern NBT* root;
 ItemList* il = nullptr;
 IlInfo info;
 bool infoR = false;
+int infoNum = -1;
 int verbose_level = 0;
 
 int main(int argc, char *argv[])

@@ -4,6 +4,7 @@
 extern QList<IlInfo> ilList;
 extern IlInfo info;
 extern bool infoR;
+extern int infoNum;
 
 ilChooseUI::ilChooseUI(QWidget *parent)
     : QDialog{parent}
@@ -52,6 +53,7 @@ void ilChooseUI::okBtn_clicked()
         {
             info = cbnList[i].info;
             infoR = true;
+            infoNum = i;
             break;
         }
     }

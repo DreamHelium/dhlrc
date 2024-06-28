@@ -4,6 +4,7 @@
 #include <QVBoxLayout>
 #include <QCheckBox>
 #include <dh/dh_string_util.h>
+#include <qapplication.h>
 #include <qcheckbox.h>
 #include <qdatetime.h>
 #include "mainwindow.h"
@@ -77,6 +78,7 @@ void ProcessUI::okBtn_clicked()
         {
             label2->setText(QString::asprintf(_("Processing: region [%d] %s \n"),
                                                           i,region_name->val[i]));
+            qApp->processEvents();
             new_il = lite_region_item_list_extend(root, i, new_il, 1);
         }
     }

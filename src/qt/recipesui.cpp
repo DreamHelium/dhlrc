@@ -11,6 +11,7 @@
 #include <qlabel.h>
 #include <qline.h>
 #include <qlineedit.h>
+#include <qmessagebox.h>
 #include <qnamespace.h>
 #include "../translation.h"
 #include "../recipe_class_ng/recipes_general.h"
@@ -19,10 +20,12 @@
 #include "ilchooseui.h"
 #include "../config.h"
 #include "../uncompress.h"
+#include <QAbstractItemView>
 
 extern bool infoR;
 extern IlInfo info;
 extern QList<IlInfo> ilList;
+extern int infoNum;
 
 typedef struct RecipesInternal{
     QString itemName;
@@ -66,26 +69,31 @@ void RecipesUI::recipesInit()
     RecipeList* rcl = recipe_list_init(recipeDir, il);
     if(!rcl)
     {
-        /* Extract file from game dir */
-        char* gameDir = dh_get_game_dir();
-        char* version = dh_get_version();
-        QString originGameJar = gameDir;
-        originGameJar += "/versions/";
-        originGameJar += version;
-        originGameJar += "/";
-        originGameJar += version;
-        originGameJar += ".jar";
-        char* cacheDir = dh_get_cache_dir();
-        QString destDir = cacheDir;
-        destDir += "/";
-        destDir += version;
-        destDir += "/extracted/";
-        dh_file_create(destDir.toStdString().c_str(), FALSE);
-        dhlrc_extract(originGameJar.toStdString().c_str(), destDir.toStdString().c_str());
-        g_free(gameDir);
-        g_free(version);
-        g_free(cacheDir);
-        rcl = recipe_list_init(recipeDir, il);
+        auto btn = QMessageBox::question(this, _("No recipe file found!"), 
+        _("No recipe file found! Do you want to extract game file?"));
+        if(btn == QMessageBox::Yes)
+        {
+            /* Extract file from game dir */
+            char* gameDir = dh_get_game_dir();
+            char* version = dh_get_version();
+            QString originGameJar = gameDir;
+            originGameJar += "/versions/";
+            originGameJar += version;
+            originGameJar += "/";
+            originGameJar += version;
+            originGameJar += ".jar";
+            char* cacheDir = dh_get_cache_dir();
+            QString destDir = cacheDir;
+            destDir += "/";
+            destDir += version;
+            destDir += "/extracted/";
+            dh_file_create(destDir.toStdString().c_str(), FALSE);
+            dhlrc_extract(originGameJar.toStdString().c_str(), destDir.toStdString().c_str());
+            g_free(gameDir);
+            g_free(version);
+            g_free(cacheDir);
+            rcl = recipe_list_init(recipeDir, il);
+        }
     }
     g_free(recipeDir);
     RecipeList* rcl_d = rcl;
@@ -168,6 +176,14 @@ void RecipesUI::initUI()
         rpl[i].textEdit->setFixedWidth(50);
 
         rpl[i].comboBox->addItems(list[i].filenames);
+        auto view = rpl[i].comboBox->view();
+        int maxWidth = 0;
+        for(int j = 0 ; j < rpl[i].comboBox->count() ; j++)
+        {
+            int width = view->sizeHintForColumn(j);
+            maxWidth = MAX(maxWidth, width);
+        }
+        view->setFixedWidth(maxWidth);
 
         QSize size = fontMetrics().size(Qt::TextSingleLine, rpl[i].recipesBtn->text());
 
@@ -192,17 +208,11 @@ void RecipesUI::initUI()
     askLayout = new QVBoxLayout();
     askForCombineBox = new QCheckBox(_("Combine items to this item list."));
     askLayout->addWidget(askForCombineBox);
-    des1 = new QLabel(_("Item track information:"));
     des2 = new QLabel(_("New item list name:"));
-    des1Edit = new QLineEdit();
-    des2Edit = new QLineEdit();
-    des1Layout = new QHBoxLayout();
-    des1Layout->addWidget(des1);
-    des1Layout->addWidget(des1Edit);
+    des2Edit = new QLineEdit(_("Generated from material list combiner."));
     des2Layout = new QHBoxLayout();
     des2Layout->addWidget(des2);
     des2Layout->addWidget(des2Edit);
-    askLayout->addLayout(des1Layout);
     askLayout->addLayout(des2Layout);
     al->addLayout(askLayout);
 
@@ -269,16 +279,23 @@ void RecipesUI::okbtn_clicked()
             ItemList* processd_il = recipesProcess(list[i].itemName.toStdString().c_str(), rpl[i].comboBox->currentText().toStdString().c_str(), rpl[i].slider->value());
             if(processd_il)
             {
-                item_list_add_num(&info.il, -rpl[i].slider->value(), (char*)list[i].itemName.toStdString().c_str());
+                item_list_add_item(&info.il, -rpl[i].slider->value(), (char*)list[i].itemName.toStdString().c_str(), 
+                _("\"Delete\" %d items from material list combiner."));
                 item_list_delete_zero_item(&info.il);
-                item_list_combine(&new_il, processd_il);
-                item_list_free(processd_il);
+                new_il = processd_il;
             }
         }
     }
-    QString str = QString(_("Generated from material combiner."));
-    IlInfo info = {.name = str , .il = new_il, .time = QDateTime::currentDateTime()};
-    ilList.append(info);
+    if(askForCombineBox->isChecked() == false)
+    {
+        IlInfo info = {.name = des2Edit->text() , .il = new_il, .time = QDateTime::currentDateTime()};
+        ilList.append(info);
+    }
+    else
+    {
+        item_list_combine(&ilList[infoNum].il, new_il);
+        item_list_free(new_il);
+    }
     this->close();
 }
 
@@ -316,7 +333,8 @@ ItemList* RecipesUI::recipesProcess(const char* item, const char* filepos ,quint
         else
         {
             guint item_num = dh_str_array_find_char(r->pattern, r->pt[i].pattern);
-            item_list_add_num(&new_il, item_num * write_num, r->pt[i].item_string->val[0]);
+            item_list_add_item(&new_il, item_num * write_num, r->pt[i].item_string->val[0], 
+            _("Add %d items from material list combiner."));
         }
     }
     recipes_free(r);

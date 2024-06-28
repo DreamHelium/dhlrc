@@ -139,7 +139,11 @@ static gchar* get_filename()
             g_object_unref(arg);
             if(G_VALUE_HOLDS_STRING(&val))
             {
+                #ifdef GOBJECT_AVAILABLE_IN_2_80
                 pure_filename = g_value_steal_string(&val);
+                #else
+                pure_filename = g_value_get_string(&val);
+                #endif
             }
             else 
             {
