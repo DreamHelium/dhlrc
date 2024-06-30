@@ -20,7 +20,7 @@
 
 #include "libnbt/nbt.h"
 #include "dhlrc_list.h"
-#include <dh/dhutil.h>
+#include <dhutil.h>
 #include "nbt_litereader.h"
 
 #ifdef __cplusplus

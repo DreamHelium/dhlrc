@@ -3,7 +3,7 @@
 #include "../translation.h"
 #include <QVBoxLayout>
 #include <QCheckBox>
-#include <dh/dh_string_util.h>
+#include <dh_string_util.h>
 #include <qapplication.h>
 #include <qboxlayout.h>
 #include <qcheckbox.h>

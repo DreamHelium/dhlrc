@@ -1,6 +1,6 @@
 #include "recipesui.h"
 #include "../dhlrc_list.h"
-#include <dh/dhutil.h>
+#include <dhutil.h>
 #include <QList>
 #include <QValidator>
 #include <QMessageBox>

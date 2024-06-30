@@ -20,7 +20,7 @@
 
 #include <glib-object.h>
 #include <cjson/cJSON.h>
-#include <dh/dhutil.h>
+#include <dhutil.h>
 #include "../dhlrc_list.h"
 
 G_BEGIN_DECLS

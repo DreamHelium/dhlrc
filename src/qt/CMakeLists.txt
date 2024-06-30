@@ -37,9 +37,6 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         ${PROJECT_SOURCES}
         processui.h processui.cpp
         ilreaderui.h ilreaderui.cpp
-        genericui.h genericui.cpp
-        
-
     )
 # Define target properties for Android with Qt 6 as:
 #    set_property(TARGET dhlrc_qt APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR

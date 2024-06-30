@@ -21,7 +21,7 @@
 #undef signals
 #include <glib-object.h>
 #include <cjson/cJSON.h>
-#include <dh/dhutil.h>
+#include <dhutil.h>
 
 G_BEGIN_DECLS
 
