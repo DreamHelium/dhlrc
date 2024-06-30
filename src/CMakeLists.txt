@@ -70,7 +70,7 @@ set(BUILD_SHARED_LIBS ON)
 
 add_subdirectory(minizip-ng)
 
-target_link_libraries(dhlrc PUBLIC m z cjson minizip dhutil
+target_link_libraries(dhlrc PUBLIC m z cjson minizip dhutil "${GIO_LIBRARIES}"
 #    deflate
 )
 
