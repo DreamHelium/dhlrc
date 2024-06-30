@@ -70,11 +70,8 @@ set(BUILD_SHARED_LIBS ON)
 
 add_subdirectory(minizip-ng)
 
-target_link_libraries(dhlrc PUBLIC m z cjson minizip dhutil "${GIO_LIBRARIES}"
-#    deflate
+target_link_libraries(dhlrc PUBLIC m z cjson minizip dhutil
 )
-
-message("${dhutil_INCLUDE_DIRS}")
 
 target_include_directories(dhlrc PUBLIC
 	"${PROJECT_BINARY_DIR}" "${GIO_INCLUDE_DIRS}" dhutil
@@ -83,6 +80,10 @@ target_include_directories(dhlrc PUBLIC
 target_link_directories(dhlrc PUBLIC "${GIO_LIBRARY_DIRS}")
 
 add_executable(dhlrc_isoc main_isoc.c main.c  lrc_extend.c lrc_extend.h)
+
+target_include_directories(dhlrc_isoc PUBLIC
+	"${PROJECT_BINARY_DIR}" "${GIO_INCLUDE_DIRS}" dhutil
+)
 
 target_link_libraries(dhlrc_isoc PUBLIC dhlrc)
 

@@ -53,11 +53,11 @@ int nbtlr_instance_ng(NbtPos* pos, int modify_mode)
 #else
         system("clear");
 #endif
-        char* key;
-        if(pos->level == 0 || pos->item != -1)
-            key = pos->current->key;
-        else
-            key = nbtlr_to_next_nbt(pos->tree[pos->level - 1] , pos->child[pos->level - 1])->key;
+        char* key = "";
+        // if(!pos->current->parent)
+        //     key = pos->current->key;
+        // else
+        //     key = pos->current->parent->key;
         printf(_("The detail of NBT \"%s\" is listed below:\n\n"), key);
         int list = 0;
 
@@ -78,6 +78,7 @@ int nbtlr_instance_ng(NbtPos* pos, int modify_mode)
             out = dh_out_new();
             DhArgInfo* arg = dh_arg_info_new();
             /* Some same argument */
+            dh_arg_info_add_arg(arg, 'p', "upper", N_("Enter upper NBT"));
             dh_arg_info_add_arg(arg, 'q', "quit", N_("Quit application"));
             dh_arg_info_add_arg(arg, 'm', "modify", N_("Enter modification mode"));
             dh_arg_info_add_arg(arg, 's', "save", N_("Save NBT file"));
@@ -108,8 +109,10 @@ int nbtlr_instance_ng(NbtPos* pos, int modify_mode)
         /* Analyse ret */
         if(G_VALUE_HOLDS_INT64(&ret))
         {
-            if(!nbt_pos_add_to_tree(pos, g_value_get_int64(&ret)))
-                return -1;
+            // if(!nbt_pos_add_to_tree(pos, g_value_get_int64(&ret)))
+            //     return -1;
+            pos->current = nbtlr_to_next_nbt(pos->current, g_value_get_int64(&ret));
+            pos->current = pos->current->child;
         }
         else if(G_VALUE_HOLDS_CHAR(&ret))
         {
@@ -123,7 +126,8 @@ int nbtlr_instance_ng(NbtPos* pos, int modify_mode)
             if(opt == 'b')
                 modify_mode = 0;
             if(opt == 'p')
-                if(!nbt_pos_delete_last(pos)) return -1;
+                // if(!nbt_pos_delete_last(pos)) return -1;
+                pos->current = pos->current->parent? pos->current->parent: pos->current;
             if(opt == 's')
             {
                 if(nbtlr_save(pos->tree[0]))
