@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.5)
 
-project(dhlrc_qt VERSION 0.1 LANGUAGES CXX)
+project(dhlrc_qt VERSION 0.3.1 LANGUAGES CXX)
 
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
@@ -28,6 +28,7 @@ set(PROJECT_SOURCES
         blockreaderui.h
         showtrackui.cpp
         showtrackui.h
+        configui.h configui.cpp configui.ui
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
@@ -37,6 +38,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         processui.h processui.cpp
         ilreaderui.h ilreaderui.cpp
         genericui.h genericui.cpp
+        
 
     )
 # Define target properties for Android with Qt 6 as:

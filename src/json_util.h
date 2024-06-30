@@ -21,6 +21,15 @@
 
 #include <cjson/cJSON.h>
 
+#ifdef __cplusplus
+extern "C"{
+#endif
+
 cJSON* dhlrc_file_to_json(const char* pos);
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* JSON_UTIL_H */

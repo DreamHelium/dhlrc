@@ -8,16 +8,16 @@ msgid ""
 msgstr ""
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-06-30 08:19+0800\n"
-"PO-Revision-Date: 2024-06-30 08:27+0800\n"
-"Last-Translator: Dream Helium\n"
-"Language-Team: Chinese <>\n"
+"POT-Creation-Date: 2024-06-30 21:32+0800\n"
+"PO-Revision-Date: 2024-06-30 21:48+0800\n"
+"Last-Translator: dream_he\n"
+"Language-Team: Chinese <kde-i18n-doc@kde.org>\n"
 "Language: zh_CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Lokalize 24.02.2\n"
+"X-Generator: Lokalize 24.05.1\n"
 
 #: src/main.c:40
 msgid "Enter NBT reader mode."
@@ -71,7 +71,7 @@ msgstr "在读取文件时出错。"
 msgid "Not a valid NBT file!"
 msgstr "不是一个有效的NBT文件！"
 
-#: src/main_isoc.c:107 src/qt/mainwindow.cpp:93
+#: src/main_isoc.c:107 src/qt/mainwindow.cpp:94
 msgid "Valid NBT file!"
 msgstr "有效的NBT文件！"
 
@@ -271,7 +271,7 @@ msgstr ""
 msgid "&No"
 msgstr ""
 
-#: src/recipe_util.c:124 src/qt/mainwindow.cpp:57
+#: src/recipe_util.c:124 src/qt/mainwindow.cpp:58
 msgid "&Quit"
 msgstr "退出(&Q)"
 
@@ -304,7 +304,7 @@ msgstr "请输入一个选项，或“d”以放弃 (d): "
 
 #: src/dhlrc_list.c:790 src/recipe_class/recipe_general.c:113
 msgid "&Discard"
-msgstr ""
+msgstr "舍弃(&D)"
 
 #: src/recipe_class/recipe_general.c:112
 #, c-format
@@ -317,7 +317,7 @@ msgstr "输入“d”舍弃结果，或输入“c”继续 (c): "
 
 #: src/recipe_class/recipe_general.c:113
 msgid "&Continue"
-msgstr ""
+msgstr "继续(&C)"
 
 #: src/recipe_class/recipe_shaped.c:132
 msgid "There are some ingredients to choose:\n"
@@ -329,71 +329,95 @@ msgstr "请输入一个物品/标识，或者输入“a”放弃选择 (a): "
 
 #: src/recipe_class/recipe_shaped.c:139
 msgid "&Abort"
-msgstr ""
+msgstr "终止(&A)"
 
-#: src/qt/mainwindow.cpp:34
+#: src/qt/configui.cpp:10
+msgid "Config settings"
+msgstr "配置设置"
+
+#: src/qt/configui.cpp:10
+msgid "Override Language"
+msgstr "覆盖语言"
+
+#: src/qt/configui.cpp:10
+msgid "Recipe Directory"
+msgstr "配方文件夹"
+
+#: src/qt/configui.cpp:10
+msgid "Translation File"
+msgstr "翻译文件"
+
+#: src/qt/configui.cpp:11
+msgid "Game Directory"
+msgstr "游戏目录"
+
+#: src/qt/mainwindow.cpp:35
 msgid "Litematica reader"
 msgstr "投影文件阅读器"
 
-#: src/qt/mainwindow.cpp:50 src/qt/ilreaderui.cpp:28
+#: src/qt/mainwindow.cpp:51 src/qt/ilreaderui.cpp:28
 msgid "&File"
 msgstr "文件(&F)"
 
-#: src/qt/mainwindow.cpp:56
+#: src/qt/mainwindow.cpp:57
 msgid "&Open"
 msgstr "打开(&O)"
 
-#: src/qt/mainwindow.cpp:66
+#: src/qt/mainwindow.cpp:67
 msgid "Select a file"
 msgstr "选择一个文件"
 
-#: src/qt/mainwindow.cpp:66
+#: src/qt/mainwindow.cpp:67
 msgid "Litematic file (*.litematic)"
 msgstr "投影文件 (*.litematic)"
 
-#: src/qt/mainwindow.cpp:94
+#: src/qt/mainwindow.cpp:95
 msgid "There are three functions:"
 msgstr "有三个功能："
 
-#: src/qt/mainwindow.cpp:98
+#: src/qt/mainwindow.cpp:99
 msgid "NBT lite &reader with modifier"
 msgstr "NBT小型阅读器及修改器(&R)"
 
-#: src/qt/mainwindow.cpp:99
+#: src/qt/mainwindow.cpp:100
 msgid "Litematica material &list with recipe combination"
 msgstr "投影材料列表及合成表合成功能(&L)"
 
-#: src/qt/mainwindow.cpp:100
+#: src/qt/mainwindow.cpp:101
 msgid "Litematica &block reader"
 msgstr "投影方块阅读器(&B)"
 
-#: src/qt/mainwindow.cpp:101
+#: src/qt/mainwindow.cpp:102
 msgid "&Item list reader and modifier"
 msgstr "物品列表阅读器和修改器(&I)"
 
-#: src/qt/mainwindow.cpp:102
+#: src/qt/mainwindow.cpp:103
 msgid "&Recipe combiner"
 msgstr "材料列表合成功能(&R)"
 
-#: src/qt/mainwindow.cpp:103
+#: src/qt/mainwindow.cpp:104
 msgid "&Clear Item list"
 msgstr "清除材料列表 (&C)"
 
-#: src/qt/mainwindow.cpp:114 src/qt/ilchooseui.cpp:31 src/qt/processui.cpp:56
+#: src/qt/mainwindow.cpp:105
+msgid "Config &settings"
+msgstr ""
+
+#: src/qt/mainwindow.cpp:117 src/qt/ilchooseui.cpp:31 src/qt/processui.cpp:56
 #: src/qt/recipesui.cpp:219 src/qt/regionselectui.cpp:41
 msgid "&OK"
 msgstr "确定(&O)"
 
-#: src/qt/mainwindow.cpp:115 src/qt/ilchooseui.cpp:32 src/qt/processui.cpp:57
+#: src/qt/mainwindow.cpp:118 src/qt/ilchooseui.cpp:32 src/qt/processui.cpp:57
 #: src/qt/recipesui.cpp:220 src/qt/regionselectui.cpp:42
 msgid "&Close"
 msgstr "关闭(&C)"
 
-#: src/qt/mainwindow.cpp:160
+#: src/qt/mainwindow.cpp:164
 msgid "Error!"
 msgstr "错误！"
 
-#: src/qt/mainwindow.cpp:160
+#: src/qt/mainwindow.cpp:164
 msgid "No selected region!"
 msgstr "没有选择的区域！"
 
@@ -520,6 +544,9 @@ msgstr "请选择一个区域："
 #: src/qt/showtrackui.cpp:18
 msgid "The track information is:\n"
 msgstr "追踪信息如下：\n"
+
+#~ msgid "Override language"
+#~ msgstr "覆盖语言"
 
 #, c-format
 #~ msgid ""

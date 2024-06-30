@@ -31,6 +31,7 @@ int         item_list_combine_recipe(ItemList** o_bl, const char* dirpos, DhGene
 long *      num_array_get_from_input(int *array_num, int max_num);
 
 const char* name_block_translate(const char* block_name);
+gboolean    dh_game_file_extract();
 int         dh_exit();
 
 #ifdef __cplusplus

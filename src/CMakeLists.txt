@@ -8,6 +8,7 @@ set( DHLRC_MAIN_POT_FILE_DEPENDS
         src/dhlrc_list.c
         src/recipe_class/recipe_general.c
         src/recipe_class/recipe_shaped.c
+		src/qt/configui.cpp
         src/qt/mainwindow.cpp
         src/qt/ilreaderui.cpp
 		src/qt/ilchooseui.cpp

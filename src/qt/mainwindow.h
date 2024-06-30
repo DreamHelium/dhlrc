@@ -46,6 +46,7 @@ private:
     QRadioButton* ilreaderBtn;
     QRadioButton* clearBtn;
     QRadioButton* recipeBtn;
+    QRadioButton* configBtn;
     QPushButton*  okBtn;
     QPushButton*  closeBtn;
     QWidget* widget;

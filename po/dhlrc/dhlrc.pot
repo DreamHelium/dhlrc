@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-06-30 08:27+0800\n"
+"POT-Creation-Date: 2024-06-30 21:32+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -69,7 +69,7 @@ msgstr ""
 msgid "Not a valid NBT file!"
 msgstr ""
 
-#: src/main_isoc.c:107 src/qt/mainwindow.cpp:93
+#: src/main_isoc.c:107 src/qt/mainwindow.cpp:94
 msgid "Valid NBT file!"
 msgstr ""
 
@@ -247,7 +247,7 @@ msgstr ""
 msgid "&No"
 msgstr ""
 
-#: src/recipe_util.c:124 src/qt/mainwindow.cpp:57
+#: src/recipe_util.c:124 src/qt/mainwindow.cpp:58
 msgid "&Quit"
 msgstr ""
 
@@ -307,69 +307,93 @@ msgstr ""
 msgid "&Abort"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:34
+#: src/qt/configui.cpp:10
+msgid "Config settings"
+msgstr ""
+
+#: src/qt/configui.cpp:10
+msgid "Override Language"
+msgstr ""
+
+#: src/qt/configui.cpp:10
+msgid "Recipe Directory"
+msgstr ""
+
+#: src/qt/configui.cpp:10
+msgid "Translation File"
+msgstr ""
+
+#: src/qt/configui.cpp:11
+msgid "Game Directory"
+msgstr ""
+
+#: src/qt/mainwindow.cpp:35
 msgid "Litematica reader"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:50 src/qt/ilreaderui.cpp:28
+#: src/qt/mainwindow.cpp:51 src/qt/ilreaderui.cpp:28
 msgid "&File"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:56
+#: src/qt/mainwindow.cpp:57
 msgid "&Open"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:66
+#: src/qt/mainwindow.cpp:67
 msgid "Select a file"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:66
+#: src/qt/mainwindow.cpp:67
 msgid "Litematic file (*.litematic)"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:94
+#: src/qt/mainwindow.cpp:95
 msgid "There are three functions:"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:98
+#: src/qt/mainwindow.cpp:99
 msgid "NBT lite &reader with modifier"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:99
+#: src/qt/mainwindow.cpp:100
 msgid "Litematica material &list with recipe combination"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:100
+#: src/qt/mainwindow.cpp:101
 msgid "Litematica &block reader"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:101
+#: src/qt/mainwindow.cpp:102
 msgid "&Item list reader and modifier"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:102
+#: src/qt/mainwindow.cpp:103
 msgid "&Recipe combiner"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:103
+#: src/qt/mainwindow.cpp:104
 msgid "&Clear Item list"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:114 src/qt/ilchooseui.cpp:31 src/qt/processui.cpp:56
+#: src/qt/mainwindow.cpp:105
+msgid "Config &settings"
+msgstr ""
+
+#: src/qt/mainwindow.cpp:117 src/qt/ilchooseui.cpp:31 src/qt/processui.cpp:56
 #: src/qt/recipesui.cpp:219 src/qt/regionselectui.cpp:41
 msgid "&OK"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:115 src/qt/ilchooseui.cpp:32 src/qt/processui.cpp:57
+#: src/qt/mainwindow.cpp:118 src/qt/ilchooseui.cpp:32 src/qt/processui.cpp:57
 #: src/qt/recipesui.cpp:220 src/qt/regionselectui.cpp:42
 msgid "&Close"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:160
+#: src/qt/mainwindow.cpp:164
 msgid "Error!"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:160
+#: src/qt/mainwindow.cpp:164
 msgid "No selected region!"
 msgstr ""
 

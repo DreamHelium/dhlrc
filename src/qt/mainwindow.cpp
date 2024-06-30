@@ -16,6 +16,7 @@
 #include "recipesui.h"
 #include "regionselectui.h"
 #include "blockreaderui.h"
+#include "configui.h"
 
 NBT* root = nullptr;
 static bool nbtRead = false;
@@ -101,6 +102,7 @@ void MainWindow::initInternalUI()
         ilreaderBtn = new QRadioButton(_("&Item list reader and modifier"));
         recipeBtn = new  QRadioButton(_("&Recipe combiner"));
         clearBtn = new QRadioButton(_("&Clear Item list"));
+        configBtn = new QRadioButton(_("Config &settings"));
 
         radioButtonGroup->addButton(nbtReaderBtn, 0);
         radioButtonGroup->addButton(lrcBtn, 1);
@@ -108,6 +110,7 @@ void MainWindow::initInternalUI()
         radioButtonGroup->addButton(ilreaderBtn, 3);
         radioButtonGroup->addButton(recipeBtn, 4);
         radioButtonGroup->addButton(clearBtn, 5);
+        radioButtonGroup->addButton(configBtn, 6);
         nbtReaderBtn->setChecked(true);
 
         /* Add PushButtons */
@@ -131,6 +134,7 @@ void MainWindow::initInternalUI()
         vLayout->addWidget(ilreaderBtn);
         vLayout->addWidget(recipeBtn);
         vLayout->addWidget(clearBtn);
+        vLayout->addWidget(configBtn);
         vLayout->addStretch();
         vLayout->addLayout(hLayout);
 
@@ -189,6 +193,11 @@ void MainWindow::okBtn_clicked()
             item_list_free(ilList[index].il);
             ilList.remove(index);
         }
+    }
+    else if(this->radioButtonGroup->checkedId() == 6) /* Config settings */
+    {
+        ConfigUI* cui = new ConfigUI();
+        cui->show();
     }
 }
 
