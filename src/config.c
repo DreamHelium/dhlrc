@@ -17,7 +17,7 @@
 
 #include "config.h"
 #include <cjson/cJSON.h>
-#include <dh/dhutil.h>
+#include "dhutil/dhutil.h"
 #include <gio/gio.h>
 #include "json_util.h"
 

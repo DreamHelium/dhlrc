@@ -62,26 +62,25 @@ add_library(dhlrc SHARED
 	       recipe_class_ng/recipes_smelting.c
 )
 
-#add_definitions(-DLIBNBT_USE_LIBDEFLATE)
-#add_definitions(-DDH_DEBUG_IN_IDE)
+add_subdirectory(dhutil)
+
 add_definitions(-DDH_USE_OLD_INPUT_LINE_FUNC)
 add_definitions(-DDH_USE_DEPRECATED_FUNCNAMES)
-add_definitions(-DDH_USE_DHLRC_FILE_UTIL)
 set(BUILD_SHARED_LIBS ON)
 
 add_subdirectory(minizip-ng)
 
-target_link_libraries(dhlrc PUBLIC m z "${dhutil_LIBRARIES}" cjson minizip
+target_link_libraries(dhlrc PUBLIC m z cjson minizip
 #    deflate
 )
 
 message("${dhutil_INCLUDE_DIRS}")
 
 target_include_directories(dhlrc PUBLIC
-	"${PROJECT_BINARY_DIR}" "${dhutil_INCLUDE_DIRS}" "${GIO_INCLUDE_DIRS}"
+	"${PROJECT_BINARY_DIR}" "${GIO_INCLUDE_DIRS}" dhutil
 )
 
-target_link_directories(dhlrc PUBLIC "${dhutil_LIBRARY_DIRS}" "${GIO_LIBRARY_DIRS}")
+target_link_directories(dhlrc PUBLIC "${GIO_LIBRARY_DIRS}")
 
 add_executable(dhlrc_isoc main_isoc.c main.c  lrc_extend.c lrc_extend.h)
 
