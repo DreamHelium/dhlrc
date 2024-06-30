@@ -21,6 +21,14 @@ set( DHLRC_MAIN_POT_FILE_DEPENDS
 )
 
 # configure_file(dhlrc_config.h.in dhlrc_config.h)
+add_subdirectory(dhutil)
+
+add_definitions(-DDH_USE_OLD_INPUT_LINE_FUNC)
+add_definitions(-DDH_USE_DEPRECATED_FUNCNAMES)
+set(BUILD_SHARED_LIBS ON)
+
+add_subdirectory(minizip-ng)
+
 
 add_library(dhlrc SHARED
 	       main.h
@@ -62,28 +70,18 @@ add_library(dhlrc SHARED
 	       recipe_class_ng/recipes_smelting.c
 )
 
-add_subdirectory(dhutil)
 
-add_definitions(-DDH_USE_OLD_INPUT_LINE_FUNC)
-add_definitions(-DDH_USE_DEPRECATED_FUNCNAMES)
-set(BUILD_SHARED_LIBS ON)
-
-add_subdirectory(minizip-ng)
 
 target_link_libraries(dhlrc PUBLIC m z cjson minizip dhutil
 )
 
 target_include_directories(dhlrc PUBLIC
-	"${PROJECT_BINARY_DIR}" "${GIO_INCLUDE_DIRS}" dhutil
+	"${GIO_INCLUDE_DIRS}" dhutil
 )
 
 target_link_directories(dhlrc PUBLIC "${GIO_LIBRARY_DIRS}")
 
 add_executable(dhlrc_isoc main_isoc.c main.c  lrc_extend.c lrc_extend.h)
-
-target_include_directories(dhlrc_isoc PUBLIC
-	"${PROJECT_BINARY_DIR}" "${GIO_INCLUDE_DIRS}" dhutil
-)
 
 target_link_libraries(dhlrc_isoc PUBLIC dhlrc)
 
