@@ -31,16 +31,6 @@ jobs:
         sudo cmake --install build
         cd ..
 
-    - name: Install dhutil from source
-      run: |
-        sudo apt install -y gettext
-        git clone https://github.com/DreamHelium/dhutil
-        cd dhutil
-        cmake -B build
-        cmake --build build
-        sudo cmake --install build
-        cd ..
-
     - name: Install Qt
       uses: jurplel/install-qt-action@v4.0.0
       with:
