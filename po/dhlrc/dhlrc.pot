@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-06-28 20:11+0800\n"
+"POT-Creation-Date: 2024-06-30 08:27+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -88,7 +88,7 @@ msgstr ""
 msgid "Please select an option, or enter 'q' to exit the program (q): "
 msgstr ""
 
-#: src/main_isoc.c:180 src/lrc_extend.c:42
+#: src/main_isoc.c:180 src/lrc_extend.c:42 src/qt/processui.cpp:41
 #, c-format
 msgid "There are %d regions:\n"
 msgstr ""
@@ -255,30 +255,30 @@ msgstr ""
 msgid "&Read"
 msgstr ""
 
-#: src/dhlrc_list.c:143
+#: src/dhlrc_list.c:162
 msgid "Name\t\tTotal\tPlaced\tAvailable\tIs tag\n"
 msgstr ""
 
-#: src/dhlrc_list.c:328
+#: src/dhlrc_list.c:347
 #, c-format
 msgid "Combined %d items to the new item list."
 msgstr ""
 
-#: src/dhlrc_list.c:757
+#: src/dhlrc_list.c:776
 #, c-format
 msgid "Processing %s.\n"
 msgstr ""
 
-#: src/dhlrc_list.c:764
+#: src/dhlrc_list.c:783
 #, c-format
 msgid "There are %d corresponding files to the item %s:\n"
 msgstr ""
 
-#: src/dhlrc_list.c:771
+#: src/dhlrc_list.c:790
 msgid "Please select an option, or 'd' to discard (d): "
 msgstr ""
 
-#: src/dhlrc_list.c:771 src/recipe_class/recipe_general.c:113
+#: src/dhlrc_list.c:790 src/recipe_class/recipe_general.c:113
 msgid "&Discard"
 msgstr ""
 
@@ -355,11 +355,13 @@ msgstr ""
 msgid "&Clear Item list"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:114
+#: src/qt/mainwindow.cpp:114 src/qt/ilchooseui.cpp:31 src/qt/processui.cpp:56
+#: src/qt/recipesui.cpp:219 src/qt/regionselectui.cpp:41
 msgid "&OK"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:115
+#: src/qt/mainwindow.cpp:115 src/qt/ilchooseui.cpp:32 src/qt/processui.cpp:57
+#: src/qt/recipesui.cpp:220 src/qt/regionselectui.cpp:42
 msgid "&Close"
 msgstr ""
 
@@ -409,4 +411,88 @@ msgstr ""
 
 #: src/qt/ilreaderui.cpp:96
 msgid "Show history"
+msgstr ""
+
+#: src/qt/ilchooseui.cpp:12
+msgid "Select a item list."
+msgstr ""
+
+#: src/qt/ilchooseui.cpp:14
+msgid "Please choose a item list:"
+msgstr ""
+
+#: src/qt/processui.cpp:45
+msgid "&All"
+msgstr ""
+
+#: src/qt/processui.cpp:50
+msgid "Item list name:"
+msgstr ""
+
+#: src/qt/processui.cpp:51
+msgid "Generated from litematic."
+msgstr ""
+
+#: src/qt/processui.cpp:89
+#, c-format
+msgid "Processing: region [%d] %s \n"
+msgstr ""
+
+#: src/qt/recipesshowui.cpp:25
+msgid "The pattern is:"
+msgstr ""
+
+#: src/qt/recipesui.cpp:72
+msgid "No recipe file found!"
+msgstr ""
+
+#: src/qt/recipesui.cpp:73
+msgid "No recipe file found! Do you want to extract game file?"
+msgstr ""
+
+#: src/qt/recipesui.cpp:140
+msgid "Please select items:"
+msgstr ""
+
+#: src/qt/recipesui.cpp:163
+msgid "Show recipe"
+msgstr ""
+
+#: src/qt/recipesui.cpp:209
+msgid "Combine items to this item list."
+msgstr ""
+
+#: src/qt/recipesui.cpp:211
+msgid "New item list name:"
+msgstr ""
+
+#: src/qt/recipesui.cpp:212
+msgid "Generated from material list combiner."
+msgstr ""
+
+#: src/qt/recipesui.cpp:283
+#, c-format
+msgid "\"Delete\" %d items from material list combiner."
+msgstr ""
+
+#: src/qt/recipesui.cpp:313
+msgid "Mod decide"
+msgstr ""
+
+#: src/qt/recipesui.cpp:313
+#, c-format
+msgid "There's a remainder with %d and %d, continue?"
+msgstr ""
+
+#: src/qt/recipesui.cpp:337
+#, c-format
+msgid "Add %d items from material list combiner."
+msgstr ""
+
+#: src/qt/regionselectui.cpp:23
+msgid "Please select a region:"
+msgstr ""
+
+#: src/qt/showtrackui.cpp:18
+msgid "The track information is:\n"
 msgstr ""

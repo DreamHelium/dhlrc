@@ -5,8 +5,11 @@
 #include <QCheckBox>
 #include <dh/dh_string_util.h>
 #include <qapplication.h>
+#include <qboxlayout.h>
 #include <qcheckbox.h>
 #include <qdatetime.h>
+#include <qlabel.h>
+#include <qlineedit.h>
 #include "mainwindow.h"
 
 static DhStrArray* region_name = nullptr;
@@ -44,6 +47,12 @@ void ProcessUI::initUI()
         for(int i = 0 ; i < region_name->num ; i++)
             checkboxGroup[i].checkbox = new QCheckBox(region_name->val[i]);
 
+        itemNameLabel = new QLabel(_("Item list name:"));
+        itemName = new QLineEdit(_("Generated from litematic."));
+        itemLayout = new QHBoxLayout();
+        itemLayout->addWidget(itemNameLabel);
+        itemLayout->addWidget(itemName);
+
         okBtn = new QPushButton(_("&OK"));
         closeBtn = new QPushButton(_("&Close"));
         hLayout->addStretch();
@@ -60,6 +69,7 @@ void ProcessUI::initUI()
         }
         vLayout->addStretch();
         vLayout->addWidget(label2);
+        vLayout->addLayout(itemLayout);
         vLayout->addLayout(hLayout);
 
         this->setLayout(vLayout);
@@ -84,8 +94,7 @@ void ProcessUI::okBtn_clicked()
     }
     item_list_delete_zero_item(&new_il);
     item_list_sort(&new_il);
-    QString str = QString(_("Generated from litematic."));
-    IlInfo info = {.name = str , .il = new_il, .time = QDateTime::currentDateTime()};
+    IlInfo info = {.name = itemName->text() , .il = new_il, .time = QDateTime::currentDateTime()};
     ilList.append(info);
     this->close();
     // lrcFunctionUI* fui = new lrcFunctionUI();

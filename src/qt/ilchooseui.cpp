@@ -9,8 +9,9 @@ extern int infoNum;
 ilChooseUI::ilChooseUI(QWidget *parent)
     : QDialog{parent}
 {
+    setWindowTitle(_("Select a item list."));
     layout = new QVBoxLayout();
-    titleLabel = new QLabel(_("Please Choose a item list:"));
+    titleLabel = new QLabel(_("Please choose a item list:"));
     layout->addWidget(titleLabel);
 
     cbnList = new cbn[ilList.length()];

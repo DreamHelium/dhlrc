@@ -8,6 +8,8 @@
 #include <QCheckBox>
 #include <QHBoxLayout>
 #include <QVBoxLayout>
+#include <qboxlayout.h>
+#include <qlineedit.h>
 
 namespace Ui {
 class ProcessUI;
@@ -28,6 +30,9 @@ public:
 private:
     QLabel* label;
     QLabel* label2;
+    QLabel* itemNameLabel;
+    QLineEdit* itemName;
+    QHBoxLayout* itemLayout;
     QCheckBox* allCheck;
     cbg* checkboxGroup;
     QPushButton* okBtn;

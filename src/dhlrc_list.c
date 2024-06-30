@@ -16,6 +16,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>. */
 
 #include "dhlrc_list.h"
+#include "glib.h"
 #include "recipe_class/recipe_general.h"
 #include <stdlib.h>
 #include <string.h>
@@ -122,6 +123,24 @@ static ItemTrack* item_track_init(const gchar* description, guint num)
     return it;
 }
 
+static ItemTrack** item_track_dup(const ItemTrack** o_track)
+{
+    int size = 0;
+    const ItemTrack** p_track = o_track;
+    for(int i = 0; *p_track; p_track++)
+        size++;
+
+    ItemTrack** new_track = g_new0(ItemTrack*, size + 1);
+    for(int i = 0 ; i < size ; i++)
+    {
+        new_track[i]->description = g_strdup(o_track[i]->description);
+        new_track[i]->num = o_track[i]->num;
+        new_track[i]->time = g_date_time_ref(o_track[i]->time);
+    }
+    new_track[size] = NULL;
+    return new_track;
+}
+
 static IListData* ilistdata_init_full(const gchar* name, gboolean is_tag, guint num, 
                                     const gchar* description)
 {
@@ -157,7 +176,7 @@ static void item_track_free(ItemTrack** it)
     {
         ItemTrack* itcon = *itd;
         g_free(itcon->description);
-        g_free(itcon->time);
+        g_date_time_unref(itcon->time);
         g_free(itcon);
     }
     g_free(it);
