@@ -8,6 +8,9 @@
 #include "../libnbt/nbt.h"
 #include "../config.h"
 #include <dhutil.h>
+#include <qcontainerfwd.h>
+#include <qevent.h>
+#include <qmessagebox.h>
 #include <string>
 #include "glibconfig.h"
 #include "ilchooseui.h"
@@ -17,6 +20,8 @@
 #include "regionselectui.h"
 #include "blockreaderui.h"
 #include "configui.h"
+#include "ui_mainwindow.h"
+#include <QMimeData>
 
 NBT* root = nullptr;
 static bool nbtRead = false;
@@ -25,41 +30,36 @@ QList<IlInfo> ilList;
 extern bool infoR;
 extern IlInfo info;
 
+static QString titile = N_("Litematica reader");
+static QString subtitle = N_("The functions are listed below:");
+static QStringList funcs = {
+    N_("&NBT lite reader with modifier"), 
+    N_("Litematica material &list with recipe combination"), 
+    N_("Litematica &block reader"),
+    N_("&Item list reader and modifier"),
+    N_("&Recipe combiner"),
+    N_("&Clear Item list"),
+    N_("Config &settings")};
+static QStringList buttonList = {N_("&OK") , N_("&Close")};
+
 MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent)
+    : QMainWindow(parent),
+    ui(new Ui::MainWindow)
 {
     ilList.clear();
     translation_init();
-    initUI();
+    ui->setupUi(this);
+    ui->widget->hide();
     initSignalSlots();
-    setWindowTitle(_("Litematica reader"));
 }
 
 MainWindow::~MainWindow()
 {
     for(int i = 0 ; i < ilList.length() ; i++)
         item_list_free(ilList[i].il);
+    delete ui;
     dh_exit();
     dh_exit1();
-}
-
-void MainWindow::initUI()
-{
-    /* Add Menu Bar and Menu */
-    menuBar = new QMenuBar(this);
-    //this->setMenuBar(menuBar);
-    fileMenu = new QMenu(_("&File"), menuBar);
-    menuBar->addAction(fileMenu->menuAction());
-
-    toolBar = new QToolBar(this);
-    this->addToolBar(toolBar);
-
-    openAction = new QAction(QIcon::fromTheme("document-open"), _("&Open"), this);
-    quitAction = new QAction(QIcon::fromTheme("application-exit"), _("&Quit"), this);
-    fileMenu->addAction(openAction);
-    fileMenu->addAction(quitAction);
-    toolBar->addAction(openAction);
-
 }
 
 void MainWindow::openAction_triggered()
@@ -78,8 +78,7 @@ void MainWindow::openAction_triggered()
 
 void MainWindow::initSignalSlots()
 {
-    QObject::connect(openAction, SIGNAL(triggered()), this, SLOT(openAction_triggered()));
-    QObject::connect(quitAction, SIGNAL(triggered()), this, SLOT(close()));
+    QObject::connect(ui->openAction, &QAction::triggered, this, &MainWindow::openAction_triggered);
 }
 
 void MainWindow::initInternalUI()
@@ -88,73 +87,21 @@ void MainWindow::initInternalUI()
     {
         nbtRead = true;
 
-        widget = new QWidget;
+        ui->widget->show();
 
-        /* Add label */
-        label1 = new QLabel(_("Valid NBT file!"));
-        label2 = new QLabel(_("There are three functions:"));
-
-        /* Add RadioButtons */
-        radioButtonGroup = new QButtonGroup(this);
-        nbtReaderBtn = new QRadioButton(_("NBT lite &reader with modifier"));
-        lrcBtn = new QRadioButton(_("Litematica material &list with recipe combination"));
-        lrcExtendBtn = new QRadioButton(_("Litematica &block reader"));
-        ilreaderBtn = new QRadioButton(_("&Item list reader and modifier"));
-        recipeBtn = new  QRadioButton(_("&Recipe combiner"));
-        clearBtn = new QRadioButton(_("&Clear Item list"));
-        configBtn = new QRadioButton(_("Config &settings"));
-
-        radioButtonGroup->addButton(nbtReaderBtn, 0);
-        radioButtonGroup->addButton(lrcBtn, 1);
-        radioButtonGroup->addButton(lrcExtendBtn, 2);
-        radioButtonGroup->addButton(ilreaderBtn, 3);
-        radioButtonGroup->addButton(recipeBtn, 4);
-        radioButtonGroup->addButton(clearBtn, 5);
-        radioButtonGroup->addButton(configBtn, 6);
-        nbtReaderBtn->setChecked(true);
-
-        /* Add PushButtons */
-        okBtn = new QPushButton(_("&OK"));
-        closeBtn = new QPushButton(_("&Close"));
-
-        okBtn->setChecked(true);
-
-        QHBoxLayout* hLayout = new QHBoxLayout();
-        hLayout->addStretch();
-        hLayout->addWidget(okBtn);
-        hLayout->addWidget(closeBtn);
-
-        QVBoxLayout* vLayout = new QVBoxLayout();
-        vLayout->addWidget(label1);
-        vLayout->addWidget(label2);
-        vLayout->addStretch();
-        vLayout->addWidget(nbtReaderBtn);
-        vLayout->addWidget(lrcBtn);
-        vLayout->addWidget(lrcExtendBtn);
-        vLayout->addWidget(ilreaderBtn);
-        vLayout->addWidget(recipeBtn);
-        vLayout->addWidget(clearBtn);
-        vLayout->addWidget(configBtn);
-        vLayout->addStretch();
-        vLayout->addLayout(hLayout);
-
-        widget->setLayout(vLayout);
-        this->setCentralWidget(widget);
-
-        QObject::connect(closeBtn, SIGNAL(clicked()), this, SLOT(close()));
-        QObject::connect(okBtn, SIGNAL(clicked()), this, SLOT(okBtn_clicked()));
+        QObject::connect(ui->okBtn, SIGNAL(clicked()), this, SLOT(okBtn_clicked()));
     }
 }
 
 void MainWindow::okBtn_clicked()
 {
-    if(this->radioButtonGroup->checkedId() == 1) /* lrc - Litematica material list with recipe combination */
+    if(ui->lrcBtn->isChecked()) /* lrc - Litematica material list with recipe combination */
     {
         ProcessUI* pui = new ProcessUI();
         pui->setAttribute(Qt::WA_DeleteOnClose);
         pui->show();
     }
-    else if(this->radioButtonGroup->checkedId() == 2) /* block reader */
+    else if(ui->lrcExtendBtn->isChecked()) /* block reader */
     {
         RegionSelectUI* rsui = new RegionSelectUI();
         int ret = rsui->exec_r();
@@ -171,19 +118,19 @@ void MainWindow::okBtn_clicked()
             brui->show();
         }
     }
-    else if(this->radioButtonGroup->checkedId() == 3) /* Item list */
+    else if(ui->ilreaderBtn->isChecked()) /* Item list */
     {
         ilReaderUI* iui = new ilReaderUI();
         iui->setAttribute(Qt::WA_DeleteOnClose);
         iui->show();
     }
-    else if(this->radioButtonGroup->checkedId() == 4) /* Recipe function */
+    else if(ui->recipeBtn->isChecked()) /* Recipe function */
     {
         RecipesUI* rui = new RecipesUI();
         rui->setAttribute(Qt::WA_DeleteOnClose);
         rui->show();
     }
-    else if(this->radioButtonGroup->checkedId() == 5) /* clear item list */
+    else if(ui->clearBtn->isChecked()) /* clear item list */
     {
         ilChooseUI* icui = new ilChooseUI();
         icui->setAttribute(Qt::WA_DeleteOnClose);
@@ -194,7 +141,7 @@ void MainWindow::okBtn_clicked()
             ilList.remove(index);
         }
     }
-    else if(this->radioButtonGroup->checkedId() == 6) /* Config settings */
+    else if(ui->configBtn->isChecked()) /* Config settings */
     {
         ConfigUI* cui = new ConfigUI();
         cui->show();
@@ -206,4 +153,31 @@ bool operator== (const IlInfo info1, const IlInfo info2)
     if((info1.il == info2.il) && (info1.name == info2.name) && (info1.time == info2.time))
         return true;
     else return false;
+}
+
+void MainWindow::dragEnterEvent(QDragEnterEvent* event)
+{
+    event->acceptProposedAction();
+}
+
+void MainWindow::dropEvent(QDropEvent* event)
+{
+    auto urls = event->mimeData()->urls();
+    if(urls.length() > 1)
+        QMessageBox::critical(this, _("Multi files detected!"), _("This program doesn't support multi files!"));
+    else
+    {
+        auto filename = urls[0].fileName();
+        if(root) NBT_Free(root);
+        gsize size = 0;
+        quint8 *data = (quint8*)dh_read_file(filename.toStdString().c_str(), &size);
+        root = NBT_Parse(data, size);
+        free(data);
+        if(root)
+            initInternalUI();
+        else
+        {
+            QMessageBox::critical(this, _("Not a valid file!"), _("This file is not a valid NBT file!"));
+        }
+    }
 }

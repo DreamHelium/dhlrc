@@ -8,6 +8,7 @@
 #include <QPushButton>
 #include <QVBoxLayout>
 #include <QDateTime>
+#include <qevent.h>
 #include "../translation.h"
 
 typedef struct IlInfo{
@@ -31,29 +32,14 @@ public:
     ~MainWindow();
 
 private:
-    QMenuBar* menuBar;
-    QToolBar* toolBar;
-    QMenu* fileMenu;
-    QAction* openAction;
-    QAction* quitAction;
+    Ui::MainWindow *ui;
 
-    QLabel* label1;
-    QLabel* label2;
-    QButtonGroup* radioButtonGroup;
-    QRadioButton* nbtReaderBtn;
-    QRadioButton* lrcBtn;
-    QRadioButton* lrcExtendBtn;
-    QRadioButton* ilreaderBtn;
-    QRadioButton* clearBtn;
-    QRadioButton* recipeBtn;
-    QRadioButton* configBtn;
-    QPushButton*  okBtn;
-    QPushButton*  closeBtn;
-    QWidget* widget;
-
-    void initUI();
     void initSignalSlots();
     void initInternalUI();
+
+protected:
+    void virtual dragEnterEvent(QDragEnterEvent* event);
+    void virtual dropEvent(QDropEvent* event);
 
 private Q_SLOTS:
     void openAction_triggered();

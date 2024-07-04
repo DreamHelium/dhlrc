@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-06-30 21:32+0800\n"
-"PO-Revision-Date: 2024-06-30 21:48+0800\n"
+"POT-Creation-Date: 2024-07-04 22:53+0800\n"
+"PO-Revision-Date: 2024-07-04 22:57+0800\n"
 "Last-Translator: dream_he\n"
 "Language-Team: Chinese <kde-i18n-doc@kde.org>\n"
 "Language: zh_CN\n"
@@ -71,7 +71,7 @@ msgstr "在读取文件时出错。"
 msgid "Not a valid NBT file!"
 msgstr "不是一个有效的NBT文件！"
 
-#: src/main_isoc.c:107 src/qt/mainwindow.cpp:94
+#: src/main_isoc.c:107
 msgid "Valid NBT file!"
 msgstr "有效的NBT文件！"
 
@@ -114,23 +114,28 @@ msgstr ""
 "NBT \"%s\" 的细节如下：\n"
 "\n"
 
-#: src/nbt_litereader.c:81 src/nbt_litereader.c:314
+#: src/nbt_litereader.c:81 src/nbt_litereader.c:94 src/nbt_litereader.c:102
+#: src/nbt_litereader.c:317
+msgid "Enter upper NBT"
+msgstr "进入上层NBT"
+
+#: src/nbt_litereader.c:82 src/nbt_litereader.c:318
 msgid "Quit application"
 msgstr "退出程序"
 
-#: src/nbt_litereader.c:82
+#: src/nbt_litereader.c:83
 msgid "Enter modification mode"
 msgstr "进入修改模式"
 
-#: src/nbt_litereader.c:83
+#: src/nbt_litereader.c:84
 msgid "Save NBT file"
 msgstr "保存NBT文件"
 
-#: src/nbt_litereader.c:84
+#: src/nbt_litereader.c:85
 msgid "Enter upper instance"
 msgstr "进入上层实例"
 
-#: src/nbt_litereader.c:89
+#: src/nbt_litereader.c:90
 msgid ""
 "\n"
 "Please enter a number or choose option to continue [Q/m/s/e/?]: "
@@ -138,11 +143,7 @@ msgstr ""
 "\n"
 "请输入一个数字或选择选项以继续 [Q/m/s/e/?]： "
 
-#: src/nbt_litereader.c:93 src/nbt_litereader.c:101 src/nbt_litereader.c:313
-msgid "Enter upper NBT"
-msgstr "进入上层NBT"
-
-#: src/nbt_litereader.c:95
+#: src/nbt_litereader.c:96
 msgid ""
 "\n"
 "Please enter a number or choose option to continue [P/q/m/s/e/?]: "
@@ -150,7 +151,7 @@ msgstr ""
 "\n"
 "请输入一个数字或选择选项以继续 [P/q/m/s/e/?]： "
 
-#: src/nbt_litereader.c:103
+#: src/nbt_litereader.c:104
 msgid ""
 "\n"
 "No deeper NBT, please choose option to continue [P/q/m/s/e/?]: "
@@ -158,7 +159,7 @@ msgstr ""
 "\n"
 "没有深层NBT，请选择选项以继续 [P/q/m/s/e/?]： "
 
-#: src/nbt_litereader.c:273 src/nbt_litereader.c:372
+#: src/nbt_litereader.c:277 src/nbt_litereader.c:376
 #, c-format
 msgid ""
 "\n"
@@ -167,28 +168,28 @@ msgstr ""
 "\n"
 "不支持的修改模式请求，将退回至阅读模式。"
 
-#: src/nbt_litereader.c:315
+#: src/nbt_litereader.c:319
 msgid "Exit modification mode"
 msgstr "退出修改模式"
 
-#: src/nbt_litereader.c:321
+#: src/nbt_litereader.c:325
 msgid ""
 "\n"
 "Please enter an integer or choose an option [P/q/b/?]: "
 msgstr ""
 
-#: src/nbt_litereader.c:335
+#: src/nbt_litereader.c:339
 #, c-format
 msgid ""
 "\n"
 "The integer you input is %ld, please confirm [Y/n/?]:"
 msgstr ""
 
-#: src/nbt_litereader.c:337
+#: src/nbt_litereader.c:341
 msgid "Yes"
 msgstr "是"
 
-#: src/nbt_litereader.c:338
+#: src/nbt_litereader.c:342
 msgid "No"
 msgstr "否"
 
@@ -271,7 +272,7 @@ msgstr ""
 msgid "&No"
 msgstr ""
 
-#: src/recipe_util.c:124 src/qt/mainwindow.cpp:58
+#: src/recipe_util.c:124
 msgid "&Quit"
 msgstr "退出(&Q)"
 
@@ -351,17 +352,51 @@ msgstr "翻译文件"
 msgid "Game Directory"
 msgstr "游戏目录"
 
-#: src/qt/mainwindow.cpp:35
+#: src/qt/mainwindow.cpp:33
 msgid "Litematica reader"
 msgstr "投影文件阅读器"
 
-#: src/qt/mainwindow.cpp:51 src/qt/ilreaderui.cpp:28
-msgid "&File"
-msgstr "文件(&F)"
+#: src/qt/mainwindow.cpp:34
+msgid "The functions are listed below:"
+msgstr ""
 
-#: src/qt/mainwindow.cpp:57
-msgid "&Open"
-msgstr "打开(&O)"
+#: src/qt/mainwindow.cpp:36
+msgid "&NBT lite reader with modifier"
+msgstr ""
+
+#: src/qt/mainwindow.cpp:37
+msgid "Litematica material &list with recipe combination"
+msgstr "投影材料列表及合成表合成功能(&L)"
+
+#: src/qt/mainwindow.cpp:38
+msgid "Litematica &block reader"
+msgstr "投影方块阅读器(&B)"
+
+#: src/qt/mainwindow.cpp:39
+msgid "&Item list reader and modifier"
+msgstr "物品列表阅读器和修改器(&I)"
+
+#: src/qt/mainwindow.cpp:40
+msgid "&Recipe combiner"
+msgstr "材料列表合成功能(&R)"
+
+#: src/qt/mainwindow.cpp:41
+msgid "&Clear Item list"
+msgstr "清除材料列表 (&C)"
+
+#: src/qt/mainwindow.cpp:42
+msgid "Config &settings"
+msgstr ""
+
+#: src/qt/mainwindow.cpp:43 src/qt/ilchooseui.cpp:31 src/qt/processui.cpp:56
+#: src/qt/recipesui.cpp:219 src/qt/regionselectui.cpp:41
+msgid "&OK"
+msgstr "确定(&O)"
+
+#: src/qt/mainwindow.cpp:43 src/qt/ilchooseui.cpp:32 src/qt/processui.cpp:57
+#: src/qt/recipesui.cpp:220 src/qt/regionselectui.cpp:42
+msgid "&Close"
+msgstr "关闭(&C)"
 
 #: src/qt/mainwindow.cpp:67
 msgid "Select a file"
@@ -371,55 +406,33 @@ msgstr "选择一个文件"
 msgid "Litematic file (*.litematic)"
 msgstr "投影文件 (*.litematic)"
 
-#: src/qt/mainwindow.cpp:95
-msgid "There are three functions:"
-msgstr "有三个功能："
-
-#: src/qt/mainwindow.cpp:99
-msgid "NBT lite &reader with modifier"
-msgstr "NBT小型阅读器及修改器(&R)"
-
-#: src/qt/mainwindow.cpp:100
-msgid "Litematica material &list with recipe combination"
-msgstr "投影材料列表及合成表合成功能(&L)"
-
-#: src/qt/mainwindow.cpp:101
-msgid "Litematica &block reader"
-msgstr "投影方块阅读器(&B)"
-
-#: src/qt/mainwindow.cpp:102
-msgid "&Item list reader and modifier"
-msgstr "物品列表阅读器和修改器(&I)"
-
-#: src/qt/mainwindow.cpp:103
-msgid "&Recipe combiner"
-msgstr "材料列表合成功能(&R)"
-
-#: src/qt/mainwindow.cpp:104
-msgid "&Clear Item list"
-msgstr "清除材料列表 (&C)"
-
-#: src/qt/mainwindow.cpp:105
-msgid "Config &settings"
-msgstr ""
-
-#: src/qt/mainwindow.cpp:117 src/qt/ilchooseui.cpp:31 src/qt/processui.cpp:56
-#: src/qt/recipesui.cpp:219 src/qt/regionselectui.cpp:41
-msgid "&OK"
-msgstr "确定(&O)"
-
-#: src/qt/mainwindow.cpp:118 src/qt/ilchooseui.cpp:32 src/qt/processui.cpp:57
-#: src/qt/recipesui.cpp:220 src/qt/regionselectui.cpp:42
-msgid "&Close"
-msgstr "关闭(&C)"
-
-#: src/qt/mainwindow.cpp:164
+#: src/qt/mainwindow.cpp:111
 msgid "Error!"
 msgstr "错误！"
 
-#: src/qt/mainwindow.cpp:164
+#: src/qt/mainwindow.cpp:111
 msgid "No selected region!"
 msgstr "没有选择的区域！"
+
+#: src/qt/mainwindow.cpp:167
+msgid "Multi files detected!"
+msgstr "检测到多文件！"
+
+#: src/qt/mainwindow.cpp:167
+msgid "This program doesn't support multi files!"
+msgstr "本程序不支持多文件！"
+
+#: src/qt/mainwindow.cpp:180
+msgid "Not a valid file!"
+msgstr "不是一个有效的文件！"
+
+#: src/qt/mainwindow.cpp:180
+msgid "This file is not a valid NBT file!"
+msgstr "本文件不是一个有效的NBT文件！"
+
+#: src/qt/ilreaderui.cpp:28
+msgid "&File"
+msgstr "文件(&F)"
 
 #: src/qt/ilreaderui.cpp:31
 msgid "&Save"
@@ -544,6 +557,15 @@ msgstr "请选择一个区域："
 #: src/qt/showtrackui.cpp:18
 msgid "The track information is:\n"
 msgstr "追踪信息如下：\n"
+
+#~ msgid "&Open"
+#~ msgstr "打开(&O)"
+
+#~ msgid "There are three functions:"
+#~ msgstr "有三个功能："
+
+#~ msgid "NBT lite &reader with modifier"
+#~ msgstr "NBT小型阅读器及修改器(&R)"
 
 #~ msgid "Override language"
 #~ msgstr "覆盖语言"
