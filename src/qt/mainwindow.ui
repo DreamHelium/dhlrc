@@ -43,12 +43,22 @@
             </spacer>
            </item>
            <item>
+            <widget class="QRadioButton" name="selectBtn">
+             <property name="text">
+              <string>NBT s&amp;elector</string>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
             <widget class="QRadioButton" name="nbtReaderBtn">
              <property name="text">
               <string>&amp;NBT lite reader with modifier</string>
              </property>
              <property name="checked">
-              <bool>true</bool>
+              <bool>false</bool>
              </property>
             </widget>
            </item>

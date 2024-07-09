@@ -1,7 +1,10 @@
 #include "blockreaderui.h"
 #include "../translation.h"
 #include "../litematica_region.h"
+#include "blocklistui.h"
 #include <QValidator>
+#include <qnamespace.h>
+#include <qpushbutton.h>
 
 extern NBT* root;
 static int* regionSize;
@@ -75,15 +78,18 @@ void BlockReaderUI::initUI(quint32 i)
     layout->addWidget(infoLabel);
     layout->addStretch();
 
+    listBtn = new QPushButton(_("List blocks"));
     okBtn = new QPushButton(_("&OK"));
     closeBtn = new QPushButton(_("&Close"));
     hLayoutBtn = new QHBoxLayout();
     hLayoutBtn->addStretch();
+    hLayoutBtn->addWidget(listBtn);
     hLayoutBtn->addWidget(okBtn);
     hLayoutBtn->addWidget(closeBtn);
     layout->addLayout(hLayoutBtn);
     this->setLayout(layout);
 
+    QObject::connect(listBtn, &QPushButton::clicked, this, &BlockReaderUI::listBtn_clicked);
     QObject::connect(okBtn, &QPushButton::clicked, this, &BlockReaderUI::okBtn_clicked);
     QObject::connect(closeBtn, &QPushButton::clicked, this, &BlockReaderUI::close);
 }
@@ -94,4 +100,11 @@ void BlockReaderUI::okBtn_clicked()
     const char* blockName = trm(lr->blocks->val[id]);
     QString str = QString::asprintf(_("The block is %s."), blockName);
     infoLabel->setText(str);
+}
+
+void BlockReaderUI::listBtn_clicked()
+{
+    BlockListUI* blui = new BlockListUI(lr);
+    blui->setAttribute(Qt::WA_DeleteOnClose);
+    blui->show();
 }

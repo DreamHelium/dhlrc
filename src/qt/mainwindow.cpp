@@ -1,4 +1,5 @@
 #include "mainwindow.h"
+#include "../nbt_info.h"
 #include "../translation.h"
 #include <QMenuBar>
 #include <QToolBar>
@@ -10,11 +11,12 @@
 #include <dhutil.h>
 #include <qcontainerfwd.h>
 #include <qevent.h>
+#include <qlineedit.h>
 #include <qmessagebox.h>
 #include <string>
-#include "glibconfig.h"
 #include "ilchooseui.h"
 #include "ilreaderui.h"
+#include "nbtselectui.h"
 #include "processui.h"
 #include "recipesui.h"
 #include "regionselectui.h"
@@ -22,6 +24,7 @@
 #include "configui.h"
 #include "ui_mainwindow.h"
 #include <QMimeData>
+#include <QInputDialog>
 
 NBT* root = nullptr;
 static bool nbtRead = false;
@@ -33,6 +36,7 @@ extern IlInfo info;
 static QString titile = N_("Litematica reader");
 static QString subtitle = N_("The functions are listed below:");
 static QStringList funcs = {
+    N_("NBT s&elector"),
     N_("&NBT lite reader with modifier"), 
     N_("Litematica material &list with recipe combination"), 
     N_("Litematica &block reader"),
@@ -67,12 +71,7 @@ void MainWindow::openAction_triggered()
     QString fileName = QFileDialog::getOpenFileName(this, _("Select a file"), nullptr, _("Litematic file (*.litematic)"));
     if(!fileName.isEmpty())
     {
-        if(root) NBT_Free(root);
-        gsize size = 0;
-        quint8 *data = (quint8*)dh_read_file(fileName.toStdString().c_str(), &size);
-        root = NBT_Parse(data, size);
-        free(data);
-        initInternalUI();
+        readNbtFile(fileName);
     }
 }
 
@@ -86,9 +85,7 @@ void MainWindow::initInternalUI()
     if(!nbtRead)
     {
         nbtRead = true;
-
         ui->widget->show();
-
         QObject::connect(ui->okBtn, SIGNAL(clicked()), this, SLOT(okBtn_clicked()));
     }
 }
@@ -146,6 +143,11 @@ void MainWindow::okBtn_clicked()
         ConfigUI* cui = new ConfigUI();
         cui->show();
     }
+    else if(ui->selectBtn->isChecked())
+    {
+        NbtSelectUI* nsui = new NbtSelectUI();
+        nsui->exec();
+    }
 }
 
 bool operator== (const IlInfo info1, const IlInfo info2)
@@ -168,16 +170,39 @@ void MainWindow::dropEvent(QDropEvent* event)
     else
     {
         auto filename = urls[0].toLocalFile();
-        if(root) NBT_Free(root);
-        gsize size = 0;
-        quint8 *data = (quint8*)dh_read_file(filename.toStdString().c_str(), &size);
-        root = NBT_Parse(data, size);
-        free(data);
-        if(root)
-            initInternalUI();
-        else
+        readNbtFile(filename);
+    }
+}
+
+void MainWindow::readNbtFile(QString filename)
+{
+    gsize size = 0;
+    quint8 *data = (quint8*)dh_read_file(filename.toStdString().c_str(), &size);
+    NBT* nbtData = NBT_Parse(data, size);
+    free(data);
+    if(nbtData)
+    {
+        auto retBtn1 = QMessageBox::question(this, _("Add NBT File"), _("Do you want to add this NBT file to the list?"));
+        if(retBtn1 == QMessageBox::Yes)
         {
-            QMessageBox::critical(this, _("Not a valid file!"), _("This file is not a valid NBT file!"));
+            auto str = QInputDialog::getText(this, _("Set NBT Info Description"), _("Please enter description"), QLineEdit::Normal, _("Added from reading file"));
+            nbt_info_new(nbtData, g_date_time_new_now_local(), str.toStdString().c_str());
+            if(!root)
+            {
+                root = nbtData;
+                initInternalUI();
+            }
+            else 
+            {
+                auto retBtn2 = QMessageBox::question(this, _("Set NBT File"), _("Do you want to set this NBT file as default?"));
+                if(retBtn2 == QMessageBox::Yes)
+                    root = nbtData;
+            }
         }
+        else NBT_Free(nbtData);
+    }
+    else
+    {
+        QMessageBox::critical(this, _("Not a valid file!"), _("This file is not a valid NBT file!"));
     }
 }

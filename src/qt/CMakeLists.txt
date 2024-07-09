@@ -30,6 +30,8 @@ set(PROJECT_SOURCES
         showtrackui.cpp
         showtrackui.h
         configui.h configui.cpp configui.ui
+        nbtselectui.h nbtselectui.cpp
+        blocklistui.cpp blocklistui.h blocklistui.ui
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)

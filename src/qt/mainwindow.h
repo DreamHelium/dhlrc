@@ -36,6 +36,7 @@ private:
 
     void initSignalSlots();
     void initInternalUI();
+    void readNbtFile(QString filename);
 
 protected:
     void virtual dragEnterEvent(QDragEnterEvent* event);

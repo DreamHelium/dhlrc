@@ -15,6 +15,7 @@ set( DHLRC_MAIN_POT_FILE_DEPENDS
 		src/qt/recipesui.cpp
 		src/qt/regionselectui.cpp
 		src/qt/showtrackui.cpp
+		src/qt/nbtselectui.cpp
 	PARENT_SCOPE
 )
 
@@ -50,6 +51,8 @@ add_library(dhlrc SHARED
 	       nbt_litereader.c
 		   json_util.c
 		   json_util.h
+		   nbt_info.c
+		   nbt_info.h
 	       recipe_class_ng/recipes_general.h
 	       recipe_class_ng/recipes_general.c
 	       recipe_class_ng/recipes_shaped.h

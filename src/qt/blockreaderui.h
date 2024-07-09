@@ -33,6 +33,7 @@ private:
     inputbox ib[3];
     QHBoxLayout* hLayoutIb;
     QLabel* infoLabel;
+    QPushButton* listBtn;
     QPushButton* okBtn;
     QPushButton* closeBtn;
     QHBoxLayout* hLayoutBtn;
@@ -40,6 +41,7 @@ private:
 
 private Q_SLOTS:
     void okBtn_clicked();
+    void listBtn_clicked();
 };
 
 #endif /* BLOCKREADER_H */

@@ -54,10 +54,10 @@ int nbtlr_instance_ng(NbtPos* pos, int modify_mode)
         system("clear");
 #endif
         char* key = "";
-        if(!pos->current->parent)
+        if(pos->level == 0 || pos->item != -1)
             key = pos->current->key;
         else
-            key = pos->current->parent->key;
+            key = nbtlr_to_next_nbt(pos->tree[pos->level - 1] , pos->child[pos->level - 1])->key;
         printf(_("The detail of NBT \"%s\" is listed below:\n\n"), key);
         int list = 0;
 

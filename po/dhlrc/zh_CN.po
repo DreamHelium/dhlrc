@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-07-04 22:53+0800\n"
+"POT-Creation-Date: 2024-07-09 23:27+0800\n"
 "PO-Revision-Date: 2024-07-04 22:57+0800\n"
 "Last-Translator: dream_he\n"
 "Language-Team: Chinese <kde-i18n-doc@kde.org>\n"
@@ -114,28 +114,23 @@ msgstr ""
 "NBT \"%s\" 的细节如下：\n"
 "\n"
 
-#: src/nbt_litereader.c:81 src/nbt_litereader.c:94 src/nbt_litereader.c:102
-#: src/nbt_litereader.c:317
-msgid "Enter upper NBT"
-msgstr "进入上层NBT"
-
-#: src/nbt_litereader.c:82 src/nbt_litereader.c:318
+#: src/nbt_litereader.c:81 src/nbt_litereader.c:314
 msgid "Quit application"
 msgstr "退出程序"
 
-#: src/nbt_litereader.c:83
+#: src/nbt_litereader.c:82
 msgid "Enter modification mode"
 msgstr "进入修改模式"
 
-#: src/nbt_litereader.c:84
+#: src/nbt_litereader.c:83
 msgid "Save NBT file"
 msgstr "保存NBT文件"
 
-#: src/nbt_litereader.c:85
+#: src/nbt_litereader.c:84
 msgid "Enter upper instance"
 msgstr "进入上层实例"
 
-#: src/nbt_litereader.c:90
+#: src/nbt_litereader.c:89
 msgid ""
 "\n"
 "Please enter a number or choose option to continue [Q/m/s/e/?]: "
@@ -143,7 +138,11 @@ msgstr ""
 "\n"
 "请输入一个数字或选择选项以继续 [Q/m/s/e/?]： "
 
-#: src/nbt_litereader.c:96
+#: src/nbt_litereader.c:93 src/nbt_litereader.c:101 src/nbt_litereader.c:313
+msgid "Enter upper NBT"
+msgstr "进入上层NBT"
+
+#: src/nbt_litereader.c:95
 msgid ""
 "\n"
 "Please enter a number or choose option to continue [P/q/m/s/e/?]: "
@@ -151,7 +150,7 @@ msgstr ""
 "\n"
 "请输入一个数字或选择选项以继续 [P/q/m/s/e/?]： "
 
-#: src/nbt_litereader.c:104
+#: src/nbt_litereader.c:103
 msgid ""
 "\n"
 "No deeper NBT, please choose option to continue [P/q/m/s/e/?]: "
@@ -159,7 +158,7 @@ msgstr ""
 "\n"
 "没有深层NBT，请选择选项以继续 [P/q/m/s/e/?]： "
 
-#: src/nbt_litereader.c:277 src/nbt_litereader.c:376
+#: src/nbt_litereader.c:273 src/nbt_litereader.c:372
 #, c-format
 msgid ""
 "\n"
@@ -168,28 +167,28 @@ msgstr ""
 "\n"
 "不支持的修改模式请求，将退回至阅读模式。"
 
-#: src/nbt_litereader.c:319
+#: src/nbt_litereader.c:315
 msgid "Exit modification mode"
 msgstr "退出修改模式"
 
-#: src/nbt_litereader.c:325
+#: src/nbt_litereader.c:321
 msgid ""
 "\n"
 "Please enter an integer or choose an option [P/q/b/?]: "
 msgstr ""
 
-#: src/nbt_litereader.c:339
+#: src/nbt_litereader.c:335
 #, c-format
 msgid ""
 "\n"
 "The integer you input is %ld, please confirm [Y/n/?]:"
 msgstr ""
 
-#: src/nbt_litereader.c:341
+#: src/nbt_litereader.c:337
 msgid "Yes"
 msgstr "是"
 
-#: src/nbt_litereader.c:342
+#: src/nbt_litereader.c:338
 msgid "No"
 msgstr "否"
 
@@ -259,78 +258,10 @@ msgstr ""
 msgid "Input numbers directly, or type 'a' for all numbers, 'q' to quit (a): "
 msgstr "请直接输入数字，或输入“a”选择所有数字，“q”以退出 (a): "
 
-#: src/recipe_util.c:122
-#, c-format
-msgid "Processing %s with %d items, continue or read item list? [Y/n/q/r] :"
-msgstr "处理%s（含有%d个物品），继续或阅读物品列表？ [Y/n/q/r] : "
-
-#: src/recipe_util.c:124
-msgid "&Yes"
-msgstr ""
-
-#: src/recipe_util.c:124
-msgid "&No"
-msgstr ""
-
-#: src/recipe_util.c:124
-msgid "&Quit"
-msgstr "退出(&Q)"
-
-#: src/recipe_util.c:124
-msgid "&Read"
-msgstr ""
-
-#: src/dhlrc_list.c:162
-msgid "Name\t\tTotal\tPlaced\tAvailable\tIs tag\n"
-msgstr "名称\t\t总计\t已放置\t可用\t是否为标签\n"
-
-#: src/dhlrc_list.c:347
+#: src/dhlrc_list.c:330
 #, c-format
 msgid "Combined %d items to the new item list."
 msgstr "合并了%d物品至新的物品列表。"
-
-#: src/dhlrc_list.c:776
-#, c-format
-msgid "Processing %s.\n"
-msgstr "处理%s中。\n"
-
-#: src/dhlrc_list.c:783
-#, c-format
-msgid "There are %d corresponding files to the item %s:\n"
-msgstr "有%d个对应%s的文件：\n"
-
-#: src/dhlrc_list.c:790
-msgid "Please select an option, or 'd' to discard (d): "
-msgstr "请输入一个选项，或“d”以放弃 (d): "
-
-#: src/dhlrc_list.c:790 src/recipe_class/recipe_general.c:113
-msgid "&Discard"
-msgstr "舍弃(&D)"
-
-#: src/recipe_class/recipe_general.c:112
-#, c-format
-msgid "There is a remainder with %d and %d.\n"
-msgstr "%d除以%d有余数。\n"
-
-#: src/recipe_class/recipe_general.c:113
-msgid "Enter 'd' to discard the result, or enter 'c' to continue (c): "
-msgstr "输入“d”舍弃结果，或输入“c”继续 (c): "
-
-#: src/recipe_class/recipe_general.c:113
-msgid "&Continue"
-msgstr "继续(&C)"
-
-#: src/recipe_class/recipe_shaped.c:132
-msgid "There are some ingredients to choose:\n"
-msgstr "有一些配方供选择：\n"
-
-#: src/recipe_class/recipe_shaped.c:139
-msgid "Please select an item/tag, or enter 'a' to give up selecting (a): "
-msgstr "请输入一个物品/标识，或者输入“a”放弃选择 (a): "
-
-#: src/recipe_class/recipe_shaped.c:139
-msgid "&Abort"
-msgstr "终止(&A)"
 
 #: src/qt/configui.cpp:10
 msgid "Config settings"
@@ -352,81 +283,115 @@ msgstr "翻译文件"
 msgid "Game Directory"
 msgstr "游戏目录"
 
-#: src/qt/mainwindow.cpp:33
+#: src/qt/mainwindow.cpp:36
 msgid "Litematica reader"
 msgstr "投影文件阅读器"
 
-#: src/qt/mainwindow.cpp:34
+#: src/qt/mainwindow.cpp:37
 msgid "The functions are listed below:"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:36
+#: src/qt/mainwindow.cpp:39
+msgid "NBT s&elector"
+msgstr ""
+
+#: src/qt/mainwindow.cpp:40
 msgid "&NBT lite reader with modifier"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:37
+#: src/qt/mainwindow.cpp:41
 msgid "Litematica material &list with recipe combination"
 msgstr "投影材料列表及合成表合成功能(&L)"
 
-#: src/qt/mainwindow.cpp:38
+#: src/qt/mainwindow.cpp:42
 msgid "Litematica &block reader"
 msgstr "投影方块阅读器(&B)"
 
-#: src/qt/mainwindow.cpp:39
+#: src/qt/mainwindow.cpp:43
 msgid "&Item list reader and modifier"
 msgstr "物品列表阅读器和修改器(&I)"
 
-#: src/qt/mainwindow.cpp:40
+#: src/qt/mainwindow.cpp:44
 msgid "&Recipe combiner"
 msgstr "材料列表合成功能(&R)"
 
-#: src/qt/mainwindow.cpp:41
+#: src/qt/mainwindow.cpp:45
 msgid "&Clear Item list"
 msgstr "清除材料列表 (&C)"
 
-#: src/qt/mainwindow.cpp:42
+#: src/qt/mainwindow.cpp:46
 msgid "Config &settings"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:43 src/qt/ilchooseui.cpp:31 src/qt/processui.cpp:56
+#: src/qt/mainwindow.cpp:47 src/qt/ilchooseui.cpp:31 src/qt/processui.cpp:56
 #: src/qt/recipesui.cpp:219 src/qt/regionselectui.cpp:41
+#: src/qt/nbtselectui.cpp:42
 msgid "&OK"
 msgstr "确定(&O)"
 
-#: src/qt/mainwindow.cpp:43 src/qt/ilchooseui.cpp:32 src/qt/processui.cpp:57
+#: src/qt/mainwindow.cpp:47 src/qt/ilchooseui.cpp:32 src/qt/processui.cpp:57
 #: src/qt/recipesui.cpp:220 src/qt/regionselectui.cpp:42
+#: src/qt/nbtselectui.cpp:43
 msgid "&Close"
 msgstr "关闭(&C)"
 
-#: src/qt/mainwindow.cpp:67
+#: src/qt/mainwindow.cpp:71
 msgid "Select a file"
 msgstr "选择一个文件"
 
-#: src/qt/mainwindow.cpp:67
+#: src/qt/mainwindow.cpp:71
 msgid "Litematic file (*.litematic)"
 msgstr "投影文件 (*.litematic)"
 
-#: src/qt/mainwindow.cpp:111
+#: src/qt/mainwindow.cpp:108
 msgid "Error!"
 msgstr "错误！"
 
-#: src/qt/mainwindow.cpp:111
+#: src/qt/mainwindow.cpp:108
 msgid "No selected region!"
 msgstr "没有选择的区域！"
 
-#: src/qt/mainwindow.cpp:167
+#: src/qt/mainwindow.cpp:169
 msgid "Multi files detected!"
 msgstr "检测到多文件！"
 
-#: src/qt/mainwindow.cpp:167
+#: src/qt/mainwindow.cpp:169
 msgid "This program doesn't support multi files!"
 msgstr "本程序不支持多文件！"
 
-#: src/qt/mainwindow.cpp:180
+#: src/qt/mainwindow.cpp:185
+msgid "Add NBT File"
+msgstr ""
+
+#: src/qt/mainwindow.cpp:185
+msgid "Do you want to add this NBT file to the list?"
+msgstr ""
+
+#: src/qt/mainwindow.cpp:188
+msgid "Set NBT Info Description"
+msgstr ""
+
+#: src/qt/mainwindow.cpp:188
+msgid "Please enter description"
+msgstr ""
+
+#: src/qt/mainwindow.cpp:188
+msgid "Added from reading file"
+msgstr ""
+
+#: src/qt/mainwindow.cpp:197
+msgid "Set NBT File"
+msgstr ""
+
+#: src/qt/mainwindow.cpp:197
+msgid "Do you want to set this NBT file as default?"
+msgstr ""
+
+#: src/qt/mainwindow.cpp:206
 msgid "Not a valid file!"
 msgstr "不是一个有效的文件！"
 
-#: src/qt/mainwindow.cpp:180
+#: src/qt/mainwindow.cpp:206
 msgid "This file is not a valid NBT file!"
 msgstr "本文件不是一个有效的NBT文件！"
 
@@ -558,6 +523,53 @@ msgstr "请选择一个区域："
 msgid "The track information is:\n"
 msgstr "追踪信息如下：\n"
 
+#: src/qt/nbtselectui.cpp:21
+msgid "Please select a NBT:"
+msgstr ""
+
+#~ msgid "Name\t\tTotal\tPlaced\tAvailable\tIs tag\n"
+#~ msgstr "名称\t\t总计\t已放置\t可用\t是否为标签\n"
+
+#, c-format
+#~ msgid "Processing %s with %d items, continue or read item list? [Y/n/q/r] :"
+#~ msgstr "处理%s（含有%d个物品），继续或阅读物品列表？ [Y/n/q/r] : "
+
+#~ msgid "&Quit"
+#~ msgstr "退出(&Q)"
+
+#, c-format
+#~ msgid "Processing %s.\n"
+#~ msgstr "处理%s中。\n"
+
+#, c-format
+#~ msgid "There are %d corresponding files to the item %s:\n"
+#~ msgstr "有%d个对应%s的文件：\n"
+
+#~ msgid "Please select an option, or 'd' to discard (d): "
+#~ msgstr "请输入一个选项，或“d”以放弃 (d): "
+
+#~ msgid "&Discard"
+#~ msgstr "舍弃(&D)"
+
+#, c-format
+#~ msgid "There is a remainder with %d and %d.\n"
+#~ msgstr "%d除以%d有余数。\n"
+
+#~ msgid "Enter 'd' to discard the result, or enter 'c' to continue (c): "
+#~ msgstr "输入“d”舍弃结果，或输入“c”继续 (c): "
+
+#~ msgid "&Continue"
+#~ msgstr "继续(&C)"
+
+#~ msgid "There are some ingredients to choose:\n"
+#~ msgstr "有一些配方供选择：\n"
+
+#~ msgid "Please select an item/tag, or enter 'a' to give up selecting (a): "
+#~ msgstr "请输入一个物品/标识，或者输入“a”放弃选择 (a): "
+
+#~ msgid "&Abort"
+#~ msgstr "终止(&A)"
+
 #~ msgid "&Open"
 #~ msgstr "打开(&O)"
 
@@ -668,4 +680,3 @@ msgstr "追踪信息如下：\n"
 #~ "another region, enter 'q' to exit the program (b): "
 #~ msgstr ""
 #~ "请再次输入方块的坐标，或输入 “b” 选择其他区域，输入 “q” 退出程序 (b): "
-
