@@ -22,6 +22,10 @@ jobs:
       with:
         submodules: true
 
+    - name: Install gettext
+      run: |
+        sudo apt install gettext-runtime gettext-tools
+
     - name: Install cJSON from source
       run: |
         git clone https://github.com/DaveGamble/cJSON

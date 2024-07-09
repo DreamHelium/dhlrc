@@ -1,6 +1,6 @@
 [submodule "libnbt"]
 	path = src/libnbt
-	url = https://github.com/djytw/libnbt.git
+	url = https://github.com/DreamHelium/libnbt.git
 [submodule "src/minizip-ng"]
 	path = src/minizip-ng
 	url = https://github.com/zlib-ng/minizip-ng.git
