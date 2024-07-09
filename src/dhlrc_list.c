@@ -55,11 +55,8 @@ static RecipeListBaseData* rlbasedata_init(const char* dir, const char* filename
 static void get_name(cJSON* json, char** namespace, char** item_name);
 static void rlbasedata_free(gpointer data);
 
-static ItemList* analyse_shaped(guint num, const char* filename, DhGeneral* self);
 static ItemList* analyse_smelting(guint num, const char* filename);
-static ItemList* analyse_shapeless(guint num, const char* filename, DhGeneral* self);
 static void analyse_object(guint num, cJSON* object, ItemList** list);
-static guint mod_decide(guint num1, guint num2, DhGeneral* self);
 static char* get_array_item_name(cJSON* json, int num);
 static guint get_key_nums(const char* str, char key);
 static void get_name_from_name(const char* name, char** namespace, char** item_name);
@@ -153,19 +150,6 @@ static IListData* ilistdata_init_full(const gchar* name, gboolean is_tag, guint 
     ildata->track_info[0] = item_track_init(description, num);
     ildata->track_info[1] = NULL;
     return ildata;
-}
-
-void item_list_read(ItemList* il, DhGeneral* general)
-{
-    dh_new_win(general, FALSE);
-    dh_printf(general, _("Name\t\tTotal\tPlaced\tAvailable\tIs tag\n"));
-    while(il)
-    {
-        IListData* data = il->data;
-        dh_printf(general, "%s\t\t%d\t%d\t%d\t%d\n", trm(data->name), data->total, data->placed, data->available, data->is_tag);
-        // g_message("%ld", strlen(trm(data->name)));
-        il = il->next;
-    }
 }
 
 static void item_track_free(ItemTrack** it)

@@ -198,11 +198,6 @@ static int start_lrc_main(NBT *root)
             lite_region_free_names(region_name,region_num);
             item_list_delete_zero_item(&il);
 
-            DhIsoc* isoc = dh_general_isoc_new();
-
-            item_list_combine_recipe(&il, "recipes", DH_GENERAL(isoc));
-            g_object_unref(isoc);
-
             item_list_sort(&il);
             item_list_to_csv("test.csv",il);
             item_list_free(il);
