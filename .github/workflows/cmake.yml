@@ -24,7 +24,7 @@ jobs:
 
     - name: Install gettext
       run: |
-        sudo apt install gettext-runtime gettext-tools
+        sudo apt install gettext
 
     - name: Install cJSON from source
       run: |
