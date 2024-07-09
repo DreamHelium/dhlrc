@@ -69,8 +69,6 @@ int         item_list_to_csv(char* pos,ItemList* il);
 const char* item_list_item_name(ItemList* il);
 
 gint        item_list_item_index(ItemList* il, const char* item_name);
-ItemList*   item_list_recipe(RecipeList* rcl, int num, const char* item_name, DhGeneral* general);
-
 
 BlackList*  black_list_init();
 void        black_list_free(BlackList* bl);

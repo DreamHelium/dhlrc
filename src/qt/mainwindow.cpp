@@ -167,7 +167,7 @@ void MainWindow::dropEvent(QDropEvent* event)
         QMessageBox::critical(this, _("Multi files detected!"), _("This program doesn't support multi files!"));
     else
     {
-        auto filename = urls[0].fileName();
+        auto filename = urls[0].toLocalFile();
         if(root) NBT_Free(root);
         gsize size = 0;
         quint8 *data = (quint8*)dh_read_file(filename.toStdString().c_str(), &size);

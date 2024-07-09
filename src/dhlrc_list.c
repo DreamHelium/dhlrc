@@ -17,7 +17,6 @@
 
 #include "dhlrc_list.h"
 #include "glib.h"
-#include "recipe_class/recipe_general.h"
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -769,43 +768,6 @@ static void rlbasedata_free(gpointer data)
     free(data_d->inamespace);
     free(data_d->recipe_type);
     free(data_d);
-}
-
-ItemList* item_list_recipe(RecipeList* rcl, int num, const char* item_name, DhGeneral* general)
-{
-    /*dh_*/printf(/*general, */_("Processing %s.\n"), trm(item_name));
-    RecipeList* item_recipes = dh_search_in_list_custom(rcl, item_name, rcldata_issame);
-    RecipeList* option_recipe = item_recipes;
-
-    if(g_list_length(item_recipes) > 1)
-    {
-        dh_new_win(general, FALSE);
-        dh_printf(general, _("There are %d corresponding files to the item %s:\n"), g_list_length(item_recipes), trm(item_name));
-        RecipeList* item_recipes_d = item_recipes;
-        while(item_recipes_d)
-        {
-            dh_option_printer(general, g_list_index(item_recipes, item_recipes_d->data), recipe_list_filename(item_recipes_d));
-            item_recipes_d = item_recipes_d->next;
-        }
-        int option = dh_selector(general, _("Please select an option, or 'd' to discard (d): "), g_list_length(item_recipes), "d", _("&Discard"));
-        if(option == -1)
-        {
-            g_list_free(item_recipes);
-            return NULL;
-        }
-        else
-            option_recipe = g_list_nth(item_recipes, option);
-    }
-
-    /* Analyse */
-    ItemList* ret = NULL;
-    RecipeGeneral* recipe_general = recipe_general_new(recipe_list_filename(option_recipe));
-    RecipeGeneralClass* klass = RECIPE_GENERAL_GET_CLASS(recipe_general);
-
-    ret = klass->get_recipe(recipe_general, num, general);
-
-    g_list_free(item_recipes);
-    return ret;
 }
 
 static char* get_array_item_name(cJSON* json, int num)

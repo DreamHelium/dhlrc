@@ -6,8 +6,6 @@ set( DHLRC_MAIN_POT_FILE_DEPENDS
         src/lrc_extend.c
         src/recipe_util.c
         src/dhlrc_list.c
-        src/recipe_class/recipe_general.c
-        src/recipe_class/recipe_shaped.c
 		src/qt/configui.cpp
         src/qt/mainwindow.cpp
         src/qt/ilreaderui.cpp
@@ -52,14 +50,6 @@ add_library(dhlrc SHARED
 	       nbt_litereader.c
 		   json_util.c
 		   json_util.h
-	       recipe_class/recipe_general.h
-	       recipe_class/recipe_general.c
-	       recipe_class/recipe_shaped.h
-	       recipe_class/recipe_shaped.c
-	       recipe_class/recipe_shapeless.h
-	       recipe_class/recipe_shapeless.c
-	       recipe_class/recipe_smelting.h
-	       recipe_class/recipe_smelting.c
 	       recipe_class_ng/recipes_general.h
 	       recipe_class_ng/recipes_general.c
 	       recipe_class_ng/recipes_shaped.h
