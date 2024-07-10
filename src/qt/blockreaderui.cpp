@@ -24,6 +24,7 @@ BlockReaderUI::~BlockReaderUI()
 
 void BlockReaderUI::initUI(quint32 i)
 {
+    qDebug() << i;
     regionSize = lite_region_size_array(root, i);
     qDebug() << regionSize[0] << regionSize[1] << regionSize[2];
     lr = lite_region_create(root, i);

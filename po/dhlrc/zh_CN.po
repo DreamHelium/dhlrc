@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-07-09 23:27+0800\n"
+"POT-Creation-Date: 2024-07-10 22:29+0800\n"
 "PO-Revision-Date: 2024-07-04 22:57+0800\n"
 "Last-Translator: dream_he\n"
 "Language-Team: Chinese <kde-i18n-doc@kde.org>\n"
@@ -323,119 +323,119 @@ msgstr "清除材料列表 (&C)"
 msgid "Config &settings"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:47 src/qt/ilchooseui.cpp:31 src/qt/processui.cpp:56
-#: src/qt/recipesui.cpp:219 src/qt/regionselectui.cpp:41
+#: src/qt/mainwindow.cpp:47 src/qt/ilchooseui.cpp:38 src/qt/processui.cpp:56
+#: src/qt/recipesui.cpp:210 src/qt/regionselectui.cpp:41
 #: src/qt/nbtselectui.cpp:42
 msgid "&OK"
 msgstr "确定(&O)"
 
-#: src/qt/mainwindow.cpp:47 src/qt/ilchooseui.cpp:32 src/qt/processui.cpp:57
-#: src/qt/recipesui.cpp:220 src/qt/regionselectui.cpp:42
+#: src/qt/mainwindow.cpp:47 src/qt/ilchooseui.cpp:39 src/qt/processui.cpp:57
+#: src/qt/recipesui.cpp:211 src/qt/regionselectui.cpp:42
 #: src/qt/nbtselectui.cpp:43
 msgid "&Close"
 msgstr "关闭(&C)"
 
-#: src/qt/mainwindow.cpp:71
+#: src/qt/mainwindow.cpp:70
 msgid "Select a file"
 msgstr "选择一个文件"
 
-#: src/qt/mainwindow.cpp:71
+#: src/qt/mainwindow.cpp:70
 msgid "Litematic file (*.litematic)"
 msgstr "投影文件 (*.litematic)"
 
-#: src/qt/mainwindow.cpp:108
+#: src/qt/mainwindow.cpp:107 src/qt/ilchooseui.cpp:64
 msgid "Error!"
 msgstr "错误！"
 
-#: src/qt/mainwindow.cpp:108
+#: src/qt/mainwindow.cpp:107
 msgid "No selected region!"
 msgstr "没有选择的区域！"
 
-#: src/qt/mainwindow.cpp:169
+#: src/qt/mainwindow.cpp:172
 msgid "Multi files detected!"
 msgstr "检测到多文件！"
 
-#: src/qt/mainwindow.cpp:169
+#: src/qt/mainwindow.cpp:172
 msgid "This program doesn't support multi files!"
 msgstr "本程序不支持多文件！"
 
-#: src/qt/mainwindow.cpp:185
+#: src/qt/mainwindow.cpp:188
 msgid "Add NBT File"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:185
+#: src/qt/mainwindow.cpp:188
 msgid "Do you want to add this NBT file to the list?"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:188
+#: src/qt/mainwindow.cpp:191
 msgid "Set NBT Info Description"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:188
+#: src/qt/mainwindow.cpp:191
 msgid "Please enter description"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:188
+#: src/qt/mainwindow.cpp:191
 msgid "Added from reading file"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:197
+#: src/qt/mainwindow.cpp:200
 msgid "Set NBT File"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:197
+#: src/qt/mainwindow.cpp:200
 msgid "Do you want to set this NBT file as default?"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:206
+#: src/qt/mainwindow.cpp:209
 msgid "Not a valid file!"
 msgstr "不是一个有效的文件！"
 
-#: src/qt/mainwindow.cpp:206
+#: src/qt/mainwindow.cpp:209
 msgid "This file is not a valid NBT file!"
 msgstr "本文件不是一个有效的NBT文件！"
 
-#: src/qt/ilreaderui.cpp:28
+#: src/qt/ilreaderui.cpp:21
 msgid "&File"
 msgstr "文件(&F)"
 
-#: src/qt/ilreaderui.cpp:31
+#: src/qt/ilreaderui.cpp:24
 msgid "&Save"
 msgstr "保存 (&S)"
 
-#: src/qt/ilreaderui.cpp:63
+#: src/qt/ilreaderui.cpp:51
 msgid "Save file"
 msgstr "保存文件"
 
-#: src/qt/ilreaderui.cpp:63
+#: src/qt/ilreaderui.cpp:51
 msgid "CSV file (*.csv)"
 msgstr ""
 
-#: src/qt/ilreaderui.cpp:75
+#: src/qt/ilreaderui.cpp:63
 msgid "Name"
 msgstr "名称"
 
-#: src/qt/ilreaderui.cpp:75
+#: src/qt/ilreaderui.cpp:63
 msgid "Total"
 msgstr "总计"
 
-#: src/qt/ilreaderui.cpp:75
+#: src/qt/ilreaderui.cpp:63
 msgid "Placed"
 msgstr "已放置"
 
-#: src/qt/ilreaderui.cpp:76
+#: src/qt/ilreaderui.cpp:64
 msgid "Available"
 msgstr "可用"
 
-#: src/qt/ilreaderui.cpp:76
+#: src/qt/ilreaderui.cpp:64
 msgid "isTag"
 msgstr "是否为标签"
 
-#: src/qt/ilreaderui.cpp:76
+#: src/qt/ilreaderui.cpp:64
 msgid "Track"
 msgstr "追踪"
 
-#: src/qt/ilreaderui.cpp:96
+#: src/qt/ilreaderui.cpp:84
 msgid "Show history"
 msgstr "展示历史"
 
@@ -446,6 +446,10 @@ msgstr "选择一个物品列表。"
 #: src/qt/ilchooseui.cpp:14
 msgid "Please choose a item list:"
 msgstr "请选择一个物品列表："
+
+#: src/qt/ilchooseui.cpp:64
+msgid "No item list selected!"
+msgstr ""
 
 #: src/qt/processui.cpp:45
 msgid "&All"
@@ -468,49 +472,49 @@ msgstr ""
 msgid "The pattern is:"
 msgstr ""
 
-#: src/qt/recipesui.cpp:72
+#: src/qt/recipesui.cpp:63
 msgid "No recipe file found!"
 msgstr "找不到配方！"
 
-#: src/qt/recipesui.cpp:73
+#: src/qt/recipesui.cpp:64
 msgid "No recipe file found! Do you want to extract game file?"
 msgstr "找不到配方！你想要解压游戏文件吗？"
 
-#: src/qt/recipesui.cpp:140
+#: src/qt/recipesui.cpp:131
 msgid "Please select items:"
 msgstr "请选择物品："
 
-#: src/qt/recipesui.cpp:163
+#: src/qt/recipesui.cpp:154
 msgid "Show recipe"
 msgstr "展示配方"
 
-#: src/qt/recipesui.cpp:209
+#: src/qt/recipesui.cpp:200
 msgid "Combine items to this item list."
 msgstr "合并物品至此物品列表。"
 
-#: src/qt/recipesui.cpp:211
+#: src/qt/recipesui.cpp:202
 msgid "New item list name:"
 msgstr "新的物品列表名字："
 
-#: src/qt/recipesui.cpp:212
+#: src/qt/recipesui.cpp:203
 msgid "Generated from material list combiner."
 msgstr "从材料列表合成器生成。"
 
-#: src/qt/recipesui.cpp:283
+#: src/qt/recipesui.cpp:275
 #, c-format
 msgid "\"Delete\" %d items from material list combiner."
 msgstr "从材料列表合成器\"删除\"%d物品。"
 
-#: src/qt/recipesui.cpp:313
+#: src/qt/recipesui.cpp:306
 msgid "Mod decide"
 msgstr "余数决定"
 
-#: src/qt/recipesui.cpp:313
+#: src/qt/recipesui.cpp:306
 #, c-format
 msgid "There's a remainder with %d and %d, continue?"
 msgstr "%d除以%d有余数，继续？"
 
-#: src/qt/recipesui.cpp:337
+#: src/qt/recipesui.cpp:330
 #, c-format
 msgid "Add %d items from material list combiner."
 msgstr "从材料列表合成器添加%d物品。"

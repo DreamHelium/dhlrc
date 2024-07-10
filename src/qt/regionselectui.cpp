@@ -5,7 +5,7 @@
 
 extern NBT* root;
 static int buttonId = -1;
-
+extern int regionNum;
 
 RegionSelectUI::RegionSelectUI(QWidget *parent) :
     QDialog(parent)
@@ -51,14 +51,13 @@ void RegionSelectUI::initUI()
     this->setLayout(layout);
 }
 
-int RegionSelectUI::exec_r()
-{
-    this->exec();
-    return buttonId;
-}
-
 void RegionSelectUI::okBtn_clicked()
 {
     buttonId = group->checkedId();
-    this->close();
+    if(buttonId != -1)
+    {
+        regionNum = buttonId;
+        accept();
+    }
+    else reject();
 }

@@ -9,45 +9,32 @@
 #include <qnamespace.h>
 #include <qpushbutton.h>
 #include "showtrackui.h"
-
-extern QList<IlInfo> ilList;
-extern IlInfo info;
-extern bool infoR;
+#include "../il_info.h"
 
 ilReaderUI::ilReaderUI(QWidget *parent)
     : QWidget{parent}
 {
-    ilChooseUI* iui = new ilChooseUI();
-    iui->setAttribute(Qt::WA_DeleteOnClose);
-    iui->exec();
+    showTable();
 
-    if(infoR){
-        showTable();
+    menuBar = new QMenuBar(this);
+    fileMenu = new QMenu(_("&File"), menuBar);
+    menuBar->addAction(fileMenu->menuAction());
 
-        menuBar = new QMenuBar(this);
-        fileMenu = new QMenu(_("&File"), menuBar);
-        menuBar->addAction(fileMenu->menuAction());
-
-        saveAction = new QAction(QIcon::fromTheme("document-save"), _("&Save"), this);
-        saveAction->setShortcut(QKeySequence("Ctrl+S"));
-        fileMenu->addAction(saveAction);
-        QObject::connect(saveAction, SIGNAL(triggered()), this, SLOT(saveAction_triggered()));
-    }
-    else
-        ; /* It seems that this window must exists? */
+    saveAction = new QAction(QIcon::fromTheme("document-save"), _("&Save"), this);
+    saveAction->setShortcut(QKeySequence("Ctrl+S"));
+    fileMenu->addAction(saveAction);
+    QObject::connect(saveAction, SIGNAL(triggered()), this, SLOT(saveAction_triggered()));
 }
 
 ilReaderUI::~ilReaderUI()
 {
-    if(infoR){
-        tableWidget->clearContents();
-        delete[] ti;
-    }
+    tableWidget->clearContents();
+    delete[] ti;
 }
 
 void ilReaderUI::saveAction_triggered()
 {
-    ItemList* il = info.il;
+    ItemList* il = il_info_get_item_list();
     ItemList* ild = il;
     int i = 0;
     while(ild)
@@ -67,7 +54,7 @@ void ilReaderUI::saveAction_triggered()
 
 void ilReaderUI::showTable()
 {
-    ItemList* il = info.il;
+    ItemList* il = il_info_get_item_list();
     int rows = g_list_length(il);
 
     vLayout = new QVBoxLayout(this);
@@ -116,7 +103,7 @@ void ilReaderUI::showTable()
 
 int ilReaderUI::buttonClicked(int id)
 {
-    ShowTrackUI* stui = new ShowTrackUI((IListData*)g_list_nth_data(info.il, id));
+    ShowTrackUI* stui = new ShowTrackUI((IListData*)g_list_nth_data(il_info_get_item_list(), id));
     stui->setAttribute(Qt::WA_DeleteOnClose);
     stui->show();
     return 0;

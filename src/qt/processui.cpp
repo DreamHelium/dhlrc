@@ -11,11 +11,11 @@
 #include <qlabel.h>
 #include <qlineedit.h>
 #include "mainwindow.h"
+#include "../il_info.h"
 
 static DhStrArray* region_name = nullptr;
 extern ItemList* il;
 extern NBT* root;
-extern QList<IlInfo> ilList;
 
 ProcessUI::ProcessUI(QWidget *parent) :
     QWidget(parent)
@@ -94,8 +94,7 @@ void ProcessUI::okBtn_clicked()
     }
     item_list_delete_zero_item(&new_il);
     item_list_sort(&new_il);
-    IlInfo info = {.name = itemName->text() , .il = new_il, .time = QDateTime::currentDateTime()};
-    ilList.append(info);
+    il_info_new(new_il, g_date_time_new_now_local(), itemName->text().toStdString().c_str());
     this->close();
     // lrcFunctionUI* fui = new lrcFunctionUI();
     // fui->setAttribute(Qt::WA_DeleteOnClose);

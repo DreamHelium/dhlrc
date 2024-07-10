@@ -11,14 +11,6 @@
 #include <qevent.h>
 #include "../translation.h"
 
-typedef struct IlInfo{
-    QString name;
-    ItemList* il;
-    QDateTime time;
-} IlInfo;
-
-bool operator== (const IlInfo info1, const IlInfo info2);
-
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE

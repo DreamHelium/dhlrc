@@ -6,12 +6,9 @@
 #include <QVBoxLayout>
 #include <QPushButton>
 #include <QRadioButton>
+#include <qbuttongroup.h>
+#include <qradiobutton.h>
 #include "mainwindow.h"
-
-typedef struct cbn{
-    QRadioButton* button;
-    IlInfo info;
-} cbn;
 
 class ilChooseUI : public QDialog
 {
@@ -24,13 +21,13 @@ private:
     QVBoxLayout* layout;
     QHBoxLayout* hLayout;
     QLabel* titleLabel;
-    cbn* cbnList;
+    QList<QRadioButton*> btnList;
+    QButtonGroup* group;
     QPushButton* okBtn;
     QPushButton* closeBtn;
 
 private Q_SLOTS:
     void okBtn_clicked();
-    void closeBtn_clicked();
 };
 
 #endif // ILCHOOSEUI_H

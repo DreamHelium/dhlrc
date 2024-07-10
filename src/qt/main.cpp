@@ -2,15 +2,10 @@
 #include "../main.h"
 #include "../translation.h"
 #include "../libnbt/nbt.h"
-
 #include <QApplication>
 #include <QTranslator>
+
 extern NBT* root;
-ItemList* il = nullptr;
-IlInfo info;
-bool infoR = false;
-int infoNum = -1;
-int verbose_level = 0;
 
 class SelfTranslator : public QTranslator
 {
@@ -34,7 +29,6 @@ int main(int argc, char *argv[])
     MainWindow w;
     w.show();
     int ret = a.exec();
-    if(root) NBT_Free(root);
     return ret;
 }
 

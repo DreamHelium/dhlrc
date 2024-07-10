@@ -53,6 +53,8 @@ add_library(dhlrc SHARED
 		   json_util.h
 		   nbt_info.c
 		   nbt_info.h
+		   il_info.c
+		   il_info.h
 	       recipe_class_ng/recipes_general.h
 	       recipe_class_ng/recipes_general.c
 	       recipe_class_ng/recipes_shaped.h

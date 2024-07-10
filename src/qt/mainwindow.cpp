@@ -13,6 +13,7 @@
 #include <qevent.h>
 #include <qlineedit.h>
 #include <qmessagebox.h>
+#include <qnamespace.h>
 #include <string>
 #include "ilchooseui.h"
 #include "ilreaderui.h"
@@ -25,13 +26,12 @@
 #include "ui_mainwindow.h"
 #include <QMimeData>
 #include <QInputDialog>
+#include "../il_info.h"
 
 NBT* root = nullptr;
+int regionNum = 0;
 static bool nbtRead = false;
-extern ItemList* il;
-QList<IlInfo> ilList;
-extern bool infoR;
-extern IlInfo info;
+int verbose_level;
 
 static QString titile = N_("Litematica reader");
 static QString subtitle = N_("The functions are listed below:");
@@ -50,7 +50,6 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
-    ilList.clear();
     translation_init();
     ui->setupUi(this);
     ui->widget->hide();
@@ -59,9 +58,9 @@ MainWindow::MainWindow(QWidget *parent)
 
 MainWindow::~MainWindow()
 {
-    for(int i = 0 ; i < ilList.length() ; i++)
-        item_list_free(ilList[i].il);
     delete ui;
+    nbt_info_list_clear();
+    il_info_list_free();
     dh_exit();
     dh_exit1();
 }
@@ -101,8 +100,8 @@ void MainWindow::okBtn_clicked()
     else if(ui->lrcExtendBtn->isChecked()) /* block reader */
     {
         RegionSelectUI* rsui = new RegionSelectUI();
-        int ret = rsui->exec_r();
-        if( ret == -1 )
+        int ret = rsui->exec();
+        if( ret != QDialog::Accepted )
         {
             /* Warning */
             QMessageBox::warning(this, _("Error!"), _("No selected region!"));
@@ -110,51 +109,55 @@ void MainWindow::okBtn_clicked()
         else
         {
             /* Popup a normal window */
-            BlockReaderUI* brui = new BlockReaderUI(ret);
+            BlockReaderUI* brui = new BlockReaderUI(regionNum);
             brui->setAttribute(Qt::WA_DeleteOnClose);
             brui->show();
         }
     }
     else if(ui->ilreaderBtn->isChecked()) /* Item list */
     {
-        ilReaderUI* iui = new ilReaderUI();
+        ilChooseUI* iui = new ilChooseUI();
         iui->setAttribute(Qt::WA_DeleteOnClose);
-        iui->show();
+        int ret = iui->exec();
+
+        if(ret == QDialog::Accepted){
+            ilReaderUI* iui = new ilReaderUI();
+            iui->setAttribute(Qt::WA_DeleteOnClose);
+            iui->show();
+        }
     }
     else if(ui->recipeBtn->isChecked()) /* Recipe function */
     {
-        RecipesUI* rui = new RecipesUI();
-        rui->setAttribute(Qt::WA_DeleteOnClose);
-        rui->show();
+        ilChooseUI* iui = new ilChooseUI();
+        iui->setAttribute(Qt::WA_DeleteOnClose);
+        int ret = iui->exec();
+
+        if(ret == QDialog::Accepted){
+            RecipesUI* rui = new RecipesUI();
+            rui->setAttribute(Qt::WA_DeleteOnClose);
+            rui->show();
+        }
     }
     else if(ui->clearBtn->isChecked()) /* clear item list */
     {
         ilChooseUI* icui = new ilChooseUI();
         icui->setAttribute(Qt::WA_DeleteOnClose);
-        icui->exec();
-        if(infoR){
-            int index = ilList.indexOf(info);
-            item_list_free(ilList[index].il);
-            ilList.remove(index);
-        }
+        int ret = icui->exec();
+        if(ret == QDialog::Accepted)
+            il_info_list_remove_item(il_info_list_get_id());
     }
     else if(ui->configBtn->isChecked()) /* Config settings */
     {
         ConfigUI* cui = new ConfigUI();
+        cui->setAttribute(Qt::WA_DeleteOnClose);
         cui->show();
     }
     else if(ui->selectBtn->isChecked())
     {
         NbtSelectUI* nsui = new NbtSelectUI();
+        nsui->setAttribute(Qt::WA_DeleteOnClose);
         nsui->exec();
     }
-}
-
-bool operator== (const IlInfo info1, const IlInfo info2)
-{
-    if((info1.il == info2.il) && (info1.name == info2.name) && (info1.time == info2.time))
-        return true;
-    else return false;
 }
 
 void MainWindow::dragEnterEvent(QDragEnterEvent* event)

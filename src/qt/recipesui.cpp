@@ -20,12 +20,8 @@
 #include "ilchooseui.h"
 #include "../config.h"
 #include "../uncompress.h"
+#include "../il_info.h"
 #include <QAbstractItemView>
-
-extern bool infoR;
-extern IlInfo info;
-extern QList<IlInfo> ilList;
-extern int infoNum;
 
 typedef struct RecipesInternal{
     QString itemName;
@@ -46,13 +42,8 @@ typedef struct RecipeListBaseData{
 RecipesUI::RecipesUI(QWidget *parent) :
     QWidget(parent)
 {
-    ilChooseUI* iui = new ilChooseUI();
-    iui->setAttribute(Qt::WA_DeleteOnClose);
-    iui->exec();
-    if(infoR){
-        recipesInit();
-        initUI();
-    }
+    recipesInit();
+    initUI();
 }
 
 RecipesUI::~RecipesUI()
@@ -63,7 +54,7 @@ RecipesUI::~RecipesUI()
 
 void RecipesUI::recipesInit()
 {
-    ItemList* il = info.il;
+    ItemList* il = il_info_get_item_list();
     gchar* recipeDir = dh_get_recipe_dir();
     qDebug() << recipeDir;
     RecipeList* rcl = recipe_list_init(recipeDir, il);
@@ -279,21 +270,23 @@ void RecipesUI::okbtn_clicked()
             ItemList* processd_il = recipesProcess(list[i].itemName.toStdString().c_str(), rpl[i].comboBox->currentText().toStdString().c_str(), rpl[i].slider->value());
             if(processd_il)
             {
-                item_list_add_item(&info.il, -rpl[i].slider->value(), (char*)list[i].itemName.toStdString().c_str(), 
+                ItemList* il = il_info_get_item_list();
+                item_list_add_item(&il, -rpl[i].slider->value(), (char*)list[i].itemName.toStdString().c_str(), 
                 _("\"Delete\" %d items from material list combiner."));
-                item_list_delete_zero_item(&info.il);
+                item_list_delete_zero_item(&il);
                 new_il = processd_il;
             }
         }
     }
     if(askForCombineBox->isChecked() == false)
     {
-        IlInfo info = {.name = des2Edit->text() , .il = new_il, .time = QDateTime::currentDateTime()};
-        ilList.append(info);
+        il_info_new(new_il, g_date_time_new_now_local(), des2Edit->text().toStdString().c_str());
     }
     else
     {
-        item_list_combine(&ilList[infoNum].il, new_il);
+        ItemList* il = il_info_get_item_list();
+        item_list_combine(&il, new_il);
+        il_info_update_item_list(il);
         item_list_free(new_il);
     }
     this->close();

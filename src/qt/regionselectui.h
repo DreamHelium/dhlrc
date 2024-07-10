@@ -24,7 +24,6 @@ class RegionSelectUI : public QDialog
 public:
     explicit RegionSelectUI(QWidget *parent = nullptr);
     ~RegionSelectUI();
-    int exec_r();
 
 private:
     QLabel* label;
