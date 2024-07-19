@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>453</width>
-    <height>443</height>
+    <width>345</width>
+    <height>352</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -32,7 +32,7 @@
            <item>
             <spacer name="verticalSpacer_3">
              <property name="orientation">
-              <enum>Qt::Orientation::Vertical</enum>
+              <enum>Qt::Vertical</enum>
              </property>
              <property name="sizeHint" stdset="0">
               <size>
@@ -41,16 +41,6 @@
               </size>
              </property>
             </spacer>
-           </item>
-           <item>
-            <widget class="QRadioButton" name="selectBtn">
-             <property name="text">
-              <string>NBT s&amp;elector</string>
-             </property>
-             <property name="checked">
-              <bool>true</bool>
-             </property>
-            </widget>
            </item>
            <item>
             <widget class="QRadioButton" name="nbtReaderBtn">
@@ -91,23 +81,9 @@
             </widget>
            </item>
            <item>
-            <widget class="QRadioButton" name="clearBtn">
-             <property name="text">
-              <string>&amp;Clear Item list</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QRadioButton" name="configBtn">
-             <property name="text">
-              <string>Config &amp;settings</string>
-             </property>
-            </widget>
-           </item>
-           <item>
             <spacer name="verticalSpacer">
              <property name="orientation">
-              <enum>Qt::Orientation::Vertical</enum>
+              <enum>Qt::Vertical</enum>
              </property>
              <property name="sizeHint" stdset="0">
               <size>
@@ -124,12 +100,12 @@
            <item>
             <spacer name="horizontalSpacer">
              <property name="orientation">
-              <enum>Qt::Orientation::Horizontal</enum>
+              <enum>Qt::Horizontal</enum>
              </property>
              <property name="sizeHint" stdset="0">
               <size>
-               <width>40</width>
-               <height>20</height>
+               <width>20</width>
+               <height>40</height>
               </size>
              </property>
             </spacer>
@@ -162,8 +138,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>453</width>
-     <height>31</height>
+     <width>345</width>
+     <height>32</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu_File">
@@ -173,7 +149,16 @@
     <addaction name="openAction"/>
     <addaction name="quitAction"/>
    </widget>
+   <widget class="QMenu" name="menu_Tools">
+    <property name="title">
+     <string>&amp;Tool</string>
+    </property>
+    <addaction name="configAction"/>
+    <addaction name="clearAction"/>
+    <addaction name="selectAction"/>
+   </widget>
    <addaction name="menu_File"/>
+   <addaction name="menu_Tools"/>
   </widget>
   <widget class="QToolBar" name="toolBar">
    <property name="windowTitle">
@@ -190,24 +175,44 @@
   </widget>
   <action name="openAction">
    <property name="icon">
-    <iconset theme="QIcon::ThemeIcon::DocumentOpen"/>
+    <iconset theme="document-open">
+     <normaloff>.</normaloff>.</iconset>
    </property>
    <property name="text">
     <string>&amp;Open</string>
    </property>
    <property name="menuRole">
-    <enum>QAction::MenuRole::TextHeuristicRole</enum>
+    <enum>QAction::NoRole</enum>
    </property>
   </action>
   <action name="quitAction">
    <property name="icon">
-    <iconset theme="QIcon::ThemeIcon::ApplicationExit"/>
+    <iconset theme="application-exit">
+     <normaloff>.</normaloff>.</iconset>
    </property>
    <property name="text">
     <string>&amp;Quit</string>
    </property>
    <property name="menuRole">
-    <enum>QAction::MenuRole::QuitRole</enum>
+    <enum>QAction::NoRole</enum>
+   </property>
+  </action>
+  <action name="configAction">
+   <property name="text">
+    <string>Config &amp;settings</string>
+   </property>
+  </action>
+  <action name="clearAction">
+   <property name="icon">
+    <iconset theme="edit-clear"/>
+   </property>
+   <property name="text">
+    <string>&amp;Clear Item list</string>
+   </property>
+  </action>
+  <action name="selectAction">
+   <property name="text">
+    <string>NBT s&amp;elector</string>
    </property>
   </action>
  </widget>

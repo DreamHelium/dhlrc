@@ -37,6 +37,9 @@ protected:
 private Q_SLOTS:
     void openAction_triggered();
     void okBtn_clicked();
+    void configAction_triggered();
+    void clearAction_triggered();
+    void selectAction_triggered();
 
 };
 #endif // MAINWINDOW_H

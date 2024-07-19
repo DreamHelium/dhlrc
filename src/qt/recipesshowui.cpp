@@ -1,5 +1,6 @@
 #include "recipesshowui.h"
 #include "../translation.h"
+#include <QDebug>
 
 RecipesShowUI::RecipesShowUI(QString filename ,QWidget *parent) :
     QWidget(parent)

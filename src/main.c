@@ -166,6 +166,7 @@ static gchar* get_filename()
                 break;
             }
         }
+        else break;
     }
     g_free(schematics_dir);
     return filename;

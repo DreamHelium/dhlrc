@@ -33,8 +33,9 @@ int regionNum = 0;
 static bool nbtRead = false;
 int verbose_level;
 
-static QString titile = N_("Litematica reader");
+static QString title = N_("Litematica reader");
 static QString subtitle = N_("The functions are listed below:");
+static QStringList menu = {N_("&File"), N_("&Tool")};
 static QStringList funcs = {
     N_("NBT s&elector"),
     N_("&NBT lite reader with modifier"), 
@@ -77,6 +78,9 @@ void MainWindow::openAction_triggered()
 void MainWindow::initSignalSlots()
 {
     QObject::connect(ui->openAction, &QAction::triggered, this, &MainWindow::openAction_triggered);
+    QObject::connect(ui->configAction, &QAction::triggered, this, &MainWindow::configAction_triggered);
+    QObject::connect(ui->clearAction, &QAction::triggered, this, &MainWindow::clearAction_triggered);
+    QObject::connect(ui->selectAction, &QAction::triggered, this, &MainWindow::selectAction_triggered);
 }
 
 void MainWindow::initInternalUI()
@@ -138,26 +142,6 @@ void MainWindow::okBtn_clicked()
             rui->show();
         }
     }
-    else if(ui->clearBtn->isChecked()) /* clear item list */
-    {
-        ilChooseUI* icui = new ilChooseUI();
-        icui->setAttribute(Qt::WA_DeleteOnClose);
-        int ret = icui->exec();
-        if(ret == QDialog::Accepted)
-            il_info_list_remove_item(il_info_list_get_id());
-    }
-    else if(ui->configBtn->isChecked()) /* Config settings */
-    {
-        ConfigUI* cui = new ConfigUI();
-        cui->setAttribute(Qt::WA_DeleteOnClose);
-        cui->show();
-    }
-    else if(ui->selectBtn->isChecked())
-    {
-        NbtSelectUI* nsui = new NbtSelectUI();
-        nsui->setAttribute(Qt::WA_DeleteOnClose);
-        nsui->exec();
-    }
 }
 
 void MainWindow::dragEnterEvent(QDragEnterEvent* event)
@@ -208,4 +192,31 @@ void MainWindow::readNbtFile(QString filename)
     {
         QMessageBox::critical(this, _("Not a valid file!"), _("This file is not a valid NBT file!"));
     }
+}
+
+void MainWindow::configAction_triggered()
+{
+    ConfigUI* cui = new ConfigUI();
+    cui->setAttribute(Qt::WA_DeleteOnClose);
+    cui->show();
+}
+
+void MainWindow::clearAction_triggered()
+{
+    ilChooseUI* icui = new ilChooseUI();
+    icui->setAttribute(Qt::WA_DeleteOnClose);
+    int ret = icui->exec();
+    if(ret == QDialog::Accepted)
+        il_info_list_remove_item(il_info_list_get_id());
+}
+
+void MainWindow::selectAction_triggered()
+{
+    if(nbtRead)
+    {
+        NbtSelectUI* nsui = new NbtSelectUI();
+        nsui->setAttribute(Qt::WA_DeleteOnClose);
+        nsui->exec();
+    }
+    else QMessageBox::critical(this, _("No NBT File!"), _("No NBT file loaded!"));
 }

@@ -22,6 +22,7 @@
 #include "../uncompress.h"
 #include "../il_info.h"
 #include <QAbstractItemView>
+#include <QDebug>
 
 typedef struct RecipesInternal{
     QString itemName;

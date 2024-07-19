@@ -5,6 +5,7 @@
 #include <QValidator>
 #include <qnamespace.h>
 #include <qpushbutton.h>
+#include <QDebug>
 
 extern NBT* root;
 static int* regionSize;
