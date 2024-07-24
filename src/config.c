@@ -19,6 +19,7 @@
 #include <cjson/cJSON.h>
 #include "dhutil/dhutil.h"
 #include <gio/gio.h>
+#include "glibconfig.h"
 #include "json_util.h"
 
 /* Unused until I get understand of monitor */
@@ -44,13 +45,14 @@ void dhlrc_make_config()
         gchar* minecraft_dir = g_strconcat(g_get_home_dir(), "/.minecraft", NULL);
 #endif
 
-        gchar* cache_dir = g_strconcat(g_get_user_cache_dir(), "/dhlrc", NULL);
+        gchar* cache_dir = g_strconcat(g_get_user_cache_dir(), G_DIR_SEPARATOR_S ,"dhlrc", NULL);
 
         cJSON* config = cJSON_CreateObject();
         cJSON_AddStringToObject(config, "cacheDir", cache_dir);
         cJSON_AddStringToObject(config, "overrideLang", "");
 
-        cJSON_AddStringToObject(config, "recipeConfig", "recipes/");
+        gchar* recipe_dir = g_strconcat("recipes", G_DIR_SEPARATOR_S ,NULL);
+        cJSON_AddStringToObject(config, "recipeConfig", recipe_dir);
         cJSON_AddStringToObject(config, "itemTranslate", "translation.json");
         cJSON_AddStringToObject(config, "overrideVersion", "1.18.2");
         cJSON_AddStringToObject(config, "gameDir", minecraft_dir);
@@ -58,6 +60,7 @@ void dhlrc_make_config()
         printf("%s\n", config_file);
         g_free(minecraft_dir);
         g_free(cache_dir);
+        g_free(recipe_dir);
 
         dh_write_file(config_file, config_text, strlen(config_text));
 

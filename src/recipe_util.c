@@ -25,6 +25,7 @@
 #include "config.h"
 #include "dhlrc_list.h"
 #include <dhutil.h>
+#include "dh_validator.h"
 #include "translation.h"
 
 static cJSON* translation_json = NULL;
@@ -34,47 +35,35 @@ static gchar* find_transfile();
 long* num_array_get_from_input(int* array_num, int max_num)
 {
     if(!array_num) return NULL;
-    printf(_("Input numbers directly, or type 'a' for all numbers, 'q' to quit (a): "));
-    dh_limit* limit = dh_limit_Init(NumArray);
-    if(limit)
+    DhOut* out = dh_out_new();
+    DhIntArrayValidator* validator = dh_int_array_validator_new();
+    dh_int_array_validator_add_range(validator, 0, max_num);
+    dh_int_array_validator_set_split_str(validator, " ");
+    dh_int_array_validator_set_allow_repeated(validator, FALSE);
+    DhArgInfo* arg = dh_arg_info_new();
+    dh_arg_info_add_arg(arg, 'a', "all", N_("Choose all numbers"));
+    dh_arg_info_add_arg(arg, 'q', "quit", N_("Quit application"));
+    GValue val = {0};
+    dh_out_read_and_output(out, N_("Please enter numbers or option: "), 
+    "dhlrc", arg, DH_VALIDATOR(validator), TRUE, &val);
+    
+    if(G_VALUE_HOLDS_POINTER(&val))
     {
-        dh_limit_SetArrayArgs(limit, -1, 1, 1, 1);
-        if(!dh_limit_AddInt(limit, 0 , max_num - 1 ))
+        GList* list = g_value_get_pointer(&val);
+        long* out = malloc(g_list_length(list) * sizeof(long));
+        *array_num = g_list_length(list);
+        for(int i = 0 ; i < g_list_length(list) ; i++)
         {
-            dh_limit_Free(limit);
-            *array_num = 0;
-            return NULL;
+            gint64 tmp_val = *(gint64*)g_list_nth_data(list, i);
+            out[i] = tmp_val;
         }
+        return out;
     }
-    else
+    else if(G_VALUE_HOLDS_CHAR(&val))
     {
-        *array_num = 0;
-        return NULL;
-    }
-    dh_LineOut* dout = InputLine_General( sizeof(long), limit, 0, "aq", 1);
-    dh_limit_Free(limit);
-    if(dout)
-    {
-        if(dout->type == NumArray)
+        char val_c = g_value_get_schar(&val);
+        if(val_c == 'a')
         {
-            long* out = (long*)malloc( dout->len * sizeof(long) );
-            if(out)
-            {
-                memcpy( out, dout->val, dout->len*sizeof(long) );
-                *array_num = dout->len;
-                dh_LineOut_Free(dout);
-                return out;
-            }
-            else
-            {
-                dh_LineOut_Free(dout);
-                *array_num = 0;
-                return NULL;
-            }
-        }
-        else if(dout->type == Empty || (dout->type == Character && dout->val_c == 'a'))
-        {
-            dh_LineOut_Free(dout);
             long* out = (long*)malloc( max_num * sizeof(long) );
             if(out)
             {
@@ -83,18 +72,9 @@ long* num_array_get_from_input(int* array_num, int max_num)
                 *array_num = max_num;
                 return out;
             }
-            else
-            {
-                *array_num = 0;
-                return NULL;
-            }
         }
-        else
-        {
-            dh_LineOut_Free(dout);
-            *array_num = 0;
-            return NULL;
-        }
+        else *array_num = 0;
+        return NULL;
     }
     else
     {

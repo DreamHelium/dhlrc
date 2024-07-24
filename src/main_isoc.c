@@ -22,6 +22,7 @@
 #include "litematica_region.h"
 #include "recipe_util.h"
 #include "lrc_extend.h"
+#include <dh_validator.h>
 #include "config.h"
 #include <stdint.h>
 #include <stdio.h>
@@ -122,31 +123,20 @@ static enum option start_without_option()
     "[0] NBT lite reader with modifier\n"
     "[1] Litematica material list with recipe combination\n"
     "[2] Litematica block reader\n\n"));
-    printf(_("Please select an option, or enter 'q' to exit the program (q): "));
-#ifndef DH_DEBUG_IN_IDE
-    dh_LineOut* output = InputLine_Get_OneOpt(1,1,1,0,2,'q');
-#else
-    dh_LineOut* output = InputLine_Get_OneOpt(1, 1, 1, 0 ,3 ,'q');
-#endif
-    if(output)
-    {
-        switch(output->type){
-        case Integer:
-        {
-            int option = output->num_i;
-            dh_LineOut_Free(output);
-            return option;
-        }
-        case Character:
-        case Empty:
-        default:
-            dh_LineOut_Free(output);
-            break;
-        }
-        return Exit;
-    }
-    else
-        return Exit;
+    DhOut* out = dh_out_new();
+    DhIntValidator* validator = dh_int_validator_new(0, 2);
+    DhArgInfo* arg = dh_arg_info_new();
+    dh_arg_info_add_arg(arg, 'q', "quit", N_("Quit application"));
+    GValue val = {0};
+    dh_out_read_and_output(out, N_("Please select an option, or enter 'q' to exit the program (q): "), "dhlrc"
+    , arg, DH_VALIDATOR(validator), FALSE, &val);
+    g_object_unref(out);
+    g_object_unref(validator);
+    g_object_unref(arg);
+    
+    if(G_VALUE_HOLDS_INT64(&val))
+        return g_value_get_int64(&val);
+    else return Exit;
 }
 
 static int start_func(NBT *root, enum option opt)
