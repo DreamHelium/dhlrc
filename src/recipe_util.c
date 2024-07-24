@@ -46,6 +46,9 @@ long* num_array_get_from_input(int* array_num, int max_num)
     GValue val = {0};
     dh_out_read_and_output(out, N_("Please enter numbers or option: "), 
     "dhlrc", arg, DH_VALIDATOR(validator), TRUE, &val);
+    g_object_unref(out);
+    g_object_unref(validator);
+    g_object_unref(arg);
     
     if(G_VALUE_HOLDS_POINTER(&val))
     {
@@ -57,6 +60,8 @@ long* num_array_get_from_input(int* array_num, int max_num)
             gint64 tmp_val = *(gint64*)g_list_nth_data(list, i);
             out[i] = tmp_val;
         }
+        g_list_free_full(list, g_free);
+        g_value_unset(&val);
         return out;
     }
     else if(G_VALUE_HOLDS_CHAR(&val))
@@ -142,17 +147,17 @@ static gchar* find_transfile()
         return g_strdup("translation.json");
     else
     {
-        gchar* game_dir = NULL;
+        gchar* game_dir = dh_get_game_dir();
         gchar* index_file = NULL;
         /* Analyse .minecraft filepos */
-        if(dh_get_game_dir())
+        if(game_dir)
         {
-            game_dir = dh_get_game_dir();
             index_file = g_strconcat(game_dir, "/assets/indexes/1.18.json" , NULL);
         }
         else index_file = g_strconcat(g_get_home_dir(), "/.minecraft/assets/indexes/1.18.json", NULL);
         if(dh_file_exist(index_file))
         {
+            g_free(game_dir);
             cJSON* index = dhlrc_file_to_json(index_file);
             g_free(index_file);
             /* Analyse index file */

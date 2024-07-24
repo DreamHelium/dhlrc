@@ -494,6 +494,7 @@ ItemList *lite_region_item_list_extend(NBT* root, int r_num, ItemList* oBlock, i
         TmpItem* data = tild->data;
         oBlock = item_list_add_item(&oBlock, data->total, data->name, description);
     }
+    g_free(description);
     tmpitem_list_free(til);
     return oBlock;
 }
