@@ -34,7 +34,7 @@ class RecipesUI : public QWidget
     Q_OBJECT
 
 public:
-    explicit RecipesUI(QWidget *parent = nullptr);
+    explicit RecipesUI(ItemList* il, QWidget *parent = nullptr);
     ~RecipesUI();
 
 private:

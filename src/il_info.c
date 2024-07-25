@@ -24,6 +24,7 @@ typedef struct IlInfo {
     ItemList* il;
     GDateTime* time;
     gchar* description;
+    gboolean lock;
 } IlInfo;
 
 static void ilinfo_free(gpointer data)
@@ -33,6 +34,13 @@ static void ilinfo_free(gpointer data)
     g_date_time_unref(info->time);
     g_free(info->description);
     g_free(info);
+}
+
+/* a is the IlInfo */
+static int illist_compare(gconstpointer a, gconstpointer b)
+{
+    const IlInfo* info = a;
+    return ((info->il) - (ItemList*)b);
 }
 
 void il_info_list_free()
@@ -46,6 +54,7 @@ void il_info_new(ItemList *il, GDateTime *time, const gchar *description)
     info->il = il;
     info->time = time;
     info->description = g_strdup(description);
+    info->lock = FALSE;
     il_info_list = g_list_append(il_info_list, info);
 }
 
@@ -63,13 +72,22 @@ void il_info_list_set_id(guint id)
 ItemList* il_info_get_item_list()
 {
     IlInfo* info = g_list_nth_data(il_info_list, list_id);
-    return info->il;
+    if(!info->lock)
+    {
+        info->lock = TRUE;
+        return info->il;
+    }
+    else return NULL;
 }
 
-void il_info_update_item_list(ItemList *il)
+void il_info_update_item_list(ItemList *il, ItemList* oil)
 {
-    IlInfo* info = g_list_nth_data(il_info_list, list_id);
-    info->il = il;
+    GList* data = g_list_find_custom(il_info_list, oil, illist_compare);
+    if(data)
+    {
+        IlInfo* info = data->data;
+        info->il = il;
+    }
 }
 
 GDateTime* il_info_get_time()
@@ -84,14 +102,25 @@ gchar* il_info_get_description()
     return info->description;
 }
 
-void il_info_list_remove_item(guint id)
+gboolean il_info_list_remove_item(guint id)
 {
     IlInfo* info = g_list_nth_data(il_info_list, id);
-    ilinfo_free(info);
-    il_info_list = g_list_remove(il_info_list, info);
+    if(!info->lock)
+    {
+        ilinfo_free(info);
+        il_info_list = g_list_remove(il_info_list, info);
+        return TRUE;
+    }
+    else return FALSE; /* Some function is using the il */
 }
 
 guint il_info_list_get_id()
 {
     return list_id;
+}
+
+void il_info_unlock()
+{
+    IlInfo* info = g_list_nth_data(il_info_list, list_id);
+    info->lock = FALSE;
 }

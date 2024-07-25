@@ -125,9 +125,14 @@ void MainWindow::okBtn_clicked()
         int ret = iui->exec();
 
         if(ret == QDialog::Accepted){
-            ilReaderUI* iui = new ilReaderUI();
-            iui->setAttribute(Qt::WA_DeleteOnClose);
-            iui->show();
+            ItemList* il = il_info_get_item_list();
+            if(il)
+            {
+                ilReaderUI* iui = new ilReaderUI(il);
+                iui->setAttribute(Qt::WA_DeleteOnClose);
+                iui->show();
+            }
+            else QMessageBox::critical(this, _("Error!"), _("The item list is locked!"));
         }
     }
     else if(ui->recipeBtn->isChecked()) /* Recipe function */
@@ -137,9 +142,14 @@ void MainWindow::okBtn_clicked()
         int ret = iui->exec();
 
         if(ret == QDialog::Accepted){
-            RecipesUI* rui = new RecipesUI();
-            rui->setAttribute(Qt::WA_DeleteOnClose);
-            rui->show();
+            ItemList* il = il_info_get_item_list();
+            if(il) 
+            {
+                RecipesUI* rui = new RecipesUI(il);
+                rui->setAttribute(Qt::WA_DeleteOnClose);
+                rui->show();
+            }
+            else QMessageBox::critical(this, _("Error!"), _("The item list is locked!"));;
         }
     }
 }
@@ -203,11 +213,18 @@ void MainWindow::configAction_triggered()
 
 void MainWindow::clearAction_triggered()
 {
-    ilChooseUI* icui = new ilChooseUI();
-    icui->setAttribute(Qt::WA_DeleteOnClose);
-    int ret = icui->exec();
-    if(ret == QDialog::Accepted)
-        il_info_list_remove_item(il_info_list_get_id());
+    if(il_info_list_get_length())
+    {
+        ilChooseUI* icui = new ilChooseUI();
+        icui->setAttribute(Qt::WA_DeleteOnClose);
+        int ret = icui->exec();
+        bool success = false;
+        if(ret == QDialog::Accepted)
+            success = il_info_list_remove_item(il_info_list_get_id());
+        if(!success)
+            QMessageBox::critical(this, _("Error!"), _("The item list is locked!"));
+    }
+    else QMessageBox::warning(this, _("Error!"), _("No item list!"));
 }
 
 void MainWindow::selectAction_triggered()

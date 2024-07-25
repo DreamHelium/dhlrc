@@ -40,9 +40,12 @@ typedef struct RecipeListBaseData{
     gboolean supported;
 } RecipeListBaseData;
 
-RecipesUI::RecipesUI(QWidget *parent) :
+static ItemList* ilr = nullptr;
+
+RecipesUI::RecipesUI(ItemList* il, QWidget *parent) :
     QWidget(parent)
 {
+    ilr = il;
     recipesInit();
     initUI();
 }
@@ -51,14 +54,14 @@ RecipesUI::~RecipesUI()
 {
     list.clear();
     delete[] rpl;
+    il_info_unlock();
 }
 
 void RecipesUI::recipesInit()
 {
-    ItemList* il = il_info_get_item_list();
     gchar* recipeDir = dh_get_recipe_dir();
     qDebug() << recipeDir;
-    RecipeList* rcl = recipe_list_init(recipeDir, il);
+    RecipeList* rcl = recipe_list_init(recipeDir, ilr);
     if(!rcl)
     {
         auto btn = QMessageBox::question(this, _("No recipe file found!"), 
@@ -84,7 +87,7 @@ void RecipesUI::recipesInit()
             g_free(gameDir);
             g_free(version);
             g_free(cacheDir);
-            rcl = recipe_list_init(recipeDir, il);
+            rcl = recipe_list_init(recipeDir, ilr);
         }
     }
     g_free(recipeDir);
@@ -110,7 +113,7 @@ void RecipesUI::recipesInit()
             RecipesInternal* ri = new RecipesInternal;
             ri->itemName = rclName;
             ri->filenames << data->filename;
-            ri->num = item_list_get_item_num(il, (char*)rclName.toStdString().c_str());
+            ri->num = item_list_get_item_num(ilr, (char*)rclName.toStdString().c_str());
             list.append(*ri);
             delete ri; /* Can I do this? */
         }
@@ -118,7 +121,7 @@ void RecipesUI::recipesInit()
     }
     recipe_list_free(rcl);
 
-    ItemList* ild = il;
+    ItemList* ild = ilr;
 }
 
 void RecipesUI::initUI()
@@ -262,6 +265,7 @@ void RecipesUI::recipesbtn_clicked()
 
 void RecipesUI::okbtn_clicked()
 {
+    ItemList* oil = ilr;
     ItemList* new_il = nullptr;
     for(int i = 0 ; i < list.length() ; i++)
     {
@@ -271,10 +275,9 @@ void RecipesUI::okbtn_clicked()
             ItemList* processd_il = recipesProcess(list[i].itemName.toStdString().c_str(), rpl[i].comboBox->currentText().toStdString().c_str(), rpl[i].slider->value());
             if(processd_il)
             {
-                ItemList* il = il_info_get_item_list();
-                item_list_add_item(&il, -rpl[i].slider->value(), (char*)list[i].itemName.toStdString().c_str(), 
+                item_list_add_item(&ilr, -rpl[i].slider->value(), (char*)list[i].itemName.toStdString().c_str(), 
                 _("\"Delete\" %d items from material list combiner."));
-                item_list_delete_zero_item(&il);
+                item_list_delete_zero_item(&ilr);
                 new_il = processd_il;
             }
         }
@@ -285,9 +288,8 @@ void RecipesUI::okbtn_clicked()
     }
     else
     {
-        ItemList* il = il_info_get_item_list();
-        item_list_combine(&il, new_il);
-        il_info_update_item_list(il);
+        item_list_combine(&ilr, new_il);
+        il_info_update_item_list(ilr, oil);
         item_list_free(new_il);
     }
     this->close();

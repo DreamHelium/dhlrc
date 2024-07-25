@@ -1,4 +1,4 @@
-/*  il_info - item list info struct
+/*  region - Region Structure
     Copyright (C) 2024 Dream Helium
     This file is part of litematica_reader_c.
 
@@ -15,25 +15,24 @@
     You should have received a copy of the GNU Lesser General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>. */
 
-#ifndef IL_INFO_H
-#define IL_INFO_H
+#ifndef REGION_H
+#define REGION_H
 
-#include "dhlrc_list.h"
+#include <glib.h>
 
-G_BEGIN_DECLS
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-guint il_info_list_get_length();
-void il_info_list_set_id(guint id);
-guint il_info_list_get_id();
-void il_info_list_free();
-void il_info_new(ItemList* il, GDateTime* time, const gchar* description);
-ItemList* il_info_get_item_list();
-GDateTime* il_info_get_time();
-gchar* il_info_get_description();
-void il_info_update_item_list(ItemList* il, ItemList* oil);
-gboolean il_info_list_remove_item(guint id);
-void il_info_unlock();
+typedef struct _Region Region;
 
-G_END_DECLS
 
-#endif /* IL_INFO_H */
+
+
+
+#ifdef __cplusplus
+}
+#endif
+
+
+#endif /* REGION_H */
