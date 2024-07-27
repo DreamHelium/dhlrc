@@ -5,21 +5,12 @@
 #include <qlist.h>
 #include "../translation.h"
 #include "../litematica_region.h"
+#include "../region.h"
 
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class BlockListUI; }
 QT_END_NAMESPACE
-
-typedef struct Block{
-    quint64 id;
-    QString idName;
-    QString trName;
-    int x;
-    int y;
-    int z;
-    quint32 palette;
-} Block;
 
 class BlockListUI : public QWidget
 {
@@ -31,7 +22,7 @@ public:
 
 private:
     Ui::BlockListUI *ui;
-    QList<Block*> list;
+    Region* region;
     void setList(LiteRegion* lr);
     void drawList();
 

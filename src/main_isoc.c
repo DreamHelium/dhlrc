@@ -79,7 +79,7 @@ int main_isoc(int argc, char** argv)
     printf("You are in debug mode! Don't define \"DH_DEBUG_IN_IDE\" to use the normal program!\n");
     printf("Anyway, enter 3 in the following program (if success reading file) to enter debug function. \n\n");
     if(!data)
-        data = (uint8_t*)dh_ReadFile("/path/to/litematic",&size);
+        data = (uint8_t*)dh_read_file("/path/to/litematic",&size);
 #endif
     if(!data)
     {
@@ -127,6 +127,9 @@ static enum option start_without_option()
     DhIntValidator* validator = dh_int_validator_new(0, 2);
     DhArgInfo* arg = dh_arg_info_new();
     dh_arg_info_add_arg(arg, 'q', "quit", N_("Quit application"));
+    #ifdef DH_DEBUG_IN_IDE
+    dh_arg_info_add_arg(arg, 'd', "debug", "Enter debug mode");
+    #endif
     GValue val = {0};
     dh_out_read_and_output(out, N_("Please select an option, or enter 'q' to exit the program (q): "), "dhlrc"
     , arg, DH_VALIDATOR(validator), FALSE, &val);
@@ -136,7 +139,14 @@ static enum option start_without_option()
     
     if(G_VALUE_HOLDS_INT64(&val))
         return g_value_get_int64(&val);
-    else return Exit;
+    else
+#ifdef DH_DEBUG_IN_IDE
+    if(G_VALUE_HOLDS_CHAR(&val))
+        if(g_value_get_schar(&val) == 'd')
+            return Debug;
+    else
+#endif
+        return Exit;
 }
 
 static int start_func(NBT *root, enum option opt)

@@ -5,6 +5,12 @@
 
 static bool ignoreAir = false;
 
+static gboolean find_block(gconstpointer a, gconstpointer b)
+{
+    BlockInfo* info = (BlockInfo*)a;
+    return g_str_equal(info->id_name, b);
+}
+
 BlockListUI::BlockListUI(LiteRegion* lr, QWidget *parent)
     : QWidget(parent),
     ui(new Ui::BlockListUI)
@@ -19,51 +25,39 @@ BlockListUI::BlockListUI(LiteRegion* lr, QWidget *parent)
 BlockListUI::~BlockListUI()
 {
     delete ui;
-    for(int i = 0; i < list.length() ; i++)
-    {
-        delete list[i];
-    }
+    region_free(region);
 }
 
 void BlockListUI::setList(LiteRegion* lr)
 {
-    for(int y = 0 ; y < lr->region_size.y ; y++)
+    region = region_new_from_lite_region(lr);
+    if(ignoreAir)
     {
-        for(int z = 0 ; z < lr->region_size.z ; z++)
+        bool not_found = false;
+        do 
         {
-            for(int x = 0; x < lr->region_size.x ; x++)
-            {
-                Block* block = new Block();
-                block->id = lite_region_block_index(lr, x, y, z);
-                block->palette = lite_region_block_id(lr, block->id);
-                if(block->palette == 0 && ignoreAir )
-                {
-                    delete block;
-                    continue;
-                }
-                block->x = x;
-                block->y = y;
-                block->z = z;
-                block->idName = lr->replaced_blocks->val[block->palette];
-                block->trName = trm(block->idName.toStdString().c_str());
-                list.append(block);
-            }
-        }
+            guint index = 0;
+            bool found = g_ptr_array_find_with_equal_func(region->block_info_array, "minecraft:air", find_block, &index);
+            if(found)
+                g_ptr_array_remove_index(region->block_info_array, index);
+            else not_found = true;
+        }while (!not_found);
     }
 }
 
 void BlockListUI::drawList()
 {
-    ui->tableWidget->setRowCount(list.length());
-    for(int i = 0 ; i < list.length() ; i++)
+    ui->tableWidget->setRowCount(region->block_info_array->len);
+    for(int i = 0 ; i < region->block_info_array->len ; i++)
     {
-        QTableWidgetItem* item0 = new QTableWidgetItem(QString::number(list[i]->id));
-        QTableWidgetItem* item1 = new QTableWidgetItem(list[i]->idName);
-        QTableWidgetItem* item2 = new QTableWidgetItem(list[i]->trName);
-        QTableWidgetItem* item3 = new QTableWidgetItem(QString::number(list[i]->x));
-        QTableWidgetItem* item4 = new QTableWidgetItem(QString::number(list[i]->y));
-        QTableWidgetItem* item5 = new QTableWidgetItem(QString::number(list[i]->z));
-        QTableWidgetItem* item6 = new QTableWidgetItem(QString::number(list[i]->palette));
+        BlockInfo* info = (BlockInfo*)region->block_info_array->pdata[i];
+        QTableWidgetItem* item0 = new QTableWidgetItem(QString::number(info->index));
+        QTableWidgetItem* item1 = new QTableWidgetItem(info->id_name);
+        QTableWidgetItem* item2 = new QTableWidgetItem(trm(info->id_name));
+        QTableWidgetItem* item3 = new QTableWidgetItem(QString::number(info->pos->x));
+        QTableWidgetItem* item4 = new QTableWidgetItem(QString::number(info->pos->y));
+        QTableWidgetItem* item5 = new QTableWidgetItem(QString::number(info->pos->z));
+        QTableWidgetItem* item6 = new QTableWidgetItem(QString::number(info->palette));
         ui->tableWidget->setItem(i, 0, item0);
         ui->tableWidget->setItem(i, 1, item1);
         ui->tableWidget->setItem(i, 2, item2);

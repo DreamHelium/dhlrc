@@ -37,7 +37,7 @@ long* num_array_get_from_input(int* array_num, int max_num)
     if(!array_num) return NULL;
     DhOut* out = dh_out_new();
     DhIntArrayValidator* validator = dh_int_array_validator_new();
-    dh_int_array_validator_add_range(validator, 0, max_num);
+    dh_int_array_validator_add_range(validator, 0, max_num - 1);
     dh_int_array_validator_set_split_str(validator, " ");
     dh_int_array_validator_set_allow_repeated(validator, FALSE);
     DhArgInfo* arg = dh_arg_info_new();

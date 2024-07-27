@@ -18,6 +18,7 @@
 #ifndef REGION_H
 #define REGION_H
 
+#include "litematica_region.h"
 #include <glib.h>
 
 #ifdef __cplusplus
@@ -26,9 +27,46 @@ extern "C" {
 
 typedef struct _Region Region;
 
+typedef struct Pos{
+    int x;
+    int y;
+    int z;
+} Pos;
 
+typedef Pos RegionSize;
 
+typedef struct BlockInfo{
+    int index;
+    Pos* pos;
+    char* id_name;
+    int palette;
+} BlockInfo;
 
+typedef struct Palette{
+    char* id_name;
+    DhStrArray* property_name;
+    DhStrArray* property_data;
+} Palette;
+
+/** Just like `GPtrArray<BlockInfo>` */
+typedef GPtrArray BlockInfoArray;
+/** Just like `GPtrArray<Palette>` */
+typedef GPtrArray PaletteArray;
+/** Just like `GList<Region>` */
+typedef GList RegionInfo;
+
+typedef struct _Region
+{
+    /** The size of region */
+    RegionSize* region_size;
+    /** The block info array */
+    BlockInfoArray* block_info_array;
+    /** The Palette info array*/
+    PaletteArray* palette_array;
+} Region;
+
+Region* region_new_from_lite_region(LiteRegion* lr);
+void region_free(Region* region);
 
 #ifdef __cplusplus
 }
