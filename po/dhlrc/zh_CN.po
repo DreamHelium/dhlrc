@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-07-25 23:50+0800\n"
-"PO-Revision-Date: 2024-07-25 23:49+0800\n"
+"POT-Creation-Date: 2024-07-28 19:26+0800\n"
+"PO-Revision-Date: 2024-07-28 19:28+0800\n"
 "Last-Translator: dream_he\n"
 "Language-Team: Chinese <kde-i18n-doc@kde.org>\n"
 "Language: zh_CN\n"
@@ -95,16 +95,16 @@ msgstr ""
 msgid "Quit application"
 msgstr "退出程序"
 
-#: src/main_isoc.c:131
+#: src/main_isoc.c:134
 msgid "Please select an option, or enter 'q' to exit the program (q): "
 msgstr "请选择一个选项，或输入 “q” 退出程序 (q): "
 
-#: src/main_isoc.c:170 src/lrc_extend.c:42 src/qt/processui.cpp:41
+#: src/main_isoc.c:180 src/lrc_extend.c:42 src/qt/processui.cpp:41
 #, c-format
 msgid "There are %d regions:\n"
 msgstr "有 %d 个区域：\n"
 
-#: src/main_isoc.c:183
+#: src/main_isoc.c:193
 #, c-format
 msgid "Processing: region %d / %d : [%ld] %s"
 msgstr ""
@@ -255,11 +255,11 @@ msgstr ""
 
 #: src/recipe_util.c:44
 msgid "Choose all numbers"
-msgstr ""
+msgstr "选择所有数字"
 
 #: src/recipe_util.c:47
 msgid "Please enter numbers or option: "
-msgstr ""
+msgstr "请输入数字或选项："
 
 #: src/dhlrc_list.c:330
 #, c-format
@@ -343,13 +343,13 @@ msgid "Config &settings"
 msgstr "设定设置 (&S)"
 
 #: src/qt/mainwindow.cpp:48 src/qt/ilchooseui.cpp:38 src/qt/processui.cpp:56
-#: src/qt/recipesui.cpp:214 src/qt/regionselectui.cpp:41
+#: src/qt/recipesui.cpp:229 src/qt/regionselectui.cpp:41
 #: src/qt/nbtselectui.cpp:42
 msgid "&OK"
 msgstr "确定(&O)"
 
 #: src/qt/mainwindow.cpp:48 src/qt/ilchooseui.cpp:39 src/qt/processui.cpp:57
-#: src/qt/recipesui.cpp:215 src/qt/regionselectui.cpp:42
+#: src/qt/recipesui.cpp:230 src/qt/regionselectui.cpp:42
 #: src/qt/nbtselectui.cpp:43
 msgid "&Close"
 msgstr "关闭(&C)"
@@ -506,49 +506,53 @@ msgstr ""
 msgid "The pattern is:"
 msgstr ""
 
-#: src/qt/recipesui.cpp:67
+#: src/qt/recipesui.cpp:68
 msgid "No recipe file found!"
 msgstr "找不到配方！"
 
-#: src/qt/recipesui.cpp:68
+#: src/qt/recipesui.cpp:69
 msgid "No recipe file found! Do you want to extract game file?"
 msgstr "找不到配方！你想要解压游戏文件吗？"
 
-#: src/qt/recipesui.cpp:135
+#: src/qt/recipesui.cpp:136
 msgid "Please select items:"
 msgstr "请选择物品："
 
-#: src/qt/recipesui.cpp:158
+#: src/qt/recipesui.cpp:138
+msgid "Search block name"
+msgstr "搜索方块名称"
+
+#: src/qt/recipesui.cpp:164
 msgid "Show recipe"
 msgstr "展示配方"
 
-#: src/qt/recipesui.cpp:204
+#: src/qt/recipesui.cpp:219
 msgid "Combine items to this item list."
 msgstr "合并物品至此物品列表。"
 
-#: src/qt/recipesui.cpp:206
+#: src/qt/recipesui.cpp:221
 msgid "New item list name:"
 msgstr "新的物品列表名字："
 
-#: src/qt/recipesui.cpp:207
+#: src/qt/recipesui.cpp:222
 msgid "Generated from material list combiner."
 msgstr "从材料列表合成器生成。"
 
-#: src/qt/recipesui.cpp:279
+#: src/qt/recipesui.cpp:295
 #, c-format
 msgid "\"Delete\" %d items from material list combiner."
 msgstr "从材料列表合成器\"删除\"%d物品。"
 
-#: src/qt/recipesui.cpp:309
+#: src/qt/recipesui.cpp:325
 msgid "Mod decide"
 msgstr "余数决定"
 
-#: src/qt/recipesui.cpp:309
+#: src/qt/recipesui.cpp:325
 #, c-format
 msgid "There's a remainder with %d and %d, continue?"
 msgstr "%d除以%d有余数，继续？"
 
-#: src/qt/recipesui.cpp:333
+#: src/qt/recipesui.cpp:349
 #, c-format
 msgid "Add %d items from material list combiner."
 msgstr "从材料列表合成器添加%d物品。"
@@ -564,6 +568,14 @@ msgstr "追踪信息如下：\n"
 #: src/qt/nbtselectui.cpp:21
 msgid "Please select a NBT:"
 msgstr "请选择一个NBT："
+
+#: src/qt/blocklistui.cpp:22
+msgid "Ignore Air?"
+msgstr "忽略空气？"
+
+#: src/qt/blocklistui.cpp:22
+msgid "Do you want to ignore air?"
+msgstr "您想要忽略空气吗？"
 
 #, c-format
 #~ msgid ""
@@ -723,3 +735,4 @@ msgstr "请选择一个NBT："
 #~ "another region, enter 'q' to exit the program (b): "
 #~ msgstr ""
 #~ "请再次输入方块的坐标，或输入 “b” 选择其他区域，输入 “q” 退出程序 (b): "
+

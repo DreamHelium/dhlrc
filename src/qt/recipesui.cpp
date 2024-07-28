@@ -15,6 +15,7 @@
 #include <qnamespace.h>
 #include "../translation.h"
 #include "../recipe_class_ng/recipes_general.h"
+#include "glibconfig.h"
 #include "mainwindow.h"
 #include "recipesshowui.h"
 #include "ilchooseui.h"
@@ -133,10 +134,15 @@ void RecipesUI::initUI()
     al->addWidget(area);
 
     label1 = new QLabel(_("Please select items:"));
+    lineedit = new QLineEdit();
+    lineedit->setPlaceholderText(_("Search block name"));
     allLayout = new QVBoxLayout(widget);
     widget->setLayout(allLayout);
 
+    QObject::connect(lineedit, &QLineEdit::textChanged, this, &RecipesUI::search_text_changed);
+
     allLayout->addWidget(label1);
+    allLayout->addWidget(lineedit);
     allLayout->addStretch();
 
     area->setWidgetResizable(true);
@@ -170,7 +176,16 @@ void RecipesUI::initUI()
         rpl[i].textEdit->setValidator(validator);
         rpl[i].textEdit->setFixedWidth(50);
 
-        rpl[i].comboBox->addItems(list[i].filenames);
+        QStringList filenamesStr;
+
+        for(int j = 0 ; j < list[i].filenames.length() ; j++)
+        {
+            QString filename = list[i].filenames[j];
+            QStringList splitNames = filename.split(G_DIR_SEPARATOR);
+            filenamesStr.append(splitNames[splitNames.length()-1]);
+        }
+        
+        rpl[i].comboBox->addItems(filenamesStr);
         auto view = rpl[i].comboBox->view();
         int maxWidth = 0;
         for(int j = 0 ; j < rpl[i].comboBox->count() ; j++)
@@ -258,7 +273,7 @@ void RecipesUI::recipesbtn_clicked()
             break;
         }
     }
-    RecipesShowUI* rsui = new RecipesShowUI(rpl[btnId].comboBox->currentText());
+    RecipesShowUI* rsui = new RecipesShowUI(list[btnId].filenames[rpl[btnId].comboBox->currentIndex()]);
     rsui->setAttribute(Qt::WA_DeleteOnClose);
     rsui->show();
 }
@@ -271,8 +286,9 @@ void RecipesUI::okbtn_clicked()
     {
         if(rpl[i].checkBox->isChecked())
         {
+            QString realFilename = list[i].filenames[rpl[i].comboBox->currentIndex()];
             /* Process Recipes */
-            ItemList* processd_il = recipesProcess(list[i].itemName.toStdString().c_str(), rpl[i].comboBox->currentText().toStdString().c_str(), rpl[i].slider->value());
+            ItemList* processd_il = recipesProcess(list[i].itemName.toStdString().c_str(), realFilename.toStdString().c_str(), rpl[i].slider->value());
             if(processd_il)
             {
                 item_list_add_item(&ilr, -rpl[i].slider->value(), (char*)list[i].itemName.toStdString().c_str(), 
@@ -357,5 +373,29 @@ void RecipesUI::afcb_clicked(bool checked)
     {
         des2->show();
         des2Edit->show();
+    }
+}
+
+void RecipesUI::search_text_changed(const QString &a)
+{
+    for(int i = 0 ; i < list.length() ; i++)
+    {
+        bool hide = true;
+        QString transName = trm(list[i].itemName.toStdString().c_str());
+        if(transName.contains(a) || list[i].itemName.contains(a))
+            hide = false;
+
+        if(hide)
+        {
+            rpl[i].checkBox->hide();
+            rpl[i].recipesWidget->hide();
+        }
+        else 
+        {
+            rpl[i].checkBox->show();
+            if(rpl[i].checkBox->isChecked())
+                rpl[i].recipesWidget->show();
+            else rpl[i].recipesWidget->hide();
+        }
     }
 }

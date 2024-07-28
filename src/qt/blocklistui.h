@@ -27,6 +27,7 @@ private:
     void drawList();
 
 private Q_SLOTS:
+    void textChanged_cb(const QString & str);
 
 };
 #endif // BLOCKLISTUI_H

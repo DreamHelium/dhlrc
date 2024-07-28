@@ -11,6 +11,7 @@
 #include <QPushButton>
 #include <QScrollArea>
 #include <qboxlayout.h>
+#include <qlineedit.h>
 #include <qwidget.h>
 #include "../dhlrc_list.h"
 
@@ -39,6 +40,7 @@ public:
 
 private:
     QLabel* label1;
+    QLineEdit* lineedit;
 
     rp* rpl = nullptr;
 
@@ -67,6 +69,7 @@ private Q_SLOTS:
     void text_changed(const QString &a);
     void recipesbtn_clicked();
     void afcb_clicked(bool checked);
+    void search_text_changed(const QString &a);
 
 protected:
     void resizeEvent(QResizeEvent* event);

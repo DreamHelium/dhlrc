@@ -19,6 +19,10 @@
 #include "dh_string_util.h"
 #include "litematica_region.h"
 
+/* TODO and maybe never do, since property can be too much */
+const char* property[] = {"", ""};
+const char* data[] = {"", ""};
+
 static void palette_free(gpointer mem);
 static void block_info_free(gpointer mem);
 
