@@ -3,6 +3,7 @@
 #include "../litematica_region.h"
 #include "blocklistui.h"
 #include <QValidator>
+#include <qapplication.h>
 #include <qnamespace.h>
 #include <qpushbutton.h>
 #include <QDebug>
@@ -10,6 +11,7 @@
 extern NBT* root;
 static int* regionSize;
 static LiteRegion* lr;
+static Region* region;
 
 BlockReaderUI::BlockReaderUI(quint32 i, QWidget *parent)
     : QWidget{parent}
@@ -21,6 +23,7 @@ BlockReaderUI::~BlockReaderUI()
 {
     free(regionSize);
     lite_region_free(lr);
+    region_free(region);
 }
 
 void BlockReaderUI::initUI(quint32 i)
@@ -29,6 +32,7 @@ void BlockReaderUI::initUI(quint32 i)
     regionSize = lite_region_size_array(root, i);
     qDebug() << regionSize[0] << regionSize[1] << regionSize[2];
     lr = lite_region_create(root, i);
+    region = region_new_from_lite_region(lr);
     layout = new QVBoxLayout();
     QString str = _("Please enter the coordination:");
     str += " (";
@@ -77,31 +81,53 @@ void BlockReaderUI::initUI(quint32 i)
     layout->addLayout(hLayoutIb);
     
     infoLabel = new QLabel("");
+    paletteLabel = new QLabel("");
     layout->addWidget(infoLabel);
+    layout->addWidget(paletteLabel);
     layout->addStretch();
 
     listBtn = new QPushButton(_("List blocks"));
-    okBtn = new QPushButton(_("&OK"));
     closeBtn = new QPushButton(_("&Close"));
     hLayoutBtn = new QHBoxLayout();
     hLayoutBtn->addStretch();
     hLayoutBtn->addWidget(listBtn);
-    hLayoutBtn->addWidget(okBtn);
     hLayoutBtn->addWidget(closeBtn);
     layout->addLayout(hLayoutBtn);
     this->setLayout(layout);
 
     QObject::connect(listBtn, &QPushButton::clicked, this, &BlockReaderUI::listBtn_clicked);
-    QObject::connect(okBtn, &QPushButton::clicked, this, &BlockReaderUI::okBtn_clicked);
     QObject::connect(closeBtn, &QPushButton::clicked, this, &BlockReaderUI::close);
+    QObject::connect(ib[0].inputLine, &QLineEdit::textChanged, this, &BlockReaderUI::textChanged_cb);
+    QObject::connect(ib[1].inputLine, &QLineEdit::textChanged, this, &BlockReaderUI::textChanged_cb);
+    QObject::connect(ib[2].inputLine, &QLineEdit::textChanged, this, &BlockReaderUI::textChanged_cb);
 }
 
-void BlockReaderUI::okBtn_clicked()
+void BlockReaderUI::textChanged_cb()
 {
-    int id = lite_region_block_id_xyz(lr, ib[0].inputLine->text().toUInt(), ib[1].inputLine->text().toUInt(), ib[2].inputLine->text().toUInt());
-    const char* blockName = trm(lr->blocks->val[id]);
-    QString str = QString::asprintf(_("The block is %s."), blockName);
-    infoLabel->setText(str);
+    if(ib[0].inputLine->text().length() != 0 && ib[1].inputLine->text().length() != 0 && ib[2].inputLine->text().length() != 0)
+    {
+        int index = lite_region_block_index(lr, ib[0].inputLine->text().toUInt(), ib[1].inputLine->text().toUInt(), ib[2].inputLine->text().toUInt());
+        BlockInfo* info = (BlockInfo*)region->block_info_array->pdata[index];
+        const char* blockName = info->id_name;
+        QString str = QString::asprintf(_("The block is %s (%s)."), trm(blockName), blockName);
+        infoLabel->setText(str);
+
+        QString paletteStr = _("The property info is:\n");
+        Palette* palette = (Palette*)region->palette_array->pdata[info->palette];
+        if(palette->property_data)
+        {
+            for(int j = 0 ; j < palette->property_data->num ; j++)
+            {
+                /* `tr()` is same as `gettext()` in this program...... */
+                paletteStr += tr(palette->property_name->val[j]);
+                paletteStr += ": ";
+                paletteStr += tr(palette->property_data->val[j]);
+                if(j != palette->property_name->num - 1)
+                    paletteStr += "\n";
+            }
+        }
+        paletteLabel->setText(paletteStr);
+    }
 }
 
 void BlockReaderUI::listBtn_clicked()

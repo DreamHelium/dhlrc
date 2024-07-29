@@ -85,9 +85,12 @@ void RecipesUI::recipesInit()
             destDir += "/extracted/";
             dh_file_create(destDir.toStdString().c_str(), FALSE);
             dhlrc_extract(originGameJar.toStdString().c_str(), destDir.toStdString().c_str());
+            QString sourceDir = destDir;
+            sourceDir += "/data/minecraft/recipes/";
             g_free(gameDir);
             g_free(version);
             g_free(cacheDir);
+            dh_file_copy_dir(sourceDir.toStdString().c_str(), recipeDir, G_FILE_COPY_NONE);
             rcl = recipe_list_init(recipeDir, ilr);
         }
     }

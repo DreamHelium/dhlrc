@@ -33,14 +33,14 @@ private:
     inputbox ib[3];
     QHBoxLayout* hLayoutIb;
     QLabel* infoLabel;
+    QLabel* paletteLabel;
     QPushButton* listBtn;
-    QPushButton* okBtn;
     QPushButton* closeBtn;
     QHBoxLayout* hLayoutBtn;
     void initUI(quint32 i);
 
 private Q_SLOTS:
-    void okBtn_clicked();
+    void textChanged_cb();
     void listBtn_clicked();
 };
 
