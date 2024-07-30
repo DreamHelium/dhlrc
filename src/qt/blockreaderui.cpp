@@ -49,7 +49,7 @@ void BlockReaderUI::initUI(quint32 i)
     /* x coordination */
     ib[0].label = new QLabel("x");
     ib[0].inputLine = new QLineEdit();
-    QValidator* vx = new QIntValidator(0, regionSize[0] - 1);
+    vx = new QIntValidator(0, regionSize[0] - 1);
     ib[0].inputLine->setValidator(vx);
     ib[0].vLayout = new QVBoxLayout();
     ib[0].vLayout->addWidget(ib[0].label);
@@ -58,7 +58,7 @@ void BlockReaderUI::initUI(quint32 i)
     /* y coordination */
     ib[1].label = new QLabel("y");
     ib[1].inputLine = new QLineEdit();
-    QValidator* vy = new QIntValidator(0, regionSize[1] - 1);
+    vy = new QIntValidator(0, regionSize[1] - 1);
     ib[1].inputLine->setValidator(vy);
     ib[1].vLayout = new QVBoxLayout();
     ib[1].vLayout->addWidget(ib[1].label);
@@ -67,7 +67,7 @@ void BlockReaderUI::initUI(quint32 i)
     /* z coordination */
     ib[2].label = new QLabel("z");
     ib[2].inputLine = new QLineEdit();
-    QValidator* vz = new QIntValidator(0, regionSize[2] - 1);
+    vz = new QIntValidator(0, regionSize[2] - 1);
     ib[2].inputLine->setValidator(vz);
     ib[2].vLayout = new QVBoxLayout();
     ib[2].vLayout->addWidget(ib[2].label);
@@ -104,29 +104,42 @@ void BlockReaderUI::initUI(quint32 i)
 
 void BlockReaderUI::textChanged_cb()
 {
-    if(ib[0].inputLine->text().length() != 0 && ib[1].inputLine->text().length() != 0 && ib[2].inputLine->text().length() != 0)
+    if(ib[0].inputLine->text().length() != 0 && 
+       ib[1].inputLine->text().length() != 0 && 
+       ib[2].inputLine->text().length() != 0)
     {
-        int index = lite_region_block_index(lr, ib[0].inputLine->text().toUInt(), ib[1].inputLine->text().toUInt(), ib[2].inputLine->text().toUInt());
-        BlockInfo* info = (BlockInfo*)region->block_info_array->pdata[index];
-        const char* blockName = info->id_name;
-        QString str = QString::asprintf(_("The block is %s (%s)."), trm(blockName), blockName);
-        infoLabel->setText(str);
-
-        QString paletteStr = _("The property info is:\n");
-        Palette* palette = (Palette*)region->palette_array->pdata[info->palette];
-        if(palette->property_data)
+        int pos = 0;
+        /* Since QIntValidator is not strict we need another determination */
+        QString xText = ib[0].inputLine->text();
+        QString yText = ib[1].inputLine->text();
+        QString zText = ib[2].inputLine->text();
+        if(vx->validate(xText, pos) == QValidator::Acceptable && 
+           vy->validate(yText, pos) == QValidator::Acceptable &&
+           vz->validate(zText, pos) == QValidator::Acceptable)
         {
-            for(int j = 0 ; j < palette->property_data->num ; j++)
+            int index = lite_region_block_index(lr, xText.toUInt(), yText.toUInt(), zText.toUInt());
+            BlockInfo* info = (BlockInfo*)region->block_info_array->pdata[index];
+            const char* blockName = info->id_name;
+            QString str = QString::asprintf(_("The block is %s (%s)."), trm(blockName), blockName);
+            infoLabel->setText(str);
+
+            QString paletteStr = _("The property info is:\n");
+            Palette* palette = (Palette*)region->palette_array->pdata[info->palette];
+            if(palette->property_data)
             {
-                /* `tr()` is same as `gettext()` in this program...... */
-                paletteStr += tr(palette->property_name->val[j]);
-                paletteStr += ": ";
-                paletteStr += tr(palette->property_data->val[j]);
-                if(j != palette->property_name->num - 1)
-                    paletteStr += "\n";
+                for(int j = 0 ; j < palette->property_data->num ; j++)
+                {
+                    /* `tr()` is same as `gettext()` in this program...... */
+                    paletteStr += tr(palette->property_name->val[j]);
+                    paletteStr += ": ";
+                    paletteStr += tr(palette->property_data->val[j]);
+                    if(j != palette->property_name->num - 1)
+                        paletteStr += "\n";
+                }
             }
+            paletteLabel->setText(paletteStr);
         }
-        paletteLabel->setText(paletteStr);
+        else infoLabel->setText(_("The input is not valid!"));
     }
 }
 

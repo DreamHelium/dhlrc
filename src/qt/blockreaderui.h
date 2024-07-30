@@ -6,6 +6,7 @@
 #include <QBoxLayout>
 #include <QLineEdit>
 #include <QPushButton>
+#include <qvalidator.h>
 
 namespace Ui {
 class ProcessUI;
@@ -37,6 +38,9 @@ private:
     QPushButton* listBtn;
     QPushButton* closeBtn;
     QHBoxLayout* hLayoutBtn;
+    QValidator* vx;
+    QValidator* vy;
+    QValidator* vz;
     void initUI(quint32 i);
 
 private Q_SLOTS:
