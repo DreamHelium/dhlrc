@@ -16,6 +16,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>. */
 
 #include "dhlrc_list.h"
+#include "download_file.h"
 #include "main.h"
 #include "translation.h"
 #include <dhutil.h>
@@ -72,6 +73,9 @@ int main_isoc(int argc, char** argv)
         return -1;
     }
 #endif
+    gchar* cache_dir = dh_get_cache_dir();
+    g_message("%d", dh_download_version_manifest(cache_dir));
+    g_free(cache_dir);
     int size = 0;
     uint8_t* data = NULL;
     data = (uint8_t*)dh_read_file(argv[1],&size);
