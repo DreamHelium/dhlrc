@@ -22,7 +22,8 @@
 
 G_BEGIN_DECLS
 
-gboolean dh_download_version_manifest(const char* dir);
+gboolean dh_download_version_manifest(const char* dir, GFileProgressCallback callback);
+void dh_file_progress_callback(goffset current, goffset total, gpointer data);
 
 G_END_DECLS
 

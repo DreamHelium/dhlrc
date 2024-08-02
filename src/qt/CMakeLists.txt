@@ -32,6 +32,7 @@ set(PROJECT_SOURCES
         configui.h configui.cpp configui.ui
         nbtselectui.h nbtselectui.cpp
         blocklistui.cpp blocklistui.h blocklistui.ui
+        nbtreaderui.cpp nbtreaderui.h nbtreaderui.ui
         processui.h processui.cpp
         ilreaderui.h ilreaderui.cpp
 )

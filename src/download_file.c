@@ -16,8 +16,20 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>. */
 
 #include "download_file.h"
+#include <inttypes.h>
+#include <stdio.h>
 
-gboolean dh_download_version_manifest(const char *dir)
+gboolean dh_download_version_manifest(const char *dir, GFileProgressCallback callback)
 {
-    return dh_file_download_file("https://launchermeta.mojang.com/mc/game/version_manifest.json", dir, G_FILE_COPY_OVERWRITE);
+    return dh_file_download_full_arg("https://launchermeta.mojang.com/mc/game/version_manifest.json", dir, G_FILE_COPY_OVERWRITE
+                                     , NULL, callback, "Version Manifest", NULL);
+}
+
+void dh_file_progress_callback(goffset current, goffset total, gpointer data)
+{
+    char* description = data;
+    double percentage = (double)current / total * 100;
+
+    fprintf(stderr, "[%.2f%%] Copying %s."" (%"PRId64"/%"PRId64").\r", percentage, description, current, total);
+    if(current == total) fprintf(stderr, "\n");
 }

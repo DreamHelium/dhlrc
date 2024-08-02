@@ -15,8 +15,10 @@
 #include <qmessagebox.h>
 #include <qnamespace.h>
 #include <string>
+#include "glibconfig.h"
 #include "ilchooseui.h"
 #include "ilreaderui.h"
+#include "nbtreaderui.h"
 #include "nbtselectui.h"
 #include "processui.h"
 #include "recipesui.h"
@@ -26,12 +28,16 @@
 #include "ui_mainwindow.h"
 #include <QMimeData>
 #include <QInputDialog>
+#include <QProgressDialog>
 #include "../il_info.h"
+#include <cinttypes>
+#include "../download_file.h"
 
 NBT* root = nullptr;
 int regionNum = 0;
 static bool nbtRead = false;
 int verbose_level;
+
 
 static QString title = N_("Litematica reader");
 static QString subtitle = N_("The functions are listed below:");
@@ -47,14 +53,18 @@ static QStringList funcs = {
     N_("Config &settings")};
 static QStringList buttonList = {N_("&OK") , N_("&Close")};
 
+static MainWindow* mw;
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
     translation_init();
     ui->setupUi(this);
+    mw = this;
     ui->widget->hide();
     initSignalSlots();
+    pd.setWindowTitle("Downloading file ...");
 }
 
 MainWindow::~MainWindow()
@@ -75,6 +85,13 @@ void MainWindow::openAction_triggered()
     }
 }
 
+static void mw_download_progress(goffset cur, goffset total, gpointer data)
+{
+    mw->pd.setMaximum(total);
+    mw->pd.setValue(cur);
+    mw->pd.setLabelText(QString::asprintf("Copying %s.""(%" PRId64"/%" PRId64").", (char*)data, cur, total));
+}
+
 void MainWindow::initSignalSlots()
 {
     QObject::connect(ui->openAction, &QAction::triggered, this, &MainWindow::openAction_triggered);
@@ -89,6 +106,9 @@ void MainWindow::initInternalUI()
     {
         nbtRead = true;
         ui->widget->show();
+        gchar* cacheDir = dh_get_cache_dir();
+        dh_download_version_manifest(cacheDir, mw_download_progress);
+        g_free(cacheDir);
         QObject::connect(ui->okBtn, SIGNAL(clicked()), this, SLOT(okBtn_clicked()));
     }
 }
@@ -151,6 +171,12 @@ void MainWindow::okBtn_clicked()
             }
             else QMessageBox::critical(this, _("Error!"), _("The item list is locked!"));;
         }
+    }
+    else if(ui->nbtReaderBtn->isChecked())
+    {
+        NbtReaderUI* nrui = new NbtReaderUI();
+        nrui->setAttribute(Qt::WA_DeleteOnClose);
+        nrui->show();
     }
 }
 

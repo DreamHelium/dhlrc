@@ -9,6 +9,7 @@
 #include <QVBoxLayout>
 #include <QDateTime>
 #include <qevent.h>
+#include <qprogressdialog.h>
 #include "../translation.h"
 
 QT_BEGIN_NAMESPACE
@@ -22,13 +23,15 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+    QProgressDialog pd = QProgressDialog(this, Qt::Dialog);
 
 private:
     Ui::MainWindow *ui;
-
+    
     void initSignalSlots();
     void initInternalUI();
     void readNbtFile(QString filename);
+    
 
 protected:
     void virtual dragEnterEvent(QDragEnterEvent* event);

@@ -74,7 +74,7 @@ int main_isoc(int argc, char** argv)
     }
 #endif
     gchar* cache_dir = dh_get_cache_dir();
-    g_message("%d", dh_download_version_manifest(cache_dir));
+    dh_download_version_manifest(cache_dir, dh_file_progress_callback);
     g_free(cache_dir);
     int size = 0;
     uint8_t* data = NULL;
