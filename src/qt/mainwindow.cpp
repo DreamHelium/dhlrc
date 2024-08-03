@@ -11,6 +11,7 @@
 #include <dhutil.h>
 #include <qcontainerfwd.h>
 #include <qevent.h>
+#include <qinputdialog.h>
 #include <qlineedit.h>
 #include <qmessagebox.h>
 #include <qnamespace.h>
@@ -32,6 +33,7 @@
 #include "../il_info.h"
 #include <cinttypes>
 #include "../download_file.h"
+#include "../region.h"
 
 NBT* root = nullptr;
 int regionNum = 0;
@@ -177,6 +179,13 @@ void MainWindow::okBtn_clicked()
         NbtReaderUI* nrui = new NbtReaderUI();
         nrui->setAttribute(Qt::WA_DeleteOnClose);
         nrui->show();
+    }
+    else if(ui->generateButton->isChecked())
+    {
+        QString itemlistName = QInputDialog::getText(this, _("Input Item List Name."), _("Input new item list name."));
+        Region* region = region_new_from_nbt(root);
+        ItemList* new_il = item_list_new_from_region(region);
+        il_info_new(new_il, g_date_time_new_now_local(), itemlistName.toStdString().c_str());
     }
 }
 

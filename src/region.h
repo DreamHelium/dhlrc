@@ -66,6 +66,8 @@ typedef struct _Region
 } Region;
 
 Region* region_new_from_lite_region(LiteRegion* lr);
+Region* region_new_from_nbt(NBT* root);
+ItemList* item_list_new_from_region(Region* region);
 void region_free(Region* region);
 
 #ifdef __cplusplus

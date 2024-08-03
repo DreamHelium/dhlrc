@@ -40,7 +40,7 @@ static enum option start_without_option();
 static int start_func(NBT* root, enum option opt);
 static int start_lrc_main(NBT* root);
 #ifdef DH_DEBUG_IN_IDE
-int debug();
+static int debug(NBT* root);
 #endif
 
 extern gchar* log_filename;
@@ -166,7 +166,7 @@ static int start_func(NBT *root, enum option opt)
         return 0;
 #ifdef DH_DEBUG_IN_IDE
     case Debug:
-        return debug();
+        return debug(root);
 #endif
     case Exit:
         return 0;
@@ -214,11 +214,11 @@ static int start_lrc_main(NBT *root)
 
 #ifdef DH_DEBUG_IN_IDE
 
-#include "uncompress.h"
+#include "region.h"
 
-int debug()
+int debug(NBT* root)
 {
-    dhlrc_extract("/home/dream_he/.minecraft/versions/1.18.2/1.18.2.jar", "test");
+    Region* region = region_new_from_nbt(root);
     return 0;
 }
 
