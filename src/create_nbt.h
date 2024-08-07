@@ -1,5 +1,5 @@
-/*  nbt_litereader - nbt lite reader
-    Copyright (C) 2022 Dream Helium
+/*  create_nbt - Create own NBT sturcture
+    Copyright (C) 2024 Dream Helium
     This file is part of litematica_reader_c.
 
     This program is free software: you can redistribute it and/or modify
@@ -15,32 +15,20 @@
     You should have received a copy of the GNU Lesser General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>. */
 
-#ifndef NBT_LITEREADER_H
-#define NBT_LITEREADER_H
+#ifndef CREATE_NBT_H
+#define CREATE_NBT_H
 
+#include <glib-object.h>
 #include "libnbt/nbt.h"
-#include <dhutil.h>
-#include "nbt_pos.h"
 
 #ifdef __cplusplus
 extern "C"{
 #endif
 
-/** Just use this to start a reader instance.
- *  Please pass NULL in "parent" to start. */
-int         nbtlr_start(NBT* root);
-
-int         nbtlr_start_pos(NbtPos* pos);
-int         nbtlr_list(NBT* given_nbt, int read_next);
-int         nbtlr_list_item(NBT* given_nbt);
-NBT*        nbtlr_to_next_nbt(NBT* root, int n);
-int         nbtlr_save(NBT* root);
-
-void nbtlr_modifier_start(NBT* root, int modify_list, GValue* value);
-
+NBT* nbt_new(NBT_Tags tag, GValue* value, int len, const char* key);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // NBT_LITEREADER_H
+#endif

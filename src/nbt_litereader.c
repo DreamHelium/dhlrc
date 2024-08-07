@@ -27,9 +27,6 @@
 int nbtlr_instance(NBT* root, int from_parent, int modify_mode);
 int nbtlr_instance_ng(NbtPos* pos, int modify_mode);
 int nbtlr_Modifier_instance(NBT* root);
-int nbtlr_save(NBT* root);
-
-
 
 int nbtlr_start(NBT* root)
 {

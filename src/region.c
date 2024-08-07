@@ -16,6 +16,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>. */
     
 #include "region.h"
+#include "create_nbt.h"
 #include "dh_string_util.h"
 #include "libnbt/nbt.h"
 #include "litematica_region.h"
@@ -277,4 +278,63 @@ ItemList* item_list_new_from_region(Region* region)
 
     tmpitem_list_free(til);
     return oblock;
+}
+
+static NBT* size_nbt_new(Pos* pos)
+{
+    GValue val = {0};
+    g_value_init(&val, G_TYPE_INT64);
+    g_value_set_int64(&val, pos->x);
+    NBT* x = nbt_new(TAG_Int, &val, 0, NULL);
+    g_value_set_int64(&val, pos->y);
+    NBT* y = nbt_new(TAG_Int, &val, 0, NULL);
+    g_value_set_int64(&val, pos->z);
+    NBT* z = nbt_new(TAG_Int, &val, 0, NULL);
+    g_value_unset(&val);
+
+    x->next = y;
+    y->prev = x;
+    y->next = z;
+    z->prev = y;
+
+    g_value_init(&val, G_TYPE_POINTER);
+    g_value_set_pointer(&val, x);
+    NBT* ret = nbt_new(TAG_List, &val, 3, "size");
+    return ret;
+}
+
+static NBT* entities_nbt_new()
+{
+    GValue val = {0};
+    g_value_init(&val, G_TYPE_POINTER);
+    g_value_set_pointer(&val, NULL);
+    NBT* ret = nbt_new(TAG_List, &val, 0, "entities");
+    return ret;
+}
+
+static NBT* data_version_nbt_new(gint64 version)
+{
+    GValue val = {0};
+    g_value_init(&val, G_TYPE_INT64);
+    g_value_set_int64(&val, version);
+    NBT* ret = nbt_new(TAG_Int, &val, 0, "DataVersion");
+    return ret;
+}
+
+NBT* nbt_new_from_region(Region* region)
+{
+    /* First is size */
+    NBT* size_nbt = size_nbt_new(region->region_size);
+    /* Second is entities */
+    NBT* entities_nbt = entities_nbt_new();
+    size_nbt->next = entities_nbt;
+    entities_nbt->prev = size_nbt;
+
+    
+    /* Cover cover */
+    GValue val = {0};
+    g_value_init(&val, G_TYPE_POINTER);
+    g_value_set_pointer(&val, size_nbt);
+    NBT* ret = nbt_new(TAG_Compound, &val, 5, NULL);
+    return ret;
 }
