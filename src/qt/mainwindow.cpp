@@ -23,6 +23,7 @@
 #include "nbtselectui.h"
 #include "processui.h"
 #include "recipesui.h"
+#include "regionchooseui.h"
 #include "regionselectui.h"
 #include "blockreaderui.h"
 #include "configui.h"
@@ -34,9 +35,11 @@
 #include <cinttypes>
 #include "../download_file.h"
 #include "../region.h"
+#include "../region_info.h"
 
 NBT* root = nullptr;
 int regionNum = 0;
+Region* region = nullptr;
 static bool nbtRead = false;
 int verbose_level;
 
@@ -182,10 +185,30 @@ void MainWindow::okBtn_clicked()
     }
     else if(ui->generateButton->isChecked())
     {
-        QString itemlistName = QInputDialog::getText(this, _("Input Item List Name."), _("Input new item list name."));
-        Region* region = region_new_from_nbt(root);
-        ItemList* new_il = item_list_new_from_region(region);
-        il_info_new(new_il, g_date_time_new_now_local(), itemlistName.toStdString().c_str());
+        RegionChooseUI* rcui = new RegionChooseUI();
+        rcui->setAttribute(Qt::WA_DeleteOnClose);
+        rcui->exec();
+        if(region)
+        {
+            QString itemlistName = QInputDialog::getText(this, _("Input Item List Name."), _("Input new item list name."));
+            Region* region = region_new_from_nbt(root);
+            ItemList* new_il = item_list_new_from_region(region);
+            il_info_new(new_il, g_date_time_new_now_local(), itemlistName.toStdString().c_str());
+        }
+    }
+    else if(ui->genRegionBtn->isChecked())
+    {
+        QString regionName = QInputDialog::getText(this, _("Input Region Name"),
+         _("Please input new region's name."));
+        Region* newRegion = nullptr;
+        if(lite_region_num(root))
+        {
+            /* TODO */
+            LiteRegion* lr = lite_region_create(root, 0);
+            newRegion = region_new_from_lite_region(lr);
+        }
+        else newRegion = region_new_from_nbt(root);
+        region_info_new(newRegion, g_date_time_new_now_local(), regionName.toStdString().c_str());
     }
 }
 

@@ -55,7 +55,7 @@ RecipesUI::~RecipesUI()
 {
     list.clear();
     delete[] rpl;
-    il_info_unlock();
+    il_info_unlock(ilr);
 }
 
 void RecipesUI::recipesInit()

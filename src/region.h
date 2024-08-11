@@ -52,8 +52,6 @@ typedef struct Palette{
 typedef GPtrArray BlockInfoArray;
 /** Just like `GPtrArray<Palette>` */
 typedef GPtrArray PaletteArray;
-/** Just like `GList<Region>` */
-typedef GList RegionInfo;
 
 typedef struct _Region
 {

@@ -17,6 +17,7 @@
 
 #include "dhlrc_list.h"
 #include "download_file.h"
+#include "libnbt/nbt.h"
 #include "main.h"
 #include "translation.h"
 #include <dhutil.h>
@@ -218,7 +219,15 @@ static int start_lrc_main(NBT *root)
 
 int debug(NBT* root)
 {
-    Region* region = region_new_from_nbt(root);
+    LiteRegion* lr = lite_region_create(root, 0);
+    if(lr)
+    {
+        Region* region = region_new_from_lite_region(lr);
+        NBT* new_nbt = nbt_new_from_region(region);
+        nbtlr_save(new_nbt);
+        region_free(region);
+        NBT_Free(new_nbt);
+    }
     return 0;
 }
 

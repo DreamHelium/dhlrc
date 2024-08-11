@@ -119,8 +119,9 @@ guint il_info_list_get_id()
     return list_id;
 }
 
-void il_info_unlock()
+void il_info_unlock(ItemList* il)
 {
-    IlInfo* info = g_list_nth_data(il_info_list, list_id);
+    GList* info_list = g_list_find_custom(il_info_list, il, illist_compare);
+    IlInfo* info = info_list->data;
     info->lock = FALSE;
 }

@@ -34,7 +34,7 @@ ilReaderUI::~ilReaderUI()
 {
     tableWidget->clearContents();
     delete[] ti;
-    il_info_unlock();
+    il_info_unlock(ilr);
 }
 
 void ilReaderUI::saveAction_triggered()

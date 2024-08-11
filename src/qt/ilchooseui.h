@@ -8,7 +8,7 @@
 #include <QRadioButton>
 #include <qbuttongroup.h>
 #include <qradiobutton.h>
-#include "mainwindow.h"
+#include <QLabel>
 
 class ilChooseUI : public QDialog
 {

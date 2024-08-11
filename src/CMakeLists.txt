@@ -62,6 +62,8 @@ add_library(dhlrc SHARED
 		   download_file.c
 		   create_nbt.h
 		   create_nbt.c
+		   region_info.c
+		   region_info.h
 	       recipe_class_ng/recipes_general.h
 	       recipe_class_ng/recipes_general.c
 	       recipe_class_ng/recipes_shaped.h

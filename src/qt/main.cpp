@@ -5,8 +5,6 @@
 #include <QApplication>
 #include <QTranslator>
 
-extern NBT* root;
-
 class SelfTranslator : public QTranslator
 {
 public:

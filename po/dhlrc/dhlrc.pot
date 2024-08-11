@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-07-28 19:39+0800\n"
+"POT-Creation-Date: 2024-08-12 03:58+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -61,19 +61,19 @@ msgstr ""
 msgid "file"
 msgstr ""
 
-#: src/main_isoc.c:86
+#: src/main_isoc.c:91
 msgid "Error when reading file."
 msgstr ""
 
-#: src/main_isoc.c:102
+#: src/main_isoc.c:107
 msgid "Not a valid NBT file!"
 msgstr ""
 
-#: src/main_isoc.c:108
+#: src/main_isoc.c:113
 msgid "Valid NBT file!"
 msgstr ""
 
-#: src/main_isoc.c:122
+#: src/main_isoc.c:127
 #, c-format
 msgid ""
 "There are three functions:\n"
@@ -83,95 +83,95 @@ msgid ""
 "\n"
 msgstr ""
 
-#: src/main_isoc.c:129 src/nbt_litereader.c:81 src/nbt_litereader.c:314
+#: src/main_isoc.c:134 src/nbt_litereader.c:78 src/nbt_litereader.c:311
 #: src/recipe_util.c:45
 msgid "Quit application"
 msgstr ""
 
-#: src/main_isoc.c:134
+#: src/main_isoc.c:139
 msgid "Please select an option, or enter 'q' to exit the program (q): "
 msgstr ""
 
-#: src/main_isoc.c:180 src/lrc_extend.c:42 src/qt/processui.cpp:41
+#: src/main_isoc.c:185 src/lrc_extend.c:42 src/qt/processui.cpp:41
 #, c-format
 msgid "There are %d regions:\n"
 msgstr ""
 
-#: src/main_isoc.c:193
+#: src/main_isoc.c:198
 #, c-format
 msgid "Processing: region %d / %d : [%ld] %s"
 msgstr ""
 
-#: src/nbt_litereader.c:61
+#: src/nbt_litereader.c:58
 #, c-format
 msgid ""
 "The detail of NBT \"%s\" is listed below:\n"
 "\n"
 msgstr ""
 
-#: src/nbt_litereader.c:82
+#: src/nbt_litereader.c:79
 msgid "Enter modification mode"
 msgstr ""
 
-#: src/nbt_litereader.c:83
+#: src/nbt_litereader.c:80
 msgid "Save NBT file"
 msgstr ""
 
-#: src/nbt_litereader.c:84
+#: src/nbt_litereader.c:81
 msgid "Enter upper instance"
 msgstr ""
 
-#: src/nbt_litereader.c:89
+#: src/nbt_litereader.c:86
 msgid ""
 "\n"
 "Please enter a number or choose option to continue [Q/m/s/e/?]: "
 msgstr ""
 
-#: src/nbt_litereader.c:93 src/nbt_litereader.c:101 src/nbt_litereader.c:313
+#: src/nbt_litereader.c:90 src/nbt_litereader.c:98 src/nbt_litereader.c:310
 msgid "Enter upper NBT"
 msgstr ""
 
-#: src/nbt_litereader.c:95
+#: src/nbt_litereader.c:92
 msgid ""
 "\n"
 "Please enter a number or choose option to continue [P/q/m/s/e/?]: "
 msgstr ""
 
-#: src/nbt_litereader.c:103
+#: src/nbt_litereader.c:100
 msgid ""
 "\n"
 "No deeper NBT, please choose option to continue [P/q/m/s/e/?]: "
 msgstr ""
 
-#: src/nbt_litereader.c:273 src/nbt_litereader.c:372
+#: src/nbt_litereader.c:270 src/nbt_litereader.c:369
 #, c-format
 msgid ""
 "\n"
 "Unsupported modification mode request, will exit to reading mode."
 msgstr ""
 
-#: src/nbt_litereader.c:315
+#: src/nbt_litereader.c:312
 msgid "Exit modification mode"
 msgstr ""
 
-#: src/nbt_litereader.c:321
+#: src/nbt_litereader.c:318
 msgid ""
 "\n"
 "Please enter an integer or choose an option [P/q/b/?]: "
 msgstr ""
 
-#: src/nbt_litereader.c:335
+#: src/nbt_litereader.c:332
 #, c-format
 msgid ""
 "\n"
 "The integer you input is %ld, please confirm [Y/n/?]:"
 msgstr ""
 
-#: src/nbt_litereader.c:337
+#: src/nbt_litereader.c:334
 msgid "Yes"
 msgstr ""
 
-#: src/nbt_litereader.c:338
+#: src/nbt_litereader.c:335
 msgid "No"
 msgstr ""
 
@@ -270,142 +270,158 @@ msgstr ""
 msgid "Override Version"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:36
+#: src/qt/mainwindow.cpp:47
 msgid "Litematica reader"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:37
+#: src/qt/mainwindow.cpp:48
 msgid "The functions are listed below:"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:38 src/qt/ilreaderui.cpp:24
+#: src/qt/mainwindow.cpp:49 src/qt/ilreaderui.cpp:24
 msgid "&File"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:38
+#: src/qt/mainwindow.cpp:49
 msgid "&Tool"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:40
+#: src/qt/mainwindow.cpp:51
 msgid "NBT s&elector"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:41
+#: src/qt/mainwindow.cpp:52
 msgid "&NBT lite reader with modifier"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:42
+#: src/qt/mainwindow.cpp:53
 msgid "Litematica material &list with recipe combination"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:43
+#: src/qt/mainwindow.cpp:54
 msgid "Litematica &block reader"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:44
+#: src/qt/mainwindow.cpp:55
 msgid "&Item list reader and modifier"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:45
+#: src/qt/mainwindow.cpp:56
 msgid "&Recipe combiner"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:46
+#: src/qt/mainwindow.cpp:57
 msgid "&Clear Item list"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:47
+#: src/qt/mainwindow.cpp:58
 msgid "Config &settings"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:48 src/qt/ilchooseui.cpp:38 src/qt/processui.cpp:56
-#: src/qt/recipesui.cpp:229 src/qt/regionselectui.cpp:41
+#: src/qt/mainwindow.cpp:59 src/qt/ilchooseui.cpp:38 src/qt/processui.cpp:56
+#: src/qt/recipesui.cpp:232 src/qt/regionselectui.cpp:41
 #: src/qt/nbtselectui.cpp:42
 msgid "&OK"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:48 src/qt/ilchooseui.cpp:39 src/qt/processui.cpp:57
-#: src/qt/recipesui.cpp:230 src/qt/regionselectui.cpp:42
+#: src/qt/mainwindow.cpp:59 src/qt/ilchooseui.cpp:39 src/qt/processui.cpp:57
+#: src/qt/recipesui.cpp:233 src/qt/regionselectui.cpp:42
 #: src/qt/nbtselectui.cpp:43
 msgid "&Close"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:71
+#: src/qt/mainwindow.cpp:86
 msgid "Select a file"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:71
+#: src/qt/mainwindow.cpp:86
 msgid "Litematic file (*.litematic)"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:111 src/qt/mainwindow.cpp:135
-#: src/qt/mainwindow.cpp:152 src/qt/mainwindow.cpp:225
-#: src/qt/mainwindow.cpp:227 src/qt/ilreaderui.cpp:110 src/qt/ilchooseui.cpp:64
+#: src/qt/mainwindow.cpp:136 src/qt/mainwindow.cpp:160
+#: src/qt/mainwindow.cpp:177 src/qt/mainwindow.cpp:283
+#: src/qt/mainwindow.cpp:285 src/qt/ilreaderui.cpp:110 src/qt/ilchooseui.cpp:64
 msgid "Error!"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:111
+#: src/qt/mainwindow.cpp:136
 msgid "No selected region!"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:135 src/qt/mainwindow.cpp:152
-#: src/qt/mainwindow.cpp:225 src/qt/ilreaderui.cpp:110
+#: src/qt/mainwindow.cpp:160 src/qt/mainwindow.cpp:177
+#: src/qt/mainwindow.cpp:283 src/qt/ilreaderui.cpp:110
 msgid "The item list is locked!"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:166
+#: src/qt/mainwindow.cpp:193
+msgid "Input Item List Name."
+msgstr ""
+
+#: src/qt/mainwindow.cpp:193
+msgid "Input new item list name."
+msgstr ""
+
+#: src/qt/mainwindow.cpp:201
+msgid "Input Region Name"
+msgstr ""
+
+#: src/qt/mainwindow.cpp:202
+msgid "Please input new region's name."
+msgstr ""
+
+#: src/qt/mainwindow.cpp:224
 msgid "Multi files detected!"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:166
+#: src/qt/mainwindow.cpp:224
 msgid "This program doesn't support multi files!"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:182
+#: src/qt/mainwindow.cpp:240
 msgid "Add NBT File"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:182
+#: src/qt/mainwindow.cpp:240
 msgid "Do you want to add this NBT file to the list?"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:185
+#: src/qt/mainwindow.cpp:243
 msgid "Set NBT Info Description"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:185
+#: src/qt/mainwindow.cpp:243
 msgid "Please enter description"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:185
+#: src/qt/mainwindow.cpp:243
 msgid "Added from reading file"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:194
+#: src/qt/mainwindow.cpp:252
 msgid "Set NBT File"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:194
+#: src/qt/mainwindow.cpp:252
 msgid "Do you want to set this NBT file as default?"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:203
+#: src/qt/mainwindow.cpp:261
 msgid "Not a valid file!"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:203
+#: src/qt/mainwindow.cpp:261
 msgid "This file is not a valid NBT file!"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:227
+#: src/qt/mainwindow.cpp:285
 msgid "No item list!"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:238
+#: src/qt/mainwindow.cpp:296
 msgid "No NBT File!"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:238
+#: src/qt/mainwindow.cpp:296
 msgid "No NBT file loaded!"
 msgstr ""
 
@@ -490,45 +506,45 @@ msgstr ""
 msgid "No recipe file found! Do you want to extract game file?"
 msgstr ""
 
-#: src/qt/recipesui.cpp:136
+#: src/qt/recipesui.cpp:139
 msgid "Please select items:"
 msgstr ""
 
-#: src/qt/recipesui.cpp:138
+#: src/qt/recipesui.cpp:141
 msgid "Search block name"
 msgstr ""
 
-#: src/qt/recipesui.cpp:164
+#: src/qt/recipesui.cpp:167
 msgid "Show recipe"
 msgstr ""
 
-#: src/qt/recipesui.cpp:219
+#: src/qt/recipesui.cpp:222
 msgid "Combine items to this item list."
 msgstr ""
 
-#: src/qt/recipesui.cpp:221
+#: src/qt/recipesui.cpp:224
 msgid "New item list name:"
 msgstr ""
 
-#: src/qt/recipesui.cpp:222
+#: src/qt/recipesui.cpp:225
 msgid "Generated from material list combiner."
 msgstr ""
 
-#: src/qt/recipesui.cpp:295
+#: src/qt/recipesui.cpp:298
 #, c-format
 msgid "\"Delete\" %d items from material list combiner."
 msgstr ""
 
-#: src/qt/recipesui.cpp:325
+#: src/qt/recipesui.cpp:328
 msgid "Mod decide"
 msgstr ""
 
-#: src/qt/recipesui.cpp:325
+#: src/qt/recipesui.cpp:328
 #, c-format
 msgid "There's a remainder with %d and %d, continue?"
 msgstr ""
 
-#: src/qt/recipesui.cpp:349
+#: src/qt/recipesui.cpp:352
 #, c-format
 msgid "Add %d items from material list combiner."
 msgstr ""

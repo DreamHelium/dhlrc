@@ -31,6 +31,7 @@ set(PROJECT_SOURCES
         showtrackui.h
         configui.h configui.cpp configui.ui
         nbtselectui.h nbtselectui.cpp
+        regionchooseui.h regionchooseui.cpp
         blocklistui.cpp blocklistui.h blocklistui.ui
         nbtreaderui.cpp nbtreaderui.h nbtreaderui.ui
         processui.h processui.cpp

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-07-28 19:26+0800\n"
+"POT-Creation-Date: 2024-08-12 03:57+0800\n"
 "PO-Revision-Date: 2024-07-28 19:28+0800\n"
 "Last-Translator: dream_he\n"
 "Language-Team: Chinese <kde-i18n-doc@kde.org>\n"
@@ -63,19 +63,19 @@ msgstr "目录"
 msgid "file"
 msgstr "文件"
 
-#: src/main_isoc.c:86
+#: src/main_isoc.c:91
 msgid "Error when reading file."
 msgstr "在读取文件时出错。"
 
-#: src/main_isoc.c:102
+#: src/main_isoc.c:107
 msgid "Not a valid NBT file!"
 msgstr "不是一个有效的NBT文件！"
 
-#: src/main_isoc.c:108
+#: src/main_isoc.c:113
 msgid "Valid NBT file!"
 msgstr "有效的NBT文件！"
 
-#: src/main_isoc.c:122
+#: src/main_isoc.c:127
 #, c-format
 msgid ""
 "There are three functions:\n"
@@ -90,26 +90,26 @@ msgstr ""
 "[2] 投影方块阅读器\n"
 "\n"
 
-#: src/main_isoc.c:129 src/nbt_litereader.c:81 src/nbt_litereader.c:314
+#: src/main_isoc.c:134 src/nbt_litereader.c:78 src/nbt_litereader.c:311
 #: src/recipe_util.c:45
 msgid "Quit application"
 msgstr "退出程序"
 
-#: src/main_isoc.c:134
+#: src/main_isoc.c:139
 msgid "Please select an option, or enter 'q' to exit the program (q): "
 msgstr "请选择一个选项，或输入 “q” 退出程序 (q): "
 
-#: src/main_isoc.c:180 src/lrc_extend.c:42 src/qt/processui.cpp:41
+#: src/main_isoc.c:185 src/lrc_extend.c:42 src/qt/processui.cpp:41
 #, c-format
 msgid "There are %d regions:\n"
 msgstr "有 %d 个区域：\n"
 
-#: src/main_isoc.c:193
+#: src/main_isoc.c:198
 #, c-format
 msgid "Processing: region %d / %d : [%ld] %s"
 msgstr ""
 
-#: src/nbt_litereader.c:61
+#: src/nbt_litereader.c:58
 #, c-format
 msgid ""
 "The detail of NBT \"%s\" is listed below:\n"
@@ -118,19 +118,19 @@ msgstr ""
 "NBT \"%s\" 的细节如下：\n"
 "\n"
 
-#: src/nbt_litereader.c:82
+#: src/nbt_litereader.c:79
 msgid "Enter modification mode"
 msgstr "进入修改模式"
 
-#: src/nbt_litereader.c:83
+#: src/nbt_litereader.c:80
 msgid "Save NBT file"
 msgstr "保存NBT文件"
 
-#: src/nbt_litereader.c:84
+#: src/nbt_litereader.c:81
 msgid "Enter upper instance"
 msgstr "进入上层实例"
 
-#: src/nbt_litereader.c:89
+#: src/nbt_litereader.c:86
 msgid ""
 "\n"
 "Please enter a number or choose option to continue [Q/m/s/e/?]: "
@@ -138,11 +138,11 @@ msgstr ""
 "\n"
 "请输入一个数字或选择选项以继续 [Q/m/s/e/?]： "
 
-#: src/nbt_litereader.c:93 src/nbt_litereader.c:101 src/nbt_litereader.c:313
+#: src/nbt_litereader.c:90 src/nbt_litereader.c:98 src/nbt_litereader.c:310
 msgid "Enter upper NBT"
 msgstr "进入上层NBT"
 
-#: src/nbt_litereader.c:95
+#: src/nbt_litereader.c:92
 msgid ""
 "\n"
 "Please enter a number or choose option to continue [P/q/m/s/e/?]: "
@@ -150,7 +150,7 @@ msgstr ""
 "\n"
 "请输入一个数字或选择选项以继续 [P/q/m/s/e/?]： "
 
-#: src/nbt_litereader.c:103
+#: src/nbt_litereader.c:100
 msgid ""
 "\n"
 "No deeper NBT, please choose option to continue [P/q/m/s/e/?]: "
@@ -158,7 +158,7 @@ msgstr ""
 "\n"
 "没有深层NBT，请选择选项以继续 [P/q/m/s/e/?]： "
 
-#: src/nbt_litereader.c:273 src/nbt_litereader.c:372
+#: src/nbt_litereader.c:270 src/nbt_litereader.c:369
 #, c-format
 msgid ""
 "\n"
@@ -167,28 +167,28 @@ msgstr ""
 "\n"
 "不支持的修改模式请求，将退回至阅读模式。"
 
-#: src/nbt_litereader.c:315
+#: src/nbt_litereader.c:312
 msgid "Exit modification mode"
 msgstr "退出修改模式"
 
-#: src/nbt_litereader.c:321
+#: src/nbt_litereader.c:318
 msgid ""
 "\n"
 "Please enter an integer or choose an option [P/q/b/?]: "
 msgstr ""
 
-#: src/nbt_litereader.c:335
+#: src/nbt_litereader.c:332
 #, c-format
 msgid ""
 "\n"
 "The integer you input is %ld, please confirm [Y/n/?]:"
 msgstr ""
 
-#: src/nbt_litereader.c:337
+#: src/nbt_litereader.c:334
 msgid "Yes"
 msgstr "是"
 
-#: src/nbt_litereader.c:338
+#: src/nbt_litereader.c:335
 msgid "No"
 msgstr "否"
 
@@ -294,142 +294,158 @@ msgstr "缓存目录"
 msgid "Override Version"
 msgstr "覆盖版本"
 
-#: src/qt/mainwindow.cpp:36
+#: src/qt/mainwindow.cpp:47
 msgid "Litematica reader"
 msgstr "投影文件阅读器"
 
-#: src/qt/mainwindow.cpp:37
+#: src/qt/mainwindow.cpp:48
 msgid "The functions are listed below:"
 msgstr "功能如下："
 
-#: src/qt/mainwindow.cpp:38 src/qt/ilreaderui.cpp:24
+#: src/qt/mainwindow.cpp:49 src/qt/ilreaderui.cpp:24
 msgid "&File"
 msgstr "文件 (&F)"
 
-#: src/qt/mainwindow.cpp:38
+#: src/qt/mainwindow.cpp:49
 msgid "&Tool"
 msgstr "工具 (&T)"
 
-#: src/qt/mainwindow.cpp:40
+#: src/qt/mainwindow.cpp:51
 msgid "NBT s&elector"
 msgstr "NBT选择 (&E)"
 
-#: src/qt/mainwindow.cpp:41
+#: src/qt/mainwindow.cpp:52
 msgid "&NBT lite reader with modifier"
 msgstr "&NBT小型阅读及修改器"
 
-#: src/qt/mainwindow.cpp:42
+#: src/qt/mainwindow.cpp:53
 msgid "Litematica material &list with recipe combination"
 msgstr "投影材料列表及合成表合成功能(&L)"
 
-#: src/qt/mainwindow.cpp:43
+#: src/qt/mainwindow.cpp:54
 msgid "Litematica &block reader"
 msgstr "投影方块阅读器(&B)"
 
-#: src/qt/mainwindow.cpp:44
+#: src/qt/mainwindow.cpp:55
 msgid "&Item list reader and modifier"
 msgstr "物品列表阅读器和修改器(&I)"
 
-#: src/qt/mainwindow.cpp:45
+#: src/qt/mainwindow.cpp:56
 msgid "&Recipe combiner"
 msgstr "材料列表合成功能(&R)"
 
-#: src/qt/mainwindow.cpp:46
+#: src/qt/mainwindow.cpp:57
 msgid "&Clear Item list"
 msgstr "清除材料列表 (&C)"
 
-#: src/qt/mainwindow.cpp:47
+#: src/qt/mainwindow.cpp:58
 msgid "Config &settings"
 msgstr "设定设置 (&S)"
 
-#: src/qt/mainwindow.cpp:48 src/qt/ilchooseui.cpp:38 src/qt/processui.cpp:56
-#: src/qt/recipesui.cpp:229 src/qt/regionselectui.cpp:41
+#: src/qt/mainwindow.cpp:59 src/qt/ilchooseui.cpp:38 src/qt/processui.cpp:56
+#: src/qt/recipesui.cpp:232 src/qt/regionselectui.cpp:41
 #: src/qt/nbtselectui.cpp:42
 msgid "&OK"
 msgstr "确定(&O)"
 
-#: src/qt/mainwindow.cpp:48 src/qt/ilchooseui.cpp:39 src/qt/processui.cpp:57
-#: src/qt/recipesui.cpp:230 src/qt/regionselectui.cpp:42
+#: src/qt/mainwindow.cpp:59 src/qt/ilchooseui.cpp:39 src/qt/processui.cpp:57
+#: src/qt/recipesui.cpp:233 src/qt/regionselectui.cpp:42
 #: src/qt/nbtselectui.cpp:43
 msgid "&Close"
 msgstr "关闭(&C)"
 
-#: src/qt/mainwindow.cpp:71
+#: src/qt/mainwindow.cpp:86
 msgid "Select a file"
 msgstr "选择一个文件"
 
-#: src/qt/mainwindow.cpp:71
+#: src/qt/mainwindow.cpp:86
 msgid "Litematic file (*.litematic)"
 msgstr "投影文件 (*.litematic)"
 
-#: src/qt/mainwindow.cpp:111 src/qt/mainwindow.cpp:135
-#: src/qt/mainwindow.cpp:152 src/qt/mainwindow.cpp:225
-#: src/qt/mainwindow.cpp:227 src/qt/ilreaderui.cpp:110 src/qt/ilchooseui.cpp:64
+#: src/qt/mainwindow.cpp:136 src/qt/mainwindow.cpp:160
+#: src/qt/mainwindow.cpp:177 src/qt/mainwindow.cpp:283
+#: src/qt/mainwindow.cpp:285 src/qt/ilreaderui.cpp:110 src/qt/ilchooseui.cpp:64
 msgid "Error!"
 msgstr "错误！"
 
-#: src/qt/mainwindow.cpp:111
+#: src/qt/mainwindow.cpp:136
 msgid "No selected region!"
 msgstr "没有选择的区域！"
 
-#: src/qt/mainwindow.cpp:135 src/qt/mainwindow.cpp:152
-#: src/qt/mainwindow.cpp:225 src/qt/ilreaderui.cpp:110
+#: src/qt/mainwindow.cpp:160 src/qt/mainwindow.cpp:177
+#: src/qt/mainwindow.cpp:283 src/qt/ilreaderui.cpp:110
 msgid "The item list is locked!"
 msgstr "此材料列表被锁定！"
 
-#: src/qt/mainwindow.cpp:166
+#: src/qt/mainwindow.cpp:193
+msgid "Input Item List Name."
+msgstr ""
+
+#: src/qt/mainwindow.cpp:193
+msgid "Input new item list name."
+msgstr ""
+
+#: src/qt/mainwindow.cpp:201
+msgid "Input Region Name"
+msgstr ""
+
+#: src/qt/mainwindow.cpp:202
+msgid "Please input new region's name."
+msgstr ""
+
+#: src/qt/mainwindow.cpp:224
 msgid "Multi files detected!"
 msgstr "检测到多文件！"
 
-#: src/qt/mainwindow.cpp:166
+#: src/qt/mainwindow.cpp:224
 msgid "This program doesn't support multi files!"
 msgstr "本程序不支持多文件！"
 
-#: src/qt/mainwindow.cpp:182
+#: src/qt/mainwindow.cpp:240
 msgid "Add NBT File"
 msgstr "添加NBT文件"
 
-#: src/qt/mainwindow.cpp:182
+#: src/qt/mainwindow.cpp:240
 msgid "Do you want to add this NBT file to the list?"
 msgstr "您想要添加此NBT文件至列表吗？"
 
-#: src/qt/mainwindow.cpp:185
+#: src/qt/mainwindow.cpp:243
 msgid "Set NBT Info Description"
 msgstr "设置NBT信息描述"
 
-#: src/qt/mainwindow.cpp:185
+#: src/qt/mainwindow.cpp:243
 msgid "Please enter description"
 msgstr "请输入描述内容"
 
-#: src/qt/mainwindow.cpp:185
+#: src/qt/mainwindow.cpp:243
 msgid "Added from reading file"
 msgstr "从文件添加"
 
-#: src/qt/mainwindow.cpp:194
+#: src/qt/mainwindow.cpp:252
 msgid "Set NBT File"
 msgstr "设置NBT文件"
 
-#: src/qt/mainwindow.cpp:194
+#: src/qt/mainwindow.cpp:252
 msgid "Do you want to set this NBT file as default?"
 msgstr "您想要设置此NBT文件为默认吗？"
 
-#: src/qt/mainwindow.cpp:203
+#: src/qt/mainwindow.cpp:261
 msgid "Not a valid file!"
 msgstr "不是一个有效的文件！"
 
-#: src/qt/mainwindow.cpp:203
+#: src/qt/mainwindow.cpp:261
 msgid "This file is not a valid NBT file!"
 msgstr "本文件不是一个有效的NBT文件！"
 
-#: src/qt/mainwindow.cpp:227
+#: src/qt/mainwindow.cpp:285
 msgid "No item list!"
 msgstr "无物品列表！"
 
-#: src/qt/mainwindow.cpp:238
+#: src/qt/mainwindow.cpp:296
 msgid "No NBT File!"
 msgstr "无NBT文件！"
 
-#: src/qt/mainwindow.cpp:238
+#: src/qt/mainwindow.cpp:296
 msgid "No NBT file loaded!"
 msgstr "无NBT文件加载！"
 
@@ -514,45 +530,45 @@ msgstr "找不到配方！"
 msgid "No recipe file found! Do you want to extract game file?"
 msgstr "找不到配方！你想要解压游戏文件吗？"
 
-#: src/qt/recipesui.cpp:136
+#: src/qt/recipesui.cpp:139
 msgid "Please select items:"
 msgstr "请选择物品："
 
-#: src/qt/recipesui.cpp:138
+#: src/qt/recipesui.cpp:141
 msgid "Search block name"
 msgstr "搜索方块名称"
 
-#: src/qt/recipesui.cpp:164
+#: src/qt/recipesui.cpp:167
 msgid "Show recipe"
 msgstr "展示配方"
 
-#: src/qt/recipesui.cpp:219
+#: src/qt/recipesui.cpp:222
 msgid "Combine items to this item list."
 msgstr "合并物品至此物品列表。"
 
-#: src/qt/recipesui.cpp:221
+#: src/qt/recipesui.cpp:224
 msgid "New item list name:"
 msgstr "新的物品列表名字："
 
-#: src/qt/recipesui.cpp:222
+#: src/qt/recipesui.cpp:225
 msgid "Generated from material list combiner."
 msgstr "从材料列表合成器生成。"
 
-#: src/qt/recipesui.cpp:295
+#: src/qt/recipesui.cpp:298
 #, c-format
 msgid "\"Delete\" %d items from material list combiner."
 msgstr "从材料列表合成器\"删除\"%d物品。"
 
-#: src/qt/recipesui.cpp:325
+#: src/qt/recipesui.cpp:328
 msgid "Mod decide"
 msgstr "余数决定"
 
-#: src/qt/recipesui.cpp:325
+#: src/qt/recipesui.cpp:328
 #, c-format
 msgid "There's a remainder with %d and %d, continue?"
 msgstr "%d除以%d有余数，继续？"
 
-#: src/qt/recipesui.cpp:349
+#: src/qt/recipesui.cpp:352
 #, c-format
 msgid "Add %d items from material list combiner."
 msgstr "从材料列表合成器添加%d物品。"
@@ -735,4 +751,3 @@ msgstr "您想要忽略空气吗？"
 #~ "another region, enter 'q' to exit the program (b): "
 #~ msgstr ""
 #~ "请再次输入方块的坐标，或输入 “b” 选择其他区域，输入 “q” 退出程序 (b): "
-

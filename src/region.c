@@ -147,7 +147,7 @@ static PaletteArray* get_palette_full_info_from_nbt(NBT* root)
         palette->id_name = g_strdup(NBT_GetChild(palette_nbt, "Name")->value_a.value);
 
         NBT* property = NBT_GetChild(palette_nbt, "Properties");
-        if(property) property = property->next;
+        if(property) property = property->child;
         DhStrArray* name = get_property_name_from_nbt(property);
         DhStrArray* data = get_property_data_from_nbt(property);
 
@@ -280,7 +280,7 @@ ItemList* item_list_new_from_region(Region* region)
     return oblock;
 }
 
-static NBT* size_nbt_new(Pos* pos)
+static NBT* size_nbt_new(Pos* pos, const char* key)
 {
     GValue val = {0};
     g_value_init(&val, G_TYPE_INT64);
@@ -299,7 +299,7 @@ static NBT* size_nbt_new(Pos* pos)
 
     g_value_init(&val, G_TYPE_POINTER);
     g_value_set_pointer(&val, x);
-    NBT* ret = nbt_new(TAG_List, &val, 3, "size");
+    NBT* ret = nbt_new(TAG_List, &val, 3, key);
     return ret;
 }
 
@@ -321,16 +321,130 @@ static NBT* data_version_nbt_new(gint64 version)
     return ret;
 }
 
+static NBT* block_nbt_new(BlockInfo* info)
+{
+    NBT* pos = size_nbt_new(info->pos, "pos");
+    GValue val = {0};
+    g_value_init(&val, G_TYPE_INT64);
+    g_value_set_int64(&val, info->palette);
+    NBT* state = nbt_new(TAG_Int, &val, 0, "state");
+    pos->next = state;
+    pos->next->prev = pos;
+    g_value_unset(&val);
+
+    g_value_init(&val, G_TYPE_POINTER);
+    g_value_set_pointer(&val, pos);
+    NBT* ret = nbt_new(TAG_Compound, &val, 2, NULL);
+    return ret;
+}
+
+static NBT* blocks_nbt_new(BlockInfoArray* array)
+{
+    NBT* head = NULL;
+    NBT* prev = NULL;
+    NBT* cur = NULL;
+    for(int i = 0 ; i < array->len ; i++)
+    {
+        cur = block_nbt_new(array->pdata[i]);
+        cur->prev = prev;
+        if(prev) prev->next = cur;
+        if(i == 0) head = cur;
+        prev = cur;
+    }
+
+    GValue val = {0};
+    g_value_init(&val, G_TYPE_POINTER);
+    g_value_set_pointer(&val, head);
+    NBT* ret = nbt_new(TAG_List, &val, 0, "blocks");
+    return ret;
+}
+
+static NBT* properties_nbt_new(DhStrArray* name, DhStrArray* data)
+{
+    NBT* head = NULL;
+    NBT* prev = NULL;
+    NBT* cur = NULL;
+    if(!name) return NULL;
+    for(int i = 0 ; i < name->num ; i++)
+    {
+        GValue val = {0};
+        g_value_init(&val, G_TYPE_STRING);
+        g_value_set_string(&val, data->val[i]);
+        cur = nbt_new(TAG_String, &val, 0, name->val[i]);
+        cur->prev = prev;
+        if(prev) prev->next = cur;
+        if(i == 0) head = cur;
+        prev = cur;
+    }
+
+    if(!head) return NULL;
+    GValue val = {0};
+    g_value_init(&val, G_TYPE_POINTER);
+    g_value_set_pointer(&val, head);
+    NBT* ret = nbt_new(TAG_Compound, &val, 0, "Properties");
+    return ret;
+}
+
+static NBT* palette_nbt_new(Palette* palette)
+{
+    NBT* properties = properties_nbt_new(palette->property_name, palette->property_data);
+    GValue val = {0};
+    g_value_init(&val, G_TYPE_STRING);
+    g_value_set_string(&val, palette->id_name);
+    NBT* name = nbt_new(TAG_String, &val, 0, "Name");
+    
+    if(properties) properties->next = name;
+    name->prev = properties;
+
+    GValue val2 = {0};
+    g_value_init(&val2, G_TYPE_POINTER);
+    g_value_set_pointer(&val2, properties ? properties : name);
+    NBT* ret = nbt_new(TAG_Compound, &val2, 0, NULL);
+    return ret;
+}
+
+static NBT* palettes_nbt_new(PaletteArray* array)
+{
+    NBT* head = NULL;
+    NBT* prev = NULL;
+    NBT* cur = NULL;
+    for(int i = 0 ; i < array->len ; i++)
+    {
+        cur = palette_nbt_new(array->pdata[i]);
+        cur->prev = prev;
+        if(prev) prev->next = cur;
+        if(i == 0) head = cur;
+        prev = cur;
+    }
+
+    GValue val = {0};
+    g_value_init(&val, G_TYPE_POINTER);
+    g_value_set_pointer(&val, head);
+    NBT* ret = nbt_new(TAG_List, &val, 0, "palette");
+    return ret;
+}
+
 NBT* nbt_new_from_region(Region* region)
 {
     /* First is size */
-    NBT* size_nbt = size_nbt_new(region->region_size);
+    NBT* size_nbt = size_nbt_new(region->region_size, "size");
     /* Second is entities */
     NBT* entities_nbt = entities_nbt_new();
     size_nbt->next = entities_nbt;
     entities_nbt->prev = size_nbt;
+    /* Third is blocks */
+    NBT* blocks_nbt = blocks_nbt_new(region->block_info_array);
+    entities_nbt->next = blocks_nbt;
+    blocks_nbt->prev = entities_nbt;
+    /* Fourth is palette */
+    NBT* palette_nbt = palettes_nbt_new(region->palette_array);
+    blocks_nbt->next = palette_nbt;
+    palette_nbt->prev = blocks_nbt;
+    /* Fifth is DataVersion */
+    NBT* data_version_nbt = data_version_nbt_new(2230);
+    palette_nbt->next = data_version_nbt;
+    data_version_nbt->prev = palette_nbt;
 
-    
     /* Cover cover */
     GValue val = {0};
     g_value_init(&val, G_TYPE_POINTER);
