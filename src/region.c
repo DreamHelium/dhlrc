@@ -240,21 +240,30 @@ Region* region_new_from_nbt(NBT* root)
     /* Fill RegionSize */
     RegionSize* rs = g_new0(RegionSize, 1);
     NBT* size_nbt = NBT_GetChild(root, "size");
-    size_nbt = size_nbt->child;
-    rs->x = size_nbt->value_i;
-    rs->y = size_nbt->next->value_i;
-    rs->z = size_nbt->next->next->value_i;
-    region->region_size = rs;
+    if(size_nbt)
+    {
+        size_nbt = size_nbt->child;
+        rs->x = size_nbt->value_i;
+        rs->y = size_nbt->next->value_i;
+        rs->z = size_nbt->next->next->value_i;
+        region->region_size = rs;
 
-    /* Fill PaletteArray */
-    PaletteArray* pa = get_palette_full_info_from_nbt(root);
-    region->palette_array = pa;
+        /* Fill PaletteArray */
+        PaletteArray* pa = get_palette_full_info_from_nbt(root);
+        region->palette_array = pa;
 
-    /* Fill BlockInfoArray */
-    BlockInfoArray* bia = get_block_full_info_from_nbt(root, pa);
-    region->block_info_array = bia;
-    
-    return region;
+        /* Fill BlockInfoArray */
+        BlockInfoArray* bia = get_block_full_info_from_nbt(root, pa);
+        region->block_info_array = bia;
+        
+        return region;
+    }
+    else 
+    {
+        g_free(region);
+        g_free(rs);
+        return NULL;
+    }
 }
 
 ItemList* item_list_new_from_region(Region* region)

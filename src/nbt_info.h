@@ -19,9 +19,13 @@
 #define NBT_INFO_H
 
 #include <glib.h>
+#include <openssl/dh.h>
 #include "libnbt/nbt.h"
 
 G_BEGIN_DECLS
+
+typedef enum DhNbtType { Litematica, NBTStruct, Schematics, Others } 
+    DhNbtType;
 
 void  nbt_info_new(NBT* root, GDateTime* time, const gchar* description);
 void  nbt_info_list_clear();
@@ -30,6 +34,7 @@ NBT*  nbt_info_get_nbt(guint id);
 GDateTime* nbt_info_get_time(guint id);
 /* Don't free the string! */
 gchar* nbt_info_get_description(guint id);
+DhNbtType nbt_info_get_type(guint id);
 
 G_END_DECLS
 

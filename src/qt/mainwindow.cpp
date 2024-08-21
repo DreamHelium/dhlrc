@@ -32,7 +32,6 @@
 #include <QInputDialog>
 #include <QProgressDialog>
 #include "../il_info.h"
-#include <cinttypes>
 #include "../download_file.h"
 #include "../region.h"
 #include "../region_info.h"
@@ -90,11 +89,12 @@ void MainWindow::openAction_triggered()
     }
 }
 
-static void mw_download_progress(goffset cur, goffset total, gpointer data)
+static int mw_download_progress(void* data, curl_off_t total, curl_off_t cur, curl_off_t unused0, curl_off_t unused1)
 {
-    mw->pd.setMaximum(total);
+    if(total != 0) mw->pd.setMaximum(total);
     mw->pd.setValue(cur);
-    mw->pd.setLabelText(QString::asprintf("Copying %s.""(%" PRId64"/%" PRId64").", (char*)data, cur, total));
+    mw->pd.setLabelText(QString::asprintf("Copying %s.""(%" CURL_FORMAT_CURL_OFF_T"/%" CURL_FORMAT_CURL_OFF_T").", (char*)data, cur, total));
+    return 0;
 }
 
 void MainWindow::initSignalSlots()

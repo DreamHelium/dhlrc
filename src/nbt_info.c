@@ -16,6 +16,8 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>. */
 
 #include "nbt_info.h"
+#include "litematica_region.h"
+#include "region.h"
 
 static GList* nbt_info_list = NULL;
 
@@ -23,6 +25,8 @@ typedef struct NbtInfo{
     NBT* root;
     GDateTime* time;
     gchar* description;
+
+    DhNbtType type;
 } NbtInfo;
 
 static void nbt_info_free(gpointer info);
@@ -47,6 +51,19 @@ void nbt_info_new(NBT *root, GDateTime *time, const gchar *description)
     info->root = root;
     info->time = time;
     info->description = g_strdup(description);
+
+    if(lite_region_num(root))
+        info->type = Litematica;
+    else
+    {
+        Region* region = region_new_from_nbt(root);
+        if(region)
+        {
+            info->type = NBTStruct;
+            region_free(region);
+        }
+        else info->type = Others;
+    }
     nbt_info_list = g_list_append(nbt_info_list, info);
 }
 
@@ -71,4 +88,10 @@ gchar* nbt_info_get_description(guint id)
 {
     NbtInfo* info = g_list_nth_data(nbt_info_list, id);
     return info->description;
+}
+
+DhNbtType nbt_info_get_type(guint id)
+{
+    NbtInfo* info = g_list_nth_data(nbt_info_list, id);
+    return info->type;
 }
