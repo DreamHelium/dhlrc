@@ -14,11 +14,13 @@
 
 static ItemList* ilr = nullptr;
 
-ilReaderUI::ilReaderUI(ItemList* il, QWidget *parent)
+ilReaderUI::ilReaderUI(IlInfo* info, QWidget *parent)
     : QWidget{parent}
 {
+    ItemList* il = info->il;
     showTable(il);
     ilr = il;
+    g_rw_lock_reader_unlock(&(info->info_lock));
 
     menuBar = new QMenuBar(this);
     fileMenu = new QMenu(_("&File"), menuBar);
@@ -34,26 +36,26 @@ ilReaderUI::~ilReaderUI()
 {
     tableWidget->clearContents();
     delete[] ti;
-    il_info_unlock(ilr);
 }
 
 void ilReaderUI::saveAction_triggered()
 {
-    ItemList* ild = ilr;
-    int i = 0;
-    while(ild)
-    {
-        IListData* data = (IListData*)ild->data;
-        data->total = ti[i].item1->text().toInt();
-        data->placed = ti[i].item2->text().toInt();
-        data->available = ti[i].item3->text().toInt();
+    /* This changes old item list but not locked */
+    // ItemList* ild = ilr;
+    // int i = 0;
+    // while(ild)
+    // {
+    //     IListData* data = (IListData*)ild->data;
+    //     data->total = ti[i].item1->text().toInt();
+    //     data->placed = ti[i].item2->text().toInt();
+    //     data->available = ti[i].item3->text().toInt();
 
-        ild = ild->next;
-        i++;
-    }
-    QString fileName = QFileDialog::getSaveFileName(this, _("Save file"), nullptr ,_("CSV file (*.csv)"));
-    if(!fileName.isEmpty())
-        item_list_to_csv((char*)fileName.toStdString().c_str(), ilr);
+    //     ild = ild->next;
+    //     i++;
+    // }
+    // QString fileName = QFileDialog::getSaveFileName(this, _("Save file"), nullptr ,_("CSV file (*.csv)"));
+    // if(!fileName.isEmpty())
+    //     item_list_to_csv((char*)fileName.toStdString().c_str(), ilr);
 }
 
 void ilReaderUI::showTable(ItemList* il)

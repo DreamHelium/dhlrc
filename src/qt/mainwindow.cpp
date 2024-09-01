@@ -67,8 +67,8 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
     mw = this;
     ui->widget->hide();
+    pd.hide();
     initSignalSlots();
-    pd.setWindowTitle("Downloading file ...");
 }
 
 MainWindow::~MainWindow()
@@ -91,6 +91,8 @@ void MainWindow::openAction_triggered()
 
 static int mw_download_progress(void* data, curl_off_t total, curl_off_t cur, curl_off_t unused0, curl_off_t unused1)
 {
+    mw->pd.show();
+    mw->pd.setWindowTitle("Downloading file ...");
     if(total != 0) mw->pd.setMaximum(total);
     mw->pd.setValue(cur);
     mw->pd.setLabelText(QString::asprintf("Copying %s.""(%" CURL_FORMAT_CURL_OFF_T"/%" CURL_FORMAT_CURL_OFF_T").", (char*)data, cur, total));
@@ -150,14 +152,19 @@ void MainWindow::okBtn_clicked()
         int ret = iui->exec();
 
         if(ret == QDialog::Accepted){
-            ItemList* il = il_info_get_item_list();
-            if(il)
+            IlInfo* info = il_info_list_get_il_info(il_info_list_get_id());
+            if(info)
             {
-                ilReaderUI* iui = new ilReaderUI(il);
-                iui->setAttribute(Qt::WA_DeleteOnClose);
-                iui->show();
+                /* Currently it only read */
+                if(g_rw_lock_reader_trylock(&(info->info_lock)))
+                {
+                    ilReaderUI* iui = new ilReaderUI(info);
+                    iui->setAttribute(Qt::WA_DeleteOnClose);
+                    iui->show();
+                }
+                else QMessageBox::critical(this, _("Error!"), _("The item list is locked!"));
             }
-            else QMessageBox::critical(this, _("Error!"), _("The item list is locked!"));
+            else QMessageBox::critical(this, _("Error!"), _("The item list is freed!"));
         }
     }
     else if(ui->recipeBtn->isChecked()) /* Recipe function */
@@ -167,14 +174,18 @@ void MainWindow::okBtn_clicked()
         int ret = iui->exec();
 
         if(ret == QDialog::Accepted){
-            ItemList* il = il_info_get_item_list();
-            if(il) 
+            IlInfo* info = il_info_list_get_il_info(il_info_list_get_id());
+            if(info) 
             {
-                RecipesUI* rui = new RecipesUI(il);
-                rui->setAttribute(Qt::WA_DeleteOnClose);
-                rui->show();
+                if(g_rw_lock_writer_trylock(&(info->info_lock)))
+                {
+                    RecipesUI* rui = new RecipesUI(info);
+                    rui->setAttribute(Qt::WA_DeleteOnClose);
+                    rui->show();
+                }
+                else QMessageBox::critical(this, _("Error!"), _("The item list is locked!"));
             }
-            else QMessageBox::critical(this, _("Error!"), _("The item list is locked!"));;
+            else QMessageBox::critical(this, _("Error!"), _("The item list is freed!"));;
         }
     }
     else if(ui->nbtReaderBtn->isChecked())

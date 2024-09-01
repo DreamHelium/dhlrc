@@ -22,17 +22,27 @@
 
 G_BEGIN_DECLS
 
+typedef struct IlInfo {
+    ItemList* il;
+    GDateTime* time;
+    gchar* description;
+    /* The lock for this il_info */
+    GRWLock info_lock;
+    /* Freed sign */
+    gboolean freed;
+    gchar* uuid;
+} IlInfo;
+
 guint il_info_list_get_length();
-void il_info_list_set_id(guint id);
-guint il_info_list_get_id();
 void il_info_list_free();
 void il_info_new(ItemList* il, GDateTime* time, const gchar* description);
-ItemList* il_info_get_item_list();
-GDateTime* il_info_get_time();
-gchar* il_info_get_description();
-void il_info_update_item_list(ItemList* il, ItemList* oil);
 gboolean il_info_list_remove_item(guint id);
-void il_info_unlock(ItemList* il);
+IlInfo* il_info_list_get_il_info(guint id);
+/* Block the update and update */
+void il_info_list_update_il(IlInfo* info);
+
+void il_info_list_set_id(guint id);
+guint il_info_list_get_id();
 
 G_END_DECLS
 

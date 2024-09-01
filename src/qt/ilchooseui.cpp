@@ -17,20 +17,26 @@ ilChooseUI::ilChooseUI(QWidget *parent)
 
     group = new QButtonGroup();
     guint len = il_info_list_get_length();
-    guint old_id = il_info_list_get_id();
 
     for(int i = 0 ; i < len ; i++)
     {
-        il_info_list_set_id(i);
-        gchar* time_literal = g_date_time_format(il_info_get_time(), "%T");
-        QString str = QString("%1 (%2)").arg(il_info_get_description()).arg(time_literal);
-        QRadioButton* btn = new QRadioButton(str);
-        g_free(time_literal);
-        layout->addWidget(btn);
-        group->addButton(btn, i);
+        IlInfo* info = il_info_list_get_il_info(i);
+        if(g_rw_lock_reader_trylock(&(info->info_lock)))
+        {
+            gchar* time_literal = g_date_time_format(info->time, "%T");
+            QString str = QString("%1 (%2)").arg(info->description).arg(time_literal);
+            QRadioButton* btn = new QRadioButton(str);
+            g_free(time_literal);
+            g_rw_lock_reader_unlock(&(info->info_lock));
+            layout->addWidget(btn);
+            group->addButton(btn, i);
+        }
+        else {
+            QRadioButton* btn = new QRadioButton(_("locked"));
+            layout->addWidget(btn);
+            group->addButton(btn, i);
+        }
     }
-
-    il_info_list_set_id(old_id);
     
     layout->addStretch();
 

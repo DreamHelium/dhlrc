@@ -42,10 +42,13 @@ typedef struct RecipeListBaseData{
 } RecipeListBaseData;
 
 static ItemList* ilr = nullptr;
+static IlInfo* il_info = nullptr;
 
-RecipesUI::RecipesUI(ItemList* il, QWidget *parent) :
+RecipesUI::RecipesUI(IlInfo* info, QWidget *parent) :
     QWidget(parent)
 {
+    ItemList* il = info->il;
+    il_info = info;
     ilr = il;
     recipesInit();
     initUI();
@@ -55,7 +58,7 @@ RecipesUI::~RecipesUI()
 {
     list.clear();
     delete[] rpl;
-    il_info_unlock(ilr);
+    g_rw_lock_writer_unlock(&(il_info->info_lock));
 }
 
 void RecipesUI::recipesInit()
@@ -308,7 +311,8 @@ void RecipesUI::okbtn_clicked()
     else
     {
         item_list_combine(&ilr, new_il);
-        il_info_update_item_list(ilr, oil);
+        il_info->il = ilr;
+        il_info_list_update_il(il_info);
         item_list_free(new_il);
     }
     this->close();

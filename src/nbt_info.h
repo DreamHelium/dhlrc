@@ -19,7 +19,6 @@
 #define NBT_INFO_H
 
 #include <glib.h>
-#include <openssl/dh.h>
 #include "libnbt/nbt.h"
 
 G_BEGIN_DECLS
