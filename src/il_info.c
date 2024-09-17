@@ -16,12 +16,14 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>. */
 
 #include "il_info.h"
+#include "dh_mt_table.h"
 
 static GList* il_info_list = NULL;
 /* On the last stage we unlock all the locks and free full */
 static gboolean full_free = FALSE;
 static guint set_id = 0;
 
+static DhMTTable* table = NULL;
 
 static void ilinfo_free(gpointer data)
 {
@@ -33,11 +35,16 @@ static void ilinfo_free(gpointer data)
     item_list_free(info->il);
     g_date_time_unref(info->time);
     g_free(info->description);
-    g_free(info->uuid);
     info->freed = TRUE; /* Should never use this info */
     g_rw_lock_writer_unlock(&(info->info_lock));
     g_rw_lock_clear(&(info->info_lock));
     g_free(info);
+}
+
+static gboolean is_same_string(gconstpointer a, gconstpointer b)
+{
+    if(strcmp(a, b)) return FALSE;
+    else return TRUE;
 }
 
 /* a is the IlInfo */
@@ -47,16 +54,10 @@ static int illist_compare(gconstpointer a, gconstpointer b)
     return ((info->il) - (ItemList*)b);
 }
 
-static int uuid_compare(gconstpointer a, gconstpointer b)
-{
-    const IlInfo* info = a;
-    return strcmp(info->uuid, b);
-}
-
 void il_info_list_free()
 {
     full_free = TRUE;
-    g_list_free_full(il_info_list, ilinfo_free);
+    dh_mt_table_destroy(table);
 }
 
 void il_info_new(ItemList *il, GDateTime *time, const gchar *description)
@@ -70,43 +71,37 @@ void il_info_new(ItemList *il, GDateTime *time, const gchar *description)
     info->il = il;
     info->time = time;
     info->description = g_strdup(description);
-    info->uuid = g_uuid_string_random();
 
-    il_info_list = g_list_append(il_info_list, info);
+    if(!table)
+        table = dh_mt_table_new(g_str_hash, is_same_string, g_free, ilinfo_free);
+    dh_mt_table_insert(table, g_uuid_string_random, info);
     /* Unlock the writer lock */
     g_rw_lock_writer_unlock(&(info->info_lock));
 }
 
-guint il_info_list_get_length()
+gboolean il_info_list_remove_item(gchar* uuid)
 {
-    return g_list_length(il_info_list);
-}
-
-gboolean il_info_list_remove_item(guint id)
-{
-    IlInfo* info = g_list_nth_data(il_info_list, id);
+    IlInfo* info = dh_mt_table_lookup(table, uuid);
     if(g_rw_lock_writer_trylock(&(info->info_lock)))
     {
-        ilinfo_free(info);
-        il_info_list = g_list_remove(il_info_list, info);
-        return TRUE;
+        gboolean ret = dh_mt_table_remove(table, uuid);
+        return ret;
     }
     else return FALSE; /* Some function is using the il */
 }
 
-IlInfo* il_info_list_get_il_info(guint id)
+IlInfo* il_info_list_get_il_info(gchar* uuid)
 {
-    IlInfo* info = g_list_nth_data(il_info_list, id);
-    if(info->freed) return NULL;
+    IlInfo* info = dh_mt_table_lookup(table, uuid);
+    if(info && info->freed) return NULL;
     else return info;
 }
 
-void il_info_list_update_il(IlInfo* info)
+void il_info_list_update_il(gchar* uuid, IlInfo* info)
 {
     /* We believe this function is used in a lock function
      * If not we will not lock */
-    GList* old_info = g_list_find_custom(il_info_list, info->uuid, uuid_compare);
-    old_info->data = info;
+    dh_mt_table_replace(table, uuid, info);
 }
 
 void il_info_list_set_id(guint id)
@@ -117,4 +112,9 @@ void il_info_list_set_id(guint id)
 guint il_info_list_get_id()
 {
     return set_id;
+}
+
+GList* il_info_list_get_uuid_list()
+{
+    return dh_mt_table_get_keys(table);
 }

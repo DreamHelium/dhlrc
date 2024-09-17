@@ -30,18 +30,19 @@ typedef struct IlInfo {
     GRWLock info_lock;
     /* Freed sign */
     gboolean freed;
-    gchar* uuid;
 } IlInfo;
 
-guint il_info_list_get_length();
 void il_info_list_free();
 void il_info_new(ItemList* il, GDateTime* time, const gchar* description);
-gboolean il_info_list_remove_item(guint id);
-IlInfo* il_info_list_get_il_info(guint id);
+gboolean il_info_list_remove_item(gchar* uuid);
+IlInfo* il_info_list_get_il_info(gchar* uuid);
 /* Block the update and update */
-void il_info_list_update_il(IlInfo* info);
+void il_info_list_update_il(gchar* uuid, IlInfo* info);
+GList* il_info_list_get_uuid_list();
 
+G_DEPRECATED
 void il_info_list_set_id(guint id);
+G_DEPRECATED
 guint il_info_list_get_id();
 
 G_END_DECLS

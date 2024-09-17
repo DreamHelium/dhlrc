@@ -41,7 +41,7 @@ int regionNum = 0;
 Region* region = nullptr;
 static bool nbtRead = false;
 int verbose_level;
-
+gchar* ilUUID = nullptr;
 
 static QString title = N_("Litematica reader");
 static QString subtitle = N_("The functions are listed below:");
@@ -152,7 +152,7 @@ void MainWindow::okBtn_clicked()
         int ret = iui->exec();
 
         if(ret == QDialog::Accepted){
-            IlInfo* info = il_info_list_get_il_info(il_info_list_get_id());
+            IlInfo* info = il_info_list_get_il_info(ilUUID);
             if(info)
             {
                 /* Currently it only read */
@@ -174,12 +174,12 @@ void MainWindow::okBtn_clicked()
         int ret = iui->exec();
 
         if(ret == QDialog::Accepted){
-            IlInfo* info = il_info_list_get_il_info(il_info_list_get_id());
+            IlInfo* info = il_info_list_get_il_info(ilUUID);
             if(info) 
             {
                 if(g_rw_lock_writer_trylock(&(info->info_lock)))
                 {
-                    RecipesUI* rui = new RecipesUI(info);
+                    RecipesUI* rui = new RecipesUI(ilUUID, info);
                     rui->setAttribute(Qt::WA_DeleteOnClose);
                     rui->show();
                 }
@@ -282,18 +282,14 @@ void MainWindow::configAction_triggered()
 
 void MainWindow::clearAction_triggered()
 {
-    if(il_info_list_get_length())
-    {
-        ilChooseUI* icui = new ilChooseUI();
-        icui->setAttribute(Qt::WA_DeleteOnClose);
-        int ret = icui->exec();
-        bool success = false;
-        if(ret == QDialog::Accepted)
-            success = il_info_list_remove_item(il_info_list_get_id());
-        if(!success)
-            QMessageBox::critical(this, _("Error!"), _("The item list is locked!"));
-    }
-    else QMessageBox::warning(this, _("Error!"), _("No item list!"));
+    ilChooseUI* icui = new ilChooseUI();
+    icui->setAttribute(Qt::WA_DeleteOnClose);
+    int ret = icui->exec();
+    bool success = false;
+    if(ret == QDialog::Accepted)
+        success = il_info_list_remove_item(ilUUID);
+    if(!success)
+        QMessageBox::critical(this, _("Error!"), _("The item list is locked!"));
 }
 
 void MainWindow::selectAction_triggered()

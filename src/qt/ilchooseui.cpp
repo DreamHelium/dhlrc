@@ -2,9 +2,10 @@
 #include "../translation.h"
 #include "../il_info.h"
 #include <qmessagebox.h>
+#include <QDebug>
 
-extern bool infoR;
-extern int infoNum;
+extern gchar* ilUUID;
+static GList* uuidList = nullptr;
 
 ilChooseUI::ilChooseUI(QWidget *parent)
     : QDialog{parent}
@@ -16,15 +17,16 @@ ilChooseUI::ilChooseUI(QWidget *parent)
     layout->addStretch();
 
     group = new QButtonGroup();
-    guint len = il_info_list_get_length();
+    uuidList = il_info_list_get_uuid_list();
+    guint len = uuidList ? g_list_length(uuidList) : 0;
 
     for(int i = 0 ; i < len ; i++)
     {
-        IlInfo* info = il_info_list_get_il_info(i);
+        IlInfo* info = il_info_list_get_il_info((gchar*)g_list_nth_data(uuidList, i));
         if(g_rw_lock_reader_trylock(&(info->info_lock)))
         {
             gchar* time_literal = g_date_time_format(info->time, "%T");
-            QString str = QString("%1 (%2)").arg(info->description).arg(time_literal);
+            QString str = QString("(UUID: %1) %2 (%3)").arg((gchar*)g_list_nth_data(uuidList, i)).arg(info->description).arg(time_literal);
             QRadioButton* btn = new QRadioButton(str);
             g_free(time_literal);
             g_rw_lock_reader_unlock(&(info->info_lock));
@@ -39,6 +41,7 @@ ilChooseUI::ilChooseUI(QWidget *parent)
     }
     
     layout->addStretch();
+    g_list_free(uuidList);
 
     hLayout = new QHBoxLayout();
     okBtn = new QPushButton(_("&OK"));
@@ -56,13 +59,17 @@ ilChooseUI::ilChooseUI(QWidget *parent)
 
 ilChooseUI::~ilChooseUI()
 {
+    g_list_free(uuidList);
 }
 
 void ilChooseUI::okBtn_clicked()
 {
     if(group->checkedId() != -1)
     {
-        il_info_list_set_id(group->checkedId());
+        GList* list = il_info_list_get_uuid_list();
+        ilUUID = (gchar*)g_list_nth_data(list, group->checkedId());
+        qDebug() << (gchar*)g_list_nth_data(list, 0);
+        g_list_free(list);
         accept();
     }
     else
