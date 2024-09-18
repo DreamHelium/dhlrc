@@ -41,7 +41,6 @@ ilChooseUI::ilChooseUI(QWidget *parent)
     }
     
     layout->addStretch();
-    g_list_free(uuidList);
 
     hLayout = new QHBoxLayout();
     okBtn = new QPushButton(_("&OK"));
@@ -66,10 +65,7 @@ void ilChooseUI::okBtn_clicked()
 {
     if(group->checkedId() != -1)
     {
-        GList* list = il_info_list_get_uuid_list();
-        ilUUID = (gchar*)g_list_nth_data(list, group->checkedId());
-        qDebug() << (gchar*)g_list_nth_data(list, 0);
-        g_list_free(list);
+        ilUUID = (gchar*)g_list_nth_data(uuidList, group->checkedId());
         accept();
     }
     else

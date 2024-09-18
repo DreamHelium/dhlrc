@@ -63,7 +63,7 @@ int         item_list_combine(ItemList** dest,ItemList* src);
 int         item_list_get_item_num(ItemList* il, char* item_name);
 ItemList*   item_list_init(const char* block_name);
 ItemList*   item_list_init_with_tag(const char* block_name, gboolean is_tag);
-int         item_list_to_csv(char* pos,ItemList* il);
+int         item_list_to_csv(const char* pos,ItemList* il);
 const char* item_list_item_name(ItemList* il);
 
 gint        item_list_item_index(ItemList* il, const char* item_name);

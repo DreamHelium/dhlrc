@@ -43,6 +43,8 @@ private Q_SLOTS:
     void configAction_triggered();
     void clearAction_triggered();
     void selectAction_triggered();
+    void saveNBTAction_triggered();
+    void saveilAction_triggered();
 
 };
 #endif // MAINWINDOW_H

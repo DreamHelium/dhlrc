@@ -15,6 +15,7 @@
 #include <qlineedit.h>
 #include <qmessagebox.h>
 #include <qnamespace.h>
+#include <qobject.h>
 #include <string>
 #include "glibconfig.h"
 #include "ilchooseui.h"
@@ -105,6 +106,8 @@ void MainWindow::initSignalSlots()
     QObject::connect(ui->configAction, &QAction::triggered, this, &MainWindow::configAction_triggered);
     QObject::connect(ui->clearAction, &QAction::triggered, this, &MainWindow::clearAction_triggered);
     QObject::connect(ui->selectAction, &QAction::triggered, this, &MainWindow::selectAction_triggered);
+    QObject::connect(ui->actionNBT_File, &QAction::triggered, this, &MainWindow::saveNBTAction_triggered);
+    QObject::connect(ui->actionItem_List, &QAction::triggered, this, &MainWindow::saveilAction_triggered);
 }
 
 void MainWindow::initInternalUI()
@@ -202,7 +205,6 @@ void MainWindow::okBtn_clicked()
         if(region)
         {
             QString itemlistName = QInputDialog::getText(this, _("Input Item List Name."), _("Input new item list name."));
-            Region* region = region_new_from_nbt(root);
             ItemList* new_il = item_list_new_from_region(region);
             il_info_new(new_il, g_date_time_new_now_local(), itemlistName.toStdString().c_str());
         }
@@ -301,4 +303,31 @@ void MainWindow::selectAction_triggered()
         nsui->exec();
     }
     else QMessageBox::critical(this, _("No NBT File!"), _("No NBT file loaded!"));
+}
+
+void MainWindow::saveNBTAction_triggered()
+{
+
+}
+
+void MainWindow::saveilAction_triggered()
+{
+    ilChooseUI* iui = new ilChooseUI();
+    iui->setAttribute(Qt::WA_DeleteOnClose);
+    int ret = iui->exec();
+
+    if(ret == QDialog::Accepted){
+        IlInfo* info = il_info_list_get_il_info(ilUUID);
+        if(info) 
+        {
+            if(g_rw_lock_reader_trylock(&(info->info_lock)))
+            {
+                QString filepos = QFileDialog::getSaveFileName(this, _("Save file"), nullptr, _("CSV file (*.csv)"));
+                item_list_to_csv(filepos.toStdString().c_str(), info->il);
+                g_rw_lock_reader_unlock(&(info->info_lock));
+            }
+            else QMessageBox::critical(this, _("Error!"), _("The item list is locked!"));
+        }
+        else QMessageBox::critical(this, _("Error!"), _("The item list is freed!"));;
+    }
 }

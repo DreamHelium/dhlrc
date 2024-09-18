@@ -74,7 +74,7 @@ void il_info_new(ItemList *il, GDateTime *time, const gchar *description)
 
     if(!table)
         table = dh_mt_table_new(g_str_hash, is_same_string, g_free, ilinfo_free);
-    dh_mt_table_insert(table, g_uuid_string_random, info);
+    dh_mt_table_insert(table, g_uuid_string_random(), info);
     /* Unlock the writer lock */
     g_rw_lock_writer_unlock(&(info->info_lock));
 }

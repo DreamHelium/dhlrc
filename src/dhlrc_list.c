@@ -490,7 +490,7 @@ int item_list_get_item_num(ItemList *il, char *item_name)
     else return -1;
 }
 
-int item_list_to_csv(char* pos,ItemList* il)
+int item_list_to_csv(const char* pos,ItemList* il)
 {
     FILE* f = fopen(pos,"wb");
     fprintf(f,"\"Item\",\"Total\",\"Missing\",\"Available\"\n");
