@@ -55,7 +55,9 @@ static QStringList funcs = {
     N_("&Item list reader and modifier"),
     N_("&Recipe combiner"),
     N_("&Clear Item list"),
-    N_("Config &settings")};
+    N_("Config &settings"),
+    N_("Generate Region &struct"),
+    N_("&Generate item list with Region Struct")};
 static QStringList buttonList = {N_("&OK") , N_("&Close")};
 
 static MainWindow* mw;
@@ -323,7 +325,7 @@ void MainWindow::saveilAction_triggered()
             if(g_rw_lock_reader_trylock(&(info->info_lock)))
             {
                 QString filepos = QFileDialog::getSaveFileName(this, _("Save file"), nullptr, _("CSV file (*.csv)"));
-                item_list_to_csv(filepos.toStdString().c_str(), info->il);
+                if(!filepos.isEmpty())  item_list_to_csv(filepos.toStdString().c_str(), info->il);
                 g_rw_lock_reader_unlock(&(info->info_lock));
             }
             else QMessageBox::critical(this, _("Error!"), _("The item list is locked!"));

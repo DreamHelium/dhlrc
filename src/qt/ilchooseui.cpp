@@ -58,7 +58,6 @@ ilChooseUI::ilChooseUI(QWidget *parent)
 
 ilChooseUI::~ilChooseUI()
 {
-    g_list_free(uuidList);
 }
 
 void ilChooseUI::okBtn_clicked()

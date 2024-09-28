@@ -40,11 +40,6 @@ IlInfo* il_info_list_get_il_info(gchar* uuid);
 void il_info_list_update_il(gchar* uuid, IlInfo* info);
 GList* il_info_list_get_uuid_list();
 
-G_DEPRECATED
-void il_info_list_set_id(guint id);
-G_DEPRECATED
-guint il_info_list_get_id();
-
 G_END_DECLS
 
 #endif /* IL_INFO_H */

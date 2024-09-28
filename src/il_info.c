@@ -17,11 +17,12 @@
 
 #include "il_info.h"
 #include "dh_mt_table.h"
+#include "glib.h"
 
-static GList* il_info_list = NULL;
+static GList* uuid_list = NULL;
+static GRWLock list_lock;
 /* On the last stage we unlock all the locks and free full */
 static gboolean full_free = FALSE;
-static guint set_id = 0;
 
 static DhMTTable* table = NULL;
 
@@ -58,6 +59,11 @@ void il_info_list_free()
 {
     full_free = TRUE;
     dh_mt_table_destroy(table);
+    if(uuid_list)
+    {
+        g_list_free(uuid_list);
+        g_rw_lock_clear(&list_lock);
+    }
 }
 
 void il_info_new(ItemList *il, GDateTime *time, const gchar *description)
@@ -73,8 +79,15 @@ void il_info_new(ItemList *il, GDateTime *time, const gchar *description)
     info->description = g_strdup(description);
 
     if(!table)
+    {
         table = dh_mt_table_new(g_str_hash, is_same_string, g_free, ilinfo_free);
-    dh_mt_table_insert(table, g_uuid_string_random(), info);
+        g_rw_lock_init(&list_lock);
+    }
+    g_rw_lock_writer_lock(&list_lock);
+    gchar* uuid = g_uuid_string_random();
+    dh_mt_table_insert(table, uuid, info);
+    uuid_list = g_list_append(uuid_list, uuid);
+    g_rw_lock_writer_unlock(&list_lock);
     /* Unlock the writer lock */
     g_rw_lock_writer_unlock(&(info->info_lock));
 }
@@ -84,7 +97,10 @@ gboolean il_info_list_remove_item(gchar* uuid)
     IlInfo* info = dh_mt_table_lookup(table, uuid);
     if(g_rw_lock_writer_trylock(&(info->info_lock)))
     {
+        g_rw_lock_writer_lock(&list_lock);
+        uuid_list = g_list_remove(uuid_list, uuid);
         gboolean ret = dh_mt_table_remove(table, uuid);
+        g_rw_lock_writer_unlock(&list_lock);
         return ret;
     }
     else return FALSE; /* Some function is using the il */
@@ -104,17 +120,7 @@ void il_info_list_update_il(gchar* uuid, IlInfo* info)
     dh_mt_table_replace(table, uuid, info);
 }
 
-void il_info_list_set_id(guint id)
-{
-    set_id = id;
-}
-
-guint il_info_list_get_id()
-{
-    return set_id;
-}
-
 GList* il_info_list_get_uuid_list()
 {
-    return dh_mt_table_get_keys(table);
+    return uuid_list;
 }
