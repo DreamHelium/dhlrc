@@ -69,8 +69,8 @@ MainWindow::MainWindow(QWidget *parent)
     translation_init();
     ui->setupUi(this);
     mw = this;
-    ui->widget->hide();
-    pd.hide();
+    // ui->widget->hide();
+    // pd.hide();
     initSignalSlots();
 }
 
@@ -92,6 +92,7 @@ void MainWindow::openAction_triggered()
     }
 }
 
+/*
 static int mw_download_progress(void* data, curl_off_t total, curl_off_t cur, curl_off_t unused0, curl_off_t unused1)
 {
     mw->pd.show();
@@ -101,15 +102,18 @@ static int mw_download_progress(void* data, curl_off_t total, curl_off_t cur, cu
     mw->pd.setLabelText(QString::asprintf("Copying %s.""(%" CURL_FORMAT_CURL_OFF_T"/%" CURL_FORMAT_CURL_OFF_T").", (char*)data, cur, total));
     return 0;
 }
+*/
 
 void MainWindow::initSignalSlots()
 {
+    /*
     QObject::connect(ui->openAction, &QAction::triggered, this, &MainWindow::openAction_triggered);
     QObject::connect(ui->configAction, &QAction::triggered, this, &MainWindow::configAction_triggered);
     QObject::connect(ui->clearAction, &QAction::triggered, this, &MainWindow::clearAction_triggered);
     QObject::connect(ui->selectAction, &QAction::triggered, this, &MainWindow::selectAction_triggered);
     QObject::connect(ui->actionNBT_File, &QAction::triggered, this, &MainWindow::saveNBTAction_triggered);
     QObject::connect(ui->actionItem_List, &QAction::triggered, this, &MainWindow::saveilAction_triggered);
+    */
 }
 
 void MainWindow::initInternalUI()
@@ -119,7 +123,7 @@ void MainWindow::initInternalUI()
         nbtRead = true;
         ui->widget->show();
         gchar* cacheDir = dh_get_cache_dir();
-        dh_download_version_manifest(cacheDir, mw_download_progress);
+        // dh_download_version_manifest(cacheDir, mw_download_progress);
         g_free(cacheDir);
         QObject::connect(ui->okBtn, SIGNAL(clicked()), this, SLOT(okBtn_clicked()));
     }

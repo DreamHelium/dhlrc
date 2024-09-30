@@ -23,7 +23,7 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
-    QProgressDialog pd = QProgressDialog(this, Qt::Dialog);
+    // QProgressDialog pd = QProgressDialog(this, Qt::Dialog);
 
 private:
     Ui::MainWindow *ui;
