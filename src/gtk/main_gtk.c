@@ -26,6 +26,40 @@ static GtkWidget*
 make_title_bar();
 
 static void
+nbt_open_response (GtkDialog *dialog,
+                  int        response)
+{
+  if (response == GTK_RESPONSE_ACCEPT)
+    {
+      GtkFileChooser *chooser = GTK_FILE_CHOOSER (dialog);
+      GFile* file = gtk_file_chooser_get_file (chooser);
+      /* Unfinished */
+      
+
+      g_object_unref(file);
+    }
+
+  gtk_window_destroy (GTK_WINDOW (dialog));
+}
+
+static void
+load_nbt_file (GtkButton* self,
+               gpointer user_data)
+{
+  GtkFileFilter* filter = gtk_file_filter_new();
+  gtk_file_filter_add_pattern(filter, "*.litematic");
+  gtk_file_filter_add_pattern(filter, "*.nbt");
+
+  /* This is the code deprecated in 4.10, however Debian uses 4.8 */
+  GtkWidget* dialog = gtk_file_chooser_dialog_new(_("Open NBT file"), GTK_WINDOW(window),
+  GTK_FILE_CHOOSER_ACTION_OPEN, _("_Cancel"), GTK_RESPONSE_CANCEL,
+  _("_Open"), GTK_RESPONSE_ACCEPT, NULL);
+  gtk_widget_set_size_request(dialog, 600, 600);
+  gtk_window_present(GTK_WINDOW(dialog));
+  g_signal_connect(dialog, "response", G_CALLBACK(nbt_open_response), NULL);
+}
+
+static void
 title_bar_button_toggled (GtkToggleButton* self,
                           gpointer user_data)
 {
@@ -65,12 +99,13 @@ activate (GtkApplication *app,
 {
   window = gtk_application_window_new (app);
   gtk_window_set_title (GTK_WINDOW (window), _("Litematica reader"));
+  gtk_window_set_default_size(GTK_WINDOW(window), 400, 400);
 
   GtkWidget* header_bar = make_title_bar();
 
-  region_box = make_region_box();
+  nbt_box = make_nbt_box();
 
-  gtk_window_set_child (GTK_WINDOW (window), region_box);
+  gtk_window_set_child (GTK_WINDOW (window), nbt_box);
   gtk_window_set_titlebar(GTK_WINDOW(window), header_bar);
 
   gtk_window_present (GTK_WINDOW (window));
@@ -99,6 +134,9 @@ make_region_box()
   gtk_box_append (GTK_BOX(box), gen_item_list_btn);
   gtk_box_append (GTK_BOX(box), block_reader_btn);
 
+  gtk_widget_set_halign(box, GTK_ALIGN_CENTER);
+  gtk_widget_set_valign(box, GTK_ALIGN_CENTER);
+
   return box;
 }
 
@@ -112,15 +150,19 @@ make_nbt_box()
 
   GtkWidget *decision_box = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 0);
   GtkWidget *load_btn = gtk_button_new_with_label (_("Load"));
-  GtkWidget *set_default_nbt_btn = gtk_button_new_with_label (_("Manage NBT"));
+  g_signal_connect(load_btn, "clicked", G_CALLBACK(load_nbt_file), NULL);
+  GtkWidget *manage_btn = gtk_button_new_with_label (_("Manage NBT"));
   gtk_box_append (GTK_BOX(decision_box), load_btn);
-  gtk_box_append (GTK_BOX(decision_box), set_default_nbt_btn);
+  gtk_box_append (GTK_BOX(decision_box), manage_btn);
+  gtk_widget_set_halign(decision_box, GTK_ALIGN_CENTER);
   gtk_box_append (GTK_BOX(box), decision_box);
 
   GtkWidget *second_label = gtk_label_new(_("You can do things below for the NBT file."));
   gtk_box_append (GTK_BOX(box), second_label);
   GtkWidget *nbt_reader_btn = gtk_button_new_with_label(_("NBT Reader"));
   gtk_box_append (GTK_BOX(box), nbt_reader_btn);
+  gtk_widget_set_halign(box, GTK_ALIGN_CENTER);
+  gtk_widget_set_valign(box, GTK_ALIGN_CENTER);
 
   return box;
 }
@@ -135,6 +177,9 @@ make_item_list_box()
   gtk_box_append (GTK_BOX(box), reader_btn);
   gtk_box_append (GTK_BOX(box), recipe_btn);
 
+  gtk_widget_set_halign(box, GTK_ALIGN_CENTER);
+  gtk_widget_set_valign(box, GTK_ALIGN_CENTER);
+
   return box;
 }
 
@@ -148,9 +193,10 @@ make_title_bar()
   region_button = gtk_toggle_button_new_with_label(_("Region"));
   nbt_button = gtk_toggle_button_new_with_label(_("NBT"));
   item_list_button = gtk_toggle_button_new_with_label(_("Item List"));
-  gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(region_button), TRUE);
-  gtk_box_append(GTK_BOX(box), region_button);
+  gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(nbt_button), TRUE);
+  
   gtk_box_append(GTK_BOX(box), nbt_button);
+  gtk_box_append(GTK_BOX(box), region_button);
   gtk_box_append(GTK_BOX(box), item_list_button);
   gtk_toggle_button_set_group (GTK_TOGGLE_BUTTON(nbt_button), GTK_TOGGLE_BUTTON(region_button));
   gtk_toggle_button_set_group (GTK_TOGGLE_BUTTON(item_list_button), GTK_TOGGLE_BUTTON(region_button));

@@ -66,9 +66,10 @@ void il_info_list_free()
     }
 }
 
-void il_info_new(ItemList *il, GDateTime *time, const gchar *description)
+gboolean il_info_new(ItemList *il, GDateTime *time, const gchar *description)
 {
     IlInfo* info = g_new0(IlInfo, 1);
+    gboolean ret = FALSE;
     /* Init the item info lock and ready to lock it */
     g_rw_lock_init(&(info->info_lock));
     g_rw_lock_writer_lock(&(info->info_lock));
@@ -85,11 +86,12 @@ void il_info_new(ItemList *il, GDateTime *time, const gchar *description)
     }
     g_rw_lock_writer_lock(&list_lock);
     gchar* uuid = g_uuid_string_random();
-    dh_mt_table_insert(table, uuid, info);
+    ret = dh_mt_table_insert(table, uuid, info);
     uuid_list = g_list_append(uuid_list, uuid);
     g_rw_lock_writer_unlock(&list_lock);
     /* Unlock the writer lock */
     g_rw_lock_writer_unlock(&(info->info_lock));
+    return ret;
 }
 
 gboolean il_info_list_remove_item(gchar* uuid)
@@ -113,11 +115,11 @@ IlInfo* il_info_list_get_il_info(gchar* uuid)
     else return info;
 }
 
-void il_info_list_update_il(gchar* uuid, IlInfo* info)
+gboolean il_info_list_update_il(gchar* uuid, IlInfo* info)
 {
     /* We believe this function is used in a lock function
      * If not we will not lock */
-    dh_mt_table_replace(table, uuid, info);
+    return dh_mt_table_replace(table, uuid, info);
 }
 
 GList* il_info_list_get_uuid_list()

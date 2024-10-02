@@ -16,38 +16,54 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>. */
 
 #include "nbt_info.h"
-#include "litematica_region.h"
+#include "dh_mt_table.h"
 #include "region.h"
 
-static GList* nbt_info_list = NULL;
+static GList* uuid_list = NULL;
+static GRWLock list_lock;
+static gboolean full_free = FALSE;
+static DhMTTable* table = NULL;
 
-typedef struct NbtInfo{
-    NBT* root;
-    GDateTime* time;
-    gchar* description;
-
-    DhNbtType type;
-} NbtInfo;
-
-static void nbt_info_free(gpointer info);
-
-static void nbt_info_free(gpointer data)
+static void nbtinfo_free(gpointer data)
 {
     NbtInfo* info = data;
+    /* Although item list info can be freed by outer function
+     * We believe the programmer would not do this */
+    if(full_free) g_rw_lock_writer_lock(&(info->info_lock));
+
     NBT_Free(info->root);
     g_date_time_unref(info->time);
     g_free(info->description);
+    g_rw_lock_writer_unlock(&(info->info_lock));
+    g_rw_lock_clear(&(info->info_lock));
     g_free(info);
 }
 
-void nbt_info_list_clear()
+
+static gboolean is_same_string(gconstpointer a, gconstpointer b)
 {
-    g_list_free_full(nbt_info_list, nbt_info_free);
+    if(strcmp(a, b)) return FALSE;
+    else return TRUE;
 }
 
-void nbt_info_new(NBT *root, GDateTime *time, const gchar *description)
+void nbt_info_list_free()
+{
+    full_free = TRUE;
+    if(uuid_list)
+    {
+        dh_mt_table_destroy(table);
+        g_list_free(uuid_list);
+        g_rw_lock_clear(&list_lock);
+    }
+}
+gboolean nbt_info_new(NBT* root, GDateTime* time, const gchar* description)
 {
     NbtInfo* info = g_new0(NbtInfo, 1);
+    gboolean ret = FALSE;
+    /* Init the item info lock and ready to lock it */
+    g_rw_lock_init(&(info->info_lock));
+    g_rw_lock_writer_lock(&(info->info_lock));
+
     info->root = root;
     info->time = time;
     info->description = g_strdup(description);
@@ -64,34 +80,51 @@ void nbt_info_new(NBT *root, GDateTime *time, const gchar *description)
         }
         else info->type = Others;
     }
-    nbt_info_list = g_list_append(nbt_info_list, info);
+
+    if(!table)
+    {
+        table = dh_mt_table_new(g_str_hash, is_same_string, g_free, nbtinfo_free);
+        g_rw_lock_init(&list_lock);
+    }
+    g_rw_lock_writer_lock(&list_lock);
+    gchar* uuid = g_uuid_string_random();
+    ret = dh_mt_table_insert(table, uuid, info);
+    uuid_list = g_list_append(uuid_list, uuid);
+    g_rw_lock_writer_unlock(&list_lock);
+    /* Unlock the writer lock */
+    g_rw_lock_writer_unlock(&(info->info_lock));
+    return ret;
 }
 
-guint nbt_info_list_length()
+gboolean nbt_info_list_remove_item(gchar* uuid)
 {
-    return g_list_length(nbt_info_list);
+    NbtInfo* info = dh_mt_table_lookup(table, uuid);
+    if(g_rw_lock_writer_trylock(&(info->info_lock)))
+    {
+        g_rw_lock_writer_lock(&list_lock);
+        uuid_list = g_list_remove(uuid_list, uuid);
+        gboolean ret = dh_mt_table_remove(table, uuid);
+        g_rw_lock_writer_unlock(&list_lock);
+        return ret;
+    }
+    else return FALSE; /* Some function is using the il */
 }
 
-NBT* nbt_info_get_nbt(guint id)
+NbtInfo* nbt_info_list_get_nbt_info(gchar* uuid)
 {
-    NbtInfo* info = g_list_nth_data(nbt_info_list, id);
-    return info->root;
+    NbtInfo* info = dh_mt_table_lookup(table, uuid);
+    return info;
+}
+/* Block the update and update */
+gboolean nbt_info_list_update_nbt(gchar* uuid, NbtInfo* info)
+{
+    /* We believe this function is used in a lock function
+     * If not we will not lock */
+    return dh_mt_table_replace(table, uuid, info);
 }
 
-GDateTime* nbt_info_get_time(guint id)
-{
-    NbtInfo* info = g_list_nth_data(nbt_info_list, id);
-    return info->time;
-}
 
-gchar* nbt_info_get_description(guint id)
+GList* nbt_info_list_get_uuid_list()
 {
-    NbtInfo* info = g_list_nth_data(nbt_info_list, id);
-    return info->description;
-}
-
-DhNbtType nbt_info_get_type(guint id)
-{
-    NbtInfo* info = g_list_nth_data(nbt_info_list, id);
-    return info->type;
+    return uuid_list;
 }

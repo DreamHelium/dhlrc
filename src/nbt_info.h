@@ -26,14 +26,21 @@ G_BEGIN_DECLS
 typedef enum DhNbtType { Litematica, NBTStruct, Schematics, Others } 
     DhNbtType;
 
-void  nbt_info_new(NBT* root, GDateTime* time, const gchar* description);
-void  nbt_info_list_clear();
-guint nbt_info_list_length();
-NBT*  nbt_info_get_nbt(guint id);
-GDateTime* nbt_info_get_time(guint id);
-/* Don't free the string! */
-gchar* nbt_info_get_description(guint id);
-DhNbtType nbt_info_get_type(guint id);
+typedef struct NbtInfo{
+    NBT* root;
+    GDateTime* time;
+    gchar* description;
+    GRWLock info_lock;
+    DhNbtType type;
+} NbtInfo;
+
+void nbt_info_list_free();
+gboolean nbt_info_new(NBT* root, GDateTime* time, const gchar* description);
+gboolean nbt_info_list_remove_item(gchar* uuid);
+NbtInfo* nbt_info_list_get_nbt_info(gchar* uuid);
+/* Block the update and update */
+gboolean nbt_info_list_update_nbt(gchar* uuid, NbtInfo* info);
+GList* nbt_info_list_get_uuid_list();
 
 G_END_DECLS
 
