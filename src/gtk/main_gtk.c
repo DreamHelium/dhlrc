@@ -1,7 +1,9 @@
 #include <gtk/gtk.h>
 #include "../translation.h"
+#include "../libnbt/nbt.h"
+#include "../nbt_info.h"
 #include "glib.h"
-#include "gtk/gtkshortcut.h"
+#include "input_dialog.h"
 
 static GtkWidget* window;
 static GtkWidget* region_box;
@@ -34,7 +36,27 @@ nbt_open_response (GtkDialog *dialog,
       GtkFileChooser *chooser = GTK_FILE_CHOOSER (dialog);
       GFile* file = gtk_file_chooser_get_file (chooser);
       /* Unfinished */
-      
+      char* name = g_file_get_basename(file);
+      char* content;
+      gsize len;
+      g_file_load_contents(file, NULL, &content, &len, NULL, NULL);
+      NBT* new_nbt = NBT_Parse(content, len);
+
+      GtkWidget* input_dialog = dh_input_dialog_new(_("Enter Desciption"), _("Please enter description for the NBT."), _("Desciption"), name, GTK_WINDOW(window));
+      gtk_window_present(GTK_WINDOW(input_dialog));
+      char* description = dh_input_dialog_get_text();
+
+      if(description)
+      {
+        nbt_info_new(new_nbt, g_date_time_new_now_local(), description);
+        g_free(description);
+      }
+      else
+      {
+        NBT_Free(new_nbt);
+        GtkAlertDialog* dialog = gtk_alert_dialog_new(_("No desciption entered! The NBT will not be added!"));
+        gtk_alert_dialog_show(dialog, GTK_WINDOW(window));
+      }
 
       g_object_unref(file);
     }
@@ -54,7 +76,7 @@ load_nbt_file (GtkButton* self,
   GtkWidget* dialog = gtk_file_chooser_dialog_new(_("Open NBT file"), GTK_WINDOW(window),
   GTK_FILE_CHOOSER_ACTION_OPEN, _("_Cancel"), GTK_RESPONSE_CANCEL,
   _("_Open"), GTK_RESPONSE_ACCEPT, NULL);
-  gtk_widget_set_size_request(dialog, 600, 600);
+  gtk_file_chooser_set_filter(GTK_FILE_CHOOSER(dialog), filter);
   gtk_window_present(GTK_WINDOW(dialog));
   g_signal_connect(dialog, "response", G_CALLBACK(nbt_open_response), NULL);
 }
