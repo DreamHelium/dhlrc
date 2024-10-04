@@ -12,6 +12,7 @@ static GtkWidget* item_list_box;
 static GtkWidget* region_button;
 static GtkWidget* nbt_button;
 static GtkWidget* item_list_button;
+static NBT* new_nbt;
 
 int verbose_level;
 
@@ -28,6 +29,21 @@ static GtkWidget*
 make_title_bar();
 
 static void
+add_nbt_info(const char* description)
+{
+  if(description)
+  {
+    nbt_info_new(new_nbt, g_date_time_new_now_local(), description);
+  }
+  else
+  {
+    NBT_Free(new_nbt);
+    GtkAlertDialog* dialog = gtk_alert_dialog_new(_("No desciption entered! The NBT will not be added!"));
+    gtk_alert_dialog_show(dialog, GTK_WINDOW(window));
+  }
+}
+
+static void
 nbt_open_response (GtkDialog *dialog,
                   int        response)
 {
@@ -40,23 +56,9 @@ nbt_open_response (GtkDialog *dialog,
       char* content;
       gsize len;
       g_file_load_contents(file, NULL, &content, &len, NULL, NULL);
-      NBT* new_nbt = NBT_Parse(content, len);
+      new_nbt = NBT_Parse(content, len);
 
-      GtkWidget* input_dialog = dh_input_dialog_new(_("Enter Desciption"), _("Please enter description for the NBT."), _("Desciption"), name, GTK_WINDOW(window));
-      gtk_window_present(GTK_WINDOW(input_dialog));
-      char* description = dh_input_dialog_get_text();
-
-      if(description)
-      {
-        nbt_info_new(new_nbt, g_date_time_new_now_local(), description);
-        g_free(description);
-      }
-      else
-      {
-        NBT_Free(new_nbt);
-        GtkAlertDialog* dialog = gtk_alert_dialog_new(_("No desciption entered! The NBT will not be added!"));
-        gtk_alert_dialog_show(dialog, GTK_WINDOW(window));
-      }
+      dh_input_dialog_new(_("Enter Desciption"), _("Please enter description for the NBT."), _("Desciption"), name, GTK_WINDOW(window), add_nbt_info);
 
       g_object_unref(file);
     }

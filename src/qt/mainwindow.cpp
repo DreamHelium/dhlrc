@@ -20,6 +20,7 @@
 #include "glibconfig.h"
 #include "ilchooseui.h"
 #include "ilreaderui.h"
+#include "manageui.h"
 #include "nbtreaderui.h"
 #include "nbtselectui.h"
 #include "processui.h"
@@ -33,7 +34,6 @@
 #include <QInputDialog>
 #include <QProgressDialog>
 #include "../il_info.h"
-#include "../download_file.h"
 #include "../region.h"
 #include "../region_info.h"
 
@@ -77,7 +77,7 @@ MainWindow::MainWindow(QWidget *parent)
 MainWindow::~MainWindow()
 {
     delete ui;
-    nbt_info_list_clear();
+    nbt_info_list_free();
     il_info_list_free();
     dh_exit();
     dh_exit1();
@@ -114,6 +114,7 @@ void MainWindow::initSignalSlots()
     QObject::connect(ui->actionNBT_File, &QAction::triggered, this, &MainWindow::saveNBTAction_triggered);
     QObject::connect(ui->actionItem_List, &QAction::triggered, this, &MainWindow::saveilAction_triggered);
     */
+    QObject::connect(ui->manageBtn, &QPushButton::clicked, this, &MainWindow::manageBtn_clicked);
 }
 
 void MainWindow::initInternalUI()
@@ -336,4 +337,11 @@ void MainWindow::saveilAction_triggered()
         }
         else QMessageBox::critical(this, _("Error!"), _("The item list is freed!"));;
     }
+}
+
+void MainWindow::manageBtn_clicked()
+{
+    ManageUI* mui = new ManageUI();
+    mui->setAttribute(Qt::WA_DeleteOnClose);
+    mui->show();
 }

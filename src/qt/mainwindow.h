@@ -45,6 +45,7 @@ private Q_SLOTS:
     void selectAction_triggered();
     void saveNBTAction_triggered();
     void saveilAction_triggered();
+    void manageBtn_clicked();
 
 };
 #endif // MAINWINDOW_H

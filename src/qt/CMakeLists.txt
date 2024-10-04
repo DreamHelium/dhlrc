@@ -34,6 +34,7 @@ set(PROJECT_SOURCES
         regionchooseui.h regionchooseui.cpp
         blocklistui.cpp blocklistui.h blocklistui.ui
         nbtreaderui.cpp nbtreaderui.h nbtreaderui.ui
+        manageui.h manageui.cpp manageui.ui
         processui.h processui.cpp
         ilreaderui.h ilreaderui.cpp
 )

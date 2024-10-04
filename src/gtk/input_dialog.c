@@ -7,21 +7,44 @@ static GtkWidget* dialog;
 static GtkWidget* input_line;
 static GtkWidget* ok_button;
 static GtkWidget* close_button;
+static DhInputFunc* func;
+
+typedef struct SelfWindow{
+    GtkWidget* dialog;
+    GThread* thread;
+} SelfWindow;
 
 static void set_text(GtkButton* self, gpointer user_data)
 {
-    if(self == GTK_BUTTON(ok_button))
+    while (TRUE)
     {
-        GtkEntryBuffer* buffer = gtk_entry_get_buffer(GTK_ENTRY(input_line));
-        text = g_strdup(gtk_entry_buffer_get_text(buffer));
+        if(self == GTK_BUTTON(ok_button))
+        {
+            GtkEntryBuffer* buffer = gtk_entry_get_buffer(GTK_ENTRY(input_line));
+            text = g_strdup(gtk_entry_buffer_get_text(buffer));
+            break;
+        }
+        else if(self == GTK_BUTTON(close_button))
+        {
+            text = NULL;
+            break;
+        }
     }
-    else text = NULL;
     gtk_window_destroy(GTK_WINDOW(dialog));
+    func(text);
+    g_free(text);
 }
 
-GtkWidget* dh_input_dialog_new(const char* title, const char* content, const char* tip, const char* default_input, GtkWindow* parent)
+static gpointer test(gpointer data)
+{
+    return NULL;
+}
+
+void dh_input_dialog_new(const char* title, const char* content, const char* tip, const char* default_input, GtkWindow* parent, DhInputFunc afunc)
 {
     dialog = gtk_window_new();
+    
+    gtk_window_set_default_size(GTK_WINDOW(dialog),400 , 400);
     gtk_window_set_modal(GTK_WINDOW(dialog), TRUE);
     gtk_window_set_transient_for(GTK_WINDOW(dialog), parent);
     gtk_window_set_title(GTK_WINDOW(dialog), title);
@@ -48,8 +71,8 @@ GtkWidget* dh_input_dialog_new(const char* title, const char* content, const cha
 
     g_signal_connect(ok_button, "clicked", G_CALLBACK(set_text), NULL);
     g_signal_connect(close_button, "clicked", G_CALLBACK(set_text), NULL);
-
-    return dialog;
+    func = afunc;
+    gtk_window_present(GTK_WINDOW(dialog));
 }
 
 char* dh_input_dialog_get_text()

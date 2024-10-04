@@ -42,6 +42,9 @@ NbtInfo* nbt_info_list_get_nbt_info(gchar* uuid);
 gboolean nbt_info_list_update_nbt(gchar* uuid, NbtInfo* info);
 GList* nbt_info_list_get_uuid_list();
 
+void nbt_info_list_set_uuid(const char* uuid);
+const char* nbt_info_list_get_uuid();
+
 G_END_DECLS
 
 #endif /* NBT_INFO_H */

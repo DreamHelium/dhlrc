@@ -25,6 +25,7 @@ static GRWLock list_lock;
 static gboolean full_free = FALSE;
 
 static DhMTTable* table = NULL;
+static const char* uuid = NULL;
 
 static void ilinfo_free(gpointer data)
 {
@@ -125,4 +126,14 @@ gboolean il_info_list_update_il(gchar* uuid, IlInfo* info)
 GList* il_info_list_get_uuid_list()
 {
     return uuid_list;
+}
+
+void il_info_list_set_uuid(const char* auuid)
+{
+    uuid = auuid;
+}
+
+const char* il_info_list_get_uuid()
+{
+    return uuid;
 }

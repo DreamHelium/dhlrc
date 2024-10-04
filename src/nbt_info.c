@@ -23,6 +23,7 @@ static GList* uuid_list = NULL;
 static GRWLock list_lock;
 static gboolean full_free = FALSE;
 static DhMTTable* table = NULL;
+static const char* uuid = NULL;
 
 static void nbtinfo_free(gpointer data)
 {
@@ -127,4 +128,14 @@ gboolean nbt_info_list_update_nbt(gchar* uuid, NbtInfo* info)
 GList* nbt_info_list_get_uuid_list()
 {
     return uuid_list;
+}
+
+void nbt_info_list_set_uuid(const char* auuid)
+{
+    uuid = auuid;
+}
+
+const char* nbt_info_list_get_uuid()
+{
+    return uuid;
 }
