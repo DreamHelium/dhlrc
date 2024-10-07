@@ -43,6 +43,7 @@ Region* region = nullptr;
 static bool nbtRead = false;
 int verbose_level;
 gchar* ilUUID = nullptr;
+static ManageUI* mui = nullptr;
 
 static QString title = N_("Litematica reader");
 static QString subtitle = N_("The functions are listed below:");
@@ -77,6 +78,7 @@ MainWindow::MainWindow(QWidget *parent)
 MainWindow::~MainWindow()
 {
     delete ui;
+    delete mui;
     nbt_info_list_free();
     il_info_list_free();
     dh_exit();
@@ -341,7 +343,6 @@ void MainWindow::saveilAction_triggered()
 
 void MainWindow::manageBtn_clicked()
 {
-    ManageUI* mui = new ManageUI();
-    mui->setAttribute(Qt::WA_DeleteOnClose);
+    if(!mui) mui = new ManageUI();
     mui->show();
 }

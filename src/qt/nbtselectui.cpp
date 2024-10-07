@@ -26,7 +26,8 @@ void NbtSelectUI::initUI()
 
     group = new QButtonGroup();
 
-    uuidList = nbt_info_list_get_uuid_list();
+    DhList* list = nbt_info_list_get_uuid_list();
+    uuidList = list->list;
     guint len = uuidList ? g_list_length(uuidList) : 0;
 
     for(int i = 0 ; i < len ; i++)

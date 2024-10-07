@@ -31,6 +31,11 @@ typedef GList BlackList;
 typedef GList ReplaceList;
 typedef GList RecipeList;
 
+typedef struct DhList{
+    GList* list;
+    GRWLock lock;
+} DhList;
+
 typedef struct ItemTrack{
     gchar* description;
     guint num;
@@ -88,6 +93,10 @@ char*           recipe_list_filename(RecipeList* rcl);
 char*           recipe_list_item_name(RecipeList* rcl);
 DhStrArray*    recipe_list_item_names(RecipeList* rcl);
 DhStrArray*    recipe_list_item_names_with_namespace(RecipeList* rcl);
+
+DhList* dh_list_new();
+void    dh_list_free(DhList* list);
+
 //only for debug
 //int Test();
 

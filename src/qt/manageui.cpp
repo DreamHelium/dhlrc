@@ -1,5 +1,7 @@
 #include "manageui.h"
+#include "glib.h"
 #include "ui_manageui.h"
+#include <qevent.h>
 #include <qinputdialog.h>
 #include <qmessagebox.h>
 #include <qobject.h>
@@ -9,6 +11,12 @@
 #include "../translation.h"
 #include "../nbt_info.h"
 #include <QFileDialog>
+#include <qwidget.h>
+
+static void noAction()
+{}
+
+static DhList* uuidList = nullptr;
 
 ManageUI::ManageUI(QWidget *parent) :
     QWidget(parent),
@@ -18,6 +26,7 @@ ManageUI::ManageUI(QWidget *parent) :
     initSignalSlots();
     initModel();
     ui->tableView->setModel(model);
+    uuidList = nbt_info_list_get_uuid_list();
 }
 
 ManageUI::~ManageUI()
@@ -30,6 +39,9 @@ void ManageUI::initSignalSlots()
     QObject::connect(ui->addBtn, &QPushButton::clicked, this, &ManageUI::addBtn_clicked);
     QObject::connect(ui->closeBtn, &QPushButton::clicked, this, &ManageUI::close);
     QObject::connect(ui->refreshBtn, &QPushButton::clicked, this, &ManageUI::updateModel);
+    QObject::connect(this, &ManageUI::closeSig, this, &ManageUI::close_cb);
+    QObject::connect(this, &ManageUI::showSig, this, &ManageUI::show_cb);
+    QObject::connect(ui->removeBtn, &QPushButton::clicked, this, &ManageUI::removeBtn_clicked);
 }
 
 void ManageUI::initModel()
@@ -49,33 +61,50 @@ QList<QList<QStandardItem*>> ManageUI::getList()
 {
     QList<QList<QStandardItem*>> ret;
 
-    GList* fullList = nbt_info_list_get_uuid_list();
-    guint len = fullList ? g_list_length(fullList) : 0;
-    for(int i = 0 ; i < len ; i++)
+    uuidList = nbt_info_list_get_uuid_list();
+    GList* fullList = uuidList ? uuidList->list : nullptr;
+    uuidList ? g_rw_lock_writer_unlock(&uuidList->lock) : noAction();
+    if(uuidList? g_rw_lock_reader_trylock(&uuidList->lock): true)
     {
-        NbtInfo* info = nbt_info_list_get_nbt_info((gchar*)g_list_nth_data(fullList, i));
+        guint len = fullList ? g_list_length(fullList) : 0;
+        for(int i = 0 ; i < len ; i++)
+        {
+            NbtInfo* info = nbt_info_list_get_nbt_info((gchar*)g_list_nth_data(fullList, i));
+            QStandardItem* description = new QStandardItem;
+            QStandardItem* uuid = new QStandardItem;
+            QStandardItem* time = new QStandardItem;
+            uuid->setEditable(false);
+            time->setEditable(false);
+            if(g_rw_lock_reader_trylock(&info->info_lock))
+            {
+                description->setData(QString(info->description), 2);
+                uuid->setData(QString((gchar*)g_list_nth_data(fullList, i)), 0);
+                time->setData(QString(g_date_time_format(info->time, "%T")), 0);
+                g_rw_lock_reader_unlock(&info->info_lock);
+            }
+            else 
+            {
+                description->setData(QString(_("locked")), 0);
+                uuid->setData(QString(_("locked")), 0);
+                time->setData(QString(_("locked")), 0);
+            }
+            QList<QStandardItem*> list = {description, uuid, time};
+            ret.append(list);
+        }
+        uuidList? g_rw_lock_reader_unlock(&uuidList->lock): noAction();
+    }
+    else
+    {
         QStandardItem* description = new QStandardItem;
         QStandardItem* uuid = new QStandardItem;
         QStandardItem* time = new QStandardItem;
-        uuid->setEditable(false);
-        time->setEditable(false);
-        if(g_rw_lock_reader_trylock(&info->info_lock))
-        {
-            description->setData(QString(info->description), 2);
-            uuid->setData(QString((gchar*)g_list_nth_data(fullList, i)), 0);
-            time->setData(QString(g_date_time_format(info->time, "%T")), 0);
-            g_rw_lock_reader_unlock(&info->info_lock);
-        }
-        else 
-        {
-            description->setData(QString(_("locked")), 0);
-            uuid->setData(QString(_("locked")), 0);
-            time->setData(QString(_("locked")), 0);
-        }
+        description->setData(QString(_("locked")), 0);
+        uuid->setData(QString(_("locked")), 0);
+        time->setData(QString(_("locked")), 0);
         QList<QStandardItem*> list = {description, uuid, time};
         ret.append(list);
     }
-
+    uuidList ? g_rw_lock_writer_trylock(&uuidList->lock) : false;
     return ret;
 }
 
@@ -111,10 +140,59 @@ void ManageUI::addBtn_clicked()
             gsize len;
             g_file_load_contents(file, NULL, &content, &len, NULL, NULL);
             NBT* newNBT = NBT_Parse((guint8*)content, len);
-            nbt_info_new(newNBT, g_date_time_new_now_local(), description.toStdString().c_str());
+            if(newNBT)
+            {
+                uuidList ? g_rw_lock_writer_unlock(&uuidList->lock) : noAction();
+                nbt_info_new(newNBT, g_date_time_new_now_local(), description.toStdString().c_str());
+                uuidList = nbt_info_list_get_uuid_list();
+                g_rw_lock_writer_trylock(&uuidList->lock);
+            }
+            else QMessageBox::critical(this, _("Not Valid File!"), _("Not a valid NBT file!"));
             g_free(content);
             updateModel();
         }
         g_object_unref(file);
+    }
+}
+
+void ManageUI::removeBtn_clicked()
+{
+    auto index = ui->tableView->selectionModel()->currentIndex();
+    if(index.isValid())
+    {
+        int row = index.row();
+        char* uuid = (char*)g_list_nth_data(uuidList->list, row);
+        g_rw_lock_writer_unlock(&uuidList->lock);
+        nbt_info_list_remove_item(uuid);
+        g_rw_lock_writer_trylock(&uuidList->lock);
+        updateModel();
+    }
+    else QMessageBox::critical(this, _("No Selected Row!"), _("No row is selected!"));
+}
+
+void ManageUI::closeEvent(QCloseEvent* event)
+{
+    emit closeSig();
+    QWidget::closeEvent(event);
+}
+
+void ManageUI::close_cb()
+{
+    qDebug() << "closed";
+    g_rw_lock_writer_unlock(&uuidList->lock);
+}
+
+void ManageUI::showEvent(QShowEvent* event)
+{
+    emit showSig();
+    QWidget::showEvent(event);
+}
+
+void ManageUI::show_cb()
+{
+    if(!isMinimized())
+    {
+        uuidList ? g_rw_lock_writer_trylock(&uuidList->lock) : false;
+        qDebug() << "show";
     }
 }

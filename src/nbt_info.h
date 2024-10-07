@@ -20,6 +20,7 @@
 
 #include <glib.h>
 #include "libnbt/nbt.h"
+#include "dhlrc_list.h"
 
 G_BEGIN_DECLS
 
@@ -40,7 +41,7 @@ gboolean nbt_info_list_remove_item(gchar* uuid);
 NbtInfo* nbt_info_list_get_nbt_info(gchar* uuid);
 /* Block the update and update */
 gboolean nbt_info_list_update_nbt(gchar* uuid, NbtInfo* info);
-GList* nbt_info_list_get_uuid_list();
+DhList* nbt_info_list_get_uuid_list();
 
 void nbt_info_list_set_uuid(const char* uuid);
 const char* nbt_info_list_get_uuid();

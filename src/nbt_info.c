@@ -17,13 +17,14 @@
 
 #include "nbt_info.h"
 #include "dh_mt_table.h"
+#include "dhlrc_list.h"
 #include "region.h"
 
-static GList* uuid_list = NULL;
-static GRWLock list_lock;
 static gboolean full_free = FALSE;
 static DhMTTable* table = NULL;
 static const char* uuid = NULL;
+
+static DhList* uuid_list = NULL;
 
 static void nbtinfo_free(gpointer data)
 {
@@ -53,10 +54,10 @@ void nbt_info_list_free()
     if(uuid_list)
     {
         dh_mt_table_destroy(table);
-        g_list_free(uuid_list);
-        g_rw_lock_clear(&list_lock);
+        dh_list_free(uuid_list);
     }
 }
+
 gboolean nbt_info_new(NBT* root, GDateTime* time, const gchar* description)
 {
     NbtInfo* info = g_new0(NbtInfo, 1);
@@ -85,13 +86,13 @@ gboolean nbt_info_new(NBT* root, GDateTime* time, const gchar* description)
     if(!table)
     {
         table = dh_mt_table_new(g_str_hash, is_same_string, g_free, nbtinfo_free);
-        g_rw_lock_init(&list_lock);
+        uuid_list = dh_list_new();
     }
-    g_rw_lock_writer_lock(&list_lock);
+    g_rw_lock_writer_lock(&uuid_list->lock);
     gchar* uuid = g_uuid_string_random();
     ret = dh_mt_table_insert(table, uuid, info);
-    uuid_list = g_list_append(uuid_list, uuid);
-    g_rw_lock_writer_unlock(&list_lock);
+    uuid_list->list = g_list_append(uuid_list->list, uuid);
+    g_rw_lock_writer_unlock(&uuid_list->lock);
     /* Unlock the writer lock */
     g_rw_lock_writer_unlock(&(info->info_lock));
     return ret;
@@ -102,10 +103,10 @@ gboolean nbt_info_list_remove_item(gchar* uuid)
     NbtInfo* info = dh_mt_table_lookup(table, uuid);
     if(g_rw_lock_writer_trylock(&(info->info_lock)))
     {
-        g_rw_lock_writer_lock(&list_lock);
-        uuid_list = g_list_remove(uuid_list, uuid);
+        g_rw_lock_writer_lock(&uuid_list->lock);
+        uuid_list->list = g_list_remove(uuid_list->list, uuid);
         gboolean ret = dh_mt_table_remove(table, uuid);
-        g_rw_lock_writer_unlock(&list_lock);
+        g_rw_lock_writer_unlock(&uuid_list->lock);
         return ret;
     }
     else return FALSE; /* Some function is using the il */
@@ -125,7 +126,7 @@ gboolean nbt_info_list_update_nbt(gchar* uuid, NbtInfo* info)
 }
 
 
-GList* nbt_info_list_get_uuid_list()
+DhList* nbt_info_list_get_uuid_list()
 {
     return uuid_list;
 }
