@@ -46,6 +46,8 @@ private Q_SLOTS:
     void saveNBTAction_triggered();
     void saveilAction_triggered();
     void manageBtn_clicked();
+    void ilReaderBtn_clicked();
+    void recipeCombineBtn_clicked();
 
 };
 #endif // MAINWINDOW_H

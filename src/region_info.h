@@ -23,13 +23,23 @@
 
 G_BEGIN_DECLS
 
-void  region_info_new(Region* region, GDateTime* time, const gchar* description);
-void  region_info_list_clear();
-guint region_info_list_length();
-Region*  region_info_get_region(guint id);
-GDateTime* region_info_get_time(guint id);
-/* Don't free the string! */
-gchar* region_info_get_description(guint id);
+typedef struct RegionInfo{
+    Region* root;
+    GDateTime* time;
+    gchar* description;
+    GRWLock info_lock;
+} RegionInfo;
+
+void region_info_list_free();
+gboolean region_info_new(Region* root, GDateTime* time, const gchar* description);
+gboolean region_info_list_remove_item(gchar* uuid);
+RegionInfo* region_info_list_get_region_info(gchar* uuid);
+/* Block the update and update */
+gboolean region_info_list_update_region(gchar* uuid, RegionInfo* info);
+DhList* region_info_list_get_uuid_list();
+
+void region_info_list_set_uuid(const char* uuid);
+const char* region_info_list_get_uuid();
 
 G_END_DECLS
 

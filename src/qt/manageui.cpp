@@ -2,6 +2,7 @@
 #include "glib.h"
 #include "ui_manageui.h"
 #include <qevent.h>
+#include <qfiledialog.h>
 #include <qinputdialog.h>
 #include <qmessagebox.h>
 #include <qobject.h>
@@ -12,9 +13,21 @@
 #include "../nbt_info.h"
 #include <QFileDialog>
 #include <qwidget.h>
+#include "../nbt_litereader.h"
 
 static void noAction()
 {}
+
+static QString getTypeOfNbt(DhNbtType type)
+{
+    switch(type)
+    {
+        case Litematica: return _("Litematica");
+        case NBTStruct : return _("NBT Struct");
+        case Schematics: return _("Schematics");
+        case Others    : return _("Others");
+    }
+}
 
 static DhList* uuidList = nullptr;
 
@@ -39,16 +52,15 @@ void ManageUI::initSignalSlots()
     QObject::connect(ui->addBtn, &QPushButton::clicked, this, &ManageUI::addBtn_clicked);
     QObject::connect(ui->closeBtn, &QPushButton::clicked, this, &ManageUI::close);
     QObject::connect(ui->refreshBtn, &QPushButton::clicked, this, &ManageUI::updateModel);
-    QObject::connect(this, &ManageUI::closeSig, this, &ManageUI::close_cb);
-    QObject::connect(this, &ManageUI::showSig, this, &ManageUI::show_cb);
     QObject::connect(ui->removeBtn, &QPushButton::clicked, this, &ManageUI::removeBtn_clicked);
+    QObject::connect(ui->saveBtn, &QPushButton::clicked, this, &ManageUI::saveBtn_clicked);
 }
 
 void ManageUI::initModel()
 {
     model = new QStandardItemModel(0, 3);
     QStringList list;
-    list << _("Description") << _("UUID") << _("Time");
+    list << _("Description") << _("UUID") << _("Time") << _("Type");
     model->setHorizontalHeaderLabels(list);
     QList<QList<QStandardItem*>> itemList = getList();
     for(int i = 0 ; i < itemList.length() ; i++)
@@ -73,6 +85,7 @@ QList<QList<QStandardItem*>> ManageUI::getList()
             QStandardItem* description = new QStandardItem;
             QStandardItem* uuid = new QStandardItem;
             QStandardItem* time = new QStandardItem;
+            QStandardItem* type = new QStandardItem;
             uuid->setEditable(false);
             time->setEditable(false);
             if(g_rw_lock_reader_trylock(&info->info_lock))
@@ -80,6 +93,7 @@ QList<QList<QStandardItem*>> ManageUI::getList()
                 description->setData(QString(info->description), 2);
                 uuid->setData(QString((gchar*)g_list_nth_data(fullList, i)), 0);
                 time->setData(QString(g_date_time_format(info->time, "%T")), 0);
+                type->setData(getTypeOfNbt(info->type), 0);
                 g_rw_lock_reader_unlock(&info->info_lock);
             }
             else 
@@ -87,8 +101,9 @@ QList<QList<QStandardItem*>> ManageUI::getList()
                 description->setData(QString(_("locked")), 0);
                 uuid->setData(QString(_("locked")), 0);
                 time->setData(QString(_("locked")), 0);
+                type->setData(QString(_("locked")), 0);
             }
-            QList<QStandardItem*> list = {description, uuid, time};
+            QList<QStandardItem*> list = {description, uuid, time, type};
             ret.append(list);
         }
         uuidList? g_rw_lock_reader_unlock(&uuidList->lock): noAction();
@@ -98,10 +113,12 @@ QList<QList<QStandardItem*>> ManageUI::getList()
         QStandardItem* description = new QStandardItem;
         QStandardItem* uuid = new QStandardItem;
         QStandardItem* time = new QStandardItem;
+        QStandardItem* type = new QStandardItem;
         description->setData(QString(_("locked")), 0);
         uuid->setData(QString(_("locked")), 0);
         time->setData(QString(_("locked")), 0);
-        QList<QStandardItem*> list = {description, uuid, time};
+        type->setData(QString(_("locked")), 0);
+        QList<QStandardItem*> list = {description, uuid, time, type};
         ret.append(list);
     }
     uuidList ? g_rw_lock_writer_trylock(&uuidList->lock) : false;
@@ -112,7 +129,7 @@ void ManageUI::updateModel()
 {
     model->clear();
     QStringList list;
-    list << _("Description") << _("UUID") << _("Time");
+    list << _("Description") << _("UUID") << _("Time") << _("Type");
     model->setHorizontalHeaderLabels(list);
     QList<QList<QStandardItem*>> itemList = getList();
     for(int i = 0 ; i < itemList.length() ; i++)
@@ -172,27 +189,38 @@ void ManageUI::removeBtn_clicked()
 
 void ManageUI::closeEvent(QCloseEvent* event)
 {
-    emit closeSig();
+    qDebug() << "closed";
+    uuidList ? g_rw_lock_writer_unlock(&uuidList->lock) : noAction();
     QWidget::closeEvent(event);
 }
 
-void ManageUI::close_cb()
-{
-    qDebug() << "closed";
-    g_rw_lock_writer_unlock(&uuidList->lock);
-}
-
 void ManageUI::showEvent(QShowEvent* event)
-{
-    emit showSig();
-    QWidget::showEvent(event);
-}
-
-void ManageUI::show_cb()
 {
     if(!isMinimized())
     {
         uuidList ? g_rw_lock_writer_trylock(&uuidList->lock) : false;
         qDebug() << "show";
     }
+    QWidget::showEvent(event);
+}
+
+void ManageUI::saveBtn_clicked()
+{
+    auto index = ui->tableView->selectionModel()->currentIndex();
+    if(index.isValid())
+    {
+        int row = index.row();
+        QString filepos = QFileDialog::getSaveFileName(this, _("Save File"));
+        if(!filepos.isEmpty())
+        {
+            NbtInfo* info = nbt_info_list_get_nbt_info((char*)g_list_nth_data(uuidList->list, row));
+            if(g_rw_lock_writer_trylock(&info->info_lock))
+            {
+                dhlrc_nbt_save(info->root, filepos.toLocal8Bit());
+                g_rw_lock_writer_unlock(&info->info_lock);
+            }
+            else QMessageBox::critical(this, _("Info Locked!"), _("The NBT info is locked!"));
+        }
+    }
+    else QMessageBox::critical(this, _("No Selected Row!"), _("No row is selected!"));
 }

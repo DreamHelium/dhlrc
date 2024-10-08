@@ -35,6 +35,7 @@ int         nbtlr_list(NBT* given_nbt, int read_next);
 int         nbtlr_list_item(NBT* given_nbt);
 NBT*        nbtlr_to_next_nbt(NBT* root, int n);
 int         nbtlr_save(NBT* root);
+int         dhlrc_nbt_save(NBT* root, const char* pos);
 
 void nbtlr_modifier_start(NBT* root, int modify_list, GValue* value);
 

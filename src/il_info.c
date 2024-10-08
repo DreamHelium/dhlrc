@@ -17,10 +17,10 @@
 
 #include "il_info.h"
 #include "dh_mt_table.h"
+#include "dhlrc_list.h"
 #include "glib.h"
 
-static GList* uuid_list = NULL;
-static GRWLock list_lock;
+static DhList* uuid_list = NULL;
 /* On the last stage we unlock all the locks and free full */
 static gboolean full_free = FALSE;
 
@@ -59,11 +59,10 @@ static int illist_compare(gconstpointer a, gconstpointer b)
 void il_info_list_free()
 {
     full_free = TRUE;
-    dh_mt_table_destroy(table);
     if(uuid_list)
     {
-        g_list_free(uuid_list);
-        g_rw_lock_clear(&list_lock);
+        dh_mt_table_destroy(table);
+        dh_list_free(uuid_list);
     }
 }
 
@@ -83,13 +82,13 @@ gboolean il_info_new(ItemList *il, GDateTime *time, const gchar *description)
     if(!table)
     {
         table = dh_mt_table_new(g_str_hash, is_same_string, g_free, ilinfo_free);
-        g_rw_lock_init(&list_lock);
+        uuid_list = dh_list_new();
     }
-    g_rw_lock_writer_lock(&list_lock);
+    g_rw_lock_writer_lock(&uuid_list->lock);
     gchar* uuid = g_uuid_string_random();
     ret = dh_mt_table_insert(table, uuid, info);
-    uuid_list = g_list_append(uuid_list, uuid);
-    g_rw_lock_writer_unlock(&list_lock);
+    uuid_list->list = g_list_append(uuid_list->list, uuid);
+    g_rw_lock_writer_unlock(&uuid_list->lock);
     /* Unlock the writer lock */
     g_rw_lock_writer_unlock(&(info->info_lock));
     return ret;
@@ -100,16 +99,16 @@ gboolean il_info_list_remove_item(gchar* uuid)
     IlInfo* info = dh_mt_table_lookup(table, uuid);
     if(g_rw_lock_writer_trylock(&(info->info_lock)))
     {
-        g_rw_lock_writer_lock(&list_lock);
-        uuid_list = g_list_remove(uuid_list, uuid);
+        g_rw_lock_writer_lock(&uuid_list->lock);
+        uuid_list->list = g_list_remove(uuid_list->list, uuid);
         gboolean ret = dh_mt_table_remove(table, uuid);
-        g_rw_lock_writer_unlock(&list_lock);
+        g_rw_lock_writer_unlock(&uuid_list->lock);
         return ret;
     }
     else return FALSE; /* Some function is using the il */
 }
 
-IlInfo* il_info_list_get_il_info(gchar* uuid)
+IlInfo* il_info_list_get_il_info(const gchar* uuid)
 {
     IlInfo* info = dh_mt_table_lookup(table, uuid);
     if(info && info->freed) return NULL;
@@ -123,7 +122,7 @@ gboolean il_info_list_update_il(gchar* uuid, IlInfo* info)
     return dh_mt_table_replace(table, uuid, info);
 }
 
-GList* il_info_list_get_uuid_list()
+DhList* il_info_list_get_uuid_list()
 {
     return uuid_list;
 }

@@ -35,10 +35,10 @@ typedef struct IlInfo {
 void il_info_list_free();
 gboolean il_info_new(ItemList* il, GDateTime* time, const gchar* description);
 gboolean il_info_list_remove_item(gchar* uuid);
-IlInfo* il_info_list_get_il_info(gchar* uuid);
+IlInfo* il_info_list_get_il_info(const gchar* uuid);
 /* Block the update and update */
 gboolean il_info_list_update_il(gchar* uuid, IlInfo* info);
-GList* il_info_list_get_uuid_list();
+DhList* il_info_list_get_uuid_list();
 
 void il_info_list_set_uuid(const char* uuid);
 const char* il_info_list_get_uuid();

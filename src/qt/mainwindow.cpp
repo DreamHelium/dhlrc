@@ -16,6 +16,7 @@
 #include <qmessagebox.h>
 #include <qnamespace.h>
 #include <qobject.h>
+#include <qpushbutton.h>
 #include <string>
 #include "glibconfig.h"
 #include "ilchooseui.h"
@@ -117,6 +118,8 @@ void MainWindow::initSignalSlots()
     QObject::connect(ui->actionItem_List, &QAction::triggered, this, &MainWindow::saveilAction_triggered);
     */
     QObject::connect(ui->manageBtn, &QPushButton::clicked, this, &MainWindow::manageBtn_clicked);
+    QObject::connect(ui->ilReaderBtn, &QPushButton::clicked, this, &MainWindow::ilReaderBtn_clicked);
+    QObject::connect(ui->recipeCombineBtn, &QPushButton::clicked, this, &MainWindow::recipeCombineBtn_clicked);
 }
 
 void MainWindow::initInternalUI()
@@ -345,4 +348,49 @@ void MainWindow::manageBtn_clicked()
 {
     if(!mui) mui = new ManageUI();
     mui->show();
+}
+
+void MainWindow::ilReaderBtn_clicked()
+{
+    ilChooseUI* iui = new ilChooseUI();
+    iui->setAttribute(Qt::WA_DeleteOnClose);
+    int ret = iui->exec();
+
+    if(ret == QDialog::Accepted){
+        IlInfo* info = il_info_list_get_il_info(il_info_list_get_uuid());
+        if(info)
+        {
+            /* Currently it only read */
+            if(g_rw_lock_reader_trylock(&(info->info_lock)))
+            {
+                ilReaderUI* iui = new ilReaderUI(info);
+                iui->setAttribute(Qt::WA_DeleteOnClose);
+                iui->show();
+            }
+            else QMessageBox::critical(this, _("Error!"), _("The item list is locked!"));
+        }
+        else QMessageBox::critical(this, _("Error!"), _("The item list is freed!"));
+    }
+}
+
+void MainWindow::recipeCombineBtn_clicked()
+{
+    ilChooseUI* iui = new ilChooseUI();
+    iui->setAttribute(Qt::WA_DeleteOnClose);
+    int ret = iui->exec();
+
+    if(ret == QDialog::Accepted){
+        IlInfo* info = il_info_list_get_il_info(il_info_list_get_uuid());
+        if(info) 
+        {
+            if(g_rw_lock_writer_trylock(&(info->info_lock)))
+            {
+                RecipesUI* rui = new RecipesUI(ilUUID, info);
+                rui->setAttribute(Qt::WA_DeleteOnClose);
+                rui->show();
+            }
+            else QMessageBox::critical(this, _("Error!"), _("The item list is locked!"));
+        }
+        else QMessageBox::critical(this, _("Error!"), _("The item list is freed!"));;
+    }
 }

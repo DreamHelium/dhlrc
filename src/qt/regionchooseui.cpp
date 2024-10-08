@@ -3,6 +3,7 @@
 #include "../translation.h"
 
 extern Region* region;
+static GList* uuidList = nullptr;
 
 RegionChooseUI::RegionChooseUI(QWidget *parent) :
     QDialog(parent)
@@ -23,16 +24,28 @@ void RegionChooseUI::initUI()
 
     group = new QButtonGroup();
 
-    guint len = region_info_list_length();
+    DhList* list = region_info_list_get_uuid_list();
+
+    guint len = list? g_list_length(list->list) : 0;
 
     for(int i = 0 ; i < len ; i++)
     {
-        gchar* time_literal = g_date_time_format(region_info_get_time(i), "%T");
-        QString str = QString("%1 (%2)").arg(region_info_get_description(i)).arg(time_literal);
-        QRadioButton* btn = new QRadioButton(str);
-        g_free(time_literal);
-        layout->addWidget(btn);
-        group->addButton(btn, i);
+        uuidList = list->list;
+        RegionInfo* info = region_info_list_get_region_info((char*)g_list_nth_data(uuidList, i));
+        if(g_rw_lock_reader_trylock(&info->info_lock))
+        {
+            gchar* time_literal = g_date_time_format(info->time, "%T");
+            QString str = QString("%1 (%2)").arg(info->description).arg(time_literal);
+            QRadioButton* btn = new QRadioButton(str);
+            g_free(time_literal);
+            layout->addWidget(btn);
+            group->addButton(btn, i);
+        }
+        else {
+            QRadioButton* btn = new QRadioButton(_("locked"));
+            layout->addWidget(btn);
+            group->addButton(btn, i);
+        }
     }
 
     layout->addStretch();
@@ -52,6 +65,6 @@ void RegionChooseUI::initUI()
 
 void RegionChooseUI::okBtn_clicked()
 {
-    region = region_info_get_region(group->checkedId());
+    region_info_list_set_uuid((const char*)g_list_nth_data(uuidList, group->checkedId()));
     this->close();
 }

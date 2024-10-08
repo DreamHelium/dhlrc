@@ -161,7 +161,7 @@ void lite_region_free(LiteRegion* lr)
 int lite_region_num(NBT* root)
 {
     NBT* regionParent = NBT_GetChild_Deep(root,"Regions",NULL);
-    if(regionParent->child)
+    if(regionParent && regionParent->child)
     {
         NBT* regionName = regionParent -> child;
 

@@ -17,7 +17,7 @@ ilChooseUI::ilChooseUI(QWidget *parent)
     layout->addStretch();
 
     group = new QButtonGroup();
-    uuidList = il_info_list_get_uuid_list();
+    uuidList = il_info_list_get_uuid_list()->list;
     guint len = uuidList ? g_list_length(uuidList) : 0;
 
     for(int i = 0 ; i < len ; i++)

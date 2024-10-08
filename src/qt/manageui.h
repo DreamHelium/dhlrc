@@ -18,8 +18,6 @@ public:
     ~ManageUI();
 
 Q_SIGNALS:
-    void closeSig();
-    void showSig();
     
 private:
     Ui::ManageUI *ui;
@@ -35,11 +33,8 @@ protected:
 
 private Q_SLOTS:
     void addBtn_clicked();
-    void close_cb();
-    void show_cb();
-
-public Q_SLOTS:
     void removeBtn_clicked();
+    void saveBtn_clicked();
 };
 
 #endif /* MANAGEUI_H */
