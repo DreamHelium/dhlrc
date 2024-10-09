@@ -97,7 +97,7 @@ gboolean region_info_list_remove_item(gchar* uuid)
     else return FALSE; /* Some function is using the il */
 }
 
-RegionInfo* region_info_list_get_region_info(gchar* uuid)
+RegionInfo* region_info_list_get_region_info(const gchar* uuid)
 {
     RegionInfo* info = dh_mt_table_lookup(table, uuid);
     return info;

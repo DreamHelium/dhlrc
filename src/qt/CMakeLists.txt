@@ -23,10 +23,6 @@ set(PROJECT_SOURCES
         recipesshowui.h
         ilchooseui.cpp
         ilchooseui.h
-        regionselectui.cpp
-        regionselectui.h
-        blockreaderui.cpp
-        blockreaderui.h
         showtrackui.cpp
         showtrackui.h
         configui.h configui.cpp configui.ui
@@ -35,8 +31,8 @@ set(PROJECT_SOURCES
         blocklistui.cpp blocklistui.h blocklistui.ui
         nbtreaderui.cpp nbtreaderui.h nbtreaderui.ui
         manageui.h manageui.cpp manageui.ui
-        processui.h processui.cpp
         ilreaderui.h ilreaderui.cpp
+        dhtableview.h dhtableview.cpp
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)

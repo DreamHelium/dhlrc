@@ -15,8 +15,7 @@
 #include <qwidget.h>
 #include "../nbt_litereader.h"
 
-static void noAction()
-{}
+// #define DHLRC_MANAGEUI_TRACK_LOCK
 
 static QString getTypeOfNbt(DhNbtType type)
 {
@@ -37,7 +36,7 @@ ManageUI::ManageUI(QWidget *parent) :
 {
     ui->setupUi(this);
     initSignalSlots();
-    initModel();
+    model = new QStandardItemModel(0, 4);
     ui->tableView->setModel(model);
     uuidList = nbt_info_list_get_uuid_list();
 }
@@ -58,7 +57,6 @@ void ManageUI::initSignalSlots()
 
 void ManageUI::initModel()
 {
-    model = new QStandardItemModel(0, 3);
     QStringList list;
     list << _("Description") << _("UUID") << _("Time") << _("Type");
     model->setHorizontalHeaderLabels(list);
@@ -74,9 +72,12 @@ QList<QList<QStandardItem*>> ManageUI::getList()
     QList<QList<QStandardItem*>> ret;
 
     uuidList = nbt_info_list_get_uuid_list();
-    GList* fullList = uuidList ? uuidList->list : nullptr;
-    uuidList ? g_rw_lock_writer_unlock(&uuidList->lock) : noAction();
-    if(uuidList? g_rw_lock_reader_trylock(&uuidList->lock): true)
+    GList* fullList = uuidList->list;
+    g_rw_lock_writer_unlock(&uuidList->lock);
+#ifdef DHLRC_MANAGEUI_TRACK_LOCK
+    qDebug() << "unlocked";
+#endif
+    if(g_rw_lock_reader_trylock(&uuidList->lock))
     {
         guint len = fullList ? g_list_length(fullList) : 0;
         for(int i = 0 ; i < len ; i++)
@@ -106,22 +107,23 @@ QList<QList<QStandardItem*>> ManageUI::getList()
             QList<QStandardItem*> list = {description, uuid, time, type};
             ret.append(list);
         }
-        uuidList? g_rw_lock_reader_unlock(&uuidList->lock): noAction();
+        g_rw_lock_reader_unlock(&uuidList->lock);
     }
     else
     {
+        /* This is a rare situation, if occured, contact the programmer. */
         QStandardItem* description = new QStandardItem;
         QStandardItem* uuid = new QStandardItem;
         QStandardItem* time = new QStandardItem;
         QStandardItem* type = new QStandardItem;
-        description->setData(QString(_("locked")), 0);
-        uuid->setData(QString(_("locked")), 0);
-        time->setData(QString(_("locked")), 0);
-        type->setData(QString(_("locked")), 0);
+        description->setData(QString(_("List locked")), 0);
+        uuid->setData(QString(_("List locked")), 0);
+        time->setData(QString(_("List locked")), 0);
+        type->setData(QString(_("List locked")), 0);
         QList<QStandardItem*> list = {description, uuid, time, type};
         ret.append(list);
     }
-    uuidList ? g_rw_lock_writer_trylock(&uuidList->lock) : false;
+    g_rw_lock_writer_trylock(&uuidList->lock);
     return ret;
 }
 
@@ -140,7 +142,7 @@ void ManageUI::updateModel()
 
 void ManageUI::addBtn_clicked()
 {
-    QString dir = QFileDialog::getOpenFileName(this, _("Select a file"), nullptr, _("Litematic file (*.litematic)"));
+    QString dir = QFileDialog::getOpenFileName(this, _("Select a file"), nullptr, _("Litematic file (*.litematic);;NBT File (*.nbt)"));
     if(!dir.isEmpty())
     {
         GFile* file = g_file_new_for_path(dir.toStdString().c_str());
@@ -159,10 +161,7 @@ void ManageUI::addBtn_clicked()
             NBT* newNBT = NBT_Parse((guint8*)content, len);
             if(newNBT)
             {
-                uuidList ? g_rw_lock_writer_unlock(&uuidList->lock) : noAction();
                 nbt_info_new(newNBT, g_date_time_new_now_local(), description.toStdString().c_str());
-                uuidList = nbt_info_list_get_uuid_list();
-                g_rw_lock_writer_trylock(&uuidList->lock);
             }
             else QMessageBox::critical(this, _("Not Valid File!"), _("Not a valid NBT file!"));
             g_free(content);
@@ -189,8 +188,10 @@ void ManageUI::removeBtn_clicked()
 
 void ManageUI::closeEvent(QCloseEvent* event)
 {
-    qDebug() << "closed";
-    uuidList ? g_rw_lock_writer_unlock(&uuidList->lock) : noAction();
+    #ifdef DHLRC_MANAGEUI_TRACK_LOCK
+    qDebug() << "unlocked in closeEvent";
+    #endif
+    g_rw_lock_writer_unlock(&uuidList->lock);
     QWidget::closeEvent(event);
 }
 
@@ -198,8 +199,8 @@ void ManageUI::showEvent(QShowEvent* event)
 {
     if(!isMinimized())
     {
-        uuidList ? g_rw_lock_writer_trylock(&uuidList->lock) : false;
-        qDebug() << "show";
+        g_rw_lock_writer_trylock(&uuidList->lock);
+        qDebug() << "locked";
     }
     QWidget::showEvent(event);
 }

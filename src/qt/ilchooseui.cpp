@@ -64,7 +64,7 @@ void ilChooseUI::okBtn_clicked()
 {
     if(group->checkedId() != -1)
     {
-        ilUUID = (gchar*)g_list_nth_data(uuidList, group->checkedId());
+        il_info_list_set_uuid((gchar*)g_list_nth_data(uuidList, group->checkedId()));
         accept();
     }
     else

@@ -33,7 +33,7 @@ typedef struct RegionInfo{
 void region_info_list_free();
 gboolean region_info_new(Region* root, GDateTime* time, const gchar* description);
 gboolean region_info_list_remove_item(gchar* uuid);
-RegionInfo* region_info_list_get_region_info(gchar* uuid);
+RegionInfo* region_info_list_get_region_info(const gchar* uuid);
 /* Block the update and update */
 gboolean region_info_list_update_region(gchar* uuid, RegionInfo* info);
 DhList* region_info_list_get_uuid_list();

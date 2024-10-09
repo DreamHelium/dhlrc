@@ -10,10 +10,8 @@ set( DHLRC_MAIN_POT_FILE_DEPENDS
         src/qt/mainwindow.cpp
         src/qt/ilreaderui.cpp
 		src/qt/ilchooseui.cpp
-		src/qt/processui.cpp
 		src/qt/recipesshowui.cpp
 		src/qt/recipesui.cpp
-		src/qt/regionselectui.cpp
 		src/qt/showtrackui.cpp
 		src/qt/nbtselectui.cpp
 		src/qt/blocklistui.cpp

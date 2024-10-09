@@ -68,5 +68,5 @@ void NbtSelectUI::initUI()
 void NbtSelectUI::okBtn_clicked()
 {
     nbt_info_list_set_uuid((const char*)g_list_nth_data(uuidList, group->checkedId()));
-    this->close();
+    accept();
 }

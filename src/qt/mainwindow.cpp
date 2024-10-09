@@ -10,6 +10,7 @@
 #include "../config.h"
 #include <dhutil.h>
 #include <qcontainerfwd.h>
+#include <qdialog.h>
 #include <qevent.h>
 #include <qinputdialog.h>
 #include <qlineedit.h>
@@ -18,17 +19,15 @@
 #include <qobject.h>
 #include <qpushbutton.h>
 #include <string>
+#include "glib.h"
 #include "glibconfig.h"
 #include "ilchooseui.h"
 #include "ilreaderui.h"
 #include "manageui.h"
 #include "nbtreaderui.h"
 #include "nbtselectui.h"
-#include "processui.h"
 #include "recipesui.h"
 #include "regionchooseui.h"
-#include "regionselectui.h"
-#include "blockreaderui.h"
 #include "configui.h"
 #include "ui_mainwindow.h"
 #include <QMimeData>
@@ -38,12 +37,8 @@
 #include "../region.h"
 #include "../region_info.h"
 
-NBT* root = nullptr;
-int regionNum = 0;
-Region* region = nullptr;
 static bool nbtRead = false;
 int verbose_level;
-gchar* ilUUID = nullptr;
 static ManageUI* mui = nullptr;
 
 static QString title = N_("Litematica reader");
@@ -68,12 +63,11 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
-    translation_init();
     ui->setupUi(this);
     mw = this;
-    // ui->widget->hide();
     // pd.hide();
     initSignalSlots();
+    nbt_info_list_init();
 }
 
 MainWindow::~MainWindow()
@@ -114,126 +108,22 @@ void MainWindow::initSignalSlots()
     QObject::connect(ui->configAction, &QAction::triggered, this, &MainWindow::configAction_triggered);
     QObject::connect(ui->clearAction, &QAction::triggered, this, &MainWindow::clearAction_triggered);
     QObject::connect(ui->selectAction, &QAction::triggered, this, &MainWindow::selectAction_triggered);
-    QObject::connect(ui->actionNBT_File, &QAction::triggered, this, &MainWindow::saveNBTAction_triggered);
-    QObject::connect(ui->actionItem_List, &QAction::triggered, this, &MainWindow::saveilAction_triggered);
     */
+    QObject::connect(ui->okBtn, SIGNAL(clicked()), this, SLOT(okBtn_clicked()));
     QObject::connect(ui->manageBtn, &QPushButton::clicked, this, &MainWindow::manageBtn_clicked);
     QObject::connect(ui->ilReaderBtn, &QPushButton::clicked, this, &MainWindow::ilReaderBtn_clicked);
     QObject::connect(ui->recipeCombineBtn, &QPushButton::clicked, this, &MainWindow::recipeCombineBtn_clicked);
-}
-
-void MainWindow::initInternalUI()
-{
-    if(!nbtRead)
-    {
-        nbtRead = true;
-        ui->widget->show();
-        gchar* cacheDir = dh_get_cache_dir();
-        // dh_download_version_manifest(cacheDir, mw_download_progress);
-        g_free(cacheDir);
-        QObject::connect(ui->okBtn, SIGNAL(clicked()), this, SLOT(okBtn_clicked()));
-    }
+    QObject::connect(ui->createBtn, &QPushButton::clicked, this, &MainWindow::createBtn_clicked);
+    QObject::connect(ui->generateBtn, &QPushButton::clicked, this, &MainWindow::generateBtn_clicked);
 }
 
 void MainWindow::okBtn_clicked()
 {
-    if(ui->lrcBtn->isChecked()) /* lrc - Litematica material list with recipe combination */
-    {
-        ProcessUI* pui = new ProcessUI();
-        pui->setAttribute(Qt::WA_DeleteOnClose);
-        pui->show();
-    }
-    else if(ui->lrcExtendBtn->isChecked()) /* block reader */
-    {
-        RegionSelectUI* rsui = new RegionSelectUI();
-        int ret = rsui->exec();
-        if( ret != QDialog::Accepted )
-        {
-            /* Warning */
-            QMessageBox::warning(this, _("Error!"), _("No selected region!"));
-        }
-        else
-        {
-            /* Popup a normal window */
-            BlockReaderUI* brui = new BlockReaderUI(regionNum);
-            brui->setAttribute(Qt::WA_DeleteOnClose);
-            brui->show();
-        }
-    }
-    else if(ui->ilreaderBtn->isChecked()) /* Item list */
-    {
-        ilChooseUI* iui = new ilChooseUI();
-        iui->setAttribute(Qt::WA_DeleteOnClose);
-        int ret = iui->exec();
-
-        if(ret == QDialog::Accepted){
-            IlInfo* info = il_info_list_get_il_info(ilUUID);
-            if(info)
-            {
-                /* Currently it only read */
-                if(g_rw_lock_reader_trylock(&(info->info_lock)))
-                {
-                    ilReaderUI* iui = new ilReaderUI(info);
-                    iui->setAttribute(Qt::WA_DeleteOnClose);
-                    iui->show();
-                }
-                else QMessageBox::critical(this, _("Error!"), _("The item list is locked!"));
-            }
-            else QMessageBox::critical(this, _("Error!"), _("The item list is freed!"));
-        }
-    }
-    else if(ui->recipeBtn->isChecked()) /* Recipe function */
-    {
-        ilChooseUI* iui = new ilChooseUI();
-        iui->setAttribute(Qt::WA_DeleteOnClose);
-        int ret = iui->exec();
-
-        if(ret == QDialog::Accepted){
-            IlInfo* info = il_info_list_get_il_info(ilUUID);
-            if(info) 
-            {
-                if(g_rw_lock_writer_trylock(&(info->info_lock)))
-                {
-                    RecipesUI* rui = new RecipesUI(ilUUID, info);
-                    rui->setAttribute(Qt::WA_DeleteOnClose);
-                    rui->show();
-                }
-                else QMessageBox::critical(this, _("Error!"), _("The item list is locked!"));
-            }
-            else QMessageBox::critical(this, _("Error!"), _("The item list is freed!"));;
-        }
-    }
-    else if(ui->nbtReaderBtn->isChecked())
+    if(ui->nbtReaderBtn->isChecked())
     {
         NbtReaderUI* nrui = new NbtReaderUI();
         nrui->setAttribute(Qt::WA_DeleteOnClose);
         nrui->show();
-    }
-    else if(ui->generateButton->isChecked())
-    {
-        RegionChooseUI* rcui = new RegionChooseUI();
-        rcui->setAttribute(Qt::WA_DeleteOnClose);
-        rcui->exec();
-        if(region)
-        {
-            QString itemlistName = QInputDialog::getText(this, _("Input Item List Name."), _("Input new item list name."));
-            ItemList* new_il = item_list_new_from_region(region);
-            il_info_new(new_il, g_date_time_new_now_local(), itemlistName.toStdString().c_str());
-        }
-    }
-    else if(ui->genRegionBtn->isChecked())
-    {
-        QString regionName = QInputDialog::getText(this, _("Input Region Name"),
-         _("Please input new region's name."));
-        Region* newRegion = nullptr;
-        if(lite_region_num(root))
-        {
-            /* TODO */
-            LiteRegion* lr = lite_region_create(root, 0);
-            newRegion = region_new_from_lite_region(lr);
-        }
-        else newRegion = region_new_from_nbt(root);
-        region_info_new(newRegion, g_date_time_new_now_local(), regionName.toStdString().c_str());
     }
 }
 
@@ -256,35 +146,34 @@ void MainWindow::dropEvent(QDropEvent* event)
 
 void MainWindow::readNbtFile(QString filename)
 {
-    gsize size = 0;
-    quint8 *data = (quint8*)dh_read_file(filename.toStdString().c_str(), &size);
-    NBT* nbtData = NBT_Parse(data, size);
-    free(data);
-    if(nbtData)
+    GFile* file = g_file_new_for_path(filename.toLocal8Bit());
+    char* defaultDescription = g_file_get_basename(file);
+    QString description = QInputDialog::getText(this, _("Enter Desciption"), _("Enter desciption for the NBT file."), QLineEdit::Normal, defaultDescription);
+
+    if(description.isEmpty())
     {
-        auto retBtn1 = QMessageBox::question(this, _("Add NBT File"), _("Do you want to add this NBT file to the list?"));
-        if(retBtn1 == QMessageBox::Yes)
-        {
-            auto str = QInputDialog::getText(this, _("Set NBT Info Description"), _("Please enter description"), QLineEdit::Normal, _("Added from reading file"));
-            nbt_info_new(nbtData, g_date_time_new_now_local(), str.toStdString().c_str());
-            if(!root)
-            {
-                root = nbtData;
-                initInternalUI();
-            }
-            else 
-            {
-                auto retBtn2 = QMessageBox::question(this, _("Set NBT File"), _("Do you want to set this NBT file as default?"));
-                if(retBtn2 == QMessageBox::Yes)
-                    root = nbtData;
-            }
-        }
-        else NBT_Free(nbtData);
+        QMessageBox::critical(this, _("No Description Entered!"), _("No desciption entered! Will not add the NBT file!"));
     }
     else
     {
-        QMessageBox::critical(this, _("Not a valid file!"), _("This file is not a valid NBT file!"));
+        char* content;
+        gsize len;
+        g_file_load_contents(file, NULL, &content, &len, NULL, NULL);
+        NBT* newNBT = NBT_Parse((guint8*)content, len);
+        if(newNBT)
+        {
+            DhList* uuidList = nbt_info_list_get_uuid_list();
+            if(g_rw_lock_writer_trylock(&uuidList->lock))
+            {
+                nbt_info_new(newNBT, g_date_time_new_now_local(), description.toStdString().c_str());
+                g_rw_lock_writer_unlock(&uuidList->lock);
+            }
+            else QMessageBox::critical(this, _("Error!"), _("NBT list is locked!"));
+        }
+        else QMessageBox::critical(this, _("Not Valid File!"), _("Not a valid NBT file!"));
+        g_free(content);
     }
+    g_object_unref(file);
 }
 
 void MainWindow::configAction_triggered()
@@ -292,18 +181,6 @@ void MainWindow::configAction_triggered()
     ConfigUI* cui = new ConfigUI();
     cui->setAttribute(Qt::WA_DeleteOnClose);
     cui->show();
-}
-
-void MainWindow::clearAction_triggered()
-{
-    ilChooseUI* icui = new ilChooseUI();
-    icui->setAttribute(Qt::WA_DeleteOnClose);
-    int ret = icui->exec();
-    bool success = false;
-    if(ret == QDialog::Accepted)
-        success = il_info_list_remove_item(ilUUID);
-    if(!success)
-        QMessageBox::critical(this, _("Error!"), _("The item list is locked!"));
 }
 
 void MainWindow::selectAction_triggered()
@@ -317,31 +194,30 @@ void MainWindow::selectAction_triggered()
     else QMessageBox::critical(this, _("No NBT File!"), _("No NBT file loaded!"));
 }
 
-void MainWindow::saveNBTAction_triggered()
-{
-
-}
-
 void MainWindow::saveilAction_triggered()
 {
-    ilChooseUI* iui = new ilChooseUI();
-    iui->setAttribute(Qt::WA_DeleteOnClose);
-    int ret = iui->exec();
+    if(il_info_list_get_uuid_list())
+    {
+        ilChooseUI* iui = new ilChooseUI();
+        iui->setAttribute(Qt::WA_DeleteOnClose);
+        int ret = iui->exec();
 
-    if(ret == QDialog::Accepted){
-        IlInfo* info = il_info_list_get_il_info(ilUUID);
-        if(info) 
-        {
-            if(g_rw_lock_reader_trylock(&(info->info_lock)))
+        if(ret == QDialog::Accepted){
+            IlInfo* info = il_info_list_get_il_info(il_info_list_get_uuid());
+            if(info) 
             {
-                QString filepos = QFileDialog::getSaveFileName(this, _("Save file"), nullptr, _("CSV file (*.csv)"));
-                if(!filepos.isEmpty())  item_list_to_csv(filepos.toStdString().c_str(), info->il);
-                g_rw_lock_reader_unlock(&(info->info_lock));
+                if(g_rw_lock_reader_trylock(&(info->info_lock)))
+                {
+                    QString filepos = QFileDialog::getSaveFileName(this, _("Save file"), nullptr, _("CSV file (*.csv)"));
+                    if(!filepos.isEmpty())  item_list_to_csv(filepos.toStdString().c_str(), info->il);
+                    g_rw_lock_reader_unlock(&(info->info_lock));
+                }
+                else QMessageBox::critical(this, _("Error!"), _("The item list is locked!"));
             }
-            else QMessageBox::critical(this, _("Error!"), _("The item list is locked!"));
+            else QMessageBox::critical(this, _("Error!"), _("The item list is freed!"));
         }
-        else QMessageBox::critical(this, _("Error!"), _("The item list is freed!"));;
     }
+    else QMessageBox::critical(this, _("Error!"), _("No item list!"));
 }
 
 void MainWindow::manageBtn_clicked()
@@ -352,45 +228,121 @@ void MainWindow::manageBtn_clicked()
 
 void MainWindow::ilReaderBtn_clicked()
 {
-    ilChooseUI* iui = new ilChooseUI();
-    iui->setAttribute(Qt::WA_DeleteOnClose);
-    int ret = iui->exec();
+    if(il_info_list_get_uuid_list())
+    {
+        ilChooseUI* iui = new ilChooseUI();
+        iui->setAttribute(Qt::WA_DeleteOnClose);
+        int ret = iui->exec();
 
-    if(ret == QDialog::Accepted){
-        IlInfo* info = il_info_list_get_il_info(il_info_list_get_uuid());
-        if(info)
-        {
-            /* Currently it only read */
-            if(g_rw_lock_reader_trylock(&(info->info_lock)))
+        if(ret == QDialog::Accepted){
+            IlInfo* info = il_info_list_get_il_info(il_info_list_get_uuid());
+            if(info)
             {
-                ilReaderUI* iui = new ilReaderUI(info);
-                iui->setAttribute(Qt::WA_DeleteOnClose);
-                iui->show();
+                /* Currently it only read */
+                if(g_rw_lock_reader_trylock(&(info->info_lock)))
+                {
+                    ilReaderUI* iui = new ilReaderUI(info);
+                    iui->setAttribute(Qt::WA_DeleteOnClose);
+                    iui->show();
+                }
+                else QMessageBox::critical(this, _("Error!"), _("The item list is locked!"));
             }
-            else QMessageBox::critical(this, _("Error!"), _("The item list is locked!"));
+            else QMessageBox::critical(this, _("Error!"), _("The item list is freed!"));
         }
-        else QMessageBox::critical(this, _("Error!"), _("The item list is freed!"));
     }
+    else QMessageBox::critical(this, _("Error!"), _("No item list!"));
 }
 
 void MainWindow::recipeCombineBtn_clicked()
 {
-    ilChooseUI* iui = new ilChooseUI();
-    iui->setAttribute(Qt::WA_DeleteOnClose);
-    int ret = iui->exec();
+    if(il_info_list_get_uuid_list())
+    {
+        ilChooseUI* iui = new ilChooseUI();
+        iui->setAttribute(Qt::WA_DeleteOnClose);
+        int ret = iui->exec();
 
-    if(ret == QDialog::Accepted){
-        IlInfo* info = il_info_list_get_il_info(il_info_list_get_uuid());
-        if(info) 
-        {
-            if(g_rw_lock_writer_trylock(&(info->info_lock)))
+        if(ret == QDialog::Accepted){
+            IlInfo* info = il_info_list_get_il_info(il_info_list_get_uuid());
+            if(info) 
             {
-                RecipesUI* rui = new RecipesUI(ilUUID, info);
-                rui->setAttribute(Qt::WA_DeleteOnClose);
-                rui->show();
+                if(g_rw_lock_writer_trylock(&(info->info_lock)))
+                {
+                    RecipesUI* rui = new RecipesUI((char*)il_info_list_get_uuid(), info);
+                    rui->setAttribute(Qt::WA_DeleteOnClose);
+                    rui->show();
+                }
+                else QMessageBox::critical(this, _("Error!"), _("The item list is locked!"));
             }
-            else QMessageBox::critical(this, _("Error!"), _("The item list is locked!"));
+            else QMessageBox::critical(this, _("Error!"), _("The item list is freed!"));;
         }
-        else QMessageBox::critical(this, _("Error!"), _("The item list is freed!"));;
     }
+    else QMessageBox::critical(this, _("Error!"), _("No item list!"));
+}
+
+void MainWindow::createBtn_clicked()
+{
+    DhList* list = nbt_info_list_get_uuid_list();
+    if(g_rw_lock_reader_trylock(&list->lock))
+    {
+        /* Lock for NBT info start */
+        NbtSelectUI* nsui = new NbtSelectUI();
+        nsui->setAttribute(Qt::WA_DeleteOnClose);
+        auto res = nsui->exec();
+        /* Lock for NBT info end */
+        g_rw_lock_reader_unlock(&list->lock);
+        if(res == QDialog::Accepted)
+        {
+            NbtInfo* info = nbt_info_list_get_nbt_info(nbt_info_list_get_uuid());
+            if(g_rw_lock_reader_trylock(&info->info_lock))
+            {
+                /* Lock NBT start */
+                if(info->type == NBTStruct)
+                {
+                    auto str = QInputDialog::getText(this, _("Enter Region Name"), _("Enter name for the new region."), QLineEdit::Normal, info->description);
+                    if(str.isEmpty())
+                        QMessageBox::critical(this, _("Error!"), _("No description for the Region!"));
+                    else
+                    {
+                        Region* region = region_new_from_nbt(info->root);
+                        region_info_new(region, g_date_time_new_now_local(), str.toLocal8Bit());
+                    }
+                }
+
+                /* Lock NBT end */
+                g_rw_lock_reader_unlock(&info->info_lock);
+            }
+            /* Lock NBT fail */
+            else QMessageBox::critical(this, _("Error!"), _("This NBT is locked!"));
+        }
+        /* No option given for the NBT selection */
+        else QMessageBox::critical(this, _("Error!"), _("No NBT or no NBT selected!"));
+    }
+    /* Lock NBT info fail */
+    else QMessageBox::critical(this, _("Error!"), _("NBT list is locked!"));
+}
+
+void MainWindow::generateBtn_clicked()
+{
+    DhList* list = region_info_list_get_uuid_list();
+    if(g_rw_lock_reader_trylock(&list->lock))
+    {
+        RegionChooseUI* rcui = new RegionChooseUI();
+        rcui->setAttribute(Qt::WA_DeleteOnClose);
+        auto ret = rcui->exec();
+        g_rw_lock_reader_unlock(&list->lock);
+        if(ret == QDialog::Accepted)
+        {
+            RegionInfo* info = region_info_list_get_region_info(region_info_list_get_uuid());
+            if(g_rw_lock_reader_trylock(&info->info_lock))
+            {
+                QString itemlistName = QInputDialog::getText(this, _("Input Item List Name."), _("Input new item list name."), QLineEdit::Normal, info->description);
+                ItemList* new_il = item_list_new_from_region(info->root);
+                il_info_new(new_il, g_date_time_new_now_local(), itemlistName.toLocal8Bit());
+            }
+            else QMessageBox::critical(this, _("Error!"), _("The Region is locked."));
+        }
+        /* No option given for the Region selection */
+        else QMessageBox::critical(this, _("Error!"), _("No Region or no Region selected!"));
+    }
+    else QMessageBox::critical(this, _("Error!"), _("Region list is locked!"));
 }

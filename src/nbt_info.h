@@ -35,10 +35,11 @@ typedef struct NbtInfo{
     DhNbtType type;
 } NbtInfo;
 
+void nbt_info_list_init();
 void nbt_info_list_free();
 gboolean nbt_info_new(NBT* root, GDateTime* time, const gchar* description);
 gboolean nbt_info_list_remove_item(gchar* uuid);
-NbtInfo* nbt_info_list_get_nbt_info(gchar* uuid);
+NbtInfo* nbt_info_list_get_nbt_info(const gchar* uuid);
 /* Block the update and update */
 gboolean nbt_info_list_update_nbt(gchar* uuid, NbtInfo* info);
 DhList* nbt_info_list_get_uuid_list();

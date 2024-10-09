@@ -29,7 +29,6 @@ private:
     Ui::MainWindow *ui;
     
     void initSignalSlots();
-    void initInternalUI();
     void readNbtFile(QString filename);
     
 
@@ -41,13 +40,13 @@ private Q_SLOTS:
     void openAction_triggered();
     void okBtn_clicked();
     void configAction_triggered();
-    void clearAction_triggered();
     void selectAction_triggered();
-    void saveNBTAction_triggered();
     void saveilAction_triggered();
     void manageBtn_clicked();
     void ilReaderBtn_clicked();
     void recipeCombineBtn_clicked();
+    void createBtn_clicked();
+    void generateBtn_clicked();
 
 };
 #endif // MAINWINDOW_H

@@ -1,7 +1,6 @@
 #include "mainwindow.h"
 #include "../main.h"
 #include "../translation.h"
-#include "../libnbt/nbt.h"
 #include <QApplication>
 #include <QTranslator>
 

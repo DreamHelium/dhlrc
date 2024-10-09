@@ -86,14 +86,12 @@ gboolean nbt_info_new(NBT* root, GDateTime* time, const gchar* description)
     if(!table)
     {
         table = dh_mt_table_new(g_str_hash, is_same_string, g_free, nbtinfo_free);
-        uuid_list = dh_list_new();
     }
-    g_rw_lock_writer_lock(&uuid_list->lock);
     gchar* uuid = g_uuid_string_random();
     ret = dh_mt_table_insert(table, uuid, info);
     uuid_list->list = g_list_append(uuid_list->list, uuid);
-    g_rw_lock_writer_unlock(&uuid_list->lock);
-    /* Unlock the writer lock */
+    /* Unlock the writer lock
+     * UUID Lock is unlocked by main function  */
     g_rw_lock_writer_unlock(&(info->info_lock));
     return ret;
 }
@@ -112,7 +110,7 @@ gboolean nbt_info_list_remove_item(gchar* uuid)
     else return FALSE; /* Some function is using the il */
 }
 
-NbtInfo* nbt_info_list_get_nbt_info(gchar* uuid)
+NbtInfo* nbt_info_list_get_nbt_info(const gchar* uuid)
 {
     NbtInfo* info = dh_mt_table_lookup(table, uuid);
     return info;
@@ -139,4 +137,11 @@ void nbt_info_list_set_uuid(const char* auuid)
 const char* nbt_info_list_get_uuid()
 {
     return uuid;
+}
+
+void nbt_info_list_init()
+{
+    /* In this way we get a new UUID list without 
+     * figuring whether the list is created. */
+    uuid_list = dh_list_new();
 }
