@@ -2,9 +2,6 @@
 #define BLOCKLISTUI_H
 
 #include <QWidget>
-#include <qlist.h>
-#include "../translation.h"
-#include "../litematica_region.h"
 #include "../region.h"
 
 
@@ -17,13 +14,12 @@ class BlockListUI : public QWidget
     Q_OBJECT
 
 public:
-    BlockListUI(LiteRegion* lr, QWidget *parent = nullptr);
+    BlockListUI(QWidget *parent = nullptr);
     ~BlockListUI();
 
 private:
     Ui::BlockListUI *ui;
-    Region* region;
-    void setList(LiteRegion* lr);
+    void setList(Region* region);
     void drawList();
 
 private Q_SLOTS:

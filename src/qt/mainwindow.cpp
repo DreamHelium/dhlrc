@@ -23,6 +23,7 @@
 #include "glibconfig.h"
 #include "ilchooseui.h"
 #include "ilreaderui.h"
+#include "lrchooseui.h"
 #include "manageui.h"
 #include "nbtreaderui.h"
 #include "nbtselectui.h"
@@ -42,19 +43,7 @@ int verbose_level;
 static ManageUI* mui = nullptr;
 
 static QString title = N_("Litematica reader");
-static QString subtitle = N_("The functions are listed below:");
 static QStringList menu = {N_("&File"), N_("&Tool")};
-static QStringList funcs = {
-    N_("NBT s&elector"),
-    N_("&NBT lite reader with modifier"), 
-    N_("Litematica material &list with recipe combination"), 
-    N_("Litematica &block reader"),
-    N_("&Item list reader and modifier"),
-    N_("&Recipe combiner"),
-    N_("&Clear Item list"),
-    N_("Config &settings"),
-    N_("Generate Region &struct"),
-    N_("&Generate item list with Region Struct")};
 static QStringList buttonList = {N_("&OK") , N_("&Close")};
 
 static MainWindow* mw;
@@ -68,6 +57,7 @@ MainWindow::MainWindow(QWidget *parent)
     // pd.hide();
     initSignalSlots();
     nbt_info_list_init();
+    region_info_list_init();
 }
 
 MainWindow::~MainWindow()
@@ -307,6 +297,13 @@ void MainWindow::createBtn_clicked()
                         region_info_new(region, g_date_time_new_now_local(), str.toLocal8Bit());
                     }
                 }
+                else if(info->type == Litematica)
+                {
+                    LrChooseUI* lcui = new LrChooseUI(this);
+                    lcui->setAttribute(Qt::WA_DeleteOnClose);
+                    lcui->exec();
+                }
+                else QMessageBox::critical(this, _("Error!"), _("The NBT Struct is unsupported!"));
 
                 /* Lock NBT end */
                 g_rw_lock_reader_unlock(&info->info_lock);

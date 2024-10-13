@@ -1,7 +1,5 @@
 #include "ilreaderui.h"
-#include "ilchooseui.h"
 #include "../translation.h"
-#include "mainwindow.h"
 #include <QTableWidget>
 #include <QFileDialog>
 #include <glib.h>

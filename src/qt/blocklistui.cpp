@@ -6,6 +6,9 @@
 #include <qmessagebox.h>
 #include <qnamespace.h>
 #include <qobject.h>
+#include <QList>
+#include "../translation.h"
+#include "../region_info.h"
 
 static bool ignoreAir = false;
 
@@ -15,15 +18,15 @@ static gboolean find_block(gconstpointer a, gconstpointer b)
     return g_str_equal(info->id_name, b);
 }
 
-BlockListUI::BlockListUI(LiteRegion* lr, QWidget *parent)
+BlockListUI::BlockListUI(QWidget *parent)
     : QWidget(parent),
     ui(new Ui::BlockListUI)
 {
-    auto btn = QMessageBox::question(this, _("Ignore Air?"), _("Do you want to ignore air?"));
-    if(btn == QMessageBox::Yes) ignoreAir = true;
+    // auto btn = QMessageBox::question(this, _("Ignore Air?"), _("Do you want to ignore air?"));
+    // if(btn == QMessageBox::Yes) ignoreAir = true;
     ui->setupUi(this);
     QObject::connect(ui->lineEdit, &QLineEdit::textChanged, this, &BlockListUI::textChanged_cb);
-    setList(lr);
+    // setList(region);
     drawList();
 }
 
@@ -31,28 +34,27 @@ BlockListUI::~BlockListUI()
 {
     ui->tableWidget->clear();
     delete ui;
-    region_free(region);
 }
 
-void BlockListUI::setList(LiteRegion* lr)
+void BlockListUI::setList(Region* region)
 {
-    region = region_new_from_lite_region(lr);
-    if(ignoreAir)
-    {
-        bool not_found = false;
-        do 
-        {
-            guint index = 0;
-            bool found = g_ptr_array_find_with_equal_func(region->block_info_array, "minecraft:air", find_block, &index);
-            if(found)
-                g_ptr_array_remove_index(region->block_info_array, index);
-            else not_found = true;
-        }while (!not_found);
-    }
+    // if(ignoreAir)
+    // {
+    //     bool not_found = false;
+    //     do 
+    //     {
+    //         guint index = 0;
+    //         bool found = g_ptr_array_find_with_equal_func(region->block_info_array, "minecraft:air", find_block, &index);
+    //         if(found)
+    //             g_ptr_array_remove_index(region->block_info_array, index);
+    //         else not_found = true;
+    //     }while (!not_found);
+    // }
 }
 
 void BlockListUI::drawList()
 {
+    Region* region = region_info_list_get_region_info(region_info_list_get_uuid())->root;
     ui->tableWidget->setRowCount(region->block_info_array->len);
     for(int i = 0 ; i < region->block_info_array->len ; i++)
     {

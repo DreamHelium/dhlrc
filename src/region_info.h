@@ -40,6 +40,7 @@ DhList* region_info_list_get_uuid_list();
 
 void region_info_list_set_uuid(const char* uuid);
 const char* region_info_list_get_uuid();
+void region_info_list_init();
 
 G_END_DECLS
 

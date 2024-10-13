@@ -20,40 +20,59 @@ ilChooseUI::ilChooseUI(QWidget *parent)
     uuidList = il_info_list_get_uuid_list()->list;
     guint len = uuidList ? g_list_length(uuidList) : 0;
 
-    for(int i = 0 ; i < len ; i++)
+    if(len)
     {
-        IlInfo* info = il_info_list_get_il_info((gchar*)g_list_nth_data(uuidList, i));
-        if(g_rw_lock_reader_trylock(&(info->info_lock)))
+        for(int i = 0 ; i < len ; i++)
         {
-            gchar* time_literal = g_date_time_format(info->time, "%T");
-            QString str = QString("(UUID: %1) %2 (%3)").arg((gchar*)g_list_nth_data(uuidList, i)).arg(info->description).arg(time_literal);
-            QRadioButton* btn = new QRadioButton(str);
-            g_free(time_literal);
-            g_rw_lock_reader_unlock(&(info->info_lock));
-            layout->addWidget(btn);
-            group->addButton(btn, i);
+            IlInfo* info = il_info_list_get_il_info((gchar*)g_list_nth_data(uuidList, i));
+            if(g_rw_lock_reader_trylock(&(info->info_lock)))
+            {
+                gchar* time_literal = g_date_time_format(info->time, "%T");
+                QString str = QString("(UUID: %1) %2 (%3)").arg((gchar*)g_list_nth_data(uuidList, i)).arg(info->description).arg(time_literal);
+                QRadioButton* btn = new QRadioButton(str);
+                g_free(time_literal);
+                g_rw_lock_reader_unlock(&(info->info_lock));
+                layout->addWidget(btn);
+                group->addButton(btn, i);
+            }
+            else {
+                QRadioButton* btn = new QRadioButton(_("locked"));
+                layout->addWidget(btn);
+                group->addButton(btn, i);
+            }
         }
-        else {
-            QRadioButton* btn = new QRadioButton(_("locked"));
-            layout->addWidget(btn);
-            group->addButton(btn, i);
-        }
+        
+        layout->addStretch();
+
+        hLayout = new QHBoxLayout();
+        okBtn = new QPushButton(_("&OK"));
+        closeBtn = new QPushButton(_("&Close"));
+
+        hLayout->addStretch();
+        hLayout->addWidget(okBtn);
+        hLayout->addWidget(closeBtn);
+        layout->addLayout(hLayout);
+        this->setLayout(layout);
+
+        QObject::connect(okBtn, &QPushButton::clicked, this, &ilChooseUI::okBtn_clicked);
+        QObject::connect(closeBtn, &QPushButton::clicked, this, &ilChooseUI::close);
     }
-    
-    layout->addStretch();
+    else
+    {
+        layout = new QVBoxLayout();
 
-    hLayout = new QHBoxLayout();
-    okBtn = new QPushButton(_("&OK"));
-    closeBtn = new QPushButton(_("&Close"));
+        QLabel* label = new QLabel(_("No item list available!"));
+        layout->addWidget(label);
 
-    hLayout->addStretch();
-    hLayout->addWidget(okBtn);
-    hLayout->addWidget(closeBtn);
-    layout->addLayout(hLayout);
-    this->setLayout(layout);
+        okBtn = new QPushButton(_("&OK"));
+        hLayout = new QHBoxLayout();
+        hLayout->addStretch();
+        hLayout->addWidget(okBtn);
+        layout->addLayout(hLayout);
 
-    QObject::connect(okBtn, &QPushButton::clicked, this, &ilChooseUI::okBtn_clicked);
-    QObject::connect(closeBtn, &QPushButton::clicked, this, &ilChooseUI::close);
+        QObject::connect(okBtn, &QPushButton::clicked, this, &ilChooseUI::close);
+        setLayout(layout);
+    }
 }
 
 ilChooseUI::~ilChooseUI()

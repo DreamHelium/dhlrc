@@ -71,7 +71,6 @@ gboolean region_info_new(Region* root, GDateTime* time, const gchar* description
     if(!table)
     {
         table = dh_mt_table_new(g_str_hash, is_same_string, g_free, region_info_free);
-        uuid_list = dh_list_new();
     }
     g_rw_lock_writer_lock(&uuid_list->lock);
     gchar* uuid = g_uuid_string_random();
@@ -125,4 +124,11 @@ void region_info_list_set_uuid(const char* auuid)
 const char* region_info_list_get_uuid()
 {
     return uuid;
+}
+
+void region_info_list_init()
+{
+    /* In this way we get a new UUID list without 
+     * figuring whether the list is created. */
+    uuid_list = dh_list_new();
 }
