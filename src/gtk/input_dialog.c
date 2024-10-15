@@ -1,4 +1,5 @@
 #include "input_dialog.h"
+#include "glib.h"
 #include "gtk/gtk.h"
 #include <string.h>
 
@@ -8,31 +9,32 @@ static GtkWidget* input_line;
 static GtkWidget* ok_button;
 static GtkWidget* close_button;
 static DhInputFunc* func;
+static GMainLoop* loop;
 
 typedef struct SelfWindow{
     GtkWidget* dialog;
     GThread* thread;
 } SelfWindow;
 
+static void wait_func(const char* str)
+{
+    g_main_loop_quit(loop);
+}
+
 static void set_text(GtkButton* self, gpointer user_data)
 {
-    while (TRUE)
+    if(self == GTK_BUTTON(ok_button))
     {
-        if(self == GTK_BUTTON(ok_button))
-        {
-            GtkEntryBuffer* buffer = gtk_entry_get_buffer(GTK_ENTRY(input_line));
-            text = g_strdup(gtk_entry_buffer_get_text(buffer));
-            break;
-        }
-        else if(self == GTK_BUTTON(close_button))
-        {
-            text = NULL;
-            break;
-        }
+        GtkEntryBuffer* buffer = gtk_entry_get_buffer(GTK_ENTRY(input_line));
+        text = g_strdup(gtk_entry_buffer_get_text(buffer));
     }
-    gtk_window_destroy(GTK_WINDOW(dialog));
+    else if(self == GTK_BUTTON(close_button))
+    {
+        text = NULL;
+    }
+    
     func(text);
-    g_free(text);
+    gtk_window_destroy(GTK_WINDOW(dialog));
 }
 
 static gpointer test(gpointer data)
@@ -77,5 +79,17 @@ void dh_input_dialog_new(const char* title, const char* content, const char* tip
 
 char* dh_input_dialog_get_text()
 {
+    return text;
+}
+
+char* dh_input_dialog_new_no_func(const char* title, const char* content, const char* tip, const char* default_input, GtkWindow* parent)
+{
+    dh_input_dialog_new(title, title, tip, default_input, parent, wait_func);
+
+    /* Found in GtkDialog.run ... ? */
+    loop = g_main_loop_new(NULL, FALSE);
+    g_main_loop_run(loop);
+    g_main_loop_unref(loop);
+    loop = NULL;
     return text;
 }

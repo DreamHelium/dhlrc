@@ -34,7 +34,7 @@
        <item>
         <widget class="QPushButton" name="addBtn">
          <property name="text">
-          <string/>
+          <string>&amp;Add</string>
          </property>
          <property name="icon">
           <iconset theme="list-add"/>
@@ -44,7 +44,7 @@
        <item>
         <widget class="QPushButton" name="removeBtn">
          <property name="text">
-          <string/>
+          <string>&amp;Remove</string>
          </property>
          <property name="icon">
           <iconset theme="list-remove"/>
@@ -54,7 +54,7 @@
        <item>
         <widget class="QPushButton" name="refreshBtn">
          <property name="text">
-          <string/>
+          <string>R&amp;efresh</string>
          </property>
          <property name="icon">
           <iconset theme="system-reboot"/>
@@ -64,7 +64,7 @@
        <item>
         <widget class="QPushButton" name="saveBtn">
          <property name="text">
-          <string/>
+          <string>&amp;Save</string>
          </property>
          <property name="icon">
           <iconset theme="document-save"/>

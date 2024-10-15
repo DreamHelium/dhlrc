@@ -17,6 +17,13 @@
 
 // #define DHLRC_MANAGEUI_TRACK_LOCK
 
+static QStringList buttonStr = {
+    N_("&Add"),
+    N_("&Remove"),
+    N_("R&efresh"),
+    N_("&Save")
+};
+
 static QString getTypeOfNbt(DhNbtType type)
 {
     switch(type)
@@ -34,6 +41,7 @@ ManageUI::ManageUI(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::ManageUI)
 {
+    setWindowTitle(_("Manage NBT"));
     ui->setupUi(this);
     initSignalSlots();
     model = new QStandardItemModel(0, 4);

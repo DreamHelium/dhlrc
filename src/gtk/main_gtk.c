@@ -29,18 +29,12 @@ static GtkWidget*
 make_title_bar();
 
 static void
-add_nbt_info(const char* description)
+debug (GtkButton* self,
+       gpointer user_data)
 {
-  if(description)
-  {
-    nbt_info_new(new_nbt, g_date_time_new_now_local(), description);
-  }
-  else
-  {
-    NBT_Free(new_nbt);
-    GtkAlertDialog* dialog = gtk_alert_dialog_new(_("No desciption entered! The NBT will not be added!"));
-    gtk_alert_dialog_show(dialog, GTK_WINDOW(window));
-  }
+  char* input = dh_input_dialog_new_no_func("test", "test", "test", "test", GTK_WINDOW(window));
+  GtkAlertDialog* dialog = gtk_alert_dialog_new("%s", input? input : "NULL");
+  gtk_alert_dialog_show(dialog, GTK_WINDOW(window));
 }
 
 static void
@@ -58,7 +52,20 @@ nbt_open_response (GtkDialog *dialog,
       g_file_load_contents(file, NULL, &content, &len, NULL, NULL);
       new_nbt = NBT_Parse(content, len);
 
-      dh_input_dialog_new(_("Enter Desciption"), _("Please enter description for the NBT."), _("Desciption"), name, GTK_WINDOW(window), add_nbt_info);
+      char* description = dh_input_dialog_new_no_func(_("Enter Desciption"), _("Please enter description for the NBT."), _("Desciption"), name, GTK_WINDOW(window));
+
+      if(description)
+      {
+        nbt_info_new(new_nbt, g_date_time_new_now_local(), description);
+      }
+      else
+      {
+        NBT_Free(new_nbt);
+        GtkAlertDialog* dialog = gtk_alert_dialog_new(_("No desciption entered! The NBT will not be added!"));
+        gtk_alert_dialog_show(dialog, GTK_WINDOW(window));
+      }
+
+      g_free(description);
 
       g_object_unref(file);
     }
@@ -121,6 +128,7 @@ static void
 activate (GtkApplication *app,
           gpointer        user_data)
 {
+  nbt_info_list_init();
   window = gtk_application_window_new (app);
   gtk_window_set_title (GTK_WINDOW (window), _("Litematica reader"));
   gtk_window_set_default_size(GTK_WINDOW(window), 400, 400);
@@ -217,11 +225,18 @@ make_title_bar()
   region_button = gtk_toggle_button_new_with_label(_("Region"));
   nbt_button = gtk_toggle_button_new_with_label(_("NBT"));
   item_list_button = gtk_toggle_button_new_with_label(_("Item List"));
+#ifdef DH_DEBUG_IN_IDE
+  GtkWidget* debug_button = gtk_toggle_button_new_with_label("debug");
+#endif
   gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(nbt_button), TRUE);
   
   gtk_box_append(GTK_BOX(box), nbt_button);
   gtk_box_append(GTK_BOX(box), region_button);
   gtk_box_append(GTK_BOX(box), item_list_button);
+#ifdef DH_DEBUG_IN_IDE
+  gtk_box_append(GTK_BOX(box), debug_button);
+#endif
+
   gtk_toggle_button_set_group (GTK_TOGGLE_BUTTON(nbt_button), GTK_TOGGLE_BUTTON(region_button));
   gtk_toggle_button_set_group (GTK_TOGGLE_BUTTON(item_list_button), GTK_TOGGLE_BUTTON(region_button));
 
@@ -229,6 +244,9 @@ make_title_bar()
   g_signal_connect (region_button, "toggled", G_CALLBACK(title_bar_button_toggled), NULL);
   g_signal_connect (nbt_button, "toggled", G_CALLBACK(title_bar_button_toggled), NULL);
   g_signal_connect (item_list_button, "toggled", G_CALLBACK(title_bar_button_toggled), NULL);
+#ifdef DH_DEBUG_IN_IDE
+  g_signal_connect (debug_button, "toggled", G_CALLBACK(debug), NULL);
+#endif
 
   return header_bar;
 }
@@ -244,6 +262,8 @@ main (int    argc,
   app = gtk_application_new ("cn.dh.dhlrc", G_APPLICATION_DEFAULT_FLAGS);
   g_signal_connect (app, "activate", G_CALLBACK (activate), NULL);
   status = g_application_run (G_APPLICATION (app), argc, argv);
+
+  nbt_info_list_free();
   g_object_unref (app);
 
   return status;

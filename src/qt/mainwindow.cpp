@@ -288,7 +288,7 @@ void MainWindow::createBtn_clicked()
                 /* Lock NBT start */
                 if(info->type == NBTStruct)
                 {
-                    auto str = QInputDialog::getText(this, _("Enter Region Name"), _("Enter name for the new region."), QLineEdit::Normal, info->description);
+                    auto str = QInputDialog::getText(this, _("Enter Region Name"), _("Enter name for the new Region."), QLineEdit::Normal, info->description);
                     if(str.isEmpty())
                         QMessageBox::critical(this, _("Error!"), _("No description for the Region!"));
                     else
