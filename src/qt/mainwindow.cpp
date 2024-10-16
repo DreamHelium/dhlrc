@@ -45,6 +45,21 @@ static ManageUI* mui = nullptr;
 static QString title = N_("Litematica reader");
 static QStringList menu = {N_("&File"), N_("&Tool")};
 static QStringList buttonList = {N_("&OK") , N_("&Close")};
+static QStringList funcList = {
+    N_("&Manage NBT"),
+    N_("N&BT Reader"),
+    N_("&Create Region from NBT"),
+    N_("&Generate item list"),
+    N_("&Block reader"),
+    N_("I&tem list reader and modifier"),
+    N_("R&ecipe combiner")
+};
+static QStringList description = {
+    N_("Let's load a NBT file here!"),
+    N_("You can do things below for the NBT file."),
+    N_("First, you need to create a Region struct."),
+    N_("Second, you can do lots of things with the Region.")
+};
 
 static MainWindow* mw;
 
@@ -66,6 +81,7 @@ MainWindow::~MainWindow()
     delete mui;
     nbt_info_list_free();
     il_info_list_free();
+    region_info_list_free();
     dh_exit();
     dh_exit1();
 }
@@ -323,20 +339,15 @@ void MainWindow::generateBtn_clicked()
     DhList* list = region_info_list_get_uuid_list();
     if(g_rw_lock_reader_trylock(&list->lock))
     {
-        RegionChooseUI* rcui = new RegionChooseUI();
+        RegionChooseUI* rcui = new RegionChooseUI(true);
         rcui->setAttribute(Qt::WA_DeleteOnClose);
         auto ret = rcui->exec();
         g_rw_lock_reader_unlock(&list->lock);
         if(ret == QDialog::Accepted)
         {
-            RegionInfo* info = region_info_list_get_region_info(region_info_list_get_uuid());
-            if(g_rw_lock_reader_trylock(&info->info_lock))
-            {
-                QString itemlistName = QInputDialog::getText(this, _("Input Item List Name."), _("Input new item list name."), QLineEdit::Normal, info->description);
-                ItemList* new_il = item_list_new_from_region(info->root);
-                il_info_new(new_il, g_date_time_new_now_local(), itemlistName.toLocal8Bit());
-            }
-            else QMessageBox::critical(this, _("Error!"), _("The Region is locked."));
+            QString itemlistName = QInputDialog::getText(this, _("Input Item List Name."), _("Input new item list name."));
+            ItemList* new_il = item_list_new_from_multi_region(region_info_list_get_multi_uuid());
+            il_info_new(new_il, g_date_time_new_now_local(), itemlistName.toLocal8Bit());
         }
         /* No option given for the Region selection */
         else QMessageBox::critical(this, _("Error!"), _("No Region or no Region selected!"));

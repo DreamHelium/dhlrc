@@ -39,7 +39,7 @@
             <item>
              <widget class="QPushButton" name="manageBtn">
               <property name="text">
-               <string>Manage NBT</string>
+               <string>&amp;Manage NBT</string>
               </property>
              </widget>
             </item>
@@ -55,7 +55,7 @@
           <item>
            <widget class="QPushButton" name="pushButton_3">
             <property name="text">
-             <string>NBT Reader</string>
+             <string>N&amp;BT Reader</string>
             </property>
            </widget>
           </item>
@@ -80,7 +80,7 @@
           <item>
            <widget class="QPushButton" name="createBtn">
             <property name="text">
-             <string>Create Region from NBT</string>
+             <string>&amp;Create Region from NBT</string>
             </property>
            </widget>
           </item>
@@ -94,14 +94,14 @@
           <item>
            <widget class="QPushButton" name="generateBtn">
             <property name="text">
-             <string>Generate item list</string>
+             <string>&amp;Generate item list</string>
             </property>
            </widget>
           </item>
           <item>
            <widget class="QPushButton" name="pushButton_6">
             <property name="text">
-             <string>Block reader</string>
+             <string>&amp;Block reader</string>
             </property>
            </widget>
           </item>
@@ -119,14 +119,14 @@
           <item>
            <widget class="QPushButton" name="ilReaderBtn">
             <property name="text">
-             <string>&amp;Item list reader and modifier</string>
+             <string>I&amp;tem list reader and modifier</string>
             </property>
            </widget>
           </item>
           <item>
            <widget class="QPushButton" name="recipeCombineBtn">
             <property name="text">
-             <string>&amp;Recipe combiner</string>
+             <string>R&amp;ecipe combiner</string>
             </property>
            </widget>
           </item>
@@ -173,20 +173,6 @@
                  </property>
                  <property name="checked">
                   <bool>false</bool>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QRadioButton" name="lrcBtn">
-                 <property name="text">
-                  <string>Litematica material &amp;list</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QRadioButton" name="lrcExtendBtn">
-                 <property name="text">
-                  <string>Litematica &amp;block reader</string>
                  </property>
                 </widget>
                </item>

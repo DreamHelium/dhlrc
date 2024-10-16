@@ -183,7 +183,9 @@ make_nbt_box()
   GtkWidget *decision_box = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 0);
   GtkWidget *load_btn = gtk_button_new_with_label (_("Load"));
   g_signal_connect(load_btn, "clicked", G_CALLBACK(load_nbt_file), NULL);
-  GtkWidget *manage_btn = gtk_button_new_with_label (_("Manage NBT"));
+  char* manage_str = R(_("&Manage NBT"));
+  GtkWidget *manage_btn = gtk_button_new_with_mnemonic (manage_str);
+  g_free(manage_str);
   gtk_box_append (GTK_BOX(decision_box), load_btn);
   gtk_box_append (GTK_BOX(decision_box), manage_btn);
   gtk_widget_set_halign(decision_box, GTK_ALIGN_CENTER);
@@ -191,7 +193,9 @@ make_nbt_box()
 
   GtkWidget *second_label = gtk_label_new(_("You can do things below for the NBT file."));
   gtk_box_append (GTK_BOX(box), second_label);
-  GtkWidget *nbt_reader_btn = gtk_button_new_with_label(_("NBT Reader"));
+  char* nbt_reader_str = R(_("N&BT Reader"));
+  GtkWidget *nbt_reader_btn = gtk_button_new_with_mnemonic(nbt_reader_str);
+  g_free(nbt_reader_str);
   gtk_box_append (GTK_BOX(box), nbt_reader_btn);
   gtk_widget_set_halign(box, GTK_ALIGN_CENTER);
   gtk_widget_set_valign(box, GTK_ALIGN_CENTER);

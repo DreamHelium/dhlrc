@@ -93,3 +93,11 @@ static gboolean set_locale_to_utf8()
         }
     }
 }
+
+char* replace_at_with_slash(char* str)
+{
+    char* ret = g_strdup(str);
+    char* at_pos = strchr(ret, '&');
+    at_pos[0] = '_';
+    return ret;
+}

@@ -73,6 +73,7 @@ void dh_input_dialog_new(const char* title, const char* content, const char* tip
 
     g_signal_connect(ok_button, "clicked", G_CALLBACK(set_text), NULL);
     g_signal_connect(close_button, "clicked", G_CALLBACK(set_text), NULL);
+    g_signal_connect(dialog, "close-request", G_CALLBACK(set_text), NULL);
     func = afunc;
     gtk_window_present(GTK_WINDOW(dialog));
 }

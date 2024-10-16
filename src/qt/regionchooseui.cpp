@@ -1,22 +1,26 @@
 #include "regionchooseui.h"
 #include "../region_info.h"
 #include "../translation.h"
+#include "dh_string_util.h"
 #include <QMessageBox>
+#include <qabstractbutton.h>
+#include <qcheckbox.h>
 
 extern Region* region;
 static GList* uuidList = nullptr;
 
-RegionChooseUI::RegionChooseUI(QWidget *parent) :
+RegionChooseUI::RegionChooseUI(bool needMulti, QWidget *parent) :
     QDialog(parent)
 {
-    initUI();
+    nm = needMulti;
+    initUI(needMulti);
 }
 
 RegionChooseUI::~RegionChooseUI()
 {
 }
 
-void RegionChooseUI::initUI()
+void RegionChooseUI::initUI(bool needMulti)
 {
     label = new QLabel(_("Please select a Region:"));
     layout = new QVBoxLayout();
@@ -24,6 +28,9 @@ void RegionChooseUI::initUI()
     layout->addStretch();
 
     group = new QButtonGroup();
+
+    if(needMulti)
+        group->setExclusive(false);
 
     DhList* list = region_info_list_get_uuid_list();
 
@@ -39,13 +46,20 @@ void RegionChooseUI::initUI()
             {
                 gchar* time_literal = g_date_time_format(info->time, "%T");
                 QString str = QString("%1 (%2)").arg(info->description).arg(time_literal);
-                QRadioButton* btn = new QRadioButton(str);
+                QAbstractButton* btn;
+                if(needMulti)
+                    btn = new QCheckBox(str);
+                else btn = new QRadioButton(str);
                 g_free(time_literal);
                 layout->addWidget(btn);
                 group->addButton(btn, i);
+                g_rw_lock_reader_unlock(&info->info_lock);
             }
             else {
-                QRadioButton* btn = new QRadioButton(_("locked"));
+                QAbstractButton* btn;
+                if(needMulti)
+                    btn = new QCheckBox(_("locked"));
+                else btn = new QRadioButton(_("locked"));
                 layout->addWidget(btn);
                 group->addButton(btn, i);
             }
@@ -88,7 +102,19 @@ void RegionChooseUI::okBtn_clicked()
 {
     if(group->checkedId() != -1)
     {
-        region_info_list_set_uuid((gchar*)g_list_nth_data(uuidList, group->checkedId()));
+        if(!nm)
+            region_info_list_set_uuid((gchar*)g_list_nth_data(uuidList, group->checkedId()));
+        else
+        {
+            auto ids = group->buttons();
+            DhStrArray* arr = NULL;
+            for(int i = 0 ; i < ids.length() ; i++)
+            {
+                if(ids[i]->isChecked())
+                    dh_str_array_add_str(&arr, (gchar*)g_list_nth_data(uuidList, i));
+            }
+            region_info_list_set_multi_uuid(arr);
+        }
         accept();
     }
     else

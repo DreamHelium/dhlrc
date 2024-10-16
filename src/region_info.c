@@ -16,6 +16,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>. */
 
 #include "region_info.h"
+#include "dh_string_util.h"
 #include <dh_mt_table.h>
 
 static gboolean full_free = FALSE;
@@ -23,6 +24,7 @@ static DhMTTable* table = NULL;
 static const char* uuid = NULL;
 
 static DhList* uuid_list = NULL;
+static DhStrArray* uuid_array = NULL;
 
 static void region_info_free(gpointer data)
 {
@@ -53,6 +55,8 @@ void region_info_list_free()
     {
         dh_mt_table_destroy(table);
         dh_list_free(uuid_list);
+        if(uuid_array)
+            dh_str_array_free(uuid_array);
     }
 }
 
@@ -131,4 +135,15 @@ void region_info_list_init()
     /* In this way we get a new UUID list without 
      * figuring whether the list is created. */
     uuid_list = dh_list_new();
+}
+
+void region_info_list_set_multi_uuid(DhStrArray* arr)
+{
+    if(uuid_array) dh_str_array_free(uuid_array);
+    uuid_array = arr;
+}
+
+DhStrArray* region_info_list_get_multi_uuid()
+{
+    return uuid_array;
 }

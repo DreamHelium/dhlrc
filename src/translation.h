@@ -28,9 +28,11 @@
 #define _(str) gettext (str)
 #define N_(str) str
 #define trm(str) name_block_translate (str)
+#define R(str) replace_at_with_slash (str)
 #else
 #define _(str) str
 #define trm(str) str
+#define N_(str) str
 #endif
 
 #ifdef __cplusplus
@@ -38,6 +40,7 @@ extern "C"{
 #endif
 
 void translation_init();
+char* replace_at_with_slash(char* str);
 
 #ifdef __cplusplus
 }

@@ -18,8 +18,10 @@
 #include "region.h"
 #include "create_nbt.h"
 #include "dh_string_util.h"
+#include "dhlrc_list.h"
 #include "libnbt/nbt.h"
 #include "litematica_region.h"
+#include "region_info.h"
 
 /* TODO and maybe never do, since property can be too much */
 const char* property[] = {"", ""};
@@ -287,6 +289,20 @@ ItemList* item_list_new_from_region(Region* region)
 
     tmpitem_list_free(til);
     return oblock;
+}
+
+ItemList* item_list_new_from_multi_region(DhStrArray* region_uuid_arr)
+{
+    ItemList* ret = NULL;
+    for(int i = 0 ; i < region_uuid_arr->num ; i++)
+    {
+        RegionInfo* info = region_info_list_get_region_info(region_uuid_arr->val[i]);
+        Region* region = info->root;
+        ItemList* i_il = item_list_new_from_region(region);
+        item_list_combine(&ret, i_il);
+        item_list_free(i_il);
+    }
+    return ret;
 }
 
 static NBT* size_nbt_new(Pos* pos, const char* key)

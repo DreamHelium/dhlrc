@@ -18,7 +18,7 @@ class RegionChooseUI : public QDialog
     Q_OBJECT
 
 public:
-    explicit RegionChooseUI(QWidget *parent = nullptr);
+    explicit RegionChooseUI(bool needMulti = false, QWidget *parent = nullptr);
     ~RegionChooseUI();
 
 private:
@@ -29,7 +29,8 @@ private:
     QPushButton* closeBtn;
     QVBoxLayout* layout;
     QHBoxLayout* hLayout;
-    void initUI();
+    bool nm;
+    void initUI(bool needMulti);
 
 private Q_SLOTS:
     void okBtn_clicked();

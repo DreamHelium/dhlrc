@@ -41,9 +41,9 @@ ManageUI::ManageUI(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::ManageUI)
 {
-    setWindowTitle(_("Manage NBT"));
     ui->setupUi(this);
     initSignalSlots();
+    setWindowTitle(_("Manage NBT"));
     model = new QStandardItemModel(0, 4);
     ui->tableView->setModel(model);
     uuidList = nbt_info_list_get_uuid_list();

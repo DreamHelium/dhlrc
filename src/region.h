@@ -66,6 +66,7 @@ typedef struct _Region
 Region* region_new_from_lite_region(LiteRegion* lr);
 Region* region_new_from_nbt(NBT* root);
 ItemList* item_list_new_from_region(Region* region);
+ItemList* item_list_new_from_multi_region(DhStrArray* region_uuid_arr);
 NBT* nbt_new_from_region(Region* region);
 void region_free(Region* region);
 
