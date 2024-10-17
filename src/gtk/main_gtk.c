@@ -4,6 +4,7 @@
 #include "../nbt_info.h"
 #include "glib.h"
 #include "input_dialog.h"
+#include "manage_nbt.h"
 
 static GtkWidget* window;
 static GtkWidget* region_box;
@@ -33,8 +34,14 @@ debug (GtkButton* self,
        gpointer user_data)
 {
   char* input = dh_input_dialog_new_no_func("test", "test", "test", "test", GTK_WINDOW(window));
+#ifdef GDK_AVAILABLE_IN_4_10
   GtkAlertDialog* dialog = gtk_alert_dialog_new("%s", input? input : "NULL");
   gtk_alert_dialog_show(dialog, GTK_WINDOW(window));
+#else
+  GtkWidget* dialog = gtk_message_dialog_new(GTK_WINDOW(window), 
+  GTK_DIALOG_DESTROY_WITH_PARENT | GTK_DIALOG_MODAL, GTK_MESSAGE_INFO, GTK_BUTTONS_CLOSE, "%s", input ? input : "NULL");
+  g_signal_connect(dialog, "response", G_CALLBACK(gtk_window_destroy), NULL);
+#endif
 }
 
 static void
@@ -61,8 +68,14 @@ nbt_open_response (GtkDialog *dialog,
       else
       {
         NBT_Free(new_nbt);
+#ifdef GDK_AVAILABLE_IN_4_10
         GtkAlertDialog* dialog = gtk_alert_dialog_new(_("No desciption entered! The NBT will not be added!"));
         gtk_alert_dialog_show(dialog, GTK_WINDOW(window));
+#else
+         GtkWidget* dialog = gtk_message_dialog_new(GTK_WINDOW(window), 
+  GTK_DIALOG_DESTROY_WITH_PARENT | GTK_DIALOG_MODAL, GTK_MESSAGE_INFO, GTK_BUTTONS_CLOSE, _("No desciption entered! The NBT will not be added!"));
+  g_signal_connect(dialog, "response", G_CALLBACK(gtk_window_destroy), NULL);
+#endif
       }
 
       g_free(description);
@@ -109,21 +122,6 @@ title_bar_button_toggled (GtkToggleButton* self,
   }
 }
 
-
-static void
-print_hello (GtkWidget *widget,
-             gpointer   data)
-{
-  g_print ("Hello World\n");
-}
-
-static void
-close_window (GtkWidget *widget,
-              gpointer data)
-{
-  gtk_window_close(GTK_WINDOW(window));
-}
-
 static void
 activate (GtkApplication *app,
           gpointer        user_data)
@@ -154,21 +152,33 @@ make_region_box()
   /* Let's put widget here! */
   GtkWidget *first_label = gtk_label_new (_("First, you need to create a Region struct."));
   gtk_box_append (GTK_BOX(box), first_label);
-  GtkWidget *region_button = gtk_button_new_with_label(_("Create Region from NBT"));
+  char* region_str = R(_("&Create Region from NBT"));
+  GtkWidget *region_button = gtk_button_new_with_mnemonic(region_str);
+  g_free(region_str);
   gtk_box_append (GTK_BOX(box), region_button);
 
   GtkWidget *second_label = gtk_label_new(_("Second, you can do lots of things with the Region."));
   gtk_box_append (GTK_BOX(box), second_label);
 
   /* Lots of options and choices */
-  GtkWidget *gen_item_list_btn = gtk_button_new_with_label (_("Generate item list"));
-  GtkWidget *block_reader_btn = gtk_button_new_with_label (_("Block reader"));
+  char* gen_item_list_str = R(_("&Generate item list"));
+  GtkWidget *gen_item_list_btn = gtk_button_new_with_mnemonic (gen_item_list_str);
+  g_free(gen_item_list_str);
+
+  char* block_reader_str = R(_("&Block reader"));
+  GtkWidget *block_reader_btn = gtk_button_new_with_mnemonic (block_reader_str);
+  g_free(block_reader_str);
   gtk_box_append (GTK_BOX(box), gen_item_list_btn);
   gtk_box_append (GTK_BOX(box), block_reader_btn);
 
   gtk_widget_set_halign(box, GTK_ALIGN_CENTER);
   gtk_widget_set_valign(box, GTK_ALIGN_CENTER);
 
+  gtk_widget_set_margin_bottom(box, 20);
+  gtk_widget_set_margin_top(box, 20);
+  gtk_widget_set_margin_start(box, 20);
+  gtk_widget_set_margin_end(box, 20);
+  gtk_box_set_spacing(GTK_BOX(box), 20);
   return box;
 }
 
@@ -180,16 +190,11 @@ make_nbt_box()
   GtkWidget *first_label = gtk_label_new (_("Let's load a NBT file here!"));
   gtk_box_append (GTK_BOX(box), first_label);
 
-  GtkWidget *decision_box = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 0);
-  GtkWidget *load_btn = gtk_button_new_with_label (_("Load"));
-  g_signal_connect(load_btn, "clicked", G_CALLBACK(load_nbt_file), NULL);
   char* manage_str = R(_("&Manage NBT"));
   GtkWidget *manage_btn = gtk_button_new_with_mnemonic (manage_str);
   g_free(manage_str);
-  gtk_box_append (GTK_BOX(decision_box), load_btn);
-  gtk_box_append (GTK_BOX(decision_box), manage_btn);
-  gtk_widget_set_halign(decision_box, GTK_ALIGN_CENTER);
-  gtk_box_append (GTK_BOX(box), decision_box);
+  gtk_box_append (GTK_BOX(box), manage_btn);
+  g_signal_connect(manage_btn, "clicked", G_CALLBACK(manage_nbt), NULL);
 
   GtkWidget *second_label = gtk_label_new(_("You can do things below for the NBT file."));
   gtk_box_append (GTK_BOX(box), second_label);
@@ -200,6 +205,12 @@ make_nbt_box()
   gtk_widget_set_halign(box, GTK_ALIGN_CENTER);
   gtk_widget_set_valign(box, GTK_ALIGN_CENTER);
 
+  gtk_widget_set_margin_bottom(box, 20);
+  gtk_widget_set_margin_top(box, 20);
+  gtk_widget_set_margin_start(box, 20);
+  gtk_widget_set_margin_end(box, 20);
+  gtk_box_set_spacing(GTK_BOX(box), 20);
+
   return box;
 }
 
@@ -208,13 +219,23 @@ make_item_list_box()
 {
   GtkWidget *box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
 
-  GtkWidget *reader_btn = gtk_button_new_with_label(_("Item list reader and modifier"));
-  GtkWidget *recipe_btn = gtk_button_new_with_label(_("Recipe combiner"));
+  char* reader_str = R(_("I&tem list reader and modifier"));
+  GtkWidget *reader_btn = gtk_button_new_with_mnemonic(reader_str);
+  g_free(reader_str);
+  char* recipe_str = R(_("R&ecipe combiner"));
+  GtkWidget *recipe_btn = gtk_button_new_with_mnemonic(recipe_str);
+  g_free(recipe_str);
   gtk_box_append (GTK_BOX(box), reader_btn);
   gtk_box_append (GTK_BOX(box), recipe_btn);
 
   gtk_widget_set_halign(box, GTK_ALIGN_CENTER);
   gtk_widget_set_valign(box, GTK_ALIGN_CENTER);
+
+  gtk_widget_set_margin_bottom(box, 20);
+  gtk_widget_set_margin_top(box, 20);
+  gtk_widget_set_margin_start(box, 20);
+  gtk_widget_set_margin_end(box, 20);
+  gtk_box_set_spacing(GTK_BOX(box), 20);
 
   return box;
 }

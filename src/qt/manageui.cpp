@@ -13,6 +13,7 @@
 #include "../nbt_info.h"
 #include <QFileDialog>
 #include <qwidget.h>
+#include <QDebug>
 #include "../nbt_litereader.h"
 
 // #define DHLRC_MANAGEUI_TRACK_LOCK

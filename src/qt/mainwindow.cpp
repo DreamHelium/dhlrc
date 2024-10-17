@@ -19,6 +19,7 @@
 #include <qobject.h>
 #include <qpushbutton.h>
 #include <string>
+#include "blockreaderui.h"
 #include "glib.h"
 #include "glibconfig.h"
 #include "ilchooseui.h"
@@ -121,6 +122,7 @@ void MainWindow::initSignalSlots()
     QObject::connect(ui->recipeCombineBtn, &QPushButton::clicked, this, &MainWindow::recipeCombineBtn_clicked);
     QObject::connect(ui->createBtn, &QPushButton::clicked, this, &MainWindow::createBtn_clicked);
     QObject::connect(ui->generateBtn, &QPushButton::clicked, this, &MainWindow::generateBtn_clicked);
+    QObject::connect(ui->brBtn, &QPushButton::clicked, this, &MainWindow::brBtn_clicked);
 }
 
 void MainWindow::okBtn_clicked()
@@ -348,6 +350,27 @@ void MainWindow::generateBtn_clicked()
             QString itemlistName = QInputDialog::getText(this, _("Input Item List Name."), _("Input new item list name."));
             ItemList* new_il = item_list_new_from_multi_region(region_info_list_get_multi_uuid());
             il_info_new(new_il, g_date_time_new_now_local(), itemlistName.toLocal8Bit());
+        }
+        /* No option given for the Region selection */
+        else QMessageBox::critical(this, _("Error!"), _("No Region or no Region selected!"));
+    }
+    else QMessageBox::critical(this, _("Error!"), _("Region list is locked!"));
+}
+
+void MainWindow::brBtn_clicked()
+{
+    DhList* list = region_info_list_get_uuid_list();
+    if(g_rw_lock_reader_trylock(&list->lock))
+    {
+        RegionChooseUI* rcui = new RegionChooseUI(false);
+        rcui->setAttribute(Qt::WA_DeleteOnClose);
+        auto ret = rcui->exec();
+        g_rw_lock_reader_unlock(&list->lock);
+        if(ret == QDialog::Accepted)
+        {
+            BlockReaderUI* brui = new BlockReaderUI();
+            brui->setAttribute(Qt::WA_DeleteOnClose);
+            brui->show();
         }
         /* No option given for the Region selection */
         else QMessageBox::critical(this, _("Error!"), _("No Region or no Region selected!"));
