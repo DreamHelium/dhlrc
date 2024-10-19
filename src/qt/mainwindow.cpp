@@ -25,7 +25,7 @@
 #include "ilchooseui.h"
 #include "ilreaderui.h"
 #include "lrchooseui.h"
-#include "manageui.h"
+#include "manage.h"
 #include "nbtreaderui.h"
 #include "nbtselectui.h"
 #include "recipesui.h"
@@ -41,7 +41,7 @@
 
 static bool nbtRead = false;
 int verbose_level;
-static ManageUI* mui = nullptr;
+static dh::ManageNBT* mn = nullptr;
 
 static QString title = N_("Litematica reader");
 static QStringList menu = {N_("&File"), N_("&Tool")};
@@ -79,7 +79,7 @@ MainWindow::MainWindow(QWidget *parent)
 MainWindow::~MainWindow()
 {
     delete ui;
-    delete mui;
+    delete mn;
     nbt_info_list_free();
     il_info_list_free();
     region_info_list_free();
@@ -230,8 +230,8 @@ void MainWindow::saveilAction_triggered()
 
 void MainWindow::manageBtn_clicked()
 {
-    if(!mui) mui = new ManageUI();
-    mui->show();
+    if(!mn) mn = new dh::ManageNBT();
+    mn->show();
 }
 
 void MainWindow::ilReaderBtn_clicked()

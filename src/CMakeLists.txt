@@ -16,6 +16,7 @@ set( DHLRC_MAIN_POT_FILE_DEPENDS
 		src/qt/nbtselectui.cpp
 		src/qt/blocklistui.cpp
 		src/qt/manageui.cpp
+		src/qt/manage.cpp
 	PARENT_SCOPE
 )
 

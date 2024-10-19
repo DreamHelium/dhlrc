@@ -16,16 +16,19 @@ class ManageUI : public QWidget
 public:
     explicit ManageUI(QWidget *parent = nullptr);
     ~ManageUI();
+    void updateModel(QStandardItemModel* model);
 
 Q_SIGNALS:
+    void add();
+    void remove(int row);
+    void refresh();
+    void save(int row);
+    void showSig();
+    void closeSig();
     
 private:
     Ui::ManageUI *ui;
     void initSignalSlots();
-    void initModel();
-    void updateModel();
-    QList<QList<QStandardItem*>> getList();
-    QStandardItemModel* model;
 
 protected:
     void closeEvent(QCloseEvent *event);
@@ -35,6 +38,7 @@ private Q_SLOTS:
     void addBtn_clicked();
     void removeBtn_clicked();
     void saveBtn_clicked();
+    void refreshBtn_clicked();
 };
 
 #endif /* MANAGEUI_H */

@@ -35,6 +35,7 @@ set(PROJECT_SOURCES
         ilreaderui.h ilreaderui.cpp
         dhtableview.h dhtableview.cpp
         lrchooseui.h lrchooseui.cpp
+        manage.h manage.cpp
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
