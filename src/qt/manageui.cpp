@@ -42,6 +42,7 @@ void ManageUI::initSignalSlots()
     QObject::connect(ui->removeBtn, &QPushButton::clicked, this, &ManageUI::removeBtn_clicked);
     QObject::connect(ui->saveBtn, &QPushButton::clicked, this, &ManageUI::saveBtn_clicked);
     QObject::connect(ui->refreshBtn, &QPushButton::clicked, this, &ManageUI::refreshBtn_clicked);
+    QObject::connect(ui->okBtn, &QPushButton::clicked, this, &ManageUI::okBtn_clicked);
 }
 
 void ManageUI::updateModel(QStandardItemModel* model)
@@ -56,17 +57,22 @@ void ManageUI::addBtn_clicked()
 
 void ManageUI::removeBtn_clicked()
 {
-    auto index = ui->tableView->selectionModel()->currentIndex();
-    if(index.isValid())
+    auto model = ui->tableView->selectionModel();
+    if(model)
     {
-        int row = index.row();
-        emit remove(row);
+        auto index = model->currentIndex();
+        if(index.isValid())
+        {
+            int row = index.row();
+            emit remove(row);
+        }
+        else
+        {
+            QMessageBox::critical(this, _("No Selected Row!"), _("No row is selected!"));
+            emit remove(-1);
+        }
     }
-    else
-    {
-        QMessageBox::critical(this, _("No Selected Row!"), _("No row is selected!"));
-        emit remove(-1);
-    }
+    else emit remove(-1);
 }
 
 void ManageUI::closeEvent(QCloseEvent* event)
@@ -84,20 +90,30 @@ void ManageUI::showEvent(QShowEvent* event)
 
 void ManageUI::saveBtn_clicked()
 {
-    auto index = ui->tableView->selectionModel()->currentIndex();
-    if(index.isValid())
+    auto model = ui->tableView->selectionModel();
+    if(model)
     {
-        int row = index.row();
-        emit save(row);
+        auto index = model->currentIndex();
+        if(index.isValid())
+        {
+            int row = index.row();
+            emit save(row);
+        }
+        else
+        {
+            QMessageBox::critical(this, _("No Selected Row!"), _("No row is selected!"));
+            emit save(-1);
+        }
     }
-    else
-    {
-        emit save(-1);
-        QMessageBox::critical(this, _("No Selected Row!"), _("No row is selected!"));
-    }
+    else emit save(-1);
 }
 
 void ManageUI::refreshBtn_clicked()
 {
     emit refresh();
+}
+
+void ManageUI::okBtn_clicked()
+{
+    emit ok();
 }

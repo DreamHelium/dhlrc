@@ -35,15 +35,11 @@
            </widget>
           </item>
           <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_4">
-            <item>
-             <widget class="QPushButton" name="manageBtn">
-              <property name="text">
-               <string>&amp;Manage NBT</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
+           <widget class="QPushButton" name="manageBtn">
+            <property name="text">
+             <string>&amp;Manage NBT</string>
+            </property>
+           </widget>
           </item>
           <item>
            <widget class="QLabel" name="label_3">
@@ -88,6 +84,13 @@
            <widget class="QLabel" name="label_5">
             <property name="text">
              <string>Second, you can do lots of things with the Region.</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="mrBtn">
+            <property name="text">
+             <string>&amp;Manage Region</string>
             </property>
            </widget>
           </item>

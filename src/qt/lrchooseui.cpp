@@ -2,6 +2,7 @@
 #include "../translation.h"
 #include <qboxlayout.h>
 #include <qcheckbox.h>
+#include <qmessagebox.h>
 #include <qobject.h>
 #include <qpushbutton.h>
 #include "../nbt_info.h"
@@ -102,7 +103,17 @@ void LrChooseUI::okBtn_clicked()
             QString des = lineEdit->text().arg(info->description).arg(arr->val[i]);
             LiteRegion* lr = lite_region_create(info->root, i);
             Region* region = region_new_from_lite_region(lr);
-            region_info_new(region, g_date_time_new_now_local(), des.toLocal8Bit());
+            DhList* uuidList = region_info_list_get_uuid_list();
+            if(g_rw_lock_writer_trylock(&uuidList->lock))
+            {
+                region_info_new(region, g_date_time_new_now_local(), des.toUtf8());
+                g_rw_lock_writer_unlock(&uuidList->lock);
+            }
+            else
+            {
+                region_free(region);
+                QMessageBox::critical(this, _("Error!"), _("Region list is locked!"));
+            }
             lite_region_free(lr);
         }
     }

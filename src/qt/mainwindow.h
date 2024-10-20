@@ -48,6 +48,7 @@ private Q_SLOTS:
     void createBtn_clicked();
     void generateBtn_clicked();
     void brBtn_clicked();
+    void mrBtn_clicked();
 
 };
 #endif // MAINWINDOW_H

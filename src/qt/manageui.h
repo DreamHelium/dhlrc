@@ -25,6 +25,7 @@ Q_SIGNALS:
     void save(int row);
     void showSig();
     void closeSig();
+    void ok();
     
 private:
     Ui::ManageUI *ui;
@@ -39,6 +40,7 @@ private Q_SLOTS:
     void removeBtn_clicked();
     void saveBtn_clicked();
     void refreshBtn_clicked();
+    void okBtn_clicked();
 };
 
 #endif /* MANAGEUI_H */

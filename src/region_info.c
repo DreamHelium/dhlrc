@@ -76,12 +76,11 @@ gboolean region_info_new(Region* root, GDateTime* time, const gchar* description
     {
         table = dh_mt_table_new(g_str_hash, is_same_string, g_free, region_info_free);
     }
-    g_rw_lock_writer_lock(&uuid_list->lock);
     gchar* uuid = g_uuid_string_random();
     ret = dh_mt_table_insert(table, uuid, info);
     uuid_list->list = g_list_append(uuid_list->list, uuid);
-    g_rw_lock_writer_unlock(&uuid_list->lock);
-    /* Unlock the writer lock */
+    /* Unlock the writer lock
+     * UUID List is locked by the main function */
     g_rw_lock_writer_unlock(&(info->info_lock));
     return ret;
 }

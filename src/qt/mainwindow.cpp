@@ -42,6 +42,7 @@
 static bool nbtRead = false;
 int verbose_level;
 static dh::ManageNBT* mn = nullptr;
+static dh::ManageRegion* mr = nullptr;
 
 static QString title = N_("Litematica reader");
 static QStringList menu = {N_("&File"), N_("&Tool")};
@@ -53,7 +54,8 @@ static QStringList funcList = {
     N_("&Generate item list"),
     N_("&Block reader"),
     N_("I&tem list reader and modifier"),
-    N_("R&ecipe combiner")
+    N_("R&ecipe combiner"),
+    N_("&Manage Region")
 };
 static QStringList description = {
     N_("Let's load a NBT file here!"),
@@ -123,6 +125,7 @@ void MainWindow::initSignalSlots()
     QObject::connect(ui->createBtn, &QPushButton::clicked, this, &MainWindow::createBtn_clicked);
     QObject::connect(ui->generateBtn, &QPushButton::clicked, this, &MainWindow::generateBtn_clicked);
     QObject::connect(ui->brBtn, &QPushButton::clicked, this, &MainWindow::brBtn_clicked);
+    QObject::connect(ui->mrBtn, &QPushButton::clicked, this, &MainWindow::mrBtn_clicked);
 }
 
 void MainWindow::okBtn_clicked()
@@ -312,7 +315,17 @@ void MainWindow::createBtn_clicked()
                     else
                     {
                         Region* region = region_new_from_nbt(info->root);
-                        region_info_new(region, g_date_time_new_now_local(), str.toLocal8Bit());
+                        auto uuidList = region_info_list_get_uuid_list();
+                        if(g_rw_lock_writer_trylock(&uuidList->lock))
+                        {
+                            region_info_new(region, g_date_time_new_now_local(), str.toUtf8());
+                            g_rw_lock_writer_unlock(&uuidList->lock);
+                        }
+                        else
+                        {
+                            region_free(region);
+                            QMessageBox::critical(this, _("Error!"), _("Region list is locked!"));
+                        }
                     }
                 }
                 else if(info->type == Litematica)
@@ -376,4 +389,10 @@ void MainWindow::brBtn_clicked()
         else QMessageBox::critical(this, _("Error!"), _("No Region or no Region selected!"));
     }
     else QMessageBox::critical(this, _("Error!"), _("Region list is locked!"));
+}
+
+void MainWindow::mrBtn_clicked()
+{
+    if(!mr) mr = new dh::ManageRegion();
+    mr->show();
 }

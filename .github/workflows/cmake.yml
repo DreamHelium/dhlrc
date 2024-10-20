@@ -22,9 +22,9 @@ jobs:
       with:
         submodules: true
 
-    - name: Install gettext
+    - name: Install dependency
       run: |
-        sudo apt install gettext
+        sudo apt install gettext libcurl4-openssl-dev libreadline-dev libgtk-4-dev
 
     - name: Install cJSON from source
       run: |
