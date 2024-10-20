@@ -284,7 +284,11 @@ main (int    argc,
   GtkApplication *app;
   int status;
 
+#ifdef GIO_AVAILABLE_ENUMERATOR_IN_2_74
   app = gtk_application_new ("cn.dh.dhlrc", G_APPLICATION_DEFAULT_FLAGS);
+#else
+  app = gtk_application_new ("cn.dh.dhlrc", G_APPLICATION_FLAGS_NONE);
+#endif
   g_signal_connect (app, "activate", G_CALLBACK (activate), NULL);
   status = g_application_run (G_APPLICATION (app), argc, argv);
 
