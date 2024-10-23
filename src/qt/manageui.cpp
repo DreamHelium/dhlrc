@@ -1,9 +1,12 @@
 #include "manageui.h"
 #include "ui_manageui.h"
+#include <qabstractitemview.h>
 #include <qevent.h>
 #include <qfiledialog.h>
 #include <qinputdialog.h>
 #include <qmessagebox.h>
+#include <qmimedata.h>
+#include <qnamespace.h>
 #include <qobject.h>
 #include <qpushbutton.h>
 #include <QStandardItemModel>
@@ -12,6 +15,8 @@
 #include <QFileDialog>
 #include <qwidget.h>
 #include <QDebug>
+#include <QMimeData>
+#include <QDrag>
 
 static QStringList buttonStr = {
     N_("&Add"),
@@ -116,4 +121,25 @@ void ManageUI::refreshBtn_clicked()
 void ManageUI::okBtn_clicked()
 {
     emit ok();
+}
+
+void ManageUI::dragEnterEvent(QDragEnterEvent* event)
+{
+    if(dndEnabled)
+        event->acceptProposedAction();
+}
+
+void ManageUI::dropEvent(QDropEvent* event)
+{
+    if(dndEnabled)
+    {
+        auto mimedata = event->mimeData();
+        emit dnd(mimedata);
+    }
+}
+
+void ManageUI::setDND(bool enabled)
+{
+    dndEnabled = enabled;
+    setAcceptDrops(dndEnabled);
 }

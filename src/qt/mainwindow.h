@@ -28,16 +28,13 @@ public:
 private:
     Ui::MainWindow *ui;
     
-    void initSignalSlots();
-    void readNbtFile(QString filename);
-    
+    void initSignalSlots();    
 
 protected:
     void virtual dragEnterEvent(QDragEnterEvent* event);
     void virtual dropEvent(QDropEvent* event);
 
 private Q_SLOTS:
-    void openAction_triggered();
     void okBtn_clicked();
     void configAction_triggered();
     void selectAction_triggered();

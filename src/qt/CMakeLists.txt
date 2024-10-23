@@ -36,6 +36,7 @@ set(PROJECT_SOURCES
         dhtableview.h dhtableview.cpp
         lrchooseui.h lrchooseui.cpp
         manage.h manage.cpp
+        utility.h utility.cpp
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)

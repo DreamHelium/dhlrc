@@ -24,7 +24,6 @@
 #include "glibconfig.h"
 #include "ilchooseui.h"
 #include "ilreaderui.h"
-#include "lrchooseui.h"
 #include "manage.h"
 #include "nbtreaderui.h"
 #include "nbtselectui.h"
@@ -38,6 +37,7 @@
 #include "../il_info.h"
 #include "../region.h"
 #include "../region_info.h"
+#include "utility.h"
 
 static bool nbtRead = false;
 int verbose_level;
@@ -88,16 +88,6 @@ MainWindow::~MainWindow()
     dh_exit();
     dh_exit1();
 }
-
-void MainWindow::openAction_triggered()
-{
-    QString fileName = QFileDialog::getOpenFileName(this, _("Select a file"), nullptr, _("Litematic file (*.litematic)"));
-    if(!fileName.isEmpty())
-    {
-        readNbtFile(fileName);
-    }
-}
-
 /*
 static int mw_download_progress(void* data, curl_off_t total, curl_off_t cur, curl_off_t unused0, curl_off_t unused1)
 {
@@ -145,46 +135,19 @@ void MainWindow::dragEnterEvent(QDragEnterEvent* event)
 
 void MainWindow::dropEvent(QDropEvent* event)
 {
-    auto urls = event->mimeData()->urls();
-    if(urls.length() > 1)
-        QMessageBox::critical(this, _("Multi files detected!"), _("This program doesn't support multi files!"));
-    else
+    DhList* uuidList = nbt_info_list_get_uuid_list();
+    if(g_rw_lock_writer_trylock(&uuidList->lock))
     {
-        auto filename = urls[0].toLocalFile();
-        readNbtFile(filename);
-    }
-}
-
-void MainWindow::readNbtFile(QString filename)
-{
-    GFile* file = g_file_new_for_path(filename.toLocal8Bit());
-    char* defaultDescription = g_file_get_basename(file);
-    QString description = QInputDialog::getText(this, _("Enter Desciption"), _("Enter desciption for the NBT file."), QLineEdit::Normal, defaultDescription);
-
-    if(description.isEmpty())
-    {
-        QMessageBox::critical(this, _("No Description Entered!"), _("No desciption entered! Will not add the NBT file!"));
-    }
-    else
-    {
-        char* content;
-        gsize len;
-        g_file_load_contents(file, NULL, &content, &len, NULL, NULL);
-        NBT* newNBT = NBT_Parse((guint8*)content, len);
-        if(newNBT)
+        auto urls = event->mimeData()->urls();
+        QStringList filelist;
+        for(int i = 0 ; i < urls.length() ; i++)
         {
-            DhList* uuidList = nbt_info_list_get_uuid_list();
-            if(g_rw_lock_writer_trylock(&uuidList->lock))
-            {
-                nbt_info_new(newNBT, g_date_time_new_now_local(), description.toStdString().c_str());
-                g_rw_lock_writer_unlock(&uuidList->lock);
-            }
-            else QMessageBox::critical(this, _("Error!"), _("NBT list is locked!"));
+            filelist << urls[i].toLocalFile();
         }
-        else QMessageBox::critical(this, _("Not Valid File!"), _("Not a valid NBT file!"));
-        g_free(content);
+        dh::loadNbtFiles(this, filelist);
+        g_rw_lock_writer_unlock(&uuidList->lock);
     }
-    g_object_unref(file);
+    else QMessageBox::critical(this, _("Error!"), _("NBT list is locked!"));
 }
 
 void MainWindow::configAction_triggered()
@@ -292,61 +255,13 @@ void MainWindow::recipeCombineBtn_clicked()
 
 void MainWindow::createBtn_clicked()
 {
-    DhList* list = nbt_info_list_get_uuid_list();
-    if(g_rw_lock_reader_trylock(&list->lock))
+    auto uuidList = region_info_list_get_uuid_list();
+    if(g_rw_lock_writer_trylock(&uuidList->lock))
     {
-        /* Lock for NBT info start */
-        NbtSelectUI* nsui = new NbtSelectUI();
-        nsui->setAttribute(Qt::WA_DeleteOnClose);
-        auto res = nsui->exec();
-        /* Lock for NBT info end */
-        g_rw_lock_reader_unlock(&list->lock);
-        if(res == QDialog::Accepted)
-        {
-            NbtInfo* info = nbt_info_list_get_nbt_info(nbt_info_list_get_uuid());
-            if(g_rw_lock_reader_trylock(&info->info_lock))
-            {
-                /* Lock NBT start */
-                if(info->type == NBTStruct)
-                {
-                    auto str = QInputDialog::getText(this, _("Enter Region Name"), _("Enter name for the new Region."), QLineEdit::Normal, info->description);
-                    if(str.isEmpty())
-                        QMessageBox::critical(this, _("Error!"), _("No description for the Region!"));
-                    else
-                    {
-                        Region* region = region_new_from_nbt(info->root);
-                        auto uuidList = region_info_list_get_uuid_list();
-                        if(g_rw_lock_writer_trylock(&uuidList->lock))
-                        {
-                            region_info_new(region, g_date_time_new_now_local(), str.toUtf8());
-                            g_rw_lock_writer_unlock(&uuidList->lock);
-                        }
-                        else
-                        {
-                            region_free(region);
-                            QMessageBox::critical(this, _("Error!"), _("Region list is locked!"));
-                        }
-                    }
-                }
-                else if(info->type == Litematica)
-                {
-                    LrChooseUI* lcui = new LrChooseUI(this);
-                    lcui->setAttribute(Qt::WA_DeleteOnClose);
-                    lcui->exec();
-                }
-                else QMessageBox::critical(this, _("Error!"), _("The NBT Struct is unsupported!"));
-
-                /* Lock NBT end */
-                g_rw_lock_reader_unlock(&info->info_lock);
-            }
-            /* Lock NBT fail */
-            else QMessageBox::critical(this, _("Error!"), _("This NBT is locked!"));
-        }
-        /* No option given for the NBT selection */
-        else QMessageBox::critical(this, _("Error!"), _("No NBT or no NBT selected!"));
+        dh::loadRegion(this);
+        g_rw_lock_writer_unlock(&uuidList->lock);
     }
-    /* Lock NBT info fail */
-    else QMessageBox::critical(this, _("Error!"), _("NBT list is locked!"));
+    else QMessageBox::critical(this, _("Error!"), _("Region list is locked!"));
 }
 
 void MainWindow::generateBtn_clicked()
@@ -381,9 +296,15 @@ void MainWindow::brBtn_clicked()
         g_rw_lock_reader_unlock(&list->lock);
         if(ret == QDialog::Accepted)
         {
-            BlockReaderUI* brui = new BlockReaderUI();
-            brui->setAttribute(Qt::WA_DeleteOnClose);
-            brui->show();
+            RegionInfo* info = region_info_list_get_region_info(region_info_list_get_uuid());
+            if(g_rw_lock_reader_trylock(&info->info_lock))
+            {
+                BlockReaderUI* brui = new BlockReaderUI();
+                brui->setAttribute(Qt::WA_DeleteOnClose);
+                brui->show();
+            }
+            /* Region locked */
+            else QMessageBox::critical(this, _("Error!"), _("Region is locked!"));
         }
         /* No option given for the Region selection */
         else QMessageBox::critical(this, _("Error!"), _("No Region or no Region selected!"));

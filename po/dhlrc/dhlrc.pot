@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-10-21 03:17+0800\n"
+"POT-Creation-Date: 2024-10-23 22:59+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -65,7 +65,7 @@ msgstr ""
 msgid "Error when reading file."
 msgstr ""
 
-#: src/main_isoc.c:107 src/qt/mainwindow.cpp:184 src/qt/manage.cpp:91
+#: src/main_isoc.c:107
 msgid "Not a valid NBT file!"
 msgstr ""
 
@@ -340,135 +340,76 @@ msgstr ""
 msgid "Second, you can do lots of things with the Region."
 msgstr ""
 
-#: src/qt/mainwindow.cpp:94 src/qt/manage.cpp:70
-msgid "Select a file"
-msgstr ""
-
-#: src/qt/mainwindow.cpp:94
-msgid "Litematic file (*.litematic)"
-msgstr ""
-
-#: src/qt/mainwindow.cpp:150
-msgid "Multi files detected!"
-msgstr ""
-
-#: src/qt/mainwindow.cpp:150
-msgid "This program doesn't support multi files!"
-msgstr ""
-
-#: src/qt/mainwindow.cpp:162 src/qt/manage.cpp:75
-msgid "Enter Desciption"
-msgstr ""
-
-#: src/qt/mainwindow.cpp:162 src/qt/manage.cpp:75
-msgid "Enter desciption for the NBT file."
-msgstr ""
-
-#: src/qt/mainwindow.cpp:166 src/qt/manage.cpp:79
-msgid "No Description Entered!"
-msgstr ""
-
-#: src/qt/mainwindow.cpp:166 src/qt/manage.cpp:79
-msgid "No desciption entered! Will not add the NBT file!"
-msgstr ""
-
-#: src/qt/mainwindow.cpp:182 src/qt/mainwindow.cpp:226
-#: src/qt/mainwindow.cpp:228 src/qt/mainwindow.cpp:231
-#: src/qt/mainwindow.cpp:259 src/qt/mainwindow.cpp:261
-#: src/qt/mainwindow.cpp:264 src/qt/mainwindow.cpp:285
-#: src/qt/mainwindow.cpp:287 src/qt/mainwindow.cpp:290
-#: src/qt/mainwindow.cpp:314 src/qt/mainwindow.cpp:327
-#: src/qt/mainwindow.cpp:337 src/qt/mainwindow.cpp:343
-#: src/qt/mainwindow.cpp:346 src/qt/mainwindow.cpp:349
-#: src/qt/mainwindow.cpp:368 src/qt/mainwindow.cpp:370
-#: src/qt/mainwindow.cpp:389 src/qt/mainwindow.cpp:391
+#: src/qt/mainwindow.cpp:150 src/qt/mainwindow.cpp:189
+#: src/qt/mainwindow.cpp:191 src/qt/mainwindow.cpp:194
+#: src/qt/mainwindow.cpp:222 src/qt/mainwindow.cpp:224
+#: src/qt/mainwindow.cpp:227 src/qt/mainwindow.cpp:248
+#: src/qt/mainwindow.cpp:250 src/qt/mainwindow.cpp:253
+#: src/qt/mainwindow.cpp:264 src/qt/mainwindow.cpp:283
+#: src/qt/mainwindow.cpp:285 src/qt/mainwindow.cpp:307
+#: src/qt/mainwindow.cpp:310 src/qt/mainwindow.cpp:312
 #: src/qt/ilreaderui.cpp:110 src/qt/ilchooseui.cpp:91 src/qt/nbtselectui.cpp:98
-#: src/qt/manage.cpp:331 src/qt/manage.cpp:346 src/qt/manage.cpp:352
-#: src/qt/manage.cpp:355 src/qt/manage.cpp:358
+#: src/qt/manage.cpp:366 src/qt/manage.cpp:379
 msgid "Error!"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:182 src/qt/mainwindow.cpp:349 src/qt/manage.cpp:358
+#: src/qt/mainwindow.cpp:150
 msgid "NBT list is locked!"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:184 src/qt/manage.cpp:91
-msgid "Not Valid File!"
-msgstr ""
-
-#: src/qt/mainwindow.cpp:205
+#: src/qt/mainwindow.cpp:168
 msgid "No NBT File!"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:205
+#: src/qt/mainwindow.cpp:168
 msgid "No NBT file loaded!"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:222
+#: src/qt/mainwindow.cpp:185
 msgid "Save file"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:222
+#: src/qt/mainwindow.cpp:185
 msgid "CSV file (*.csv)"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:226 src/qt/mainwindow.cpp:259
-#: src/qt/mainwindow.cpp:285 src/qt/ilreaderui.cpp:110
+#: src/qt/mainwindow.cpp:189 src/qt/mainwindow.cpp:222
+#: src/qt/mainwindow.cpp:248 src/qt/ilreaderui.cpp:110
 msgid "The item list is locked!"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:228 src/qt/mainwindow.cpp:261
-#: src/qt/mainwindow.cpp:287
+#: src/qt/mainwindow.cpp:191 src/qt/mainwindow.cpp:224
+#: src/qt/mainwindow.cpp:250
 msgid "The item list is freed!"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:231 src/qt/mainwindow.cpp:264
-#: src/qt/mainwindow.cpp:290
+#: src/qt/mainwindow.cpp:194 src/qt/mainwindow.cpp:227
+#: src/qt/mainwindow.cpp:253
 msgid "No item list!"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:312 src/qt/manage.cpp:329
-msgid "Enter Region Name"
-msgstr ""
-
-#: src/qt/mainwindow.cpp:312 src/qt/manage.cpp:329
-msgid "Enter name for the new Region."
-msgstr ""
-
-#: src/qt/mainwindow.cpp:314 src/qt/manage.cpp:331
-msgid "No description for the Region!"
-msgstr ""
-
-#: src/qt/mainwindow.cpp:327 src/qt/mainwindow.cpp:370
-#: src/qt/mainwindow.cpp:391
+#: src/qt/mainwindow.cpp:264 src/qt/mainwindow.cpp:285
+#: src/qt/mainwindow.cpp:312
 msgid "Region list is locked!"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:337 src/qt/manage.cpp:346
-msgid "The NBT Struct is unsupported!"
-msgstr ""
-
-#: src/qt/mainwindow.cpp:343 src/qt/manage.cpp:352
-msgid "This NBT is locked!"
-msgstr ""
-
-#: src/qt/mainwindow.cpp:346 src/qt/manage.cpp:355
-msgid "No NBT or no NBT selected!"
-msgstr ""
-
-#: src/qt/mainwindow.cpp:363
+#: src/qt/mainwindow.cpp:278
 msgid "Input Item List Name."
 msgstr ""
 
-#: src/qt/mainwindow.cpp:363
+#: src/qt/mainwindow.cpp:278
 msgid "Input new item list name."
 msgstr ""
 
-#: src/qt/mainwindow.cpp:368 src/qt/mainwindow.cpp:389
+#: src/qt/mainwindow.cpp:283 src/qt/mainwindow.cpp:310
 msgid "No Region or no Region selected!"
 msgstr ""
 
-#: src/qt/ilreaderui.cpp:27 src/qt/manageui.cpp:20
+#: src/qt/mainwindow.cpp:307
+msgid "Region is locked!"
+msgstr ""
+
+#: src/qt/ilreaderui.cpp:27 src/qt/manageui.cpp:25
 msgid "&Save"
 msgstr ""
 
@@ -508,9 +449,9 @@ msgstr ""
 msgid "Please choose a item list:"
 msgstr ""
 
-#: src/qt/ilchooseui.cpp:39 src/qt/nbtselectui.cpp:51 src/qt/manage.cpp:150
-#: src/qt/manage.cpp:151 src/qt/manage.cpp:152 src/qt/manage.cpp:153
-#: src/qt/manage.cpp:276 src/qt/manage.cpp:277 src/qt/manage.cpp:278
+#: src/qt/ilchooseui.cpp:39 src/qt/nbtselectui.cpp:51 src/qt/manage.cpp:142
+#: src/qt/manage.cpp:143 src/qt/manage.cpp:144 src/qt/manage.cpp:145
+#: src/qt/manage.cpp:268 src/qt/manage.cpp:269 src/qt/manage.cpp:270
 msgid "locked"
 msgstr ""
 
@@ -593,84 +534,96 @@ msgstr ""
 msgid "No NBT selected!"
 msgstr ""
 
-#: src/qt/manageui.cpp:17
+#: src/qt/manageui.cpp:22
 msgid "&Add"
 msgstr ""
 
-#: src/qt/manageui.cpp:18
+#: src/qt/manageui.cpp:23
 msgid "&Remove"
 msgstr ""
 
-#: src/qt/manageui.cpp:19
+#: src/qt/manageui.cpp:24
 msgid "R&efresh"
 msgstr ""
 
-#: src/qt/manageui.cpp:71 src/qt/manageui.cpp:104
+#: src/qt/manageui.cpp:76 src/qt/manageui.cpp:109
 msgid "No Selected Row!"
 msgstr ""
 
-#: src/qt/manageui.cpp:71 src/qt/manageui.cpp:104
+#: src/qt/manageui.cpp:76 src/qt/manageui.cpp:109
 msgid "No row is selected!"
 msgstr ""
 
-#: src/qt/manage.cpp:24
+#: src/qt/manage.cpp:27
 msgid "Litematica"
 msgstr ""
 
-#: src/qt/manage.cpp:25
+#: src/qt/manage.cpp:28
 msgid "NBT Struct"
 msgstr ""
 
-#: src/qt/manage.cpp:26
+#: src/qt/manage.cpp:29
 msgid "Schematics"
 msgstr ""
 
-#: src/qt/manage.cpp:27
+#: src/qt/manage.cpp:30
 msgid "Others"
 msgstr ""
 
-#: src/qt/manage.cpp:59
+#: src/qt/manage.cpp:62
 msgid "Manage NBT"
 msgstr ""
 
-#: src/qt/manage.cpp:70
+#: src/qt/manage.cpp:86
+msgid "Select a file"
+msgstr ""
+
+#: src/qt/manage.cpp:86
 msgid "Litematic file (*.litematic);;NBT File (*.nbt)"
 msgstr ""
 
-#: src/qt/manage.cpp:167 src/qt/manage.cpp:168 src/qt/manage.cpp:169
-#: src/qt/manage.cpp:170 src/qt/manage.cpp:291 src/qt/manage.cpp:292
-#: src/qt/manage.cpp:293
+#: src/qt/manage.cpp:159 src/qt/manage.cpp:160 src/qt/manage.cpp:161
+#: src/qt/manage.cpp:162 src/qt/manage.cpp:283 src/qt/manage.cpp:284
+#: src/qt/manage.cpp:285
 msgid "List locked"
 msgstr ""
 
-#: src/qt/manage.cpp:178 src/qt/manage.cpp:301
+#: src/qt/manage.cpp:170 src/qt/manage.cpp:293
 msgid "Description"
 msgstr ""
 
-#: src/qt/manage.cpp:178 src/qt/manage.cpp:301
+#: src/qt/manage.cpp:170 src/qt/manage.cpp:293
 msgid "UUID"
 msgstr ""
 
-#: src/qt/manage.cpp:178 src/qt/manage.cpp:301
+#: src/qt/manage.cpp:170 src/qt/manage.cpp:293
 msgid "Time"
 msgstr ""
 
-#: src/qt/manage.cpp:178
+#: src/qt/manage.cpp:170
 msgid "Type"
 msgstr ""
 
-#: src/qt/manage.cpp:191
+#: src/qt/manage.cpp:183
 msgid "Save File"
 msgstr ""
 
-#: src/qt/manage.cpp:200
+#: src/qt/manage.cpp:192
 msgid "Info Locked!"
 msgstr ""
 
-#: src/qt/manage.cpp:200
+#: src/qt/manage.cpp:192
 msgid "The NBT info is locked!"
 msgstr ""
 
-#: src/qt/manage.cpp:240
+#: src/qt/manage.cpp:233
 msgid "Manage Region"
+msgstr ""
+
+#: src/qt/manage.cpp:366
+msgid "Not a valid NBT List!"
+msgstr ""
+
+#: src/qt/manage.cpp:379
+msgid "Not a valid NBT UUID!"
 msgstr ""

@@ -4,6 +4,7 @@
 #include "manageui.h"
 #include <QWidget>
 #include "../dhlrc_list.h"
+#include <qmimedata.h>
 #include <qstandarditemmodel.h>
 
 namespace dh 
@@ -38,7 +39,6 @@ namespace dh
         ~ManageNBT();
 
     private:
-        ManageBase* mb;
         DhList* uuidList;
         QStandardItemModel* model;
         void updateModel();
@@ -51,6 +51,7 @@ namespace dh
         void showSig_triggered();
         void closeSig_triggered();
         void ok_triggered();
+        void dnd_triggered(const QMimeData* data);
     };
 
     class ManageRegion : public ManageBase 
@@ -61,7 +62,6 @@ namespace dh
         ~ManageRegion();
 
     private:
-        ManageBase* mb;
         DhList* uuidList;
         QStandardItemModel* model;
         void updateModel();
@@ -74,6 +74,7 @@ namespace dh
         void showSig_triggered();
         void closeSig_triggered();
         void ok_triggered();
+        void dnd_triggered(const QMimeData* data);
     };
 }
 

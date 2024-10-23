@@ -2,7 +2,7 @@
 #define BLOCKREADERUI_H
 
 #include <QWidget>
-#include "../region.h"
+#include "../region_info.h"
 
 
 QT_BEGIN_NAMESPACE
@@ -19,9 +19,13 @@ public:
 
 private:
     Ui::BlockReaderUI *ui;
+    RegionInfo* info;
+    Region* region;
+    void setText();
 
 private Q_SLOTS:
-    // void textChanged_cb(const QString & str);
+    void textChanged_cb(const QString & str);
+    void listBtn_clicked();
 
 };
 #endif // BLOCKREADERUI_H

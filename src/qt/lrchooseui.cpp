@@ -104,16 +104,7 @@ void LrChooseUI::okBtn_clicked()
             LiteRegion* lr = lite_region_create(info->root, i);
             Region* region = region_new_from_lite_region(lr);
             DhList* uuidList = region_info_list_get_uuid_list();
-            if(g_rw_lock_writer_trylock(&uuidList->lock))
-            {
-                region_info_new(region, g_date_time_new_now_local(), des.toUtf8());
-                g_rw_lock_writer_unlock(&uuidList->lock);
-            }
-            else
-            {
-                region_free(region);
-                QMessageBox::critical(this, _("Error!"), _("Region list is locked!"));
-            }
+            region_info_new(region, g_date_time_new_now_local(), des.toUtf8());
             lite_region_free(lr);
         }
     }

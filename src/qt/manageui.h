@@ -17,6 +17,7 @@ public:
     explicit ManageUI(QWidget *parent = nullptr);
     ~ManageUI();
     void updateModel(QStandardItemModel* model);
+    void setDND(bool enabled = false);
 
 Q_SIGNALS:
     void add();
@@ -26,15 +27,19 @@ Q_SIGNALS:
     void showSig();
     void closeSig();
     void ok();
+    void dnd(const QMimeData* data);
     
 private:
     Ui::ManageUI *ui;
     void initSignalSlots();
+    bool dndEnabled = false;
 
 protected:
     void closeEvent(QCloseEvent *event);
     void showEvent(QShowEvent* event);
-
+    void dragEnterEvent(QDragEnterEvent* event);
+    void dropEvent(QDropEvent* event);
+    
 private Q_SLOTS:
     void addBtn_clicked();
     void removeBtn_clicked();

@@ -1,6 +1,10 @@
 #include "manage.h"
 #include "glib.h"
 #include "manageui.h"
+#include <qabstractitemmodel.h>
+#include <qmessagebox.h>
+#include <qmimedata.h>
+#include <qnamespace.h>
 #include <qobject.h>
 #include "../nbt_info.h"
 #include <QInputDialog>
@@ -11,8 +15,7 @@
 #include "../nbt_litereader.h"
 #include <QDebug>
 #include "../region_info.h"
-#include "lrchooseui.h"
-#include "nbtselectui.h"
+#include "utility.h"
 #include <QMessageBox>
 
 using namespace dh;
@@ -52,49 +55,38 @@ void ManageBase::show()
 }
 
 ManageNBT::ManageNBT()
-    : mb(new ManageBase())
 {
+    mui->setDND(true);
     model = new QStandardItemModel();
     uuidList = nbt_info_list_get_uuid_list();
     mui->setWindowTitle(_("Manage NBT"));
+    QObject::connect(mui, &ManageUI::dnd, this, &ManageNBT::dnd_triggered);
 }
 
 ManageNBT::~ManageNBT()
 {
     delete model;
-    delete mb;
+}
+
+void ManageNBT::dnd_triggered(const QMimeData* data)
+{
+    auto urls = data->urls();
+    QStringList filelist;
+    for(int i = 0 ; i < urls.length() ; i++)
+    {
+        filelist << urls[i].toLocalFile();
+    }
+    dh::loadNbtFiles(mui, filelist);
+    updateModel();
+    mui->updateModel(model);
 }
 
 void ManageNBT::add_triggered()
 {
-    QString dir = QFileDialog::getOpenFileName(mui, _("Select a file"), nullptr, _("Litematic file (*.litematic);;NBT File (*.nbt)"));
-    if(!dir.isEmpty())
-    {
-        GFile* file = g_file_new_for_path(dir.toStdString().c_str());
-        char* defaultDescription = g_file_get_basename(file);
-        QString description = QInputDialog::getText(mui, _("Enter Desciption"), _("Enter desciption for the NBT file."), QLineEdit::Normal, defaultDescription);
-
-        if(description.isEmpty())
-        {
-            QMessageBox::critical(mui, _("No Description Entered!"), _("No desciption entered! Will not add the NBT file!"));
-        }
-        else
-        {
-            char* content;
-            gsize len;
-            g_file_load_contents(file, NULL, &content, &len, NULL, NULL);
-            NBT* newNBT = NBT_Parse((guint8*)content, len);
-            if(newNBT)
-            {
-                nbt_info_new(newNBT, g_date_time_new_now_local(), description.toStdString().c_str());
-            }
-            else QMessageBox::critical(mui, _("Not Valid File!"), _("Not a valid NBT file!"));
-            g_free(content);
-            updateModel();
-            mui->updateModel(model);
-        }
-        g_object_unref(file);
-    }
+    auto dirs = QFileDialog::getOpenFileNames(mui, _("Select a file"), nullptr, _("Litematic file (*.litematic);;NBT File (*.nbt)"));
+    dh::loadNbtFiles(mui, dirs);
+    updateModel();
+    mui->updateModel(model);
 }
 
 void ManageNBT::remove_triggered(int row)
@@ -233,8 +225,9 @@ void ManageNBT::ok_triggered()
 
 
 ManageRegion::ManageRegion()
-     : mb(new ManageBase)
 {
+    mui->setDND(true);
+    QObject::connect(mui, &ManageUI::dnd, this, &ManageRegion::dnd_triggered);
     model = new QStandardItemModel();
     uuidList = region_info_list_get_uuid_list();
     mui->setWindowTitle(_("Manage Region"));
@@ -243,7 +236,6 @@ ManageRegion::ManageRegion()
 ManageRegion::~ManageRegion()
 {
     delete model;
-    delete mb;
 }
 
 void ManageRegion::updateModel()
@@ -309,54 +301,7 @@ void ManageRegion::updateModel()
 
 void ManageRegion::add_triggered()
 {
-    DhList* list = nbt_info_list_get_uuid_list();
-    if(g_rw_lock_reader_trylock(&list->lock))
-    {
-        /* Lock for NBT info start */
-        NbtSelectUI* nsui = new NbtSelectUI();
-        nsui->setAttribute(Qt::WA_DeleteOnClose);
-        auto res = nsui->exec();
-        /* Lock for NBT info end */
-        g_rw_lock_reader_unlock(&list->lock);
-        if(res == QDialog::Accepted)
-        {
-            NbtInfo* info = nbt_info_list_get_nbt_info(nbt_info_list_get_uuid());
-            if(g_rw_lock_reader_trylock(&info->info_lock))
-            {
-                /* Lock NBT start */
-                if(info->type == NBTStruct)
-                {
-                    auto str = QInputDialog::getText(mui, _("Enter Region Name"), _("Enter name for the new Region."), QLineEdit::Normal, info->description);
-                    if(str.isEmpty())
-                        QMessageBox::critical(mui, _("Error!"), _("No description for the Region!"));
-                    else
-                    {
-                        Region* region = region_new_from_nbt(info->root);
-                        region_info_new(region, g_date_time_new_now_local(), str.toLocal8Bit());
-                    }
-                }
-                else if(info->type == Litematica)
-                {
-                    g_rw_lock_writer_unlock(&uuidList->lock);
-                    LrChooseUI* lcui = new LrChooseUI(mui);
-                    lcui->setAttribute(Qt::WA_DeleteOnClose);
-                    lcui->exec();
-                    g_rw_lock_writer_lock(&uuidList->lock);
-                }
-                else QMessageBox::critical(mui, _("Error!"), _("The NBT Struct is unsupported!"));
-
-                /* Lock NBT end */
-                g_rw_lock_reader_unlock(&info->info_lock);
-            }
-            /* Lock NBT fail */
-            else QMessageBox::critical(mui, _("Error!"), _("This NBT is locked!"));
-        }
-        /* No option given for the NBT selection */
-        else QMessageBox::critical(mui, _("Error!"), _("No NBT or no NBT selected!"));
-    }
-    /* Lock NBT info fail */
-    else QMessageBox::critical(mui, _("Error!"), _("NBT list is locked!"));
-
+    loadRegion(mui);
     updateModel();
     mui->updateModel(model);
 }
@@ -413,4 +358,25 @@ void ManageRegion::ok_triggered()
         }
     }
     mui->close();
+}
+
+void ManageRegion::dnd_triggered(const QMimeData* data)
+{
+    if(!data->hasFormat("application/x-qabstractitemmodeldatalist"))
+        QMessageBox::critical(mui, _("Error!"), _("Not a valid NBT List!"));
+    else
+    {
+        auto newModel = new QStandardItemModel;
+        newModel->dropMimeData(data, Qt::CopyAction, 0, 0, QModelIndex());
+        auto text = newModel->index(0, 1).data().toString().toUtf8();
+        g_message("%s", (const char*)text);
+        if(g_uuid_string_is_valid(text))
+        {
+            loadRegion(mui, text);
+            updateModel();
+            mui->updateModel(model);
+        }
+        else QMessageBox::critical(mui, _("Error!"), _("Not a valid NBT UUID!"));
+        delete newModel;
+    }
 }
