@@ -3,7 +3,9 @@
 
 #include <QWidget>
 #include <qevent.h>
+#include <qmimedata.h>
 #include <qstandarditemmodel.h>
+#include "dhtableview.h"
 
 namespace Ui {
 class ManageUI;
@@ -18,6 +20,7 @@ public:
     ~ManageUI();
     void updateModel(QStandardItemModel* model);
     void setDND(bool enabled = false);
+    DhTableView* view;
 
 Q_SIGNALS:
     void add();
@@ -28,6 +31,7 @@ Q_SIGNALS:
     void closeSig();
     void ok();
     void dnd(const QMimeData* data);
+    void tableDND(QDropEvent* event, int selectedRow);
     
 private:
     Ui::ManageUI *ui;
@@ -46,6 +50,7 @@ private Q_SLOTS:
     void saveBtn_clicked();
     void refreshBtn_clicked();
     void okBtn_clicked();
+    void tableDND_triggered(QDropEvent* event);
 };
 
 #endif /* MANAGEUI_H */

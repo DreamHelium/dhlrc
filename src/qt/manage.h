@@ -4,6 +4,7 @@
 #include "manageui.h"
 #include <QWidget>
 #include "../dhlrc_list.h"
+#include <qcoreevent.h>
 #include <qmimedata.h>
 #include <qstandarditemmodel.h>
 
@@ -52,6 +53,7 @@ namespace dh
         void closeSig_triggered();
         void ok_triggered();
         void dnd_triggered(const QMimeData* data);
+        void tablednd_triggered(QDropEvent* event, int SelectedRow);
     };
 
     class ManageRegion : public ManageBase 

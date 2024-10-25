@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-10-23 22:46+0800\n"
+"POT-Creation-Date: 2024-10-25 14:51+0800\n"
 "PO-Revision-Date: 2024-10-16 23:52+0800\n"
 "Last-Translator: dream_he\n"
 "Language-Team: Chinese <kde-i18n-doc@kde.org>\n"
@@ -373,7 +373,7 @@ msgstr "接下来，你可以对此Region做好多事。"
 #: src/qt/mainwindow.cpp:285 src/qt/mainwindow.cpp:307
 #: src/qt/mainwindow.cpp:310 src/qt/mainwindow.cpp:312
 #: src/qt/ilreaderui.cpp:110 src/qt/ilchooseui.cpp:91 src/qt/nbtselectui.cpp:98
-#: src/qt/manage.cpp:366 src/qt/manage.cpp:379
+#: src/qt/manage.cpp:388 src/qt/manage.cpp:401
 msgid "Error!"
 msgstr "错误！"
 
@@ -433,7 +433,7 @@ msgstr "没有Region或没有Region选中！"
 msgid "Region is locked!"
 msgstr ""
 
-#: src/qt/ilreaderui.cpp:27 src/qt/manageui.cpp:25
+#: src/qt/ilreaderui.cpp:27 src/qt/manageui.cpp:27
 msgid "&Save"
 msgstr "保存 (&S)"
 
@@ -473,9 +473,9 @@ msgstr "选择一个物品列表。"
 msgid "Please choose a item list:"
 msgstr "请选择一个物品列表："
 
-#: src/qt/ilchooseui.cpp:39 src/qt/nbtselectui.cpp:51 src/qt/manage.cpp:142
-#: src/qt/manage.cpp:143 src/qt/manage.cpp:144 src/qt/manage.cpp:145
-#: src/qt/manage.cpp:268 src/qt/manage.cpp:269 src/qt/manage.cpp:270
+#: src/qt/ilchooseui.cpp:39 src/qt/nbtselectui.cpp:51 src/qt/manage.cpp:144
+#: src/qt/manage.cpp:145 src/qt/manage.cpp:146 src/qt/manage.cpp:147
+#: src/qt/manage.cpp:290 src/qt/manage.cpp:291 src/qt/manage.cpp:292
 msgid "locked"
 msgstr "已锁定"
 
@@ -558,97 +558,97 @@ msgstr "没有NBT可用！"
 msgid "No NBT selected!"
 msgstr "没有NBT被选中！"
 
-#: src/qt/manageui.cpp:22
+#: src/qt/manageui.cpp:24
 msgid "&Add"
 msgstr "添加（&A）"
 
-#: src/qt/manageui.cpp:23
+#: src/qt/manageui.cpp:25
 msgid "&Remove"
 msgstr "移除（&R）"
 
-#: src/qt/manageui.cpp:24
+#: src/qt/manageui.cpp:26
 msgid "R&efresh"
 msgstr "刷新（&E）"
 
-#: src/qt/manageui.cpp:76 src/qt/manageui.cpp:109
+#: src/qt/manageui.cpp:80 src/qt/manageui.cpp:113
 msgid "No Selected Row!"
 msgstr "没有选择行！"
 
-#: src/qt/manageui.cpp:76 src/qt/manageui.cpp:109
+#: src/qt/manageui.cpp:80 src/qt/manageui.cpp:113
 msgid "No row is selected!"
 msgstr "没有选择行！"
 
-#: src/qt/manage.cpp:27
+#: src/qt/manage.cpp:28
 msgid "Litematica"
 msgstr "投影"
 
-#: src/qt/manage.cpp:28
+#: src/qt/manage.cpp:29
 msgid "NBT Struct"
 msgstr "NBT结构"
 
-#: src/qt/manage.cpp:29
+#: src/qt/manage.cpp:30
 msgid "Schematics"
 msgstr "Schema投影"
 
-#: src/qt/manage.cpp:30
+#: src/qt/manage.cpp:31
 msgid "Others"
 msgstr "其它"
 
-#: src/qt/manage.cpp:62
+#: src/qt/manage.cpp:63
 msgid "Manage NBT"
 msgstr "管理NBT"
 
-#: src/qt/manage.cpp:86
+#: src/qt/manage.cpp:88
 msgid "Select a file"
 msgstr "选择一个文件"
 
-#: src/qt/manage.cpp:86
+#: src/qt/manage.cpp:88
 msgid "Litematic file (*.litematic);;NBT File (*.nbt)"
 msgstr "投影文件 (*.litematic);;NBT文件 (*.nbt)"
 
-#: src/qt/manage.cpp:159 src/qt/manage.cpp:160 src/qt/manage.cpp:161
-#: src/qt/manage.cpp:162 src/qt/manage.cpp:283 src/qt/manage.cpp:284
-#: src/qt/manage.cpp:285
+#: src/qt/manage.cpp:161 src/qt/manage.cpp:162 src/qt/manage.cpp:163
+#: src/qt/manage.cpp:164 src/qt/manage.cpp:305 src/qt/manage.cpp:306
+#: src/qt/manage.cpp:307
 msgid "List locked"
 msgstr "列表锁定"
 
-#: src/qt/manage.cpp:170 src/qt/manage.cpp:293
+#: src/qt/manage.cpp:172 src/qt/manage.cpp:315
 msgid "Description"
 msgstr "描述"
 
-#: src/qt/manage.cpp:170 src/qt/manage.cpp:293
+#: src/qt/manage.cpp:172 src/qt/manage.cpp:315
 msgid "UUID"
 msgstr "唯一码"
 
-#: src/qt/manage.cpp:170 src/qt/manage.cpp:293
+#: src/qt/manage.cpp:172 src/qt/manage.cpp:315
 msgid "Time"
 msgstr "时间"
 
-#: src/qt/manage.cpp:170
+#: src/qt/manage.cpp:172
 msgid "Type"
 msgstr "类型"
 
-#: src/qt/manage.cpp:183
+#: src/qt/manage.cpp:185
 msgid "Save File"
 msgstr "保存文件"
 
-#: src/qt/manage.cpp:192
+#: src/qt/manage.cpp:194
 msgid "Info Locked!"
 msgstr "信息被锁定！"
 
-#: src/qt/manage.cpp:192
+#: src/qt/manage.cpp:194
 msgid "The NBT info is locked!"
 msgstr "NBT信息被锁定！"
 
-#: src/qt/manage.cpp:233
+#: src/qt/manage.cpp:255
 msgid "Manage Region"
 msgstr ""
 
-#: src/qt/manage.cpp:366
+#: src/qt/manage.cpp:388
 msgid "Not a valid NBT List!"
 msgstr ""
 
-#: src/qt/manage.cpp:379
+#: src/qt/manage.cpp:401
 msgid "Not a valid NBT UUID!"
 msgstr ""
 

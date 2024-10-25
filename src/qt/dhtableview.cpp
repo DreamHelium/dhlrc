@@ -14,17 +14,14 @@ DhTableView::DhTableView(QWidget *parent)
     setSelectionMode(SingleSelection);
     setSelectionBehavior(SelectRows);
 
-    indicateLabel = new QLabel(this);
-    indicateLabel->setFixedHeight(2);
-    indicateLabel->setGeometry(1, 0, width(), 2);
-    indicateLabel->setStyleSheet("border: 1px solid #8B7500;");
-    indicateLabel->hide();
+    // indicateLabel = new QLabel(this);
+    // indicateLabel->setFixedHeight(2);
+    // indicateLabel->setGeometry(1, 0, width(), 2);
+    // indicateLabel->setStyleSheet("border: 1px solid #8B7500;");
+    // indicateLabel->hide();
 }
 
-bool DhTableView::dropMimeData(const QMimeData* data, Qt::DropAction action, int row, int coloum)
+void DhTableView::dropEvent(QDropEvent* event)
 {
-    if(!data || action != Qt::MoveAction)
-        return false;
-    QAbstractItemModel* model = this->model();
-    return false; 
+    emit tableDND(event);
 }

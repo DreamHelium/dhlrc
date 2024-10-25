@@ -1,6 +1,8 @@
 #include "manageui.h"
+#include "dhtableview.h"
 #include "ui_manageui.h"
 #include <qabstractitemview.h>
+#include <qdebug.h>
 #include <qevent.h>
 #include <qfiledialog.h>
 #include <qinputdialog.h>
@@ -32,6 +34,7 @@ ManageUI::ManageUI(QWidget *parent) :
     ui(new Ui::ManageUI)
 {
     ui->setupUi(this);
+    view = ui->tableView;
     initSignalSlots();
 }
 
@@ -48,6 +51,7 @@ void ManageUI::initSignalSlots()
     QObject::connect(ui->saveBtn, &QPushButton::clicked, this, &ManageUI::saveBtn_clicked);
     QObject::connect(ui->refreshBtn, &QPushButton::clicked, this, &ManageUI::refreshBtn_clicked);
     QObject::connect(ui->okBtn, &QPushButton::clicked, this, &ManageUI::okBtn_clicked);
+    QObject::connect(ui->tableView, &DhTableView::tableDND, this, &ManageUI::tableDND_triggered);
 }
 
 void ManageUI::updateModel(QStandardItemModel* model)
@@ -142,4 +146,18 @@ void ManageUI::setDND(bool enabled)
 {
     dndEnabled = enabled;
     setAcceptDrops(dndEnabled);
+}
+
+void ManageUI::tableDND_triggered(QDropEvent* event)
+{
+    auto dropObj = event->source();
+    auto row = -1;
+    auto model = ui->tableView->selectionModel();
+    if(dropObj == view)
+    {
+        auto index = model->currentIndex();
+        if(index.isValid())
+            row = index.row();
+    }
+    emit tableDND(event, row);
 }

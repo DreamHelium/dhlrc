@@ -74,12 +74,12 @@
       </layout>
      </item>
      <item>
-      <widget class="QTableView" name="tableView">
+      <widget class="DhTableView" name="tableView">
        <property name="dragEnabled">
         <bool>true</bool>
        </property>
        <property name="dragDropMode">
-        <enum>QAbstractItemView::DragDropMode::InternalMove</enum>
+        <enum>QAbstractItemView::DragDropMode::DragDrop</enum>
        </property>
        <property name="defaultDropAction">
         <enum>Qt::DropAction::MoveAction</enum>
@@ -130,6 +130,13 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>DhTableView</class>
+   <extends>QTableView</extends>
+   <header>dhtableview.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

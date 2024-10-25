@@ -2,6 +2,7 @@
 #include "glib.h"
 #include "manageui.h"
 #include <qabstractitemmodel.h>
+#include <qevent.h>
 #include <qmessagebox.h>
 #include <qmimedata.h>
 #include <qnamespace.h>
@@ -61,6 +62,7 @@ ManageNBT::ManageNBT()
     uuidList = nbt_info_list_get_uuid_list();
     mui->setWindowTitle(_("Manage NBT"));
     QObject::connect(mui, &ManageUI::dnd, this, &ManageNBT::dnd_triggered);
+    QObject::connect(mui, &ManageUI::tableDND, this, &ManageNBT::tablednd_triggered);
 }
 
 ManageNBT::~ManageNBT()
@@ -221,6 +223,26 @@ void ManageNBT::ok_triggered()
         }
     }
     mui->close();
+}
+
+void ManageNBT::tablednd_triggered(QDropEvent* event, int SelectedRow)
+{
+    int throwedRow = -1;
+    if(SelectedRow != -1)
+    {
+        #if QT_VERSION_MAJOR >= 6
+        auto pos = event->position();
+        #else
+        auto pos = event->posF();
+        #endif
+        throwedRow = mui->view->indexAt(pos.toPoint()).row();
+        /* We delete this and add this */
+        char* uuid = (char*)g_list_nth_data(uuidList->list, SelectedRow);
+        uuidList->list = g_list_remove(uuidList->list, uuid);
+        uuidList->list = g_list_insert(uuidList->list, uuid, throwedRow == -1 ? g_list_length(uuidList->list) : throwedRow);
+        updateModel();
+        mui->updateModel(model);
+    }
 }
 
 

@@ -6,16 +6,18 @@
 #include <qnamespace.h>
 #include <qtableview.h>
 
-class DhTableView : QTableView
+class DhTableView : public QTableView
 {
     Q_OBJECT
 
 public:
     DhTableView(QWidget* parent =  nullptr);
 
-protected:
-    bool dropMimeData(const QMimeData* data, Qt::DropAction action, int row, int coloum);
+Q_SIGNALS:
+    void tableDND(QDropEvent* event);
 
+protected:
+    void dropEvent(QDropEvent* event);
 
 private:
     QLabel* indicateLabel;
