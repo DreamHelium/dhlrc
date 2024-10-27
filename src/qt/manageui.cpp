@@ -51,7 +51,6 @@ void ManageUI::initSignalSlots()
     QObject::connect(ui->saveBtn, &QPushButton::clicked, this, &ManageUI::saveBtn_clicked);
     QObject::connect(ui->refreshBtn, &QPushButton::clicked, this, &ManageUI::refreshBtn_clicked);
     QObject::connect(ui->okBtn, &QPushButton::clicked, this, &ManageUI::okBtn_clicked);
-    QObject::connect(ui->tableView, &DhTableView::tableDND, this, &ManageUI::tableDND_triggered);
 }
 
 void ManageUI::updateModel(QStandardItemModel* model)
@@ -69,19 +68,16 @@ void ManageUI::removeBtn_clicked()
     auto model = ui->tableView->selectionModel();
     if(model)
     {
-        auto index = model->currentIndex();
-        if(index.isValid())
+        auto rows = model->selectedRows();
+        auto rowLength = rows.length();
+        QList<int> removeRows;
+        for(auto row : rows)
         {
-            int row = index.row();
-            emit remove(row);
+            removeRows.append(row.row());
         }
-        else
-        {
-            QMessageBox::critical(this, _("No Selected Row!"), _("No row is selected!"));
-            emit remove(-1);
-        }
+        emit remove(removeRows);
     }
-    else emit remove(-1);
+    else emit remove(QList<int>());
 }
 
 void ManageUI::closeEvent(QCloseEvent* event)
@@ -102,19 +98,16 @@ void ManageUI::saveBtn_clicked()
     auto model = ui->tableView->selectionModel();
     if(model)
     {
-        auto index = model->currentIndex();
-        if(index.isValid())
+        auto rows = model->selectedRows();
+        auto rowLength = rows.length();
+        QList<int> saveRows;
+        for(auto row : rows)
         {
-            int row = index.row();
-            emit save(row);
+            saveRows.append(row.row());
         }
-        else
-        {
-            QMessageBox::critical(this, _("No Selected Row!"), _("No row is selected!"));
-            emit save(-1);
-        }
+        emit save(saveRows);
     }
-    else emit save(-1);
+    else emit save(QList<int>());
 }
 
 void ManageUI::refreshBtn_clicked()
@@ -146,18 +139,4 @@ void ManageUI::setDND(bool enabled)
 {
     dndEnabled = enabled;
     setAcceptDrops(dndEnabled);
-}
-
-void ManageUI::tableDND_triggered(QDropEvent* event)
-{
-    auto dropObj = event->source();
-    auto row = -1;
-    auto model = ui->tableView->selectionModel();
-    if(dropObj == view)
-    {
-        auto index = model->currentIndex();
-        if(index.isValid())
-            row = index.row();
-    }
-    emit tableDND(event, row);
 }

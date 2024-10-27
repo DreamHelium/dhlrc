@@ -98,13 +98,12 @@ gboolean nbt_info_new(NBT* root, GDateTime* time, const gchar* description)
 
 gboolean nbt_info_list_remove_item(gchar* uuid)
 {
+    /* You should lock the uuid list before operating. */
     NbtInfo* info = dh_mt_table_lookup(table, uuid);
     if(g_rw_lock_writer_trylock(&(info->info_lock)))
     {
-        g_rw_lock_writer_lock(&uuid_list->lock);
         uuid_list->list = g_list_remove(uuid_list->list, uuid);
         gboolean ret = dh_mt_table_remove(table, uuid);
-        g_rw_lock_writer_unlock(&uuid_list->lock);
         return ret;
     }
     else return FALSE; /* Some function is using the il */

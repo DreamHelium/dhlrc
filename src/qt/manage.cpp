@@ -1,7 +1,10 @@
 #include "manage.h"
+#include "dhtableview.h"
 #include "glib.h"
+#include "glibconfig.h"
 #include "manageui.h"
 #include <qabstractitemmodel.h>
+#include <qcontainerfwd.h>
 #include <qevent.h>
 #include <qmessagebox.h>
 #include <qmimedata.h>
@@ -18,6 +21,11 @@
 #include "../region_info.h"
 #include "utility.h"
 #include <QMessageBox>
+
+static void messageNoRow(QWidget* parent)
+{
+    QMessageBox::critical(parent, _("Error!"), _("No row is selected!"));
+}
 
 using namespace dh;
 
@@ -43,6 +51,7 @@ ManageBase::ManageBase()
     QObject::connect(mui, &ManageUI::showSig, this, &ManageBase::showSig_triggered);
     QObject::connect(mui, &ManageUI::closeSig, this, &ManageBase::closeSig_triggered);
     QObject::connect(mui, &ManageUI::ok, this, &ManageBase::ok_triggered);
+    QObject::connect(mui->view, &DhTableView::tableDND, this, &ManageBase::tablednd_triggered);
 }
 
 ManageBase::~ManageBase()
@@ -62,7 +71,6 @@ ManageNBT::ManageNBT()
     uuidList = nbt_info_list_get_uuid_list();
     mui->setWindowTitle(_("Manage NBT"));
     QObject::connect(mui, &ManageUI::dnd, this, &ManageNBT::dnd_triggered);
-    QObject::connect(mui, &ManageUI::tableDND, this, &ManageNBT::tablednd_triggered);
 }
 
 ManageNBT::~ManageNBT()
@@ -91,18 +99,24 @@ void ManageNBT::add_triggered()
     mui->updateModel(model);
 }
 
-void ManageNBT::remove_triggered(int row)
+void ManageNBT::remove_triggered(QList<int> rows)
 {
-    if(row != -1)
+    if(rows.length())
     {
         uuidList = nbt_info_list_get_uuid_list();
-        char* uuid = (char*)g_list_nth_data(uuidList->list, row);
-        g_rw_lock_writer_unlock(&uuidList->lock);
-        nbt_info_list_remove_item(uuid);
-        g_rw_lock_writer_trylock(&uuidList->lock);
+        QList<char*> removedList;
+        for(auto row : rows)
+        {
+            char* uuid = (char*)g_list_nth_data(uuidList->list, row);
+            removedList.append(uuid);
+        }
+        for(auto uuid : removedList)
+            nbt_info_list_remove_item(uuid);
+
         updateModel();
         mui->updateModel(model);
     }
+    else messageNoRow(mui);
 }
 
 void ManageNBT::refresh_triggered()
@@ -178,22 +192,56 @@ void ManageNBT::updateModel()
     }
 }
 
-void ManageNBT::save_triggered(int row)
+void ManageNBT::save_triggered(QList<int> rows)
 {
-    if(row != -1)
+    if(rows.length())
     {
-        QString filepos = QFileDialog::getSaveFileName(mui, _("Save File"));
-        if(!filepos.isEmpty())
+        if(rows.length() == 1)
         {
-            NbtInfo* info = nbt_info_list_get_nbt_info((char*)g_list_nth_data(uuidList->list, row));
-            if(g_rw_lock_writer_trylock(&info->info_lock))
+            auto row = rows[0];
+            QString filepos = QFileDialog::getSaveFileName(mui, _("Save File"));
+            if(!filepos.isEmpty())
             {
-                dhlrc_nbt_save(info->root, filepos.toLocal8Bit());
-                g_rw_lock_writer_unlock(&info->info_lock);
+                NbtInfo* info = nbt_info_list_get_nbt_info((char*)g_list_nth_data(uuidList->list, row));
+                if(g_rw_lock_writer_trylock(&info->info_lock))
+                {
+                    dhlrc_nbt_save(info->root, filepos.toUtf8());
+                    g_rw_lock_writer_unlock(&info->info_lock);
+                }
+                else QMessageBox::critical(mui, _("Info Locked!"), _("The NBT info is locked!"));
             }
-            else QMessageBox::critical(mui, _("Info Locked!"), _("The NBT info is locked!"));
+        }
+        else
+        {
+            auto dir = QFileDialog::getExistingDirectory(mui, _("Save Files"));
+            if(!dir.isEmpty())
+            {
+                QStringList lockedInfo;
+                for(auto row : rows)
+                {
+                    NbtInfo* info = nbt_info_list_get_nbt_info((char*)g_list_nth_data(uuidList->list, row));
+                    QString filepos = (dir + G_DIR_SEPARATOR + info->description);
+                    if(g_rw_lock_writer_trylock(&info->info_lock))
+                    {
+                        dhlrc_nbt_save(info->root, filepos.toUtf8());
+                        g_rw_lock_writer_unlock(&info->info_lock);
+                    }
+                    else lockedInfo << info->description;
+                }
+                if(lockedInfo.length())
+                {
+                    QString lockedInfoStr = _("The following infos are locked:\n");
+                    for(auto str : lockedInfo)
+                    {
+                        lockedInfoStr += str;
+                        lockedInfoStr += '\n';
+                    }
+                    QMessageBox::critical(mui, _("Error!"), lockedInfoStr);
+                }
+            }
         }
     }
+    else messageNoRow(mui);
 }
 
 void ManageNBT::showSig_triggered()
@@ -225,10 +273,11 @@ void ManageNBT::ok_triggered()
     mui->close();
 }
 
-void ManageNBT::tablednd_triggered(QDropEvent* event, int SelectedRow)
+void ManageBase::tablednd_triggered(QDropEvent* event)
 {
     int throwedRow = -1;
-    if(SelectedRow != -1)
+    auto obj = event->source();
+    if(obj == mui->view)
     {
         #if QT_VERSION_MAJOR >= 6
         auto pos = event->position();
@@ -237,9 +286,22 @@ void ManageNBT::tablednd_triggered(QDropEvent* event, int SelectedRow)
         #endif
         throwedRow = mui->view->indexAt(pos.toPoint()).row();
         /* We delete this and add this */
-        char* uuid = (char*)g_list_nth_data(uuidList->list, SelectedRow);
-        uuidList->list = g_list_remove(uuidList->list, uuid);
-        uuidList->list = g_list_insert(uuidList->list, uuid, throwedRow == -1 ? g_list_length(uuidList->list) : throwedRow);
+        auto selectedModel = mui->view->selectionModel();
+        auto rowList = selectedModel->selectedRows();
+        QList<char*> deletedList;
+        for(auto row : rowList)
+        {
+            auto rowNum = row.row();
+            char* uuid = (char*)g_list_nth_data(uuidList->list, rowNum);
+            deletedList.append(uuid);
+        }
+        int i = 0;
+        for(auto uuid : deletedList)
+        {
+            uuidList->list = g_list_remove(uuidList->list, uuid);
+            uuidList->list = g_list_insert(uuidList->list, uuid, (throwedRow == -1 ? g_list_length(uuidList->list) : throwedRow));
+            i++;
+        }
         updateModel();
         mui->updateModel(model);
     }
@@ -328,21 +390,22 @@ void ManageRegion::add_triggered()
     mui->updateModel(model);
 }
 
-void ManageRegion::remove_triggered(int row)
+void ManageRegion::remove_triggered(QList<int> rows)
 {
-    if(row != -1)
+    if(rows.length())
     {
-        uuidList = region_info_list_get_uuid_list();
-        char* uuid = (char*)g_list_nth_data(uuidList->list, row);
-        g_rw_lock_writer_unlock(&uuidList->lock);
-        region_info_list_remove_item(uuid);
-        g_rw_lock_writer_trylock(&uuidList->lock);
+        for(auto row : rows)
+        {
+            char* uuid = (char*)g_list_nth_data(uuidList->list, row);
+            region_info_list_remove_item(uuid);
+        }
         updateModel();
         mui->updateModel(model);
     }
+    else messageNoRow(mui);
 }
 
-void ManageRegion::save_triggered(int row)
+void ManageRegion::save_triggered(QList<int> rows)
 {
     /* TODO */
 }

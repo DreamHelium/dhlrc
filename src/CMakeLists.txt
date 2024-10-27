@@ -85,9 +85,9 @@ target_include_directories(dhlrc PUBLIC
 
 target_link_directories(dhlrc PUBLIC "${GIO_LIBRARY_DIRS}")
 
-add_executable(dhlrc_isoc main_isoc.c main.c  lrc_extend.c lrc_extend.h)
+add_executable(dhlrc_cli main_isoc.c main.c lrc_extend.c lrc_extend.h)
 
-target_link_libraries(dhlrc_isoc PUBLIC dhlrc)
+target_link_libraries(dhlrc_cli PUBLIC dhlrc)
 
 add_subdirectory(qt)
 add_subdirectory(gtk)

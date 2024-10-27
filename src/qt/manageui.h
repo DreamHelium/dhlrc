@@ -24,9 +24,9 @@ public:
 
 Q_SIGNALS:
     void add();
-    void remove(int row);
+    void remove(QList<int> row);
     void refresh();
-    void save(int row);
+    void save(QList<int> row);
     void showSig();
     void closeSig();
     void ok();
@@ -50,7 +50,6 @@ private Q_SLOTS:
     void saveBtn_clicked();
     void refreshBtn_clicked();
     void okBtn_clicked();
-    void tableDND_triggered(QDropEvent* event);
 };
 
 #endif /* MANAGEUI_H */

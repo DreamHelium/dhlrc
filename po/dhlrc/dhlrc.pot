@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-10-25 15:01+0800\n"
+"POT-Creation-Date: 2024-10-27 09:33+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -349,7 +349,8 @@ msgstr ""
 #: src/qt/mainwindow.cpp:285 src/qt/mainwindow.cpp:307
 #: src/qt/mainwindow.cpp:310 src/qt/mainwindow.cpp:312
 #: src/qt/ilreaderui.cpp:110 src/qt/ilchooseui.cpp:91 src/qt/nbtselectui.cpp:98
-#: src/qt/manage.cpp:388 src/qt/manage.cpp:401
+#: src/qt/manage.cpp:27 src/qt/manage.cpp:239 src/qt/manage.cpp:451
+#: src/qt/manage.cpp:464
 msgid "Error!"
 msgstr ""
 
@@ -449,9 +450,9 @@ msgstr ""
 msgid "Please choose a item list:"
 msgstr ""
 
-#: src/qt/ilchooseui.cpp:39 src/qt/nbtselectui.cpp:51 src/qt/manage.cpp:144
-#: src/qt/manage.cpp:145 src/qt/manage.cpp:146 src/qt/manage.cpp:147
-#: src/qt/manage.cpp:290 src/qt/manage.cpp:291 src/qt/manage.cpp:292
+#: src/qt/ilchooseui.cpp:39 src/qt/nbtselectui.cpp:51 src/qt/manage.cpp:158
+#: src/qt/manage.cpp:159 src/qt/manage.cpp:160 src/qt/manage.cpp:161
+#: src/qt/manage.cpp:352 src/qt/manage.cpp:353 src/qt/manage.cpp:354
 msgid "locked"
 msgstr ""
 
@@ -546,84 +547,88 @@ msgstr ""
 msgid "R&efresh"
 msgstr ""
 
-#: src/qt/manageui.cpp:80 src/qt/manageui.cpp:113
-msgid "No Selected Row!"
-msgstr ""
-
-#: src/qt/manageui.cpp:80 src/qt/manageui.cpp:113
+#: src/qt/manage.cpp:27
 msgid "No row is selected!"
 msgstr ""
 
-#: src/qt/manage.cpp:28
+#: src/qt/manage.cpp:36
 msgid "Litematica"
 msgstr ""
 
-#: src/qt/manage.cpp:29
+#: src/qt/manage.cpp:37
 msgid "NBT Struct"
 msgstr ""
 
-#: src/qt/manage.cpp:30
+#: src/qt/manage.cpp:38
 msgid "Schematics"
 msgstr ""
 
-#: src/qt/manage.cpp:31
+#: src/qt/manage.cpp:39
 msgid "Others"
 msgstr ""
 
-#: src/qt/manage.cpp:63
+#: src/qt/manage.cpp:72
 msgid "Manage NBT"
 msgstr ""
 
-#: src/qt/manage.cpp:88
+#: src/qt/manage.cpp:96
 msgid "Select a file"
 msgstr ""
 
-#: src/qt/manage.cpp:88
+#: src/qt/manage.cpp:96
 msgid "Litematic file (*.litematic);;NBT File (*.nbt)"
 msgstr ""
 
-#: src/qt/manage.cpp:161 src/qt/manage.cpp:162 src/qt/manage.cpp:163
-#: src/qt/manage.cpp:164 src/qt/manage.cpp:305 src/qt/manage.cpp:306
-#: src/qt/manage.cpp:307
+#: src/qt/manage.cpp:175 src/qt/manage.cpp:176 src/qt/manage.cpp:177
+#: src/qt/manage.cpp:178 src/qt/manage.cpp:367 src/qt/manage.cpp:368
+#: src/qt/manage.cpp:369
 msgid "List locked"
 msgstr ""
 
-#: src/qt/manage.cpp:172 src/qt/manage.cpp:315
+#: src/qt/manage.cpp:186 src/qt/manage.cpp:377
 msgid "Description"
 msgstr ""
 
-#: src/qt/manage.cpp:172 src/qt/manage.cpp:315
+#: src/qt/manage.cpp:186 src/qt/manage.cpp:377
 msgid "UUID"
 msgstr ""
 
-#: src/qt/manage.cpp:172 src/qt/manage.cpp:315
+#: src/qt/manage.cpp:186 src/qt/manage.cpp:377
 msgid "Time"
 msgstr ""
 
-#: src/qt/manage.cpp:172
+#: src/qt/manage.cpp:186
 msgid "Type"
 msgstr ""
 
-#: src/qt/manage.cpp:185
+#: src/qt/manage.cpp:202
 msgid "Save File"
 msgstr ""
 
-#: src/qt/manage.cpp:194
+#: src/qt/manage.cpp:211
 msgid "Info Locked!"
 msgstr ""
 
-#: src/qt/manage.cpp:194
+#: src/qt/manage.cpp:211
 msgid "The NBT info is locked!"
 msgstr ""
 
-#: src/qt/manage.cpp:255
+#: src/qt/manage.cpp:216
+msgid "Save Files"
+msgstr ""
+
+#: src/qt/manage.cpp:233
+msgid "The following infos are locked:\n"
+msgstr ""
+
+#: src/qt/manage.cpp:317
 msgid "Manage Region"
 msgstr ""
 
-#: src/qt/manage.cpp:388
+#: src/qt/manage.cpp:451
 msgid "Not a valid NBT List!"
 msgstr ""
 
-#: src/qt/manage.cpp:401
+#: src/qt/manage.cpp:464
 msgid "Not a valid NBT UUID!"
 msgstr ""
