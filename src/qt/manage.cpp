@@ -3,6 +3,7 @@
 #include "glib.h"
 #include "glibconfig.h"
 #include "manageui.h"
+#include <cstddef>
 #include <qabstractitemmodel.h>
 #include <qcontainerfwd.h>
 #include <qevent.h>
@@ -295,11 +296,12 @@ void ManageBase::tablednd_triggered(QDropEvent* event)
             char* uuid = (char*)g_list_nth_data(uuidList->list, rowNum);
             deletedList.append(uuid);
         }
+        GList* afterList =  throwedRow != -1 ? g_list_nth(uuidList->list, throwedRow) : NULL;
         int i = 0;
         for(auto uuid : deletedList)
         {
             uuidList->list = g_list_remove(uuidList->list, uuid);
-            uuidList->list = g_list_insert(uuidList->list, uuid, (throwedRow == -1 ? g_list_length(uuidList->list) : throwedRow));
+            uuidList->list = g_list_insert_before(uuidList->list, afterList, uuid);
             i++;
         }
         updateModel();
