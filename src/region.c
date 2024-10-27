@@ -217,6 +217,9 @@ Region* region_new_from_lite_region(LiteRegion *lr)
 {
     Region* region = g_new0(Region, 1);
 
+    /* Fill DataVersion */
+    region->data_version = lr->data_version; 
+
     /* Fill RegionSize */
     RegionSize* rs = g_new0(RegionSize, 1);
     rs->x = lr->region_size.x;
@@ -257,6 +260,10 @@ Region* region_new_from_nbt(NBT* root)
         /* Fill BlockInfoArray */
         BlockInfoArray* bia = get_block_full_info_from_nbt(root, pa);
         region->block_info_array = bia;
+
+        /* Fill Data Version */
+        NBT* data_version = NBT_GetChild(root, "DataVersion");
+        region->data_version = data_version->value_i;
         
         return region;
     }

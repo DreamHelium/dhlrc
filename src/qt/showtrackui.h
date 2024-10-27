@@ -6,11 +6,6 @@
 #include <qboxlayout.h>
 #include "../dhlrc_list.h"
 
-
-namespace Ui {
-class ShowTrackUI;
-}
-
 class ShowTrackUI : public QWidget
 {
     Q_OBJECT

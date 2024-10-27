@@ -37,6 +37,7 @@ set(PROJECT_SOURCES
         lrchooseui.h lrchooseui.cpp
         manage.h manage.cpp
         utility.h utility.cpp
+        saveregionselectui.h saveregionselectui.cpp
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)

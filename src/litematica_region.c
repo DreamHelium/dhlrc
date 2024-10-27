@@ -20,7 +20,6 @@
 #include "libnbt/nbt.h"
 #include <string.h>
 #include <stdlib.h>
-#include <math.h>
 #include <time.h>
 #include "translation.h"
 
@@ -84,6 +83,9 @@ LiteRegion* lite_region_create(NBT* root, int r_num)
             free(out);
             return NULL;
         }
+        
+        NBT* data_version = NBT_GetChild(root, "MinecraftDataVersion");
+        out->data_version = data_version->value_i;
 
         DhStrArray* r_name = lite_region_name_array(root);
         if(r_num < r_name->num)

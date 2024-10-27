@@ -37,6 +37,9 @@ extern "C"{
 /** Infomation of a region */
 typedef struct LiteRegion{
 
+    /** Data Version */
+    int data_version;
+
     /** Region name */
     char* name;
 

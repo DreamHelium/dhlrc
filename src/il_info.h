@@ -39,6 +39,7 @@ IlInfo* il_info_list_get_il_info(const gchar* uuid);
 /* Block the update and update */
 gboolean il_info_list_update_il(gchar* uuid, IlInfo* info);
 DhList* il_info_list_get_uuid_list();
+void il_info_list_init();
 
 void il_info_list_set_uuid(const char* uuid);
 const char* il_info_list_get_uuid();

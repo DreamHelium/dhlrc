@@ -55,6 +55,8 @@ typedef GPtrArray PaletteArray;
 
 typedef struct _Region
 {
+    /** The base information */
+    int data_version;
     /** The size of region */
     RegionSize* region_size;
     /** The block info array */

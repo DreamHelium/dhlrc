@@ -66,6 +66,11 @@ void il_info_list_free()
     }
 }
 
+void il_info_list_init()
+{
+    uuid_list = dh_list_new();
+}
+
 gboolean il_info_new(ItemList *il, GDateTime *time, const gchar *description)
 {
     IlInfo* info = g_new0(IlInfo, 1);
@@ -82,13 +87,11 @@ gboolean il_info_new(ItemList *il, GDateTime *time, const gchar *description)
     if(!table)
     {
         table = dh_mt_table_new(g_str_hash, is_same_string, g_free, ilinfo_free);
-        uuid_list = dh_list_new();
     }
-    g_rw_lock_writer_lock(&uuid_list->lock);
+    /* The uuid list should be locked by main func */    
     gchar* uuid = g_uuid_string_random();
     ret = dh_mt_table_insert(table, uuid, info);
     uuid_list->list = g_list_append(uuid_list->list, uuid);
-    g_rw_lock_writer_unlock(&uuid_list->lock);
     /* Unlock the writer lock */
     g_rw_lock_writer_unlock(&(info->info_lock));
     return ret;

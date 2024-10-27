@@ -6,7 +6,6 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QDebug>
-#include "../libnbt/nbt.h"
 #include "../config.h"
 #include <dhutil.h>
 #include <qcontainerfwd.h>
@@ -21,7 +20,6 @@
 #include <string>
 #include "blockreaderui.h"
 #include "glib.h"
-#include "glibconfig.h"
 #include "ilchooseui.h"
 #include "ilreaderui.h"
 #include "manage.h"
@@ -76,6 +74,7 @@ MainWindow::MainWindow(QWidget *parent)
     initSignalSlots();
     nbt_info_list_init();
     region_info_list_init();
+    il_info_list_init();
 }
 
 MainWindow::~MainWindow()
@@ -275,9 +274,19 @@ void MainWindow::generateBtn_clicked()
         g_rw_lock_reader_unlock(&list->lock);
         if(ret == QDialog::Accepted)
         {
-            QString itemlistName = QInputDialog::getText(this, _("Input Item List Name."), _("Input new item list name."));
-            ItemList* new_il = item_list_new_from_multi_region(region_info_list_get_multi_uuid());
-            il_info_new(new_il, g_date_time_new_now_local(), itemlistName.toLocal8Bit());
+            DhList* ilUuidList = il_info_list_get_uuid_list();
+            if(g_rw_lock_writer_trylock(&ilUuidList->lock))
+            {
+                auto str = QInputDialog::getText(this, _("Enter Name for Item List"), _("Enter the name for item list"));
+                if(!str.isEmpty())
+                {
+                    ItemList* newIl = item_list_new_from_multi_region(region_info_list_get_multi_uuid());
+                    il_info_new(newIl, g_date_time_new_now_local(), str.toUtf8());
+                    g_rw_lock_writer_unlock(&ilUuidList->lock);
+                }
+                else QMessageBox::critical(this, _("Error!"), _("Description is empty!"));
+            }
+            else QMessageBox::critical(this, _("Error!"), _("Item list is locked!"));
         }
         /* No option given for the Region selection */
         else QMessageBox::critical(this, _("Error!"), _("No Region or no Region selected!"));

@@ -35,6 +35,7 @@ namespace dh
         virtual void closeSig_triggered(){}
         virtual void ok_triggered(){}
         virtual void tablednd_triggered(QDropEvent* event);
+        virtual void dnd_triggered(const QMimeData* data){};
     };
 
     class ManageNBT : public ManageBase

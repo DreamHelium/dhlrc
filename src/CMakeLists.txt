@@ -76,7 +76,7 @@ add_library(dhlrc SHARED
 
 
 
-target_link_libraries(dhlrc PUBLIC m z cjson minizip dhutil
+target_link_libraries(dhlrc PUBLIC z cjson minizip dhutil
 )
 
 target_include_directories(dhlrc PUBLIC

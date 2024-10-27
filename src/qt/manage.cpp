@@ -1,4 +1,5 @@
 #include "manage.h"
+#include "dh_string_util.h"
 #include "dhtableview.h"
 #include "glib.h"
 #include "glibconfig.h"
@@ -20,6 +21,7 @@
 #include "../nbt_litereader.h"
 #include <QDebug>
 #include "../region_info.h"
+#include "saveregionselectui.h"
 #include "utility.h"
 #include <QMessageBox>
 
@@ -307,6 +309,10 @@ void ManageBase::tablednd_triggered(QDropEvent* event)
         updateModel();
         mui->updateModel(model);
     }
+    else
+    {
+        dnd_triggered(event->mimeData());
+    }
 }
 
 
@@ -396,11 +402,16 @@ void ManageRegion::remove_triggered(QList<int> rows)
 {
     if(rows.length())
     {
+        uuidList = nbt_info_list_get_uuid_list();
+        QList<char*> removedList;
         for(auto row : rows)
         {
             char* uuid = (char*)g_list_nth_data(uuidList->list, row);
-            region_info_list_remove_item(uuid);
+            removedList.append(uuid);
         }
+        for(auto uuid : removedList)
+            region_info_list_remove_item(uuid);
+
         updateModel();
         mui->updateModel(model);
     }
@@ -409,7 +420,13 @@ void ManageRegion::remove_triggered(QList<int> rows)
 
 void ManageRegion::save_triggered(QList<int> rows)
 {
-    /* TODO */
+    DhStrArray* arr = nullptr;
+    for(auto row : rows)
+        dh_str_array_add_str(&arr, (char*)g_list_nth_data(uuidList->list, row));
+    region_info_list_set_multi_uuid(arr);
+    SaveRegionSelectUI* srsui = new SaveRegionSelectUI();
+    srsui->setAttribute(Qt::WA_DeleteOnClose);
+    srsui->exec();
 }
 
 void ManageRegion::refresh_triggered()

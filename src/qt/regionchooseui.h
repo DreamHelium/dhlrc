@@ -9,10 +9,6 @@
 #include <QButtonGroup>
 #include <QDialog>
 
-namespace Ui {
-class RegionChooseUI;
-}
-
 class RegionChooseUI : public QDialog
 {
     Q_OBJECT

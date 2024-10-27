@@ -85,7 +85,9 @@ void BlockReaderUI::textChanged_cb(const QString & str)
 void BlockReaderUI::setText()
 {
     auto size = region->region_size;
-    QString sizeStr = QString("(%1, %2, %3)").arg(size->x).arg(size->y).arg(size->z);
+    QString str = "(%1, %2, %3) ";
+    str += _("With DataVersion %4.");
+    QString sizeStr = str.arg(size->x).arg(size->y).arg(size->z).arg(region->data_version);
     ui->sizeLabel->setText(sizeStr);
 
     ui->xEdit->setValidator(new QIntValidator(0, size->x));
