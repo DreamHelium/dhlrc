@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-10-28 00:05+0800\n"
+"POT-Creation-Date: 2024-11-01 23:54+0800\n"
 "PO-Revision-Date: 2024-10-16 23:52+0800\n"
 "Last-Translator: dream_he\n"
 "Language-Team: Chinese <kde-i18n-doc@kde.org>\n"
@@ -63,19 +63,19 @@ msgstr "目录"
 msgid "file"
 msgstr "文件"
 
-#: src/main_isoc.c:91
+#: src/main_isoc.c:93
 msgid "Error when reading file."
 msgstr "在读取文件时出错。"
 
-#: src/main_isoc.c:107
+#: src/main_isoc.c:109
 msgid "Not a valid NBT file!"
 msgstr "不是一个有效的NBT文件！"
 
-#: src/main_isoc.c:113
+#: src/main_isoc.c:115
 msgid "Valid NBT file!"
 msgstr "有效的NBT文件！"
 
-#: src/main_isoc.c:127
+#: src/main_isoc.c:129
 #, c-format
 msgid ""
 "There are three functions:\n"
@@ -90,21 +90,21 @@ msgstr ""
 "[2] 投影方块阅读器\n"
 "\n"
 
-#: src/main_isoc.c:134 src/nbt_litereader.c:78 src/nbt_litereader.c:311
+#: src/main_isoc.c:136 src/nbt_litereader.c:78 src/nbt_litereader.c:311
 #: src/recipe_util.c:45
 msgid "Quit application"
 msgstr "退出程序"
 
-#: src/main_isoc.c:139
+#: src/main_isoc.c:141
 msgid "Please select an option, or enter 'q' to exit the program (q): "
 msgstr "请选择一个选项，或输入 “q” 退出程序 (q): "
 
-#: src/main_isoc.c:185 src/lrc_extend.c:42
+#: src/main_isoc.c:187 src/lrc_extend.c:42
 #, c-format
 msgid "There are %d regions:\n"
 msgstr "有 %d 个区域：\n"
 
-#: src/main_isoc.c:198
+#: src/main_isoc.c:200
 #, c-format
 msgid "Processing: region %d / %d : [%ld] %s"
 msgstr ""

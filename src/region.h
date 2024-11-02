@@ -40,6 +40,7 @@ typedef struct BlockInfo{
     Pos* pos;
     char* id_name;
     int palette;
+    NBT* nbt;
 } BlockInfo;
 
 typedef struct Palette{

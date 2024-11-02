@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-10-28 00:05+0800\n"
+"POT-Creation-Date: 2024-11-02 21:15+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -61,19 +61,19 @@ msgstr ""
 msgid "file"
 msgstr ""
 
-#: src/main_isoc.c:91
+#: src/main_isoc.c:93
 msgid "Error when reading file."
 msgstr ""
 
-#: src/main_isoc.c:107
+#: src/main_isoc.c:109
 msgid "Not a valid NBT file!"
 msgstr ""
 
-#: src/main_isoc.c:113
+#: src/main_isoc.c:115
 msgid "Valid NBT file!"
 msgstr ""
 
-#: src/main_isoc.c:127
+#: src/main_isoc.c:129
 #, c-format
 msgid ""
 "There are three functions:\n"
@@ -83,21 +83,21 @@ msgid ""
 "\n"
 msgstr ""
 
-#: src/main_isoc.c:134 src/nbt_litereader.c:78 src/nbt_litereader.c:311
+#: src/main_isoc.c:136 src/nbt_litereader.c:78 src/nbt_litereader.c:311
 #: src/recipe_util.c:45
 msgid "Quit application"
 msgstr ""
 
-#: src/main_isoc.c:139
+#: src/main_isoc.c:141
 msgid "Please select an option, or enter 'q' to exit the program (q): "
 msgstr ""
 
-#: src/main_isoc.c:185 src/lrc_extend.c:42
+#: src/main_isoc.c:187 src/lrc_extend.c:42
 #, c-format
 msgid "There are %d regions:\n"
 msgstr ""
 
-#: src/main_isoc.c:198
+#: src/main_isoc.c:200
 #, c-format
 msgid "Processing: region %d / %d : [%ld] %s"
 msgstr ""

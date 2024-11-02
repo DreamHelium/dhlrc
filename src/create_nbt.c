@@ -16,9 +16,10 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>. */
 
 #include "create_nbt.h"
-#include "dhutil.h"
-#include "glibconfig.h"
+#include "dh_string_util.h"
+#include "glib-object.h"
 #include "libnbt/nbt.h"
+#include "region.h"
 
 NBT* fail_free(NBT* root)
 {
@@ -93,4 +94,78 @@ NBT* nbt_new(NBT_Tags tag, GValue* val, int len, const char* key)
         else return fail_free(new_nbt);
     }
     else return fail_free(new_nbt);
+}
+
+NBT* nbt_dup(NBT* root)
+{
+    NBT* ret = NULL;
+    GValue val = {0};
+
+    if(!root)
+        return ret;
+    else if(root->type >= TAG_Byte && root->type <= TAG_Long)
+    {
+        g_value_init(&val, G_TYPE_INT64);
+        g_value_set_int64(&val, root->value_i);
+        ret = nbt_new(root->type, &val, 0, root->key);
+    }
+    else if(root->type == TAG_Float || root->type == TAG_Double)
+    {
+        g_value_init(&val, G_TYPE_DOUBLE);
+        g_value_set_double(&val, root->value_d);
+        ret = nbt_new(root->type, &val, 0, root->key);
+    }
+    else if(root->type == TAG_String)
+    {
+        g_value_init(&val, G_TYPE_STRING);
+        g_value_set_string(&val, root->value_a.value);
+        ret = nbt_new(root->type, &val, root->value_a.len, root->key);
+    }
+    else if(root->type == TAG_Byte_Array || root->type == TAG_Int_Array || root->type == TAG_Long_Array)
+    {
+        g_value_init(&val, G_TYPE_POINTER);
+        g_value_set_pointer(&val, root->value_a.value);
+        ret = nbt_new(root->type, &val, root->value_a.len, root->key);
+    }
+    else if(root->type == TAG_List || root->type == TAG_Compound)
+    {
+        NBT* head = NULL;
+        NBT* prev = NULL;
+        NBT* cur = NULL;
+        NBT* origin_child = root->child;
+        for(; origin_child ; origin_child = origin_child->next)
+        {
+            cur = nbt_dup(origin_child);
+            if(origin_child == root->child) head = cur;
+            cur->prev = prev;
+            if(prev) prev->next = cur;
+            prev = cur;
+        }
+        /* Then head is the new Child */
+        g_value_init(&val, G_TYPE_POINTER);
+        g_value_set_pointer(&val, head);
+        ret = nbt_new(root->type, &val, 0, root->key);
+    }
+    g_value_unset(&val);
+    return ret;
+}
+
+NBT* nbt_rm(NBT* root, const char* node)
+{
+    NBT* node_nbt = NBT_GetChild(root, node);
+    /* First we get the prev and next of the node */
+    if(node_nbt)
+    {
+        NBT* prev = node_nbt->prev;
+        NBT* next = node_nbt->next;
+
+        node_nbt->prev = NULL;
+        node_nbt->next = NULL;
+        NBT_Free(node_nbt);
+
+        if(prev) prev->next = next;
+        next->prev = prev;
+        if(!prev) root->child = next;
+    }
+    return root;
 }

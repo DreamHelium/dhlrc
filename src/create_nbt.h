@@ -26,6 +26,8 @@ extern "C"{
 #endif
 
 NBT* nbt_new(NBT_Tags tag, GValue* value, int len, const char* key);
+NBT* nbt_dup(NBT* root);
+NBT* nbt_rm(NBT* root, const char* node);
 
 #ifdef __cplusplus
 }

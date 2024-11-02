@@ -20,7 +20,7 @@
 
 cJSON* dhlrc_file_to_json(const char* pos)
 {
-    int size;
+    gsize size;
     char* data = dh_read_file(pos, &size);
     if(data)
     {

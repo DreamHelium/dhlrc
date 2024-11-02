@@ -19,6 +19,7 @@
 #include "create_nbt.h"
 #include "dh_string_util.h"
 #include "dhlrc_list.h"
+#include "glibconfig.h"
 #include "libnbt/nbt.h"
 #include "litematica_region.h"
 #include "region_info.h"
@@ -164,6 +165,7 @@ static PaletteArray* get_palette_full_info_from_nbt(NBT* root)
 static void block_info_free(gpointer mem)
 {
     BlockInfo* info = mem;
+    if(info->nbt) NBT_Free(info->nbt);
     g_free(info->pos);
     g_free(info->id_name);
     g_free(mem);
@@ -185,10 +187,26 @@ static BlockInfoArray* get_block_full_info_from_lr(LiteRegion* lr)
                 block->pos->x = x;
                 block->pos->y = y;
                 block->pos->z = z;
+                block->nbt = NULL;
                 block->id_name = g_strdup(lr->blocks->val[block->palette]);
                 g_ptr_array_add(array, block);
             }
         }
+    }
+
+    NBT* tile_entities = NBT_GetChild(lr->region_nbt, "TileEntities")->child;
+    for(; tile_entities ; tile_entities = tile_entities->next)
+    {
+        gint64 x = NBT_GetChild(tile_entities, "x")->value_i;
+        gint64 y = NBT_GetChild(tile_entities, "y")->value_i;
+        gint64 z = NBT_GetChild(tile_entities, "z")->value_i;
+        NBT* new_tile_entities = nbt_dup(tile_entities);
+        new_tile_entities = nbt_rm(new_tile_entities, "x");
+        new_tile_entities = nbt_rm(new_tile_entities, "y");
+        new_tile_entities = nbt_rm(new_tile_entities, "z");
+        gint64 index = lite_region_block_index(lr, x, y, z);
+        ((BlockInfo*)array->pdata[index])->nbt = new_tile_entities;
+        new_tile_entities->key = dh_strdup("nbt");
     }
     return array;
 }
@@ -206,6 +224,7 @@ static BlockInfoArray* get_block_full_info_from_nbt(NBT* root, PaletteArray* pa)
         block->pos->x = NBT_GetChild(blocks_nbt, "pos")->child->value_i;
         block->pos->y = NBT_GetChild(blocks_nbt, "pos")->child->next->value_i;
         block->pos->z = NBT_GetChild(blocks_nbt, "pos")->child->next->next->value_i;
+        block->nbt = nbt_dup(NBT_GetChild(blocks_nbt, "nbt"));
         Palette* block_palette = pa->pdata[block->palette];
         block->id_name = g_strdup(block_palette->id_name);
         g_ptr_array_add(array, block);
@@ -355,7 +374,10 @@ static NBT* data_version_nbt_new(gint64 version)
 
 static NBT* block_nbt_new(BlockInfo* info)
 {
+    NBT* nbt = nbt_dup(info->nbt);
     NBT* pos = size_nbt_new(info->pos, "pos");
+    pos->prev = nbt;
+    if(nbt)  nbt->next = pos;
     GValue val = {0};
     g_value_init(&val, G_TYPE_INT64);
     g_value_set_int64(&val, info->palette);
@@ -365,7 +387,7 @@ static NBT* block_nbt_new(BlockInfo* info)
     g_value_unset(&val);
 
     g_value_init(&val, G_TYPE_POINTER);
-    g_value_set_pointer(&val, pos);
+    g_value_set_pointer(&val, nbt? nbt : pos);
     NBT* ret = nbt_new(TAG_Compound, &val, 2, NULL);
     return ret;
 }
@@ -407,6 +429,7 @@ static NBT* properties_nbt_new(DhStrArray* name, DhStrArray* data)
         if(prev) prev->next = cur;
         if(i == 0) head = cur;
         prev = cur;
+        g_value_unset(&val);
     }
 
     if(!head) return NULL;
@@ -427,6 +450,8 @@ static NBT* palette_nbt_new(Palette* palette)
     
     if(properties) properties->next = name;
     name->prev = properties;
+
+    g_value_unset(&val);
 
     GValue val2 = {0};
     g_value_init(&val2, G_TYPE_POINTER);

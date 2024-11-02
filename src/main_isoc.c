@@ -15,10 +15,12 @@
     You should have received a copy of the GNU Lesser General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>. */
 
+#include "create_nbt.h"
 #include "dhlrc_list.h"
 #include "download_file.h"
 #include "libnbt/nbt.h"
 #include "main.h"
+#include "nbt_litereader.h"
 #include "translation.h"
 #include <dhutil.h>
 #include "litematica_region.h"
@@ -220,14 +222,14 @@ static int start_lrc_main(NBT *root)
 int debug(NBT* root)
 {
     LiteRegion* lr = lite_region_create(root, 0);
-    if(lr)
+    Region* region = region_new_from_lite_region(lr);
+    BlockInfoArray* arr = region->block_info_array;
+    for(int i = 0 ; i < arr->len ; i++)
     {
-        Region* region = region_new_from_lite_region(lr);
-        NBT* new_nbt = nbt_new_from_region(region);
-        nbtlr_save(new_nbt);
-        region_free(region);
-        NBT_Free(new_nbt);
+        if(((BlockInfo*)(arr->pdata[i]))->nbt)
+            nbtlr_start(((BlockInfo*)(arr->pdata[i]))->nbt);
     }
+    
     return 0;
 }
 
