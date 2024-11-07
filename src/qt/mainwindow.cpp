@@ -17,9 +17,7 @@
 #include <qnamespace.h>
 #include <qobject.h>
 #include <qpushbutton.h>
-#include <string>
 #include "blockreaderui.h"
-#include "glib.h"
 #include "ilchooseui.h"
 #include "ilreaderui.h"
 #include "manage.h"
@@ -101,13 +99,6 @@ static int mw_download_progress(void* data, curl_off_t total, curl_off_t cur, cu
 
 void MainWindow::initSignalSlots()
 {
-    /*
-    QObject::connect(ui->openAction, &QAction::triggered, this, &MainWindow::openAction_triggered);
-    QObject::connect(ui->configAction, &QAction::triggered, this, &MainWindow::configAction_triggered);
-    QObject::connect(ui->clearAction, &QAction::triggered, this, &MainWindow::clearAction_triggered);
-    QObject::connect(ui->selectAction, &QAction::triggered, this, &MainWindow::selectAction_triggered);
-    */
-    QObject::connect(ui->okBtn, SIGNAL(clicked()), this, SLOT(okBtn_clicked()));
     QObject::connect(ui->manageBtn, &QPushButton::clicked, this, &MainWindow::manageBtn_clicked);
     QObject::connect(ui->ilReaderBtn, &QPushButton::clicked, this, &MainWindow::ilReaderBtn_clicked);
     QObject::connect(ui->recipeCombineBtn, &QPushButton::clicked, this, &MainWindow::recipeCombineBtn_clicked);
@@ -115,16 +106,8 @@ void MainWindow::initSignalSlots()
     QObject::connect(ui->generateBtn, &QPushButton::clicked, this, &MainWindow::generateBtn_clicked);
     QObject::connect(ui->brBtn, &QPushButton::clicked, this, &MainWindow::brBtn_clicked);
     QObject::connect(ui->mrBtn, &QPushButton::clicked, this, &MainWindow::mrBtn_clicked);
-}
-
-void MainWindow::okBtn_clicked()
-{
-    if(ui->nbtReaderBtn->isChecked())
-    {
-        NbtReaderUI* nrui = new NbtReaderUI();
-        nrui->setAttribute(Qt::WA_DeleteOnClose);
-        nrui->show();
-    }
+    QObject::connect(ui->nbtReaderBtn_2, &QPushButton::clicked, this, &MainWindow::nbtReaderBtn_clicked);
+    QObject::connect(ui->configBtn, &QPushButton::clicked, this, &MainWindow::configAction_triggered);
 }
 
 void MainWindow::dragEnterEvent(QDragEnterEvent* event)
@@ -154,43 +137,6 @@ void MainWindow::configAction_triggered()
     ConfigUI* cui = new ConfigUI();
     cui->setAttribute(Qt::WA_DeleteOnClose);
     cui->show();
-}
-
-void MainWindow::selectAction_triggered()
-{
-    if(nbtRead)
-    {
-        NbtSelectUI* nsui = new NbtSelectUI();
-        nsui->setAttribute(Qt::WA_DeleteOnClose);
-        nsui->exec();
-    }
-    else QMessageBox::critical(this, _("No NBT File!"), _("No NBT file loaded!"));
-}
-
-void MainWindow::saveilAction_triggered()
-{
-    if(il_info_list_get_uuid_list())
-    {
-        ilChooseUI* iui = new ilChooseUI();
-        iui->setAttribute(Qt::WA_DeleteOnClose);
-        int ret = iui->exec();
-
-        if(ret == QDialog::Accepted){
-            IlInfo* info = il_info_list_get_il_info(il_info_list_get_uuid());
-            if(info) 
-            {
-                if(g_rw_lock_reader_trylock(&(info->info_lock)))
-                {
-                    QString filepos = QFileDialog::getSaveFileName(this, _("Save file"), nullptr, _("CSV file (*.csv)"));
-                    if(!filepos.isEmpty())  item_list_to_csv(filepos.toStdString().c_str(), info->il);
-                    g_rw_lock_reader_unlock(&(info->info_lock));
-                }
-                else QMessageBox::critical(this, _("Error!"), _("The item list is locked!"));
-            }
-            else QMessageBox::critical(this, _("Error!"), _("The item list is freed!"));
-        }
-    }
-    else QMessageBox::critical(this, _("Error!"), _("No item list!"));
 }
 
 void MainWindow::manageBtn_clicked()
@@ -325,4 +271,24 @@ void MainWindow::mrBtn_clicked()
 {
     if(!mr) mr = new dh::ManageRegion();
     mr->show();
+}
+
+void MainWindow::nbtReaderBtn_clicked()
+{
+    DhList* uuidList = nbt_info_list_get_uuid_list();
+    if(g_rw_lock_reader_trylock(&uuidList->lock))
+    {
+        auto nui = new NbtSelectUI();
+        nui->setAttribute(Qt::WA_DeleteOnClose);
+        auto ret = nui->exec();
+        g_rw_lock_reader_unlock(&uuidList->lock);
+        if(ret == QDialog::Accepted)
+        {
+            auto nrui = new NbtReaderUI();
+            nrui->setAttribute(Qt::WA_DeleteOnClose);
+            nrui->show();
+        }
+        else QMessageBox::critical(this, _("Error!"), _("No NBT is selected!"));
+    }
+    else QMessageBox::critical(this, _("Error!"), _("NBT list is locked!"));
 }

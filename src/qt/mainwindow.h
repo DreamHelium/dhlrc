@@ -9,8 +9,6 @@
 #include <QVBoxLayout>
 #include <QDateTime>
 #include <qevent.h>
-#include <qprogressdialog.h>
-#include "../translation.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -35,10 +33,7 @@ protected:
     void virtual dropEvent(QDropEvent* event);
 
 private Q_SLOTS:
-    void okBtn_clicked();
     void configAction_triggered();
-    void selectAction_triggered();
-    void saveilAction_triggered();
     void manageBtn_clicked();
     void ilReaderBtn_clicked();
     void recipeCombineBtn_clicked();
@@ -46,6 +41,7 @@ private Q_SLOTS:
     void generateBtn_clicked();
     void brBtn_clicked();
     void mrBtn_clicked();
+    void nbtReaderBtn_clicked();
 
 };
 #endif // MAINWINDOW_H
