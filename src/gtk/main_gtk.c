@@ -1,6 +1,5 @@
 #include <gtk/gtk.h>
 #include "../translation.h"
-#include "../libnbt/nbt.h"
 #include "../nbt_info.h"
 #include "glib.h"
 #include "input_dialog.h"
@@ -16,7 +15,6 @@ static GtkWidget* item_list_box;
 static GtkWidget* region_button;
 static GtkWidget* nbt_button;
 static GtkWidget* item_list_button;
-static NBT* new_nbt;
 
 int verbose_level;
 
@@ -45,65 +43,6 @@ debug (GtkButton* self,
   GTK_DIALOG_DESTROY_WITH_PARENT | GTK_DIALOG_MODAL, GTK_MESSAGE_INFO, GTK_BUTTONS_CLOSE, "%s", input ? input : "NULL");
   g_signal_connect(dialog, "response", G_CALLBACK(gtk_window_destroy), NULL);
 #endif
-}
-
-static void
-nbt_open_response (GtkDialog *dialog,
-                  int        response)
-{
-  if (response == GTK_RESPONSE_ACCEPT)
-    {
-      GtkFileChooser *chooser = GTK_FILE_CHOOSER (dialog);
-      GFile* file = gtk_file_chooser_get_file (chooser);
-      /* Unfinished */
-      char* name = g_file_get_basename(file);
-      char* content;
-      gsize len;
-      g_file_load_contents(file, NULL, &content, &len, NULL, NULL);
-      new_nbt = NBT_Parse(content, len);
-
-      char* description = dh_input_dialog_new_no_func(_("Enter Desciption"), _("Please enter description for the NBT."), _("Desciption"), name, GTK_WINDOW(window));
-
-      if(description)
-      {
-        nbt_info_new(new_nbt, g_date_time_new_now_local(), description);
-      }
-      else
-      {
-        NBT_Free(new_nbt);
-#ifdef GDK_AVAILABLE_IN_4_10
-        GtkAlertDialog* dialog = gtk_alert_dialog_new(_("No desciption entered! The NBT will not be added!"));
-        gtk_alert_dialog_show(dialog, GTK_WINDOW(window));
-#else
-         GtkWidget* dialog = gtk_message_dialog_new(GTK_WINDOW(window), 
-  GTK_DIALOG_DESTROY_WITH_PARENT | GTK_DIALOG_MODAL, GTK_MESSAGE_INFO, GTK_BUTTONS_CLOSE, _("No desciption entered! The NBT will not be added!"));
-  g_signal_connect(dialog, "response", G_CALLBACK(gtk_window_destroy), NULL);
-#endif
-      }
-
-      g_free(description);
-
-      g_object_unref(file);
-    }
-
-  gtk_window_destroy (GTK_WINDOW (dialog));
-}
-
-static void
-load_nbt_file (GtkButton* self,
-               gpointer user_data)
-{
-  GtkFileFilter* filter = gtk_file_filter_new();
-  gtk_file_filter_add_pattern(filter, "*.litematic");
-  gtk_file_filter_add_pattern(filter, "*.nbt");
-
-  /* This is the code deprecated in 4.10, however Debian uses 4.8 */
-  GtkWidget* dialog = gtk_file_chooser_dialog_new(_("Open NBT file"), GTK_WINDOW(window),
-  GTK_FILE_CHOOSER_ACTION_OPEN, _("_Cancel"), GTK_RESPONSE_CANCEL,
-  _("_Open"), GTK_RESPONSE_ACCEPT, NULL);
-  gtk_file_chooser_set_filter(GTK_FILE_CHOOSER(dialog), filter);
-  gtk_window_present(GTK_WINDOW(dialog));
-  g_signal_connect(dialog, "response", G_CALLBACK(nbt_open_response), NULL);
 }
 
 static void

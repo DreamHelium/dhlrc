@@ -90,4 +90,4 @@ add_executable(dhlrc_cli main_isoc.c main.c lrc_extend.c lrc_extend.h)
 target_link_libraries(dhlrc_cli PUBLIC dhlrc)
 
 add_subdirectory(qt)
-add_subdirectory(gtk)
+#add_subdirectory(gtk)
