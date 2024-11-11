@@ -20,9 +20,13 @@
 #include <glib.h>
 /*#include "dhlrc_config.h"*/
 #include "config.h"
+#include "il_info.h"
+#include "libnbt/nbt.h"
 #include "main.h"
 #include "dh_file_util.h"
 #include "dh_validator.h"
+#include "nbt_info.h"
+#include "region_info.h"
 #include "translation.h"
 #include <dhutil.h>
 
@@ -31,7 +35,6 @@ static gboolean block_mode = FALSE;
 static gboolean list_mode = FALSE;
 gchar* log_filename = NULL;
 static guint mode_num = 0;
-int verbose_level = 0;
 
 static gchar* get_filename();
 
@@ -40,63 +43,148 @@ static GOptionEntry entries[] =
     {"reader", 'r', 0, G_OPTION_ARG_NONE, &reader_mode, N_("Enter NBT reader mode."), NULL},
     {"block", 'b', 0, G_OPTION_ARG_NONE, &block_mode, N_("Enter litematica block reader."), NULL},
     {"list", 'l', 0, G_OPTION_ARG_NONE, &list_mode, N_("Enter litematica material list with recipe combination."), NULL},
-    {"log", 0, 0, G_OPTION_ARG_FILENAME, &log_filename, N_("Output log file to FILE"), "FILE"},
-    {"verbose", 'v', 0, G_OPTION_ARG_INT, &verbose_level, N_("Set verbose level to N.\n""\t\t\t""Level 1: See process.\n""\t\t\t""Level 2: See details except block processing.\n""\t\t\t""Level 3: See all the details (Not recommended!)."), "N"}
+    {"log", 0, 0, G_OPTION_ARG_FILENAME, &log_filename, N_("Output log file to FILE"), "FILE"}
 };
+
+static void startup(GApplication* self, gpointer user_data)
+{
+    dhlrc_make_config();
+    il_info_list_init();
+    nbt_info_list_init();
+    region_info_list_init();
+}
+
+static void app_shutdown(GApplication* self, gpointer user_data)
+{
+    il_info_list_free();
+    nbt_info_list_free();
+    region_info_list_free();
+}
+
+static int start_point()
+{
+    printf(_("The functions are listed below:\n"));
+    printf("[0] %s\n", _("Manage NBT"));
+    printf("[1] %s\n", _("Manage Region"));
+    printf("[2] %s\n", _("Manage item list"));
+    printf("[3] %s\n", _("Config settings"));
+    DhOut* out = dh_out_new();
+    DhArgInfo* arg = dh_arg_info_new();
+    dh_arg_info_add_arg(arg, 'n', "mnbt", N_("Manage NBT"));
+    dh_arg_info_add_arg(arg, 'r', "mregion", N_("Manage Region"));
+    dh_arg_info_add_arg(arg, 'i', "mitem", N_("Manage item list"));
+    dh_arg_info_add_arg(arg, 'c', "config", N_("Config settings"));
+    dh_arg_info_add_arg(arg, 'q', "quit", N_("Quit application"));
+    DhIntValidator* validator = dh_int_validator_new(0, 3);
+    
+    GValue val = {0};
+    int ret_val = -1;
+    char ret_val_c = 0;
+    dh_out_read_and_output(out, N_("Please enter a number or an option [N/r/i/c/q/?]:"), "dhlrc", arg, DH_VALIDATOR(validator), FALSE, &val);
+
+    if(G_VALUE_HOLDS_INT64(&val)) ret_val = g_value_get_int64(&val);
+    else if(G_VALUE_HOLDS_CHAR(&val)) ret_val_c = g_value_get_schar(&val);
+    else return -1;
+
+    g_message("%d", ret_val);
+    g_message("%d", ret_val_c);
+    g_object_unref(out);
+    g_object_unref(arg);
+    g_object_unref(validator);
+    return 0;
+}
+
+static gboolean file_open(GFile* file, gboolean single)
+{
+    gboolean ret = FALSE;
+    if(!g_file_query_exists(file, NULL))
+    {
+        if(single) g_critical(_("Not a valid NBT file!"));
+        return ret;
+    }
+    char* filename = g_file_get_basename(file); /* Should be freed */
+    char* description = NULL;
+    if(single)
+    {
+        DhOut* out = dh_out_new();
+        GValue val = {0};
+        dh_out_read_and_output(out, N_("Enter desciption for the NBT file."), "dhlrc", NULL, NULL, FALSE, &val);
+        if(G_VALUE_HOLDS_STRING(&val))
+        {
+            description = g_value_get_string(&val);
+        }
+        else description = g_strdup(filename);
+        g_free(filename);
+    }
+    else description = filename;
+    if(description)
+    {
+        guint8* content = NULL;
+        gsize len;
+        g_file_load_contents(file, NULL, (char**)&content, &len, NULL, NULL);
+        NBT* root = NBT_Parse(content, len);
+        if(root)
+        {
+            nbt_info_new(root, g_date_time_new_now_local(), description);
+            ret = TRUE;
+        }
+        else if(single)
+            g_critical(_("Not a valid NBT file!"));
+        g_free(description);
+        g_free(content);
+    }
+    return ret;
+}
+
+static void app_open(GApplication* self, gpointer files, gint n_files, gchar* hint, gpointer user_data)
+{
+    GFile** f = files;
+    DhStrArray* arr = NULL;
+    if(n_files == 1)
+        file_open(f[0], TRUE);
+    else
+    {
+        for(int i = 0 ; i < n_files ; i++)
+        {
+            gboolean success = file_open(f[i], FALSE);
+            if(!success)
+            {
+                char* file_basename = g_file_get_basename(f[i]);
+                dh_str_array_add_str(&arr, file_basename);
+                g_free(file_basename);
+            }
+        }
+    }
+    if(n_files > 1 && arr)
+    {
+        g_critical(_("The following files couldn't be added:\n"));
+        for(int i = 0 ; i < arr->num ; i++)
+            g_critical("%s", arr->val[i]);
+    }
+    dh_str_array_free(arr);
+    start_point();
+}
+
+static void activate(GApplication* self, gpointer user_data)
+{
+    start_point();
+}
 
 int main(int argc, char** argb)
 {
-    dhlrc_make_config();
     translation_init();
-    GOptionContext *context = g_option_context_new(_("[FILE] - Read a litematic file."));
-    //GOptionGroup* verbose_group = g_option_group_new("v", "Unfinished", "See level", NULL, NULL);
+    GApplication* app = g_application_new("cn.dh.dhlrc.cli", G_APPLICATION_HANDLES_OPEN);
+    g_signal_connect(app, "startup", G_CALLBACK(startup), NULL);
+    g_signal_connect(app, "shutdown", G_CALLBACK(app_shutdown), NULL);
+    g_signal_connect(app, "activate", G_CALLBACK(activate), NULL);
+    g_signal_connect(app, "open", G_CALLBACK(app_open), NULL);
+    g_application_add_main_option_entries(app, entries);
+    g_application_set_option_context_parameter_string(app, _("[FILE] - Read a litematic file."));
 
-    g_option_context_add_main_entries(context, entries, "dhlrc");
-    //g_option_context_add_group(context, verbose_group);
-    GError *error = NULL;
-    gchar **args = NULL;
+    int ret = g_application_run(app, argc, argb);
 
-#ifdef G_OS_WIN32
-    args = g_win32_get_command_line();
-#else
-    args = g_strdupv(argb);
-#endif
-
-
-    if (!g_option_context_parse (context, &argc, &args, &error))
-    {
-        g_print ("option parsing failed: %s\n", error->message);
-        return EXIT_FAILURE;
-    }
-
-    if( (reader_mode + block_mode + list_mode) > 1 )
-    {
-        g_print(_("Only one option can be chosen!\n"));
-        return EXIT_FAILURE;
-    }
-
-    if( verbose_level > 3 )
-    {
-        g_print(_("A level below 3 is allowed!\n"));
-        return EXIT_FAILURE;
-    }
-
-    if(argc == 1)
-    {
-        /* Enter interactive mode */
-        gchar* filename = get_filename();
-        if(filename)
-        {
-            args = g_realloc(args, 3 * sizeof(gchar*));
-            argc = 2;
-            args[1] = filename;
-            args[2] = NULL;
-        }
-    }
-
-    //g_option_group_unref(verbose_group);
-    g_option_context_free(context);
-    return main_isoc(argc, args);
+    g_object_unref(app);
+    return ret;
 }
 
 static gchar* get_filename()

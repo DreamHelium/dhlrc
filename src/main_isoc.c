@@ -47,7 +47,6 @@ static int debug(NBT* root);
 #endif
 
 extern gchar* log_filename;
-extern int verbose_level;
 static FILE* log_file = NULL;
 
 static void write_log(const gchar* log_domain, GLogLevelFlags log_level, const gchar* message, gpointer user_data)

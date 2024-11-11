@@ -23,8 +23,6 @@
 #include <time.h>
 #include "translation.h"
 
-extern int verbose_level;
-
 typedef struct TmpItem{
     gchar* name;
     guint total;
@@ -440,9 +438,9 @@ ItemList *lite_region_item_list_extend(NBT* root, int r_num, ItemList* oBlock, i
                     fprintf(stderr, "\r");
 
                 }
-                if(verbose_level == 3)
-                        g_message(_("Processing Blocks %lu/%lu, (%3d,%3d,%3d)/(%3d,%3d,%3d)"" %s"), index+1, volume ,
-                            x,y,z,lr->region_size.x,lr->region_size.y,lr->region_size.z, trm(id_block_name));
+                // if(verbose_level == 3)
+                //         g_message(_("Processing Blocks %lu/%lu, (%3d,%3d,%3d)/(%3d,%3d,%3d)"" %s"), index+1, volume ,
+                //             x,y,z,lr->region_size.x,lr->region_size.y,lr->region_size.z, trm(id_block_name));
                 if(!black_list_scan(bl,id_block_name))
                 {
                     if(lite_region_block_properties_equal(lr, id, "waterlogged", "true"))

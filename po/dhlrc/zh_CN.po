@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-07 22:47+0800\n"
+"POT-Creation-Date: 2024-11-11 15:15+0800\n"
 "PO-Revision-Date: 2024-10-16 23:52+0800\n"
 "Last-Translator: dream_he\n"
 "Language-Team: Chinese <kde-i18n-doc@kde.org>\n"
@@ -19,63 +19,84 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Lokalize 24.08.1\n"
 
-#: src/main.c:40
+#: src/main.c:43
 msgid "Enter NBT reader mode."
 msgstr "进入NBT阅读器模式。"
 
-#: src/main.c:41
+#: src/main.c:44
 msgid "Enter litematica block reader."
 msgstr "进入投影方块阅读器。"
 
-#: src/main.c:42
+#: src/main.c:45
 msgid "Enter litematica material list with recipe combination."
 msgstr "进入投影材料列表及合成表合成功能。"
 
-#: src/main.c:43
+#: src/main.c:46
 msgid "Output log file to FILE"
 msgstr "输出日志文件至FILE"
 
-#: src/main.c:44
-msgid ""
-"Set verbose level to N.\n"
-"\t\t\tLevel 1: See process.\n"
-"\t\t\tLevel 2: See details except block processing.\n"
-"\t\t\tLevel 3: See all the details (Not recommended!)."
+#: src/main.c:66
+#, c-format
+msgid "The functions are listed below:\n"
 msgstr ""
 
-#: src/main.c:51
-msgid "[FILE] - Read a litematic file."
-msgstr "[文件] - 读取一个投影文件。"
+#: src/main.c:67 src/main.c:73 src/qt/manage.cpp:75
+msgid "Manage NBT"
+msgstr "管理NBT"
 
-#: src/main.c:74
-msgid "Only one option can be chosen!\n"
-msgstr "只有一个选项可选！\n"
-
-#: src/main.c:80
-msgid "A level below 3 is allowed!\n"
+#: src/main.c:68 src/main.c:74 src/qt/manage.cpp:325
+msgid "Manage Region"
 msgstr ""
 
-#: src/main.c:128
-msgid "directory"
-msgstr "目录"
+#: src/main.c:69 src/main.c:75
+msgid "Manage item list"
+msgstr ""
 
-#: src/main.c:129
-msgid "file"
-msgstr "文件"
+#: src/main.c:70 src/main.c:76 src/qt/configui.cpp:16
+msgid "Config settings"
+msgstr "配置设置"
 
-#: src/main_isoc.c:93
-msgid "Error when reading file."
-msgstr "在读取文件时出错。"
+#: src/main.c:77
+msgid "Exit application"
+msgstr ""
 
-#: src/main_isoc.c:109
+#: src/main.c:83
+msgid "Please enter a number or an option [N/r/i/c/?]:"
+msgstr ""
+
+#: src/main.c:99 src/main.c:129 src/main_isoc.c:108
 msgid "Not a valid NBT file!"
 msgstr "不是一个有效的NBT文件！"
 
-#: src/main_isoc.c:115
+#: src/main.c:108
+msgid "Enter desciption for the NBT file."
+msgstr "输入NBT文件的描述。"
+
+#: src/main.c:157
+msgid "The following files couldn't be added:\n"
+msgstr ""
+
+#: src/main.c:179
+msgid "[FILE] - Read a litematic file."
+msgstr "[文件] - 读取一个投影文件。"
+
+#: src/main.c:213
+msgid "directory"
+msgstr "目录"
+
+#: src/main.c:214
+msgid "file"
+msgstr "文件"
+
+#: src/main_isoc.c:92
+msgid "Error when reading file."
+msgstr "在读取文件时出错。"
+
+#: src/main_isoc.c:114
 msgid "Valid NBT file!"
 msgstr "有效的NBT文件！"
 
-#: src/main_isoc.c:129
+#: src/main_isoc.c:128
 #, c-format
 msgid ""
 "There are three functions:\n"
@@ -90,21 +111,21 @@ msgstr ""
 "[2] 投影方块阅读器\n"
 "\n"
 
-#: src/main_isoc.c:136 src/nbt_litereader.c:78 src/nbt_litereader.c:311
+#: src/main_isoc.c:135 src/nbt_litereader.c:78 src/nbt_litereader.c:311
 #: src/recipe_util.c:45
 msgid "Quit application"
 msgstr "退出程序"
 
-#: src/main_isoc.c:141
+#: src/main_isoc.c:140
 msgid "Please select an option, or enter 'q' to exit the program (q): "
 msgstr "请选择一个选项，或输入 “q” 退出程序 (q): "
 
-#: src/main_isoc.c:187 src/lrc_extend.c:42
+#: src/main_isoc.c:186 src/lrc_extend.c:42
 #, c-format
 msgid "There are %d regions:\n"
 msgstr "有 %d 个区域：\n"
 
-#: src/main_isoc.c:200
+#: src/main_isoc.c:199
 #, c-format
 msgid "Processing: region %d / %d : [%ld] %s"
 msgstr ""
@@ -192,17 +213,12 @@ msgstr "是"
 msgid "No"
 msgstr "否"
 
-#: src/litematica_region.c:438
+#: src/litematica_region.c:436
 #, c-format
 msgid "[%.2f%%] Processing Blocks %lu/%lu, (%3d,%3d,%3d)/(%3d,%3d,%3d)"
 msgstr "[%.2f%%] 处理方块中 %lu/%lu, (%3d,%3d,%3d)/(%3d,%3d,%3d) ……"
 
-#: src/litematica_region.c:444
-#, c-format
-msgid "Processing Blocks %lu/%lu, (%3d,%3d,%3d)/(%3d,%3d,%3d) %s"
-msgstr ""
-
-#: src/litematica_region.c:487
+#: src/litematica_region.c:485
 #, c-format
 msgid "Add %%d items from region %s"
 msgstr "从区域%s添加%%d物品"
@@ -265,10 +281,6 @@ msgstr "请输入数字或选项："
 #, c-format
 msgid "Combined %d items to the new item list."
 msgstr "合并了%d物品至新的物品列表。"
-
-#: src/qt/configui.cpp:16
-msgid "Config settings"
-msgstr "配置设置"
 
 #: src/qt/configui.cpp:16
 msgid "Override Language"
@@ -585,10 +597,6 @@ msgstr "Schema投影"
 msgid "Others"
 msgstr "其它"
 
-#: src/qt/manage.cpp:75
-msgid "Manage NBT"
-msgstr "管理NBT"
-
 #: src/qt/manage.cpp:99
 msgid "Select a file"
 msgstr "选择一个文件"
@@ -639,10 +647,6 @@ msgstr ""
 msgid "The following infos are locked:\n"
 msgstr ""
 
-#: src/qt/manage.cpp:325
-msgid "Manage Region"
-msgstr ""
-
 #: src/qt/manage.cpp:470
 msgid "Not a valid NBT List!"
 msgstr ""
@@ -650,6 +654,9 @@ msgstr ""
 #: src/qt/manage.cpp:483
 msgid "Not a valid NBT UUID!"
 msgstr ""
+
+#~ msgid "Only one option can be chosen!\n"
+#~ msgstr "只有一个选项可选！\n"
 
 #~ msgid "No NBT File!"
 #~ msgstr "无NBT文件！"
@@ -680,9 +687,6 @@ msgstr ""
 
 #~ msgid "Enter Desciption"
 #~ msgstr "输入描述"
-
-#~ msgid "Enter desciption for the NBT file."
-#~ msgstr "输入NBT文件的描述。"
 
 #~ msgid "No Description Entered!"
 #~ msgstr "没有输入的描述！"

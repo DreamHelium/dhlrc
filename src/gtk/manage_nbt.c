@@ -104,12 +104,12 @@ set_row_factory()
 }
 
 static void
-refresh_model(GtkColumnView* view)
+refresh_model(GtkListView* view)
 {
     GtkSelectionModel* model = GTK_SELECTION_MODEL(gtk_single_selection_new(get_model()));
     g_message("%d", GTK_IS_SELECTION_MODEL(model));
-    gtk_column_view_set_model(view, model);
-    gtk_column_view_set_row_factory(view, set_row_factory());
+    gtk_list_view_set_model(view, model);
+    gtk_list_view_set_factory(view, set_row_factory());
 }
 
 static void
@@ -153,10 +153,10 @@ nbt_open_response (GtkDialog *dialog,
     }
 
     gtk_window_destroy (GTK_WINDOW (dialog));
-    refresh_model(GTK_COLUMN_VIEW(user_data));
+    refresh_model(GTK_LIST_VIEW(user_data));
 }
 
-static void add_cb(DhManageWindow* self, GtkColumnView* view)
+static void add_cb(DhManageWindow* self, GtkListView* view)
 {
     GtkFileFilter* filter = gtk_file_filter_new();
     gtk_file_filter_add_pattern(filter, "*.litematic");

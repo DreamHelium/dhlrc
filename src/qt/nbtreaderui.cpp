@@ -4,7 +4,6 @@
 #include <qitemselectionmodel.h>
 #include <qstandarditemmodel.h>
 #include <qtreeview.h>
-#include <qtypes.h>
 #include <qvariant.h>
 
 static QString uuid;

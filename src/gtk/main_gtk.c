@@ -247,7 +247,7 @@ main (int    argc,
   GtkApplication *app;
   int status;
 
-#ifdef GIO_AVAILABLE_ENUMERATOR_IN_2_74
+#ifdef GLIB_AVAILABLE_IN_2_74
   app = gtk_application_new ("cn.dh.dhlrc", G_APPLICATION_DEFAULT_FLAGS);
 #else
   app = gtk_application_new ("cn.dh.dhlrc", G_APPLICATION_FLAGS_NONE);

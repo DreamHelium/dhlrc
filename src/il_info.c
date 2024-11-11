@@ -61,7 +61,7 @@ void il_info_list_free()
     full_free = TRUE;
     if(uuid_list)
     {
-        dh_mt_table_destroy(table);
+        if(table) dh_mt_table_destroy(table);
         dh_list_free(uuid_list);
     }
 }

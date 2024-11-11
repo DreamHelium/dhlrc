@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-10 16:59+0800\n"
+"POT-Creation-Date: 2024-11-11 15:15+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,63 +17,84 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: src/main.c:40
+#: src/main.c:43
 msgid "Enter NBT reader mode."
 msgstr ""
 
-#: src/main.c:41
+#: src/main.c:44
 msgid "Enter litematica block reader."
 msgstr ""
 
-#: src/main.c:42
+#: src/main.c:45
 msgid "Enter litematica material list with recipe combination."
 msgstr ""
 
-#: src/main.c:43
+#: src/main.c:46
 msgid "Output log file to FILE"
 msgstr ""
 
-#: src/main.c:44
-msgid ""
-"Set verbose level to N.\n"
-"\t\t\tLevel 1: See process.\n"
-"\t\t\tLevel 2: See details except block processing.\n"
-"\t\t\tLevel 3: See all the details (Not recommended!)."
+#: src/main.c:66
+#, c-format
+msgid "The functions are listed below:\n"
 msgstr ""
 
-#: src/main.c:51
-msgid "[FILE] - Read a litematic file."
+#: src/main.c:67 src/main.c:73 src/qt/manage.cpp:75
+msgid "Manage NBT"
 msgstr ""
 
-#: src/main.c:74
-msgid "Only one option can be chosen!\n"
+#: src/main.c:68 src/main.c:74 src/qt/manage.cpp:325
+msgid "Manage Region"
 msgstr ""
 
-#: src/main.c:80
-msgid "A level below 3 is allowed!\n"
+#: src/main.c:69 src/main.c:75
+msgid "Manage item list"
 msgstr ""
 
-#: src/main.c:128
-msgid "directory"
+#: src/main.c:70 src/main.c:76 src/qt/configui.cpp:16
+msgid "Config settings"
 msgstr ""
 
-#: src/main.c:129
-msgid "file"
+#: src/main.c:77
+msgid "Exit application"
 msgstr ""
 
-#: src/main_isoc.c:93
-msgid "Error when reading file."
+#: src/main.c:83
+msgid "Please enter a number or an option [N/r/i/c/?]:"
 msgstr ""
 
-#: src/main_isoc.c:109
+#: src/main.c:99 src/main.c:129 src/main_isoc.c:108
 msgid "Not a valid NBT file!"
 msgstr ""
 
-#: src/main_isoc.c:115
+#: src/main.c:108
+msgid "Enter desciption for the NBT file."
+msgstr ""
+
+#: src/main.c:157
+msgid "The following files couldn't be added:\n"
+msgstr ""
+
+#: src/main.c:179
+msgid "[FILE] - Read a litematic file."
+msgstr ""
+
+#: src/main.c:213
+msgid "directory"
+msgstr ""
+
+#: src/main.c:214
+msgid "file"
+msgstr ""
+
+#: src/main_isoc.c:92
+msgid "Error when reading file."
+msgstr ""
+
+#: src/main_isoc.c:114
 msgid "Valid NBT file!"
 msgstr ""
 
-#: src/main_isoc.c:129
+#: src/main_isoc.c:128
 #, c-format
 msgid ""
 "There are three functions:\n"
@@ -83,21 +104,21 @@ msgid ""
 "\n"
 msgstr ""
 
-#: src/main_isoc.c:136 src/nbt_litereader.c:78 src/nbt_litereader.c:311
+#: src/main_isoc.c:135 src/nbt_litereader.c:78 src/nbt_litereader.c:311
 #: src/recipe_util.c:45
 msgid "Quit application"
 msgstr ""
 
-#: src/main_isoc.c:141
+#: src/main_isoc.c:140
 msgid "Please select an option, or enter 'q' to exit the program (q): "
 msgstr ""
 
-#: src/main_isoc.c:187 src/lrc_extend.c:42
+#: src/main_isoc.c:186 src/lrc_extend.c:42
 #, c-format
 msgid "There are %d regions:\n"
 msgstr ""
 
-#: src/main_isoc.c:200
+#: src/main_isoc.c:199
 #, c-format
 msgid "Processing: region %d / %d : [%ld] %s"
 msgstr ""
@@ -175,17 +196,12 @@ msgstr ""
 msgid "No"
 msgstr ""
 
-#: src/litematica_region.c:438
+#: src/litematica_region.c:436
 #, c-format
 msgid "[%.2f%%] Processing Blocks %lu/%lu, (%3d,%3d,%3d)/(%3d,%3d,%3d)"
 msgstr ""
 
-#: src/litematica_region.c:444
-#, c-format
-msgid "Processing Blocks %lu/%lu, (%3d,%3d,%3d)/(%3d,%3d,%3d) %s"
-msgstr ""
-
-#: src/litematica_region.c:487
+#: src/litematica_region.c:485
 #, c-format
 msgid "Add %%d items from region %s"
 msgstr ""
@@ -240,10 +256,6 @@ msgstr ""
 #: src/dhlrc_list.c:330
 #, c-format
 msgid "Combined %d items to the new item list."
-msgstr ""
-
-#: src/qt/configui.cpp:16
-msgid "Config settings"
 msgstr ""
 
 #: src/qt/configui.cpp:16
@@ -561,10 +573,6 @@ msgstr ""
 msgid "Others"
 msgstr ""
 
-#: src/qt/manage.cpp:75
-msgid "Manage NBT"
-msgstr ""
-
 #: src/qt/manage.cpp:99
 msgid "Select a file"
 msgstr ""
@@ -613,10 +621,6 @@ msgstr ""
 
 #: src/qt/manage.cpp:236
 msgid "The following infos are locked:\n"
-msgstr ""
-
-#: src/qt/manage.cpp:325
-msgid "Manage Region"
 msgstr ""
 
 #: src/qt/manage.cpp:470
