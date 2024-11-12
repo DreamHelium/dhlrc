@@ -70,17 +70,19 @@ static int start_point()
     printf("[3] %s\n", _("Config settings"));
     DhOut* out = dh_out_new();
     DhArgInfo* arg = dh_arg_info_new();
+    dh_out_set_show_opt(out, TRUE);
     dh_arg_info_add_arg(arg, 'n', "mnbt", N_("Manage NBT"));
     dh_arg_info_add_arg(arg, 'r', "mregion", N_("Manage Region"));
     dh_arg_info_add_arg(arg, 'i', "mitem", N_("Manage item list"));
     dh_arg_info_add_arg(arg, 'c', "config", N_("Config settings"));
     dh_arg_info_add_arg(arg, 'q', "quit", N_("Quit application"));
+    dh_arg_info_change_default_arg(arg, 'q');
     DhIntValidator* validator = dh_int_validator_new(0, 3);
     
     GValue val = {0};
     int ret_val = -1;
     char ret_val_c = 0;
-    dh_out_read_and_output(out, N_("Please enter a number or an option [N/r/i/c/q/?]:"), "dhlrc", arg, DH_VALIDATOR(validator), FALSE, &val);
+    dh_out_read_and_output(out, N_("Please enter a number or an option"), "dhlrc", arg, DH_VALIDATOR(validator), FALSE, &val);
 
     if(G_VALUE_HOLDS_INT64(&val)) ret_val = g_value_get_int64(&val);
     else if(G_VALUE_HOLDS_CHAR(&val)) ret_val_c = g_value_get_schar(&val);
