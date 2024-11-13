@@ -1,5 +1,4 @@
 #include "mainwindow.h"
-#include "../main.h"
 #include "../translation.h"
 #include <QApplication>
 #include <QTranslator>
@@ -27,9 +26,4 @@ int main(int argc, char *argv[])
     w.show();
     int ret = a.exec();
     return ret;
-}
-
-int main_qt(int argc, char **argv)
-{
-    return main(argc, argv);
 }

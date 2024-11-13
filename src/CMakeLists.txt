@@ -3,7 +3,6 @@ set( DHLRC_MAIN_POT_FILE_DEPENDS
         src/main_isoc.c
         src/nbt_litereader.c
         src/litematica_region.c
-        src/lrc_extend.c
         src/recipe_util.c
         src/dhlrc_list.c
 		src/qt/configui.cpp
@@ -29,9 +28,18 @@ set(BUILD_SHARED_LIBS ON)
 
 add_subdirectory(minizip-ng)
 
+add_library(dhlrc_recipe_full SHARED
+		    recipe_class_ng/recipes_general.h
+	        recipe_class_ng/recipes_general.c
+	        recipe_class_ng/recipes_shaped.h
+	        recipe_class_ng/recipes_shaped.c
+	        recipe_class_ng/recipes_shapeless.h
+	        recipe_class_ng/recipes_shapeless.c
+	        recipe_class_ng/recipes_smelting.h
+	        recipe_class_ng/recipes_smelting.c
+)
 
 add_library(dhlrc SHARED
-	       main.h
 		   translation.h
 		   translation.c
 	       libnbt/nbt.h
@@ -64,19 +72,11 @@ add_library(dhlrc SHARED
 		   create_nbt.c
 		   region_info.c
 		   region_info.h
-	       recipe_class_ng/recipes_general.h
-	       recipe_class_ng/recipes_general.c
-	       recipe_class_ng/recipes_shaped.h
-	       recipe_class_ng/recipes_shaped.c
-	       recipe_class_ng/recipes_shapeless.h
-	       recipe_class_ng/recipes_shapeless.c
-	       recipe_class_ng/recipes_smelting.h
-	       recipe_class_ng/recipes_smelting.c
 )
 
+target_link_libraries(dhlrc_recipe_full PUBLIC dhutil)
 
-
-target_link_libraries(dhlrc PUBLIC z cjson minizip dhutil
+target_link_libraries(dhlrc PUBLIC z cjson minizip dhutil dhlrc_recipe_full
 )
 
 target_include_directories(dhlrc PUBLIC
@@ -85,9 +85,9 @@ target_include_directories(dhlrc PUBLIC
 
 target_link_directories(dhlrc PUBLIC "${GIO_LIBRARY_DIRS}")
 
-add_executable(dhlrc_cli main_isoc.c main.c lrc_extend.c lrc_extend.h)
+add_executable(dhlrc_cli main.c)
 
-target_link_libraries(dhlrc_cli PUBLIC dhlrc)
+target_link_libraries(dhlrc_cli PUBLIC dhlrc "${nc_LIBRARIES}")
 
 add_subdirectory(qt)
 add_subdirectory(gtk)

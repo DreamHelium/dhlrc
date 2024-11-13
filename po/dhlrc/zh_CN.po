@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-11 15:15+0800\n"
+"POT-Creation-Date: 2024-11-13 22:34+0800\n"
 "PO-Revision-Date: 2024-10-16 23:52+0800\n"
 "Last-Translator: dream_he\n"
 "Language-Team: Chinese <kde-i18n-doc@kde.org>\n"
@@ -19,72 +19,72 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Lokalize 24.08.1\n"
 
-#: src/main.c:43
+#: src/main.c:50
 msgid "Enter NBT reader mode."
 msgstr "进入NBT阅读器模式。"
 
-#: src/main.c:44
+#: src/main.c:51
 msgid "Enter litematica block reader."
 msgstr "进入投影方块阅读器。"
 
-#: src/main.c:45
+#: src/main.c:52
 msgid "Enter litematica material list with recipe combination."
 msgstr "进入投影材料列表及合成表合成功能。"
 
-#: src/main.c:46
+#: src/main.c:53
 msgid "Output log file to FILE"
 msgstr "输出日志文件至FILE"
 
-#: src/main.c:66
-#, c-format
+#: src/main.c:76
 msgid "The functions are listed below:\n"
 msgstr ""
 
-#: src/main.c:67 src/main.c:73 src/qt/manage.cpp:75
+#: src/main.c:77 src/main.c:85 src/qt/manage.cpp:75
 msgid "Manage NBT"
 msgstr "管理NBT"
 
-#: src/main.c:68 src/main.c:74 src/qt/manage.cpp:325
+#: src/main.c:78 src/main.c:86 src/qt/manage.cpp:325
 msgid "Manage Region"
 msgstr ""
 
-#: src/main.c:69 src/main.c:75
+#: src/main.c:79 src/main.c:87
 msgid "Manage item list"
 msgstr ""
 
-#: src/main.c:70 src/main.c:76 src/qt/configui.cpp:16
+#: src/main.c:80 src/main.c:88 src/qt/configui.cpp:16
 msgid "Config settings"
 msgstr "配置设置"
 
-#: src/main.c:77
-msgid "Exit application"
+#: src/main.c:89 src/main_isoc.c:135 src/nbt_litereader.c:78
+#: src/nbt_litereader.c:311 src/recipe_util.c:45
+msgid "Quit application"
+msgstr "退出程序"
+
+#: src/main.c:91
+msgid "Debug"
 msgstr ""
 
-#: src/main.c:83
-msgid "Please enter a number or an option [N/r/i/c/?]:"
-msgstr ""
-
-#: src/main.c:99 src/main.c:129 src/main_isoc.c:108
+#: src/main.c:126 src/main.c:156 src/main_isoc.c:108
 msgid "Not a valid NBT file!"
 msgstr "不是一个有效的NBT文件！"
 
-#: src/main.c:108
+#: src/main.c:135
 msgid "Enter desciption for the NBT file."
 msgstr "输入NBT文件的描述。"
 
-#: src/main.c:157
+#: src/main.c:184
 msgid "The following files couldn't be added:\n"
 msgstr ""
 
-#: src/main.c:179
+#: src/main.c:206
 msgid "[FILE] - Read a litematic file."
 msgstr "[文件] - 读取一个投影文件。"
 
-#: src/main.c:213
+#: src/main.c:240
 msgid "directory"
 msgstr "目录"
 
-#: src/main.c:214
+#: src/main.c:241
 msgid "file"
 msgstr "文件"
 
@@ -111,16 +111,11 @@ msgstr ""
 "[2] 投影方块阅读器\n"
 "\n"
 
-#: src/main_isoc.c:135 src/nbt_litereader.c:78 src/nbt_litereader.c:311
-#: src/recipe_util.c:45
-msgid "Quit application"
-msgstr "退出程序"
-
 #: src/main_isoc.c:140
 msgid "Please select an option, or enter 'q' to exit the program (q): "
 msgstr "请选择一个选项，或输入 “q” 退出程序 (q): "
 
-#: src/main_isoc.c:186 src/lrc_extend.c:42
+#: src/main_isoc.c:186
 #, c-format
 msgid "There are %d regions:\n"
 msgstr "有 %d 个区域：\n"
@@ -222,52 +217,6 @@ msgstr "[%.2f%%] 处理方块中 %lu/%lu, (%3d,%3d,%3d)/(%3d,%3d,%3d) ……"
 #, c-format
 msgid "Add %%d items from region %s"
 msgstr "从区域%s添加%%d物品"
-
-#: src/lrc_extend.c:49
-#, c-format
-msgid "Enter the region number, or enter 'q' to exit program (q): "
-msgstr "输入区域号，或输入 “q” 退出程序 (q)： "
-
-#: src/lrc_extend.c:65 src/lrc_extend.c:152
-#, c-format
-msgid ""
-"You are reading region: [%2d] %s:\n"
-"The size of the region is (%d, %d, %d).\n"
-"\n"
-msgstr ""
-"你正在阅读区域 [%2d] %s：\n"
-"这个区域的大小为 (%d, %d, %d)。\n"
-"\n"
-
-#: src/lrc_extend.c:68
-#, c-format
-msgid ""
-"Please enter the coordination of the block (just numbers of x y z without "
-"additional character\n"
-"or enter 'b' to choose another region, enter 'q' to exit the program (b): "
-msgstr ""
-"请输入方块坐标（仅输入数字，不需要额外字符）\n"
-"或输入 “b” 选择其他区域，输入 “q” 退出程序 (b): "
-
-#: src/lrc_extend.c:160
-#, c-format
-msgid "The block in (%ld, %ld, %ld) is %s.\n"
-msgstr "在 (%ld, %ld, %ld) 处的方块是 %s 。\n"
-
-#: src/lrc_extend.c:161
-#, c-format
-msgid "The block's position in BlockStatePalette is %d.\n"
-msgstr "此方块在 BlockStatePalette 中的位置为%d。\n"
-
-#: src/lrc_extend.c:162
-#, c-format
-msgid ""
-"Please enter the coordination of the block again, or enter 'b' to choose "
-"another region, enter 'r' to read the detail of the block, enter 'q' to exit "
-"the program (b): "
-msgstr ""
-"请再次输入方块的坐标，或输入 “b” 选择其他区域，输入 “r” 阅读方块的细节，输入 "
-"“q” 退出程序 (b): "
 
 #: src/recipe_util.c:44
 msgid "Choose all numbers"
@@ -654,6 +603,46 @@ msgstr ""
 #: src/qt/manage.cpp:483
 msgid "Not a valid NBT UUID!"
 msgstr ""
+
+#, c-format
+#~ msgid "Enter the region number, or enter 'q' to exit program (q): "
+#~ msgstr "输入区域号，或输入 “q” 退出程序 (q)： "
+
+#, c-format
+#~ msgid ""
+#~ "You are reading region: [%2d] %s:\n"
+#~ "The size of the region is (%d, %d, %d).\n"
+#~ "\n"
+#~ msgstr ""
+#~ "你正在阅读区域 [%2d] %s：\n"
+#~ "这个区域的大小为 (%d, %d, %d)。\n"
+#~ "\n"
+
+#, c-format
+#~ msgid ""
+#~ "Please enter the coordination of the block (just numbers of x y z without "
+#~ "additional character\n"
+#~ "or enter 'b' to choose another region, enter 'q' to exit the program (b): "
+#~ msgstr ""
+#~ "请输入方块坐标（仅输入数字，不需要额外字符）\n"
+#~ "或输入 “b” 选择其他区域，输入 “q” 退出程序 (b): "
+
+#, c-format
+#~ msgid "The block in (%ld, %ld, %ld) is %s.\n"
+#~ msgstr "在 (%ld, %ld, %ld) 处的方块是 %s 。\n"
+
+#, c-format
+#~ msgid "The block's position in BlockStatePalette is %d.\n"
+#~ msgstr "此方块在 BlockStatePalette 中的位置为%d。\n"
+
+#, c-format
+#~ msgid ""
+#~ "Please enter the coordination of the block again, or enter 'b' to choose "
+#~ "another region, enter 'r' to read the detail of the block, enter 'q' to "
+#~ "exit the program (b): "
+#~ msgstr ""
+#~ "请再次输入方块的坐标，或输入 “b” 选择其他区域，输入 “r” 阅读方块的细节，输"
+#~ "入 “q” 退出程序 (b): "
 
 #~ msgid "Only one option can be chosen!\n"
 #~ msgstr "只有一个选项可选！\n"

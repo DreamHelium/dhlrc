@@ -20,15 +20,17 @@
 #include <glib.h>
 /*#include "dhlrc_config.h"*/
 #include "config.h"
+#include "dh_nc_rl.h"
+#include "dh_string_util.h"
 #include "il_info.h"
 #include "libnbt/nbt.h"
-#include "main.h"
 #include "dh_file_util.h"
 #include "dh_validator.h"
 #include "nbt_info.h"
 #include "region_info.h"
 #include "translation.h"
 #include <dhutil.h>
+#include <ncursesw/ncurses.h>
 
 static gboolean reader_mode = FALSE;
 static gboolean block_mode = FALSE;
@@ -38,6 +40,11 @@ static guint mode_num = 0;
 
 static gchar* get_filename();
 
+static void debug()
+{
+    printf("%s\n", dh_getprint_str("测试测试", 6));
+}
+
 static GOptionEntry entries[] =
 {
     {"reader", 'r', 0, G_OPTION_ARG_NONE, &reader_mode, N_("Enter NBT reader mode."), NULL},
@@ -46,12 +53,14 @@ static GOptionEntry entries[] =
     {"log", 0, 0, G_OPTION_ARG_FILENAME, &log_filename, N_("Output log file to FILE"), "FILE"}
 };
 
+
 static void startup(GApplication* self, gpointer user_data)
 {
     dhlrc_make_config();
     il_info_list_init();
     nbt_info_list_init();
     region_info_list_init();
+    initscr();
 }
 
 static void app_shutdown(GApplication* self, gpointer user_data)
@@ -59,15 +68,17 @@ static void app_shutdown(GApplication* self, gpointer user_data)
     il_info_list_free();
     nbt_info_list_free();
     region_info_list_free();
+    endwin();
 }
 
 static int start_point()
 {
-    printf(_("The functions are listed below:\n"));
-    printf("[0] %s\n", _("Manage NBT"));
-    printf("[1] %s\n", _("Manage Region"));
-    printf("[2] %s\n", _("Manage item list"));
-    printf("[3] %s\n", _("Config settings"));
+    printw(_("The functions are listed below:\n"));
+    printw("[0] %s\n", _("Manage NBT"));
+    printw("[1] %s\n", _("Manage Region"));
+    printw("[2] %s\n", _("Manage item list"));
+    printw("[3] %s\n", _("Config settings"));
+    refresh();
     DhOut* out = dh_out_new();
     DhArgInfo* arg = dh_arg_info_new();
     dh_out_set_show_opt(out, TRUE);
@@ -76,13 +87,18 @@ static int start_point()
     dh_arg_info_add_arg(arg, 'i', "mitem", N_("Manage item list"));
     dh_arg_info_add_arg(arg, 'c', "config", N_("Config settings"));
     dh_arg_info_add_arg(arg, 'q', "quit", N_("Quit application"));
+    #ifdef DH_DEBUG_IN_IDE
+    dh_arg_info_add_arg(arg, 'd', "debug", N_("Debug"));
+    #endif
     dh_arg_info_change_default_arg(arg, 'q');
     DhIntValidator* validator = dh_int_validator_new(0, 3);
     
     GValue val = {0};
     int ret_val = -1;
     char ret_val_c = 0;
-    dh_out_read_and_output(out, N_("Please enter a number or an option"), "dhlrc", arg, DH_VALIDATOR(validator), FALSE, &val);
+    // dh_out_read_and_output(out, N_("Please enter a number or an option"), "dhlrc", arg, DH_VALIDATOR(validator), FALSE, &val);
+
+    dh_nc_rl_get_arg(NULL);
 
     if(G_VALUE_HOLDS_INT64(&val)) ret_val = g_value_get_int64(&val);
     else if(G_VALUE_HOLDS_CHAR(&val)) ret_val_c = g_value_get_schar(&val);
@@ -90,6 +106,12 @@ static int start_point()
 
     g_message("%d", ret_val);
     g_message("%d", ret_val_c);
+
+    #ifdef DH_DEBUG_IN_IDE
+    if(ret_val_c == 'd')
+        debug();
+    #endif
+
     g_object_unref(out);
     g_object_unref(arg);
     g_object_unref(validator);
