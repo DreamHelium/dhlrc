@@ -1,12 +1,10 @@
 #include <gtk/gtk.h>
 #include "../translation.h"
-#include "../nbt_info.h"
 #include "glib.h"
 #include "input_dialog.h"
 #include "manage_nbt.h"
-#include "../region_info.h"
-#include "../il_info.h"
-#include "../config.h"
+#include "main_gtk.h"
+
 
 static GtkWidget* window;
 static GtkWidget* region_box;
@@ -64,8 +62,8 @@ title_bar_button_toggled (GtkToggleButton* self,
   }
 }
 
-static void
-activate (GtkApplication *app,
+extern void
+gtk_app_activate (GtkApplication *app,
           gpointer        user_data)
 {
   window = gtk_application_window_new (app);
@@ -215,49 +213,4 @@ make_title_bar()
 #endif
 
   return header_bar;
-}
-
-static void
-startup (GApplication* self,
-         gpointer user_data
-)
-{
-  translation_init();
-  nbt_info_list_init();
-  region_info_list_init();
-  il_info_list_init();
-}
-
-static void app_shutdown (GApplication* self,
-                          gpointer user_data
-)
-{
-  nbt_info_list_free();
-  region_info_list_free();
-  il_info_list_free();
-  dh_exit();
-  dh_exit1();
-}
-
-
-int
-main (int    argc,
-      char **argv)
-{
-  GtkApplication *app;
-  int status;
-
-#ifdef GLIB_AVAILABLE_IN_2_74
-  app = gtk_application_new ("cn.dh.dhlrc", G_APPLICATION_DEFAULT_FLAGS);
-#else
-  app = gtk_application_new ("cn.dh.dhlrc", G_APPLICATION_FLAGS_NONE);
-#endif
-  g_signal_connect (app, "startup", G_CALLBACK(startup), NULL);
-  g_signal_connect (app, "activate", G_CALLBACK (activate), NULL);
-  g_signal_connect (app, "shutdown", G_CALLBACK(app_shutdown), NULL);
-  status = g_application_run (G_APPLICATION (app), argc, argv);
-
-  g_object_unref (app);
-
-  return status;
 }

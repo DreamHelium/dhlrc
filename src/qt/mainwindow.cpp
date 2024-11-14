@@ -70,20 +70,12 @@ MainWindow::MainWindow(QWidget *parent)
     mw = this;
     // pd.hide();
     initSignalSlots();
-    nbt_info_list_init();
-    region_info_list_init();
-    il_info_list_init();
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
     delete mn;
-    nbt_info_list_free();
-    il_info_list_free();
-    region_info_list_free();
-    dh_exit();
-    dh_exit1();
 }
 /*
 static int mw_download_progress(void* data, curl_off_t total, curl_off_t cur, curl_off_t unused0, curl_off_t unused1)

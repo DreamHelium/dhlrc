@@ -5,6 +5,7 @@ project(dhlrc_qt VERSION 0.3.1 LANGUAGES CXX)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
+set(LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR}/module)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -13,7 +14,8 @@ find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
 
 set(PROJECT_SOURCES
-        main.cpp
+        module.h
+        module.cpp
         mainwindow.ui
         mainwindow.cpp
         mainwindow.h
@@ -41,7 +43,7 @@ set(PROJECT_SOURCES
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
-    qt_add_executable(dhlrc_qt
+    qt_add_library(dhlrc_qt SHARED
         MANUAL_FINALIZATION
         ${PROJECT_SOURCES}
     )
@@ -57,7 +59,7 @@ else()
 # Define properties for Android with Qt 5 after find_package() calls as:
 #    set(ANDROID_PACKAGE_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/android")
     else()
-        add_executable(dhlrc_qt
+        add_library(dhlrc_qt
             ${PROJECT_SOURCES}
         )
     endif()
@@ -70,6 +72,7 @@ target_link_libraries(dhlrc_qt PUBLIC dhlrc)
 target_include_directories(dhlrc_qt PUBLIC
         "${PROJECT_BINARY_DIR}" "${GIO_INCLUDE_DIRS}" "${dhutil_INCLUDE_DIRS}"
 )
+
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
 # If you are developing for iOS or macOS you should consider setting an

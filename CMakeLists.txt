@@ -12,6 +12,7 @@ find_package(PkgConfig)
 
 pkg_search_module(GIO REQUIRED gio-2.0)
 pkg_search_module(nc REQUIRED ncurses)
+pkg_search_module(gm REQUIRED gmodule-2.0)
 
 set(DH_ENABLE_TRANSLATION true)
 

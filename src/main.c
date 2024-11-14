@@ -22,6 +22,8 @@
 #include "config.h"
 #include "dh_nc_rl.h"
 #include "dh_string_util.h"
+#include "glibconfig.h"
+#include "gmodule.h"
 #include "il_info.h"
 #include "libnbt/nbt.h"
 #include "dh_file_util.h"
@@ -40,19 +42,78 @@ static guint mode_num = 0;
 
 static gchar* get_filename();
 
-static void debug()
+typedef int (*DhlrcMainFunc)(int argc, char** argv);
+typedef const char* (*DhlrcGetModuleName)();
+typedef DhStrArray* (*DhlrcGetModuleNameArray)();
+typedef const char* (*DhlrcGetModuleDescription)();
+typedef const char* (*DhlrcGetModuleHelpDescription)();
+
+typedef struct DhlrcModule{
+    const char* module_name;
+    DhStrArray* module_name_full;
+
+    const char* module_description;
+    const char* help_description;
+    DhlrcMainFunc start_point;
+    GModule* module;
+} DhlrcModule;
+
+static void debug(int argc, char** argv)
 {
-    printf("%s\n", dh_getprint_str("测试测试", 6));
+    
 }
 
-static GOptionEntry entries[] =
+static void modules_free(DhlrcModule* modules, int len)
 {
-    {"reader", 'r', 0, G_OPTION_ARG_NONE, &reader_mode, N_("Enter NBT reader mode."), NULL},
-    {"block", 'b', 0, G_OPTION_ARG_NONE, &block_mode, N_("Enter litematica block reader."), NULL},
-    {"list", 'l', 0, G_OPTION_ARG_NONE, &list_mode, N_("Enter litematica material list with recipe combination."), NULL},
-    {"log", 0, 0, G_OPTION_ARG_FILENAME, &log_filename, N_("Output log file to FILE"), "FILE"}
-};
+    for(int i = 0 ; i < len ; i++)
+    {
+        dh_str_array_free(modules[i].module_name_full);
+        g_module_close(modules[i].module);
+    }
+    g_free(modules);
+}
 
+static DhlrcModule* get_module(int* module_num)
+{
+    int real_module_num = 0;
+    GList* module_files = dh_file_list_create("module");
+    DhlrcModule* ret = NULL;
+    gboolean succeed = TRUE;
+    for(int i = 0 ; i < g_list_length(module_files) ; i++)
+    {
+        char* dir = g_strconcat("module", G_DIR_SEPARATOR_S, g_list_nth_data(module_files, i), NULL);
+        GModule* module = g_module_open(dir, G_MODULE_BIND_MASK);
+        g_free(dir);
+
+        if(!module) continue; /* Get Module fail */
+        DhlrcGetModuleName name;
+        DhlrcGetModuleNameArray arr;
+        DhlrcGetModuleDescription des;
+        DhlrcGetModuleHelpDescription helpdes;
+        DhlrcMainFunc main_func;
+
+        if(succeed) succeed = g_module_symbol(module, "module_name", (gpointer*)&name);
+        if(succeed) succeed = g_module_symbol(module, "module_name_array", (gpointer*)&arr);
+        if(succeed) succeed = g_module_symbol(module, "module_description", (gpointer*)&des);
+        if(succeed) succeed = g_module_symbol(module, "help_description", (gpointer*)&helpdes);
+        if(succeed) succeed = g_module_symbol(module, "start_point", (gpointer*)&main_func);
+
+        if(succeed)
+        {
+            ret = g_realloc(ret, (real_module_num + 1) * sizeof(DhlrcModule));
+            ret[real_module_num].module_name = name();
+            ret[real_module_num].module_name_full = arr();
+            ret[real_module_num].module_description = des();
+            ret[real_module_num].help_description = helpdes();
+            ret[real_module_num].start_point = main_func;
+            ret[real_module_num].module = module;
+            real_module_num++;
+        }
+    }
+    *module_num = real_module_num;
+    g_list_free_full(module_files, free);
+    return ret;
+}
 
 static void startup(GApplication* self, gpointer user_data)
 {
@@ -60,7 +121,6 @@ static void startup(GApplication* self, gpointer user_data)
     il_info_list_init();
     nbt_info_list_init();
     region_info_list_init();
-    initscr();
 }
 
 static void app_shutdown(GApplication* self, gpointer user_data)
@@ -68,7 +128,6 @@ static void app_shutdown(GApplication* self, gpointer user_data)
     il_info_list_free();
     nbt_info_list_free();
     region_info_list_free();
-    endwin();
 }
 
 static int start_point()
@@ -160,6 +219,89 @@ static gboolean file_open(GFile* file, gboolean single)
     return ret;
 }
 
+static DhStrArray* modules(DhlrcModule* module, int len)
+{
+    DhStrArray* arr = NULL;
+    for(int i = 0 ; i < len ; i++)
+        dh_str_array_add_str(&arr, module[i].module_name);
+    return arr;
+}
+
+static gboolean get_module_pos(DhlrcModule* modules, int len, int* pos, const char* module)
+{
+    for(int i = 0 ; i < len ; i++)
+    {
+        const char* module_name = modules[i].module_name;
+        DhStrArray* module_arr = modules[i].module_name_full;
+        if(module_name && g_str_equal(module_name, module))
+        {
+            *pos = i;
+            return TRUE;
+        }
+        else if(module_arr && dh_str_array_find_repeated(module_arr, module))
+        {
+            *pos = i;
+            return TRUE;
+        }
+    }
+    return FALSE;
+}
+
+static gint run_app (GApplication* self, GApplicationCommandLine* command_line, gpointer user_data)
+{
+    if(!g_module_supported())
+    {
+        printf("The program is not supported!\n");
+        return -1;
+    }
+
+    gchar **argv;
+    gint argc;
+    gint i;
+
+    argv = g_application_command_line_get_arguments (command_line, &argc);
+
+    // debug(argc, argv);
+    int len = 0;
+    int module_pos = 0;
+    DhlrcModule* modules = get_module(&len);
+    int ret = 0;
+
+    if((argc >= 2 && g_str_equal(argv[1], "--help")) || argc == 1)
+    {
+        if(argc == 2 || argc == 1)
+        {
+            printf(_("dhlrc - Program to handle litematic or other struct of Minecraft.\n"));
+            printf("\n");
+            printf(_("Modules:\n"));
+            
+            for(int i = 0 ; i < len ; i++)
+            {
+                if(modules[i].module_name) printf("%s\t", modules[i].module_name);
+                printf("%s\n", modules[i].module_description);
+            }
+            printf("\n");
+        }
+        else
+        {
+            printf(_("Unrecognized options "));
+            for(int i = 2 ; i < argc; i++)
+                printf("\"%s\"", argv[i]);
+            printf(".\n");
+        }
+    }
+    else if(argc >= 2 && get_module_pos(modules, len, &module_pos, argv[1]))
+    {
+        ret = modules[module_pos].start_point(argc - 1 , argv + 1);
+    }
+    else printf("Not supported!\n");
+
+
+    g_strfreev (argv);
+
+    return ret;
+}
+
 static void app_open(GApplication* self, gpointer files, gint n_files, gchar* hint, gpointer user_data)
 {
     GFile** f = files;
@@ -197,12 +339,10 @@ static void activate(GApplication* self, gpointer user_data)
 int main(int argc, char** argb)
 {
     translation_init();
-    GApplication* app = g_application_new("cn.dh.dhlrc.cli", G_APPLICATION_HANDLES_OPEN);
+    GApplication* app = g_application_new("cn.dh.dhlrc.cli", G_APPLICATION_HANDLES_COMMAND_LINE);
     g_signal_connect(app, "startup", G_CALLBACK(startup), NULL);
     g_signal_connect(app, "shutdown", G_CALLBACK(app_shutdown), NULL);
-    g_signal_connect(app, "activate", G_CALLBACK(activate), NULL);
-    g_signal_connect(app, "open", G_CALLBACK(app_open), NULL);
-    g_application_add_main_option_entries(app, entries);
+    g_signal_connect(app, "command-line", G_CALLBACK(run_app), NULL);
     g_application_set_option_context_parameter_string(app, _("[FILE] - Read a litematic file."));
 
     int ret = g_application_run(app, argc, argb);

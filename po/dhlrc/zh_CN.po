@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-13 22:34+0800\n"
+"POT-Creation-Date: 2024-11-15 03:07+0800\n"
 "PO-Revision-Date: 2024-10-16 23:52+0800\n"
 "Last-Translator: dream_he\n"
 "Language-Team: Chinese <kde-i18n-doc@kde.org>\n"
@@ -19,72 +19,71 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Lokalize 24.08.1\n"
 
-#: src/main.c:50
-msgid "Enter NBT reader mode."
-msgstr "进入NBT阅读器模式。"
-
-#: src/main.c:51
-msgid "Enter litematica block reader."
-msgstr "进入投影方块阅读器。"
-
-#: src/main.c:52
-msgid "Enter litematica material list with recipe combination."
-msgstr "进入投影材料列表及合成表合成功能。"
-
-#: src/main.c:53
-msgid "Output log file to FILE"
-msgstr "输出日志文件至FILE"
-
-#: src/main.c:76
+#: src/main.c:135
 msgid "The functions are listed below:\n"
 msgstr ""
 
-#: src/main.c:77 src/main.c:85 src/qt/manage.cpp:75
+#: src/main.c:136 src/main.c:144 src/qt/manage.cpp:75
 msgid "Manage NBT"
 msgstr "管理NBT"
 
-#: src/main.c:78 src/main.c:86 src/qt/manage.cpp:325
+#: src/main.c:137 src/main.c:145 src/qt/manage.cpp:325
 msgid "Manage Region"
 msgstr ""
 
-#: src/main.c:79 src/main.c:87
+#: src/main.c:138 src/main.c:146
 msgid "Manage item list"
 msgstr ""
 
-#: src/main.c:80 src/main.c:88 src/qt/configui.cpp:16
+#: src/main.c:139 src/main.c:147 src/qt/configui.cpp:16
 msgid "Config settings"
 msgstr "配置设置"
 
-#: src/main.c:89 src/main_isoc.c:135 src/nbt_litereader.c:78
+#: src/main.c:148 src/main_isoc.c:135 src/nbt_litereader.c:78
 #: src/nbt_litereader.c:311 src/recipe_util.c:45
 msgid "Quit application"
 msgstr "退出程序"
 
-#: src/main.c:91
+#: src/main.c:150
 msgid "Debug"
 msgstr ""
 
-#: src/main.c:126 src/main.c:156 src/main_isoc.c:108
+#: src/main.c:185 src/main.c:215 src/main_isoc.c:108
 msgid "Not a valid NBT file!"
 msgstr "不是一个有效的NBT文件！"
 
-#: src/main.c:135
+#: src/main.c:194
 msgid "Enter desciption for the NBT file."
 msgstr "输入NBT文件的描述。"
 
-#: src/main.c:184
+#: src/main.c:274
+#, c-format
+msgid "dhlrc - Program to handle litematic or other struct of Minecraft.\n"
+msgstr ""
+
+#: src/main.c:276
+#, c-format
+msgid "Modules:\n"
+msgstr ""
+
+#: src/main.c:287
+#, c-format
+msgid "Unrecognized options "
+msgstr ""
+
+#: src/main.c:326
 msgid "The following files couldn't be added:\n"
 msgstr ""
 
-#: src/main.c:206
+#: src/main.c:346
 msgid "[FILE] - Read a litematic file."
 msgstr "[文件] - 读取一个投影文件。"
 
-#: src/main.c:240
+#: src/main.c:380
 msgid "directory"
 msgstr "目录"
 
-#: src/main.c:241
+#: src/main.c:381
 msgid "file"
 msgstr "文件"
 
@@ -325,67 +324,67 @@ msgstr "首先，你需要创建一个Region结构。"
 msgid "Second, you can do lots of things with the Region."
 msgstr "接下来，你可以对此Region做好多事。"
 
-#: src/qt/mainwindow.cpp:132 src/qt/mainwindow.cpp:167
-#: src/qt/mainwindow.cpp:169 src/qt/mainwindow.cpp:172
-#: src/qt/mainwindow.cpp:193 src/qt/mainwindow.cpp:195
-#: src/qt/mainwindow.cpp:198 src/qt/mainwindow.cpp:209
-#: src/qt/mainwindow.cpp:233 src/qt/mainwindow.cpp:235
-#: src/qt/mainwindow.cpp:238 src/qt/mainwindow.cpp:240
-#: src/qt/mainwindow.cpp:262 src/qt/mainwindow.cpp:265
-#: src/qt/mainwindow.cpp:267 src/qt/mainwindow.cpp:291
-#: src/qt/mainwindow.cpp:293 src/qt/ilreaderui.cpp:110 src/qt/ilchooseui.cpp:91
+#: src/qt/mainwindow.cpp:124 src/qt/mainwindow.cpp:159
+#: src/qt/mainwindow.cpp:161 src/qt/mainwindow.cpp:164
+#: src/qt/mainwindow.cpp:185 src/qt/mainwindow.cpp:187
+#: src/qt/mainwindow.cpp:190 src/qt/mainwindow.cpp:201
+#: src/qt/mainwindow.cpp:225 src/qt/mainwindow.cpp:227
+#: src/qt/mainwindow.cpp:230 src/qt/mainwindow.cpp:232
+#: src/qt/mainwindow.cpp:254 src/qt/mainwindow.cpp:257
+#: src/qt/mainwindow.cpp:259 src/qt/mainwindow.cpp:283
+#: src/qt/mainwindow.cpp:285 src/qt/ilreaderui.cpp:110 src/qt/ilchooseui.cpp:91
 #: src/qt/nbtselectui.cpp:98 src/qt/manage.cpp:30 src/qt/manage.cpp:242
 #: src/qt/manage.cpp:470 src/qt/manage.cpp:483
 msgid "Error!"
 msgstr "错误！"
 
-#: src/qt/mainwindow.cpp:132 src/qt/mainwindow.cpp:293
+#: src/qt/mainwindow.cpp:124 src/qt/mainwindow.cpp:285
 msgid "NBT list is locked!"
 msgstr "NBT列表被锁定！"
 
-#: src/qt/mainwindow.cpp:167 src/qt/mainwindow.cpp:193
+#: src/qt/mainwindow.cpp:159 src/qt/mainwindow.cpp:185
 #: src/qt/ilreaderui.cpp:110
 msgid "The item list is locked!"
 msgstr "此材料列表被锁定！"
 
-#: src/qt/mainwindow.cpp:169 src/qt/mainwindow.cpp:195
+#: src/qt/mainwindow.cpp:161 src/qt/mainwindow.cpp:187
 msgid "The item list is freed!"
 msgstr "物品列表被释放！"
 
-#: src/qt/mainwindow.cpp:172 src/qt/mainwindow.cpp:198
+#: src/qt/mainwindow.cpp:164 src/qt/mainwindow.cpp:190
 msgid "No item list!"
 msgstr "无物品列表！"
 
-#: src/qt/mainwindow.cpp:209 src/qt/mainwindow.cpp:240
-#: src/qt/mainwindow.cpp:267
+#: src/qt/mainwindow.cpp:201 src/qt/mainwindow.cpp:232
+#: src/qt/mainwindow.cpp:259
 msgid "Region list is locked!"
 msgstr "Region列表被锁定！"
 
-#: src/qt/mainwindow.cpp:226
+#: src/qt/mainwindow.cpp:218
 msgid "Enter Name for Item List"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:226
+#: src/qt/mainwindow.cpp:218
 msgid "Enter the name for item list"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:233
+#: src/qt/mainwindow.cpp:225
 msgid "Description is empty!"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:235
+#: src/qt/mainwindow.cpp:227
 msgid "Item list is locked!"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:238 src/qt/mainwindow.cpp:265
+#: src/qt/mainwindow.cpp:230 src/qt/mainwindow.cpp:257
 msgid "No Region or no Region selected!"
 msgstr "没有Region或没有Region选中！"
 
-#: src/qt/mainwindow.cpp:262
+#: src/qt/mainwindow.cpp:254
 msgid "Region is locked!"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:291
+#: src/qt/mainwindow.cpp:283
 msgid "No NBT is selected!"
 msgstr ""
 
@@ -603,6 +602,18 @@ msgstr ""
 #: src/qt/manage.cpp:483
 msgid "Not a valid NBT UUID!"
 msgstr ""
+
+#~ msgid "Enter NBT reader mode."
+#~ msgstr "进入NBT阅读器模式。"
+
+#~ msgid "Enter litematica block reader."
+#~ msgstr "进入投影方块阅读器。"
+
+#~ msgid "Enter litematica material list with recipe combination."
+#~ msgstr "进入投影材料列表及合成表合成功能。"
+
+#~ msgid "Output log file to FILE"
+#~ msgstr "输出日志文件至FILE"
 
 #, c-format
 #~ msgid "Enter the region number, or enter 'q' to exit program (q): "
