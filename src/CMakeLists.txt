@@ -85,9 +85,10 @@ target_include_directories(dhlrc PUBLIC
 
 target_link_directories(dhlrc PUBLIC "${GIO_LIBRARY_DIRS}")
 
-add_executable(dhlrc_cli main.c)
+add_executable(dhlrc.bin main.c)
 
-target_link_libraries(dhlrc_cli PUBLIC dhlrc "${nc_LIBRARIES}" gmodule-2.0)
+target_link_libraries(dhlrc.bin PUBLIC dhlrc gmodule-2.0)
 
 add_subdirectory(qt)
 add_subdirectory(gtk)
+add_subdirectory(cli)

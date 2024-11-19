@@ -3,7 +3,7 @@ PROJECT( dhlrc )
 
 set(CMAKE_BUILD_TYPE Debug)
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR})
-set(LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR})
+set(LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR}/lib/shared)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_C_STANDARD 11)
 
@@ -11,7 +11,6 @@ find_package(Gettext)
 find_package(PkgConfig)
 
 pkg_search_module(GIO REQUIRED gio-2.0)
-pkg_search_module(nc REQUIRED ncurses)
 pkg_search_module(gm REQUIRED gmodule-2.0)
 
 set(DH_ENABLE_TRANSLATION true)
