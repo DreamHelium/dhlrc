@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-15 03:07+0800\n"
+"POT-Creation-Date: 2024-11-22 01:21+0800\n"
 "PO-Revision-Date: 2024-10-16 23:52+0800\n"
 "Last-Translator: dream_he\n"
 "Language-Team: Chinese <kde-i18n-doc@kde.org>\n"
@@ -19,71 +19,42 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Lokalize 24.08.1\n"
 
-#: src/main.c:135
-msgid "The functions are listed below:\n"
-msgstr ""
-
-#: src/main.c:136 src/main.c:144 src/qt/manage.cpp:75
-msgid "Manage NBT"
-msgstr "管理NBT"
-
-#: src/main.c:137 src/main.c:145 src/qt/manage.cpp:325
-msgid "Manage Region"
-msgstr ""
-
-#: src/main.c:138 src/main.c:146
-msgid "Manage item list"
-msgstr ""
-
-#: src/main.c:139 src/main.c:147 src/qt/configui.cpp:16
-msgid "Config settings"
-msgstr "配置设置"
-
-#: src/main.c:148 src/main_isoc.c:135 src/nbt_litereader.c:78
-#: src/nbt_litereader.c:311 src/recipe_util.c:45
-msgid "Quit application"
-msgstr "退出程序"
-
-#: src/main.c:150
-msgid "Debug"
-msgstr ""
-
-#: src/main.c:185 src/main.c:215 src/main_isoc.c:108
+#: src/main.c:146 src/main.c:176 src/main_isoc.c:108
 msgid "Not a valid NBT file!"
 msgstr "不是一个有效的NBT文件！"
 
-#: src/main.c:194
+#: src/main.c:155
 msgid "Enter desciption for the NBT file."
 msgstr "输入NBT文件的描述。"
 
-#: src/main.c:274
+#: src/main.c:235
 #, c-format
 msgid "dhlrc - Program to handle litematic or other struct of Minecraft.\n"
 msgstr ""
 
-#: src/main.c:276
+#: src/main.c:237
 #, c-format
 msgid "Modules:\n"
 msgstr ""
 
-#: src/main.c:287
+#: src/main.c:259
 #, c-format
 msgid "Unrecognized options "
 msgstr ""
 
-#: src/main.c:326
+#: src/main.c:300
 msgid "The following files couldn't be added:\n"
 msgstr ""
 
-#: src/main.c:346
+#: src/main.c:315
 msgid "[FILE] - Read a litematic file."
 msgstr "[文件] - 读取一个投影文件。"
 
-#: src/main.c:380
+#: src/main.c:349
 msgid "directory"
 msgstr "目录"
 
-#: src/main.c:381
+#: src/main.c:350
 msgid "file"
 msgstr "文件"
 
@@ -109,6 +80,11 @@ msgstr ""
 "[1] 投影材料列表及合成表合成功能\n"
 "[2] 投影方块阅读器\n"
 "\n"
+
+#: src/main_isoc.c:135 src/nbt_litereader.c:78 src/nbt_litereader.c:311
+#: src/recipe_util.c:45
+msgid "Quit application"
+msgstr "退出程序"
 
 #: src/main_isoc.c:140
 msgid "Please select an option, or enter 'q' to exit the program (q): "
@@ -231,6 +207,10 @@ msgid "Combined %d items to the new item list."
 msgstr "合并了%d物品至新的物品列表。"
 
 #: src/qt/configui.cpp:16
+msgid "Config settings"
+msgstr "配置设置"
+
+#: src/qt/configui.cpp:16
 msgid "Override Language"
 msgstr "覆盖语言"
 
@@ -253,6 +233,18 @@ msgstr "缓存目录"
 #: src/qt/configui.cpp:17
 msgid "Override Version"
 msgstr "覆盖版本"
+
+#: src/qt/configui.cpp:17
+msgid "Show Wizard On Start"
+msgstr ""
+
+#: src/qt/configui.cpp:19
+msgid "true"
+msgstr ""
+
+#: src/qt/configui.cpp:19
+msgid "false"
+msgstr ""
 
 #: src/qt/mainwindow.cpp:43
 msgid "Litematica reader"
@@ -545,6 +537,10 @@ msgstr "Schema投影"
 msgid "Others"
 msgstr "其它"
 
+#: src/qt/manage.cpp:75
+msgid "Manage NBT"
+msgstr "管理NBT"
+
 #: src/qt/manage.cpp:99
 msgid "Select a file"
 msgstr "选择一个文件"
@@ -593,6 +589,10 @@ msgstr ""
 
 #: src/qt/manage.cpp:236
 msgid "The following infos are locked:\n"
+msgstr ""
+
+#: src/qt/manage.cpp:325
+msgid "Manage Region"
 msgstr ""
 
 #: src/qt/manage.cpp:470

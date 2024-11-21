@@ -39,7 +39,7 @@
 extern "C"{
 #endif
 
-void translation_init();
+void translation_init(const char* prog_name);
 char* replace_at_with_slash(char* str);
 
 #ifdef __cplusplus

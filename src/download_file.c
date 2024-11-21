@@ -15,24 +15,20 @@
     You should have received a copy of the GNU Lesser General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>. */
 
-#include "download_file.h"
-#include <curl/system.h>
-#include <inttypes.h>
-#include <stdio.h>
 
-gboolean dh_download_version_manifest(const char *dir, DhProgressCallback callback)
-{
-    gboolean ret = dh_file_download_full_arg("https://launchermeta.mojang.com/mc/game/version_manifest.json", dir, G_FILE_COPY_OVERWRITE
-                                     , NULL, callback, "Version Manifest", NULL);
-    return ret;
-}
+// gboolean dh_download_version_manifest(const char *dir, DhProgressCallback callback)
+// {
+//     gboolean ret = dh_file_download_full_arg("https://launchermeta.mojang.com/mc/game/version_manifest.json", dir, G_FILE_COPY_OVERWRITE
+//                                      , NULL, callback, "Version Manifest", NULL);
+//     return ret;
+// }
 
-int dh_file_progress_callback(void* data, curl_off_t total, curl_off_t current, curl_off_t unused0, curl_off_t unused1)
-{
-    char* description = data;
-    double percentage = (double)current / total * 100;
+// int dh_file_progress_callback(void* data, curl_off_t total, curl_off_t current, curl_off_t unused0, curl_off_t unused1)
+// {
+//     char* description = data;
+//     double percentage = (double)current / total * 100;
 
-    fprintf(stderr, "[%.2f%%] Copying %s."" (%"CURL_FORMAT_CURL_OFF_T"/%"CURL_FORMAT_CURL_OFF_T").\r", percentage, description, current, total);
-    if(current == total && total != 0) fprintf(stderr, "\n");
-    return 0;
-}
+//     fprintf(stderr, "[%.2f%%] Copying %s."" (%"CURL_FORMAT_CURL_OFF_T"/%"CURL_FORMAT_CURL_OFF_T").\r", percentage, description, current, total);
+//     if(current == total && total != 0) fprintf(stderr, "\n");
+//     return 0;
+// }

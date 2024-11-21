@@ -16,24 +16,26 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>. */
 
 #include "translation.h"
+#include "dh_file_util.h"
 #include <glib.h>
 #include <locale.h>
 
 static gboolean set_locale_to_utf8();
 
 static gboolean translation_inited = FALSE;
-void translation_init()
+void translation_init(const char* prog_name)
 {
     if(!translation_inited)
     {
-#ifndef DH_DISABLE_TRANSLATION
+        char* dir = dh_file_get_current_program_dir(prog_name);
         set_locale_to_utf8();
-
-        bindtextdomain("dhlrc", "locale");
+        char* locale_dir = g_strconcat(dir, G_DIR_SEPARATOR_S, "locale", NULL);
+        bindtextdomain("dhlrc", locale_dir);
         /* Force the output for UTF-8 */
         bind_textdomain_codeset("dhlrc", "UTF-8");
         textdomain("dhlrc");
-#endif
+        g_free(locale_dir);
+        g_free(dir);
     }
 }
 

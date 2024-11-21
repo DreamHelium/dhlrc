@@ -31,6 +31,7 @@ private Q_SLOTS:
     void reset4Btn_clicked();
     void reset5Btn_clicked();
     void reset6Btn_clicked();
+    void reset7Btn_clicked();
     void okBtn_clicked();
 };
 

@@ -18,9 +18,13 @@ extern "C"
 
     };
 
-    extern int start_point(int argc, char *argv[])
+    extern int start_point(int argc, char *argv[], const char* prpath)
     {
-        translation_init();
+#ifdef G_OS_WIN32
+        char* dir = g_strconcat(prpath, "..\\lib\\qt", NULL);
+        AddDllDirectory(dir);
+        g_free(dir);
+#endif
         QApplication a(argc, argv);
         SelfTranslator st;
         QCoreApplication::installTranslator(&st);

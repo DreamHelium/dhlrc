@@ -16,7 +16,8 @@ It uses [libnbt](https://github.com/djytw/libnbt) as the library to read litemat
 - [cJSON](https://github.com/DaveGamble/cJSON) `>= 1.7.13`
 - `gettext` (It's a part of `glibc` so you might not need to install it in GNU/Linux but other systems might need)(Optional -- if you need translation)
 - `glib2`
-- [dhutil](https://github.com/DreamHelium/dhutil)
+- `minizip-ng`
+- [dhutil](https://github.com/DreamHelium/dhutil) (already in submodule of the repo)
 
 ## Compile
 

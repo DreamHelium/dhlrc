@@ -22,13 +22,8 @@ set( DHLRC_MAIN_POT_FILE_DEPENDS
 # configure_file(dhlrc_config.h.in dhlrc_config.h)
 add_subdirectory(dhutil)
 
-add_definitions(-DDH_USE_OLD_INPUT_LINE_FUNC)
-add_definitions(-DDH_USE_DEPRECATED_FUNCNAMES)
-set(BUILD_SHARED_LIBS ON)
-
-add_subdirectory(minizip-ng)
-
 add_library(dhlrc_recipe_full SHARED
+			json_util.c json_util.h
 		    recipe_class_ng/recipes_general.h
 	        recipe_class_ng/recipes_general.c
 	        recipe_class_ng/recipes_shaped.h
@@ -74,13 +69,18 @@ add_library(dhlrc SHARED
 		   region_info.h
 )
 
-target_link_libraries(dhlrc_recipe_full PUBLIC dhutil)
+target_link_libraries(dhlrc_recipe_full PUBLIC dhutil cjson)
 
-target_link_libraries(dhlrc PUBLIC z cjson minizip dhutil dhlrc_recipe_full
+target_link_libraries(dhlrc PUBLIC z cjson ${minizip_LIBRARIES} dhutil dhlrc_recipe_full
 )
 
+if(${minizip_VERSION} LESS 4.0.0)
+	add_definitions(-DDHLRC_MZ_VERSION_LESS_THAN_FOUR)
+endif()
+
+
 target_include_directories(dhlrc PUBLIC
-	"${GIO_INCLUDE_DIRS}" dhutil
+	"${GIO_INCLUDE_DIRS}" dhutil "${minizip_INCLUDE_DIRS}"
 )
 
 target_link_directories(dhlrc PUBLIC "${GIO_LIBRARY_DIRS}")
@@ -88,6 +88,18 @@ target_link_directories(dhlrc PUBLIC "${GIO_LIBRARY_DIRS}")
 add_executable(dhlrc.bin main.c)
 
 target_link_libraries(dhlrc.bin PUBLIC dhlrc gmodule-2.0)
+
+set_target_properties(dhlrc.bin PROPERTIES INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib64")
+
+install(TARGETS dhlrc dhlrc_recipe_full
+    BUNDLE DESTINATION .
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+)
+
+install(TARGETS dhlrc.bin
+    BUNDLE DESTINATION .
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+)
 
 add_subdirectory(qt)
 add_subdirectory(gtk)

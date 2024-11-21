@@ -4,8 +4,13 @@
 
 extern int
 start_point (int    argc,
-      char **argv)
+      char **argv, const char* prpath)
 {
+#ifdef G_OS_WIN32
+        char* dir = g_strconcat(prpath, "..\\lib\\gtk", NULL);
+        AddDllDirectory(dir);
+        g_free(dir);
+#endif
   GtkApplication *app;
   int status;
 

@@ -9,10 +9,11 @@
 ## 依赖
 
 - [libnbt](https://github.com/djytw/libnbt)（已在本项目中的submodule中）
-- `zlib`或`libdeflate`（参阅`libnbt`的README.md）
+- `zlib`
 - [cJSON](https://github.com/DaveGamble/cJSON) `>= 1.7.13`（~正好用上了两个这版本增加的函数~）
 - `gettext` （其是`glibc`的一部分所以你大概不需要在GNU/Linux中进行额外安装，但是在其他系统可能需要）（可选——如果你需要翻译）
-- `glib`
+- `glib2`
+- `minizip-ng`
 - [dhutil](https://github.com/DreamHelium/dhutil)
 
 ## 编译

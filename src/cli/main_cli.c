@@ -6,8 +6,9 @@
 #include "dh_nc_rl.h"
 
 extern int
-start_point (int argc, char **argv)
+start_point (int argc, char **argv, const char* prpath)
 {
+    /* Hmm, the should-loaded libs are all in lib/shared */
     initscr();
     printw(_("The functions are listed below:\n"));
     printw("[0] %s\n", _("Manage NBT"));

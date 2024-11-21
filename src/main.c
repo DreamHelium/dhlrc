@@ -20,7 +20,6 @@
 #include <glib.h>
 /*#include "dhlrc_config.h"*/
 #include "config.h"
-#include "dh_nc_rl.h"
 #include "dh_string_util.h"
 #include "glibconfig.h"
 #include "gmodule.h"
@@ -42,7 +41,7 @@ static guint mode_num = 0;
 
 static gchar* get_filename();
 
-typedef int (*DhlrcMainFunc)(int argc, char** argv);
+typedef int (*DhlrcMainFunc)(int argc, char** argv, const char*);
 typedef const char* (*DhlrcGetModuleName)();
 typedef DhStrArray* (*DhlrcGetModuleNameArray)();
 typedef const char* (*DhlrcGetModuleDescription)();
@@ -73,15 +72,22 @@ static void modules_free(DhlrcModule* modules, int len)
     g_free(modules);
 }
 
-static DhlrcModule* get_module(int* module_num)
+static DhlrcModule* get_module(int* module_num, char* arg_zero)
 {
     int real_module_num = 0;
-    GList* module_files = dh_file_list_create("module");
+
+    char* prpath = dh_file_get_current_program_dir(arg_zero);
+    /* All platforms the module will be in bin directory, sorry */
+    char* module_path = g_strconcat(prpath, G_DIR_SEPARATOR_S, "module", NULL);
+
+    g_free(prpath);
+
+    GList* module_files = dh_file_list_create(module_path);
     DhlrcModule* ret = NULL;
     gboolean succeed = TRUE;
     for(int i = 0 ; i < g_list_length(module_files) ; i++)
     {
-        char* dir = g_strconcat("module", G_DIR_SEPARATOR_S, g_list_nth_data(module_files, i), NULL);
+        char* dir = g_strconcat(module_path, G_DIR_SEPARATOR_S, g_list_nth_data(module_files, i), NULL);
         GModule* module = g_module_open(dir, G_MODULE_BIND_MASK);
         g_free(dir);
 
@@ -112,6 +118,7 @@ static DhlrcModule* get_module(int* module_num)
         succeed = TRUE; /* Reset succeed. */
     }
     *module_num = real_module_num;
+    g_free(module_path);
     g_list_free_full(module_files, free);
     return ret;
 }
@@ -129,11 +136,6 @@ static void app_shutdown(GApplication* self, gpointer user_data)
     il_info_list_free();
     nbt_info_list_free();
     region_info_list_free();
-}
-
-static int start_point()
-{
-    
 }
 
 static gboolean file_open(GFile* file, gboolean single)
@@ -223,7 +225,7 @@ static gint run_app (GApplication* self, GApplicationCommandLine* command_line, 
     // debug(argc, argv);
     int len = 0;
     int module_pos = 0;
-    DhlrcModule* modules = get_module(&len);
+    DhlrcModule* modules = get_module(&len, argv[0]);
     int ret = 0;
 
     if((argc >= 2 && g_str_equal(argv[1], "--help")) || argc == 1)
@@ -262,7 +264,9 @@ static gint run_app (GApplication* self, GApplicationCommandLine* command_line, 
     }
     else if(argc >= 2 && get_module_pos(modules, len, &module_pos, argv[1]))
     {
-        ret = modules[module_pos].start_point(argc - 1 , argv + 1);
+        char* prpath = dh_file_get_current_program_dir(argv[0]);
+        ret = modules[module_pos].start_point(argc - 1 , argv + 1, prpath);
+        g_free(prpath);
     }
     else printf("Not supported!\n");
 
@@ -298,17 +302,12 @@ static void app_open(GApplication* self, gpointer files, gint n_files, gchar* hi
             g_critical("%s", arr->val[i]);
     }
     dh_str_array_free(arr);
-    start_point();
-}
-
-static void activate(GApplication* self, gpointer user_data)
-{
-    start_point();
 }
 
 int main(int argc, char** argb)
 {
-    translation_init();
+    /* There's not a good idea to load the library but we will try */
+    translation_init(argb[0]);
     GApplication* app = g_application_new("cn.dh.dhlrc.cli", G_APPLICATION_HANDLES_COMMAND_LINE);
     g_signal_connect(app, "startup", G_CALLBACK(startup), NULL);
     g_signal_connect(app, "shutdown", G_CALLBACK(app_shutdown), NULL);

@@ -16,7 +16,8 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>. */
 
 #include "uncompress.h"
-#include "mz.h"
+#include <mz.h>
+#include <time.h>
 #include "mz_os.h"
 #include "mz_strm.h"
 #include "mz_strm_buf.h"
@@ -33,7 +34,12 @@ int dhlrc_extract(const char* path, const char* dest)
     int err = MZ_OK;
     int err_close = MZ_OK;
 
+#ifdef DHLRC_MZ_VERSION_LESS_THAN_FOUR
+    reader = mz_zip_reader_create(NULL);
+#else
     reader = mz_zip_reader_create();
+#endif
+
     if(!reader)
         return MZ_MEM_ERROR;
 

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-15 03:10+0800\n"
+"POT-Creation-Date: 2024-11-22 01:48+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,71 +17,42 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: src/main.c:135
-msgid "The functions are listed below:\n"
-msgstr ""
-
-#: src/main.c:136 src/main.c:144 src/qt/manage.cpp:75
-msgid "Manage NBT"
-msgstr ""
-
-#: src/main.c:137 src/main.c:145 src/qt/manage.cpp:325
-msgid "Manage Region"
-msgstr ""
-
-#: src/main.c:138 src/main.c:146
-msgid "Manage item list"
-msgstr ""
-
-#: src/main.c:139 src/main.c:147 src/qt/configui.cpp:16
-msgid "Config settings"
-msgstr ""
-
-#: src/main.c:148 src/main_isoc.c:135 src/nbt_litereader.c:78
-#: src/nbt_litereader.c:311 src/recipe_util.c:45
-msgid "Quit application"
-msgstr ""
-
-#: src/main.c:150
-msgid "Debug"
-msgstr ""
-
-#: src/main.c:185 src/main.c:215 src/main_isoc.c:108
+#: src/main.c:146 src/main.c:176 src/main_isoc.c:108
 msgid "Not a valid NBT file!"
 msgstr ""
 
-#: src/main.c:194
+#: src/main.c:155
 msgid "Enter desciption for the NBT file."
 msgstr ""
 
-#: src/main.c:274
+#: src/main.c:235
 #, c-format
 msgid "dhlrc - Program to handle litematic or other struct of Minecraft.\n"
 msgstr ""
 
-#: src/main.c:276
+#: src/main.c:237
 #, c-format
 msgid "Modules:\n"
 msgstr ""
 
-#: src/main.c:287
+#: src/main.c:259
 #, c-format
 msgid "Unrecognized options "
 msgstr ""
 
-#: src/main.c:326
+#: src/main.c:300
 msgid "The following files couldn't be added:\n"
 msgstr ""
 
-#: src/main.c:346
+#: src/main.c:315
 msgid "[FILE] - Read a litematic file."
 msgstr ""
 
-#: src/main.c:380
+#: src/main.c:349
 msgid "directory"
 msgstr ""
 
-#: src/main.c:381
+#: src/main.c:350
 msgid "file"
 msgstr ""
 
@@ -101,6 +72,11 @@ msgid ""
 "[1] Litematica material list with recipe combination\n"
 "[2] Litematica block reader\n"
 "\n"
+msgstr ""
+
+#: src/main_isoc.c:135 src/nbt_litereader.c:78 src/nbt_litereader.c:311
+#: src/recipe_util.c:45
+msgid "Quit application"
 msgstr ""
 
 #: src/main_isoc.c:140
@@ -214,6 +190,10 @@ msgid "Combined %d items to the new item list."
 msgstr ""
 
 #: src/qt/configui.cpp:16
+msgid "Config settings"
+msgstr ""
+
+#: src/qt/configui.cpp:16
 msgid "Override Language"
 msgstr ""
 
@@ -235,6 +215,18 @@ msgstr ""
 
 #: src/qt/configui.cpp:17
 msgid "Override Version"
+msgstr ""
+
+#: src/qt/configui.cpp:17
+msgid "Show Wizard On Start"
+msgstr ""
+
+#: src/qt/configui.cpp:19
+msgid "true"
+msgstr ""
+
+#: src/qt/configui.cpp:19
+msgid "false"
 msgstr ""
 
 #: src/qt/mainwindow.cpp:43
@@ -528,6 +520,10 @@ msgstr ""
 msgid "Others"
 msgstr ""
 
+#: src/qt/manage.cpp:75
+msgid "Manage NBT"
+msgstr ""
+
 #: src/qt/manage.cpp:99
 msgid "Select a file"
 msgstr ""
@@ -576,6 +572,10 @@ msgstr ""
 
 #: src/qt/manage.cpp:236
 msgid "The following infos are locked:\n"
+msgstr ""
+
+#: src/qt/manage.cpp:325
+msgid "Manage Region"
 msgstr ""
 
 #: src/qt/manage.cpp:470

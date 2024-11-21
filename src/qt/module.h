@@ -8,7 +8,7 @@ extern "C"
     extern DhStrArray* module_name_array();
     extern const char* module_description();
     extern const char* help_description();
-    extern int start_point(int argc, char** argv);
+    extern int start_point(int argc, char** argv, const char* prpath);
 }
 
 #endif /* MODULE_H */
