@@ -28,6 +28,7 @@ set(PROJECT_SOURCES
         showtrackui.cpp
         showtrackui.h
         configui.h configui.cpp configui.ui
+        wizardui.h wizardui.cpp wizardui.ui
         nbtselectui.h nbtselectui.cpp
         regionchooseui.h regionchooseui.cpp
         blocklistui.cpp blocklistui.h blocklistui.ui

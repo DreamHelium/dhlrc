@@ -34,6 +34,7 @@
 #include "../region.h"
 #include "../region_info.h"
 #include "utility.h"
+#include "wizardui.h"
 
 static bool nbtRead = false;
 int verbose_level;
@@ -70,6 +71,9 @@ MainWindow::MainWindow(QWidget *parent)
     mw = this;
     // pd.hide();
     initSignalSlots();
+    WizardUI* wui = new WizardUI();
+    wui->setAttribute(Qt::WA_DeleteOnClose);
+    wui->exec();
 }
 
 MainWindow::~MainWindow()

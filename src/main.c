@@ -228,9 +228,9 @@ static gint run_app (GApplication* self, GApplicationCommandLine* command_line, 
     DhlrcModule* modules = get_module(&len, argv[0]);
     int ret = 0;
 
-    if((argc >= 2 && g_str_equal(argv[1], "--help")) || argc == 1)
+    if((argc >= 2 && g_str_equal(argv[1], "--help")))
     {
-        if(argc == 2 || argc == 1)
+        if(argc == 2)
         {
             printf(_("dhlrc - Program to handle litematic or other struct of Minecraft.\n"));
             printf("\n");
@@ -261,6 +261,35 @@ static gint run_app (GApplication* self, GApplicationCommandLine* command_line, 
                 printf("\"%s\"", argv[i]);
             printf(".\n");
         }
+    }
+    else if(argc == 1)
+    {
+#if defined G_OS_WIN32 || defined __APPLE__
+        if(get_module_pos(modules, len, &module_pos, "qt"))
+        {
+            char* prpath = dh_file_get_current_program_dir(argv[0]);
+            ret = modules[module_pos].start_point(argc, argv, prpath);
+            g_free(prpath);
+        }
+        else printf("Failed to load qt module!\n");
+#else
+        if(g_getenv("XDG_SESSION_DESKTOP"))
+        {
+            if(get_module_pos(modules, len, &module_pos, "qt"))
+            {
+                char* prpath = dh_file_get_current_program_dir(argv[0]);
+                ret = modules[module_pos].start_point(argc, argv, prpath);
+                g_free(prpath);
+            }
+            else printf("Failed to load qt module!\n");
+        }
+        else if (get_module_pos(modules, len, &module_pos, "cli")) 
+        {
+            char* prpath = dh_file_get_current_program_dir(argv[0]);
+            ret = modules[module_pos].start_point(argc , argv, prpath);
+            g_free(prpath);
+        }
+#endif
     }
     else if(argc >= 2 && get_module_pos(modules, len, &module_pos, argv[1]))
     {
