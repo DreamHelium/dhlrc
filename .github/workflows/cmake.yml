@@ -24,7 +24,7 @@ jobs:
 
     - name: Install dependency
       run: |
-        sudo apt install gettext libminizip-ng-dev libreadline-dev libgtk-4-dev
+        sudo apt install gettext libreadline-dev libgtk-4-dev
 
     - name: Install minizip-ng from source
       run: |
@@ -34,7 +34,7 @@ jobs:
         cmake --build build
         sudo cmake --install build
         cd ..
-        
+
     - name: Install cJSON from source
       run: |
         git clone https://github.com/DaveGamble/cJSON
