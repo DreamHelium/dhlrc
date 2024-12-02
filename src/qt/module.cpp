@@ -10,10 +10,11 @@ extern "C"
     {
     public:
         QString translate(const char *context, const char *sourceText,
-                        const char *disambiguation = nullptr,
+                        const char *disambiguation,
                         int n = -1) const
         {
-            return gettext(sourceText);
+            QString trStr = QString("%1%2").arg(context).arg("|");
+            return g_dpgettext2("dhlrc", trStr.toUtf8(), sourceText);
         }
 
     };

@@ -8,15 +8,8 @@
 #include <qobject.h>
 #include <qpushbutton.h>
 #include "../json_util.h"
-#include "../translation.h"
 
 static cJSON* configFile = nullptr;
-
-static QString content[] = 
-{N_("Config settings"), N_("Override Language"), N_("Recipe Directory"), N_("Translation File"),
-N_("Game Directory"), N_("Cache Directory"), N_("Override Version"), N_("Show Wizard On Start")};
-
-static const char* selection[] = {N_("true"), N_("false")};
 
 static QString configFilePath;
 

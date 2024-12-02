@@ -33,6 +33,14 @@
 #include <dhutil.h>
 #include <ncursesw/ncurses.h>
 
+#ifdef G_OS_WIN32
+#define LINK_PATH "PATH"
+#define MIDD_SEP ";"
+#else
+#define LINK_PATH "LD_LIBRARY_PATH"
+#define MIDD_SEP ":"
+#endif
+
 static gboolean reader_mode = FALSE;
 static gboolean block_mode = FALSE;
 static gboolean list_mode = FALSE;
@@ -123,6 +131,8 @@ static DhlrcModule* get_module(int* module_num, char* arg_zero)
     return ret;
 }
 
+
+
 static void startup(GApplication* self, gpointer user_data)
 {
     dhlrc_make_config();
@@ -208,6 +218,28 @@ static gboolean get_module_pos(DhlrcModule* modules, int len, int* pos, const ch
     return FALSE;
 }
 
+static int load_module(DhlrcModule* modules, int len, const char* module_name, const char* prog_name, int argc, char** argv, gboolean* success)
+{
+    int module_pos = 0;
+    int ret = 0;
+    if(get_module_pos(modules, len, &module_pos, module_name))
+    {
+        if(success) *success = TRUE;
+        char* prpath = dh_file_get_current_program_dir(prog_name);
+        const char* ld_path = g_getenv(LINK_PATH);
+        /* prpath/../lib/module */
+        char* add_ld_path = g_strconcat(prpath, G_DIR_SEPARATOR_S, "..", G_DIR_SEPARATOR_S, "lib", G_DIR_SEPARATOR_S, module_name,NULL);
+        char* new_ld_path = g_strconcat(ld_path ? ld_path : "", MIDD_SEP, add_ld_path ,NULL);
+        g_setenv(LINK_PATH, new_ld_path, TRUE);
+        g_free(add_ld_path);
+        g_free(new_ld_path);
+        ret = modules[module_pos].start_point(argc, argv, prpath);
+        g_free(prpath);
+    }
+    else if(success) *success = FALSE;
+    return ret;
+}
+
 static gint run_app (GApplication* self, GApplicationCommandLine* command_line, gpointer user_data)
 {
     if(!g_module_supported())
@@ -264,38 +296,28 @@ static gint run_app (GApplication* self, GApplicationCommandLine* command_line, 
     }
     else if(argc == 1)
     {
+        gboolean success = TRUE;
 #if defined G_OS_WIN32 || defined __APPLE__
-        if(get_module_pos(modules, len, &module_pos, "qt"))
-        {
-            char* prpath = dh_file_get_current_program_dir(argv[0]);
-            ret = modules[module_pos].start_point(argc, argv, prpath);
-            g_free(prpath);
-        }
-        else printf("Failed to load qt module!\n");
+        load_module(modules, len, "qt", argv[0], argc, argv, &success);
+        if(!success) printf("Failed to load qt module!\n");
 #else
         if(g_getenv("XDG_SESSION_DESKTOP"))
         {
-            if(get_module_pos(modules, len, &module_pos, "qt"))
-            {
-                char* prpath = dh_file_get_current_program_dir(argv[0]);
-                ret = modules[module_pos].start_point(argc, argv, prpath);
-                g_free(prpath);
-            }
-            else printf("Failed to load qt module!\n");
+            load_module(modules, len, "qt", argv[0], argc, argv, &success);
+            if(!success) printf("Failed to load qt module!\n");
         }
-        else if (get_module_pos(modules, len, &module_pos, "cli")) 
+        else 
         {
-            char* prpath = dh_file_get_current_program_dir(argv[0]);
-            ret = modules[module_pos].start_point(argc , argv, prpath);
-            g_free(prpath);
+            load_module(modules, len, "cli", argv[0], argc, argv, &success);
+            if(!success) printf("Failed to load cli module!\n");
         }
 #endif
     }
     else if(argc >= 2 && get_module_pos(modules, len, &module_pos, argv[1]))
     {
-        char* prpath = dh_file_get_current_program_dir(argv[0]);
-        ret = modules[module_pos].start_point(argc - 1 , argv + 1, prpath);
-        g_free(prpath);
+        gboolean success = TRUE;
+        load_module(modules, len, argv[1], argv[0], argc - 1, argv + 1, &success);
+        if(!success) printf("Failed to load module!\n");
     }
     else printf("Not supported!\n");
 

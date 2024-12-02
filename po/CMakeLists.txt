@@ -2,27 +2,31 @@ set( FIRST_POT_NAME "dhlrc" )
 
 set( FIRST_POT_FILE ${CMAKE_CURRENT_SOURCE_DIR}/${FIRST_POT_NAME}/${FIRST_POT_NAME}.pot )
 
-find_program(XGETTEXT_EXECUTABLE xgettext)
+# find_program(XGETTEXT_EXECUTABLE xgettext)
 
-# You could just do it by yourself
-#find_program(MSGINIT_EXECUTABLE msginit)
+# # You could just do it by yourself
+# #find_program(MSGINIT_EXECUTABLE msginit)
 
-set( _abs_DHLRC_MAIN_POT_FILE_DEPENDS )
-foreach(_currentDepends ${DHLRC_MAIN_POT_FILE_DEPENDS})
-    set(_abs_DHLRC_MAIN_POT_FILE_DEPENDS ${_abs_DHLRC_MAIN_POT_FILE_DEPENDS} ${dhlrc_SOURCE_DIR}/${_currentDepends})
-endforeach()
+# set( _abs_DHLRC_MAIN_POT_FILE_DEPENDS )
+# foreach(_currentDepends ${DHLRC_MAIN_POT_FILE_DEPENDS})
+#     set(_abs_DHLRC_MAIN_POT_FILE_DEPENDS ${_abs_DHLRC_MAIN_POT_FILE_DEPENDS} ${dhlrc_SOURCE_DIR}/${_currentDepends})
+# endforeach()
 
-if(XGETTEXT_EXECUTABLE)
-	set( XGETTEXT_FIRST_OPTIONS -k_ -kN_ --default-domain=${FIRST_POT_NAME} --package-name=${FIRST_POT_NAME} )
-        add_custom_target( dhlrc_mkpot ALL
-            COMMAND "${XGETTEXT_EXECUTABLE}" ${XGETTEXT_FIRST_OPTIONS} --output=${FIRST_POT_FILE} ${DHLRC_MAIN_POT_FILE_DEPENDS}
-            WORKING_DIRECTORY ${dhlrc_SOURCE_DIR}
-            DEPENDS ${_abs_DHLRC_MAIN_POT_FILE_DEPENDS}
-            COMMENT "Extract first translatable messages to ${FIRST_POT_FILE}"
-        )
-endif()
+# if(XGETTEXT_EXECUTABLE)
+# 	set( XGETTEXT_FIRST_OPTIONS -k_ -kN_ --default-domain=${FIRST_POT_NAME} --package-name=${FIRST_POT_NAME} )
+#         add_custom_target( dhlrc_mkpot ALL
+#             COMMAND "${XGETTEXT_EXECUTABLE}" ${XGETTEXT_FIRST_OPTIONS} --output=${FIRST_POT_FILE} ${DHLRC_MAIN_POT_FILE_DEPENDS}
+#             WORKING_DIRECTORY ${dhlrc_SOURCE_DIR}
+#             DEPENDS ${_abs_DHLRC_MAIN_POT_FILE_DEPENDS}
+#             COMMENT "Extract first translatable messages to ${FIRST_POT_FILE}"
+#         )
+# endif()
 
-message(STATUS ${CMAKE_CURRENT_SOURCE_DIR}/${FIRST_POT_NAME})
+# message(STATUS ${CMAKE_CURRENT_SOURCE_DIR}/${FIRST_POT_NAME})
+
+add_custom_target(dhlrc_mkpot ALL
+COMMAND cd ${CMAKE_SOURCE_DIR} && ${CMAKE_SOURCE_DIR}/make_po.sh
+)
 
 set(FIRST_PO_POS ${CMAKE_CURRENT_SOURCE_DIR}/${FIRST_POT_NAME})
 

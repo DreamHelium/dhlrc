@@ -1,0 +1,441 @@
+msgid ""
+msgstr ""
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Qt-Contexts: true\n"
+
+#: ../../src/qt/blocklistui.ui:14
+msgctxt "BlockListUI|"
+msgid "Show Block Lists"
+msgstr ""
+
+#: ../../src/qt/blocklistui.ui:24
+msgctxt "BlockListUI|"
+msgid "The blocks are listed below:"
+msgstr ""
+
+#: ../../src/qt/blocklistui.ui:31
+msgctxt "BlockListUI|"
+msgid "Search block name"
+msgstr ""
+
+#: ../../src/qt/blocklistui.ui:57
+msgctxt "BlockListUI|"
+msgid "id"
+msgstr ""
+
+#: ../../src/qt/blocklistui.ui:62
+msgctxt "BlockListUI|"
+msgid "id Name"
+msgstr ""
+
+#: ../../src/qt/blocklistui.ui:67
+msgctxt "BlockListUI|"
+msgid "Block Name"
+msgstr ""
+
+#: ../../src/qt/blocklistui.ui:72
+msgctxt "BlockListUI|"
+msgid "x"
+msgstr ""
+
+#: ../../src/qt/blocklistui.ui:77
+msgctxt "BlockListUI|"
+msgid "y"
+msgstr ""
+
+#: ../../src/qt/blocklistui.ui:82
+msgctxt "BlockListUI|"
+msgid "z"
+msgstr ""
+
+#: ../../src/qt/blocklistui.ui:87
+msgctxt "BlockListUI|"
+msgid "Palette"
+msgstr ""
+
+#: ../../src/qt/blocklistui.ui:116
+msgctxt "BlockListUI|"
+msgid "&Close"
+msgstr ""
+
+#: ../../src/qt/blockreaderui.ui:14
+msgctxt "BlockReaderUI|"
+msgid "Form"
+msgstr ""
+
+#: ../../src/qt/blockreaderui.ui:26
+msgctxt "BlockReaderUI|"
+msgid "The sizes of the region is:"
+msgstr ""
+
+#: ../../src/qt/blockreaderui.ui:40
+msgctxt "BlockReaderUI|"
+msgid "Please enter the coordination of the block:"
+msgstr ""
+
+#: ../../src/qt/blockreaderui.ui:53
+msgctxt "BlockReaderUI|"
+msgid "x"
+msgstr ""
+
+#: ../../src/qt/blockreaderui.ui:67
+msgctxt "BlockReaderUI|"
+msgid "y"
+msgstr ""
+
+#: ../../src/qt/blockreaderui.ui:81
+msgctxt "BlockReaderUI|"
+msgid "z"
+msgstr ""
+
+#: ../../src/qt/blockreaderui.ui:95
+msgctxt "BlockReaderUI|"
+msgid "The information is:"
+msgstr ""
+
+#: ../../src/qt/blockreaderui.ui:126
+msgctxt "BlockReaderUI|"
+msgid "&List blocks"
+msgstr ""
+
+#: ../../src/qt/blockreaderui.ui:133
+msgctxt "BlockReaderUI|"
+msgid "&Close"
+msgstr ""
+
+#: ../../src/qt/configui.ui:14
+msgctxt "ConfigUI|"
+msgid "Config settings"
+msgstr ""
+
+#: ../../src/qt/configui.ui:29
+msgctxt "ConfigUI|"
+msgid "Cache Directory"
+msgstr ""
+
+#: ../../src/qt/configui.ui:39 ../../src/qt/configui.ui:60
+#: ../../src/qt/configui.ui:81 ../../src/qt/configui.ui:102
+#: ../../src/qt/configui.ui:123 ../../src/qt/configui.ui:144
+#: ../../src/qt/configui.ui:176
+msgctxt "ConfigUI|"
+msgid "Reset"
+msgstr ""
+
+#: ../../src/qt/configui.ui:50
+msgctxt "ConfigUI|"
+msgid "Override Language"
+msgstr ""
+
+#: ../../src/qt/configui.ui:71
+msgctxt "ConfigUI|"
+msgid "Recipe Directory"
+msgstr ""
+
+#: ../../src/qt/configui.ui:92
+msgctxt "ConfigUI|"
+msgid "Translation File"
+msgstr ""
+
+#: ../../src/qt/configui.ui:113
+msgctxt "ConfigUI|"
+msgid "Game Directory"
+msgstr ""
+
+#: ../../src/qt/configui.ui:134
+msgctxt "ConfigUI|"
+msgid "Override Version"
+msgstr ""
+
+#: ../../src/qt/configui.ui:155
+msgctxt "ConfigUI|"
+msgid "Show Wizard On Start"
+msgstr ""
+
+#: ../../src/qt/configui.ui:163
+msgctxt "ConfigUI|"
+msgid "true"
+msgstr ""
+
+#: ../../src/qt/configui.ui:168
+msgctxt "ConfigUI|"
+msgid "false"
+msgstr ""
+
+#: ../../src/qt/mainwindow.ui:14
+msgctxt "MainWindow|"
+msgid "Litematica reader"
+msgstr ""
+
+#: ../../src/qt/mainwindow.ui:25
+msgctxt "MainWindow|"
+msgid "&NBT"
+msgstr ""
+
+#: ../../src/qt/mainwindow.ui:33
+msgctxt "MainWindow|"
+msgid "Let's load a NBT file here!"
+msgstr ""
+
+#: ../../src/qt/mainwindow.ui:40
+msgctxt "MainWindow|"
+msgid "&Manage NBT"
+msgstr ""
+
+#: ../../src/qt/mainwindow.ui:47
+msgctxt "MainWindow|"
+msgid "You can do things below for the NBT file."
+msgstr ""
+
+#: ../../src/qt/mainwindow.ui:54
+msgctxt "MainWindow|"
+msgid "N&BT Reader"
+msgstr ""
+
+#: ../../src/qt/mainwindow.ui:64
+msgctxt "MainWindow|"
+msgid "&Region"
+msgstr ""
+
+#: ../../src/qt/mainwindow.ui:72
+msgctxt "MainWindow|"
+msgid "First, you need to create a Region struct."
+msgstr ""
+
+#: ../../src/qt/mainwindow.ui:79
+msgctxt "MainWindow|"
+msgid "&Create Region from NBT"
+msgstr ""
+
+#: ../../src/qt/mainwindow.ui:86
+msgctxt "MainWindow|"
+msgid "Second, you can do lots of things with the Region."
+msgstr ""
+
+#: ../../src/qt/mainwindow.ui:93
+msgctxt "MainWindow|"
+msgid "&Manage Region"
+msgstr ""
+
+#: ../../src/qt/mainwindow.ui:100
+msgctxt "MainWindow|"
+msgid "&Generate item list"
+msgstr ""
+
+#: ../../src/qt/mainwindow.ui:107
+msgctxt "MainWindow|"
+msgid "&Block reader"
+msgstr ""
+
+#: ../../src/qt/mainwindow.ui:117
+msgctxt "MainWindow|"
+msgid "&Item List"
+msgstr ""
+
+#: ../../src/qt/mainwindow.ui:125
+msgctxt "MainWindow|"
+msgid "I&tem list reader and modifier"
+msgstr ""
+
+#: ../../src/qt/mainwindow.ui:132
+msgctxt "MainWindow|"
+msgid "R&ecipe combiner"
+msgstr ""
+
+#: ../../src/qt/mainwindow.ui:142
+msgctxt "MainWindow|"
+msgid "Utility"
+msgstr ""
+
+#: ../../src/qt/mainwindow.ui:148
+msgctxt "MainWindow|"
+msgid "&Config Setting"
+msgstr ""
+
+#: ../../src/qt/manageui.ui:14
+msgctxt "ManageUI|"
+msgid "Form"
+msgstr ""
+
+#: ../../src/qt/manageui.ui:37
+msgctxt "ManageUI|"
+msgid "&Add"
+msgstr ""
+
+#: ../../src/qt/manageui.ui:47
+msgctxt "ManageUI|"
+msgid "&Remove"
+msgstr ""
+
+#: ../../src/qt/manageui.ui:57
+msgctxt "ManageUI|"
+msgid "R&efresh"
+msgstr ""
+
+#: ../../src/qt/manageui.ui:67
+msgctxt "ManageUI|"
+msgid "&Save"
+msgstr ""
+
+#: ../../src/qt/manageui.ui:113
+msgctxt "ManageUI|"
+msgid "&OK"
+msgstr ""
+
+#: ../../src/qt/manageui.ui:123
+msgctxt "ManageUI|"
+msgid "&Close"
+msgstr ""
+
+#: ../../src/qt/nbtreaderui.ui:14
+msgctxt "NbtReaderUI|"
+msgid "NBT Reader"
+msgstr ""
+
+#: ../../src/qt/nbtreaderui.ui:22
+msgctxt "NbtReaderUI|"
+msgid "Search NBT label"
+msgstr ""
+
+#: ../../src/qt/nbtreaderui.ui:40
+msgctxt "NbtReaderUI|"
+msgid "Type:"
+msgstr ""
+
+#: ../../src/qt/nbtreaderui.ui:58
+msgctxt "NbtReaderUI|"
+msgid "Key:"
+msgstr ""
+
+#: ../../src/qt/nbtreaderui.ui:76
+msgctxt "NbtReaderUI|"
+msgid "Value:"
+msgstr ""
+
+#: ../../src/qt/nbtreaderui.ui:109
+msgctxt "NbtReaderUI|"
+msgid "Modify"
+msgstr ""
+
+#: ../../src/qt/nbtreaderui.ui:116
+msgctxt "NbtReaderUI|"
+msgid "Close"
+msgstr ""
+
+#: ../../src/qt/wizardui.ui:14
+msgctxt "WizardUI|"
+msgid "Wizard"
+msgstr ""
+
+#: ../../src/qt/wizardui.ui:23
+msgctxt "WizardUI|"
+msgid "Welcome to the guide!"
+msgstr ""
+
+#: ../../src/qt/wizardui.ui:30
+msgctxt "WizardUI|"
+msgid "We will help you configure the options."
+msgstr ""
+
+#: ../../src/qt/wizardui.ui:37
+msgctxt "WizardUI|"
+msgid "If you don't want to show the wizard, click \"Never show again.\""
+msgstr ""
+
+#: ../../src/qt/wizardui.ui:44
+msgctxt "WizardUI|"
+msgid "Never show the wizard again."
+msgstr ""
+
+#: ../../src/qt/wizardui.ui:59
+msgctxt "WizardUI|"
+msgid "First, let's configure the game directory."
+msgstr ""
+
+#: ../../src/qt/wizardui.ui:66
+msgctxt "WizardUI|"
+msgid ""
+"If you are using the default directory, just keep the default option or "
+"press \"Reset\" if it's not the right position."
+msgstr ""
+
+#: ../../src/qt/wizardui.ui:83
+msgctxt "WizardUI|"
+msgid "I want to &configure the game directory."
+msgstr ""
+
+#: ../../src/qt/wizardui.ui:95
+msgctxt "WizardUI|"
+msgid "Game directory:"
+msgstr ""
+
+#: ../../src/qt/wizardui.ui:117 ../../src/qt/wizardui.ui:184
+msgctxt "WizardUI|"
+msgid "&Reset"
+msgstr ""
+
+#: ../../src/qt/wizardui.ui:128
+msgctxt "WizardUI|"
+msgid "&I do not want to set the game directory"
+msgstr ""
+
+#: ../../src/qt/wizardui.ui:141
+msgctxt "WizardUI|"
+msgid "Let's add NBT file(s)!"
+msgstr ""
+
+#: ../../src/qt/wizardui.ui:150
+msgctxt "WizardUI|"
+msgid "I want to &add the NBT file(s)."
+msgstr ""
+
+#: ../../src/qt/wizardui.ui:162
+msgctxt "WizardUI|"
+msgid "NBT file(s):"
+msgstr ""
+
+#: ../../src/qt/wizardui.ui:195
+msgctxt "WizardUI|"
+msgid "&I do not want to add the NBT file."
+msgstr ""
+
+#: ../../src/qt/wizardui.ui:208
+msgctxt "WizardUI|"
+msgid "Let's load a region."
+msgstr ""
+
+#: ../../src/qt/wizardui.ui:217
+msgctxt "WizardUI|"
+msgid "&Add region from the NBT"
+msgstr ""
+
+#: ../../src/qt/wizardui.ui:224
+msgctxt "WizardUI|"
+msgid "&Select the region"
+msgstr ""
+
+#: ../../src/qt/wizardui.ui:233
+msgctxt "WizardUI|"
+msgid "The region base info are listed below:"
+msgstr ""
+
+#: ../../src/qt/wizardui.ui:244
+msgctxt "WizardUI|"
+msgid "Name:"
+msgstr ""
+
+#: ../../src/qt/wizardui.ui:262
+msgctxt "WizardUI|"
+msgid "UUID:"
+msgstr ""
+
+#: ../../src/qt/wizardui.ui:280
+msgctxt "WizardUI|"
+msgid "Time:"
+msgstr ""
+
+#: ../../src/qt/wizardui.ui:298
+msgctxt "WizardUI|"
+msgid "Data Version:"
+msgstr ""

@@ -12,6 +12,9 @@ src/*.user*
 
 build/
 
+# temp file
+temp/
+
 # kdevelop-generated files
 
 .kdev4/

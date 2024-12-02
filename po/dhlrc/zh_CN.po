@@ -4,57 +4,563 @@
 # This file is distributed under the same license as the dhlrc package.
 #
 # 孟小氦 <dream_he@localhost.localdomain>, 2022, 2023.
+# SPDX-FileCopyrightText: 2024 dream _he
 msgid ""
 msgstr ""
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-22 01:21+0800\n"
-"PO-Revision-Date: 2024-10-16 23:52+0800\n"
-"Last-Translator: dream_he\n"
+"POT-Creation-Date: 2024-12-02 03:02+0800\n"
+"PO-Revision-Date: 2024-11-30 07:00+0800\n"
+"Last-Translator: dream_he <48383878+DreamHelium@users.noreply.github.com>\n"
 "Language-Team: Chinese <kde-i18n-doc@kde.org>\n"
 "Language: zh_CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Lokalize 24.08.1\n"
+"X-Generator: Lokalize 24.08.3\n"
+"X-Language: zh_CN\n"
+"X-Source-Language: _CN\n"
 
-#: src/main.c:146 src/main.c:176 src/main_isoc.c:108
+#: ../../src/qt/blocklistui.ui:14
+msgctxt "BlockListUI|"
+msgid "Show Block Lists"
+msgstr "展示方块列表"
+
+#: ../../src/qt/blocklistui.ui:24
+msgctxt "BlockListUI|"
+msgid "The blocks are listed below:"
+msgstr "方块在下列出："
+
+#: ../../src/qt/blocklistui.ui:31
+msgctxt "BlockListUI|"
+msgid "Search block name"
+msgstr "搜索方块名称"
+
+#: ../../src/qt/blocklistui.ui:57
+msgctxt "BlockListUI|"
+msgid "id"
+msgstr "索引"
+
+#: ../../src/qt/blocklistui.ui:62
+msgctxt "BlockListUI|"
+msgid "id Name"
+msgstr "id名称"
+
+#: ../../src/qt/blocklistui.ui:67
+msgctxt "BlockListUI|"
+msgid "Block Name"
+msgstr "方块名称"
+
+#: ../../src/qt/blocklistui.ui:72
+msgctxt "BlockListUI|"
+msgid "x"
+msgstr "x"
+
+#: ../../src/qt/blocklistui.ui:77
+msgctxt "BlockListUI|"
+msgid "y"
+msgstr "y"
+
+#: ../../src/qt/blocklistui.ui:82
+msgctxt "BlockListUI|"
+msgid "z"
+msgstr "z"
+
+#: ../../src/qt/blocklistui.ui:87
+msgctxt "BlockListUI|"
+msgid "Palette"
+msgstr "选项板"
+
+#: ../../src/qt/blocklistui.ui:116
+msgctxt "BlockListUI|"
+msgid "&Close"
+msgstr "关闭(&C)"
+
+#: ../../src/qt/blockreaderui.ui:14
+msgctxt "BlockReaderUI|"
+msgid "Form"
+msgstr ""
+
+#: ../../src/qt/blockreaderui.ui:26
+msgctxt "BlockReaderUI|"
+msgid "The sizes of the region is:"
+msgstr "区域的大小为："
+
+#: ../../src/qt/blockreaderui.ui:40
+msgctxt "BlockReaderUI|"
+msgid "Please enter the coordination of the block:"
+msgstr "请输入方块的坐标："
+
+#: ../../src/qt/blockreaderui.ui:53
+msgctxt "BlockReaderUI|"
+msgid "x"
+msgstr "x"
+
+#: ../../src/qt/blockreaderui.ui:67
+msgctxt "BlockReaderUI|"
+msgid "y"
+msgstr "y"
+
+#: ../../src/qt/blockreaderui.ui:81
+msgctxt "BlockReaderUI|"
+msgid "z"
+msgstr "z"
+
+#: ../../src/qt/blockreaderui.ui:95
+msgctxt "BlockReaderUI|"
+msgid "The information is:"
+msgstr "方块信息为："
+
+#: ../../src/qt/blockreaderui.ui:126
+msgctxt "BlockReaderUI|"
+msgid "&List blocks"
+msgstr "列出方块（&L）"
+
+#: ../../src/qt/blockreaderui.ui:133
+msgctxt "BlockReaderUI|"
+msgid "&Close"
+msgstr "关闭(&C)"
+
+#: ../../src/qt/configui.ui:14
+msgctxt "ConfigUI|"
+msgid "Config settings"
+msgstr "配置设置"
+
+#: ../../src/qt/configui.ui:29
+msgctxt "ConfigUI|"
+msgid "Cache Directory"
+msgstr "缓存目录"
+
+#: ../../src/qt/configui.ui:39 ../../src/qt/configui.ui:60
+#: ../../src/qt/configui.ui:81 ../../src/qt/configui.ui:102
+#: ../../src/qt/configui.ui:123 ../../src/qt/configui.ui:144
+#: ../../src/qt/configui.ui:176
+msgctxt "ConfigUI|"
+msgid "Reset"
+msgstr ""
+
+#: ../../src/qt/configui.ui:50
+msgctxt "ConfigUI|"
+msgid "Override Language"
+msgstr ""
+
+#: ../../src/qt/configui.ui:71
+msgctxt "ConfigUI|"
+msgid "Recipe Directory"
+msgstr ""
+
+#: ../../src/qt/configui.ui:92
+msgctxt "ConfigUI|"
+msgid "Translation File"
+msgstr ""
+
+#: ../../src/qt/configui.ui:113
+msgctxt "ConfigUI|"
+msgid "Game Directory"
+msgstr ""
+
+#: ../../src/qt/configui.ui:134
+msgctxt "ConfigUI|"
+msgid "Override Version"
+msgstr ""
+
+#: ../../src/qt/configui.ui:155
+msgctxt "ConfigUI|"
+msgid "Show Wizard On Start"
+msgstr ""
+
+#: ../../src/qt/configui.ui:163
+msgctxt "ConfigUI|"
+msgid "true"
+msgstr "是"
+
+#: ../../src/qt/configui.ui:168
+msgctxt "ConfigUI|"
+msgid "false"
+msgstr "否"
+
+#: ../../src/qt/mainwindow.ui:14
+msgctxt "MainWindow|"
+msgid "Litematica reader"
+msgstr "投影文件阅读器"
+
+#: ../../src/qt/mainwindow.ui:25
+msgctxt "MainWindow|"
+msgid "&NBT"
+msgstr ""
+
+#: ../../src/qt/mainwindow.ui:33
+msgctxt "MainWindow|"
+msgid "Let's load a NBT file here!"
+msgstr "让我们在此添加NBT文件吧！"
+
+#: ../../src/qt/mainwindow.ui:40
+msgctxt "MainWindow|"
+msgid "&Manage NBT"
+msgstr "管理NBT（&M）"
+
+#: ../../src/qt/mainwindow.ui:47
+msgctxt "MainWindow|"
+msgid "You can do things below for the NBT file."
+msgstr "你可以对NBT文件做以下事情。"
+
+#: ../../src/qt/mainwindow.ui:54
+msgctxt "MainWindow|"
+msgid "N&BT Reader"
+msgstr "N&BT阅读器"
+
+#: ../../src/qt/mainwindow.ui:64
+msgctxt "MainWindow|"
+msgid "&Region"
+msgstr ""
+
+#: ../../src/qt/mainwindow.ui:72
+msgctxt "MainWindow|"
+msgid "First, you need to create a Region struct."
+msgstr "首先，你需要创建一个Region结构。"
+
+#: ../../src/qt/mainwindow.ui:79
+msgctxt "MainWindow|"
+msgid "&Create Region from NBT"
+msgstr "从NBT生成Region（&C）"
+
+#: ../../src/qt/mainwindow.ui:86
+msgctxt "MainWindow|"
+msgid "Second, you can do lots of things with the Region."
+msgstr "接下来，你可以对此Region做好多事。"
+
+#: ../../src/qt/mainwindow.ui:93
+msgctxt "MainWindow|"
+msgid "&Manage Region"
+msgstr "管理Region（&M）"
+
+#: ../../src/qt/mainwindow.ui:100
+msgctxt "MainWindow|"
+msgid "&Generate item list"
+msgstr "生成物品列表（&G）"
+
+#: ../../src/qt/mainwindow.ui:107
+msgctxt "MainWindow|"
+msgid "&Block reader"
+msgstr "方块阅读器（&B）"
+
+#: ../../src/qt/mainwindow.ui:117
+msgctxt "MainWindow|"
+msgid "&Item List"
+msgstr ""
+
+#: ../../src/qt/mainwindow.ui:125
+msgctxt "MainWindow|"
+msgid "I&tem list reader and modifier"
+msgstr "物品列表阅读器和修改器（&T）"
+
+#: ../../src/qt/mainwindow.ui:132
+msgctxt "MainWindow|"
+msgid "R&ecipe combiner"
+msgstr "配方合成器（&E）"
+
+#: ../../src/qt/mainwindow.ui:142
+msgctxt "MainWindow|"
+msgid "Utility"
+msgstr ""
+
+#: ../../src/qt/mainwindow.ui:148
+msgctxt "MainWindow|"
+msgid "&Config Setting"
+msgstr "配置设置（&C）"
+
+#: ../../src/qt/manageui.ui:14
+msgctxt "ManageUI|"
+msgid "Form"
+msgstr ""
+
+#: ../../src/qt/manageui.ui:37
+msgctxt "ManageUI|"
+msgid "&Add"
+msgstr "添加(&A)"
+
+#: ../../src/qt/manageui.ui:47
+msgctxt "ManageUI|"
+msgid "&Remove"
+msgstr "移除(&R)"
+
+#: ../../src/qt/manageui.ui:57
+msgctxt "ManageUI|"
+msgid "R&efresh"
+msgstr "刷新(&E)"
+
+#: ../../src/qt/manageui.ui:67
+msgctxt "ManageUI|"
+msgid "&Save"
+msgstr "保存(&S)"
+
+#: ../../src/qt/manageui.ui:113
+msgctxt "ManageUI|"
+msgid "&OK"
+msgstr "确定(&O)"
+
+#: ../../src/qt/manageui.ui:123
+msgctxt "ManageUI|"
+msgid "&Close"
+msgstr "关闭(&C)"
+
+#: ../../src/qt/nbtreaderui.ui:14
+msgctxt "NbtReaderUI|"
+msgid "NBT Reader"
+msgstr ""
+
+#: ../../src/qt/nbtreaderui.ui:22
+msgctxt "NbtReaderUI|"
+msgid "Search NBT label"
+msgstr ""
+
+#: ../../src/qt/nbtreaderui.ui:40
+msgctxt "NbtReaderUI|"
+msgid "Type:"
+msgstr ""
+
+#: ../../src/qt/nbtreaderui.ui:58
+msgctxt "NbtReaderUI|"
+msgid "Key:"
+msgstr ""
+
+#: ../../src/qt/nbtreaderui.ui:76
+msgctxt "NbtReaderUI|"
+msgid "Value:"
+msgstr ""
+
+#: ../../src/qt/nbtreaderui.ui:109
+msgctxt "NbtReaderUI|"
+msgid "Modify"
+msgstr ""
+
+#: ../../src/qt/nbtreaderui.ui:116
+msgctxt "NbtReaderUI|"
+msgid "Close"
+msgstr ""
+
+#: ../../src/qt/wizardui.ui:14
+msgctxt "WizardUI|"
+msgid "Wizard"
+msgstr ""
+
+#
+# File: ../../src/qt/wizardui.ui, line: 23
+#: ../../src/qt/wizardui.ui:23
+msgctxt "WizardUI|"
+msgid "Welcome to the guide!"
+msgstr "欢迎使用此向导！"
+
+#: ../../src/qt/wizardui.ui:30
+msgctxt "WizardUI|"
+msgid "We will help you configure the options."
+msgstr "我们将会帮助你配置选项。"
+
+#: ../../src/qt/wizardui.ui:37
+msgctxt "WizardUI|"
+msgid "If you don't want to show the wizard, click \"Never show again.\""
+msgstr ""
+
+#: ../../src/qt/wizardui.ui:44
+msgctxt "WizardUI|"
+msgid "Never show the wizard again."
+msgstr ""
+
+#: ../../src/qt/wizardui.ui:59
+msgctxt "WizardUI|"
+msgid "First, let's configure the game directory."
+msgstr ""
+
+#: ../../src/qt/wizardui.ui:66
+msgctxt "WizardUI|"
+msgid ""
+"If you are using the default directory, just keep the default option or "
+"press \"Reset\" if it's not the right position."
+msgstr ""
+
+#: ../../src/qt/wizardui.ui:83
+msgctxt "WizardUI|"
+msgid "I want to &configure the game directory."
+msgstr ""
+
+#: ../../src/qt/wizardui.ui:95
+msgctxt "WizardUI|"
+msgid "Game directory:"
+msgstr ""
+
+#: ../../src/qt/wizardui.ui:117 ../../src/qt/wizardui.ui:184
+msgctxt "WizardUI|"
+msgid "&Reset"
+msgstr ""
+
+#: ../../src/qt/wizardui.ui:128
+msgctxt "WizardUI|"
+msgid "&I do not want to set the game directory"
+msgstr ""
+
+#: ../../src/qt/wizardui.ui:141
+msgctxt "WizardUI|"
+msgid "Let's add NBT file(s)!"
+msgstr ""
+
+#: ../../src/qt/wizardui.ui:150
+msgctxt "WizardUI|"
+msgid "I want to &add the NBT file(s)."
+msgstr ""
+
+#: ../../src/qt/wizardui.ui:162
+msgctxt "WizardUI|"
+msgid "NBT file(s):"
+msgstr ""
+
+#: ../../src/qt/wizardui.ui:195
+msgctxt "WizardUI|"
+msgid "&I do not want to add the NBT file."
+msgstr ""
+
+#: ../../src/qt/wizardui.ui:208
+msgctxt "WizardUI|"
+msgid "Let's load a region."
+msgstr ""
+
+#: ../../src/qt/wizardui.ui:217
+msgctxt "WizardUI|"
+msgid "&Add region from the NBT"
+msgstr ""
+
+#: ../../src/qt/wizardui.ui:224
+msgctxt "WizardUI|"
+msgid "&Select the region"
+msgstr ""
+
+#: ../../src/qt/wizardui.ui:233
+msgctxt "WizardUI|"
+msgid "The region base info are listed below:"
+msgstr ""
+
+#: ../../src/qt/wizardui.ui:244
+msgctxt "WizardUI|"
+msgid "Name:"
+msgstr ""
+
+#: ../../src/qt/wizardui.ui:262
+msgctxt "WizardUI|"
+msgid "UUID:"
+msgstr ""
+
+#: ../../src/qt/wizardui.ui:280
+msgctxt "WizardUI|"
+msgid "Time:"
+msgstr ""
+
+#: ../../src/qt/wizardui.ui:298
+msgctxt "WizardUI|"
+msgid "Data Version:"
+msgstr ""
+
+#: src/dhlrc_list.c:330
+#, c-format
+msgid "Combined %d items to the new item list."
+msgstr "合并了%d物品至新的物品列表。"
+
+#: src/litematica_region.c:436
+#, c-format
+msgid "[%.2f%%] Processing Blocks %lu/%lu, (%3d,%3d,%3d)/(%3d,%3d,%3d)"
+msgstr "[%.2f%%] 处理方块中 %lu/%lu, (%3d,%3d,%3d)/(%3d,%3d,%3d) ……"
+
+#: src/litematica_region.c:485
+#, c-format
+msgid "Add %%d items from region %s"
+msgstr "从区域%s添加%%d物品"
+
+#: src/lrc_extend.c:42 src/main_isoc.c:186
+#, c-format
+msgid "There are %d regions:\n"
+msgstr "有 %d 个区域：\n"
+
+#: src/lrc_extend.c:49
+#, c-format
+msgid "Enter the region number, or enter 'q' to exit program (q): "
+msgstr "输入区域号，或输入 “q” 退出程序 (q)： "
+
+#: src/lrc_extend.c:65 src/lrc_extend.c:152
+#, c-format
+msgid ""
+"You are reading region: [%2d] %s:\n"
+"The size of the region is (%d, %d, %d).\n"
+"\n"
+msgstr ""
+"你正在阅读区域 [%2d] %s：\n"
+"这个区域的大小为 (%d, %d, %d)。\n"
+"\n"
+
+#: src/lrc_extend.c:68
+#, c-format
+msgid ""
+"Please enter the coordination of the block (just numbers of x y z without "
+"additional character\n"
+"or enter 'b' to choose another region, enter 'q' to exit the program (b): "
+msgstr ""
+"请输入方块坐标（仅输入数字，不需要额外字符）\n"
+"或输入 “b” 选择其他区域，输入 “q” 退出程序 (b): "
+
+#: src/lrc_extend.c:160
+#, c-format
+msgid "The block in (%ld, %ld, %ld) is %s.\n"
+msgstr "在 (%ld, %ld, %ld) 处的方块是 %s 。\n"
+
+#: src/lrc_extend.c:161
+#, c-format
+msgid "The block's position in BlockStatePalette is %d.\n"
+msgstr "此方块在 BlockStatePalette 中的位置为%d。\n"
+
+#: src/lrc_extend.c:162
+#, c-format
+msgid ""
+"Please enter the coordination of the block again, or enter 'b' to choose "
+"another region, enter 'r' to read the detail of the block, enter 'q' to exit "
+"the program (b): "
+msgstr ""
+"请再次输入方块的坐标，或输入 “b” 选择其他区域，输入 “r” 阅读方块的细节，输入 "
+"“q” 退出程序 (b): "
+
+#: src/main.c:156 src/main.c:186 src/main_isoc.c:108 src/qt/utility.cpp:125
 msgid "Not a valid NBT file!"
 msgstr "不是一个有效的NBT文件！"
 
-#: src/main.c:155
+#: src/main.c:165 src/qt/utility.cpp:105
 msgid "Enter desciption for the NBT file."
 msgstr "输入NBT文件的描述。"
 
-#: src/main.c:235
+#: src/main.c:267
 #, c-format
 msgid "dhlrc - Program to handle litematic or other struct of Minecraft.\n"
 msgstr ""
 
-#: src/main.c:237
+#: src/main.c:269
 #, c-format
 msgid "Modules:\n"
 msgstr ""
 
-#: src/main.c:259
+#: src/main.c:291
 #, c-format
 msgid "Unrecognized options "
 msgstr ""
 
-#: src/main.c:300
+#: src/main.c:351 src/qt/utility.cpp:87
 msgid "The following files couldn't be added:\n"
 msgstr ""
 
-#: src/main.c:315
+#: src/main.c:366
 msgid "[FILE] - Read a litematic file."
 msgstr "[文件] - 读取一个投影文件。"
 
-#: src/main.c:349
+#: src/main.c:400
 msgid "directory"
 msgstr "目录"
 
-#: src/main.c:350
+#: src/main.c:401
 msgid "file"
 msgstr "文件"
 
@@ -82,18 +588,13 @@ msgstr ""
 "\n"
 
 #: src/main_isoc.c:135 src/nbt_litereader.c:78 src/nbt_litereader.c:311
-#: src/recipe_util.c:45
+#: src/recipe_util.c:45 src/cli/main_cli.c:26
 msgid "Quit application"
 msgstr "退出程序"
 
 #: src/main_isoc.c:140
 msgid "Please select an option, or enter 'q' to exit the program (q): "
 msgstr "请选择一个选项，或输入 “q” 退出程序 (q): "
-
-#: src/main_isoc.c:186
-#, c-format
-msgid "There are %d regions:\n"
-msgstr "有 %d 个区域：\n"
 
 #: src/main_isoc.c:199
 #, c-format
@@ -183,16 +684,6 @@ msgstr "是"
 msgid "No"
 msgstr "否"
 
-#: src/litematica_region.c:436
-#, c-format
-msgid "[%.2f%%] Processing Blocks %lu/%lu, (%3d,%3d,%3d)/(%3d,%3d,%3d)"
-msgstr "[%.2f%%] 处理方块中 %lu/%lu, (%3d,%3d,%3d)/(%3d,%3d,%3d) ……"
-
-#: src/litematica_region.c:485
-#, c-format
-msgid "Add %%d items from region %s"
-msgstr "从区域%s添加%%d物品"
-
 #: src/recipe_util.c:44
 msgid "Choose all numbers"
 msgstr "选择所有数字"
@@ -201,186 +692,82 @@ msgstr "选择所有数字"
 msgid "Please enter numbers or option: "
 msgstr "请输入数字或选项："
 
-#: src/dhlrc_list.c:330
-#, c-format
-msgid "Combined %d items to the new item list."
-msgstr "合并了%d物品至新的物品列表。"
-
-#: src/qt/configui.cpp:16
-msgid "Config settings"
-msgstr "配置设置"
-
-#: src/qt/configui.cpp:16
-msgid "Override Language"
-msgstr "覆盖语言"
-
-#: src/qt/configui.cpp:16
-msgid "Recipe Directory"
-msgstr "配方文件夹"
-
-#: src/qt/configui.cpp:16
-msgid "Translation File"
-msgstr "翻译文件"
-
-#: src/qt/configui.cpp:17
-msgid "Game Directory"
-msgstr "游戏目录"
-
-#: src/qt/configui.cpp:17
-msgid "Cache Directory"
-msgstr "缓存目录"
-
-#: src/qt/configui.cpp:17
-msgid "Override Version"
-msgstr "覆盖版本"
-
-#: src/qt/configui.cpp:17
-msgid "Show Wizard On Start"
+#: src/qt/blockreaderui.cpp:60
+msgid ""
+"Name: %1\n"
+"Translation name: %2\n"
+"Index: %3\n"
+"Palette: %4\n"
+"Properties:\n"
 msgstr ""
 
-#: src/qt/configui.cpp:19
-msgid "true"
+#: src/qt/blockreaderui.cpp:80
+msgid "Not valid!"
 msgstr ""
 
-#: src/qt/configui.cpp:19
-msgid "false"
+#: src/qt/blockreaderui.cpp:89
+msgid "With DataVersion %4."
 msgstr ""
 
-#: src/qt/mainwindow.cpp:43
-msgid "Litematica reader"
-msgstr "投影文件阅读器"
+#: src/qt/ilchooseui.cpp:13
+msgid "Select a item list."
+msgstr "选择一个物品列表。"
 
-#: src/qt/mainwindow.cpp:44 src/qt/ilreaderui.cpp:24
-msgid "&File"
-msgstr "文件 (&F)"
+#: src/qt/ilchooseui.cpp:15
+msgid "Please choose a item list:"
+msgstr "请选择一个物品列表："
 
-#: src/qt/mainwindow.cpp:44
-msgid "&Tool"
-msgstr "工具 (&T)"
+#: src/qt/ilchooseui.cpp:39 src/qt/manage.cpp:161 src/qt/manage.cpp:162
+#: src/qt/manage.cpp:163 src/qt/manage.cpp:164 src/qt/manage.cpp:360
+#: src/qt/manage.cpp:361 src/qt/manage.cpp:362 src/qt/nbtselectui.cpp:51
+#: src/qt/regionchooseui.cpp:61 src/qt/regionchooseui.cpp:62
+msgid "locked"
+msgstr "已锁定"
 
-#: src/qt/mainwindow.cpp:45 src/qt/ilchooseui.cpp:48 src/qt/ilchooseui.cpp:67
-#: src/qt/recipesui.cpp:237 src/qt/nbtselectui.cpp:59 src/qt/nbtselectui.cpp:78
+#: src/qt/ilchooseui.cpp:48 src/qt/ilchooseui.cpp:67 src/qt/lrchooseui.cpp:60
+#: src/qt/nbtselectui.cpp:59 src/qt/nbtselectui.cpp:78 src/qt/recipesui.cpp:236
+#: src/qt/regionchooseui.cpp:70 src/qt/regionchooseui.cpp:89
+#: src/qt/saveregionselectui.cpp:42 src/gtk/manage_window.c:118
 msgid "&OK"
 msgstr "确定(&O)"
 
-#: src/qt/mainwindow.cpp:45 src/qt/ilchooseui.cpp:49 src/qt/recipesui.cpp:238
-#: src/qt/nbtselectui.cpp:60
+#: src/qt/ilchooseui.cpp:49 src/qt/lrchooseui.cpp:61 src/qt/nbtselectui.cpp:60
+#: src/qt/recipesui.cpp:237 src/qt/regionchooseui.cpp:71
+#: src/qt/saveregionselectui.cpp:43 src/gtk/manage_window.c:121
 msgid "&Close"
 msgstr "关闭(&C)"
 
-#: src/qt/mainwindow.cpp:47
-msgid "&Manage NBT"
-msgstr "管理NBT（&M）"
+#: src/qt/ilchooseui.cpp:64
+msgid "No item list available!"
+msgstr "没有物品列表可用！"
 
-#: src/qt/mainwindow.cpp:48
-msgid "N&BT Reader"
-msgstr "N&BT阅读器"
-
-#: src/qt/mainwindow.cpp:49
-msgid "&Create Region from NBT"
-msgstr "从NBT生成Region（&C）"
-
-#: src/qt/mainwindow.cpp:50
-msgid "&Generate item list"
-msgstr "生成物品列表（&G）"
-
-#: src/qt/mainwindow.cpp:51
-msgid "&Block reader"
-msgstr "方块阅读器（&B）"
-
-#: src/qt/mainwindow.cpp:52
-msgid "I&tem list reader and modifier"
-msgstr "物品列表阅读器和修改器（&T）"
-
-#: src/qt/mainwindow.cpp:53
-msgid "R&ecipe combiner"
-msgstr "配方合成器（&E）"
-
-#: src/qt/mainwindow.cpp:54
-msgid "&Manage Region"
-msgstr ""
-
-#: src/qt/mainwindow.cpp:57
-msgid "Let's load a NBT file here!"
-msgstr "让我们在此添加NBT文件吧！"
-
-#: src/qt/mainwindow.cpp:58
-msgid "You can do things below for the NBT file."
-msgstr "你可以对NBT文件做以下事情。"
-
-#: src/qt/mainwindow.cpp:59
-msgid "First, you need to create a Region struct."
-msgstr "首先，你需要创建一个Region结构。"
-
-#: src/qt/mainwindow.cpp:60
-msgid "Second, you can do lots of things with the Region."
-msgstr "接下来，你可以对此Region做好多事。"
-
-#: src/qt/mainwindow.cpp:124 src/qt/mainwindow.cpp:159
-#: src/qt/mainwindow.cpp:161 src/qt/mainwindow.cpp:164
-#: src/qt/mainwindow.cpp:185 src/qt/mainwindow.cpp:187
-#: src/qt/mainwindow.cpp:190 src/qt/mainwindow.cpp:201
-#: src/qt/mainwindow.cpp:225 src/qt/mainwindow.cpp:227
-#: src/qt/mainwindow.cpp:230 src/qt/mainwindow.cpp:232
-#: src/qt/mainwindow.cpp:254 src/qt/mainwindow.cpp:257
-#: src/qt/mainwindow.cpp:259 src/qt/mainwindow.cpp:283
-#: src/qt/mainwindow.cpp:285 src/qt/ilreaderui.cpp:110 src/qt/ilchooseui.cpp:91
-#: src/qt/nbtselectui.cpp:98 src/qt/manage.cpp:30 src/qt/manage.cpp:242
-#: src/qt/manage.cpp:470 src/qt/manage.cpp:483
+#: src/qt/ilchooseui.cpp:91 src/qt/ilreaderui.cpp:110 src/qt/mainwindow.cpp:107
+#: src/qt/mainwindow.cpp:142 src/qt/mainwindow.cpp:144
+#: src/qt/mainwindow.cpp:147 src/qt/mainwindow.cpp:168
+#: src/qt/mainwindow.cpp:170 src/qt/mainwindow.cpp:173
+#: src/qt/mainwindow.cpp:184 src/qt/mainwindow.cpp:208
+#: src/qt/mainwindow.cpp:210 src/qt/mainwindow.cpp:213
+#: src/qt/mainwindow.cpp:215 src/qt/mainwindow.cpp:237
+#: src/qt/mainwindow.cpp:240 src/qt/mainwindow.cpp:242
+#: src/qt/mainwindow.cpp:266 src/qt/mainwindow.cpp:268 src/qt/manage.cpp:30
+#: src/qt/manage.cpp:242 src/qt/manage.cpp:470 src/qt/manage.cpp:483
+#: src/qt/nbtselectui.cpp:98 src/qt/regionchooseui.cpp:122
+#: src/qt/saveregionselectui.cpp:73 src/qt/saveregionselectui.cpp:87
+#: src/qt/saveregionselectui.cpp:89 src/qt/utility.cpp:32 src/qt/utility.cpp:35
+#: src/qt/utility.cpp:48 src/qt/utility.cpp:62 src/qt/utility.cpp:68
+#: src/qt/utility.cpp:93
 msgid "Error!"
 msgstr "错误！"
 
-#: src/qt/mainwindow.cpp:124 src/qt/mainwindow.cpp:285
-msgid "NBT list is locked!"
-msgstr "NBT列表被锁定！"
+#: src/qt/ilchooseui.cpp:91 src/qt/regionchooseui.cpp:122
+msgid "No item list selected!"
+msgstr "无选择的材料列表！"
 
-#: src/qt/mainwindow.cpp:159 src/qt/mainwindow.cpp:185
-#: src/qt/ilreaderui.cpp:110
-msgid "The item list is locked!"
-msgstr "此材料列表被锁定！"
+#: src/qt/ilreaderui.cpp:24
+msgid "&File"
+msgstr "文件 (&F)"
 
-#: src/qt/mainwindow.cpp:161 src/qt/mainwindow.cpp:187
-msgid "The item list is freed!"
-msgstr "物品列表被释放！"
-
-#: src/qt/mainwindow.cpp:164 src/qt/mainwindow.cpp:190
-msgid "No item list!"
-msgstr "无物品列表！"
-
-#: src/qt/mainwindow.cpp:201 src/qt/mainwindow.cpp:232
-#: src/qt/mainwindow.cpp:259
-msgid "Region list is locked!"
-msgstr "Region列表被锁定！"
-
-#: src/qt/mainwindow.cpp:218
-msgid "Enter Name for Item List"
-msgstr ""
-
-#: src/qt/mainwindow.cpp:218
-msgid "Enter the name for item list"
-msgstr ""
-
-#: src/qt/mainwindow.cpp:225
-msgid "Description is empty!"
-msgstr ""
-
-#: src/qt/mainwindow.cpp:227
-msgid "Item list is locked!"
-msgstr ""
-
-#: src/qt/mainwindow.cpp:230 src/qt/mainwindow.cpp:257
-msgid "No Region or no Region selected!"
-msgstr "没有Region或没有Region选中！"
-
-#: src/qt/mainwindow.cpp:254
-msgid "Region is locked!"
-msgstr ""
-
-#: src/qt/mainwindow.cpp:283
-msgid "No NBT is selected!"
-msgstr ""
-
-#: src/qt/ilreaderui.cpp:27 src/qt/manageui.cpp:27
+#: src/qt/ilreaderui.cpp:27 src/gtk/manage_window.c:102
 msgid "&Save"
 msgstr "保存 (&S)"
 
@@ -412,132 +799,96 @@ msgstr "追踪"
 msgid "Show history"
 msgstr "展示历史"
 
-#: src/qt/ilchooseui.cpp:13
-msgid "Select a item list."
-msgstr "选择一个物品列表。"
+#: src/qt/ilreaderui.cpp:110 src/qt/mainwindow.cpp:142
+#: src/qt/mainwindow.cpp:168
+msgid "The item list is locked!"
+msgstr "此材料列表被锁定！"
 
-#: src/qt/ilchooseui.cpp:15
-msgid "Please choose a item list:"
-msgstr "请选择一个物品列表："
-
-#: src/qt/ilchooseui.cpp:39 src/qt/nbtselectui.cpp:51 src/qt/manage.cpp:161
-#: src/qt/manage.cpp:162 src/qt/manage.cpp:163 src/qt/manage.cpp:164
-#: src/qt/manage.cpp:360 src/qt/manage.cpp:361 src/qt/manage.cpp:362
-msgid "locked"
-msgstr "已锁定"
-
-#: src/qt/ilchooseui.cpp:64
-msgid "No item list available!"
-msgstr "没有物品列表可用！"
-
-#: src/qt/ilchooseui.cpp:91
-msgid "No item list selected!"
-msgstr "无选择的材料列表！"
-
-#: src/qt/recipesshowui.cpp:26
-msgid "The pattern is:"
+#: src/qt/lrchooseui.cpp:27
+msgid "Please select region(s) of the Litematic"
 msgstr ""
 
-#: src/qt/recipesui.cpp:73
-msgid "No recipe file found!"
-msgstr "找不到配方！"
+#: src/qt/lrchooseui.cpp:46
+msgid "&All"
+msgstr "全选 (&A)"
 
-#: src/qt/recipesui.cpp:74
-msgid "No recipe file found! Do you want to extract game file?"
-msgstr "找不到配方！你想要解压游戏文件吗？"
+#: src/qt/lrchooseui.cpp:51
+msgid ""
+"Please enter the new Region(s)' name(s): (%1 represents the NBT description "
+"and %2 represents the original region's name):"
+msgstr ""
 
-#: src/qt/recipesui.cpp:144
-msgid "Please select items:"
-msgstr "请选择物品："
+#: src/qt/lrchooseui.cpp:53
+msgid "Enter description here."
+msgstr ""
 
-#: src/qt/recipesui.cpp:146
-msgid "Search block name"
-msgstr "搜索方块名称"
+#: src/qt/mainwindow.cpp:107 src/qt/mainwindow.cpp:268
+#: src/qt/saveregionselectui.cpp:73 src/qt/utility.cpp:35
+msgid "NBT list is locked!"
+msgstr "NBT列表被锁定！"
 
-#: src/qt/recipesui.cpp:172
-msgid "Show recipe"
-msgstr "展示配方"
+#: src/qt/mainwindow.cpp:144 src/qt/mainwindow.cpp:170
+msgid "The item list is freed!"
+msgstr "物品列表被释放！"
 
-#: src/qt/recipesui.cpp:227
-msgid "Combine items to this item list."
-msgstr "合并物品至此物品列表。"
+#: src/qt/mainwindow.cpp:147 src/qt/mainwindow.cpp:173
+msgid "No item list!"
+msgstr "无物品列表！"
 
-#: src/qt/recipesui.cpp:229
-msgid "New item list name:"
-msgstr "新的物品列表名字："
+#: src/qt/mainwindow.cpp:184 src/qt/mainwindow.cpp:215
+#: src/qt/mainwindow.cpp:242
+msgid "Region list is locked!"
+msgstr "Region列表被锁定！"
 
-#: src/qt/recipesui.cpp:230
-msgid "Generated from material list combiner."
-msgstr "从材料列表合成器生成。"
+#: src/qt/mainwindow.cpp:201 src/qt/saveregionselectui.cpp:80
+msgid "Enter Name for Item List"
+msgstr ""
 
-#: src/qt/recipesui.cpp:303
-#, c-format
-msgid "\"Delete\" %d items from material list combiner."
-msgstr "从材料列表合成器\"删除\"%d物品。"
+#: src/qt/mainwindow.cpp:201 src/qt/saveregionselectui.cpp:80
+msgid "Enter the name for item list"
+msgstr ""
 
-#: src/qt/recipesui.cpp:334
-msgid "Mod decide"
-msgstr "余数决定"
+#: src/qt/mainwindow.cpp:208 src/qt/saveregionselectui.cpp:87
+msgid "Description is empty!"
+msgstr ""
 
-#: src/qt/recipesui.cpp:334
-#, c-format
-msgid "There's a remainder with %d and %d, continue?"
-msgstr "%d除以%d有余数，继续？"
+#: src/qt/mainwindow.cpp:210 src/qt/saveregionselectui.cpp:89
+msgid "Item list is locked!"
+msgstr ""
 
-#: src/qt/recipesui.cpp:358
-#, c-format
-msgid "Add %d items from material list combiner."
-msgstr "从材料列表合成器添加%d物品。"
+#: src/qt/mainwindow.cpp:213 src/qt/mainwindow.cpp:240
+msgid "No Region or no Region selected!"
+msgstr "没有Region或没有Region选中！"
 
-#: src/qt/showtrackui.cpp:18
-msgid "The track information is:\n"
-msgstr "追踪信息如下：\n"
+#: src/qt/mainwindow.cpp:237
+msgid "Region is locked!"
+msgstr ""
 
-#: src/qt/nbtselectui.cpp:24
-msgid "Please select a NBT:"
-msgstr "请选择一个NBT："
-
-#: src/qt/nbtselectui.cpp:75
-msgid "No NBT available!"
-msgstr "没有NBT可用！"
-
-#: src/qt/nbtselectui.cpp:98
-msgid "No NBT selected!"
-msgstr "没有NBT被选中！"
-
-#: src/qt/manageui.cpp:24
-msgid "&Add"
-msgstr "添加（&A）"
-
-#: src/qt/manageui.cpp:25
-msgid "&Remove"
-msgstr "移除（&R）"
-
-#: src/qt/manageui.cpp:26
-msgid "R&efresh"
-msgstr "刷新（&E）"
+#: src/qt/mainwindow.cpp:266
+msgid "No NBT is selected!"
+msgstr ""
 
 #: src/qt/manage.cpp:30
 msgid "No row is selected!"
 msgstr "没有选择行！"
 
-#: src/qt/manage.cpp:39
+#: src/qt/manage.cpp:39 src/gtk/manage_nbt.c:18
 msgid "Litematica"
 msgstr "投影"
 
-#: src/qt/manage.cpp:40
+#: src/qt/manage.cpp:40 src/gtk/manage_nbt.c:19
 msgid "NBT Struct"
 msgstr "NBT结构"
 
-#: src/qt/manage.cpp:41
+#: src/qt/manage.cpp:41 src/gtk/manage_nbt.c:20
 msgid "Schematics"
 msgstr "Schema投影"
 
-#: src/qt/manage.cpp:42
+#: src/qt/manage.cpp:42 src/gtk/manage_nbt.c:21
 msgid "Others"
 msgstr "其它"
 
-#: src/qt/manage.cpp:75
+#: src/qt/manage.cpp:75 src/cli/main_cli.c:14 src/cli/main_cli.c:22
 msgid "Manage NBT"
 msgstr "管理NBT"
 
@@ -591,7 +942,7 @@ msgstr ""
 msgid "The following infos are locked:\n"
 msgstr ""
 
-#: src/qt/manage.cpp:325
+#: src/qt/manage.cpp:325 src/cli/main_cli.c:15 src/cli/main_cli.c:23
 msgid "Manage Region"
 msgstr ""
 
@@ -602,6 +953,293 @@ msgstr ""
 #: src/qt/manage.cpp:483
 msgid "Not a valid NBT UUID!"
 msgstr ""
+
+#: src/qt/module.cpp:50
+msgid "The Qt interface of dhlrc."
+msgstr ""
+
+#: src/qt/nbtselectui.cpp:24
+msgid "Please select a NBT:"
+msgstr "请选择一个NBT："
+
+#: src/qt/nbtselectui.cpp:75
+msgid "No NBT available!"
+msgstr "没有NBT可用！"
+
+#: src/qt/nbtselectui.cpp:98
+msgid "No NBT selected!"
+msgstr "没有NBT被选中！"
+
+#: src/qt/recipesshowui.cpp:26
+msgid "The pattern is:"
+msgstr ""
+
+#: src/qt/recipesui.cpp:74
+msgid "No recipe file found!"
+msgstr "找不到配方！"
+
+#: src/qt/recipesui.cpp:75
+msgid "No recipe file found! Do you want to extract game file?"
+msgstr "找不到配方！你想要解压游戏文件吗？"
+
+#: src/qt/recipesui.cpp:84
+msgid "Please select a game jar"
+msgstr ""
+
+#: src/qt/recipesui.cpp:84
+msgid "Jar File (*.jar)"
+msgstr ""
+
+#: src/qt/recipesui.cpp:143
+msgid "Please select items:"
+msgstr "请选择物品："
+
+#: src/qt/recipesui.cpp:145
+msgid "Search block name"
+msgstr "搜索方块名称"
+
+#: src/qt/recipesui.cpp:171
+msgid "Show recipe"
+msgstr "展示配方"
+
+#: src/qt/recipesui.cpp:226
+msgid "Combine items to this item list."
+msgstr "合并物品至此物品列表。"
+
+#: src/qt/recipesui.cpp:228
+msgid "New item list name:"
+msgstr "新的物品列表名字："
+
+#: src/qt/recipesui.cpp:229
+msgid "Generated from material list combiner."
+msgstr "从材料列表合成器生成。"
+
+#: src/qt/recipesui.cpp:302
+#, c-format
+msgid "\"Delete\" %d items from material list combiner."
+msgstr "从材料列表合成器\"删除\"%d物品。"
+
+#: src/qt/recipesui.cpp:333
+msgid "Mod decide"
+msgstr "余数决定"
+
+#: src/qt/recipesui.cpp:333
+#, c-format
+msgid "There's a remainder with %d and %d, continue?"
+msgstr "%d除以%d有余数，继续？"
+
+#: src/qt/recipesui.cpp:357
+#, c-format
+msgid "Add %d items from material list combiner."
+msgstr "从材料列表合成器添加%d物品。"
+
+#: src/qt/regionchooseui.cpp:25
+msgid "Please select a Region:"
+msgstr ""
+
+#: src/qt/regionchooseui.cpp:86
+msgid "No Region available!"
+msgstr ""
+
+#: src/qt/saveregionselectui.cpp:29
+msgid "Please select a save option:"
+msgstr ""
+
+#: src/qt/saveregionselectui.cpp:33
+msgid "Save as &NBT struct."
+msgstr ""
+
+#: src/qt/saveregionselectui.cpp:35
+msgid "Save as &item list."
+msgstr ""
+
+#: src/qt/showtrackui.cpp:18
+msgid "The track information is:\n"
+msgstr "追踪信息如下：\n"
+
+#: src/qt/utility.cpp:32
+msgid "No NBT or no NBT selected!"
+msgstr "无NBT或没有NBT被选中！"
+
+#: src/qt/utility.cpp:46
+msgid "Enter Region Name"
+msgstr "输入Region名称"
+
+#: src/qt/utility.cpp:46
+msgid "Enter name for the new Region."
+msgstr "输入新Region的名称。"
+
+#: src/qt/utility.cpp:48
+msgid "No description for the Region!"
+msgstr "没有Region的描述！"
+
+#: src/qt/utility.cpp:62
+msgid "The NBT Struct is unsupported!"
+msgstr "此NBT结构不受支持！"
+
+#: src/qt/utility.cpp:68
+msgid "This NBT is locked!"
+msgstr "此NBT被锁定！"
+
+#: src/qt/utility.cpp:105 src/gtk/manage_nbt.c:131
+msgid "Enter Desciption"
+msgstr "输入描述"
+
+#: src/qt/utility.cpp:107
+msgid "No Description Entered!"
+msgstr "没有输入的描述！"
+
+#: src/qt/utility.cpp:107
+msgid "No desciption entered! Will not add the NBT file!"
+msgstr "没有描述输入！将不会添加NBT文件！"
+
+#: src/qt/utility.cpp:125
+msgid "Not Valid File!"
+msgstr "不是有效的文件！"
+
+#: src/gtk/main_gtk.c:70
+msgid "Litematica reader"
+msgstr "投影文件阅读器"
+
+#: src/gtk/main_gtk.c:92
+msgid "First, you need to create a Region struct."
+msgstr "首先，你需要创建一个Region结构。"
+
+#: src/gtk/main_gtk.c:94
+msgid "&Create Region from NBT"
+msgstr "从NBT生成Region（&C）"
+
+#: src/gtk/main_gtk.c:99
+msgid "Second, you can do lots of things with the Region."
+msgstr "接下来，你可以对此Region做好多事。"
+
+#: src/gtk/main_gtk.c:103
+msgid "&Generate item list"
+msgstr "生成物品列表（&G）"
+
+#: src/gtk/main_gtk.c:107
+msgid "&Block reader"
+msgstr "方块阅读器（&B）"
+
+#: src/gtk/main_gtk.c:129
+msgid "Let's load a NBT file here!"
+msgstr "让我们在此添加NBT文件吧！"
+
+#: src/gtk/main_gtk.c:132
+msgid "&Manage NBT"
+msgstr "管理NBT（&M）"
+
+#: src/gtk/main_gtk.c:138
+msgid "You can do things below for the NBT file."
+msgstr "你可以对NBT文件做以下事情。"
+
+#: src/gtk/main_gtk.c:140
+msgid "N&BT Reader"
+msgstr "N&BT阅读器"
+
+#: src/gtk/main_gtk.c:161
+msgid "I&tem list reader and modifier"
+msgstr "物品列表阅读器和修改器（&T）"
+
+#: src/gtk/main_gtk.c:164
+msgid "R&ecipe combiner"
+msgstr "配方合成器（&E）"
+
+#: src/gtk/main_gtk.c:189
+msgid "Region"
+msgstr ""
+
+#: src/gtk/main_gtk.c:190
+msgid "NBT"
+msgstr ""
+
+#: src/gtk/main_gtk.c:191
+msgid "Item List"
+msgstr ""
+
+#: src/gtk/manage_nbt.c:131
+msgid "Please enter description for the NBT."
+msgstr ""
+
+#: src/gtk/manage_nbt.c:131
+msgid "Desciption"
+msgstr ""
+
+#: src/gtk/manage_nbt.c:141 src/gtk/manage_nbt.c:145
+msgid "No desciption entered! The NBT will not be added!"
+msgstr ""
+
+#: src/gtk/manage_nbt.c:166
+msgid "Open NBT file"
+msgstr ""
+
+#: src/gtk/manage_nbt.c:167
+msgid "_Cancel"
+msgstr ""
+
+#: src/gtk/manage_nbt.c:168
+msgid "_Open"
+msgstr ""
+
+#: src/gtk/manage_window.c:99
+msgid "&Add"
+msgstr "添加（&A）"
+
+#: src/gtk/manage_window.c:100
+msgid "&Remove"
+msgstr "移除（&R）"
+
+#: src/gtk/manage_window.c:101
+msgid "R&efresh"
+msgstr "刷新（&E）"
+
+#: src/gtk/module.c:42
+msgid "The GTK interface of dhlrc"
+msgstr ""
+
+#: src/cli/main_cli.c:13
+msgid "The functions are listed below:\n"
+msgstr ""
+
+#: src/cli/main_cli.c:16 src/cli/main_cli.c:24
+msgid "Manage item list"
+msgstr ""
+
+#: src/cli/main_cli.c:17 src/cli/main_cli.c:25
+msgid "Config settings"
+msgstr "配置设置"
+
+#: src/cli/main_cli.c:28
+msgid "Debug"
+msgstr ""
+
+#: src/cli/main_cli.c:75
+msgid "The CLI/TUI interface of dhlrc"
+msgstr ""
+
+#~ msgid "Override Language"
+#~ msgstr "覆盖语言"
+
+#~ msgid "Recipe Directory"
+#~ msgstr "配方文件夹"
+
+#~ msgid "Translation File"
+#~ msgstr "翻译文件"
+
+#~ msgid "Game Directory"
+#~ msgstr "游戏目录"
+
+#~ msgid "Cache Directory"
+#~ msgstr "缓存目录"
+
+#~ msgid "Override Version"
+#~ msgstr "覆盖版本"
+
+#~ msgid "&Tool"
+#~ msgstr "工具 (&T)"
+
+#~ msgid "Welcome to the guide!"
+#~ msgstr "欢迎使用此向导！"
 
 #~ msgid "Enter NBT reader mode."
 #~ msgstr "进入NBT阅读器模式。"
@@ -614,46 +1252,6 @@ msgstr ""
 
 #~ msgid "Output log file to FILE"
 #~ msgstr "输出日志文件至FILE"
-
-#, c-format
-#~ msgid "Enter the region number, or enter 'q' to exit program (q): "
-#~ msgstr "输入区域号，或输入 “q” 退出程序 (q)： "
-
-#, c-format
-#~ msgid ""
-#~ "You are reading region: [%2d] %s:\n"
-#~ "The size of the region is (%d, %d, %d).\n"
-#~ "\n"
-#~ msgstr ""
-#~ "你正在阅读区域 [%2d] %s：\n"
-#~ "这个区域的大小为 (%d, %d, %d)。\n"
-#~ "\n"
-
-#, c-format
-#~ msgid ""
-#~ "Please enter the coordination of the block (just numbers of x y z without "
-#~ "additional character\n"
-#~ "or enter 'b' to choose another region, enter 'q' to exit the program (b): "
-#~ msgstr ""
-#~ "请输入方块坐标（仅输入数字，不需要额外字符）\n"
-#~ "或输入 “b” 选择其他区域，输入 “q” 退出程序 (b): "
-
-#, c-format
-#~ msgid "The block in (%ld, %ld, %ld) is %s.\n"
-#~ msgstr "在 (%ld, %ld, %ld) 处的方块是 %s 。\n"
-
-#, c-format
-#~ msgid "The block's position in BlockStatePalette is %d.\n"
-#~ msgstr "此方块在 BlockStatePalette 中的位置为%d。\n"
-
-#, c-format
-#~ msgid ""
-#~ "Please enter the coordination of the block again, or enter 'b' to choose "
-#~ "another region, enter 'r' to read the detail of the block, enter 'q' to "
-#~ "exit the program (b): "
-#~ msgstr ""
-#~ "请再次输入方块的坐标，或输入 “b” 选择其他区域，输入 “r” 阅读方块的细节，输"
-#~ "入 “q” 退出程序 (b): "
 
 #~ msgid "Only one option can be chosen!\n"
 #~ msgstr "只有一个选项可选！\n"
@@ -684,36 +1282,6 @@ msgstr ""
 
 #~ msgid "This program doesn't support multi files!"
 #~ msgstr "本程序不支持多文件！"
-
-#~ msgid "Enter Desciption"
-#~ msgstr "输入描述"
-
-#~ msgid "No Description Entered!"
-#~ msgstr "没有输入的描述！"
-
-#~ msgid "No desciption entered! Will not add the NBT file!"
-#~ msgstr "没有描述输入！将不会添加NBT文件！"
-
-#~ msgid "Not Valid File!"
-#~ msgstr "不是有效的文件！"
-
-#~ msgid "Enter Region Name"
-#~ msgstr "输入Region名称"
-
-#~ msgid "Enter name for the new Region."
-#~ msgstr "输入新Region的名称。"
-
-#~ msgid "No description for the Region!"
-#~ msgstr "没有Region的描述！"
-
-#~ msgid "The NBT Struct is unsupported!"
-#~ msgstr "此NBT结构不受支持！"
-
-#~ msgid "This NBT is locked!"
-#~ msgstr "此NBT被锁定！"
-
-#~ msgid "No NBT or no NBT selected!"
-#~ msgstr "无NBT或没有NBT被选中！"
 
 #~ msgid "&Item list reader and modifier"
 #~ msgstr "物品列表阅读器和修改器(&I)"
@@ -756,9 +1324,6 @@ msgstr ""
 
 #~ msgid "No selected region!"
 #~ msgstr "没有选择的区域！"
-
-#~ msgid "&All"
-#~ msgstr "全选 (&A)"
 
 #~ msgid "Item list name:"
 #~ msgstr "物品列表名称："

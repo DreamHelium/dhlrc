@@ -13,21 +13,11 @@
 #include <qpushbutton.h>
 #include <QStandardItemModel>
 #include <qstandarditemmodel.h>
-#include "../translation.h"
 #include <QFileDialog>
 #include <qwidget.h>
 #include <QDebug>
 #include <QMimeData>
 #include <QDrag>
-
-static QStringList buttonStr = {
-    N_("&Add"),
-    N_("&Remove"),
-    N_("R&efresh"),
-    N_("&Save")
-};
-
-static DhList* uuidList = nullptr;
 
 ManageUI::ManageUI(QWidget *parent) :
     QWidget(parent),

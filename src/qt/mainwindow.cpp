@@ -6,7 +6,6 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QDebug>
-#include "../config.h"
 #include <dhutil.h>
 #include <qcontainerfwd.h>
 #include <qdialog.h>
@@ -40,26 +39,6 @@ static bool nbtRead = false;
 int verbose_level;
 static dh::ManageNBT* mn = nullptr;
 static dh::ManageRegion* mr = nullptr;
-
-static QString title = N_("Litematica reader");
-static QStringList menu = {N_("&File"), N_("&Tool")};
-static QStringList buttonList = {N_("&OK") , N_("&Close")};
-static QStringList funcList = {
-    N_("&Manage NBT"),
-    N_("N&BT Reader"),
-    N_("&Create Region from NBT"),
-    N_("&Generate item list"),
-    N_("&Block reader"),
-    N_("I&tem list reader and modifier"),
-    N_("R&ecipe combiner"),
-    N_("&Manage Region")
-};
-static QStringList description = {
-    N_("Let's load a NBT file here!"),
-    N_("You can do things below for the NBT file."),
-    N_("First, you need to create a Region struct."),
-    N_("Second, you can do lots of things with the Region.")
-};
 
 static MainWindow* mw;
 

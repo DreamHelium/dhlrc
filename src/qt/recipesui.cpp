@@ -19,6 +19,7 @@
 #include "mainwindow.h"
 #include "recipesshowui.h"
 #include "ilchooseui.h"
+#include <QFileDialog>
 #include "../config.h"
 #include "../uncompress.h"
 #include "../il_info.h"
@@ -77,19 +78,17 @@ void RecipesUI::recipesInit()
             /* Extract file from game dir */
             char* gameDir = dh_get_game_dir();
             char* version = dh_get_version();
-            QString originGameJar = gameDir;
-            originGameJar += "/versions/";
-            originGameJar += version;
-            originGameJar += "/";
-            originGameJar += version;
-            originGameJar += ".jar";
+            /* gamedir / "versions" / version / version ".jar" */
+            /* %1      %2 versions  %2 %3     %2 %3      .jar*/
+            QString originGameJar = QString("%1%2versions%2%3%2%3.jar").arg(gameDir).arg(G_DIR_SEPARATOR).arg(version);
+            QString realGameJar = QFileDialog::getOpenFileName(this, _("Please select a game jar"), originGameJar, _("Jar File (*.jar)"));
+
             char* cacheDir = dh_get_cache_dir();
-            QString destDir = cacheDir;
-            destDir += "/";
-            destDir += version;
-            destDir += "/extracted/";
+            /* cachedir / version / "extracted" / */
+            /* %1       %2 %3     %2 extracted  %2 */
+            QString destDir = QString("%1%2%3%2extracted%2").arg(cacheDir).arg(G_DIR_SEPARATOR).arg(version);
             dh_file_create(destDir.toStdString().c_str(), FALSE);
-            dhlrc_extract(originGameJar.toStdString().c_str(), destDir.toStdString().c_str());
+            dhlrc_extract(realGameJar.toUtf8(), destDir.toStdString().c_str());
             QString sourceDir = destDir;
             sourceDir += "/data/minecraft/recipes/";
             g_free(gameDir);
