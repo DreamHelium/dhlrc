@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.12)
 
 project(dhlrc_qt VERSION 0.3.1 LANGUAGES CXX)
 
@@ -10,8 +10,8 @@ set(LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR}/module)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets)
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
+find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets Svg)
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets Svg)
 
 set(PROJECT_SOURCES
         module.h module.cpp
@@ -65,7 +65,7 @@ else()
     endif()
 endif()
 
-target_link_libraries(dhlrc_qt PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
+target_link_libraries(dhlrc_qt PRIVATE Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::Svg)
 
 target_link_libraries(dhlrc_qt PUBLIC dhlrc)
 

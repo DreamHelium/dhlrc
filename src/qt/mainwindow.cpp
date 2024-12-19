@@ -34,6 +34,7 @@
 #include "../region_info.h"
 #include "utility.h"
 #include "wizardui.h"
+#include "../common.h"
 
 static bool nbtRead = false;
 int verbose_level;
@@ -47,6 +48,10 @@ MainWindow::MainWindow(QWidget *parent)
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    auto pixmap = dh::loadSvgResourceFile("/cn/dh/dhlrc/nbt_tree.svg");
+    ui->tabWidget->setTabIcon(0, *pixmap);
+    
+    delete pixmap;
     mw = this;
     // pd.hide();
     initSignalSlots();

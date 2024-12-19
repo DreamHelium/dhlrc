@@ -35,6 +35,7 @@ add_library(dhlrc_recipe_full SHARED
 )
 
 add_library(dhlrc SHARED
+		   common.c common.h
 		   translation.h
 		   translation.c
 	       libnbt/nbt.h

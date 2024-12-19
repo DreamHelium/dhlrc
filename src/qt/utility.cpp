@@ -10,6 +10,10 @@
 #include "../translation.h"
 #include "../region_info.h"
 #include "lrchooseui.h"
+#include <QSvgRenderer>
+#include <QPixmap>
+#include <QPainter>
+#include "../common.h"
 
 void dh::loadRegion(QWidget* parent)
 {
@@ -128,4 +132,23 @@ bool dh::loadNbtFile(QWidget* parent, QString filedir, bool askForDes, bool tipF
     }
     g_object_unref(file);
     return ret;
+}
+
+QPixmap* dh::loadSvgFile(const char* contents)
+{
+    QSvgRenderer renderer = QSvgRenderer(QByteArray(contents));
+    QPixmap* pixmap = new QPixmap(64, 64);
+    pixmap->fill(Qt::transparent);
+    QPainter painter = QPainter(pixmap);
+    renderer.render(&painter);
+    return pixmap;
+}
+
+QPixmap* dh::loadSvgResourceFile(const char* pos)
+{
+    auto iconRes = g_resources_lookup_data(pos, G_RESOURCE_LOOKUP_FLAGS_NONE, NULL);
+    auto iconResBytes = g_bytes_get_data(iconRes, NULL);
+    QPixmap* pixmap = dh::loadSvgFile((const char*)iconResBytes);
+    g_bytes_unref(iconRes);
+    return pixmap;
 }

@@ -19,6 +19,7 @@
 #include <stdio.h>
 #include <glib.h>
 /*#include "dhlrc_config.h"*/
+#include "common.h"
 #include "config.h"
 #include "dh_string_util.h"
 #include "glibconfig.h"
@@ -136,6 +137,7 @@ static DhlrcModule* get_module(int* module_num, char* arg_zero)
 static void startup(GApplication* self, gpointer user_data)
 {
     dhlrc_make_config();
+    dhlrc_common_contents_init(user_data);
     il_info_list_init();
     nbt_info_list_init();
     region_info_list_init();
@@ -146,6 +148,7 @@ static void app_shutdown(GApplication* self, gpointer user_data)
     il_info_list_free();
     nbt_info_list_free();
     region_info_list_free();
+    dhlrc_common_contents_free();
 }
 
 static gboolean file_open(GFile* file, gboolean single)
@@ -360,7 +363,7 @@ int main(int argc, char** argb)
     /* There's not a good idea to load the library but we will try */
     translation_init(argb[0]);
     GApplication* app = g_application_new("cn.dh.dhlrc.cli", G_APPLICATION_HANDLES_COMMAND_LINE);
-    g_signal_connect(app, "startup", G_CALLBACK(startup), NULL);
+    g_signal_connect(app, "startup", G_CALLBACK(startup), argb[0]);
     g_signal_connect(app, "shutdown", G_CALLBACK(app_shutdown), NULL);
     g_signal_connect(app, "command-line", G_CALLBACK(run_app), NULL);
     g_application_set_option_context_parameter_string(app, _("[FILE] - Read a litematic file."));

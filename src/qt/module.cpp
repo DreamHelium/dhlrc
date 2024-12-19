@@ -1,8 +1,16 @@
 #include "module.h"
+#include "glibconfig.h"
 #include "mainwindow.h"
 #include "../translation.h"
 #include <QApplication>
 #include <QTranslator>
+#include <qcoreapplication.h>
+#include "../common.h"
+#include "utility.h"
+#include <QSvgRenderer>
+#include <QPainter>
+#include <qnamespace.h>
+#include <qpixmap.h>
 
 extern "C"
 {
@@ -21,14 +29,13 @@ extern "C"
 
     extern int start_point(int argc, char *argv[], const char* prpath)
     {
-#ifdef G_OS_WIN32
-        char* dir = g_strconcat(prpath, "..\\lib\\qt", NULL);
-        AddDllDirectory(dir);
-        g_free(dir);
-#endif
         QApplication a(argc, argv);
         SelfTranslator st;
         QCoreApplication::installTranslator(&st);
+
+        auto pixmap = dh::loadSvgResourceFile("/cn/dh/dhlrc/dhlrc.svg");
+        QApplication::setWindowIcon(QIcon(*pixmap));
+        delete pixmap;
 
         MainWindow w;
         w.show();
