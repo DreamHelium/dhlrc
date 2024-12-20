@@ -8,7 +8,7 @@
    version="1.1"
    id="svg1"
    inkscape:version="1.4 (e7c3feb100, 2024-10-09)"
-   sodipodi:docname="dhlrc.svg"
+   sodipodi:docname="region.svg"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns="http://www.w3.org/2000/svg"
@@ -40,7 +40,7 @@
        inkscape:vp_x="-11.854241 : 3.4476805 : 0"
        inkscape:vp_y="0 : 1227.8491 : 0"
        inkscape:vp_z="9.8227927 : 3.2742643 : 0"
-       inkscape:persp3d-origin="15.075159 : 1.1558866 : 1"
+       inkscape:persp3d-origin="15.702906 : 1.2129545 : 1"
        id="perspective1" />
   </defs>
   <g
@@ -59,53 +59,43 @@
          id="path6"
          style="fill:#e9e9ff;fill-rule:evenodd;stroke:none;stroke-linejoin:round"
          inkscape:box3dsidetype="11"
-         d="M 8.1114257,1.1935555 14.35171,3.0084763 v 8.9408697 l -6.2402843,-1.81492 z"
-         points="14.35171,3.0084763 14.35171,11.949346 8.1114257,10.134426 8.1114257,1.1935555 " />
+         d="M 8.7391727,1.1364876 14.979457,2.9514084 V 11.892278 L 8.7391727,10.077358 Z"
+         points="14.979457,2.9514084 14.979457,11.892278 8.7391727,10.077358 8.7391727,1.1364876 " />
       <path
          sodipodi:type="inkscape:box3dside"
          id="path1"
          style="fill:#353564;fill-rule:evenodd;stroke:none;stroke-linejoin:round"
          inkscape:box3dsidetype="6"
-         d="M 0.94034814,3.5839147 V 12.524785 L 8.1114257,10.134426 V 1.1935555 Z"
-         points="0.94034814,12.524785 8.1114257,10.134426 8.1114257,1.1935555 0.94034814,3.5839147 " />
+         d="M 1.5680951,3.5268468 V 12.467717 L 8.7391727,10.077358 V 1.1364876 Z"
+         points="1.5680951,12.467717 8.7391727,10.077358 8.7391727,1.1364876 1.5680951,3.5268468 " />
       <path
          sodipodi:type="inkscape:box3dside"
          id="path5"
          style="fill:#afafde;fill-rule:evenodd;stroke:none;stroke-linejoin:round"
          inkscape:box3dsidetype="13"
-         d="M 0.94034814,12.524785 7.1806329,14.339706 14.35171,11.949346 8.1114257,10.134426 Z"
-         points="7.1806329,14.339706 14.35171,11.949346 8.1114257,10.134426 0.94034814,12.524785 " />
+         d="m 1.5680951,12.467717 6.2402848,1.814921 7.1710771,-2.39036 -6.2402843,-1.81492 z"
+         points="7.8083799,14.282638 14.979457,11.892278 8.7391727,10.077358 1.5680951,12.467717 " />
       <path
          sodipodi:type="inkscape:box3dside"
          id="path2"
          style="fill:#4d4d9f;fill-rule:evenodd;stroke:none;stroke-linejoin:round"
          inkscape:box3dsidetype="5"
-         d="M 0.94034814,3.5839147 7.1806329,5.3988355 14.35171,3.0084763 8.1114257,1.1935555 Z"
-         points="7.1806329,5.3988355 14.35171,3.0084763 8.1114257,1.1935555 0.94034814,3.5839147 " />
+         d="M 1.5680951,3.5268468 7.8083799,5.3417676 14.979457,2.9514084 8.7391727,1.1364876 Z"
+         points="7.8083799,5.3417676 14.979457,2.9514084 8.7391727,1.1364876 1.5680951,3.5268468 " />
       <path
          sodipodi:type="inkscape:box3dside"
          id="path4"
          style="fill:#d7d7ff;fill-rule:evenodd;stroke:none;stroke-linejoin:round"
          inkscape:box3dsidetype="14"
-         d="M 7.1806329,5.3988355 V 14.339706 L 14.35171,11.949346 V 3.0084763 Z"
-         points="7.1806329,14.339706 14.35171,11.949346 14.35171,3.0084763 7.1806329,5.3988355 " />
+         d="m 7.8083799,5.3417676 v 8.9408704 l 7.1710771,-2.39036 V 2.9514084 Z"
+         points="7.8083799,14.282638 14.979457,11.892278 14.979457,2.9514084 7.8083799,5.3417676 " />
       <path
          sodipodi:type="inkscape:box3dside"
          id="path3"
          style="fill:#8686bf;fill-rule:evenodd;stroke:none;stroke-linejoin:round"
          inkscape:box3dsidetype="3"
-         d="M 0.94034814,3.5839147 7.1806329,5.3988355 V 14.339706 L 0.94034814,12.524785 Z"
-         points="7.1806329,5.3988355 7.1806329,14.339706 0.94034814,12.524785 0.94034814,3.5839147 " />
+         d="M 1.5680951,3.5268468 7.8083799,5.3417676 V 14.282638 L 1.5680951,12.467717 Z"
+         points="7.8083799,5.3417676 7.8083799,14.282638 1.5680951,12.467717 1.5680951,3.5268468 " />
     </g>
-    <circle
-       style="fill:none;stroke:#000000;stroke-width:0.49114;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none"
-       id="path7"
-       cx="12.661243"
-       cy="12.794884"
-       r="1.2437558" />
-    <path
-       style="fill:#eeebe4;stroke:#000000;stroke-width:0.49114;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none"
-       d="m 13.659751,13.688284 1.489004,1.489004"
-       id="path8" />
   </g>
 </svg>

@@ -3,5 +3,7 @@
   <gresource prefix="/cn/dh/dhlrc">
     <file>dhlrc.svg</file>
     <file>nbt_tree.svg</file>
+    <file>region.svg</file>
+    <file>item_list.svg</file>
   </gresource>
 </gresources>
