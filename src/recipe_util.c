@@ -16,6 +16,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>. */
 
 #include "recipe_util.h"
+#include "glib.h"
 #include "json_util.h"
 #include <cjson/cJSON.h>
 #include <string.h>
@@ -26,6 +27,7 @@
 #include "dhlrc_list.h"
 #include <dhutil.h>
 #include "dh_validator.h"
+#include "mcdir/path.h"
 #include "translation.h"
 
 static cJSON* translation_json = NULL;
@@ -143,39 +145,11 @@ const char* name_block_translate(const char *block_name)
 
 static gchar* find_transfile()
 {
-    if(dh_file_exist("translation.json"))
-        return g_strdup("translation.json");
-    else
-    {
-        gchar* game_dir = dh_get_game_dir();
-        gchar* index_file = NULL;
-        /* Analyse .minecraft filepos */
-        if(game_dir)
-        {
-            index_file = g_strconcat(game_dir, "/assets/indexes/1.18.json" , NULL);
-        }
-        else index_file = g_strconcat(g_get_home_dir(), "/.minecraft/assets/indexes/1.18.json", NULL);
-        if(dh_file_exist(index_file))
-        {
-            g_free(game_dir);
-            cJSON* index = dhlrc_file_to_json(index_file);
-            g_free(index_file);
-            /* Analyse index file */
-            cJSON* objects = cJSON_GetObjectItem(index, "objects");
-            cJSON* translation_file = cJSON_GetObjectItem(objects, "minecraft/lang/zh_cn.json");
-            cJSON* hash = cJSON_GetObjectItem(translation_file, "hash");
-            gchar* hash_name = cJSON_GetStringValue(hash);
-            gchar hash_name_pre[3] = {hash_name[0], hash_name[1] ,0};
-            gchar* transfile = g_strconcat(g_get_home_dir(), "/.minecraft/assets/objects/", hash_name_pre, "/", hash_name, NULL);
-            cJSON_Delete(index);
-            return transfile;
-        }
-        else
-        {
-            g_free(index_file);
-            return NULL;
-        }
-    }
+    char* gamedir = dh_get_game_dir();
+    const char* const* locales = g_get_language_names();
+    char* ret = dh_mcdir_get_translation_file(gamedir, "1.18", locales[0]);
+    g_free(gamedir);
+    return ret;
 }
 
 int dh_exit()

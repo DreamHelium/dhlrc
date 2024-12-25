@@ -17,10 +17,10 @@
 
 #include "config.h"
 #include <cjson/cJSON.h>
-#include "dhutil/dhutil.h"
 #include <gio/gio.h>
-#include "glibconfig.h"
 #include "json_util.h"
+#include "dh_string_util.h"
+#include "dh_file_util.h"
 
 /* Unused until I get understand of monitor */
 static cJSON* content = NULL;
@@ -73,6 +73,18 @@ void dh_exit1()
 {
     /* cJSON_Delete(content); */
     g_free(config_file);
+}
+
+char* dh_get_translation_dir()
+{
+    cJSON* content_d = get_content();
+    cJSON* translate_obj = cJSON_GetObjectItem(content_d, "itemTranslate");
+    char* ret = NULL;
+    if(translate_obj)
+        ret = g_strdup(cJSON_GetStringValue(translate_obj));
+    else ret = NULL;
+    cJSON_Delete(content_d);
+    return ret;
 }
 
 char* dh_get_game_dir()

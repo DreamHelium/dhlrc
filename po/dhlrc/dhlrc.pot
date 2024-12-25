@@ -15,7 +15,7 @@ msgstr ""
 "#-#-#-#-#  dhlrc.pot (dhlrc)  #-#-#-#-#\n"
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-12-20 14:11+0800\n"
+"POT-Creation-Date: 2024-12-22 15:16+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -576,7 +576,7 @@ msgid ""
 msgstr ""
 
 #: src/main_isoc.c:135 src/nbt_litereader.c:78 src/nbt_litereader.c:311
-#: src/recipe_util.c:45 src/cli/main_cli.c:26
+#: src/recipe_util.c:47 src/cli/main_cli.c:26
 msgid "Quit application"
 msgstr ""
 
@@ -662,11 +662,11 @@ msgstr ""
 msgid "No"
 msgstr ""
 
-#: src/recipe_util.c:44
+#: src/recipe_util.c:46
 msgid "Choose all numbers"
 msgstr ""
 
-#: src/recipe_util.c:47
+#: src/recipe_util.c:49
 msgid "Please enter numbers or option: "
 msgstr ""
 
@@ -719,15 +719,15 @@ msgstr ""
 msgid "No item list available!"
 msgstr ""
 
-#: src/qt/ilchooseui.cpp:91 src/qt/ilreaderui.cpp:110 src/qt/mainwindow.cpp:120
-#: src/qt/mainwindow.cpp:155 src/qt/mainwindow.cpp:157
-#: src/qt/mainwindow.cpp:160 src/qt/mainwindow.cpp:181
-#: src/qt/mainwindow.cpp:183 src/qt/mainwindow.cpp:186
-#: src/qt/mainwindow.cpp:197 src/qt/mainwindow.cpp:221
-#: src/qt/mainwindow.cpp:223 src/qt/mainwindow.cpp:226
-#: src/qt/mainwindow.cpp:228 src/qt/mainwindow.cpp:250
-#: src/qt/mainwindow.cpp:253 src/qt/mainwindow.cpp:255
-#: src/qt/mainwindow.cpp:279 src/qt/mainwindow.cpp:281 src/qt/manage.cpp:30
+#: src/qt/ilchooseui.cpp:91 src/qt/ilreaderui.cpp:110 src/qt/mainwindow.cpp:119
+#: src/qt/mainwindow.cpp:154 src/qt/mainwindow.cpp:156
+#: src/qt/mainwindow.cpp:159 src/qt/mainwindow.cpp:180
+#: src/qt/mainwindow.cpp:182 src/qt/mainwindow.cpp:185
+#: src/qt/mainwindow.cpp:196 src/qt/mainwindow.cpp:220
+#: src/qt/mainwindow.cpp:222 src/qt/mainwindow.cpp:225
+#: src/qt/mainwindow.cpp:227 src/qt/mainwindow.cpp:249
+#: src/qt/mainwindow.cpp:252 src/qt/mainwindow.cpp:254
+#: src/qt/mainwindow.cpp:278 src/qt/mainwindow.cpp:280 src/qt/manage.cpp:30
 #: src/qt/manage.cpp:242 src/qt/manage.cpp:470 src/qt/manage.cpp:483
 #: src/qt/nbtselectui.cpp:98 src/qt/regionchooseui.cpp:122
 #: src/qt/saveregionselectui.cpp:73 src/qt/saveregionselectui.cpp:87
@@ -777,8 +777,8 @@ msgstr ""
 msgid "Show history"
 msgstr ""
 
-#: src/qt/ilreaderui.cpp:110 src/qt/mainwindow.cpp:155
-#: src/qt/mainwindow.cpp:181
+#: src/qt/ilreaderui.cpp:110 src/qt/mainwindow.cpp:154
+#: src/qt/mainwindow.cpp:180
 msgid "The item list is locked!"
 msgstr ""
 
@@ -800,49 +800,49 @@ msgstr ""
 msgid "Enter description here."
 msgstr ""
 
-#: src/qt/mainwindow.cpp:120 src/qt/mainwindow.cpp:281
+#: src/qt/mainwindow.cpp:119 src/qt/mainwindow.cpp:280
 #: src/qt/saveregionselectui.cpp:73 src/qt/utility.cpp:39
 msgid "NBT list is locked!"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:157 src/qt/mainwindow.cpp:183
+#: src/qt/mainwindow.cpp:156 src/qt/mainwindow.cpp:182
 msgid "The item list is freed!"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:160 src/qt/mainwindow.cpp:186
+#: src/qt/mainwindow.cpp:159 src/qt/mainwindow.cpp:185
 msgid "No item list!"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:197 src/qt/mainwindow.cpp:228
-#: src/qt/mainwindow.cpp:255
+#: src/qt/mainwindow.cpp:196 src/qt/mainwindow.cpp:227
+#: src/qt/mainwindow.cpp:254
 msgid "Region list is locked!"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:214 src/qt/saveregionselectui.cpp:80
+#: src/qt/mainwindow.cpp:213 src/qt/saveregionselectui.cpp:80
 msgid "Enter Name for Item List"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:214 src/qt/saveregionselectui.cpp:80
+#: src/qt/mainwindow.cpp:213 src/qt/saveregionselectui.cpp:80
 msgid "Enter the name for item list"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:221 src/qt/saveregionselectui.cpp:87
+#: src/qt/mainwindow.cpp:220 src/qt/saveregionselectui.cpp:87
 msgid "Description is empty!"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:223 src/qt/saveregionselectui.cpp:89
+#: src/qt/mainwindow.cpp:222 src/qt/saveregionselectui.cpp:89
 msgid "Item list is locked!"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:226 src/qt/mainwindow.cpp:253
+#: src/qt/mainwindow.cpp:225 src/qt/mainwindow.cpp:252
 msgid "No Region or no Region selected!"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:250
+#: src/qt/mainwindow.cpp:249
 msgid "Region is locked!"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:279
+#: src/qt/mainwindow.cpp:278
 msgid "No NBT is selected!"
 msgstr ""
 

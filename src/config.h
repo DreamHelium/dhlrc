@@ -36,6 +36,8 @@ char* dh_get_cache_dir();
 char* dh_get_version();
 /** Get recipe directory, if fail return decompressed position */
 char* dh_get_recipe_dir();
+/** This is used by mcdir file */
+char* dh_get_translation_dir();
 
 
 #ifdef __cplusplus

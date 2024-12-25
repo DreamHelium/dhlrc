@@ -35,6 +35,7 @@ add_library(dhlrc_recipe_full SHARED
 )
 
 add_library(dhlrc SHARED
+           mcdir/path.c mcdir/path.h
 		   common.c common.h
 		   translation.h
 		   translation.c
@@ -103,5 +104,6 @@ install(TARGETS dhlrc.bin
 )
 
 add_subdirectory(qt)
-add_subdirectory(gtk)
+#add_subdirectory(gtk)
 add_subdirectory(cli)
+
