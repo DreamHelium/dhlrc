@@ -53,8 +53,8 @@ add_library(dhlrc SHARED
 	       config.h
 	       uncompress.c
 	       uncompress.h
-	       nbt_litereader.h
-	       nbt_litereader.c
+	       nbt_util.h
+	       nbt_util.c
 		   json_util.c
 		   json_util.h
 		   nbt_info.c

@@ -252,15 +252,6 @@ int nbtlr_list(NBT *given_nbt, int read_next)
     }
 }
 
-NBT *nbtlr_to_next_nbt(NBT *root, int n)
-{
-    NBT* next_nbt = root;
-    /* Protection for "NULL" situation */
-    for(int i = 0 ; i < n && next_nbt ; i++)
-        next_nbt = next_nbt->next;
-    return next_nbt;
-}
-
 void nbtlr_modifier_start(NBT *root, int modify_list, GValue* value)
 {
     while(1)
@@ -381,109 +372,5 @@ void nbtlr_modifier_start(NBT *root, int modify_list, GValue* value)
 
 int nbtlr_Modifier_instance(NBT* root)
 {
-    return 0;
-}
-
-int nbtlr_save(NBT* root)
-{
-    int bit = 1;
-    size_t len = 0;
-#ifndef LIBNBT_USE_LIBDEFLATE
-    size_t old_len = 0;
-#endif
-    uint8_t* data = NULL;
-    while(1)
-    {
-        len = 1 << bit;
-        data = (uint8_t*)malloc(len * sizeof(uint8_t));
-        int ret = NBT_Pack(root, data, &len);
-        if(ret == 0)
-        {
-#ifndef LIBNBT_USE_LIBDEFLATE
-            if(old_len != len) // compress not finish due to a bug in old libnbt (in submodule)
-            {
-                old_len = len;
-                free(data);
-                bit++;
-                continue;
-            }
-#endif
-            char* input = NULL;
-            size_t size = 0;
-            if(dh_getline(&input, &size, stdin) != -1)
-            {
-                int str_len = strlen(input);
-                input[str_len - 1] = 0;
-                dh_write_file(input, data, len);
-                free(data);
-                free(input);
-                return 1;
-            }
-            else
-            {
-                free(input);
-                return 0;
-            }
-        }
-        else if(bit < 25)
-        {
-            free(data);
-            bit++; // It might be not enough space
-        }
-        else
-        {
-            free(data);
-            return 0;
-        }
-    }
-    return 0;
-}
-
-int dhlrc_nbt_save(NBT* root, const char* pos)
-{
-    int bit = 1;
-    size_t len = 0;
-#ifndef LIBNBT_USE_LIBDEFLATE
-    size_t old_len = 0;
-#endif
-    uint8_t* data = NULL;
-    while(1)
-    {
-        len = 1 << bit;
-        data = (uint8_t*)malloc(len * sizeof(uint8_t));
-        int ret = NBT_Pack(root, data, &len);
-        if(ret == 0)
-        {
-#ifndef LIBNBT_USE_LIBDEFLATE
-            if(old_len != len) // compress not finish due to a bug in old libnbt (in submodule)
-            {
-                old_len = len;
-                free(data);
-                bit++;
-                continue;
-            }
-#endif
-            if(pos)
-            {
-                dh_write_file(pos, data, len);
-                free(data);
-                return 1;
-            }
-            else
-            {
-                return 0;
-            }
-        }
-        else if(bit < 25)
-        {
-            free(data);
-            bit++; // It might be not enough space
-        }
-        else
-        {
-            free(data);
-            return 0;
-        }
-    }
     return 0;
 }

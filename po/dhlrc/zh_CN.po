@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-12-21 23:10+0800\n"
+"POT-Creation-Date: 2024-12-31 22:03+0800\n"
 "PO-Revision-Date: 2024-11-30 07:00+0800\n"
 "Last-Translator: dream_he <48383878+DreamHelium@users.noreply.github.com>\n"
 "Language-Team: Chinese <kde-i18n-doc@kde.org>\n"
@@ -525,48 +525,32 @@ msgstr ""
 "请再次输入方块的坐标，或输入 “b” 选择其他区域，输入 “r” 阅读方块的细节，输入 "
 "“q” 退出程序 (b): "
 
-#: src/main.c:159 src/main.c:189 src/main_isoc.c:108 src/qt/utility.cpp:129
-msgid "Not a valid NBT file!"
-msgstr "不是一个有效的NBT文件！"
-
-#: src/main.c:168 src/qt/utility.cpp:109
-msgid "Enter desciption for the NBT file."
-msgstr "输入NBT文件的描述。"
-
-#: src/main.c:270
+#: src/main.c:269
 #, c-format
 msgid "dhlrc - Program to handle litematic or other struct of Minecraft.\n"
 msgstr ""
 
-#: src/main.c:272
+#: src/main.c:271
 #, c-format
 msgid "Modules:\n"
 msgstr ""
 
-#: src/main.c:294
+#: src/main.c:293
 #, c-format
 msgid "Unrecognized options "
 msgstr ""
 
-#: src/main.c:354 src/qt/utility.cpp:91
-msgid "The following files couldn't be added:\n"
-msgstr ""
-
-#: src/main.c:369
+#: src/main.c:368
 msgid "[FILE] - Read a litematic file."
 msgstr "[文件] - 读取一个投影文件。"
-
-#: src/main.c:403
-msgid "directory"
-msgstr "目录"
-
-#: src/main.c:404
-msgid "file"
-msgstr "文件"
 
 #: src/main_isoc.c:92
 msgid "Error when reading file."
 msgstr "在读取文件时出错。"
+
+#: src/main_isoc.c:108 src/qt/utility.cpp:129
+msgid "Not a valid NBT file!"
+msgstr "不是一个有效的NBT文件！"
 
 #: src/main_isoc.c:114
 msgid "Valid NBT file!"
@@ -587,8 +571,7 @@ msgstr ""
 "[2] 投影方块阅读器\n"
 "\n"
 
-#: src/main_isoc.c:135 src/nbt_litereader.c:78 src/nbt_litereader.c:311
-#: src/recipe_util.c:47 src/cli/main_cli.c:26
+#: src/main_isoc.c:135 src/nbt_litereader.c:78 src/nbt_litereader.c:302
 msgid "Quit application"
 msgstr "退出程序"
 
@@ -630,7 +613,7 @@ msgstr ""
 "\n"
 "请输入一个数字或选择选项以继续 [Q/m/s/e/?]： "
 
-#: src/nbt_litereader.c:90 src/nbt_litereader.c:98 src/nbt_litereader.c:310
+#: src/nbt_litereader.c:90 src/nbt_litereader.c:98 src/nbt_litereader.c:301
 msgid "Enter upper NBT"
 msgstr "进入上层NBT"
 
@@ -650,7 +633,7 @@ msgstr ""
 "\n"
 "没有深层NBT，请选择选项以继续 [P/q/m/s/e/?]： "
 
-#: src/nbt_litereader.c:270 src/nbt_litereader.c:369
+#: src/nbt_litereader.c:261 src/nbt_litereader.c:360
 #, c-format
 msgid ""
 "\n"
@@ -659,38 +642,30 @@ msgstr ""
 "\n"
 "不支持的修改模式请求，将退回至阅读模式。"
 
-#: src/nbt_litereader.c:312
+#: src/nbt_litereader.c:303
 msgid "Exit modification mode"
 msgstr "退出修改模式"
 
-#: src/nbt_litereader.c:318
+#: src/nbt_litereader.c:309
 msgid ""
 "\n"
 "Please enter an integer or choose an option [P/q/b/?]: "
 msgstr ""
 
-#: src/nbt_litereader.c:332
+#: src/nbt_litereader.c:323
 #, c-format
 msgid ""
 "\n"
 "The integer you input is %ld, please confirm [Y/n/?]:"
 msgstr ""
 
-#: src/nbt_litereader.c:334
+#: src/nbt_litereader.c:325
 msgid "Yes"
 msgstr "是"
 
-#: src/nbt_litereader.c:335
+#: src/nbt_litereader.c:326
 msgid "No"
 msgstr "否"
-
-#: src/recipe_util.c:46
-msgid "Choose all numbers"
-msgstr "选择所有数字"
-
-#: src/recipe_util.c:49
-msgid "Please enter numbers or option: "
-msgstr "请输入数字或选项："
 
 #: src/qt/blockreaderui.cpp:60
 msgid ""
@@ -888,7 +863,7 @@ msgstr "Schema投影"
 msgid "Others"
 msgstr "其它"
 
-#: src/qt/manage.cpp:75 src/cli/main_cli.c:14 src/cli/main_cli.c:22
+#: src/qt/manage.cpp:75 src/cli/main_cli.c:11 src/cli/main_cli.c:21
 msgid "Manage NBT"
 msgstr "管理NBT"
 
@@ -942,7 +917,7 @@ msgstr ""
 msgid "The following infos are locked:\n"
 msgstr ""
 
-#: src/qt/manage.cpp:325 src/cli/main_cli.c:15 src/cli/main_cli.c:23
+#: src/qt/manage.cpp:325 src/cli/main_cli.c:12 src/cli/main_cli.c:22
 msgid "Manage Region"
 msgstr ""
 
@@ -1081,9 +1056,17 @@ msgstr "此NBT结构不受支持！"
 msgid "This NBT is locked!"
 msgstr "此NBT被锁定！"
 
+#: src/qt/utility.cpp:91
+msgid "The following files couldn't be added:\n"
+msgstr ""
+
 #: src/qt/utility.cpp:109 src/gtk/manage_nbt.c:131
 msgid "Enter Desciption"
 msgstr "输入描述"
+
+#: src/qt/utility.cpp:109
+msgid "Enter desciption for the NBT file."
+msgstr "输入NBT文件的描述。"
 
 #: src/qt/utility.cpp:111
 msgid "No Description Entered!"
@@ -1197,25 +1180,42 @@ msgstr "刷新（&E）"
 msgid "The GTK interface of dhlrc"
 msgstr ""
 
-#: src/cli/main_cli.c:13
+#: src/cli/main_cli.c:10
+#, c-format
 msgid "The functions are listed below:\n"
 msgstr ""
 
-#: src/cli/main_cli.c:16 src/cli/main_cli.c:24
+#: src/cli/main_cli.c:13 src/cli/main_cli.c:23
 msgid "Manage item list"
 msgstr ""
 
-#: src/cli/main_cli.c:17 src/cli/main_cli.c:25
+#: src/cli/main_cli.c:14 src/cli/main_cli.c:24
 msgid "Config settings"
 msgstr "配置设置"
 
-#: src/cli/main_cli.c:28
+#: src/cli/main_cli.c:29
 msgid "Debug"
 msgstr ""
 
-#: src/cli/main_cli.c:75
+#: src/cli/main_cli.c:34
+msgid "Please enter a number or an option"
+msgstr ""
+
+#: src/cli/main_cli.c:64
 msgid "The CLI/TUI interface of dhlrc"
 msgstr ""
+
+#~ msgid "directory"
+#~ msgstr "目录"
+
+#~ msgid "file"
+#~ msgstr "文件"
+
+#~ msgid "Choose all numbers"
+#~ msgstr "选择所有数字"
+
+#~ msgid "Please enter numbers or option: "
+#~ msgstr "请输入数字或选项："
 
 #~ msgid "Override Language"
 #~ msgstr "覆盖语言"

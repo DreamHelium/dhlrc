@@ -16,9 +16,10 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>. */
 
 #include "nbt_pos.h"
-#include "nbt_litereader.h"
+#include "nbt_util.h"
 #include <stdlib.h>
 #include <string.h>
+#include <stdarg.h>
 
 NbtPos* nbt_pos_init(NBT* root)
 {

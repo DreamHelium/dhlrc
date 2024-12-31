@@ -15,7 +15,7 @@ msgstr ""
 "#-#-#-#-#  dhlrc.pot (dhlrc)  #-#-#-#-#\n"
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-12-22 15:16+0800\n"
+"POT-Creation-Date: 2024-12-31 23:38+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -518,47 +518,31 @@ msgid ""
 "the program (b): "
 msgstr ""
 
-#: src/main.c:159 src/main.c:189 src/main_isoc.c:108 src/qt/utility.cpp:129
-msgid "Not a valid NBT file!"
-msgstr ""
-
-#: src/main.c:168 src/qt/utility.cpp:109
-msgid "Enter desciption for the NBT file."
-msgstr ""
-
-#: src/main.c:270
+#: src/main.c:269
 #, c-format
 msgid "dhlrc - Program to handle litematic or other struct of Minecraft.\n"
 msgstr ""
 
-#: src/main.c:272
+#: src/main.c:271
 #, c-format
 msgid "Modules:\n"
 msgstr ""
 
-#: src/main.c:294
+#: src/main.c:293
 #, c-format
 msgid "Unrecognized options "
 msgstr ""
 
-#: src/main.c:354 src/qt/utility.cpp:91
-msgid "The following files couldn't be added:\n"
-msgstr ""
-
-#: src/main.c:369
+#: src/main.c:368
 msgid "[FILE] - Read a litematic file."
-msgstr ""
-
-#: src/main.c:403
-msgid "directory"
-msgstr ""
-
-#: src/main.c:404
-msgid "file"
 msgstr ""
 
 #: src/main_isoc.c:92
 msgid "Error when reading file."
+msgstr ""
+
+#: src/main_isoc.c:108 src/qt/utility.cpp:129
+msgid "Not a valid NBT file!"
 msgstr ""
 
 #: src/main_isoc.c:114
@@ -575,8 +559,7 @@ msgid ""
 "\n"
 msgstr ""
 
-#: src/main_isoc.c:135 src/nbt_litereader.c:78 src/nbt_litereader.c:311
-#: src/recipe_util.c:47 src/cli/main_cli.c:26
+#: src/main_isoc.c:135 src/nbt_litereader.c:78 src/nbt_litereader.c:302
 msgid "Quit application"
 msgstr ""
 
@@ -614,7 +597,7 @@ msgid ""
 "Please enter a number or choose option to continue [Q/m/s/e/?]: "
 msgstr ""
 
-#: src/nbt_litereader.c:90 src/nbt_litereader.c:98 src/nbt_litereader.c:310
+#: src/nbt_litereader.c:90 src/nbt_litereader.c:98 src/nbt_litereader.c:301
 msgid "Enter upper NBT"
 msgstr ""
 
@@ -630,44 +613,36 @@ msgid ""
 "No deeper NBT, please choose option to continue [P/q/m/s/e/?]: "
 msgstr ""
 
-#: src/nbt_litereader.c:270 src/nbt_litereader.c:369
+#: src/nbt_litereader.c:261 src/nbt_litereader.c:360
 #, c-format
 msgid ""
 "\n"
 "Unsupported modification mode request, will exit to reading mode."
 msgstr ""
 
-#: src/nbt_litereader.c:312
+#: src/nbt_litereader.c:303
 msgid "Exit modification mode"
 msgstr ""
 
-#: src/nbt_litereader.c:318
+#: src/nbt_litereader.c:309
 msgid ""
 "\n"
 "Please enter an integer or choose an option [P/q/b/?]: "
 msgstr ""
 
-#: src/nbt_litereader.c:332
+#: src/nbt_litereader.c:323
 #, c-format
 msgid ""
 "\n"
 "The integer you input is %ld, please confirm [Y/n/?]:"
 msgstr ""
 
-#: src/nbt_litereader.c:334
+#: src/nbt_litereader.c:325
 msgid "Yes"
 msgstr ""
 
-#: src/nbt_litereader.c:335
+#: src/nbt_litereader.c:326
 msgid "No"
-msgstr ""
-
-#: src/recipe_util.c:46
-msgid "Choose all numbers"
-msgstr ""
-
-#: src/recipe_util.c:49
-msgid "Please enter numbers or option: "
 msgstr ""
 
 #: src/qt/blockreaderui.cpp:60
@@ -866,7 +841,7 @@ msgstr ""
 msgid "Others"
 msgstr ""
 
-#: src/qt/manage.cpp:75 src/cli/main_cli.c:14 src/cli/main_cli.c:22
+#: src/qt/manage.cpp:75 src/cli/main_cli.c:21 src/cli/main_cli.c:31
 msgid "Manage NBT"
 msgstr ""
 
@@ -920,7 +895,7 @@ msgstr ""
 msgid "The following infos are locked:\n"
 msgstr ""
 
-#: src/qt/manage.cpp:325 src/cli/main_cli.c:15 src/cli/main_cli.c:23
+#: src/qt/manage.cpp:325 src/cli/main_cli.c:22 src/cli/main_cli.c:32
 msgid "Manage Region"
 msgstr ""
 
@@ -1059,8 +1034,16 @@ msgstr ""
 msgid "This NBT is locked!"
 msgstr ""
 
+#: src/qt/utility.cpp:91
+msgid "The following files couldn't be added:\n"
+msgstr ""
+
 #: src/qt/utility.cpp:109 src/gtk/manage_nbt.c:131
 msgid "Enter Desciption"
+msgstr ""
+
+#: src/qt/utility.cpp:109
+msgid "Enter desciption for the NBT file."
 msgstr ""
 
 #: src/qt/utility.cpp:111
@@ -1175,20 +1158,41 @@ msgstr ""
 msgid "The GTK interface of dhlrc"
 msgstr ""
 
-#: src/cli/main_cli.c:13
-msgid "The functions are listed below:\n"
+#: src/cli/main_cli.c:21
+msgid "manage_nbt"
 msgstr ""
 
-#: src/cli/main_cli.c:16 src/cli/main_cli.c:24
+#: src/cli/main_cli.c:22
+msgid "manage_region"
+msgstr ""
+
+#: src/cli/main_cli.c:23
+msgid "manage_item_list"
+msgstr ""
+
+#: src/cli/main_cli.c:23 src/cli/main_cli.c:33
 msgid "Manage item list"
 msgstr ""
 
-#: src/cli/main_cli.c:17 src/cli/main_cli.c:25
+#: src/cli/main_cli.c:24
+msgid "config_settings"
+msgstr ""
+
+#: src/cli/main_cli.c:24 src/cli/main_cli.c:34
 msgid "Config settings"
 msgstr ""
 
-#: src/cli/main_cli.c:28
+#: src/cli/main_cli.c:30
+#, c-format
+msgid "The functions are listed below:\n"
+msgstr ""
+
+#: src/cli/main_cli.c:40
 msgid "Debug"
+msgstr ""
+
+#: src/cli/main_cli.c:45
+msgid "Please enter a number or an option"
 msgstr ""
 
 #: src/cli/main_cli.c:75

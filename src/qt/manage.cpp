@@ -18,7 +18,7 @@
 #include <QFileDialog>
 #include <qstandarditemmodel.h>
 #include "../translation.h"
-#include "../nbt_litereader.h"
+#include "../nbt_util.h"
 #include <QDebug>
 #include "../region_info.h"
 #include "saveregionselectui.h"

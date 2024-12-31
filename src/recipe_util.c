@@ -26,7 +26,6 @@
 #include "config.h"
 #include "dhlrc_list.h"
 #include <dhutil.h>
-#include "dh_validator.h"
 #include "mcdir/path.h"
 #include "translation.h"
 
@@ -34,6 +33,7 @@ static cJSON* translation_json = NULL;
 
 static gchar* find_transfile();
 
+/*
 long* num_array_get_from_input(int* array_num, int max_num)
 {
     if(!array_num) return NULL;
@@ -89,6 +89,7 @@ long* num_array_get_from_input(int* array_num, int max_num)
         return NULL;
     }
 }
+*/
 
 const char* name_block_translate(const char *block_name)
 {
