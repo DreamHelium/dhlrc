@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>470</width>
-    <height>391</height>
+    <width>472</width>
+    <height>365</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -138,181 +138,53 @@
     <item>
      <widget class="QLabel" name="label_6">
       <property name="text">
-       <string>Let's add NBT file(s)!</string>
+       <string>Please select the logic of finding corresponding files.</string>
       </property>
      </widget>
     </item>
     <item>
-     <layout class="QVBoxLayout" name="verticalLayout_7">
-      <item>
-       <widget class="QRadioButton" name="radioButton_3">
-        <property name="text">
-         <string>I want to &amp;add the NBT file(s).</string>
-        </property>
-        <property name="checked">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <layout class="QVBoxLayout" name="addLayout">
-        <item>
-         <widget class="QLabel" name="label_7">
-          <property name="text">
-           <string>NBT file(s):</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_2">
-          <item>
-           <widget class="QLineEdit" name="lineEdit_2"/>
-          </item>
-          <item>
-           <widget class="QPushButton" name="pushButton_3">
-            <property name="text">
-             <string/>
-            </property>
-            <property name="icon">
-             <iconset theme="document-open"/>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="pushButton_4">
-            <property name="text">
-             <string>&amp;Reset</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </item>
-       </layout>
-      </item>
-      <item>
-       <widget class="QRadioButton" name="radioButton_4">
-        <property name="text">
-         <string>&amp;I do not want to add the NBT file.</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
+     <widget class="QRadioButton" name="radioButton_3">
+      <property name="text">
+       <string>Select &amp;a specific version to use the files.</string>
+      </property>
+      <property name="checked">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QRadioButton" name="radioButton_4">
+      <property name="text">
+       <string>&amp;Decide by NBT file</string>
+      </property>
+     </widget>
     </item>
    </layout>
   </widget>
   <widget class="QWizardPage" name="wizardPage_3">
-   <layout class="QVBoxLayout" name="verticalLayout_9">
+   <layout class="QVBoxLayout" name="verticalLayout_9"/>
+  </widget>
+  <widget class="QWizardPage" name="wizardPage2">
+   <layout class="QVBoxLayout" name="verticalLayout_7">
+    <item>
+     <widget class="QLabel" name="label_7">
+      <property name="text">
+       <string>The wizard is finished!</string>
+      </property>
+     </widget>
+    </item>
     <item>
      <widget class="QLabel" name="label_8">
       <property name="text">
-       <string>Let's load a region.</string>
+       <string>If you want to configure again, select &quot;Utility&quot;-&gt;&quot;Config Wizard&quot; to reconfigure.</string>
+      </property>
+      <property name="wordWrap">
+       <bool>true</bool>
       </property>
      </widget>
-    </item>
-    <item>
-     <layout class="QHBoxLayout" name="horizontalLayout_7">
-      <item>
-       <widget class="QPushButton" name="pushButton_5">
-        <property name="text">
-         <string>&amp;Add region from the NBT</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="pushButton_6">
-        <property name="text">
-         <string>&amp;Select the region</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </item>
-    <item>
-     <widget class="QLabel" name="label_9">
-      <property name="text">
-       <string>The region base info are listed below:</string>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <layout class="QVBoxLayout" name="verticalLayout_8">
-      <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_3">
-        <item>
-         <widget class="QLabel" name="label_10">
-          <property name="text">
-           <string>Name:</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QLabel" name="nameLabel">
-          <property name="text">
-           <string/>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </item>
-      <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_4">
-        <item>
-         <widget class="QLabel" name="label_11">
-          <property name="text">
-           <string>UUID:</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QLabel" name="uuidLabel">
-          <property name="text">
-           <string/>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </item>
-      <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_5">
-        <item>
-         <widget class="QLabel" name="label_12">
-          <property name="text">
-           <string>Time:</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QLabel" name="timeLabel">
-          <property name="text">
-           <string/>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </item>
-      <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_6">
-        <item>
-         <widget class="QLabel" name="label_13">
-          <property name="text">
-           <string>Data Version:</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QLabel" name="versionLabel">
-          <property name="text">
-           <string/>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </item>
-     </layout>
     </item>
    </layout>
   </widget>
-  <widget class="QWizardPage" name="wizardPage2"/>
  </widget>
  <resources/>
  <connections/>

@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-12-31 22:03+0800\n"
+"POT-Creation-Date: 2025-01-01 16:02+0800\n"
 "PO-Revision-Date: 2024-11-30 07:00+0800\n"
 "Last-Translator: dream_he <48383878+DreamHelium@users.noreply.github.com>\n"
 "Language-Team: Chinese <kde-i18n-doc@kde.org>\n"
@@ -863,7 +863,7 @@ msgstr "Schema投影"
 msgid "Others"
 msgstr "其它"
 
-#: src/qt/manage.cpp:75 src/cli/main_cli.c:11 src/cli/main_cli.c:21
+#: src/qt/manage.cpp:75 src/cli/main_cli.c:21 src/cli/main_cli.c:31
 msgid "Manage NBT"
 msgstr "管理NBT"
 
@@ -917,7 +917,7 @@ msgstr ""
 msgid "The following infos are locked:\n"
 msgstr ""
 
-#: src/qt/manage.cpp:325 src/cli/main_cli.c:12 src/cli/main_cli.c:22
+#: src/qt/manage.cpp:325 src/cli/main_cli.c:22 src/cli/main_cli.c:32
 msgid "Manage Region"
 msgstr ""
 
@@ -1180,28 +1180,44 @@ msgstr "刷新（&E）"
 msgid "The GTK interface of dhlrc"
 msgstr ""
 
-#: src/cli/main_cli.c:10
+#: src/cli/main_cli.c:21
+msgid "manage_nbt"
+msgstr ""
+
+#: src/cli/main_cli.c:22
+msgid "manage_region"
+msgstr ""
+
+#: src/cli/main_cli.c:23
+msgid "manage_item_list"
+msgstr ""
+
+#: src/cli/main_cli.c:23 src/cli/main_cli.c:33
+msgid "Manage item list"
+msgstr ""
+
+#: src/cli/main_cli.c:24
+msgid "config_settings"
+msgstr ""
+
+#: src/cli/main_cli.c:24 src/cli/main_cli.c:34
+msgid "Config settings"
+msgstr "配置设置"
+
+#: src/cli/main_cli.c:30
 #, c-format
 msgid "The functions are listed below:\n"
 msgstr ""
 
-#: src/cli/main_cli.c:13 src/cli/main_cli.c:23
-msgid "Manage item list"
-msgstr ""
-
-#: src/cli/main_cli.c:14 src/cli/main_cli.c:24
-msgid "Config settings"
-msgstr "配置设置"
-
-#: src/cli/main_cli.c:29
+#: src/cli/main_cli.c:40
 msgid "Debug"
 msgstr ""
 
-#: src/cli/main_cli.c:34
+#: src/cli/main_cli.c:45
 msgid "Please enter a number or an option"
 msgstr ""
 
-#: src/cli/main_cli.c:64
+#: src/cli/main_cli.c:75
 msgid "The CLI/TUI interface of dhlrc"
 msgstr ""
 

@@ -305,7 +305,7 @@ static gint run_app (GApplication* self, GApplicationCommandLine* command_line, 
 #else
         if(g_getenv("XDG_SESSION_DESKTOP"))
         {
-            load_module(modules, len, "cli", argv[0], argc, argv, &success);
+            load_module(modules, len, "qt", argv[0], argc, argv, &success);
             if(!success) printf("Failed to load qt module!\n");
         }
         else 
