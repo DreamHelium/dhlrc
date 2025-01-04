@@ -253,6 +253,11 @@ msgctxt "MainWindow|"
 msgid "&Config Setting"
 msgstr ""
 
+#: ../../src/qt/mainwindow.ui:155
+msgctxt "MainWindow|"
+msgid "Config &Wizard"
+msgstr ""
+
 #: ../../src/qt/manageui.ui:14
 msgctxt "ManageUI|"
 msgid "Form"
@@ -370,7 +375,7 @@ msgctxt "WizardUI|"
 msgid "Game directory:"
 msgstr ""
 
-#: ../../src/qt/wizardui.ui:117 ../../src/qt/wizardui.ui:184
+#: ../../src/qt/wizardui.ui:117
 msgctxt "WizardUI|"
 msgid "&Reset"
 msgstr ""
@@ -382,60 +387,27 @@ msgstr ""
 
 #: ../../src/qt/wizardui.ui:141
 msgctxt "WizardUI|"
-msgid "Let's add NBT file(s)!"
+msgid "Please select the logic of finding corresponding files."
 msgstr ""
 
-#: ../../src/qt/wizardui.ui:150
+#: ../../src/qt/wizardui.ui:148
 msgctxt "WizardUI|"
-msgid "I want to &add the NBT file(s)."
+msgid "Select &a specific version to use the files."
 msgstr ""
 
-#: ../../src/qt/wizardui.ui:162
+#: ../../src/qt/wizardui.ui:158
 msgctxt "WizardUI|"
-msgid "NBT file(s):"
+msgid "&Decide by NBT file"
 msgstr ""
 
-#: ../../src/qt/wizardui.ui:195
+#: ../../src/qt/wizardui.ui:172
 msgctxt "WizardUI|"
-msgid "&I do not want to add the NBT file."
+msgid "The wizard is finished!"
 msgstr ""
 
-#: ../../src/qt/wizardui.ui:208
+#: ../../src/qt/wizardui.ui:179
 msgctxt "WizardUI|"
-msgid "Let's load a region."
-msgstr ""
-
-#: ../../src/qt/wizardui.ui:217
-msgctxt "WizardUI|"
-msgid "&Add region from the NBT"
-msgstr ""
-
-#: ../../src/qt/wizardui.ui:224
-msgctxt "WizardUI|"
-msgid "&Select the region"
-msgstr ""
-
-#: ../../src/qt/wizardui.ui:233
-msgctxt "WizardUI|"
-msgid "The region base info are listed below:"
-msgstr ""
-
-#: ../../src/qt/wizardui.ui:244
-msgctxt "WizardUI|"
-msgid "Name:"
-msgstr ""
-
-#: ../../src/qt/wizardui.ui:262
-msgctxt "WizardUI|"
-msgid "UUID:"
-msgstr ""
-
-#: ../../src/qt/wizardui.ui:280
-msgctxt "WizardUI|"
-msgid "Time:"
-msgstr ""
-
-#: ../../src/qt/wizardui.ui:298
-msgctxt "WizardUI|"
-msgid "Data Version:"
+msgid ""
+"If you want to configure again, select \"Utility\"->\"Config Wizard\" to "
+"reconfigure."
 msgstr ""

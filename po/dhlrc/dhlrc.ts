@@ -263,6 +263,11 @@
         <source>&amp;Config Setting</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <location filename="../../src/qt/mainwindow.ui" line="155"/>
+        <source>Config &amp;Wizard</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ManageUI</name>
@@ -389,7 +394,6 @@
     </message>
     <message>
         <location filename="../../src/qt/wizardui.ui" line="117"/>
-        <location filename="../../src/qt/wizardui.ui" line="184"/>
         <source>&amp;Reset</source>
         <translation type="unfinished"></translation>
     </message>
@@ -400,62 +404,27 @@
     </message>
     <message>
         <location filename="../../src/qt/wizardui.ui" line="141"/>
-        <source>Let&apos;s add NBT file(s)!</source>
+        <source>Please select the logic of finding corresponding files.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qt/wizardui.ui" line="150"/>
-        <source>I want to &amp;add the NBT file(s).</source>
+        <location filename="../../src/qt/wizardui.ui" line="148"/>
+        <source>Select &amp;a specific version to use the files.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qt/wizardui.ui" line="162"/>
-        <source>NBT file(s):</source>
+        <location filename="../../src/qt/wizardui.ui" line="158"/>
+        <source>&amp;Decide by NBT file</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qt/wizardui.ui" line="195"/>
-        <source>&amp;I do not want to add the NBT file.</source>
+        <location filename="../../src/qt/wizardui.ui" line="172"/>
+        <source>The wizard is finished!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qt/wizardui.ui" line="208"/>
-        <source>Let&apos;s load a region.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../src/qt/wizardui.ui" line="217"/>
-        <source>&amp;Add region from the NBT</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../src/qt/wizardui.ui" line="224"/>
-        <source>&amp;Select the region</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../src/qt/wizardui.ui" line="233"/>
-        <source>The region base info are listed below:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../src/qt/wizardui.ui" line="244"/>
-        <source>Name:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../src/qt/wizardui.ui" line="262"/>
-        <source>UUID:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../src/qt/wizardui.ui" line="280"/>
-        <source>Time:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../src/qt/wizardui.ui" line="298"/>
-        <source>Data Version:</source>
+        <location filename="../../src/qt/wizardui.ui" line="179"/>
+        <source>If you want to configure again, select &quot;Utility&quot;-&gt;&quot;Config Wizard&quot; to reconfigure.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
