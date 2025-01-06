@@ -21,6 +21,7 @@ set( DHLRC_MAIN_POT_FILE_DEPENDS
 
 # configure_file(dhlrc_config.h.in dhlrc_config.h)
 add_subdirectory(dhutil)
+add_subdirectory(nbt_interface)
 
 add_library(dhlrc_recipe_full SHARED
 			json_util.c json_util.h
