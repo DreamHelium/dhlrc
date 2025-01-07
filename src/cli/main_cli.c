@@ -2,6 +2,7 @@
 #include "../translation.h"
 #include "dh_string_util.h"
 #include "dh_validator_cpp.hpp"
+#include "manage_nbt.h"
 #define DH_EDITLINE_USED
 
 static void add_args_common(void* arg, char c, const char* first, const char* second, const char* description)
@@ -44,7 +45,11 @@ start_point (int argc, char **argv, const char* prpath)
     char ret_val_c = 0;
     dh_get_output_arg(arg, N_("Please enter a number or an option"), TRUE, &val);
 
-    if(G_VALUE_HOLDS_UCHAR(&val)) ret_val_c = g_value_get_uchar(&val);
+    if(G_VALUE_HOLDS_UCHAR(&val)) 
+    {
+        ret_val_c = g_value_get_uchar(&val);
+        if(ret_val_c == 'n') return manage_nbt_instance();
+    }
     else return -1;
 
     g_message("%c", ret_val_c);

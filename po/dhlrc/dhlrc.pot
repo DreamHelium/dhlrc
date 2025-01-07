@@ -15,7 +15,7 @@ msgstr ""
 "#-#-#-#-#  dhlrc.pot (dhlrc)  #-#-#-#-#\n"
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-01-04 19:59+0800\n"
+"POT-Creation-Date: 2025-01-07 23:30+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -490,22 +490,22 @@ msgid ""
 "the program (b): "
 msgstr ""
 
-#: src/main.c:269
+#: src/main.c:272
 #, c-format
 msgid "dhlrc - Program to handle litematic or other struct of Minecraft.\n"
 msgstr ""
 
-#: src/main.c:271
+#: src/main.c:274
 #, c-format
 msgid "Modules:\n"
 msgstr ""
 
-#: src/main.c:293
+#: src/main.c:296
 #, c-format
 msgid "Unrecognized options "
 msgstr ""
 
-#: src/main.c:368
+#: src/main.c:371
 msgid "[FILE] - Read a litematic file."
 msgstr ""
 
@@ -531,7 +531,7 @@ msgid ""
 "\n"
 msgstr ""
 
-#: src/main_isoc.c:135 src/nbt_litereader.c:78 src/nbt_litereader.c:302
+#: src/main_isoc.c:135 src/cli/nbt_litereader.c:78 src/cli/nbt_litereader.c:302
 msgid "Quit application"
 msgstr ""
 
@@ -542,79 +542,6 @@ msgstr ""
 #: src/main_isoc.c:199
 #, c-format
 msgid "Processing: region %d / %d : [%ld] %s"
-msgstr ""
-
-#: src/nbt_litereader.c:58
-#, c-format
-msgid ""
-"The detail of NBT \"%s\" is listed below:\n"
-"\n"
-msgstr ""
-
-#: src/nbt_litereader.c:79
-msgid "Enter modification mode"
-msgstr ""
-
-#: src/nbt_litereader.c:80
-msgid "Save NBT file"
-msgstr ""
-
-#: src/nbt_litereader.c:81
-msgid "Enter upper instance"
-msgstr ""
-
-#: src/nbt_litereader.c:86
-msgid ""
-"\n"
-"Please enter a number or choose option to continue [Q/m/s/e/?]: "
-msgstr ""
-
-#: src/nbt_litereader.c:90 src/nbt_litereader.c:98 src/nbt_litereader.c:301
-msgid "Enter upper NBT"
-msgstr ""
-
-#: src/nbt_litereader.c:92
-msgid ""
-"\n"
-"Please enter a number or choose option to continue [P/q/m/s/e/?]: "
-msgstr ""
-
-#: src/nbt_litereader.c:100
-msgid ""
-"\n"
-"No deeper NBT, please choose option to continue [P/q/m/s/e/?]: "
-msgstr ""
-
-#: src/nbt_litereader.c:261 src/nbt_litereader.c:360
-#, c-format
-msgid ""
-"\n"
-"Unsupported modification mode request, will exit to reading mode."
-msgstr ""
-
-#: src/nbt_litereader.c:303
-msgid "Exit modification mode"
-msgstr ""
-
-#: src/nbt_litereader.c:309
-msgid ""
-"\n"
-"Please enter an integer or choose an option [P/q/b/?]: "
-msgstr ""
-
-#: src/nbt_litereader.c:323
-#, c-format
-msgid ""
-"\n"
-"The integer you input is %ld, please confirm [Y/n/?]:"
-msgstr ""
-
-#: src/nbt_litereader.c:325
-msgid "Yes"
-msgstr ""
-
-#: src/nbt_litereader.c:326
-msgid "No"
 msgstr ""
 
 #: src/qt/blockreaderui.cpp:60
@@ -813,7 +740,7 @@ msgstr ""
 msgid "Others"
 msgstr ""
 
-#: src/qt/manage.cpp:75 src/cli/main_cli.c:21 src/cli/main_cli.c:31
+#: src/qt/manage.cpp:75 src/cli/main_cli.c:22 src/cli/main_cli.c:32
 msgid "Manage NBT"
 msgstr ""
 
@@ -867,7 +794,7 @@ msgstr ""
 msgid "The following infos are locked:\n"
 msgstr ""
 
-#: src/qt/manage.cpp:325 src/cli/main_cli.c:22 src/cli/main_cli.c:32
+#: src/qt/manage.cpp:325 src/cli/main_cli.c:23 src/cli/main_cli.c:33
 msgid "Manage Region"
 msgstr ""
 
@@ -1130,43 +1057,117 @@ msgstr ""
 msgid "The GTK interface of dhlrc"
 msgstr ""
 
-#: src/cli/main_cli.c:21
+#: src/cli/main_cli.c:22
 msgid "manage_nbt"
 msgstr ""
 
-#: src/cli/main_cli.c:22
+#: src/cli/main_cli.c:23
 msgid "manage_region"
 msgstr ""
 
-#: src/cli/main_cli.c:23
+#: src/cli/main_cli.c:24
 msgid "manage_item_list"
 msgstr ""
 
-#: src/cli/main_cli.c:23 src/cli/main_cli.c:33
+#: src/cli/main_cli.c:24 src/cli/main_cli.c:34
 msgid "Manage item list"
 msgstr ""
 
-#: src/cli/main_cli.c:24
+#: src/cli/main_cli.c:25
 msgid "config_settings"
 msgstr ""
 
-#: src/cli/main_cli.c:24 src/cli/main_cli.c:34
+#: src/cli/main_cli.c:25 src/cli/main_cli.c:35
 msgid "Config settings"
 msgstr ""
 
-#: src/cli/main_cli.c:30
+#: src/cli/main_cli.c:31
 #, c-format
 msgid "The functions are listed below:\n"
 msgstr ""
 
-#: src/cli/main_cli.c:40
+#: src/cli/main_cli.c:41
 msgid "Debug"
 msgstr ""
 
-#: src/cli/main_cli.c:45
+#: src/cli/main_cli.c:46
 msgid "Please enter a number or an option"
 msgstr ""
 
-#: src/cli/main_cli.c:75
+#: src/cli/main_cli.c:80
 msgid "The CLI/TUI interface of dhlrc"
+msgstr ""
+
+#: src/cli/nbt_litereader.c:58
+#, c-format
+msgid ""
+"The detail of NBT \"%s\" is listed below:\n"
+"\n"
+msgstr ""
+
+#: src/cli/nbt_litereader.c:79
+msgid "Enter modification mode"
+msgstr ""
+
+#: src/cli/nbt_litereader.c:80
+msgid "Save NBT file"
+msgstr ""
+
+#: src/cli/nbt_litereader.c:81
+msgid "Enter upper instance"
+msgstr ""
+
+#: src/cli/nbt_litereader.c:86
+msgid ""
+"\n"
+"Please enter a number or choose option to continue [Q/m/s/e/?]: "
+msgstr ""
+
+#: src/cli/nbt_litereader.c:90 src/cli/nbt_litereader.c:98
+#: src/cli/nbt_litereader.c:301
+msgid "Enter upper NBT"
+msgstr ""
+
+#: src/cli/nbt_litereader.c:92
+msgid ""
+"\n"
+"Please enter a number or choose option to continue [P/q/m/s/e/?]: "
+msgstr ""
+
+#: src/cli/nbt_litereader.c:100
+msgid ""
+"\n"
+"No deeper NBT, please choose option to continue [P/q/m/s/e/?]: "
+msgstr ""
+
+#: src/cli/nbt_litereader.c:261 src/cli/nbt_litereader.c:360
+#, c-format
+msgid ""
+"\n"
+"Unsupported modification mode request, will exit to reading mode."
+msgstr ""
+
+#: src/cli/nbt_litereader.c:303
+msgid "Exit modification mode"
+msgstr ""
+
+#: src/cli/nbt_litereader.c:309
+msgid ""
+"\n"
+"Please enter an integer or choose an option [P/q/b/?]: "
+msgstr ""
+
+#: src/cli/nbt_litereader.c:323
+#, c-format
+msgid ""
+"\n"
+"The integer you input is %ld, please confirm [Y/n/?]:"
+msgstr ""
+
+#: src/cli/nbt_litereader.c:325
+msgid "Yes"
+msgstr ""
+
+#: src/cli/nbt_litereader.c:326
+msgid "No"
 msgstr ""

@@ -32,7 +32,7 @@ static void messageNoRow(QWidget* parent)
 
 using namespace dh;
 
-static QString getTypeOfNbt(DhNbtType type)
+static QString getTypeOfNbt(DhNbtTypes type)
 {
     switch(type)
     {

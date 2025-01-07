@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-01-01 20:16+0800\n"
+"POT-Creation-Date: 2025-01-07 23:04+0800\n"
 "PO-Revision-Date: 2024-11-30 07:00+0800\n"
 "Last-Translator: dream_he <48383878+DreamHelium@users.noreply.github.com>\n"
 "Language-Team: Chinese <kde-i18n-doc@kde.org>\n"
@@ -497,22 +497,22 @@ msgstr ""
 "请再次输入方块的坐标，或输入 “b” 选择其他区域，输入 “r” 阅读方块的细节，输入 "
 "“q” 退出程序 (b): "
 
-#: src/main.c:269
+#: src/main.c:272
 #, c-format
 msgid "dhlrc - Program to handle litematic or other struct of Minecraft.\n"
 msgstr ""
 
-#: src/main.c:271
+#: src/main.c:274
 #, c-format
 msgid "Modules:\n"
 msgstr ""
 
-#: src/main.c:293
+#: src/main.c:296
 #, c-format
 msgid "Unrecognized options "
 msgstr ""
 
-#: src/main.c:368
+#: src/main.c:371
 msgid "[FILE] - Read a litematic file."
 msgstr "[文件] - 读取一个投影文件。"
 
@@ -543,7 +543,7 @@ msgstr ""
 "[2] 投影方块阅读器\n"
 "\n"
 
-#: src/main_isoc.c:135 src/nbt_litereader.c:78 src/nbt_litereader.c:302
+#: src/main_isoc.c:135 src/cli/nbt_litereader.c:78 src/cli/nbt_litereader.c:302
 msgid "Quit application"
 msgstr "退出程序"
 
@@ -555,89 +555,6 @@ msgstr "请选择一个选项，或输入 “q” 退出程序 (q): "
 #, c-format
 msgid "Processing: region %d / %d : [%ld] %s"
 msgstr ""
-
-#: src/nbt_litereader.c:58
-#, c-format
-msgid ""
-"The detail of NBT \"%s\" is listed below:\n"
-"\n"
-msgstr ""
-"NBT \"%s\" 的细节如下：\n"
-"\n"
-
-#: src/nbt_litereader.c:79
-msgid "Enter modification mode"
-msgstr "进入修改模式"
-
-#: src/nbt_litereader.c:80
-msgid "Save NBT file"
-msgstr "保存NBT文件"
-
-#: src/nbt_litereader.c:81
-msgid "Enter upper instance"
-msgstr "进入上层实例"
-
-#: src/nbt_litereader.c:86
-msgid ""
-"\n"
-"Please enter a number or choose option to continue [Q/m/s/e/?]: "
-msgstr ""
-"\n"
-"请输入一个数字或选择选项以继续 [Q/m/s/e/?]： "
-
-#: src/nbt_litereader.c:90 src/nbt_litereader.c:98 src/nbt_litereader.c:301
-msgid "Enter upper NBT"
-msgstr "进入上层NBT"
-
-#: src/nbt_litereader.c:92
-msgid ""
-"\n"
-"Please enter a number or choose option to continue [P/q/m/s/e/?]: "
-msgstr ""
-"\n"
-"请输入一个数字或选择选项以继续 [P/q/m/s/e/?]： "
-
-#: src/nbt_litereader.c:100
-msgid ""
-"\n"
-"No deeper NBT, please choose option to continue [P/q/m/s/e/?]: "
-msgstr ""
-"\n"
-"没有深层NBT，请选择选项以继续 [P/q/m/s/e/?]： "
-
-#: src/nbt_litereader.c:261 src/nbt_litereader.c:360
-#, c-format
-msgid ""
-"\n"
-"Unsupported modification mode request, will exit to reading mode."
-msgstr ""
-"\n"
-"不支持的修改模式请求，将退回至阅读模式。"
-
-#: src/nbt_litereader.c:303
-msgid "Exit modification mode"
-msgstr "退出修改模式"
-
-#: src/nbt_litereader.c:309
-msgid ""
-"\n"
-"Please enter an integer or choose an option [P/q/b/?]: "
-msgstr ""
-
-#: src/nbt_litereader.c:323
-#, c-format
-msgid ""
-"\n"
-"The integer you input is %ld, please confirm [Y/n/?]:"
-msgstr ""
-
-#: src/nbt_litereader.c:325
-msgid "Yes"
-msgstr "是"
-
-#: src/nbt_litereader.c:326
-msgid "No"
-msgstr "否"
 
 #: src/qt/blockreaderui.cpp:60
 msgid ""
@@ -835,7 +752,7 @@ msgstr "Schema投影"
 msgid "Others"
 msgstr "其它"
 
-#: src/qt/manage.cpp:75 src/cli/main_cli.c:21 src/cli/main_cli.c:31
+#: src/qt/manage.cpp:75 src/cli/main_cli.c:22 src/cli/main_cli.c:32
 msgid "Manage NBT"
 msgstr "管理NBT"
 
@@ -889,7 +806,7 @@ msgstr ""
 msgid "The following infos are locked:\n"
 msgstr ""
 
-#: src/qt/manage.cpp:325 src/cli/main_cli.c:22 src/cli/main_cli.c:32
+#: src/qt/manage.cpp:325 src/cli/main_cli.c:23 src/cli/main_cli.c:33
 msgid "Manage Region"
 msgstr ""
 
@@ -1152,46 +1069,130 @@ msgstr "刷新（&E）"
 msgid "The GTK interface of dhlrc"
 msgstr ""
 
-#: src/cli/main_cli.c:21
+#: src/cli/main_cli.c:22
 msgid "manage_nbt"
 msgstr ""
 
-#: src/cli/main_cli.c:22
+#: src/cli/main_cli.c:23
 msgid "manage_region"
 msgstr ""
 
-#: src/cli/main_cli.c:23
+#: src/cli/main_cli.c:24
 msgid "manage_item_list"
 msgstr ""
 
-#: src/cli/main_cli.c:23 src/cli/main_cli.c:33
+#: src/cli/main_cli.c:24 src/cli/main_cli.c:34
 msgid "Manage item list"
 msgstr ""
 
-#: src/cli/main_cli.c:24
+#: src/cli/main_cli.c:25
 msgid "config_settings"
 msgstr ""
 
-#: src/cli/main_cli.c:24 src/cli/main_cli.c:34
+#: src/cli/main_cli.c:25 src/cli/main_cli.c:35
 msgid "Config settings"
 msgstr "配置设置"
 
-#: src/cli/main_cli.c:30
+#: src/cli/main_cli.c:31
 #, c-format
 msgid "The functions are listed below:\n"
 msgstr ""
 
-#: src/cli/main_cli.c:40
+#: src/cli/main_cli.c:41
 msgid "Debug"
 msgstr ""
 
-#: src/cli/main_cli.c:45
+#: src/cli/main_cli.c:46
 msgid "Please enter a number or an option"
 msgstr ""
 
-#: src/cli/main_cli.c:75
+#: src/cli/main_cli.c:80
 msgid "The CLI/TUI interface of dhlrc"
 msgstr ""
+
+#: src/cli/nbt_litereader.c:58
+#, c-format
+msgid ""
+"The detail of NBT \"%s\" is listed below:\n"
+"\n"
+msgstr ""
+"NBT \"%s\" 的细节如下：\n"
+"\n"
+
+#: src/cli/nbt_litereader.c:79
+msgid "Enter modification mode"
+msgstr "进入修改模式"
+
+#: src/cli/nbt_litereader.c:80
+msgid "Save NBT file"
+msgstr "保存NBT文件"
+
+#: src/cli/nbt_litereader.c:81
+msgid "Enter upper instance"
+msgstr "进入上层实例"
+
+#: src/cli/nbt_litereader.c:86
+msgid ""
+"\n"
+"Please enter a number or choose option to continue [Q/m/s/e/?]: "
+msgstr ""
+"\n"
+"请输入一个数字或选择选项以继续 [Q/m/s/e/?]： "
+
+#: src/cli/nbt_litereader.c:90 src/cli/nbt_litereader.c:98
+#: src/cli/nbt_litereader.c:301
+msgid "Enter upper NBT"
+msgstr "进入上层NBT"
+
+#: src/cli/nbt_litereader.c:92
+msgid ""
+"\n"
+"Please enter a number or choose option to continue [P/q/m/s/e/?]: "
+msgstr ""
+"\n"
+"请输入一个数字或选择选项以继续 [P/q/m/s/e/?]： "
+
+#: src/cli/nbt_litereader.c:100
+msgid ""
+"\n"
+"No deeper NBT, please choose option to continue [P/q/m/s/e/?]: "
+msgstr ""
+"\n"
+"没有深层NBT，请选择选项以继续 [P/q/m/s/e/?]： "
+
+#: src/cli/nbt_litereader.c:261 src/cli/nbt_litereader.c:360
+#, c-format
+msgid ""
+"\n"
+"Unsupported modification mode request, will exit to reading mode."
+msgstr ""
+"\n"
+"不支持的修改模式请求，将退回至阅读模式。"
+
+#: src/cli/nbt_litereader.c:303
+msgid "Exit modification mode"
+msgstr "退出修改模式"
+
+#: src/cli/nbt_litereader.c:309
+msgid ""
+"\n"
+"Please enter an integer or choose an option [P/q/b/?]: "
+msgstr ""
+
+#: src/cli/nbt_litereader.c:323
+#, c-format
+msgid ""
+"\n"
+"The integer you input is %ld, please confirm [Y/n/?]:"
+msgstr ""
+
+#: src/cli/nbt_litereader.c:325
+msgid "Yes"
+msgstr "是"
+
+#: src/cli/nbt_litereader.c:326
+msgid "No"
+msgstr "否"
 
 #~ msgid "directory"
 #~ msgstr "目录"

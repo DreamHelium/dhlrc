@@ -37,6 +37,7 @@ add_library(dhlrc_recipe_full SHARED
 
 add_library(dhlrc SHARED
            mcdir/path.c mcdir/path.h
+		   common_info.c common_info.h
 		   common.c common.h
 		   translation.h
 		   translation.c
@@ -74,7 +75,7 @@ add_library(dhlrc SHARED
 
 target_link_libraries(dhlrc_recipe_full PUBLIC dhutil cjson)
 
-target_link_libraries(dhlrc PUBLIC z cjson ${minizip_LIBRARIES} dhutil dhlrc_recipe_full
+target_link_libraries(dhlrc PUBLIC z cjson ${minizip_LIBRARIES} dhutil dhlrc_recipe_full dhnbt_interface
 )
 
 if(${minizip_VERSION} LESS 4.0.0)

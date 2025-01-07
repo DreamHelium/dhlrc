@@ -6,6 +6,7 @@ extern "C" {
 #endif
 
 void dhlrc_clear_screen();
+void dhlrc_add_args_common(void* arg, char c, const char* first, const char* second, const char* description);
 
 #ifdef __cplusplus
 }

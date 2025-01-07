@@ -24,15 +24,15 @@
 
 G_BEGIN_DECLS
 
-typedef enum DhNbtType { Litematica, NBTStruct, Schematics, Others } 
-    DhNbtType;
+typedef enum DhNbtTypes { Litematica, NBTStruct, Schematics, Others } 
+    DhNbtTypes;
 
 typedef struct NbtInfo{
     NBT* root;
     GDateTime* time;
     gchar* description;
     GRWLock info_lock;
-    DhNbtType type;
+    DhNbtTypes type;
 } NbtInfo;
 
 void nbt_info_list_init();

@@ -21,7 +21,7 @@
 #include "libnbt/nbt.h"
 #include "dhlrc_list.h"
 #include <dhutil.h>
-#include "nbt_litereader.h"
+#include "nbt_pos.h"
 
 #ifdef __cplusplus
 extern "C"{
