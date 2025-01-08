@@ -5,8 +5,7 @@
 #include "../common_info.h"
 #include "dh_validator_cpp.hpp"
 #include "../nbt_interface/nbt_interface.h"
-#include "glib-object.h"
-#include "glib.h"
+#include <fmt/color.h>
 
 static int choose_option = -1;
 
@@ -21,7 +20,9 @@ static void draw_interface()
         for(int i = 0 ; i < g_list_length(uuid_list); i++)
         {
             CommonInfo* info = common_info_list_get_common_info(DH_TYPE_NBT_INTERFACE, (const char*)g_list_nth_data(uuid_list, i));
-            printf("[%d] %s\n", i, info->description);
+            if(i != choose_option) printf("[%d] %s\n", i, info->description);
+            else fmt::print(fmt::fg(fmt::color::black) | fmt::bg(fmt::color::white), 
+            "[{}] {}\n", i, info->description);
         }
     }
     printf("\n");

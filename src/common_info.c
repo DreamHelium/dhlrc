@@ -75,7 +75,7 @@ static void common_info_single_free(gpointer mem)
     if(single->uuid_list)
     {
         if(single->table) dh_mt_table_destroy(single->table);
-        g_list_free_full(single->uuid_list, g_free);
+        g_list_free(single->uuid_list);
         if(single->uuid_array) dh_str_array_free(single->uuid_array);
     }
     g_free(mem);
