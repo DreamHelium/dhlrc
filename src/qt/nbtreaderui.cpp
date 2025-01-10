@@ -5,6 +5,8 @@
 #include <qstandarditemmodel.h>
 #include <qtreeview.h>
 #include <qvariant.h>
+#include "../common_info.h"
+#include "../nbt_interface/nbt_interface.h"
 
 static QString uuid;
 
@@ -46,8 +48,13 @@ NbtReaderUI::NbtReaderUI(QWidget *parent)
     ui(new Ui::NbtReaderUI)
 {
     ui->setupUi(this);
-    uuid = nbt_info_list_get_uuid();
-    if(!uuid.isEmpty()) root = nbt_info_list_get_nbt_info(uuid.toUtf8())->root;
+    uuid = common_info_list_get_uuid(DH_TYPE_NBT_INTERFACE);
+    if(!uuid.isEmpty())
+    {
+        auto instance = (NbtInstance*)common_info_get_data(DH_TYPE_NBT_INTERFACE, uuid.toUtf8());
+        root = (NBT*)dh_nbt_instance_get_real_original_nbt(instance);
+    } 
+    
     model = new QStandardItemModel();
     initModel();
     ui->treeView->setModel(model);

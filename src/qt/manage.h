@@ -38,27 +38,6 @@ namespace dh
         virtual void dnd_triggered(const QMimeData* data){};
     };
 
-    class ManageNBT : public ManageBase
-    {
-        Q_OBJECT
-    public:
-        ManageNBT();
-        ~ManageNBT();
-
-    private:
-        void updateModel();
-    
-    private Q_SLOTS:
-        void add_triggered();
-        void remove_triggered(QList<int> rows);
-        void save_triggered(QList<int> rows);
-        void refresh_triggered();
-        void showSig_triggered();
-        void closeSig_triggered();
-        void ok_triggered();
-        void dnd_triggered(const QMimeData* data);
-    };
-
     class ManageRegion : public ManageBase 
     {
         Q_OBJECT
@@ -74,6 +53,29 @@ namespace dh
         void remove_triggered(QList<int> rows);
         void save_triggered(QList<int> rows);
         void refresh_triggered();
+        void showSig_triggered();
+        void closeSig_triggered();
+        void ok_triggered();
+        void dnd_triggered(const QMimeData* data);
+    };
+
+    class ManageNbtInterface : public ManageBase
+    {
+        Q_OBJECT;
+    public:
+        ManageNbtInterface();
+        ~ManageNbtInterface();
+
+    private:
+        void updateModel();
+
+    public Q_SLOTS:
+        void refresh_triggered();
+    
+    private Q_SLOTS:
+        void add_triggered();
+        void remove_triggered(QList<int> rows);
+        void save_triggered(QList<int> rows);
         void showSig_triggered();
         void closeSig_triggered();
         void ok_triggered();

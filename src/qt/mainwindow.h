@@ -35,6 +35,7 @@ protected:
 private Q_SLOTS:
     void configAction_triggered();
     void manageBtn_clicked();
+    void manageBtn_2_clicked();
     void ilReaderBtn_clicked();
     void recipeCombineBtn_clicked();
     void createBtn_clicked();
@@ -42,6 +43,7 @@ private Q_SLOTS:
     void brBtn_clicked();
     void mrBtn_clicked();
     void nbtReaderBtn_clicked();
+    void nbtReaderBtn_finished(int ret);
 
 };
 #endif // MAINWINDOW_H

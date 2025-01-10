@@ -14,7 +14,7 @@ static void draw_interface()
     dhlrc_clear_screen();
     printf("%s\n\n", _("The NBTs are listed below:"));
 
-    GList* uuid_list = common_info_list_get_uuid_list(DH_TYPE_NBT_INTERFACE);
+    GList* uuid_list = (GList*)common_info_list_get_uuid_list(DH_TYPE_NBT_INTERFACE);
     if(uuid_list)
     {
         for(int i = 0 ; i < g_list_length(uuid_list); i++)
@@ -30,7 +30,7 @@ static void draw_interface()
 
 static int get_choose_option()
 {
-    GList* uuid_list = common_info_list_get_uuid_list(DH_TYPE_NBT_INTERFACE);
+    GList* uuid_list = (GList*)common_info_list_get_uuid_list(DH_TYPE_NBT_INTERFACE);
     if(uuid_list)
     {
         auto len = g_list_length(uuid_list);

@@ -1,5 +1,4 @@
 #include "module.h"
-#include "glibconfig.h"
 #include "mainwindow.h"
 #include "../translation.h"
 #include <QApplication>

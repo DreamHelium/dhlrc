@@ -96,11 +96,17 @@ static DhlrcModule* get_module(int* module_num, char* arg_zero)
     gboolean succeed = TRUE;
     for(int i = 0 ; i < g_list_length(module_files) ; i++)
     {
+        GError* err = NULL;
         char* dir = g_strconcat(module_path, G_DIR_SEPARATOR_S, g_list_nth_data(module_files, i), NULL);
-        GModule* module = g_module_open(dir, G_MODULE_BIND_MASK);
+        GModule* module = g_module_open_full(dir, G_MODULE_BIND_MASK, &err);
         g_free(dir);
 
-        if(!module) continue; /* Get Module fail */
+        if(!module) 
+        {
+            g_critical("%s", err->message);
+            g_error_free(err);
+            continue; /* Get Module fail */
+        }
         DhlrcGetModuleName name;
         DhlrcGetModuleNameArray arr;
         DhlrcGetModuleDescription des;
@@ -308,7 +314,7 @@ static gint run_app (GApplication* self, GApplicationCommandLine* command_line, 
 #else
         if(g_getenv("XDG_SESSION_DESKTOP"))
         {
-            load_module(modules, len, "cli", argv[0], argc, argv, &success);
+            load_module(modules, len, "qt", argv[0], argc, argv, &success);
             if(!success) printf("Failed to load qt module!\n");
         }
         else 

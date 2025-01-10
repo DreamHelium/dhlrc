@@ -11,7 +11,7 @@
 
 static GtkWidget* window = NULL;
 
-static char* getTypeOfNbt(DhNbtType type)
+static char* getTypeOfNbt(DhNbtTypes type)
 {
     switch(type)
     {

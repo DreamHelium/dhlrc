@@ -190,7 +190,7 @@
     </message>
     <message>
         <location filename="../../src/qt/mainwindow.ui" line="40"/>
-        <source>&amp;Manage NBT</source>
+        <source>&amp;Manage NBT Interface (Test)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -259,12 +259,12 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qt/mainwindow.ui" line="148"/>
+        <location filename="../../src/qt/mainwindow.ui" line="150"/>
         <source>&amp;Config Setting</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qt/mainwindow.ui" line="155"/>
+        <location filename="../../src/qt/mainwindow.ui" line="157"/>
         <source>Config &amp;Wizard</source>
         <translation type="unfinished"></translation>
     </message>

@@ -2,7 +2,6 @@
 #include "dh_string_util.h"
 #include "dhtableview.h"
 #include "glib.h"
-#include "glibconfig.h"
 #include "manageui.h"
 #include <cstddef>
 #include <qabstractitemmodel.h>
@@ -18,12 +17,12 @@
 #include <QFileDialog>
 #include <qstandarditemmodel.h>
 #include "../translation.h"
-#include "../nbt_util.h"
 #include <QDebug>
 #include "../region_info.h"
 #include "saveregionselectui.h"
 #include "utility.h"
 #include <QMessageBox>
+#include "../common_info.h"
 
 static void messageNoRow(QWidget* parent)
 {
@@ -67,214 +66,75 @@ void ManageBase::show()
     mui->show();
 }
 
-ManageNBT::ManageNBT()
-{
-    mui->setDND(true);
-    model = new QStandardItemModel();
-    uuidList = nbt_info_list_get_uuid_list();
-    mui->setWindowTitle(_("Manage NBT"));
-    QObject::connect(mui, &ManageUI::dnd, this, &ManageNBT::dnd_triggered);
-}
 
-ManageNBT::~ManageNBT()
-{
-    delete model;
-}
+// void ManageNBT::save_triggered(QList<int> rows)
+// {
+//     if(rows.length())
+//     {
+//         if(rows.length() == 1)
+//         {
+//             auto row = rows[0];
+//             QString filepos = QFileDialog::getSaveFileName(mui, _("Save File"));
+//             if(!filepos.isEmpty())
+//             {
+//                 NbtInfo* info = nbt_info_list_get_nbt_info((char*)g_list_nth_data(uuidList->list, row));
+//                 if(g_rw_lock_writer_trylock(&info->info_lock))
+//                 {
+//                     dhlrc_nbt_save(info->root, filepos.toUtf8());
+//                     g_rw_lock_writer_unlock(&info->info_lock);
+//                 }
+//                 else QMessageBox::critical(mui, _("Info Locked!"), _("The NBT info is locked!"));
+//             }
+//         }
+//         else
+//         {
+//             auto dir = QFileDialog::getExistingDirectory(mui, _("Save Files"));
+//             if(!dir.isEmpty())
+//             {
+//                 QStringList lockedInfo;
+//                 for(auto row : rows)
+//                 {
+//                     NbtInfo* info = nbt_info_list_get_nbt_info((char*)g_list_nth_data(uuidList->list, row));
+//                     QString filepos = (dir + G_DIR_SEPARATOR + info->description);
+//                     if(g_rw_lock_writer_trylock(&info->info_lock))
+//                     {
+//                         dhlrc_nbt_save(info->root, filepos.toUtf8());
+//                         g_rw_lock_writer_unlock(&info->info_lock);
+//                     }
+//                     else lockedInfo << info->description;
+//                 }
+//                 if(lockedInfo.length())
+//                 {
+//                     QString lockedInfoStr = _("The following infos are locked:\n");
+//                     for(auto str : lockedInfo)
+//                     {
+//                         lockedInfoStr += str;
+//                         lockedInfoStr += '\n';
+//                     }
+//                     QMessageBox::critical(mui, _("Error!"), lockedInfoStr);
+//                 }
+//             }
+//         }
+//     }
+//     else messageNoRow(mui);
+// }
 
-void ManageNBT::dnd_triggered(const QMimeData* data)
-{
-    auto urls = data->urls();
-    QStringList filelist;
-    for(int i = 0 ; i < urls.length() ; i++)
-    {
-        filelist << urls[i].toLocalFile();
-    }
-    dh::loadNbtFiles(mui, filelist);
-    updateModel();
-    mui->updateModel(model);
-}
-
-void ManageNBT::add_triggered()
-{
-    auto dirs = QFileDialog::getOpenFileNames(mui, _("Select a file"), nullptr, _("Litematic file (*.litematic);;NBT File (*.nbt)"));
-    dh::loadNbtFiles(mui, dirs);
-    updateModel();
-    mui->updateModel(model);
-}
-
-void ManageNBT::remove_triggered(QList<int> rows)
-{
-    if(rows.length())
-    {
-        uuidList = nbt_info_list_get_uuid_list();
-        QList<char*> removedList;
-        for(auto row : rows)
-        {
-            char* uuid = (char*)g_list_nth_data(uuidList->list, row);
-            removedList.append(uuid);
-        }
-        for(auto uuid : removedList)
-            nbt_info_list_remove_item(uuid);
-
-        updateModel();
-        mui->updateModel(model);
-    }
-    else messageNoRow(mui);
-}
-
-void ManageNBT::refresh_triggered()
-{
-    updateModel();
-    mui->updateModel(model);
-}
-
-void ManageNBT::updateModel()
-{
-    QList<QList<QStandardItem*>> itemList;
-
-    uuidList = nbt_info_list_get_uuid_list();
-    GList* fullList = uuidList->list;
-    g_rw_lock_writer_unlock(&uuidList->lock);
-    if(g_rw_lock_reader_trylock(&uuidList->lock))
-    {
-        guint len = fullList ? g_list_length(fullList) : 0;
-        for(int i = 0 ; i < len ; i++)
-        {
-            NbtInfo* info = nbt_info_list_get_nbt_info((gchar*)g_list_nth_data(fullList, i));
-            QStandardItem* description = new QStandardItem;
-            QStandardItem* uuid = new QStandardItem;
-            QStandardItem* time = new QStandardItem;
-            QStandardItem* type = new QStandardItem;
-            uuid->setEditable(false);
-            time->setEditable(false);
-            type->setEditable(false);
-            if(g_rw_lock_reader_trylock(&info->info_lock))
-            {
-                description->setData(QString(info->description), 2);
-                uuid->setData(QString((gchar*)g_list_nth_data(fullList, i)), 0);
-                time->setData(QString(g_date_time_format(info->time, "%T")), 0);
-                type->setData(getTypeOfNbt(info->type), 0);
-                g_rw_lock_reader_unlock(&info->info_lock);
-            }
-            else 
-            {
-                description->setData(QString(_("locked")), 0);
-                uuid->setData(QString(_("locked")), 0);
-                time->setData(QString(_("locked")), 0);
-                type->setData(QString(_("locked")), 0);
-            }
-            QList<QStandardItem*> list = {description, uuid, time, type};
-            itemList.append(list);
-        }
-        g_rw_lock_reader_unlock(&uuidList->lock);
-    }
-    else
-    {
-        /* This is a rare situation, if occured, contact the programmer. */
-        QStandardItem* description = new QStandardItem;
-        QStandardItem* uuid = new QStandardItem;
-        QStandardItem* time = new QStandardItem;
-        QStandardItem* type = new QStandardItem;
-        description->setData(QString(_("List locked")), 0);
-        uuid->setData(QString(_("List locked")), 0);
-        time->setData(QString(_("List locked")), 0);
-        type->setData(QString(_("List locked")), 0);
-        QList<QStandardItem*> list = {description, uuid, time, type};
-        itemList.append(list);
-    }
-    g_rw_lock_writer_trylock(&uuidList->lock);
-
-    model->clear();
-    QStringList list;
-    list << _("Description") << _("UUID") << _("Time") << _("Type");
-    model->setHorizontalHeaderLabels(list);
-
-    for(int i = 0 ; i < itemList.length() ; i++)
-    {
-        model->appendRow(itemList[i]);
-    }
-}
-
-void ManageNBT::save_triggered(QList<int> rows)
-{
-    if(rows.length())
-    {
-        if(rows.length() == 1)
-        {
-            auto row = rows[0];
-            QString filepos = QFileDialog::getSaveFileName(mui, _("Save File"));
-            if(!filepos.isEmpty())
-            {
-                NbtInfo* info = nbt_info_list_get_nbt_info((char*)g_list_nth_data(uuidList->list, row));
-                if(g_rw_lock_writer_trylock(&info->info_lock))
-                {
-                    dhlrc_nbt_save(info->root, filepos.toUtf8());
-                    g_rw_lock_writer_unlock(&info->info_lock);
-                }
-                else QMessageBox::critical(mui, _("Info Locked!"), _("The NBT info is locked!"));
-            }
-        }
-        else
-        {
-            auto dir = QFileDialog::getExistingDirectory(mui, _("Save Files"));
-            if(!dir.isEmpty())
-            {
-                QStringList lockedInfo;
-                for(auto row : rows)
-                {
-                    NbtInfo* info = nbt_info_list_get_nbt_info((char*)g_list_nth_data(uuidList->list, row));
-                    QString filepos = (dir + G_DIR_SEPARATOR + info->description);
-                    if(g_rw_lock_writer_trylock(&info->info_lock))
-                    {
-                        dhlrc_nbt_save(info->root, filepos.toUtf8());
-                        g_rw_lock_writer_unlock(&info->info_lock);
-                    }
-                    else lockedInfo << info->description;
-                }
-                if(lockedInfo.length())
-                {
-                    QString lockedInfoStr = _("The following infos are locked:\n");
-                    for(auto str : lockedInfo)
-                    {
-                        lockedInfoStr += str;
-                        lockedInfoStr += '\n';
-                    }
-                    QMessageBox::critical(mui, _("Error!"), lockedInfoStr);
-                }
-            }
-        }
-    }
-    else messageNoRow(mui);
-}
-
-void ManageNBT::showSig_triggered()
-{
-    uuidList = nbt_info_list_get_uuid_list();
-    g_rw_lock_writer_lock(&uuidList->lock);
-}
-
-void ManageNBT::closeSig_triggered()
-{
-    uuidList = nbt_info_list_get_uuid_list();
-    g_rw_lock_writer_unlock(&uuidList->lock);
-}
-
-void ManageNBT::ok_triggered()
-{
-    /* Update model first */
-    for(int i = 0 ; i < model->rowCount() ; i++)
-    {
-        NbtInfo* info = nbt_info_list_get_nbt_info(model->index(i, 1).data().toString().toUtf8());
-        if(g_rw_lock_writer_trylock(&info->info_lock))
-        {
-            const char* str = model->index(i,0).data().toString().toUtf8();
-            g_free(info->description);
-            info->description = g_strdup(str);
-            g_rw_lock_writer_unlock(&info->info_lock);
-        }
-    }
-    mui->close();
-}
+// void ManageNBT::ok_triggered()
+// {
+//     /* Update model first */
+//     for(int i = 0 ; i < model->rowCount() ; i++)
+//     {
+//         NbtInfo* info = nbt_info_list_get_nbt_info(model->index(i, 1).data().toString().toUtf8());
+//         if(g_rw_lock_writer_trylock(&info->info_lock))
+//         {
+//             const char* str = model->index(i,0).data().toString().toUtf8();
+//             g_free(info->description);
+//             info->description = g_strdup(str);
+//             g_rw_lock_writer_unlock(&info->info_lock);
+//         }
+//     }
+//     mui->close();
+// }
 
 void ManageBase::tablednd_triggered(QDropEvent* event)
 {
@@ -483,4 +343,130 @@ void ManageRegion::dnd_triggered(const QMimeData* data)
         else QMessageBox::critical(mui, _("Error!"), _("Not a valid NBT UUID!"));
         delete newModel;
     }
+}
+
+static void update_interface_model(void* main_class)
+{
+    auto c = (ManageNbtInterface*)main_class;
+    c->refresh_triggered();
+}
+
+ManageNbtInterface::ManageNbtInterface()
+{
+    mui->setDND(true);
+    model = new QStandardItemModel();
+    mui->setWindowTitle(_("Manage NBT Interface"));
+    QObject::connect(mui, &ManageUI::dnd, this, &ManageNbtInterface::dnd_triggered);
+    common_info_list_add_update_notifier(DH_TYPE_NBT_INTERFACE, (void*)this, update_interface_model);
+}
+
+ManageNbtInterface::~ManageNbtInterface()
+{
+    delete model;
+}
+
+void ManageNbtInterface::add_triggered()
+{
+    auto dirs = QFileDialog::getOpenFileNames(mui, _("Select a file"), nullptr, _("Litematic file (*.litematic);;NBT File (*.nbt)"));
+    dh::loadNbtInstances(mui, dirs);
+    updateModel();
+    mui->updateModel(model);
+}
+
+void ManageNbtInterface::updateModel()
+{
+    QList<QList<QStandardItem*>> itemList;
+
+    GList* fullList = (GList*)common_info_list_get_uuid_list(DH_TYPE_NBT_INTERFACE);
+    guint len = fullList ? g_list_length(fullList) : 0;
+    for(int i = 0 ; i < len ; i++)
+    {
+        auto info = common_info_list_get_common_info(DH_TYPE_NBT_INTERFACE, (gchar*)g_list_nth_data(fullList, i));
+        QStandardItem* description = new QStandardItem;
+        QStandardItem* uuid = new QStandardItem;
+        QStandardItem* time = new QStandardItem;
+        // QStandardItem* type = new QStandardItem;
+        uuid->setEditable(false);
+        time->setEditable(false);
+        // type->setEditable(false);
+        if(g_rw_lock_reader_trylock(&info->info_lock))
+        {
+            description->setData(QString(info->description), 2);
+            uuid->setData(QString((gchar*)g_list_nth_data(fullList, i)), 0);
+            time->setData(QString(g_date_time_format(info->time, "%T")), 0);
+            // type->setData(getTypeOfNbt(info->type), 0);
+            g_rw_lock_reader_unlock(&info->info_lock);
+        }
+        else 
+        {
+            description->setData(QString(_("locked")), 0);
+            uuid->setData(QString(_("locked")), 0);
+            time->setData(QString(_("locked")), 0);
+            // type->setData(QString(_("locked")), 0);
+        }
+        QList<QStandardItem*> list = {description, uuid, time};
+        itemList.append(list);
+    }
+
+    model->clear();
+    QStringList list;
+    list << _("Description") << _("UUID") << _("Time") /*<< _("Type")*/;
+    model->setHorizontalHeaderLabels(list);
+
+    for(int i = 0 ; i < itemList.length() ; i++)
+    {
+        model->appendRow(itemList[i]);
+    }
+}
+
+void ManageNbtInterface::refresh_triggered()
+{
+    updateModel();
+    mui->updateModel(model);
+}
+
+void ManageNbtInterface::showSig_triggered()
+{
+    refresh_triggered();
+}
+
+void ManageNbtInterface::closeSig_triggered()
+{}
+
+void ManageNbtInterface::remove_triggered(QList<int> rows)
+{
+    if(rows.length())
+    {
+        QList<char*> removedList;
+        GList* fulllist = (GList*) common_info_list_get_uuid_list(DH_TYPE_NBT_INTERFACE);
+        for(auto row : rows)
+        {
+            char* uuid = (char*)g_list_nth_data(fulllist, row);
+            removedList.append(uuid);
+        }
+        for(auto uuid : removedList)
+            common_info_list_remove_item(DH_TYPE_NBT_INTERFACE, uuid);
+
+        updateModel();
+        mui->updateModel(model);
+    }
+    else messageNoRow(mui);
+}
+
+void ManageNbtInterface::save_triggered(QList<int> rows)
+{}
+
+void ManageNbtInterface::ok_triggered()
+{}
+void ManageNbtInterface::dnd_triggered(const QMimeData* data)
+{
+    auto urls = data->urls();
+    QStringList filelist;
+    for(int i = 0 ; i < urls.length() ; i++)
+    {
+        filelist << urls[i].toLocalFile();
+    }
+    dh::loadNbtInstances(mui, filelist);
+    updateModel();
+    mui->updateModel(model);
 }

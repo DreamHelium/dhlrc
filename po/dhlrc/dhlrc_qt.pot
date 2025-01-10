@@ -180,7 +180,7 @@ msgstr ""
 
 #: ../../src/qt/mainwindow.ui:40
 msgctxt "MainWindow|"
-msgid "&Manage NBT"
+msgid "&Manage NBT Interface (Test)"
 msgstr ""
 
 #: ../../src/qt/mainwindow.ui:47
@@ -248,12 +248,12 @@ msgctxt "MainWindow|"
 msgid "Utility"
 msgstr ""
 
-#: ../../src/qt/mainwindow.ui:148
+#: ../../src/qt/mainwindow.ui:150
 msgctxt "MainWindow|"
 msgid "&Config Setting"
 msgstr ""
 
-#: ../../src/qt/mainwindow.ui:155
+#: ../../src/qt/mainwindow.ui:157
 msgctxt "MainWindow|"
 msgid "Config &Wizard"
 msgstr ""

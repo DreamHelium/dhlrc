@@ -37,8 +37,8 @@
 
 static bool nbtRead = false;
 int verbose_level;
-static dh::ManageNBT* mn = nullptr;
 static dh::ManageRegion* mr = nullptr;
+static dh::ManageNbtInterface* mni = nullptr;
 
 static MainWindow* mw;
 
@@ -70,7 +70,8 @@ MainWindow::MainWindow(QWidget *parent)
 MainWindow::~MainWindow()
 {
     delete ui;
-    delete mn;
+    delete mr;
+    delete mni;
 }
 /*
 static int mw_download_progress(void* data, curl_off_t total, curl_off_t cur, curl_off_t unused0, curl_off_t unused1)
@@ -86,7 +87,7 @@ static int mw_download_progress(void* data, curl_off_t total, curl_off_t cur, cu
 
 void MainWindow::initSignalSlots()
 {
-    QObject::connect(ui->manageBtn, &QPushButton::clicked, this, &MainWindow::manageBtn_clicked);
+    QObject::connect(ui->manageBtn_2, &QPushButton::clicked, this, &MainWindow::manageBtn_2_clicked);
     QObject::connect(ui->ilReaderBtn, &QPushButton::clicked, this, &MainWindow::ilReaderBtn_clicked);
     QObject::connect(ui->recipeCombineBtn, &QPushButton::clicked, this, &MainWindow::recipeCombineBtn_clicked);
     QObject::connect(ui->createBtn, &QPushButton::clicked, this, &MainWindow::createBtn_clicked);
@@ -104,19 +105,13 @@ void MainWindow::dragEnterEvent(QDragEnterEvent* event)
 
 void MainWindow::dropEvent(QDropEvent* event)
 {
-    DhList* uuidList = nbt_info_list_get_uuid_list();
-    if(g_rw_lock_writer_trylock(&uuidList->lock))
+    auto urls = event->mimeData()->urls();
+    QStringList filelist;
+    for(int i = 0 ; i < urls.length() ; i++)
     {
-        auto urls = event->mimeData()->urls();
-        QStringList filelist;
-        for(int i = 0 ; i < urls.length() ; i++)
-        {
-            filelist << urls[i].toLocalFile();
-        }
-        dh::loadNbtFiles(this, filelist);
-        g_rw_lock_writer_unlock(&uuidList->lock);
+        filelist << urls[i].toLocalFile();
     }
-    else QMessageBox::critical(this, _("Error!"), _("NBT list is locked!"));
+    dh::loadNbtInstances(this, filelist);
 }
 
 void MainWindow::configAction_triggered()
@@ -126,10 +121,10 @@ void MainWindow::configAction_triggered()
     cui->show();
 }
 
-void MainWindow::manageBtn_clicked()
+void MainWindow::manageBtn_2_clicked()
 {
-    if(!mn) mn = new dh::ManageNBT();
-    mn->show();
+    if(!mni) mni = new dh::ManageNbtInterface();
+    mni->show();
 }
 
 void MainWindow::ilReaderBtn_clicked()
@@ -262,20 +257,19 @@ void MainWindow::mrBtn_clicked()
 
 void MainWindow::nbtReaderBtn_clicked()
 {
-    DhList* uuidList = nbt_info_list_get_uuid_list();
-    if(g_rw_lock_reader_trylock(&uuidList->lock))
+    auto nui = new NbtSelectUI(this);
+    nui->setAttribute(Qt::WA_DeleteOnClose);
+    nui->show();
+    QObject::connect(nui, &NbtSelectUI::finished, this, &MainWindow::nbtReaderBtn_finished);
+}
+
+void MainWindow::nbtReaderBtn_finished(int ret)
+{
+    if(ret == QDialog::Accepted)
     {
-        auto nui = new NbtSelectUI();
-        nui->setAttribute(Qt::WA_DeleteOnClose);
-        auto ret = nui->exec();
-        g_rw_lock_reader_unlock(&uuidList->lock);
-        if(ret == QDialog::Accepted)
-        {
-            auto nrui = new NbtReaderUI();
-            nrui->setAttribute(Qt::WA_DeleteOnClose);
-            nrui->show();
-        }
-        else QMessageBox::critical(this, _("Error!"), _("No NBT is selected!"));
+        auto nrui = new NbtReaderUI();
+        nrui->setAttribute(Qt::WA_DeleteOnClose);
+        nrui->show();
     }
-    else QMessageBox::critical(this, _("Error!"), _("NBT list is locked!"));
+    else QMessageBox::critical(this, _("Error!"), _("No NBT is selected!"));
 }

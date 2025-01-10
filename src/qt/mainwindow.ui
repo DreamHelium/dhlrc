@@ -14,7 +14,7 @@
    <string>Litematica reader</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QHBoxLayout" name="horizontalLayout_3">
+   <layout class="QVBoxLayout" name="verticalLayout_2">
     <item>
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
@@ -35,9 +35,9 @@
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="manageBtn">
+           <widget class="QPushButton" name="manageBtn_2">
             <property name="text">
-             <string>&amp;Manage NBT</string>
+             <string>&amp;Manage NBT Interface (Test)</string>
             </property>
            </widget>
           </item>
@@ -141,20 +141,24 @@
        <attribute name="title">
         <string>Utility</string>
        </attribute>
-       <layout class="QVBoxLayout" name="verticalLayout">
+       <layout class="QVBoxLayout" name="verticalLayout_5">
         <item>
-         <widget class="QPushButton" name="configBtn">
-          <property name="text">
-           <string>&amp;Config Setting</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="configBtn_3">
-          <property name="text">
-           <string>Config &amp;Wizard</string>
-          </property>
-         </widget>
+         <layout class="QVBoxLayout" name="verticalLayout">
+          <item>
+           <widget class="QPushButton" name="configBtn">
+            <property name="text">
+             <string>&amp;Config Setting</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="configBtn_3">
+            <property name="text">
+             <string>Config &amp;Wizard</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </item>
        </layout>
       </widget>

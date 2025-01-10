@@ -37,23 +37,36 @@ typedef struct CommonInfo{
     GRWLock info_lock;
 } CommonInfo;
 
+typedef void (*DhUpdateFunc)(void*);
+
+typedef struct UpdateNotifier{
+    void* main_class;
+    DhUpdateFunc func;
+} UpdateNotifier;
+
 gboolean common_info_new(DhInfoTypes type, void* data, GDateTime* time, const gchar* description);
 void     common_infos_init();
 void     common_infos_free();
 gboolean common_info_list_remove_item(DhInfoTypes type, const gchar* uuid);
 CommonInfo* common_info_list_get_common_info(DhInfoTypes type, const gchar* uuid);
-gboolean common_info_list_update_data(DhInfoTypes type, const gchar* uuid, void* data);
-GList*   common_info_list_get_uuid_list(DhInfoTypes type);
+void*    common_info_get_data(DhInfoTypes type, const gchar* uuid);
+GDateTime* common_info_get_time(DhInfoTypes type, const gchar* uuid);
+gchar*     common_info_get_description(DhInfoTypes type, const gchar* uuid);
+void     common_info_reset_description(DhInfoTypes type, const gchar* uuid, const gchar* description);
+gboolean common_info_reader_trylock(DhInfoTypes type, const gchar* uuid);
+void     common_info_reader_unlock(DhInfoTypes type, const gchar* uuid);
+gboolean common_info_writer_trylock(DhInfoTypes type, const gchar* uuid);
+void     common_info_writer_unlock(DhInfoTypes type, const gchar *uuid);
+gboolean common_info_update_data(DhInfoTypes type, const gchar* uuid, void* data);
+const GList* common_info_list_get_uuid_list(DhInfoTypes type);
 
 void     common_info_list_set_uuid(DhInfoTypes type, const char* uuid);
 const char* common_info_list_get_uuid(DhInfoTypes type);
 void     common_info_list_set_multi_uuid(DhInfoTypes type, const char** arr);
 char** common_info_list_get_multi_uuid(DhInfoTypes type);
 
-gboolean common_info_list_writer_trylock(DhInfoTypes type);
-void     common_info_list_writer_unlock(DhInfoTypes type);
-gboolean common_info_list_reader_trylock(DhInfoTypes type);
-void     common_info_list_reader_unlock(DhInfoTypes type);
+void common_info_list_add_update_notifier(DhInfoTypes type, void* main_class, DhUpdateFunc func);
+void common_info_list_remove_update_notifier(DhInfoTypes type, void* main_class);
 
 G_END_DECLS
 

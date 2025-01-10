@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-01-07 23:04+0800\n"
+"POT-Creation-Date: 2025-01-10 20:11+0800\n"
 "PO-Revision-Date: 2024-11-30 07:00+0800\n"
 "Last-Translator: dream_he <48383878+DreamHelium@users.noreply.github.com>\n"
 "Language-Team: Chinese <kde-i18n-doc@kde.org>\n"
@@ -197,8 +197,8 @@ msgstr "让我们在此添加NBT文件吧！"
 
 #: ../../src/qt/mainwindow.ui:40
 msgctxt "MainWindow|"
-msgid "&Manage NBT"
-msgstr "管理NBT（&M）"
+msgid "&Manage NBT Interface (Test)"
+msgstr ""
 
 #: ../../src/qt/mainwindow.ui:47
 msgctxt "MainWindow|"
@@ -265,12 +265,12 @@ msgctxt "MainWindow|"
 msgid "Utility"
 msgstr ""
 
-#: ../../src/qt/mainwindow.ui:148
+#: ../../src/qt/mainwindow.ui:150
 msgctxt "MainWindow|"
 msgid "&Config Setting"
 msgstr "配置设置（&C）"
 
-#: ../../src/qt/mainwindow.ui:155
+#: ../../src/qt/mainwindow.ui:157
 msgctxt "MainWindow|"
 msgid "Config &Wizard"
 msgstr ""
@@ -497,22 +497,22 @@ msgstr ""
 "请再次输入方块的坐标，或输入 “b” 选择其他区域，输入 “r” 阅读方块的细节，输入 "
 "“q” 退出程序 (b): "
 
-#: src/main.c:272
+#: src/main.c:278
 #, c-format
 msgid "dhlrc - Program to handle litematic or other struct of Minecraft.\n"
 msgstr ""
 
-#: src/main.c:274
+#: src/main.c:280
 #, c-format
 msgid "Modules:\n"
 msgstr ""
 
-#: src/main.c:296
+#: src/main.c:302
 #, c-format
 msgid "Unrecognized options "
 msgstr ""
 
-#: src/main.c:371
+#: src/main.c:377
 msgid "[FILE] - Read a litematic file."
 msgstr "[文件] - 读取一个投影文件。"
 
@@ -520,7 +520,7 @@ msgstr "[文件] - 读取一个投影文件。"
 msgid "Error when reading file."
 msgstr "在读取文件时出错。"
 
-#: src/main_isoc.c:108 src/qt/utility.cpp:129
+#: src/main_isoc.c:108 src/qt/utility.cpp:130 src/qt/utility.cpp:163
 msgid "Not a valid NBT file!"
 msgstr "不是一个有效的NBT文件！"
 
@@ -543,7 +543,7 @@ msgstr ""
 "[2] 投影方块阅读器\n"
 "\n"
 
-#: src/main_isoc.c:135 src/cli/nbt_litereader.c:78 src/cli/nbt_litereader.c:302
+#: src/main_isoc.c:135 src/nbt_litereader.c:78 src/nbt_litereader.c:302
 msgid "Quit application"
 msgstr "退出程序"
 
@@ -555,6 +555,89 @@ msgstr "请选择一个选项，或输入 “q” 退出程序 (q): "
 #, c-format
 msgid "Processing: region %d / %d : [%ld] %s"
 msgstr ""
+
+#: src/nbt_litereader.c:58
+#, c-format
+msgid ""
+"The detail of NBT \"%s\" is listed below:\n"
+"\n"
+msgstr ""
+"NBT \"%s\" 的细节如下：\n"
+"\n"
+
+#: src/nbt_litereader.c:79
+msgid "Enter modification mode"
+msgstr "进入修改模式"
+
+#: src/nbt_litereader.c:80
+msgid "Save NBT file"
+msgstr "保存NBT文件"
+
+#: src/nbt_litereader.c:81
+msgid "Enter upper instance"
+msgstr "进入上层实例"
+
+#: src/nbt_litereader.c:86
+msgid ""
+"\n"
+"Please enter a number or choose option to continue [Q/m/s/e/?]: "
+msgstr ""
+"\n"
+"请输入一个数字或选择选项以继续 [Q/m/s/e/?]： "
+
+#: src/nbt_litereader.c:90 src/nbt_litereader.c:98 src/nbt_litereader.c:301
+msgid "Enter upper NBT"
+msgstr "进入上层NBT"
+
+#: src/nbt_litereader.c:92
+msgid ""
+"\n"
+"Please enter a number or choose option to continue [P/q/m/s/e/?]: "
+msgstr ""
+"\n"
+"请输入一个数字或选择选项以继续 [P/q/m/s/e/?]： "
+
+#: src/nbt_litereader.c:100
+msgid ""
+"\n"
+"No deeper NBT, please choose option to continue [P/q/m/s/e/?]: "
+msgstr ""
+"\n"
+"没有深层NBT，请选择选项以继续 [P/q/m/s/e/?]： "
+
+#: src/nbt_litereader.c:261 src/nbt_litereader.c:360
+#, c-format
+msgid ""
+"\n"
+"Unsupported modification mode request, will exit to reading mode."
+msgstr ""
+"\n"
+"不支持的修改模式请求，将退回至阅读模式。"
+
+#: src/nbt_litereader.c:303
+msgid "Exit modification mode"
+msgstr "退出修改模式"
+
+#: src/nbt_litereader.c:309
+msgid ""
+"\n"
+"Please enter an integer or choose an option [P/q/b/?]: "
+msgstr ""
+
+#: src/nbt_litereader.c:323
+#, c-format
+msgid ""
+"\n"
+"The integer you input is %ld, please confirm [Y/n/?]:"
+msgstr ""
+
+#: src/nbt_litereader.c:325
+msgid "Yes"
+msgstr "是"
+
+#: src/nbt_litereader.c:326
+msgid "No"
+msgstr "否"
 
 #: src/qt/blockreaderui.cpp:60
 msgid ""
@@ -581,21 +664,21 @@ msgstr "选择一个物品列表。"
 msgid "Please choose a item list:"
 msgstr "请选择一个物品列表："
 
-#: src/qt/ilchooseui.cpp:39 src/qt/manage.cpp:161 src/qt/manage.cpp:162
-#: src/qt/manage.cpp:163 src/qt/manage.cpp:164 src/qt/manage.cpp:360
-#: src/qt/manage.cpp:361 src/qt/manage.cpp:362 src/qt/nbtselectui.cpp:51
-#: src/qt/regionchooseui.cpp:61 src/qt/regionchooseui.cpp:62
+#: src/qt/ilchooseui.cpp:39 src/qt/manage.cpp:220 src/qt/manage.cpp:221
+#: src/qt/manage.cpp:222 src/qt/manage.cpp:402 src/qt/manage.cpp:403
+#: src/qt/manage.cpp:404 src/qt/regionchooseui.cpp:61
+#: src/qt/regionchooseui.cpp:62
 msgid "locked"
 msgstr "已锁定"
 
 #: src/qt/ilchooseui.cpp:48 src/qt/ilchooseui.cpp:67 src/qt/lrchooseui.cpp:60
-#: src/qt/nbtselectui.cpp:59 src/qt/nbtselectui.cpp:78 src/qt/recipesui.cpp:236
+#: src/qt/nbtselectui.cpp:49 src/qt/nbtselectui.cpp:68 src/qt/recipesui.cpp:236
 #: src/qt/regionchooseui.cpp:70 src/qt/regionchooseui.cpp:89
 #: src/qt/saveregionselectui.cpp:42 src/gtk/manage_window.c:118
 msgid "&OK"
 msgstr "确定(&O)"
 
-#: src/qt/ilchooseui.cpp:49 src/qt/lrchooseui.cpp:61 src/qt/nbtselectui.cpp:60
+#: src/qt/ilchooseui.cpp:49 src/qt/lrchooseui.cpp:61 src/qt/nbtselectui.cpp:50
 #: src/qt/recipesui.cpp:237 src/qt/regionchooseui.cpp:71
 #: src/qt/saveregionselectui.cpp:43 src/gtk/manage_window.c:121
 msgid "&Close"
@@ -605,21 +688,20 @@ msgstr "关闭(&C)"
 msgid "No item list available!"
 msgstr "没有物品列表可用！"
 
-#: src/qt/ilchooseui.cpp:91 src/qt/ilreaderui.cpp:110 src/qt/mainwindow.cpp:119
-#: src/qt/mainwindow.cpp:154 src/qt/mainwindow.cpp:156
-#: src/qt/mainwindow.cpp:159 src/qt/mainwindow.cpp:180
-#: src/qt/mainwindow.cpp:182 src/qt/mainwindow.cpp:185
-#: src/qt/mainwindow.cpp:196 src/qt/mainwindow.cpp:220
-#: src/qt/mainwindow.cpp:222 src/qt/mainwindow.cpp:225
-#: src/qt/mainwindow.cpp:227 src/qt/mainwindow.cpp:249
-#: src/qt/mainwindow.cpp:252 src/qt/mainwindow.cpp:254
-#: src/qt/mainwindow.cpp:278 src/qt/mainwindow.cpp:280 src/qt/manage.cpp:30
-#: src/qt/manage.cpp:242 src/qt/manage.cpp:470 src/qt/manage.cpp:483
-#: src/qt/nbtselectui.cpp:98 src/qt/regionchooseui.cpp:122
-#: src/qt/saveregionselectui.cpp:73 src/qt/saveregionselectui.cpp:87
-#: src/qt/saveregionselectui.cpp:89 src/qt/utility.cpp:36 src/qt/utility.cpp:39
-#: src/qt/utility.cpp:52 src/qt/utility.cpp:66 src/qt/utility.cpp:72
-#: src/qt/utility.cpp:97
+#: src/qt/ilchooseui.cpp:91 src/qt/ilreaderui.cpp:110 src/qt/mainwindow.cpp:149
+#: src/qt/mainwindow.cpp:151 src/qt/mainwindow.cpp:154
+#: src/qt/mainwindow.cpp:175 src/qt/mainwindow.cpp:177
+#: src/qt/mainwindow.cpp:180 src/qt/mainwindow.cpp:191
+#: src/qt/mainwindow.cpp:215 src/qt/mainwindow.cpp:217
+#: src/qt/mainwindow.cpp:220 src/qt/mainwindow.cpp:222
+#: src/qt/mainwindow.cpp:244 src/qt/mainwindow.cpp:247
+#: src/qt/mainwindow.cpp:249 src/qt/mainwindow.cpp:274 src/qt/manage.cpp:29
+#: src/qt/manage.cpp:330 src/qt/manage.cpp:343 src/qt/nbtselectui.cpp:119
+#: src/qt/regionchooseui.cpp:122 src/qt/saveregionselectui.cpp:73
+#: src/qt/saveregionselectui.cpp:87 src/qt/saveregionselectui.cpp:89
+#: src/qt/utility.cpp:37 src/qt/utility.cpp:40 src/qt/utility.cpp:53
+#: src/qt/utility.cpp:67 src/qt/utility.cpp:73 src/qt/utility.cpp:98
+#: src/qt/utility.cpp:192
 msgid "Error!"
 msgstr "错误！"
 
@@ -663,8 +745,8 @@ msgstr "追踪"
 msgid "Show history"
 msgstr "展示历史"
 
-#: src/qt/ilreaderui.cpp:110 src/qt/mainwindow.cpp:154
-#: src/qt/mainwindow.cpp:180
+#: src/qt/ilreaderui.cpp:110 src/qt/mainwindow.cpp:149
+#: src/qt/mainwindow.cpp:175
 msgid "The item list is locked!"
 msgstr "此材料列表被锁定！"
 
@@ -686,151 +768,120 @@ msgstr ""
 msgid "Enter description here."
 msgstr ""
 
-#: src/qt/mainwindow.cpp:119 src/qt/mainwindow.cpp:280
-#: src/qt/saveregionselectui.cpp:73 src/qt/utility.cpp:39
-msgid "NBT list is locked!"
-msgstr "NBT列表被锁定！"
-
-#: src/qt/mainwindow.cpp:156 src/qt/mainwindow.cpp:182
+#: src/qt/mainwindow.cpp:151 src/qt/mainwindow.cpp:177
 msgid "The item list is freed!"
 msgstr "物品列表被释放！"
 
-#: src/qt/mainwindow.cpp:159 src/qt/mainwindow.cpp:185
+#: src/qt/mainwindow.cpp:154 src/qt/mainwindow.cpp:180
 msgid "No item list!"
 msgstr "无物品列表！"
 
-#: src/qt/mainwindow.cpp:196 src/qt/mainwindow.cpp:227
-#: src/qt/mainwindow.cpp:254
+#: src/qt/mainwindow.cpp:191 src/qt/mainwindow.cpp:222
+#: src/qt/mainwindow.cpp:249
 msgid "Region list is locked!"
 msgstr "Region列表被锁定！"
 
-#: src/qt/mainwindow.cpp:213 src/qt/saveregionselectui.cpp:80
+#: src/qt/mainwindow.cpp:208 src/qt/saveregionselectui.cpp:80
 msgid "Enter Name for Item List"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:213 src/qt/saveregionselectui.cpp:80
+#: src/qt/mainwindow.cpp:208 src/qt/saveregionselectui.cpp:80
 msgid "Enter the name for item list"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:220 src/qt/saveregionselectui.cpp:87
+#: src/qt/mainwindow.cpp:215 src/qt/saveregionselectui.cpp:87
 msgid "Description is empty!"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:222 src/qt/saveregionselectui.cpp:89
+#: src/qt/mainwindow.cpp:217 src/qt/saveregionselectui.cpp:89
 msgid "Item list is locked!"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:225 src/qt/mainwindow.cpp:252
+#: src/qt/mainwindow.cpp:220 src/qt/mainwindow.cpp:247
 msgid "No Region or no Region selected!"
 msgstr "没有Region或没有Region选中！"
 
-#: src/qt/mainwindow.cpp:249
+#: src/qt/mainwindow.cpp:244
 msgid "Region is locked!"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:278
+#: src/qt/mainwindow.cpp:274
 msgid "No NBT is selected!"
 msgstr ""
 
-#: src/qt/manage.cpp:30
+#: src/qt/manage.cpp:29
 msgid "No row is selected!"
 msgstr "没有选择行！"
 
-#: src/qt/manage.cpp:39 src/gtk/manage_nbt.c:18
+#: src/qt/manage.cpp:38 src/gtk/manage_nbt.c:18
 msgid "Litematica"
 msgstr "投影"
 
-#: src/qt/manage.cpp:40 src/gtk/manage_nbt.c:19
+#: src/qt/manage.cpp:39 src/gtk/manage_nbt.c:19
 msgid "NBT Struct"
 msgstr "NBT结构"
 
-#: src/qt/manage.cpp:41 src/gtk/manage_nbt.c:20
+#: src/qt/manage.cpp:40 src/gtk/manage_nbt.c:20
 msgid "Schematics"
 msgstr "Schema投影"
 
-#: src/qt/manage.cpp:42 src/gtk/manage_nbt.c:21
+#: src/qt/manage.cpp:41 src/gtk/manage_nbt.c:21
 msgid "Others"
 msgstr "其它"
 
-#: src/qt/manage.cpp:75 src/cli/main_cli.c:22 src/cli/main_cli.c:32
-msgid "Manage NBT"
-msgstr "管理NBT"
-
-#: src/qt/manage.cpp:99
-msgid "Select a file"
-msgstr "选择一个文件"
-
-#: src/qt/manage.cpp:99
-msgid "Litematic file (*.litematic);;NBT File (*.nbt)"
-msgstr "投影文件 (*.litematic);;NBT文件 (*.nbt)"
-
-#: src/qt/manage.cpp:178 src/qt/manage.cpp:179 src/qt/manage.cpp:180
-#: src/qt/manage.cpp:181 src/qt/manage.cpp:375 src/qt/manage.cpp:376
-#: src/qt/manage.cpp:377
-msgid "List locked"
-msgstr "列表锁定"
-
-#: src/qt/manage.cpp:189 src/qt/manage.cpp:385
-msgid "Description"
-msgstr "描述"
-
-#: src/qt/manage.cpp:189 src/qt/manage.cpp:385
-msgid "UUID"
-msgstr "唯一码"
-
-#: src/qt/manage.cpp:189 src/qt/manage.cpp:385
-msgid "Time"
-msgstr "时间"
-
-#: src/qt/manage.cpp:189
-msgid "Type"
-msgstr "类型"
-
-#: src/qt/manage.cpp:205
-msgid "Save File"
-msgstr "保存文件"
-
-#: src/qt/manage.cpp:214
-msgid "Info Locked!"
-msgstr "信息被锁定！"
-
-#: src/qt/manage.cpp:214
-msgid "The NBT info is locked!"
-msgstr "NBT信息被锁定！"
-
-#: src/qt/manage.cpp:219
-msgid "Save Files"
-msgstr ""
-
-#: src/qt/manage.cpp:236
-msgid "The following infos are locked:\n"
-msgstr ""
-
-#: src/qt/manage.cpp:325 src/cli/main_cli.c:23 src/cli/main_cli.c:33
+#: src/qt/manage.cpp:185 src/cli/main_cli.c:23 src/cli/main_cli.c:33
 msgid "Manage Region"
 msgstr ""
 
-#: src/qt/manage.cpp:470
+#: src/qt/manage.cpp:235 src/qt/manage.cpp:236 src/qt/manage.cpp:237
+msgid "List locked"
+msgstr "列表锁定"
+
+#: src/qt/manage.cpp:245 src/qt/manage.cpp:413
+msgid "Description"
+msgstr "描述"
+
+#: src/qt/manage.cpp:245 src/qt/manage.cpp:413
+msgid "UUID"
+msgstr "唯一码"
+
+#: src/qt/manage.cpp:245 src/qt/manage.cpp:413
+msgid "Time"
+msgstr "时间"
+
+#: src/qt/manage.cpp:330
 msgid "Not a valid NBT List!"
 msgstr ""
 
-#: src/qt/manage.cpp:483
+#: src/qt/manage.cpp:343
 msgid "Not a valid NBT UUID!"
 msgstr ""
 
-#: src/qt/module.cpp:57
+#: src/qt/manage.cpp:358
+msgid "Manage NBT Interface"
+msgstr ""
+
+#: src/qt/manage.cpp:370
+msgid "Select a file"
+msgstr "选择一个文件"
+
+#: src/qt/manage.cpp:370
+msgid "Litematic file (*.litematic);;NBT File (*.nbt)"
+msgstr "投影文件 (*.litematic);;NBT文件 (*.nbt)"
+
+#: src/qt/module.cpp:56
 msgid "The Qt interface of dhlrc."
 msgstr ""
 
-#: src/qt/nbtselectui.cpp:24
-msgid "Please select a NBT:"
-msgstr "请选择一个NBT："
-
-#: src/qt/nbtselectui.cpp:75
+#: src/qt/nbtselectui.cpp:65
 msgid "No NBT available!"
 msgstr "没有NBT可用！"
 
-#: src/qt/nbtselectui.cpp:98
+#: src/qt/nbtselectui.cpp:104
+msgid "locked!"
+msgstr ""
+
+#: src/qt/nbtselectui.cpp:119
 msgid "No NBT selected!"
 msgstr "没有NBT被选中！"
 
@@ -917,55 +968,59 @@ msgstr ""
 msgid "Save as &item list."
 msgstr ""
 
+#: src/qt/saveregionselectui.cpp:73 src/qt/utility.cpp:40
+msgid "NBT list is locked!"
+msgstr "NBT列表被锁定！"
+
 #: src/qt/showtrackui.cpp:18
 msgid "The track information is:\n"
 msgstr "追踪信息如下：\n"
 
-#: src/qt/utility.cpp:36
+#: src/qt/utility.cpp:37
 msgid "No NBT or no NBT selected!"
 msgstr "无NBT或没有NBT被选中！"
 
-#: src/qt/utility.cpp:50
+#: src/qt/utility.cpp:51
 msgid "Enter Region Name"
 msgstr "输入Region名称"
 
-#: src/qt/utility.cpp:50
+#: src/qt/utility.cpp:51
 msgid "Enter name for the new Region."
 msgstr "输入新Region的名称。"
 
-#: src/qt/utility.cpp:52
+#: src/qt/utility.cpp:53
 msgid "No description for the Region!"
 msgstr "没有Region的描述！"
 
-#: src/qt/utility.cpp:66
+#: src/qt/utility.cpp:67
 msgid "The NBT Struct is unsupported!"
 msgstr "此NBT结构不受支持！"
 
-#: src/qt/utility.cpp:72
+#: src/qt/utility.cpp:73
 msgid "This NBT is locked!"
 msgstr "此NBT被锁定！"
 
-#: src/qt/utility.cpp:91
+#: src/qt/utility.cpp:92 src/qt/utility.cpp:186
 msgid "The following files couldn't be added:\n"
 msgstr ""
 
-#: src/qt/utility.cpp:109 src/gtk/manage_nbt.c:131
+#: src/qt/utility.cpp:110 src/qt/utility.cpp:146 src/gtk/manage_nbt.c:131
 msgid "Enter Desciption"
 msgstr "输入描述"
 
-#: src/qt/utility.cpp:109
+#: src/qt/utility.cpp:110 src/qt/utility.cpp:146
 msgid "Enter desciption for the NBT file."
 msgstr "输入NBT文件的描述。"
 
-#: src/qt/utility.cpp:111
+#: src/qt/utility.cpp:112 src/qt/utility.cpp:148
 msgid "No Description Entered!"
 msgstr "没有输入的描述！"
 
-#: src/qt/utility.cpp:111
+#: src/qt/utility.cpp:112 src/qt/utility.cpp:148
 msgid "No desciption entered! Will not add the NBT file!"
 msgstr "没有描述输入！将不会添加NBT文件！"
 
-#: src/qt/utility.cpp:129
+#: src/qt/utility.cpp:130 src/qt/utility.cpp:163
 msgid "Not Valid File!"
 msgstr "不是有效的文件！"
 
@@ -1065,13 +1120,17 @@ msgstr "移除（&R）"
 msgid "R&efresh"
 msgstr "刷新（&E）"
 
-#: src/gtk/module.c:42
+#: src/gtk/module.c:43
 msgid "The GTK interface of dhlrc"
 msgstr ""
 
 #: src/cli/main_cli.c:22
 msgid "manage_nbt"
 msgstr ""
+
+#: src/cli/main_cli.c:22 src/cli/main_cli.c:32
+msgid "Manage NBT"
+msgstr "管理NBT"
 
 #: src/cli/main_cli.c:23
 msgid "manage_region"
@@ -1110,89 +1169,24 @@ msgstr ""
 msgid "The CLI/TUI interface of dhlrc"
 msgstr ""
 
-#: src/cli/nbt_litereader.c:58
-#, c-format
-msgid ""
-"The detail of NBT \"%s\" is listed below:\n"
-"\n"
-msgstr ""
-"NBT \"%s\" 的细节如下：\n"
-"\n"
+#~ msgid "Please select a NBT:"
+#~ msgstr "请选择一个NBT："
 
-#: src/cli/nbt_litereader.c:79
-msgid "Enter modification mode"
-msgstr "进入修改模式"
+#~ msgctxt "MainWindow|"
+#~ msgid "&Manage NBT"
+#~ msgstr "管理NBT（&M）"
 
-#: src/cli/nbt_litereader.c:80
-msgid "Save NBT file"
-msgstr "保存NBT文件"
+#~ msgid "Type"
+#~ msgstr "类型"
 
-#: src/cli/nbt_litereader.c:81
-msgid "Enter upper instance"
-msgstr "进入上层实例"
+#~ msgid "Save File"
+#~ msgstr "保存文件"
 
-#: src/cli/nbt_litereader.c:86
-msgid ""
-"\n"
-"Please enter a number or choose option to continue [Q/m/s/e/?]: "
-msgstr ""
-"\n"
-"请输入一个数字或选择选项以继续 [Q/m/s/e/?]： "
+#~ msgid "Info Locked!"
+#~ msgstr "信息被锁定！"
 
-#: src/cli/nbt_litereader.c:90 src/cli/nbt_litereader.c:98
-#: src/cli/nbt_litereader.c:301
-msgid "Enter upper NBT"
-msgstr "进入上层NBT"
-
-#: src/cli/nbt_litereader.c:92
-msgid ""
-"\n"
-"Please enter a number or choose option to continue [P/q/m/s/e/?]: "
-msgstr ""
-"\n"
-"请输入一个数字或选择选项以继续 [P/q/m/s/e/?]： "
-
-#: src/cli/nbt_litereader.c:100
-msgid ""
-"\n"
-"No deeper NBT, please choose option to continue [P/q/m/s/e/?]: "
-msgstr ""
-"\n"
-"没有深层NBT，请选择选项以继续 [P/q/m/s/e/?]： "
-
-#: src/cli/nbt_litereader.c:261 src/cli/nbt_litereader.c:360
-#, c-format
-msgid ""
-"\n"
-"Unsupported modification mode request, will exit to reading mode."
-msgstr ""
-"\n"
-"不支持的修改模式请求，将退回至阅读模式。"
-
-#: src/cli/nbt_litereader.c:303
-msgid "Exit modification mode"
-msgstr "退出修改模式"
-
-#: src/cli/nbt_litereader.c:309
-msgid ""
-"\n"
-"Please enter an integer or choose an option [P/q/b/?]: "
-msgstr ""
-
-#: src/cli/nbt_litereader.c:323
-#, c-format
-msgid ""
-"\n"
-"The integer you input is %ld, please confirm [Y/n/?]:"
-msgstr ""
-
-#: src/cli/nbt_litereader.c:325
-msgid "Yes"
-msgstr "是"
-
-#: src/cli/nbt_litereader.c:326
-msgid "No"
-msgstr "否"
+#~ msgid "The NBT info is locked!"
+#~ msgstr "NBT信息被锁定！"
 
 #~ msgid "directory"
 #~ msgstr "目录"

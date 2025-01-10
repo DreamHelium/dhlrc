@@ -31,13 +31,22 @@ typedef struct CommonInfoSingle{
     DhMTTable* table;
     GList* uuid_list;
     DhStrArray* uuid_array;
-    GRWLock lock;
+    GPtrArray* update_notifiers;
 } CommonInfoSingle;
 
 typedef GPtrArray CommonInfos;
 
 /* Array<CommonInfoSingle> */
 static CommonInfos* infos = NULL;
+
+static void update(CommonInfoSingle* instance)
+{
+    for(int i = 0 ; i < instance->update_notifiers->len ; i++)
+    {
+        UpdateNotifier* un = instance->update_notifiers->pdata[i];
+        un->func(un->main_class);
+    }
+}
 
 static void common_info_free(CommonInfo* info, GFreeFunc func)
 {
@@ -77,6 +86,7 @@ static void common_info_single_free(gpointer mem)
         if(single->table) dh_mt_table_destroy(single->table);
         g_list_free(single->uuid_list);
         if(single->uuid_array) dh_str_array_free(single->uuid_array);
+        g_ptr_array_free(single->update_notifiers, TRUE);
     }
     g_free(mem);
 }
@@ -95,8 +105,6 @@ void common_infos_init()
     for(int i = 0 ; i < N_TYPES ; i++)
     {
         CommonInfoSingle* instance = g_new0(CommonInfoSingle, 1);
-        g_rw_lock_init(&instance->lock);
-        g_rw_lock_writer_lock(&instance->lock);
         if(i == DH_TYPE_NBT)
             instance->table = dh_mt_table_new(g_str_hash, is_same_string, g_free, nbt_info_free);
         else if(i == DH_TYPE_Region)
@@ -108,7 +116,7 @@ void common_infos_init()
         else instance->table = NULL;
         instance->uuid_list = NULL;
         instance->uuid_array = NULL;
-        g_rw_lock_writer_unlock(&instance->lock);
+        instance->update_notifiers = g_ptr_array_new_with_free_func(g_free);
         g_ptr_array_add(infos, instance);
     }
 }
@@ -135,6 +143,7 @@ gboolean common_info_new(DhInfoTypes type, void* data, GDateTime* time, const gc
     ret = dh_mt_table_insert(table, uuid, info);
     instance->uuid_list = g_list_append(instance->uuid_list, uuid);
     g_rw_lock_writer_unlock(&info->info_lock);
+    update(instance);
     return ret;
 }
 
@@ -158,15 +167,67 @@ CommonInfo* common_info_list_get_common_info(DhInfoTypes type, const gchar* uuid
     return info;
 }
 
-gboolean common_info_list_update_data(DhInfoTypes type, const gchar* uuid, void* data)
+void*    common_info_get_data(DhInfoTypes type, const gchar* uuid)
+{
+    CommonInfo* info = common_info_list_get_common_info(type, uuid);
+    return info->data;
+}
+
+GDateTime* common_info_get_time(DhInfoTypes type, const gchar* uuid)
+{
+    CommonInfo* info = common_info_list_get_common_info(type, uuid);
+    return info->time;
+}
+
+gchar*     common_info_get_description(DhInfoTypes type, const gchar* uuid)
+{
+    CommonInfo* info = common_info_list_get_common_info(type, uuid);
+    return info->description;
+}
+
+void     common_info_reset_description(DhInfoTypes type, const gchar* uuid, const gchar* description)
+{
+    CommonInfo* info = common_info_list_get_common_info(type, uuid);
+    g_free(info->description);
+    info->description = g_strdup(description);
+    update(infos->pdata[type]);
+}
+
+gboolean common_info_reader_trylock(DhInfoTypes type, const gchar* uuid)
+{
+    CommonInfo* info = common_info_list_get_common_info(type, uuid);
+    return g_rw_lock_reader_trylock(&info->info_lock);
+}
+
+void     common_info_reader_unlock(DhInfoTypes type, const gchar* uuid)
+{
+    CommonInfo* info = common_info_list_get_common_info(type, uuid);
+    g_rw_lock_reader_unlock(&info->info_lock);
+}
+
+gboolean common_info_writer_trylock(DhInfoTypes type, const gchar* uuid)
+{
+    CommonInfo* info = common_info_list_get_common_info(type, uuid);
+    return g_rw_lock_writer_trylock(&info->info_lock);
+}
+
+void     common_info_writer_unlock(DhInfoTypes type, const gchar *uuid)
+{
+    CommonInfo* info = common_info_list_get_common_info(type, uuid);
+    g_rw_lock_writer_unlock(&info->info_lock);
+}
+
+gboolean common_info_update_data(DhInfoTypes type, const gchar* uuid, void* data)
 {
     CommonInfoSingle* instance = infos->pdata[type];
     CommonInfo* info = dh_mt_table_lookup(instance->table, uuid);
     info->data = data;
+
+    update(instance);
     return TRUE;
 }
 
-GList* common_info_list_get_uuid_list(DhInfoTypes type)
+const GList* common_info_list_get_uuid_list(DhInfoTypes type)
 {
     CommonInfoSingle* instance = infos->pdata[type];
     return instance->uuid_list;
@@ -201,26 +262,25 @@ char** common_info_list_get_multi_uuid(DhInfoTypes type)
     return dh_str_array_dup_to_plain(instance->uuid_array);
 }
 
-gboolean common_info_list_writer_trylock(DhInfoTypes type)
+void common_info_list_add_update_notifier(DhInfoTypes type, void* main_class, DhUpdateFunc func)
 {
+    UpdateNotifier* un = g_new0(UpdateNotifier, 1);
+    un->main_class = main_class;
+    un->func = func;
     CommonInfoSingle* instance = infos->pdata[type];
-    return g_rw_lock_writer_trylock(&instance->lock);
+    g_ptr_array_add(instance->update_notifiers, un);
 }
 
-void     common_info_list_writer_unlock(DhInfoTypes type)
+void common_info_list_remove_update_notifier(DhInfoTypes type, void* main_class)
 {
     CommonInfoSingle* instance = infos->pdata[type];
-    g_rw_lock_writer_unlock(&instance->lock);
-}
-
-gboolean common_info_list_reader_trylock(DhInfoTypes type)
-{
-    CommonInfoSingle* instance = infos->pdata[type];
-    return g_rw_lock_reader_trylock(&instance->lock);
-}
-
-void     common_info_list_reader_unlock(DhInfoTypes type)
-{
-    CommonInfoSingle* instance = infos->pdata[type];
-    g_rw_lock_reader_unlock(&instance->lock);
+    for(int i = 0 ; i < instance->update_notifiers->len ; i++)
+    {
+        UpdateNotifier* un = instance->update_notifiers->pdata[i];
+        if(un->main_class == main_class)
+        {
+            g_ptr_array_remove(instance->update_notifiers, un);
+            break;
+        }
+    }
 }

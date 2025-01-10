@@ -8,6 +8,7 @@
 #include <QBoxLayout>
 #include <QButtonGroup>
 #include <QDialog>
+#include <qboxlayout.h>
 
 namespace Ui {
 class NbtSelectUI;
@@ -20,16 +21,18 @@ class NbtSelectUI : public QDialog
 public:
     explicit NbtSelectUI(QWidget *parent = nullptr);
     ~NbtSelectUI();
+    void updateUI();
 
 private:
     QLabel* label;
-    QList<QRadioButton*> btnList;
     QButtonGroup* group;
     QPushButton* okBtn;
     QPushButton* closeBtn;
     QVBoxLayout* layout;
+    QVBoxLayout* btnLayout;
     QHBoxLayout* hLayout;
     void initUI();
+    
 
 private Q_SLOTS:
     void okBtn_clicked();

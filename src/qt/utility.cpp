@@ -13,7 +13,8 @@
 #include <QSvgRenderer>
 #include <QPixmap>
 #include <QPainter>
-#include "../common.h"
+#include "../nbt_interface/nbt_interface.h"
+#include "../common_info.h"
 
 void dh::loadRegion(QWidget* parent)
 {
@@ -132,6 +133,64 @@ bool dh::loadNbtFile(QWidget* parent, QString filedir, bool askForDes, bool tipF
     }
     g_object_unref(file);
     return ret;
+}
+
+bool dh::loadNbtInstance(QWidget* parent, QString filedir, bool askForDes, bool tipForFail)
+{
+    GFile* file = g_file_new_for_path(filedir.toUtf8());
+    char* defaultDes = g_file_get_basename(file); /* Should be freed */
+    char* des = NULL;
+    bool ret = false;
+    if(askForDes)
+    {
+        QString qdes = QInputDialog::getText(parent, _("Enter Desciption"), _("Enter desciption for the NBT file."), QLineEdit::Normal, defaultDes);
+        if(qdes.isEmpty())
+            QMessageBox::critical(parent, _("No Description Entered!"), _("No desciption entered! Will not add the NBT file!"));
+        else
+            des = g_strdup(qdes.toUtf8());
+        g_free(defaultDes);
+    }
+    else des = defaultDes;
+    if(des)
+    {
+        NbtInstance* instance = dh_nbt_if_parse(filedir.toUtf8());
+        if(instance)
+        {
+            common_info_new(DH_TYPE_NBT_INTERFACE, instance, g_date_time_new_now_local(), des);
+            ret = true;
+        }
+        else if(tipForFail)
+            QMessageBox::critical(parent, _("Not Valid File!"), _("Not a valid NBT file!"));
+        g_free(des);
+    }
+    g_object_unref(file);
+    return ret;
+}
+
+void dh::loadNbtInstances(QWidget* parent, QStringList filelist)
+{
+    using namespace dh;
+    QStringList failedDir;
+    if(filelist.length() == 1)
+        loadNbtInstance(parent, filelist[0], true, true);
+    else
+    {
+        for(int i = 0 ; i < filelist.length() ; i++)
+        {
+            bool success = loadNbtInstance(parent, filelist[i], false, false);
+            if(!success) failedDir << filelist[i];
+        }
+    }
+    if(filelist.length() > 1 && failedDir.length())
+    {
+        QString tip = _("The following files couldn't be added:\n");
+        for(int i = 0 ; i < failedDir.length() ; i++)
+        {
+            tip += failedDir[i];
+            tip += '\n';
+        }
+        QMessageBox::critical(parent, _("Error!"), tip);
+    }
 }
 
 QPixmap* dh::loadSvgFile(const char* contents)
