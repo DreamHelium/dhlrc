@@ -313,17 +313,17 @@ msgctxt "NbtReaderUI|"
 msgid "Key:"
 msgstr ""
 
-#: ../../src/qt/nbtreaderui.ui:76
+#: ../../src/qt/nbtreaderui.ui:99
 msgctxt "NbtReaderUI|"
 msgid "Value:"
 msgstr ""
 
-#: ../../src/qt/nbtreaderui.ui:109
+#: ../../src/qt/nbtreaderui.ui:121
 msgctxt "NbtReaderUI|"
 msgid "Modify"
 msgstr ""
 
-#: ../../src/qt/nbtreaderui.ui:116
+#: ../../src/qt/nbtreaderui.ui:128
 msgctxt "NbtReaderUI|"
 msgid "Close"
 msgstr ""

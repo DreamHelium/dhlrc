@@ -3,7 +3,7 @@
 
 #include <qstandarditemmodel.h>
 #include <qwidget.h>
-#include "../libnbt/nbt.h"
+#include "../nbt_interface/nbt_interface.h"
 
 namespace Ui {
 class NbtReaderUI;
@@ -20,9 +20,9 @@ public:
 private:
     Ui::NbtReaderUI *ui;
     QStandardItemModel* model;
-    NBT* root;
+    NbtInstance* instance;
     void initModel();
-    void addModelTree(NBT* root, QStandardItem* iroot);
+    void addModelTree(NbtInstance* instance, QStandardItem* iroot);
 
 private Q_SLOTS:
     void treeview_clicked();

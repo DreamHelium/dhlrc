@@ -59,8 +59,6 @@ add_library(dhlrc SHARED
 	       nbt_util.c
 		   json_util.c
 		   json_util.h
-		   nbt_info.c
-		   nbt_info.h
 		   il_info.c
 		   il_info.h
 		   region.c
@@ -106,6 +104,6 @@ install(TARGETS dhlrc.bin
 )
 
 add_subdirectory(qt)
-add_subdirectory(gtk)
+#add_subdirectory(gtk)
 add_subdirectory(cli)
 

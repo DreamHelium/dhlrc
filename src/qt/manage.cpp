@@ -31,17 +31,17 @@ static void messageNoRow(QWidget* parent)
 
 using namespace dh;
 
-static QString getTypeOfNbt(DhNbtTypes type)
-{
-    switch(type)
-    {
-        case Litematica: return _("Litematica");
-        case NBTStruct : return _("NBT Struct");
-        case Schematics: return _("Schematics");
-        case Others    : return _("Others");
-        default        : return "???";
-    }
-}
+// static QString getTypeOfNbt(DhNbtTypes type)
+// {
+//     switch(type)
+//     {
+//         case Litematica: return _("Litematica");
+//         case NBTStruct : return _("NBT Struct");
+//         case Schematics: return _("Schematics");
+//         case Others    : return _("Others");
+//         default        : return "???";
+//     }
+// }
 
 ManageBase::ManageBase()
     : QObject(), mui(new ManageUI())
@@ -262,7 +262,7 @@ void ManageRegion::remove_triggered(QList<int> rows)
 {
     if(rows.length())
     {
-        uuidList = nbt_info_list_get_uuid_list();
+        uuidList = region_info_list_get_uuid_list();
         QList<char*> removedList;
         for(auto row : rows)
         {

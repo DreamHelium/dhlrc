@@ -10,6 +10,7 @@
 #include <qlineedit.h>
 #include <qpushbutton.h>
 #include "../nbt_info.h"
+#include "dh_string_util.h"
 
 class LrChooseUI : public QDialog
 {
@@ -29,7 +30,6 @@ private:
     QHBoxLayout* hLayout;
     QVBoxLayout* vLayout;
     void initUI();
-    NbtInfo* info = nullptr;
     DhStrArray* arr = nullptr;
 
 private Q_SLOTS:

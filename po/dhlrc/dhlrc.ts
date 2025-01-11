@@ -330,17 +330,17 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qt/nbtreaderui.ui" line="76"/>
+        <location filename="../../src/qt/nbtreaderui.ui" line="99"/>
         <source>Value:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qt/nbtreaderui.ui" line="109"/>
+        <location filename="../../src/qt/nbtreaderui.ui" line="121"/>
         <source>Modify</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qt/nbtreaderui.ui" line="116"/>
+        <location filename="../../src/qt/nbtreaderui.ui" line="128"/>
         <source>Close</source>
         <translation type="unfinished"></translation>
     </message>

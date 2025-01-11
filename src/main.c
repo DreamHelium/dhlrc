@@ -145,7 +145,6 @@ static void startup(GApplication* self, gpointer user_data)
     dhlrc_make_config();
     dhlrc_common_contents_init(user_data);
     il_info_list_init();
-    nbt_info_list_init();
     common_infos_init();
     region_info_list_init();
 }
@@ -153,7 +152,6 @@ static void startup(GApplication* self, gpointer user_data)
 static void app_shutdown(GApplication* self, gpointer user_data)
 {
     il_info_list_free();
-    nbt_info_list_free();
     region_info_list_free();
     common_infos_free();
     dhlrc_common_contents_free();

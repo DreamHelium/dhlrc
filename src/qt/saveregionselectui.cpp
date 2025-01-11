@@ -3,7 +3,6 @@
 #include "dh_string_util.h"
 #include "../region_info.h"
 #include "../il_info.h"
-#include "../nbt_info.h"
 #include "glib.h"
 #include <qboxlayout.h>
 #include <qinputdialog.h>
@@ -11,6 +10,8 @@
 #include <qobject.h>
 #include <qpushbutton.h>
 #include <qradiobutton.h>
+#include "../common_info.h"
+#include "../nbt_interface/nbt_interface.h"
 
 SaveRegionSelectUI::SaveRegionSelectUI(QWidget* parent):
     QDialog(parent)
@@ -58,19 +59,15 @@ void SaveRegionSelectUI::okBtn_clicked()
     DhStrArray* arr = region_info_list_get_multi_uuid();
     if(saveAsNbtBtn->isChecked())
     {
-        DhList* nbtUuidList = nbt_info_list_get_uuid_list();
-        if(g_rw_lock_writer_trylock(&nbtUuidList->lock))
+        GList* nbtUuidList = (GList*)common_info_list_get_uuid_list(DH_TYPE_NBT_INTERFACE);
+        for(int i = 0 ; i < arr->num ; i++)
         {
-            for(int i = 0 ; i < arr->num ; i++)
-            {
-                RegionInfo* info = region_info_list_get_region_info(arr->val[i]);
-                char* des = info->description;
-                NBT* newNBT = nbt_new_from_region(info->root);
-                nbt_info_new(newNBT, g_date_time_new_now_local(), des);
-            }
-            g_rw_lock_writer_unlock(&nbtUuidList->lock);
+            RegionInfo* info = region_info_list_get_region_info(arr->val[i]);
+            char* des = info->description;
+            NBT* newNBT = nbt_new_from_region(info->root);
+            NbtInstance* instance = dh_nbt_instance_new_from_real_nbt((RealNbt*)newNBT);
+            common_info_new(DH_TYPE_NBT_INTERFACE, instance, g_date_time_new_now_local(), des);
         }
-        else QMessageBox::critical(this, _("Error!"), _("NBT list is locked!"));
     }
     else if(saveAsIlBtn->isChecked())
     {

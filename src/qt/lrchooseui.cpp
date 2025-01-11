@@ -9,7 +9,8 @@
 #include "../litematica_region.h"
 #include "dh_string_util.h"
 #include "../region_info.h"
-#include "glib.h"
+#include "../common_info.h"
+#include "../nbt_interface/nbt_interface.h"
 
 LrChooseUI::LrChooseUI(QWidget *parent) :
     QDialog(parent)
@@ -29,8 +30,9 @@ void LrChooseUI::initUI()
     vLayout->addWidget(label);
     vLayout->addStretch();
 
-    info = nbt_info_list_get_nbt_info(nbt_info_list_get_uuid());
-    NBT* root = info->root;
+    auto uuid = common_info_list_get_uuid(DH_TYPE_NBT_INTERFACE);
+    auto instance = (NbtInstance*)common_info_get_data(DH_TYPE_NBT_INTERFACE, uuid);
+    auto root = (NBT*)dh_nbt_instance_get_real_original_nbt(instance);
 
     arr = lite_region_name_array(root); 
     group = new QButtonGroup();
@@ -98,10 +100,14 @@ void LrChooseUI::okBtn_clicked()
     auto buttons = group->buttons();
     for(int i = 0 ; i < buttons.length() ; i++)
     {
+        auto uuid = common_info_list_get_uuid(DH_TYPE_NBT_INTERFACE);
+        auto instance = (NbtInstance*)common_info_get_data(DH_TYPE_NBT_INTERFACE, uuid);
+        auto root = (NBT*)dh_nbt_instance_get_real_original_nbt(instance);
         if(buttons[i]->isChecked())
         {
-            QString des = lineEdit->text().arg(info->description).arg(arr->val[i]);
-            LiteRegion* lr = lite_region_create(info->root, i);
+            QString des = lineEdit->text().arg(common_info_get_description(DH_TYPE_NBT_INTERFACE, uuid))
+                                          .arg(arr->val[i]);
+            LiteRegion* lr = lite_region_create(root, i);
             Region* region = region_new_from_lite_region(lr);
             DhList* uuidList = region_info_list_get_uuid_list();
             region_info_new(region, g_date_time_new_now_local(), des.toUtf8());
