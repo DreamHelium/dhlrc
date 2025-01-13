@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-01-11 23:04+0800\n"
+"POT-Creation-Date: 2025-01-13 02:38+0800\n"
 "PO-Revision-Date: 2024-11-30 07:00+0800\n"
 "Last-Translator: dream_he <48383878+DreamHelium@users.noreply.github.com>\n"
 "Language-Team: Chinese <kde-i18n-doc@kde.org>\n"
@@ -497,22 +497,22 @@ msgstr ""
 "请再次输入方块的坐标，或输入 “b” 选择其他区域，输入 “r” 阅读方块的细节，输入 "
 "“q” 退出程序 (b): "
 
-#: src/main.c:276
+#: src/main.c:275
 #, c-format
 msgid "dhlrc - Program to handle litematic or other struct of Minecraft.\n"
 msgstr ""
 
-#: src/main.c:278
+#: src/main.c:277
 #, c-format
 msgid "Modules:\n"
 msgstr ""
 
-#: src/main.c:300
+#: src/main.c:299
 #, c-format
 msgid "Unrecognized options "
 msgstr ""
 
-#: src/main.c:375
+#: src/main.c:374
 msgid "[FILE] - Read a litematic file."
 msgstr "[文件] - 读取一个投影文件。"
 
@@ -520,7 +520,7 @@ msgstr "[文件] - 读取一个投影文件。"
 msgid "Error when reading file."
 msgstr "在读取文件时出错。"
 
-#: src/main_isoc.c:108 src/qt/utility.cpp:96
+#: src/main_isoc.c:108 src/qt/utility.cpp:95
 msgid "Not a valid NBT file!"
 msgstr "不是一个有效的NBT文件！"
 
@@ -664,21 +664,21 @@ msgstr "选择一个物品列表。"
 msgid "Please choose a item list:"
 msgstr "请选择一个物品列表："
 
-#: src/qt/ilchooseui.cpp:39 src/qt/manage.cpp:220 src/qt/manage.cpp:221
-#: src/qt/manage.cpp:222 src/qt/manage.cpp:402 src/qt/manage.cpp:403
-#: src/qt/manage.cpp:404 src/qt/regionchooseui.cpp:61
+#: src/qt/ilchooseui.cpp:39 src/qt/manage.cpp:219 src/qt/manage.cpp:220
+#: src/qt/manage.cpp:221 src/qt/manage.cpp:401 src/qt/manage.cpp:402
+#: src/qt/manage.cpp:403 src/qt/regionchooseui.cpp:61
 #: src/qt/regionchooseui.cpp:62
 msgid "locked"
 msgstr "已锁定"
 
-#: src/qt/ilchooseui.cpp:48 src/qt/ilchooseui.cpp:67 src/qt/lrchooseui.cpp:62
-#: src/qt/nbtselectui.cpp:46 src/qt/nbtselectui.cpp:65 src/qt/recipesui.cpp:236
+#: src/qt/ilchooseui.cpp:48 src/qt/ilchooseui.cpp:67 src/qt/lrchooseui.cpp:61
+#: src/qt/nbtselectui.cpp:45 src/qt/nbtselectui.cpp:64 src/qt/recipesui.cpp:236
 #: src/qt/regionchooseui.cpp:70 src/qt/regionchooseui.cpp:89
 #: src/qt/saveregionselectui.cpp:43 src/gtk/manage_window.c:118
 msgid "&OK"
 msgstr "确定(&O)"
 
-#: src/qt/ilchooseui.cpp:49 src/qt/lrchooseui.cpp:63 src/qt/nbtselectui.cpp:47
+#: src/qt/ilchooseui.cpp:49 src/qt/lrchooseui.cpp:62 src/qt/nbtselectui.cpp:46
 #: src/qt/recipesui.cpp:237 src/qt/regionchooseui.cpp:71
 #: src/qt/saveregionselectui.cpp:44 src/gtk/manage_window.c:121
 msgid "&Close"
@@ -688,18 +688,18 @@ msgstr "关闭(&C)"
 msgid "No item list available!"
 msgstr "没有物品列表可用！"
 
-#: src/qt/ilchooseui.cpp:91 src/qt/ilreaderui.cpp:110 src/qt/mainwindow.cpp:149
-#: src/qt/mainwindow.cpp:151 src/qt/mainwindow.cpp:154
-#: src/qt/mainwindow.cpp:175 src/qt/mainwindow.cpp:177
-#: src/qt/mainwindow.cpp:180 src/qt/mainwindow.cpp:191
-#: src/qt/mainwindow.cpp:215 src/qt/mainwindow.cpp:217
-#: src/qt/mainwindow.cpp:220 src/qt/mainwindow.cpp:222
-#: src/qt/mainwindow.cpp:244 src/qt/mainwindow.cpp:247
-#: src/qt/mainwindow.cpp:249 src/qt/mainwindow.cpp:274 src/qt/manage.cpp:29
-#: src/qt/manage.cpp:330 src/qt/manage.cpp:343 src/qt/nbtselectui.cpp:117
+#: src/qt/ilchooseui.cpp:91 src/qt/ilreaderui.cpp:110 src/qt/mainwindow.cpp:148
+#: src/qt/mainwindow.cpp:150 src/qt/mainwindow.cpp:153
+#: src/qt/mainwindow.cpp:174 src/qt/mainwindow.cpp:176
+#: src/qt/mainwindow.cpp:179 src/qt/mainwindow.cpp:190
+#: src/qt/mainwindow.cpp:214 src/qt/mainwindow.cpp:216
+#: src/qt/mainwindow.cpp:219 src/qt/mainwindow.cpp:221
+#: src/qt/mainwindow.cpp:243 src/qt/mainwindow.cpp:246
+#: src/qt/mainwindow.cpp:248 src/qt/mainwindow.cpp:273 src/qt/manage.cpp:28
+#: src/qt/manage.cpp:329 src/qt/manage.cpp:342 src/qt/nbtselectui.cpp:116
 #: src/qt/regionchooseui.cpp:122 src/qt/saveregionselectui.cpp:84
-#: src/qt/saveregionselectui.cpp:86 src/qt/utility.cpp:32 src/qt/utility.cpp:55
-#: src/qt/utility.cpp:61 src/qt/utility.cpp:68 src/qt/utility.cpp:125
+#: src/qt/saveregionselectui.cpp:86 src/qt/utility.cpp:31 src/qt/utility.cpp:54
+#: src/qt/utility.cpp:60 src/qt/utility.cpp:67 src/qt/utility.cpp:124
 msgid "Error!"
 msgstr "错误！"
 
@@ -743,111 +743,111 @@ msgstr "追踪"
 msgid "Show history"
 msgstr "展示历史"
 
-#: src/qt/ilreaderui.cpp:110 src/qt/mainwindow.cpp:149
-#: src/qt/mainwindow.cpp:175
+#: src/qt/ilreaderui.cpp:110 src/qt/mainwindow.cpp:148
+#: src/qt/mainwindow.cpp:174
 msgid "The item list is locked!"
 msgstr "此材料列表被锁定！"
 
-#: src/qt/lrchooseui.cpp:28
+#: src/qt/lrchooseui.cpp:27
 msgid "Please select region(s) of the Litematic"
 msgstr ""
 
-#: src/qt/lrchooseui.cpp:48
+#: src/qt/lrchooseui.cpp:47
 msgid "&All"
 msgstr "全选 (&A)"
 
-#: src/qt/lrchooseui.cpp:53
+#: src/qt/lrchooseui.cpp:52
 msgid ""
 "Please enter the new Region(s)' name(s): (%1 represents the NBT description "
 "and %2 represents the original region's name):"
 msgstr ""
 
-#: src/qt/lrchooseui.cpp:55
+#: src/qt/lrchooseui.cpp:54
 msgid "Enter description here."
 msgstr ""
 
-#: src/qt/mainwindow.cpp:151 src/qt/mainwindow.cpp:177
+#: src/qt/mainwindow.cpp:150 src/qt/mainwindow.cpp:176
 msgid "The item list is freed!"
 msgstr "物品列表被释放！"
 
-#: src/qt/mainwindow.cpp:154 src/qt/mainwindow.cpp:180
+#: src/qt/mainwindow.cpp:153 src/qt/mainwindow.cpp:179
 msgid "No item list!"
 msgstr "无物品列表！"
 
-#: src/qt/mainwindow.cpp:191 src/qt/mainwindow.cpp:222
-#: src/qt/mainwindow.cpp:249
+#: src/qt/mainwindow.cpp:190 src/qt/mainwindow.cpp:221
+#: src/qt/mainwindow.cpp:248
 msgid "Region list is locked!"
 msgstr "Region列表被锁定！"
 
-#: src/qt/mainwindow.cpp:208 src/qt/saveregionselectui.cpp:77
+#: src/qt/mainwindow.cpp:207 src/qt/saveregionselectui.cpp:77
 msgid "Enter Name for Item List"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:208 src/qt/saveregionselectui.cpp:77
+#: src/qt/mainwindow.cpp:207 src/qt/saveregionselectui.cpp:77
 msgid "Enter the name for item list"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:215 src/qt/saveregionselectui.cpp:84
+#: src/qt/mainwindow.cpp:214 src/qt/saveregionselectui.cpp:84
 msgid "Description is empty!"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:217 src/qt/saveregionselectui.cpp:86
+#: src/qt/mainwindow.cpp:216 src/qt/saveregionselectui.cpp:86
 msgid "Item list is locked!"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:220 src/qt/mainwindow.cpp:247
+#: src/qt/mainwindow.cpp:219 src/qt/mainwindow.cpp:246
 msgid "No Region or no Region selected!"
 msgstr "没有Region或没有Region选中！"
 
-#: src/qt/mainwindow.cpp:244
+#: src/qt/mainwindow.cpp:243
 msgid "Region is locked!"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:274
+#: src/qt/mainwindow.cpp:273
 msgid "No NBT is selected!"
 msgstr ""
 
-#: src/qt/manage.cpp:29
+#: src/qt/manage.cpp:28
 msgid "No row is selected!"
 msgstr "没有选择行！"
 
-#: src/qt/manage.cpp:185 src/cli/main_cli.c:23 src/cli/main_cli.c:33
+#: src/qt/manage.cpp:184 src/cli/main_cli.c:33 src/cli/main_cli.c:43
 msgid "Manage Region"
 msgstr ""
 
-#: src/qt/manage.cpp:235 src/qt/manage.cpp:236 src/qt/manage.cpp:237
+#: src/qt/manage.cpp:234 src/qt/manage.cpp:235 src/qt/manage.cpp:236
 msgid "List locked"
 msgstr "列表锁定"
 
-#: src/qt/manage.cpp:245 src/qt/manage.cpp:413
+#: src/qt/manage.cpp:244 src/qt/manage.cpp:412
 msgid "Description"
 msgstr "描述"
 
-#: src/qt/manage.cpp:245 src/qt/manage.cpp:413
+#: src/qt/manage.cpp:244 src/qt/manage.cpp:412
 msgid "UUID"
 msgstr "唯一码"
 
-#: src/qt/manage.cpp:245 src/qt/manage.cpp:413
+#: src/qt/manage.cpp:244 src/qt/manage.cpp:412
 msgid "Time"
 msgstr "时间"
 
-#: src/qt/manage.cpp:330
+#: src/qt/manage.cpp:329
 msgid "Not a valid NBT List!"
 msgstr ""
 
-#: src/qt/manage.cpp:343
+#: src/qt/manage.cpp:342
 msgid "Not a valid NBT UUID!"
 msgstr ""
 
-#: src/qt/manage.cpp:358
+#: src/qt/manage.cpp:357
 msgid "Manage NBT Interface"
 msgstr ""
 
-#: src/qt/manage.cpp:370
+#: src/qt/manage.cpp:369
 msgid "Select a file"
 msgstr "选择一个文件"
 
-#: src/qt/manage.cpp:370
+#: src/qt/manage.cpp:369
 msgid "Litematic file (*.litematic);;NBT File (*.nbt)"
 msgstr "投影文件 (*.litematic);;NBT文件 (*.nbt)"
 
@@ -855,15 +855,15 @@ msgstr "投影文件 (*.litematic);;NBT文件 (*.nbt)"
 msgid "The Qt interface of dhlrc."
 msgstr ""
 
-#: src/qt/nbtselectui.cpp:62
+#: src/qt/nbtselectui.cpp:61
 msgid "No NBT available!"
 msgstr "没有NBT可用！"
 
-#: src/qt/nbtselectui.cpp:101
+#: src/qt/nbtselectui.cpp:100
 msgid "locked!"
 msgstr ""
 
-#: src/qt/nbtselectui.cpp:117
+#: src/qt/nbtselectui.cpp:116
 msgid "No NBT selected!"
 msgstr "没有NBT被选中！"
 
@@ -954,51 +954,51 @@ msgstr ""
 msgid "The track information is:\n"
 msgstr "追踪信息如下：\n"
 
-#: src/qt/utility.cpp:32
+#: src/qt/utility.cpp:31
 msgid "No NBT or no NBT selected!"
 msgstr "无NBT或没有NBT被选中！"
 
-#: src/qt/utility.cpp:52
+#: src/qt/utility.cpp:51
 msgid "Enter Region Name"
 msgstr "输入Region名称"
 
-#: src/qt/utility.cpp:52
+#: src/qt/utility.cpp:51
 msgid "Enter name for the new Region."
 msgstr "输入新Region的名称。"
 
-#: src/qt/utility.cpp:55
+#: src/qt/utility.cpp:54
 msgid "No description for the Region!"
 msgstr "没有Region的描述！"
 
-#: src/qt/utility.cpp:61
+#: src/qt/utility.cpp:60
 msgid "The NBT Struct is unsupported!"
 msgstr "此NBT结构不受支持！"
 
-#: src/qt/utility.cpp:68
+#: src/qt/utility.cpp:67
 msgid "This NBT is locked!"
 msgstr "此NBT被锁定！"
 
-#: src/qt/utility.cpp:79 src/gtk/manage_nbt.c:131
+#: src/qt/utility.cpp:78 src/gtk/manage_nbt.c:131
 msgid "Enter Desciption"
 msgstr "输入描述"
 
-#: src/qt/utility.cpp:79
+#: src/qt/utility.cpp:78
 msgid "Enter desciption for the NBT file."
 msgstr "输入NBT文件的描述。"
 
-#: src/qt/utility.cpp:81
+#: src/qt/utility.cpp:80
 msgid "No Description Entered!"
 msgstr "没有输入的描述！"
 
-#: src/qt/utility.cpp:81
+#: src/qt/utility.cpp:80
 msgid "No desciption entered! Will not add the NBT file!"
 msgstr "没有描述输入！将不会添加NBT文件！"
 
-#: src/qt/utility.cpp:96
+#: src/qt/utility.cpp:95
 msgid "Not Valid File!"
 msgstr "不是有效的文件！"
 
-#: src/qt/utility.cpp:119
+#: src/qt/utility.cpp:118
 msgid "The following files couldn't be added:\n"
 msgstr ""
 
@@ -1118,48 +1118,48 @@ msgstr "刷新（&E）"
 msgid "The GTK interface of dhlrc"
 msgstr ""
 
-#: src/cli/main_cli.c:22
+#: src/cli/main_cli.c:32
 msgid "manage_nbt"
 msgstr ""
 
-#: src/cli/main_cli.c:22 src/cli/main_cli.c:32
+#: src/cli/main_cli.c:32 src/cli/main_cli.c:42
 msgid "Manage NBT"
 msgstr "管理NBT"
 
-#: src/cli/main_cli.c:23
+#: src/cli/main_cli.c:33
 msgid "manage_region"
 msgstr ""
 
-#: src/cli/main_cli.c:24
+#: src/cli/main_cli.c:34
 msgid "manage_item_list"
 msgstr ""
 
-#: src/cli/main_cli.c:24 src/cli/main_cli.c:34
+#: src/cli/main_cli.c:34 src/cli/main_cli.c:44
 msgid "Manage item list"
 msgstr ""
 
-#: src/cli/main_cli.c:25
+#: src/cli/main_cli.c:35
 msgid "config_settings"
 msgstr ""
 
-#: src/cli/main_cli.c:25 src/cli/main_cli.c:35
+#: src/cli/main_cli.c:35 src/cli/main_cli.c:45
 msgid "Config settings"
 msgstr "配置设置"
 
-#: src/cli/main_cli.c:31
+#: src/cli/main_cli.c:41
 #, c-format
 msgid "The functions are listed below:\n"
 msgstr ""
 
-#: src/cli/main_cli.c:41
+#: src/cli/main_cli.c:51
 msgid "Debug"
 msgstr ""
 
-#: src/cli/main_cli.c:46
+#: src/cli/main_cli.c:56
 msgid "Please enter a number or an option"
 msgstr ""
 
-#: src/cli/main_cli.c:80
+#: src/cli/main_cli.c:90
 msgid "The CLI/TUI interface of dhlrc"
 msgstr ""
 

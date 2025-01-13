@@ -5,7 +5,6 @@
 #include <qmessagebox.h>
 #include <qobject.h>
 #include <qpushbutton.h>
-#include "../nbt_info.h"
 #include "../litematica_region.h"
 #include "dh_string_util.h"
 #include "../region_info.h"

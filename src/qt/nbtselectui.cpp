@@ -1,5 +1,4 @@
 #include "nbtselectui.h"
-#include "../nbt_info.h"
 #include "../translation.h"
 #include <qapplication.h>
 #include <qboxlayout.h>

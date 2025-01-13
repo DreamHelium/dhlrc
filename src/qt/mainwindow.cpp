@@ -1,5 +1,4 @@
 #include "mainwindow.h"
-#include "../nbt_info.h"
 #include "../translation.h"
 #include <QMenuBar>
 #include <QToolBar>

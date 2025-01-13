@@ -1,5 +1,4 @@
 #include "utility.h"
-#include "../nbt_info.h"
 #include "nbtselectui.h"
 #include <QInputDialog>
 #include <QMessageBox>

@@ -9,7 +9,6 @@
 #include <qlabel.h>
 #include <qlineedit.h>
 #include <qpushbutton.h>
-#include "../nbt_info.h"
 #include "dh_string_util.h"
 
 class LrChooseUI : public QDialog

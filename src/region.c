@@ -22,7 +22,9 @@
 #include "glibconfig.h"
 #include "libnbt/nbt.h"
 #include "litematica_region.h"
+#include "nbt_interface/nbt_interface.h"
 #include "region_info.h"
+#include <time.h>
 
 /* TODO and maybe never do, since property can be too much */
 const char* property[] = {"", ""};
@@ -166,6 +168,7 @@ static void block_info_free(gpointer mem)
 {
     BlockInfo* info = mem;
     if(info->nbt) NBT_Free(info->nbt);
+    dh_nbt_instance_free_only_instance(info->instance);
     g_free(info->pos);
     g_free(info->id_name);
     g_free(mem);
@@ -188,6 +191,8 @@ static BlockInfoArray* get_block_full_info_from_lr(LiteRegion* lr)
                 block->pos->y = y;
                 block->pos->z = z;
                 block->nbt = NULL;
+                /* WARNING: This is temporary */
+                block->instance = dh_nbt_instance_new_from_real_nbt((RealNbt*)block->nbt);
                 block->id_name = g_strdup(lr->blocks->val[block->palette]);
                 g_ptr_array_add(array, block);
             }
@@ -225,6 +230,8 @@ static BlockInfoArray* get_block_full_info_from_nbt(NBT* root, PaletteArray* pa)
         block->pos->y = NBT_GetChild(blocks_nbt, "pos")->child->next->value_i;
         block->pos->z = NBT_GetChild(blocks_nbt, "pos")->child->next->next->value_i;
         block->nbt = nbt_dup(NBT_GetChild(blocks_nbt, "nbt"));
+        /* WARNING: This is a temporary thing */
+        block->instance = dh_nbt_instance_new_from_real_nbt((RealNbt*)block->nbt);
         Palette* block_palette = pa->pdata[block->palette];
         block->id_name = g_strdup(block_palette->id_name);
         g_ptr_array_add(array, block);
@@ -354,6 +361,26 @@ static NBT* size_nbt_new(Pos* pos, const char* key)
     return ret;
 }
 
+static NbtInstance* size_nbt_instance_new(Pos* pos, const char* key)
+{
+    NbtInstance* x = dh_nbt_instance_new_int(pos->x, NULL);
+    NbtInstance* y = dh_nbt_instance_new_int(pos->y, NULL);
+    NbtInstance* z = dh_nbt_instance_new_int(pos->z, NULL);
+    dh_nbt_instance_fill_next(x, y);
+    dh_nbt_instance_fill_prev(y, x);
+    dh_nbt_instance_fill_next(y, z);
+    dh_nbt_instance_fill_prev(z, y);
+
+    NbtInstance* ret = dh_nbt_instance_new_list(key);
+    dh_nbt_instance_fill_child(ret, x);
+
+    dh_nbt_instance_free_only_instance(x);
+    dh_nbt_instance_free_only_instance(y);
+    dh_nbt_instance_free_only_instance(z);
+
+    return ret;
+}
+
 static NBT* entities_nbt_new()
 {
     GValue val = {0};
@@ -363,6 +390,11 @@ static NBT* entities_nbt_new()
     return ret;
 }
 
+static NbtInstance* entities_nbt_instance_new()
+{
+    return dh_nbt_instance_new_list("entities");
+}
+
 static NBT* data_version_nbt_new(gint64 version)
 {
     GValue val = {0};
@@ -370,6 +402,11 @@ static NBT* data_version_nbt_new(gint64 version)
     g_value_set_int64(&val, version);
     NBT* ret = nbt_new(TAG_Int, &val, 0, "DataVersion");
     return ret;
+}
+
+static NbtInstance* data_version_nbt_instance_new(gint64 version)
+{
+    return dh_nbt_instance_new_int(version, "DataVersion");
 }
 
 static NBT* block_nbt_new(BlockInfo* info)
@@ -392,6 +429,26 @@ static NBT* block_nbt_new(BlockInfo* info)
     return ret;
 }
 
+static NbtInstance* block_nbt_instance_new(BlockInfo* info)
+{
+    NbtInstance* nbt = dh_nbt_instance_dup(info->instance);
+    NbtInstance* pos = size_nbt_instance_new(info->pos, "pos");
+    dh_nbt_instance_fill_prev(pos, nbt);
+    if(dh_nbt_instance_is_non_null(nbt))
+        dh_nbt_instance_fill_next(nbt, pos);
+    NbtInstance* state = dh_nbt_instance_new_int(info->palette, "state");
+    dh_nbt_instance_fill_next(pos, state);
+    dh_nbt_instance_fill_prev(state, pos);
+    NbtInstance* ret = dh_nbt_instance_new_compound(NULL);
+    dh_nbt_instance_fill_child(ret, dh_nbt_instance_is_non_null(nbt)? nbt : pos);
+
+    dh_nbt_instance_free_only_instance(nbt);
+    dh_nbt_instance_free_only_instance(pos);
+    dh_nbt_instance_free_only_instance(state);
+
+    return ret;
+}
+
 static NBT* blocks_nbt_new(BlockInfoArray* array)
 {
     NBT* head = NULL;
@@ -410,6 +467,35 @@ static NBT* blocks_nbt_new(BlockInfoArray* array)
     g_value_init(&val, G_TYPE_POINTER);
     g_value_set_pointer(&val, head);
     NBT* ret = nbt_new(TAG_List, &val, 0, "blocks");
+    return ret;
+}
+
+static NbtInstance* blocks_nbt_instance_new(BlockInfoArray* array)
+{
+    NbtInstance* head = dh_nbt_instance_new_from_real_nbt(NULL);
+    NbtInstance* prev = dh_nbt_instance_new_from_real_nbt(NULL);
+    NbtInstance* cur = NULL;
+    for(int i = 0 ; i < array->len ; i++)
+    {
+        cur = block_nbt_instance_new(array->pdata[i]);
+        /* Set head */
+        if(i == 0)
+        {
+            dh_nbt_instance_free(head);
+            head = cur;
+        } 
+        dh_nbt_instance_fill_prev(cur, prev);
+        if(dh_nbt_instance_is_non_null(prev))
+            dh_nbt_instance_fill_next(prev, cur);
+        /* Old prev is of no use */
+        if(head != prev) dh_nbt_instance_free_only_instance(prev);
+        prev = cur;
+    }
+
+    NbtInstance* ret = dh_nbt_instance_new_list("blocks");
+    dh_nbt_instance_fill_child(ret, head);
+    if(prev != head) dh_nbt_instance_free_only_instance(head);
+    dh_nbt_instance_free_only_instance(prev);
     return ret;
 }
 
@@ -440,6 +526,41 @@ static NBT* properties_nbt_new(DhStrArray* name, DhStrArray* data)
     return ret;
 }
 
+static NbtInstance* properties_nbt_instance_new(DhStrArray* name, DhStrArray* data)
+{
+    NbtInstance* head = dh_nbt_instance_new_from_real_nbt(NULL);
+    NbtInstance* prev = dh_nbt_instance_new_from_real_nbt(NULL);
+    NbtInstance* cur = NULL;
+
+    for(int i = 0 ; name && i < name->num ; i++)
+    {
+        cur = dh_nbt_instance_new_string(data->val[i], name->val[i]);
+        if(i == 0)
+        {
+            dh_nbt_instance_free(head);
+            head = cur;
+        }
+        dh_nbt_instance_fill_prev(cur, prev);
+        if(dh_nbt_instance_is_non_null(prev))
+            dh_nbt_instance_fill_next(prev, cur);
+        /* Old prev is of no use */
+        if(prev != head) dh_nbt_instance_free_only_instance(prev);
+        prev = NULL;
+        prev = cur;
+    }
+
+    if(!name) 
+    {
+        dh_nbt_instance_free(prev);
+        return head;
+    }
+    NbtInstance* ret = dh_nbt_instance_new_compound("Properties");
+    dh_nbt_instance_fill_child(ret, head);
+    if(prev != head) dh_nbt_instance_free_only_instance(head);
+    dh_nbt_instance_free_only_instance(prev);
+    return ret;
+}
+
 static NBT* palette_nbt_new(Palette* palette)
 {
     NBT* properties = properties_nbt_new(palette->property_name, palette->property_data);
@@ -457,6 +578,21 @@ static NBT* palette_nbt_new(Palette* palette)
     g_value_init(&val2, G_TYPE_POINTER);
     g_value_set_pointer(&val2, properties ? properties : name);
     NBT* ret = nbt_new(TAG_Compound, &val2, 0, NULL);
+    return ret;
+}
+
+static NbtInstance* palette_nbt_instance_new(Palette* palette)
+{
+    NbtInstance* properties = properties_nbt_instance_new(palette->property_name, palette->property_data);
+    NbtInstance* name = dh_nbt_instance_new_string(palette->id_name, "Name");
+    if(dh_nbt_instance_is_non_null(properties))
+        dh_nbt_instance_fill_next(properties, name);
+    dh_nbt_instance_fill_prev(name, properties);
+
+    NbtInstance* ret = dh_nbt_instance_new_compound(NULL);
+    dh_nbt_instance_fill_child(ret, dh_nbt_instance_is_non_null(properties)? properties : name);
+    dh_nbt_instance_free_only_instance(properties);
+    dh_nbt_instance_free_only_instance(name);
     return ret;
 }
 
@@ -478,6 +614,35 @@ static NBT* palettes_nbt_new(PaletteArray* array)
     g_value_init(&val, G_TYPE_POINTER);
     g_value_set_pointer(&val, head);
     NBT* ret = nbt_new(TAG_List, &val, 0, "palette");
+    return ret;
+}
+
+static NbtInstance* palettes_nbt_instance_new(PaletteArray* array)
+{
+    NbtInstance* head = dh_nbt_instance_new_from_real_nbt(NULL);
+    NbtInstance* prev = dh_nbt_instance_new_from_real_nbt(NULL);
+    NbtInstance* cur = NULL;
+    for(int i = 0 ; i < array->len ; i++)
+    {
+        cur = palette_nbt_instance_new(array->pdata[i]);
+        /* Set head */
+        if(i == 0)
+        {
+            dh_nbt_instance_free(head);
+            head = cur;
+        } 
+        dh_nbt_instance_fill_prev(cur, prev);
+        if(dh_nbt_instance_is_non_null(prev))
+            dh_nbt_instance_fill_next(prev, cur);
+        /* Old prev is of no use */
+        if(prev != head) dh_nbt_instance_free_only_instance(prev);
+        prev = cur;
+    }
+
+    NbtInstance* ret = dh_nbt_instance_new_list("palette");
+    dh_nbt_instance_fill_child(ret, head);
+    if(prev != head) dh_nbt_instance_free_only_instance(head);
+    dh_nbt_instance_free_only_instance(prev);
     return ret;
 }
 
@@ -507,5 +672,38 @@ NBT* nbt_new_from_region(Region* region)
     g_value_init(&val, G_TYPE_POINTER);
     g_value_set_pointer(&val, size_nbt);
     NBT* ret = nbt_new(TAG_Compound, &val, 5, NULL);
+    return ret;
+}
+
+NbtInstance* nbt_instance_new_from_region(Region* region)
+{
+    /* First is size */
+    NbtInstance* size_nbt = size_nbt_instance_new(region->region_size, "size");
+    /* Second is entities */
+    NbtInstance* entities_nbt = entities_nbt_instance_new();
+    dh_nbt_instance_fill_next(size_nbt, entities_nbt);
+    dh_nbt_instance_fill_prev(entities_nbt, size_nbt);
+    /* Third is blocks */
+    NbtInstance* blocks_nbt = blocks_nbt_instance_new(region->block_info_array);
+    dh_nbt_instance_fill_next(entities_nbt, blocks_nbt);
+    dh_nbt_instance_fill_prev(blocks_nbt, entities_nbt);
+    /* Fourth is palette */
+    NbtInstance* palette_nbt = palettes_nbt_instance_new(region->palette_array);
+    dh_nbt_instance_fill_next(blocks_nbt, palette_nbt);
+    dh_nbt_instance_fill_prev(palette_nbt, blocks_nbt);
+    /* Fifth is DataVersion */
+    NbtInstance* data_version_nbt = data_version_nbt_instance_new(2230);
+    dh_nbt_instance_fill_next(palette_nbt, data_version_nbt);
+    dh_nbt_instance_fill_prev(data_version_nbt, palette_nbt);
+
+    /* Cover cover */
+    NbtInstance* ret = dh_nbt_instance_new_compound(NULL);
+    dh_nbt_instance_fill_child(ret, entities_nbt);
+
+    dh_nbt_instance_free_only_instance(size_nbt);
+    dh_nbt_instance_free_only_instance(entities_nbt);
+    dh_nbt_instance_free_only_instance(blocks_nbt);
+    dh_nbt_instance_free_only_instance(palette_nbt);
+    dh_nbt_instance_free_only_instance(data_version_nbt);
     return ret;
 }

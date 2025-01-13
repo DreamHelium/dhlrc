@@ -11,7 +11,6 @@
 #include <qmimedata.h>
 #include <qnamespace.h>
 #include <qobject.h>
-#include "../nbt_info.h"
 #include <QInputDialog>
 #include <QMessageBox>
 #include <QFileDialog>

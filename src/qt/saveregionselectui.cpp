@@ -64,8 +64,8 @@ void SaveRegionSelectUI::okBtn_clicked()
         {
             RegionInfo* info = region_info_list_get_region_info(arr->val[i]);
             char* des = info->description;
-            NBT* newNBT = nbt_new_from_region(info->root);
-            NbtInstance* instance = dh_nbt_instance_new_from_real_nbt((RealNbt*)newNBT);
+            // NBT* newNBT = nbt_new_from_region(info->root);
+            NbtInstance* instance = nbt_instance_new_from_region(info->root);
             common_info_new(DH_TYPE_NBT_INTERFACE, instance, g_date_time_new_now_local(), des);
         }
     }
