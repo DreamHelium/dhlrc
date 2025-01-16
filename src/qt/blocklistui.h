@@ -2,6 +2,8 @@
 #define BLOCKLISTUI_H
 
 #include <QWidget>
+#include <qsortfilterproxymodel.h>
+#include <qstandarditemmodel.h>
 #include "../region.h"
 
 
@@ -14,13 +16,16 @@ class BlockListUI : public QWidget
     Q_OBJECT
 
 public:
-    BlockListUI(QWidget *parent = nullptr);
+    BlockListUI(Region* region, QWidget *parent = nullptr);
     ~BlockListUI();
 
 private:
     Ui::BlockListUI *ui;
-    void setList(Region* region);
     void drawList();
+    Region* region;
+    bool ignoreAir = false;
+    QStandardItemModel* model;
+    QSortFilterProxyModel* proxyModel;
 
 private Q_SLOTS:
     void textChanged_cb(const QString & str);

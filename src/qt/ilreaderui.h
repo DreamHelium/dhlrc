@@ -10,7 +10,6 @@
 #include <QPushButton>
 #include <qbuttongroup.h>
 #include "../dhlrc_list.h"
-#include "../il_info.h"
 
 typedef struct TableItems{
     QTableWidgetItem* item0;
@@ -25,7 +24,7 @@ class ilReaderUI : public QWidget
 {
     Q_OBJECT
 public:
-    explicit ilReaderUI(IlInfo* info, QWidget *parent = nullptr);
+    explicit ilReaderUI(QWidget *parent = nullptr);
     ~ilReaderUI();
 
 private:
@@ -34,7 +33,7 @@ private:
     QMenuBar* menuBar;
     QMenu* fileMenu;
     QButtonGroup* group;
-
+    const char* uuid;
     QAction* saveAction;
     TableItems* ti;
 

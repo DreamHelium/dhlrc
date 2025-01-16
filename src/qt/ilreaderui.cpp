@@ -7,18 +7,18 @@
 #include <qnamespace.h>
 #include <qpushbutton.h>
 #include "showtrackui.h"
-#include "../il_info.h"
 #include <QMessageBox>
+#include "../common_info.h"
 
 static ItemList* ilr = nullptr;
 
-ilReaderUI::ilReaderUI(IlInfo* info, QWidget *parent)
+ilReaderUI::ilReaderUI(QWidget *parent)
     : QWidget{parent}
 {
-    ItemList* il = info->il;
+    uuid = common_info_list_get_uuid(DH_TYPE_Item_List);
+    ItemList* il = (ItemList*)common_info_get_data(DH_TYPE_Item_List, uuid);
     showTable(il);
     ilr = il;
-    g_rw_lock_reader_unlock(&(info->info_lock));
 
     menuBar = new QMenuBar(this);
     fileMenu = new QMenu(_("&File"), menuBar);
@@ -34,6 +34,7 @@ ilReaderUI::~ilReaderUI()
 {
     tableWidget->clearContents();
     delete[] ti;
+    common_info_reader_unlock(DH_TYPE_Item_List, uuid);
 }
 
 void ilReaderUI::saveAction_triggered()

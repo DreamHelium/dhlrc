@@ -40,6 +40,7 @@ set(PROJECT_SOURCES
         manage.h manage.cpp
         utility.h utility.cpp
         saveregionselectui.h saveregionselectui.cpp
+        dhtreefilter.h dhtreefilter.cpp
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)

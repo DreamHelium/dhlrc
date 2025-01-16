@@ -16,15 +16,13 @@
 #include "../translation.h"
 #include "../recipe_class_ng/recipes_general.h"
 #include "glibconfig.h"
-#include "mainwindow.h"
 #include "recipesshowui.h"
-#include "ilchooseui.h"
 #include <QFileDialog>
 #include "../config.h"
 #include "../uncompress.h"
-#include "../il_info.h"
 #include <QAbstractItemView>
 #include <QDebug>
+#include "../common_info.h"
 
 typedef struct RecipesInternal{
     QString itemName;
@@ -42,16 +40,11 @@ typedef struct RecipeListBaseData{
     gboolean supported;
 } RecipeListBaseData;
 
-static ItemList* ilr = nullptr;
-static IlInfo* il_info = nullptr;
-static gchar* il_uuid = nullptr;
-
-RecipesUI::RecipesUI(gchar* uuid, IlInfo* info, QWidget *parent) :
+RecipesUI::RecipesUI(gchar* uuid, QWidget *parent) :
     QWidget(parent)
 {
-    ItemList* il = info->il;
+    ItemList* il = (ItemList*)common_info_get_data(DH_TYPE_Item_List, uuid);
     il_uuid = uuid;
-    il_info = info;
     ilr = il;
     recipesInit();
     initUI();
@@ -61,7 +54,7 @@ RecipesUI::~RecipesUI()
 {
     list.clear();
     delete[] rpl;
-    g_rw_lock_writer_unlock(&(il_info->info_lock));
+    common_info_writer_unlock(DH_TYPE_Item_List, il_uuid);
 }
 
 void RecipesUI::recipesInit()
@@ -307,13 +300,12 @@ void RecipesUI::okbtn_clicked()
     }
     if(askForCombineBox->isChecked() == false)
     {
-        il_info_new(new_il, g_date_time_new_now_local(), des2Edit->text().toStdString().c_str());
+        common_info_new(DH_TYPE_Region, new_il, g_date_time_new_now_local(), des2Edit->text().toStdString().c_str());
     }
     else
     {
         item_list_combine(&ilr, new_il);
-        il_info->il = ilr;
-        il_info_list_update_il(il_uuid, il_info);
+        common_info_update_data(DH_TYPE_Item_List, il_uuid, ilr);
         item_list_free(new_il);
     }
     this->close();

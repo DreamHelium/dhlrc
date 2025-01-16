@@ -8,6 +8,7 @@
 #include <QBoxLayout>
 #include <QButtonGroup>
 #include <QDialog>
+#include <glib.h>
 
 class RegionChooseUI : public QDialog
 {
@@ -26,6 +27,7 @@ private:
     QVBoxLayout* layout;
     QHBoxLayout* hLayout;
     bool nm;
+    GList* list;
     void initUI(bool needMulti);
 
 private Q_SLOTS:

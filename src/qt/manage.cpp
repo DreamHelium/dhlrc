@@ -3,10 +3,10 @@
 #include "dhtableview.h"
 #include "glib.h"
 #include "manageui.h"
-#include <cstddef>
 #include <qabstractitemmodel.h>
 #include <qcontainerfwd.h>
 #include <qevent.h>
+#include <qlist.h>
 #include <qmessagebox.h>
 #include <qmimedata.h>
 #include <qnamespace.h>
@@ -17,11 +17,10 @@
 #include <qstandarditemmodel.h>
 #include "../translation.h"
 #include <QDebug>
-#include "../region_info.h"
-#include "saveregionselectui.h"
 #include "utility.h"
 #include <QMessageBox>
 #include "../common_info.h"
+#include "saveregionselectui.h"
 
 static void messageNoRow(QWidget* parent)
 {
@@ -29,6 +28,72 @@ static void messageNoRow(QWidget* parent)
 }
 
 using namespace dh;
+
+static void update_model(DhInfoTypes type, QStandardItemModel* model)
+{
+    QList<QList<QStandardItem*>> itemList;
+
+    GList* fullList = (GList*)common_info_list_get_uuid_list(type);
+    guint len = fullList ? g_list_length(fullList) : 0;
+    for(int i = 0 ; i < len ; i++)
+    {
+        auto info = common_info_list_get_common_info(type, (gchar*)g_list_nth_data(fullList, i));
+        QStandardItem* description = new QStandardItem;
+        QStandardItem* uuid = new QStandardItem;
+        QStandardItem* time = new QStandardItem;
+        // QStandardItem* type = new QStandardItem;
+        uuid->setEditable(false);
+        time->setEditable(false);
+        // type->setEditable(false);
+        if(g_rw_lock_reader_trylock(&info->info_lock))
+        {
+            description->setData(QString(info->description), 2);
+            uuid->setData(QString((gchar*)g_list_nth_data(fullList, i)), 0);
+            time->setData(QString(g_date_time_format(info->time, "%T")), 0);
+            // type->setData(getTypeOfNbt(info->type), 0);
+            g_rw_lock_reader_unlock(&info->info_lock);
+        }
+        else 
+        {
+            description->setData(QString(_("locked")), 0);
+            uuid->setData(QString(_("locked")), 0);
+            time->setData(QString(_("locked")), 0);
+            // type->setData(QString(_("locked")), 0);
+        }
+        QList<QStandardItem*> list = {description, uuid, time};
+        itemList.append(list);
+    }
+
+    model->clear();
+    QStringList list;
+    list << _("Description") << _("UUID") << _("Time") /*<< _("Type")*/;
+    model->setHorizontalHeaderLabels(list);
+
+    for(int i = 0 ; i < itemList.length() ; i++)
+    {
+        model->appendRow(itemList[i]);
+    }
+}
+
+static void remove_items(DhInfoTypes type, QList<int> rows, ManageBase* base)
+{
+    if(rows.length())
+    {
+        QList<char*> removedList;
+        GList* fulllist = (GList*) common_info_list_get_uuid_list(type);
+        for(auto row : rows)
+        {
+            char* uuid = (char*)g_list_nth_data(fulllist, row);
+            removedList.append(uuid);
+        }
+        for(auto uuid : removedList)
+            common_info_list_remove_item(type, uuid);
+
+        base->updateModel();
+        base->mui->updateModel(base->model);
+    }
+    else messageNoRow(base->mui);
+}
 
 // static QString getTypeOfNbt(DhNbtTypes type)
 // {
@@ -135,119 +200,30 @@ void ManageBase::show()
 //     mui->close();
 // }
 
-void ManageBase::tablednd_triggered(QDropEvent* event)
+static void update_region_model(void* main_class)
 {
-    int throwedRow = -1;
-    auto obj = event->source();
-    if(obj == mui->view)
-    {
-        #if QT_VERSION_MAJOR >= 6
-        auto pos = event->position();
-        #else
-        auto pos = event->posF();
-        #endif
-        throwedRow = mui->view->indexAt(pos.toPoint()).row();
-        /* We delete this and add this */
-        auto selectedModel = mui->view->selectionModel();
-        auto rowList = selectedModel->selectedRows();
-        QList<char*> deletedList;
-        for(auto row : rowList)
-        {
-            auto rowNum = row.row();
-            char* uuid = (char*)g_list_nth_data(uuidList->list, rowNum);
-            deletedList.append(uuid);
-        }
-        GList* afterList =  throwedRow != -1 ? g_list_nth(uuidList->list, throwedRow) : NULL;
-        int i = 0;
-        for(auto uuid : deletedList)
-        {
-            uuidList->list = g_list_remove(uuidList->list, uuid);
-            uuidList->list = g_list_insert_before(uuidList->list, afterList, uuid);
-            i++;
-        }
-        updateModel();
-        mui->updateModel(model);
-    }
-    else
-    {
-        dnd_triggered(event->mimeData());
-    }
+    auto c = (ManageRegion*)main_class;
+    c->refresh_triggered();
 }
-
 
 ManageRegion::ManageRegion()
 {
     mui->setDND(true);
     QObject::connect(mui, &ManageUI::dnd, this, &ManageRegion::dnd_triggered);
     model = new QStandardItemModel();
-    uuidList = region_info_list_get_uuid_list();
     mui->setWindowTitle(_("Manage Region"));
+    common_info_list_add_update_notifier(DH_TYPE_Region, (void*)this, update_region_model);
 }
 
 ManageRegion::~ManageRegion()
 {
     delete model;
+    common_info_list_remove_update_notifier(DH_TYPE_Region, (void*)this);
 }
 
 void ManageRegion::updateModel()
 {
-    QList<QList<QStandardItem*>> itemList;
-
-    uuidList = region_info_list_get_uuid_list();
-    GList* fullList = uuidList->list;
-    g_rw_lock_writer_unlock(&uuidList->lock);
-    if(g_rw_lock_reader_trylock(&uuidList->lock))
-    {
-        guint len = fullList ? g_list_length(fullList) : 0;
-        for(int i = 0 ; i < len ; i++)
-        {
-            RegionInfo* info = region_info_list_get_region_info((gchar*)g_list_nth_data(fullList, i));
-            QStandardItem* description = new QStandardItem;
-            QStandardItem* uuid = new QStandardItem;
-            QStandardItem* time = new QStandardItem;
-            uuid->setEditable(false);
-            time->setEditable(false);
-            if(g_rw_lock_reader_trylock(&info->info_lock))
-            {
-                description->setData(QString(info->description), 2);
-                uuid->setData(QString((gchar*)g_list_nth_data(fullList, i)), 0);
-                time->setData(QString(g_date_time_format(info->time, "%T")), 0);
-                g_rw_lock_reader_unlock(&info->info_lock);
-            }
-            else 
-            {
-                description->setData(QString(_("locked")), 0);
-                uuid->setData(QString(_("locked")), 0);
-                time->setData(QString(_("locked")), 0);
-            }
-            QList<QStandardItem*> list = {description, uuid, time};
-            itemList.append(list);
-        }
-        g_rw_lock_reader_unlock(&uuidList->lock);
-    }
-    else
-    {
-        /* This is a rare situation, if occured, contact the programmer. */
-        QStandardItem* description = new QStandardItem;
-        QStandardItem* uuid = new QStandardItem;
-        QStandardItem* time = new QStandardItem;
-        description->setData(QString(_("List locked")), 0);
-        uuid->setData(QString(_("List locked")), 0);
-        time->setData(QString(_("List locked")), 0);
-        QList<QStandardItem*> list = {description, uuid, time};
-        itemList.append(list);
-    }
-    g_rw_lock_writer_trylock(&uuidList->lock);
-
-    model->clear();
-    QStringList list;
-    list << _("Description") << _("UUID") << _("Time");
-    model->setHorizontalHeaderLabels(list);
-
-    for(int i = 0 ; i < itemList.length() ; i++)
-    {
-        model->appendRow(itemList[i]);
-    }
+   update_model(DH_TYPE_Region, model);
 }
 
 void ManageRegion::add_triggered()
@@ -259,30 +235,19 @@ void ManageRegion::add_triggered()
 
 void ManageRegion::remove_triggered(QList<int> rows)
 {
-    if(rows.length())
-    {
-        uuidList = region_info_list_get_uuid_list();
-        QList<char*> removedList;
-        for(auto row : rows)
-        {
-            char* uuid = (char*)g_list_nth_data(uuidList->list, row);
-            removedList.append(uuid);
-        }
-        for(auto uuid : removedList)
-            region_info_list_remove_item(uuid);
-
-        updateModel();
-        mui->updateModel(model);
-    }
-    else messageNoRow(mui);
+    remove_items(DH_TYPE_Region, rows, this);
 }
 
 void ManageRegion::save_triggered(QList<int> rows)
 {
     DhStrArray* arr = nullptr;
+    auto uuidlist = (GList*)common_info_list_get_uuid_list(DH_TYPE_Region);
     for(auto row : rows)
-        dh_str_array_add_str(&arr, (char*)g_list_nth_data(uuidList->list, row));
-    region_info_list_set_multi_uuid(arr);
+        dh_str_array_add_str(&arr, (char*)g_list_nth_data(uuidlist, row));
+    auto plain_array = dh_str_array_dup_to_plain(arr);
+    dh_str_array_free(arr);
+    common_info_list_set_multi_uuid(DH_TYPE_Region, (const char**)plain_array);
+    dh_str_array_free_plain(plain_array);
     SaveRegionSelectUI* srsui = new SaveRegionSelectUI();
     srsui->setAttribute(Qt::WA_DeleteOnClose);
     srsui->exec();
@@ -296,31 +261,27 @@ void ManageRegion::refresh_triggered()
 
 void ManageRegion::showSig_triggered()
 {
-    uuidList = region_info_list_get_uuid_list();
-    g_rw_lock_writer_lock(&uuidList->lock);
+    refresh_triggered();
 }
 
 void ManageRegion::closeSig_triggered()
-{
-    uuidList = region_info_list_get_uuid_list();
-    g_rw_lock_writer_unlock(&uuidList->lock);
-}
+{ }
 
 void ManageRegion::ok_triggered()
 {
-    /* Update model first */
-    for(int i = 0 ; i < model->rowCount() ; i++)
-    {
-        RegionInfo* info = region_info_list_get_region_info(model->index(i, 1).data().toString().toUtf8());
-        if(g_rw_lock_writer_trylock(&info->info_lock))
-        {
-            const char* str = model->index(i,0).data().toString().toUtf8();
-            g_free(info->description);
-            info->description = g_strdup(str);
-            g_rw_lock_writer_unlock(&info->info_lock);
-        }
-    }
-    mui->close();
+    // /* Update model first */
+    // for(int i = 0 ; i < model->rowCount() ; i++)
+    // {
+    //     RegionInfo* info = region_info_list_get_region_info(model->index(i, 1).data().toString().toUtf8());
+    //     if(g_rw_lock_writer_trylock(&info->info_lock))
+    //     {
+    //         const char* str = model->index(i,0).data().toString().toUtf8();
+    //         g_free(info->description);
+    //         info->description = g_strdup(str);
+    //         g_rw_lock_writer_unlock(&info->info_lock);
+    //     }
+    // }
+    // mui->close();
 }
 
 void ManageRegion::dnd_triggered(const QMimeData* data)
@@ -362,6 +323,7 @@ ManageNbtInterface::ManageNbtInterface()
 ManageNbtInterface::~ManageNbtInterface()
 {
     delete model;
+    common_info_list_remove_update_notifier(DH_TYPE_Region, (void*)this);
 }
 
 void ManageNbtInterface::add_triggered()
@@ -374,48 +336,7 @@ void ManageNbtInterface::add_triggered()
 
 void ManageNbtInterface::updateModel()
 {
-    QList<QList<QStandardItem*>> itemList;
-
-    GList* fullList = (GList*)common_info_list_get_uuid_list(DH_TYPE_NBT_INTERFACE);
-    guint len = fullList ? g_list_length(fullList) : 0;
-    for(int i = 0 ; i < len ; i++)
-    {
-        auto info = common_info_list_get_common_info(DH_TYPE_NBT_INTERFACE, (gchar*)g_list_nth_data(fullList, i));
-        QStandardItem* description = new QStandardItem;
-        QStandardItem* uuid = new QStandardItem;
-        QStandardItem* time = new QStandardItem;
-        // QStandardItem* type = new QStandardItem;
-        uuid->setEditable(false);
-        time->setEditable(false);
-        // type->setEditable(false);
-        if(g_rw_lock_reader_trylock(&info->info_lock))
-        {
-            description->setData(QString(info->description), 2);
-            uuid->setData(QString((gchar*)g_list_nth_data(fullList, i)), 0);
-            time->setData(QString(g_date_time_format(info->time, "%T")), 0);
-            // type->setData(getTypeOfNbt(info->type), 0);
-            g_rw_lock_reader_unlock(&info->info_lock);
-        }
-        else 
-        {
-            description->setData(QString(_("locked")), 0);
-            uuid->setData(QString(_("locked")), 0);
-            time->setData(QString(_("locked")), 0);
-            // type->setData(QString(_("locked")), 0);
-        }
-        QList<QStandardItem*> list = {description, uuid, time};
-        itemList.append(list);
-    }
-
-    model->clear();
-    QStringList list;
-    list << _("Description") << _("UUID") << _("Time") /*<< _("Type")*/;
-    model->setHorizontalHeaderLabels(list);
-
-    for(int i = 0 ; i < itemList.length() ; i++)
-    {
-        model->appendRow(itemList[i]);
-    }
+    update_model(DH_TYPE_NBT_INTERFACE, model);
 }
 
 void ManageNbtInterface::refresh_triggered()
@@ -434,22 +355,7 @@ void ManageNbtInterface::closeSig_triggered()
 
 void ManageNbtInterface::remove_triggered(QList<int> rows)
 {
-    if(rows.length())
-    {
-        QList<char*> removedList;
-        GList* fulllist = (GList*) common_info_list_get_uuid_list(DH_TYPE_NBT_INTERFACE);
-        for(auto row : rows)
-        {
-            char* uuid = (char*)g_list_nth_data(fulllist, row);
-            removedList.append(uuid);
-        }
-        for(auto uuid : removedList)
-            common_info_list_remove_item(DH_TYPE_NBT_INTERFACE, uuid);
-
-        updateModel();
-        mui->updateModel(model);
-    }
-    else messageNoRow(mui);
+    remove_items(DH_TYPE_NBT_INTERFACE, rows, this);
 }
 
 void ManageNbtInterface::save_triggered(QList<int> rows)

@@ -1,8 +1,9 @@
 #include "ilchooseui.h"
 #include "../translation.h"
-#include "../il_info.h"
 #include <qmessagebox.h>
 #include <QDebug>
+#include "../common_info.h"
+#include "glib.h"
 
 extern gchar* ilUUID;
 static GList* uuidList = nullptr;
@@ -17,21 +18,21 @@ ilChooseUI::ilChooseUI(QWidget *parent)
     layout->addStretch();
 
     group = new QButtonGroup();
-    uuidList = il_info_list_get_uuid_list()->list;
+    uuidList = (GList*)common_info_list_get_uuid_list(DH_TYPE_Item_List);
     guint len = uuidList ? g_list_length(uuidList) : 0;
 
     if(len)
     {
         for(int i = 0 ; i < len ; i++)
         {
-            IlInfo* info = il_info_list_get_il_info((gchar*)g_list_nth_data(uuidList, i));
-            if(g_rw_lock_reader_trylock(&(info->info_lock)))
+            auto uuid = (char*)g_list_nth_data(uuidList, i);
+            if(common_info_reader_trylock(DH_TYPE_Item_List, uuid))
             {
-                gchar* time_literal = g_date_time_format(info->time, "%T");
-                QString str = QString("(UUID: %1) %2 (%3)").arg((gchar*)g_list_nth_data(uuidList, i)).arg(info->description).arg(time_literal);
+                gchar* time_literal = g_date_time_format(common_info_get_time(DH_TYPE_Item_List, uuid), "%T");
+                QString str = QString("(UUID: %1) %2 (%3)").arg(uuid).arg(common_info_get_description(DH_TYPE_Item_List, uuid)).arg(time_literal);
                 QRadioButton* btn = new QRadioButton(str);
                 g_free(time_literal);
-                g_rw_lock_reader_unlock(&(info->info_lock));
+                common_info_reader_unlock(DH_TYPE_Item_List, uuid);
                 layout->addWidget(btn);
                 group->addButton(btn, i);
             }
@@ -83,7 +84,7 @@ void ilChooseUI::okBtn_clicked()
 {
     if(group->checkedId() != -1)
     {
-        il_info_list_set_uuid((gchar*)g_list_nth_data(uuidList, group->checkedId()));
+        common_info_list_set_uuid(DH_TYPE_Item_List, (gchar*)g_list_nth_data(uuidList, group->checkedId()));
         accept();
     }
     else

@@ -25,10 +25,7 @@
 #include "dh_string_util.h"
 #include "glibconfig.h"
 #include "gmodule.h"
-#include "il_info.h"
-#include "libnbt/nbt.h"
 #include "dh_file_util.h"
-#include "region_info.h"
 #include "translation.h"
 #include <dhutil.h>
 #include <ncursesw/ncurses.h>
@@ -143,15 +140,11 @@ static void startup(GApplication* self, gpointer user_data)
 {
     dhlrc_make_config();
     dhlrc_common_contents_init(user_data);
-    il_info_list_init();
     common_infos_init();
-    region_info_list_init();
 }
 
 static void app_shutdown(GApplication* self, gpointer user_data)
 {
-    il_info_list_free();
-    region_info_list_free();
     common_infos_free();
     dhlrc_common_contents_free();
 }
@@ -311,7 +304,7 @@ static gint run_app (GApplication* self, GApplicationCommandLine* command_line, 
 #else
         if(g_getenv("XDG_SESSION_DESKTOP"))
         {
-            load_module(modules, len, "cli", argv[0], argc, argv, &success);
+            load_module(modules, len, "qt", argv[0], argc, argv, &success);
             if(!success) printf("Failed to load qt module!\n");
         }
         else 

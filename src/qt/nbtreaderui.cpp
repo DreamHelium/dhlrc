@@ -1,6 +1,9 @@
 #include "nbtreaderui.h"
+#include "dhtreefilter.h"
 #include "ui_nbtreaderui.h"
 #include <qitemselectionmodel.h>
+#include <qnamespace.h>
+#include <qsortfilterproxymodel.h>
 #include <qstandarditemmodel.h>
 #include <qtreeview.h>
 #include <qvariant.h>
@@ -8,6 +11,7 @@
 #include "../nbt_interface/nbt_interface.h"
 #include <cstdlib>
 #include <QDebug>
+#include <QLineEdit>
 
 static QString uuid;
 
@@ -106,11 +110,14 @@ NbtReaderUI::NbtReaderUI(QWidget *parent)
     if(!uuid.isEmpty())
         instance = (NbtInstance*)common_info_get_data(DH_TYPE_NBT_INTERFACE, uuid.toUtf8());
     
-    model = new QStandardItemModel();
+    model = new QStandardItemModel(this);
+    proxyModel = new DhTreeFilter(this);
     initModel();
-    ui->treeView->setModel(model);
+    proxyModel->setSourceModel(model);
+    ui->treeView->setModel(proxyModel);
     auto selectionModel = ui->treeView->selectionModel();
     QObject::connect(selectionModel, &QItemSelectionModel::selectionChanged, this, &NbtReaderUI::treeview_clicked);
+    QObject::connect(ui->lineEdit, &QLineEdit::textChanged, this, &NbtReaderUI::textChanged_cb);
 }
 
 NbtReaderUI::~NbtReaderUI()
@@ -150,7 +157,9 @@ void NbtReaderUI::addModelTree(NbtInstance* instance, QStandardItem* iroot)
 
 void NbtReaderUI::treeview_clicked()
 {
-    auto indexx = ui->treeView->selectionModel()->currentIndex();
+    auto index = ui->treeView->selectionModel()->selection();
+    auto selection = proxyModel->mapSelectionToSource(index);
+    auto indexx = selection.indexes()[0];
     QList<int> treeRow;
     for(; indexx.isValid() ; indexx = indexx.parent())
     {
@@ -168,4 +177,9 @@ void NbtReaderUI::treeview_clicked()
     const char* key = dh_nbt_instance_get_key(instance);
     ui->keyLabel->setText(key ? key : "(NULL)");
     ui->valueLabel->setText(ret_var(instance));
+}
+
+void NbtReaderUI::textChanged_cb(QString str)
+{
+    proxyModel->setFilterRegularExpression(str);
 }

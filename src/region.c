@@ -16,6 +16,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>. */
     
 #include "region.h"
+#include "common_info.h"
 #include "create_nbt.h"
 #include "dh_string_util.h"
 #include "dhlrc_list.h"
@@ -23,7 +24,6 @@
 #include "libnbt/nbt.h"
 #include "litematica_region.h"
 #include "nbt_interface/nbt_interface.h"
-#include "region_info.h"
 #include <time.h>
 
 /* TODO and maybe never do, since property can be too much */
@@ -324,13 +324,12 @@ ItemList* item_list_new_from_region(Region* region)
     return oblock;
 }
 
-ItemList* item_list_new_from_multi_region(DhStrArray* region_uuid_arr)
+ItemList* item_list_new_from_multi_region(const char** region_uuid_arr)
 {
     ItemList* ret = NULL;
-    for(int i = 0 ; i < region_uuid_arr->num ; i++)
+    for( ; *region_uuid_arr ; region_uuid_arr++)
     {
-        RegionInfo* info = region_info_list_get_region_info(region_uuid_arr->val[i]);
-        Region* region = info->root;
+        Region* region = (Region*)common_info_get_data(DH_TYPE_Region, *region_uuid_arr);
         ItemList* i_il = item_list_new_from_region(region);
         item_list_combine(&ret, i_il);
         item_list_free(i_il);

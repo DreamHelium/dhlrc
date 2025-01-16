@@ -56,7 +56,7 @@ start_point (int argc, char **argv, const char* prpath)
 
     #ifdef DH_DEBUG_IN_IDE
     if(ret_val_c == 'd')
-        debug();
+        // debug();
     #endif
     
     return 0;

@@ -1,13 +1,10 @@
 #include "regionchooseui.h"
-#include "../region_info.h"
 #include "../translation.h"
 #include "dh_string_util.h"
 #include <QMessageBox>
 #include <qabstractbutton.h>
 #include <qcheckbox.h>
-
-extern Region* region;
-static GList* uuidList = nullptr;
+#include "../common_info.h"
 
 RegionChooseUI::RegionChooseUI(bool needMulti, QWidget *parent) :
     QDialog(parent)
@@ -32,20 +29,19 @@ void RegionChooseUI::initUI(bool needMulti)
     if(needMulti)
         group->setExclusive(false);
 
-    DhList* list = region_info_list_get_uuid_list();
+    list = (GList*)common_info_list_get_uuid_list(DH_TYPE_Region);
 
-    guint len = list? g_list_length(list->list) : 0;
+    guint len = list? g_list_length(list) : 0;
 
     if(len)
     {
         for(int i = 0 ; i < len ; i++)
         {
-            uuidList = list->list;
-            RegionInfo* info = region_info_list_get_region_info((char*)g_list_nth_data(uuidList, i));
-            if(g_rw_lock_reader_trylock(&info->info_lock))
+            auto uuid = (char*)g_list_nth_data(list, i);
+            if(common_info_reader_trylock(DH_TYPE_Region, uuid))
             {
-                gchar* time_literal = g_date_time_format(info->time, "%T");
-                QString str = QString("%1 (%2)").arg(info->description).arg(time_literal);
+                gchar* time_literal = g_date_time_format(common_info_get_time(DH_TYPE_Region, uuid), "%T");
+                QString str = QString("%1 (%2)").arg(common_info_get_description(DH_TYPE_Region, uuid)).arg(time_literal);
                 QAbstractButton* btn;
                 if(needMulti)
                     btn = new QCheckBox(str);
@@ -53,7 +49,7 @@ void RegionChooseUI::initUI(bool needMulti)
                 g_free(time_literal);
                 layout->addWidget(btn);
                 group->addButton(btn, i);
-                g_rw_lock_reader_unlock(&info->info_lock);
+                common_info_reader_unlock(DH_TYPE_Region, uuid);
             }
             else {
                 QAbstractButton* btn;
@@ -103,7 +99,7 @@ void RegionChooseUI::okBtn_clicked()
     if(group->checkedId() != -1)
     {
         if(!nm)
-            region_info_list_set_uuid((gchar*)g_list_nth_data(uuidList, group->checkedId()));
+            common_info_list_set_uuid(DH_TYPE_Region, (gchar*)g_list_nth_data(list, group->checkedId()));
         else
         {
             auto ids = group->buttons();
@@ -111,9 +107,12 @@ void RegionChooseUI::okBtn_clicked()
             for(int i = 0 ; i < ids.length() ; i++)
             {
                 if(ids[i]->isChecked())
-                    dh_str_array_add_str(&arr, (gchar*)g_list_nth_data(uuidList, i));
+                    dh_str_array_add_str(&arr, (gchar*)g_list_nth_data(list, i));
             }
-            region_info_list_set_multi_uuid(arr);
+            auto plain_array = dh_str_array_dup_to_plain(arr);
+            common_info_list_set_multi_uuid(DH_TYPE_Region, (const char**)plain_array);
+            dh_str_array_free(arr);
+            dh_str_array_free_plain(plain_array);
         }
         accept();
     }

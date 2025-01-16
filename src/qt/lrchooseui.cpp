@@ -7,8 +7,8 @@
 #include <qpushbutton.h>
 #include "../litematica_region.h"
 #include "dh_string_util.h"
-#include "../region_info.h"
 #include "../common_info.h"
+#include "../region.h"
 #include "../nbt_interface/nbt_interface.h"
 
 LrChooseUI::LrChooseUI(QWidget *parent) :
@@ -108,8 +108,7 @@ void LrChooseUI::okBtn_clicked()
                                           .arg(arr->val[i]);
             LiteRegion* lr = lite_region_create(root, i);
             Region* region = region_new_from_lite_region(lr);
-            DhList* uuidList = region_info_list_get_uuid_list();
-            region_info_new(region, g_date_time_new_now_local(), des.toUtf8());
+            common_info_new(DH_TYPE_Region, region, g_date_time_new_now_local(), des.toUtf8());
             lite_region_free(lr);
         }
     }

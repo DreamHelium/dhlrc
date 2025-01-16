@@ -5,13 +5,13 @@
 #include <qcontainerfwd.h>
 #include <qinputdialog.h>
 #include "../translation.h"
-#include "../region_info.h"
 #include "lrchooseui.h"
 #include <QSvgRenderer>
 #include <QPixmap>
 #include <QPainter>
 #include "../nbt_interface/nbt_interface.h"
 #include "../common_info.h"
+#include "../region.h"
 
 void dh::loadRegion(QWidget* parent)
 {
@@ -54,7 +54,7 @@ void dh::loadRegion(QWidget* parent, const char* uuid)
                     QMessageBox::critical(parent, _("Error!"), _("No description for the Region!"));
                 else
                 {
-                    region_info_new(region, g_date_time_new_now_local(), str.toLocal8Bit());
+                    common_info_new(DH_TYPE_Region, region, g_date_time_new_now_local(), str.toLocal8Bit());
                 }
             }
             else QMessageBox::critical(parent, _("Error!"), _("The NBT Struct is unsupported!"));

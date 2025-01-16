@@ -3,7 +3,6 @@
 
 #include "manageui.h"
 #include <QWidget>
-#include "../dhlrc_list.h"
 #include <qcoreevent.h>
 #include <qevent.h>
 #include <qmimedata.h>
@@ -19,10 +18,9 @@ namespace dh
         ~ManageBase();
         void show();
         ManageUI* mui;
-        DhList* uuidList;
         QStandardItemModel* model;
 
-    private:
+    public:
         
         virtual void updateModel(){};
     
@@ -34,7 +32,7 @@ namespace dh
         virtual void showSig_triggered(){}
         virtual void closeSig_triggered(){}
         virtual void ok_triggered(){}
-        virtual void tablednd_triggered(QDropEvent* event);
+        virtual void tablednd_triggered(QDropEvent* event){};
         virtual void dnd_triggered(const QMimeData* data){};
     };
 
@@ -47,12 +45,14 @@ namespace dh
 
     private:
         void updateModel();
+
+    public Q_SLOTS:
+        void refresh_triggered();
     
     private Q_SLOTS:
         void add_triggered();
         void remove_triggered(QList<int> rows);
         void save_triggered(QList<int> rows);
-        void refresh_triggered();
         void showSig_triggered();
         void closeSig_triggered();
         void ok_triggered();

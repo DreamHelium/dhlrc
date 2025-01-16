@@ -1,19 +1,19 @@
 #include "blockreaderui.h"
 #include "blocklistui.h"
-#include "glib.h"
 #include "ui_blockreaderui.h"
 #include <qlineedit.h>
 #include <qnamespace.h>
 #include <qvalidator.h>
 #include "../translation.h"
+#include "../common_info.h"
 
 BlockReaderUI::BlockReaderUI(QWidget *parent)
     : QWidget(parent),
     ui(new Ui::BlockReaderUI)
 {
     ui->setupUi(this);
-    info = region_info_list_get_region_info(region_info_list_get_uuid());
-    region = info->root;
+    uuid = common_info_list_get_uuid(DH_TYPE_Region);
+    region = (Region*)common_info_get_data(DH_TYPE_Region, uuid);
     setText();
     QObject::connect(ui->xEdit, &QLineEdit::textChanged, this, &BlockReaderUI::textChanged_cb);
     QObject::connect(ui->yEdit, &QLineEdit::textChanged, this, &BlockReaderUI::textChanged_cb);
@@ -24,7 +24,7 @@ BlockReaderUI::BlockReaderUI(QWidget *parent)
 BlockReaderUI::~BlockReaderUI()
 {
     delete ui;
-    g_rw_lock_reader_unlock(&info->info_lock);
+    common_info_reader_unlock(DH_TYPE_Region, uuid);
 }
 
 void BlockReaderUI::textChanged_cb(const QString & str)
@@ -97,7 +97,7 @@ void BlockReaderUI::setText()
 
 void BlockReaderUI::listBtn_clicked()
 {
-    BlockListUI* blui = new BlockListUI();
+    BlockListUI* blui = new BlockListUI(region);
     blui->setAttribute(Qt::WA_DeleteOnClose);
     blui->show();
 }

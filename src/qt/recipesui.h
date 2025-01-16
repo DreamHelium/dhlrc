@@ -14,7 +14,6 @@
 #include <qlineedit.h>
 #include <qwidget.h>
 #include "../dhlrc_list.h"
-#include "../il_info.h"
 
 typedef struct rp{
     /* Recipes part */
@@ -36,7 +35,7 @@ class RecipesUI : public QWidget
     Q_OBJECT
 
 public:
-    explicit RecipesUI(gchar* uuid, IlInfo* info, QWidget *parent = nullptr);
+    explicit RecipesUI(gchar* uuid, QWidget *parent = nullptr);
     ~RecipesUI();
 
 private:
@@ -44,7 +43,8 @@ private:
     QLineEdit* lineedit;
 
     rp* rpl = nullptr;
-
+    ItemList* ilr;
+    const char* il_uuid;
     QVBoxLayout* al;
     QVBoxLayout* allLayout;
     QHBoxLayout* buttonLayout;

@@ -59,16 +59,12 @@ add_library(dhlrc SHARED
 	       nbt_util.c
 		   json_util.c
 		   json_util.h
-		   il_info.c
-		   il_info.h
 		   region.c
 		   region.h
 		   download_file.h
 		   download_file.c
 		   create_nbt.h
 		   create_nbt.c
-		   region_info.c
-		   region_info.h
 )
 
 target_link_libraries(dhlrc_recipe_full PUBLIC dhutil cjson)
