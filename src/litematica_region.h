@@ -41,6 +41,7 @@ LiteRegion* lite_region_create_instance(NbtInstance* instance, int r);
 void        lite_region_free(LiteRegion* lr);
 
 /** Get region numbers in litematica file */
+G_DEPRECATED_FOR(lite_region_num_instance)
 int          lite_region_num(NBT* root);
 int          lite_region_num_instance(NbtInstance* instance);
 G_DEPRECATED_FOR(lite_region_name_array)
