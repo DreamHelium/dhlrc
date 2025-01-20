@@ -16,6 +16,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>. */
 
 #include "litematica_region.h"
+#include "dh_string_util.h"
 #include "dhlrc_list.h"
 #include "nbt_interface/libnbt/nbt.h"
 #include <string.h>
@@ -23,10 +24,15 @@
 #include <time.h>
 #include "nbt_interface/nbt_interface.h"
 #include "translation.h"
-#include "nbt_pos.h"
 #include "nbt_interface/nbt_if_common.h"
 
 static DhStrArray* block_name_array(NBT* root, int r_num);
+static NBT* lite_region_nbt_region(NBT* root,int r_num);
+static NbtInstance* lite_region_nbt_region_instance(NbtInstance* instance, int r);
+static DhStrArray* block_name_array_instance(NbtInstance* instance);
+static NbtInstance* nbt_block_properties(LiteRegion* lr, int id);
+static int* size_array(NBT* root,int r_num);
+static int* size_array_instance(NbtInstance* instance);
 
 typedef struct _LiteRegion{
 
@@ -46,14 +52,11 @@ typedef struct _LiteRegion{
     DhStrArray* replaced_blocks;
 
     /** Region NBT */
-    NBT* region_nbt;
+    // NBT* region_nbt;
     NbtInstance* region_nbt_instance;
 
     /** Block Properties */
-    NBT** block_properties;
-
-    /** Region NBT Pos variable */
-    NbtPos* region_pos;
+    NbtInstance** block_properties;
 
     /** Block states */
     int64_t* states;
@@ -113,105 +116,99 @@ static void tmpitem_list_free(TmpItemList* til)
     g_list_free_full(til, tmpitem_free);
 }
 
-LiteRegion* lite_region_create_instance(NbtInstance* instance, int r)
+LiteRegion* lite_region_create_instance(NbtInstance* instance, int r_num)
 {
-    return lite_region_create((NBT*)dh_nbt_instance_get_real_original_nbt(instance), r);
+    LiteRegion* out = g_new0(LiteRegion, 1);
+
+    NbtInstance* data_version = dh_nbt_instance_dup(instance);
+    dh_nbt_instance_goto_root(data_version);
+    dh_nbt_instance_child_to_node(data_version, "MinecraftDataVersion");
+    out->data_version = dh_nbt_instance_get_int(data_version);
+    dh_nbt_instance_free(data_version);
+
+    DhStrArray* r_name = lite_region_name_array_instance(instance);
+    if(r_num < r_name->num)
+    {
+        out->name = dh_strdup( r_name->val[r_num] );
+        dh_str_array_free(r_name);
+
+        out->region_num = r_num;
+        out->region_nbt_instance = lite_region_nbt_region_instance(instance, r_num);
+
+        out->blocks = block_name_array_instance(out->region_nbt_instance);
+
+        out->replaced_blocks = NULL;
+
+        NbtInstance** properties = g_new0(NbtInstance*, out->blocks->num);
+        if(properties)
+        {
+            for(int i = 0 ; i < out->blocks->num ; i++)
+                properties[i] = nbt_block_properties(out, i);
+        }
+
+        out->block_properties = properties;
+        int* size = size_array_instance(out->region_nbt_instance);
+        out->region_size.x = size[0];
+        out->region_size.y = size[1];
+        out->region_size.z = size[2];
+        g_free(size);
+
+        NbtInstance* states = dh_nbt_instance_dup(out->region_nbt_instance);
+        dh_nbt_instance_child_to_node(states, "BlockStates");
+        int len = 0;
+        int64_t* state_val = (int64_t*)dh_nbt_instance_get_long_array(states, &len);
+        
+        out->states = state_val;
+        out->states_num = len;
+
+        dh_nbt_instance_free(states);
+
+        /* Try to get move bits */
+        int bits = 0;
+        while(out->blocks->num > (1 << bits))
+            bits++;
+        if(bits <= 2) bits = 2;
+        out->move_bits = bits;
+
+        /* Replace name of block here so you don't have to do it in the following step */
+        DhStrArray* replaced_names = NULL;
+        ReplaceList* rl = replace_list_init();
+        for(int i = 0 ; i < out->blocks->num ; i++)
+        {
+            dh_str_array_add_str(&replaced_names, replace_list_replace(rl, out->blocks->val[i]));
+        }
+        replace_list_free(rl);
+        out->replaced_blocks = replaced_names;
+
+        return out;
+    }
+    else
+    {
+        dh_str_array_free(r_name);
+        g_free(out);
+        return NULL;
+    }
 }
 
 LiteRegion* lite_region_create(NBT* root, int r_num)
 {
-    LiteRegion* out = (LiteRegion*)malloc(sizeof(LiteRegion));
-    if(out)
-    {
-        NbtPos* pos = nbt_pos_init(root);
-        if(pos)
-        {
-            nbt_pos_get_child(pos, "Regions");
-            nbt_pos_add_to_tree(pos, r_num);
-            out->region_pos = pos;
-        }
-        else
-        {
-            free(out);
-            return NULL;
-        }
-        
-        NBT* data_version = NBT_GetChild(root, "MinecraftDataVersion");
-        out->data_version = data_version->value_i;
-
-        DhStrArray* r_name = lite_region_name_array(root);
-        if(r_num < r_name->num)
-        {
-            out->name = dh_strdup( r_name->val[r_num] );
-            dh_str_array_free(r_name);
-
-            out->region_num = r_num;
-            out->region_nbt = lite_region_nbt_region(root, r_num);
-            out->region_nbt_instance = dh_nbt_instance_new_from_real_nbt((RealNbt*)out->region_nbt);
-
-            out->blocks = block_name_array(root, r_num);
-
-            out->replaced_blocks = NULL;
-
-            NBT** properties = (NBT**)malloc( out->blocks->num * sizeof(NBT*));
-            if(properties)
-            {
-                for(int i = 0 ; i < out->blocks->num ; i++)
-                    properties[i] = lite_region_nbt_block_properties(out, i);
-            }
-            else{
-                lite_region_free(out);
-                return NULL;
-            }
-
-            out->block_properties = properties;
-            int* size = lite_region_size_array(root, r_num);
-            out->region_size.x = size[0];
-            out->region_size.y = size[1];
-            out->region_size.z = size[2];
-            free(size);
-
-            NBT* states = NBT_GetChild(out->region_nbt, "BlockStates");
-            out->states = states->value_a.value;
-            out->states_num = states->value_a.len;
-
-            /* Try to get move bits */
-            int bits = 0;
-            while(out->blocks->num > (1 << bits))
-                bits++;
-            if(bits <= 2) bits = 2;
-            out->move_bits = bits;
-
-            /* Replace name of block here so you don't have to do it in the following step */
-            DhStrArray* replaced_names = NULL;
-            ReplaceList* rl = replace_list_init();
-            for(int i = 0 ; i < out->blocks->num ; i++)
-            {
-                dh_str_array_add_str(&replaced_names, replace_list_replace(rl, out->blocks->val[i]));
-            }
-            replace_list_free(rl);
-            out->replaced_blocks = replaced_names;
-
-            return out;
-        }
-        else
-        {
-            free(out);
-            return NULL;
-        }
-    }
-    else return NULL;
+    NbtInstance* instance = dh_nbt_instance_new_from_real_nbt((RealNbt*)root);
+    LiteRegion* ret = lite_region_create_instance(instance, r_num);
+    dh_nbt_instance_free(instance);
+    return ret;
 }
 
 void lite_region_free(LiteRegion* lr)
 {
+    for(int i = 0 ; i < lr->blocks->num ; i++)
+        dh_nbt_instance_free(lr->block_properties[i]);
     free(lr->name);
     dh_str_array_free(lr->blocks);
     dh_str_array_free(lr->replaced_blocks);
-    nbt_pos_free(lr->region_pos);
     dh_nbt_instance_free_only_instance(lr->region_nbt_instance);
-    free(lr->block_properties);
-    free(lr);
+    g_free(lr->block_properties);
+    g_free(lr->states);
+    g_free(lr);
 }
 
 int lite_region_num(NBT* root)
@@ -297,7 +294,7 @@ void lite_region_free_names(char** region,int rNum)
     region = NULL;
 }
 
-NBT* lite_region_nbt_region(NBT* root, int r_num)
+static NBT* lite_region_nbt_region(NBT* root, int r_num)
 {
     NBT* OutRegion = NBT_GetChild(root,"Regions")->child; //region 0
     for(int i = 0; i < r_num ; i++)
@@ -308,6 +305,20 @@ NBT* lite_region_nbt_region(NBT* root, int r_num)
             return NULL;
     }
     return OutRegion;
+}
+
+static NbtInstance* lite_region_nbt_region_instance(NbtInstance* instance, int r)
+{
+    NbtInstance* new_instance = dh_nbt_instance_dup(instance);
+    dh_nbt_instance_goto_root(new_instance);
+    dh_nbt_instance_child_to_node(new_instance, "Regions");
+    dh_nbt_instance_child(new_instance);
+    for(int i = 0 ; i < r ; i++)
+    {
+        if(dh_nbt_instance_next(new_instance)) ;
+        else return NULL;
+    }
+    return new_instance;
 }
 
 NBT* lite_region_nbt_block_state_palette(NBT* root, int r_num)
@@ -388,12 +399,35 @@ static DhStrArray* block_name_array(NBT* root, int r_num)
     return name;
 }
 
+static DhStrArray* block_name_array_instance(NbtInstance* instance)
+{
+    NbtInstance* new_instance = dh_nbt_instance_dup(instance);
+    dh_nbt_instance_child_to_node(new_instance, "BlockStatePalette");
+    dh_nbt_instance_child(new_instance);
+    DhStrArray* arr = NULL;
+    for(; dh_nbt_instance_is_non_null(new_instance) ; dh_nbt_instance_next(new_instance))
+    {
+        NbtInstance* block_nbt = dh_nbt_instance_dup(new_instance);
+        dh_nbt_instance_child_to_node(block_nbt, "Name");
+        if(dh_nbt_instance_is_non_null(block_nbt))
+        {
+            const char* str = dh_nbt_instance_get_string(block_nbt);
+            dh_str_array_add_str(&arr, str);
+            free((void*)str);
+        }
+        /* else free? */
+        dh_nbt_instance_free(block_nbt);
+    }
+    dh_nbt_instance_free(new_instance);
+    return arr;
+}
+
 DhStrArray* lite_region_block_name_array(LiteRegion* lr)
 {
     return lr->blocks;
 }
 
-NBT** lite_region_block_properties(LiteRegion* lr)
+NbtInstance** lite_region_block_properties(LiteRegion* lr)
 {
     return lr->block_properties;
 }
@@ -418,9 +452,9 @@ int lite_region_size_z(LiteRegion* lr)
     return lr->region_size.z;
 }
 
-NBT* lite_region_nbt(LiteRegion* lr)
+NbtInstance* lite_region_region_instance(LiteRegion* lr)
 {
-    return lr->region_nbt;
+    return lr->region_nbt_instance;
 }
 
 uint64_t* lite_region_block_states_array(NBT* root, int r_num, int* len)
@@ -431,7 +465,7 @@ uint64_t* lite_region_block_states_array(NBT* root, int r_num, int* len)
     return (uint64_t*)state->value_a.value;
 }
 
-int* lite_region_size_array(NBT* root,int r_num)
+static int* size_array(NBT* root,int r_num)
 {
     NBT* size_state = NBT_GetChild(lite_region_nbt_region(root,r_num),"Size");
     int* a = malloc(3*sizeof(int));
@@ -442,6 +476,30 @@ int* lite_region_size_array(NBT* root,int r_num)
     a[1] = ABS(y);
     a[2] = ABS(z);
     return a;
+}
+
+static int* size_array_instance(NbtInstance* instance)
+{
+    NbtInstance* size_state = dh_nbt_instance_dup(instance);
+    dh_nbt_instance_child_to_node(size_state, "Size");
+    int* ret = g_new0(int, 3);
+
+    dh_nbt_instance_child_to_node(size_state, "x");
+    int x = ABS(dh_nbt_instance_get_int(size_state));
+    dh_nbt_instance_parent(size_state);
+
+    dh_nbt_instance_child_to_node(size_state, "y");
+    int y = ABS(dh_nbt_instance_get_int(size_state));
+    dh_nbt_instance_parent(size_state);
+
+    dh_nbt_instance_child_to_node(size_state, "z");
+    int z = ABS(dh_nbt_instance_get_int(size_state));
+
+    dh_nbt_instance_free(size_state);
+    ret[0] = x;
+    ret[1] = y;
+    ret[2] = z;
+    return ret;
 }
 
 uint64_t lite_region_block_index(LiteRegion* lr, int x, int y, int z)
@@ -641,40 +699,58 @@ DhStrArray* lite_region_name_array(NBT* root)
     return str_arr;
 }
 
-NBT * lite_region_nbt_block_properties(LiteRegion* lr, int id)
+DhStrArray* lite_region_name_array_instance(NbtInstance* instance)
 {
-    NbtPos* pos_copy = nbt_pos_copy(lr->region_pos);
-    if(pos_copy)
+    NbtInstance* new_instance = dh_nbt_instance_dup(instance);
+    dh_nbt_instance_goto_root(new_instance);
+    dh_nbt_instance_child_to_node(new_instance, "Regions");
+    dh_nbt_instance_child(new_instance);
+    DhStrArray* arr = NULL;
+    for(; dh_nbt_instance_is_non_null(new_instance) ; dh_nbt_instance_next(new_instance))
+        dh_str_array_add_str(&arr, dh_nbt_instance_get_key(new_instance));
+    dh_nbt_instance_free(new_instance);
+    return arr;
+}
+
+static NbtInstance* nbt_block_properties(LiteRegion* lr, int id)
+{
+    NbtInstance* region_nbt_instance = lr->region_nbt_instance;
+    NbtInstance* region_nbt_copy = dh_nbt_instance_dup(region_nbt_instance);
+    dh_nbt_instance_child_to_node(region_nbt_copy, "BlockStatePalette");
+    dh_nbt_instance_child(region_nbt_copy);
+    for(int i = 0 ; i < id ; i++)
+        dh_nbt_instance_next(region_nbt_copy);
+    if(dh_nbt_instance_child_to_node(region_nbt_copy, "Properties"))
     {
-        nbt_pos_get_child( pos_copy, "BlockStatePalette" );
-        nbt_pos_add_to_tree( pos_copy, id);
-        if(nbt_pos_get_child( pos_copy, "Properties" )){
-            NBT* ret = pos_copy->current;
-            nbt_pos_free(pos_copy);
-            return ret;
-        }
-        else{
-            nbt_pos_free(pos_copy);
-            return NULL;
-        }
+        dh_nbt_instance_child(region_nbt_copy);
+        return region_nbt_copy;
     }
-    else return NULL;
+    else
+    {
+        dh_nbt_instance_free(region_nbt_copy);
+        return dh_nbt_instance_new_from_real_nbt(NULL);
+    }
 }
 
 gboolean lite_region_block_properties_equal(LiteRegion* lr, int id, char* key, char* val)
 {
-    NBT* current = (lr->block_properties)[id];
-    while(current)
+    NbtInstance* current = (lr->block_properties)[id];
+    NbtInstance* current_copy = dh_nbt_instance_dup(current);
+    gboolean ret = FALSE;
+    for(; dh_nbt_instance_is_non_null(current_copy) ; dh_nbt_instance_next(current_copy))
     {
-        if(current->key && current->value_a.value
-            && g_str_equal(current->key, key))
+        const char* str = dh_nbt_instance_get_string(current_copy);
+        if( str && g_str_equal(dh_nbt_instance_get_key(current_copy), key))
         {   /* This item */
-            if(g_str_equal(current->value_a.value, val))
-                return TRUE;
-            return FALSE;
+            if(g_str_equal(str, val))
+                ret = TRUE;
+            ret = FALSE;
+            free((void*)str);
+            dh_nbt_instance_free(current_copy);
+            return ret;
         }
-        current = current -> next;
     }
-    return FALSE;
+    dh_nbt_instance_free(current_copy);
+    return ret;
 }
 

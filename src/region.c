@@ -23,6 +23,7 @@
 #include "glibconfig.h"
 #include "nbt_interface/libnbt/nbt.h"
 #include "litematica_region.h"
+#include "nbt_interface/nbt_if_common.h"
 #include "nbt_interface/nbt_interface.h"
 #include <time.h>
 
@@ -91,32 +92,38 @@ static void palette_free(gpointer mem)
     g_free(mem);
 }
 
-static DhStrArray* get_property_name_from_nbt(NBT* root)
+static DhStrArray* get_property_name_from_nbt_instance(NbtInstance* instance)
 {
     DhStrArray* array = NULL;
-    if(root == NULL)
+    if(!dh_nbt_instance_is_non_null(instance))
         return NULL;
     else
     {
-        for(; root ; root = root->next)
+        NbtInstance* new_instance = dh_nbt_instance_dup(instance);
+        for(; dh_nbt_instance_is_non_null(new_instance) ; dh_nbt_instance_next(new_instance))
         {
-            dh_str_array_add_str(&array, root->key);
+            dh_str_array_add_str(&array, dh_nbt_instance_get_key(new_instance));
         }
+        dh_nbt_instance_free(new_instance);
     }
     return array;
 }
 
-static DhStrArray* get_property_data_from_nbt(NBT* root)
+static DhStrArray* get_property_data_from_nbt_instance(NbtInstance* instance)
 {
     DhStrArray* array = NULL;
-    if(root == NULL)
+    if(!dh_nbt_instance_is_non_null(instance))
         return NULL;
     else
     {
-        for(; root ; root = root->next)
+        NbtInstance* new_instance = dh_nbt_instance_dup(instance);
+        for(; dh_nbt_instance_is_non_null(new_instance) ; dh_nbt_instance_next(new_instance))
         {
-            dh_str_array_add_str(&array, root->value_a.value);
+            const char* str = dh_nbt_instance_get_string(new_instance);
+            dh_str_array_add_str(&array, str);
+            free((void*)str);
         }
+        dh_nbt_instance_free(new_instance);
     }
     return array;
 }
@@ -130,10 +137,10 @@ static PaletteArray* get_palette_full_info_from_lr(LiteRegion* lr)
         Palette* palette = g_new0(Palette, 1);
         palette->id_name = g_strdup(blocks->val[i]);
 
-        NBT** block_properties = lite_region_block_properties(lr);
-        NBT* property = block_properties[i];
-        DhStrArray* name = get_property_name_from_nbt(property);
-        DhStrArray* data = get_property_data_from_nbt(property);
+        NbtInstance** block_properties = lite_region_block_properties(lr);
+        NbtInstance* property = block_properties[i];
+        DhStrArray* name = get_property_name_from_nbt_instance(property);
+        DhStrArray* data = get_property_data_from_nbt_instance(property);
 
         palette->property_name = name;
         palette->property_data = data;
@@ -153,10 +160,13 @@ static PaletteArray* get_palette_full_info_from_nbt(NBT* root)
         Palette* palette = g_new0(Palette, 1);
         palette->id_name = g_strdup(NBT_GetChild(palette_nbt, "Name")->value_a.value);
 
-        NBT* property = NBT_GetChild(palette_nbt, "Properties");
-        if(property) property = property->child;
-        DhStrArray* name = get_property_name_from_nbt(property);
-        DhStrArray* data = get_property_data_from_nbt(property);
+        NbtInstance* property = dh_nbt_instance_new_from_real_nbt((RealNbt*)palette_nbt);
+        dh_nbt_instance_child_to_node(property, "Properties");
+        if(dh_nbt_instance_is_non_null(property))
+            dh_nbt_instance_child(property);
+        DhStrArray* name = get_property_name_from_nbt_instance(property);
+        DhStrArray* data = get_property_data_from_nbt_instance(property);
+        dh_nbt_instance_free_only_instance(property);
 
         palette->property_name = name;
         palette->property_data = data;
@@ -202,13 +212,25 @@ static BlockInfoArray* get_block_full_info_from_lr(LiteRegion* lr)
         }
     }
 
-    NBT* tile_entities = NBT_GetChild(lite_region_nbt(lr), "TileEntities")->child;
-    for(; tile_entities ; tile_entities = tile_entities->next)
+    NbtInstance* region_instance = lite_region_region_instance(lr);
+    NbtInstance* tile_entities = dh_nbt_instance_dup(region_instance);
+    dh_nbt_instance_child_to_node(tile_entities, "TileEntities");
+    dh_nbt_instance_child(tile_entities);
+    for(; dh_nbt_instance_is_non_null(tile_entities) ; dh_nbt_instance_next(tile_entities))
     {
-        gint64 x = NBT_GetChild(tile_entities, "x")->value_i;
-        gint64 y = NBT_GetChild(tile_entities, "y")->value_i;
-        gint64 z = NBT_GetChild(tile_entities, "z")->value_i;
-        NBT* new_tile_entities = nbt_dup(tile_entities);
+        dh_nbt_instance_child_to_node(tile_entities, "x");
+        gint64 x = dh_nbt_instance_get_int(tile_entities);
+        dh_nbt_instance_parent(tile_entities);
+
+        dh_nbt_instance_child_to_node(tile_entities, "y");
+        gint64 y = dh_nbt_instance_get_int(tile_entities);
+        dh_nbt_instance_parent(tile_entities);
+
+        dh_nbt_instance_child_to_node(tile_entities, "z");
+        gint64 z = dh_nbt_instance_get_int(tile_entities);
+        dh_nbt_instance_parent(tile_entities);
+
+        NBT* new_tile_entities = nbt_dup((NBT*)dh_nbt_instance_get_real_current_nbt(tile_entities));
         new_tile_entities = nbt_rm(new_tile_entities, "x");
         new_tile_entities = nbt_rm(new_tile_entities, "y");
         new_tile_entities = nbt_rm(new_tile_entities, "z");

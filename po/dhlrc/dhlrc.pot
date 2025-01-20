@@ -15,7 +15,7 @@ msgstr ""
 "#-#-#-#-#  dhlrc.pot (dhlrc)  #-#-#-#-#\n"
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-01-20 22:18+0800\n"
+"POT-Creation-Date: 2025-01-21 02:31+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -436,12 +436,12 @@ msgstr ""
 msgid "Combined %d items to the new item list."
 msgstr ""
 
-#: src/litematica_region.c:544
+#: src/litematica_region.c:602
 #, c-format
 msgid "[%.2f%%] Processing Blocks %lu/%lu, (%3d,%3d,%3d)/(%3d,%3d,%3d)"
 msgstr ""
 
-#: src/litematica_region.c:593
+#: src/litematica_region.c:651
 #, c-format
 msgid "Add %%d items from region %s"
 msgstr ""
@@ -684,14 +684,14 @@ msgstr ""
 msgid "locked"
 msgstr ""
 
-#: src/qt/ilchooseui.cpp:49 src/qt/ilchooseui.cpp:68 src/qt/lrchooseui.cpp:61
+#: src/qt/ilchooseui.cpp:49 src/qt/ilchooseui.cpp:68 src/qt/lrchooseui.cpp:62
 #: src/qt/nbtselectui.cpp:45 src/qt/nbtselectui.cpp:64 src/qt/recipesui.cpp:229
 #: src/qt/regionchooseui.cpp:66 src/qt/regionchooseui.cpp:85
 #: src/qt/saveregionselectui.cpp:41 src/gtk/manage_window.c:118
 msgid "&OK"
 msgstr ""
 
-#: src/qt/ilchooseui.cpp:50 src/qt/lrchooseui.cpp:62 src/qt/nbtselectui.cpp:46
+#: src/qt/ilchooseui.cpp:50 src/qt/lrchooseui.cpp:63 src/qt/nbtselectui.cpp:46
 #: src/qt/recipesui.cpp:230 src/qt/regionchooseui.cpp:67
 #: src/qt/saveregionselectui.cpp:42 src/gtk/manage_window.c:121
 msgid "&Close"
@@ -761,17 +761,17 @@ msgstr ""
 msgid "Please select region(s) of the Litematic"
 msgstr ""
 
-#: src/qt/lrchooseui.cpp:47
+#: src/qt/lrchooseui.cpp:46
 msgid "&All"
 msgstr ""
 
-#: src/qt/lrchooseui.cpp:52
+#: src/qt/lrchooseui.cpp:53
 msgid ""
 "Please enter the new Region(s)' name(s): (%1 represents the NBT description "
 "and %2 represents the original region's name):"
 msgstr ""
 
-#: src/qt/lrchooseui.cpp:54
+#: src/qt/lrchooseui.cpp:55
 msgid "Enter description here."
 msgstr ""
 

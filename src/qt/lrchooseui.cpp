@@ -31,9 +31,8 @@ void LrChooseUI::initUI()
 
     auto uuid = common_info_list_get_uuid(DH_TYPE_NBT_INTERFACE);
     auto instance = (NbtInstance*)common_info_get_data(DH_TYPE_NBT_INTERFACE, uuid);
-    auto root = (NBT*)dh_nbt_instance_get_real_original_nbt(instance);
 
-    arr = lite_region_name_array(root); 
+    arr = lite_region_name_array_instance(instance); 
     group = new QButtonGroup();
     group->setExclusive(false);
 
@@ -42,12 +41,14 @@ void LrChooseUI::initUI()
         QCheckBox* box = new QCheckBox(arr->val[i]);
         group->addButton(box, i);
         vLayout->addWidget(box);
-        QObject::connect(box, &QCheckBox::clicked, this, &LrChooseUI::box_clicked);
+        QObject::connect(box, &QCheckBox::checkStateChanged, this, &LrChooseUI::box_clicked);
     }
     allSelectBtn = new QCheckBox(_("&All"));
     vLayout->addWidget(allSelectBtn);
-    QObject::connect(allSelectBtn, &QCheckBox::clicked, this, &LrChooseUI::select_clicked);
+    QObject::connect(allSelectBtn, &QCheckBox::checkStateChanged, this, &LrChooseUI::select_clicked);
     vLayout->addStretch();
+
+    allSelectBtn->setChecked(true);
 
     descriptionLabel = new QLabel(_("Please enter the new Region(s)' name(s): (%1 represents the NBT description and %2 represents the original region's name):"));
     lineEdit = new QLineEdit(("%1 - %2"));
@@ -101,12 +102,11 @@ void LrChooseUI::okBtn_clicked()
     {
         auto uuid = common_info_list_get_uuid(DH_TYPE_NBT_INTERFACE);
         auto instance = (NbtInstance*)common_info_get_data(DH_TYPE_NBT_INTERFACE, uuid);
-        auto root = (NBT*)dh_nbt_instance_get_real_original_nbt(instance);
         if(buttons[i]->isChecked())
         {
             QString des = lineEdit->text().arg(common_info_get_description(DH_TYPE_NBT_INTERFACE, uuid))
                                           .arg(arr->val[i]);
-            LiteRegion* lr = lite_region_create(root, i);
+            LiteRegion* lr = lite_region_create_instance(instance, i);
             Region* region = region_new_from_lite_region(lr);
             common_info_new(DH_TYPE_Region, region, g_date_time_new_now_local(), des.toUtf8());
             lite_region_free(lr);

@@ -36,6 +36,7 @@ extern "C"{
 /** Infomation of a region */
 typedef struct _LiteRegion LiteRegion;
 
+G_DEPRECATED_FOR(lite_region_create_instance)
 LiteRegion* lite_region_create(NBT* root, int r_num);
 LiteRegion* lite_region_create_instance(NbtInstance* instance, int r);
 void        lite_region_free(LiteRegion* lr);
@@ -49,26 +50,26 @@ char**       lite_region_names(NBT* root, int rNum, int* err);
 G_DEPRECATED
 void         lite_region_free_names(char** region, int rNum);
 /** Improved version to get region name */
+G_DEPRECATED_FOR(lite_region_name_array_instance)
 DhStrArray* lite_region_name_array(NBT* root);
 
-NBT*         lite_region_nbt_region(NBT* root,int r_num);
+DhStrArray* lite_region_name_array_instance(NbtInstance* instance);
+
 NBT*         lite_region_nbt_block_state_palette(NBT* root, int r_num);
 NBT*         lite_region_nbt_specific_block_state_palette(NBT* root,int r_num,int id);
-NBT*         lite_region_nbt_block_properties(LiteRegion* lr, int id);
 
 /** Get block numbers in a region */
 int           lite_region_block_num(NBT* root, int r_num);
 G_DEPRECATED_FOR(lite_region_block_name_array)
 char**        lite_region_block_names(NBT* root, int r_num ,int bNum);
 DhStrArray*  lite_region_block_name_array(LiteRegion* lr);
-G_DEPRECATED
-NBT**        lite_region_block_properties(LiteRegion* lr);
+
+NbtInstance** lite_region_block_properties(LiteRegion* lr);
 int           lite_region_data_version(LiteRegion* lr);
 int           lite_region_size_x(LiteRegion* lr);
 int           lite_region_size_y(LiteRegion* lr);
 int           lite_region_size_z(LiteRegion* lr);
-G_DEPRECATED
-NBT*          lite_region_nbt(LiteRegion* lr);
+NbtInstance*  lite_region_region_instance(LiteRegion* lr);
 
 /** Directly into the BlockStatePalette (Do not need to go to child) */
 
@@ -78,7 +79,6 @@ uint64_t* lite_region_block_states_array(NBT* root, int r_num, int* len);
 int  lite_region_block_id(LiteRegion* lr, uint64_t index);
 /** A better way to get id */
 int  lite_region_block_id_xyz(LiteRegion* lr, int x, int y, int z);
-int* lite_region_size_array(NBT* root,int r_num);
 
 /** Improved version of getting index */
 uint64_t  lite_region_block_index(LiteRegion* lr, int x, int y, int z);
