@@ -21,6 +21,7 @@
 #include <QMessageBox>
 #include "../common_info.h"
 #include "saveregionselectui.h"
+#include "../nbt_interface/nbt_interface.h"
 
 static void messageNoRow(QWidget* parent)
 {
@@ -359,7 +360,61 @@ void ManageNbtInterface::remove_triggered(QList<int> rows)
 }
 
 void ManageNbtInterface::save_triggered(QList<int> rows)
-{}
+{
+    if(rows.length())
+    {
+        if(rows.length() == 1)
+        {
+            auto row = rows[0];
+            QString filepos = QFileDialog::getSaveFileName(mui, _("Save File"));
+            if(!filepos.isEmpty())
+            {
+                auto uuidlist = (GList*)common_info_list_get_uuid_list(DH_TYPE_NBT_INTERFACE);
+                auto uuid = (char*)g_list_nth_data(uuidlist, row);
+                if(common_info_reader_trylock(DH_TYPE_NBT_INTERFACE, uuid))
+                {
+                    auto instance = (NbtInstance*)common_info_get_data(DH_TYPE_NBT_INTERFACE, uuid);
+                    dh_nbt_instance_save_to_file(instance, filepos.toUtf8());
+                    common_info_reader_unlock(DH_TYPE_NBT_INTERFACE, uuid);
+                }
+                else QMessageBox::critical(mui, _("Info Locked!"), _("The NBT info is locked!"));
+            }
+        }
+        else
+        {
+            auto dir = QFileDialog::getExistingDirectory(mui, _("Save Files"));
+            if(!dir.isEmpty())
+            {
+                QStringList lockedInfo;
+                for(auto row : rows)
+                {
+                    auto uuidlist = (GList*)common_info_list_get_uuid_list(DH_TYPE_NBT_INTERFACE);
+                    auto uuid = (char*)g_list_nth_data(uuidlist, row);
+                    auto description = common_info_get_description(DH_TYPE_NBT_INTERFACE, uuid);
+                    QString filepos = (dir + G_DIR_SEPARATOR + description);
+                    if(common_info_reader_trylock(DH_TYPE_NBT_INTERFACE, uuid))
+                    {
+                        auto instance = (NbtInstance*)common_info_get_data(DH_TYPE_NBT_INTERFACE, uuid);
+                        dh_nbt_instance_save_to_file(instance, filepos.toUtf8());
+                        common_info_reader_unlock(DH_TYPE_NBT_INTERFACE, uuid);
+                    }
+                    else lockedInfo << description;
+                }
+                if(lockedInfo.length())
+                {
+                    QString lockedInfoStr = _("The following infos are locked:\n");
+                    for(auto str : lockedInfo)
+                    {
+                        lockedInfoStr += str;
+                        lockedInfoStr += '\n';
+                    }
+                    QMessageBox::critical(mui, _("Error!"), lockedInfoStr);
+                }
+            }
+        }
+    }
+    else messageNoRow(mui);
+}
 
 void ManageNbtInterface::ok_triggered()
 {}

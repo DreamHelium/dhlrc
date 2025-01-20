@@ -15,7 +15,7 @@ msgstr ""
 "#-#-#-#-#  dhlrc.pot (dhlrc)  #-#-#-#-#\n"
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-01-16 23:42+0800\n"
+"POT-Creation-Date: 2025-01-20 22:18+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -436,12 +436,12 @@ msgstr ""
 msgid "Combined %d items to the new item list."
 msgstr ""
 
-#: src/litematica_region.c:436
+#: src/litematica_region.c:544
 #, c-format
 msgid "[%.2f%%] Processing Blocks %lu/%lu, (%3d,%3d,%3d)/(%3d,%3d,%3d)"
 msgstr ""
 
-#: src/litematica_region.c:485
+#: src/litematica_region.c:593
 #, c-format
 msgid "Add %%d items from region %s"
 msgstr ""
@@ -678,8 +678,8 @@ msgstr ""
 msgid "Please choose a item list:"
 msgstr ""
 
-#: src/qt/ilchooseui.cpp:40 src/qt/manage.cpp:58 src/qt/manage.cpp:59
-#: src/qt/manage.cpp:60 src/qt/regionchooseui.cpp:57
+#: src/qt/ilchooseui.cpp:40 src/qt/manage.cpp:59 src/qt/manage.cpp:60
+#: src/qt/manage.cpp:61 src/qt/regionchooseui.cpp:57
 #: src/qt/regionchooseui.cpp:58
 msgid "locked"
 msgstr ""
@@ -704,11 +704,11 @@ msgstr ""
 #: src/qt/ilchooseui.cpp:92 src/qt/ilreaderui.cpp:111 src/qt/mainwindow.cpp:142
 #: src/qt/mainwindow.cpp:161 src/qt/mainwindow.cpp:183
 #: src/qt/mainwindow.cpp:186 src/qt/mainwindow.cpp:203
-#: src/qt/mainwindow.cpp:206 src/qt/mainwindow.cpp:231 src/qt/manage.cpp:27
-#: src/qt/manage.cpp:290 src/qt/manage.cpp:303 src/qt/nbtselectui.cpp:116
-#: src/qt/regionchooseui.cpp:121 src/qt/saveregionselectui.cpp:79
-#: src/qt/utility.cpp:31 src/qt/utility.cpp:54 src/qt/utility.cpp:60
-#: src/qt/utility.cpp:67 src/qt/utility.cpp:124
+#: src/qt/mainwindow.cpp:206 src/qt/mainwindow.cpp:231 src/qt/manage.cpp:28
+#: src/qt/manage.cpp:291 src/qt/manage.cpp:304 src/qt/manage.cpp:411
+#: src/qt/nbtselectui.cpp:116 src/qt/regionchooseui.cpp:121
+#: src/qt/saveregionselectui.cpp:79 src/qt/utility.cpp:31 src/qt/utility.cpp:54
+#: src/qt/utility.cpp:60 src/qt/utility.cpp:67 src/qt/utility.cpp:124
 msgid "Error!"
 msgstr ""
 
@@ -799,44 +799,64 @@ msgstr ""
 msgid "No NBT is selected!"
 msgstr ""
 
-#: src/qt/manage.cpp:27
+#: src/qt/manage.cpp:28
 msgid "No row is selected!"
 msgstr ""
 
-#: src/qt/manage.cpp:69
+#: src/qt/manage.cpp:70
 msgid "Description"
 msgstr ""
 
-#: src/qt/manage.cpp:69
+#: src/qt/manage.cpp:70
 msgid "UUID"
 msgstr ""
 
-#: src/qt/manage.cpp:69
+#: src/qt/manage.cpp:70
 msgid "Time"
 msgstr ""
 
-#: src/qt/manage.cpp:214 src/cli/main_cli.c:23 src/cli/main_cli.c:33
+#: src/qt/manage.cpp:215 src/cli/main_cli.c:32 src/cli/main_cli.c:42
 msgid "Manage Region"
 msgstr ""
 
-#: src/qt/manage.cpp:290
+#: src/qt/manage.cpp:291
 msgid "Not a valid NBT List!"
 msgstr ""
 
-#: src/qt/manage.cpp:303
+#: src/qt/manage.cpp:304
 msgid "Not a valid NBT UUID!"
 msgstr ""
 
-#: src/qt/manage.cpp:318
+#: src/qt/manage.cpp:319
 msgid "Manage NBT Interface"
 msgstr ""
 
-#: src/qt/manage.cpp:331
+#: src/qt/manage.cpp:332
 msgid "Select a file"
 msgstr ""
 
-#: src/qt/manage.cpp:331
+#: src/qt/manage.cpp:332
 msgid "Litematic file (*.litematic);;NBT File (*.nbt)"
+msgstr ""
+
+#: src/qt/manage.cpp:369
+msgid "Save File"
+msgstr ""
+
+#: src/qt/manage.cpp:380
+msgid "Info Locked!"
+msgstr ""
+
+#: src/qt/manage.cpp:380
+msgid "The NBT info is locked!"
+msgstr ""
+
+#: src/qt/manage.cpp:385
+msgid "Save Files"
+msgstr ""
+
+#: src/qt/manage.cpp:405
+msgid "The following infos are locked:\n"
 msgstr ""
 
 #: src/qt/module.cpp:56
@@ -1106,47 +1126,47 @@ msgstr ""
 msgid "The GTK interface of dhlrc"
 msgstr ""
 
-#: src/cli/main_cli.c:22
+#: src/cli/main_cli.c:31
 msgid "manage_nbt"
 msgstr ""
 
-#: src/cli/main_cli.c:22 src/cli/main_cli.c:32
+#: src/cli/main_cli.c:31 src/cli/main_cli.c:41
 msgid "Manage NBT"
 msgstr ""
 
-#: src/cli/main_cli.c:23
+#: src/cli/main_cli.c:32
 msgid "manage_region"
 msgstr ""
 
-#: src/cli/main_cli.c:24
+#: src/cli/main_cli.c:33
 msgid "manage_item_list"
 msgstr ""
 
-#: src/cli/main_cli.c:24 src/cli/main_cli.c:34
+#: src/cli/main_cli.c:33 src/cli/main_cli.c:43
 msgid "Manage item list"
 msgstr ""
 
-#: src/cli/main_cli.c:25
+#: src/cli/main_cli.c:34
 msgid "config_settings"
 msgstr ""
 
-#: src/cli/main_cli.c:25 src/cli/main_cli.c:35
+#: src/cli/main_cli.c:34 src/cli/main_cli.c:44
 msgid "Config settings"
 msgstr ""
 
-#: src/cli/main_cli.c:31
+#: src/cli/main_cli.c:40
 #, c-format
 msgid "The functions are listed below:\n"
 msgstr ""
 
-#: src/cli/main_cli.c:41
+#: src/cli/main_cli.c:50
 msgid "Debug"
 msgstr ""
 
-#: src/cli/main_cli.c:46
+#: src/cli/main_cli.c:55
 msgid "Please enter a number or an option"
 msgstr ""
 
-#: src/cli/main_cli.c:80
+#: src/cli/main_cli.c:89
 msgid "The CLI/TUI interface of dhlrc"
 msgstr ""

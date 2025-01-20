@@ -37,7 +37,7 @@ void dh::loadRegion(QWidget* parent, const char* uuid)
     if(common_info_reader_trylock(DH_TYPE_NBT_INTERFACE, uuid))
     {
         /* Lock NBT start */
-        if(lite_region_num((NBT*)dh_nbt_instance_get_real_original_nbt(instance)))
+        if(lite_region_num_instance(instance))
         {   
             LrChooseUI* lcui = new LrChooseUI(parent);
             lcui->setAttribute(Qt::WA_DeleteOnClose);

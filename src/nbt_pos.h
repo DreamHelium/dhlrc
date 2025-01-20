@@ -19,7 +19,7 @@
 #ifndef NBT_POS_H
 #define NBT_POS_H
 
-#include "libnbt/nbt.h"
+#include "nbt_interface/libnbt/nbt.h"
 
 typedef struct NbtPos
 {

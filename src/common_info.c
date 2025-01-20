@@ -20,7 +20,6 @@
 #include "dh_string_util.h"
 #include "dhlrc_list.h"
 #include "glib.h"
-#include "libnbt/nbt.h"
 #include "nbt_interface/nbt_interface.h"
 #include "region.h"
 
@@ -57,24 +56,19 @@ static void common_info_free(CommonInfo* info, GFreeFunc func)
     g_free(info);
 }
 
-static void nbt_info_free(gpointer mem)
-{
-    common_info_free(mem, NBT_Free);
-}
-
 static void region_info_free(gpointer mem)
 {
-    common_info_free(mem, region_free);
+    common_info_free(mem, (GFreeFunc)region_free);
 }
 
 static void item_list_info_free(gpointer mem)
 {
-    common_info_free(mem, item_list_free);
+    common_info_free(mem, (GFreeFunc)item_list_free);
 }
 
 static void nbt_interface_info_free(gpointer mem)
 {
-    common_info_free(mem, dh_nbt_instance_free);
+    common_info_free(mem, (GFreeFunc)dh_nbt_instance_free);
 }
 
 static void common_info_single_free(gpointer mem)
@@ -105,9 +99,7 @@ void common_infos_init()
     for(int i = 0 ; i < N_TYPES ; i++)
     {
         CommonInfoSingle* instance = g_new0(CommonInfoSingle, 1);
-        if(i == DH_TYPE_NBT)
-            instance->table = dh_mt_table_new(g_str_hash, is_same_string, g_free, nbt_info_free);
-        else if(i == DH_TYPE_Region)
+        if(i == DH_TYPE_Region)
             instance->table = dh_mt_table_new(g_str_hash, is_same_string, g_free, region_info_free);
         else if(i == DH_TYPE_Item_List)
             instance->table = dh_mt_table_new(g_str_hash, is_same_string, g_free, item_list_info_free);

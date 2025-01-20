@@ -41,8 +41,6 @@ add_library(dhlrc SHARED
 		   common.c common.h
 		   translation.h
 		   translation.c
-	       libnbt/nbt.h
-	       libnbt/nbt.c
 	       litematica_region.c
 	       litematica_region.h
 	       dhlrc_list.h

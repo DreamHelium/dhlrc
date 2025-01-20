@@ -17,9 +17,7 @@
 
 #include "create_nbt.h"
 #include "dh_string_util.h"
-#include "glib-object.h"
-#include "libnbt/nbt.h"
-#include "region.h"
+#include "nbt_interface/libnbt/nbt.h"
 
 NBT* fail_free(NBT* root)
 {

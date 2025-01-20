@@ -19,7 +19,7 @@
 #define CREATE_NBT_H
 
 #include <glib-object.h>
-#include "libnbt/nbt.h"
+#include "nbt_interface/libnbt/nbt.h"
 
 #ifdef __cplusplus
 extern "C"{

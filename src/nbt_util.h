@@ -22,7 +22,7 @@
 extern "C"{
 #endif
 
-#include "libnbt/nbt.h"
+#include "nbt_interface/libnbt/nbt.h"
 
 int         nbtlr_save(NBT* root);
 int         dhlrc_nbt_save(NBT* root, const char* pos);

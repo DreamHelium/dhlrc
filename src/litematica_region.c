@@ -17,11 +17,60 @@
 
 #include "litematica_region.h"
 #include "dhlrc_list.h"
-#include "libnbt/nbt.h"
+#include "nbt_interface/libnbt/nbt.h"
 #include <string.h>
 #include <stdlib.h>
 #include <time.h>
+#include "nbt_interface/nbt_interface.h"
 #include "translation.h"
+#include "nbt_pos.h"
+#include "nbt_interface/nbt_if_common.h"
+
+static DhStrArray* block_name_array(NBT* root, int r_num);
+
+typedef struct _LiteRegion{
+
+    /** Data Version */
+    int data_version;
+
+    /** Region name */
+    char* name;
+
+    /** Number of the region */
+    int region_num;
+
+    /** Block names and nums */
+    DhStrArray* blocks;
+
+    /** Replaced name of blocks */
+    DhStrArray* replaced_blocks;
+
+    /** Region NBT */
+    NBT* region_nbt;
+    NbtInstance* region_nbt_instance;
+
+    /** Block Properties */
+    NBT** block_properties;
+
+    /** Region NBT Pos variable */
+    NbtPos* region_pos;
+
+    /** Block states */
+    int64_t* states;
+
+    /** numbers of BlockStates */
+    int states_num;
+
+    struct{
+        int x;
+        int y;
+        int z;
+    } region_size;
+
+    /** In many cases you don't need it, it's used to get block id. */
+    int move_bits;
+
+} _LiteRegion;
 
 typedef struct TmpItem{
     gchar* name;
@@ -64,6 +113,11 @@ static void tmpitem_list_free(TmpItemList* til)
     g_list_free_full(til, tmpitem_free);
 }
 
+LiteRegion* lite_region_create_instance(NbtInstance* instance, int r)
+{
+    return lite_region_create((NBT*)dh_nbt_instance_get_real_original_nbt(instance), r);
+}
+
 LiteRegion* lite_region_create(NBT* root, int r_num)
 {
     LiteRegion* out = (LiteRegion*)malloc(sizeof(LiteRegion));
@@ -92,9 +146,10 @@ LiteRegion* lite_region_create(NBT* root, int r_num)
             dh_str_array_free(r_name);
 
             out->region_num = r_num;
-            out->region_nbt = lite_region_nbt_region( root, r_num );
+            out->region_nbt = lite_region_nbt_region(root, r_num);
+            out->region_nbt_instance = dh_nbt_instance_new_from_real_nbt((RealNbt*)out->region_nbt);
 
-            out->blocks = lite_region_block_name_array( root, r_num );
+            out->blocks = block_name_array(root, r_num);
 
             out->replaced_blocks = NULL;
 
@@ -154,6 +209,7 @@ void lite_region_free(LiteRegion* lr)
     dh_str_array_free(lr->blocks);
     dh_str_array_free(lr->replaced_blocks);
     nbt_pos_free(lr->region_pos);
+    dh_nbt_instance_free_only_instance(lr->region_nbt_instance);
     free(lr->block_properties);
     free(lr);
 }
@@ -176,6 +232,24 @@ int lite_region_num(NBT* root)
     {
         return 0;
     }
+}
+
+int lite_region_num_instance(NbtInstance* instance)
+{
+    NbtInstance* new_instance = dh_nbt_instance_dup(instance);
+    dh_nbt_instance_goto_root(new_instance);
+    dh_nbt_instance_child_to_node(new_instance, "Regions");
+    int ret = 0;
+    if(dh_nbt_instance_is_non_null(new_instance))
+    {
+        if(dh_nbt_instance_child(new_instance))
+        {
+            for(; dh_nbt_instance_is_non_null(new_instance) ; dh_nbt_instance_next(new_instance))
+                ret++;
+        }
+    }
+    dh_nbt_instance_free(new_instance);
+    return ret;
 }
 
 char** lite_region_names(NBT* root, int rNum, int* err)
@@ -295,7 +369,7 @@ char** lite_region_block_names(NBT* root, int r_num ,int bNum)
     return l;
 }
 
-DhStrArray* lite_region_block_name_array(NBT* root, int r_num)
+static DhStrArray* block_name_array(NBT* root, int r_num)
 {
     NBT* palette = lite_region_nbt_block_state_palette(root, r_num);
     DhStrArray* name = NULL;
@@ -312,7 +386,41 @@ DhStrArray* lite_region_block_name_array(NBT* root, int r_num)
         palette = palette -> next;
     }
     return name;
+}
 
+DhStrArray* lite_region_block_name_array(LiteRegion* lr)
+{
+    return lr->blocks;
+}
+
+NBT** lite_region_block_properties(LiteRegion* lr)
+{
+    return lr->block_properties;
+}
+
+int lite_region_data_version(LiteRegion* lr)
+{
+    return lr->data_version;
+}
+
+int lite_region_size_x(LiteRegion* lr)
+{
+    return lr->region_size.x;
+}
+
+int lite_region_size_y(LiteRegion* lr)
+{
+    return lr->region_size.y;
+}
+
+int lite_region_size_z(LiteRegion* lr)
+{
+    return lr->region_size.z;
+}
+
+NBT* lite_region_nbt(LiteRegion* lr)
+{
+    return lr->region_nbt;
 }
 
 uint64_t* lite_region_block_states_array(NBT* root, int r_num, int* len)

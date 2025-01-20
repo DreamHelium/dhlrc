@@ -1,6 +1,3 @@
-[submodule "libnbt"]
-	path = src/libnbt
-	url = https://github.com/DreamHelium/libnbt.git
 [submodule "src/dhutil"]
 	path = src/dhutil
 	url = https://github.com/DreamHelium/dhutil

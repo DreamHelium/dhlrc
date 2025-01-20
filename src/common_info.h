@@ -23,7 +23,6 @@
 G_BEGIN_DECLS
 
 typedef enum DhInfoTypes{
-    DH_TYPE_NBT,
     DH_TYPE_Region,
     DH_TYPE_Item_List,
     DH_TYPE_NBT_INTERFACE,

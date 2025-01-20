@@ -18,16 +18,15 @@
 #ifndef LITEMATICA_REGION_H
 #define LITEMATICA_REGION_H
 
-#include "libnbt/nbt.h"
+#include "dh_string_util.h"
+#include "nbt_interface/libnbt/nbt.h"
+#include "nbt_interface/nbt_interface.h"
 #include "dhlrc_list.h"
 #include <dhutil.h>
-#include "nbt_pos.h"
 
 #ifdef __cplusplus
 extern "C"{
 #endif
-
-
 
 /*************************************************************
  * Region Processing Stuff:
@@ -35,54 +34,15 @@ extern "C"{
  *************************************************************/
 
 /** Infomation of a region */
-typedef struct LiteRegion{
-
-    /** Data Version */
-    int data_version;
-
-    /** Region name */
-    char* name;
-
-    /** Number of the region */
-    int region_num;
-
-    /** Block names and nums */
-    DhStrArray* blocks;
-
-    /** Replaced name of blocks */
-    DhStrArray* replaced_blocks;
-
-    /** Region NBT */
-    NBT* region_nbt;
-
-    /** Block Properties */
-    NBT** block_properties;
-
-    /** Region NBT Pos variable */
-    NbtPos* region_pos;
-
-    /** Block states */
-    int64_t* states;
-
-    /** numbers of BlockStates */
-    int states_num;
-
-    struct{
-        int x;
-        int y;
-        int z;
-    } region_size;
-
-    /** In many cases you don't need it, it's used to get block id. */
-    int move_bits;
-
-} LiteRegion;
+typedef struct _LiteRegion LiteRegion;
 
 LiteRegion* lite_region_create(NBT* root, int r_num);
+LiteRegion* lite_region_create_instance(NbtInstance* instance, int r);
 void        lite_region_free(LiteRegion* lr);
 
 /** Get region numbers in litematica file */
 int          lite_region_num(NBT* root);
+int          lite_region_num_instance(NbtInstance* instance);
 G_DEPRECATED_FOR(lite_region_name_array)
 char**       lite_region_names(NBT* root, int rNum, int* err);
 G_DEPRECATED
@@ -99,8 +59,15 @@ NBT*         lite_region_nbt_block_properties(LiteRegion* lr, int id);
 int           lite_region_block_num(NBT* root, int r_num);
 G_DEPRECATED_FOR(lite_region_block_name_array)
 char**        lite_region_block_names(NBT* root, int r_num ,int bNum);
-/** Improved version to get block name */
-DhStrArray*  lite_region_block_name_array(NBT* root, int r_num);
+DhStrArray*  lite_region_block_name_array(LiteRegion* lr);
+G_DEPRECATED
+NBT**        lite_region_block_properties(LiteRegion* lr);
+int           lite_region_data_version(LiteRegion* lr);
+int           lite_region_size_x(LiteRegion* lr);
+int           lite_region_size_y(LiteRegion* lr);
+int           lite_region_size_z(LiteRegion* lr);
+G_DEPRECATED
+NBT*          lite_region_nbt(LiteRegion* lr);
 
 /** Directly into the BlockStatePalette (Do not need to go to child) */
 

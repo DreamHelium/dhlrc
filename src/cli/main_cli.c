@@ -3,7 +3,16 @@
 #include "dh_string_util.h"
 #include "dh_validator_cpp.hpp"
 #include "manage_nbt.h"
+#include "../nbt_interface/nbt_interface.h"
+#include "../litematica_region.h"
 #define DH_EDITLINE_USED
+
+static int debug()
+{
+    NbtInstance* instance = dh_nbt_instance_parse("/home/dream_he/下载/Station2.1-S.litematic");
+    g_message("%d", lite_region_num_instance(instance));
+    return 0;
+}
 
 static void add_args_common(void* arg, char c, const char* first, const char* second, const char* description)
 {
@@ -56,7 +65,7 @@ start_point (int argc, char **argv, const char* prpath)
 
     #ifdef DH_DEBUG_IN_IDE
     if(ret_val_c == 'd')
-        // debug();
+        debug();
     #endif
     
     return 0;
