@@ -39,6 +39,7 @@ add_library(dhlrc SHARED
            mcdir/path.c mcdir/path.h
 		   common_info.c common_info.h
 		   common.c common.h
+		   dh_bit.c dh_bit.h
 		   translation.h
 		   translation.c
 	       litematica_region.c

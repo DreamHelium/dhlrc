@@ -15,7 +15,7 @@ msgstr ""
 "#-#-#-#-#  dhlrc.pot (dhlrc)  #-#-#-#-#\n"
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-01-21 02:31+0800\n"
+"POT-Creation-Date: 2025-01-22 22:30+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -436,12 +436,12 @@ msgstr ""
 msgid "Combined %d items to the new item list."
 msgstr ""
 
-#: src/litematica_region.c:602
+#: src/litematica_region.c:600
 #, c-format
 msgid "[%.2f%%] Processing Blocks %lu/%lu, (%3d,%3d,%3d)/(%3d,%3d,%3d)"
 msgstr ""
 
-#: src/litematica_region.c:651
+#: src/litematica_region.c:649
 #, c-format
 msgid "Add %%d items from region %s"
 msgstr ""
@@ -815,7 +815,7 @@ msgstr ""
 msgid "Time"
 msgstr ""
 
-#: src/qt/manage.cpp:215 src/cli/main_cli.c:32 src/cli/main_cli.c:42
+#: src/qt/manage.cpp:215 src/cli/main_cli.c:39 src/cli/main_cli.c:49
 msgid "Manage Region"
 msgstr ""
 
@@ -1126,47 +1126,47 @@ msgstr ""
 msgid "The GTK interface of dhlrc"
 msgstr ""
 
-#: src/cli/main_cli.c:31
+#: src/cli/main_cli.c:38
 msgid "manage_nbt"
 msgstr ""
 
-#: src/cli/main_cli.c:31 src/cli/main_cli.c:41
+#: src/cli/main_cli.c:38 src/cli/main_cli.c:48
 msgid "Manage NBT"
 msgstr ""
 
-#: src/cli/main_cli.c:32
+#: src/cli/main_cli.c:39
 msgid "manage_region"
 msgstr ""
 
-#: src/cli/main_cli.c:33
+#: src/cli/main_cli.c:40
 msgid "manage_item_list"
 msgstr ""
 
-#: src/cli/main_cli.c:33 src/cli/main_cli.c:43
+#: src/cli/main_cli.c:40 src/cli/main_cli.c:50
 msgid "Manage item list"
 msgstr ""
 
-#: src/cli/main_cli.c:34
+#: src/cli/main_cli.c:41
 msgid "config_settings"
 msgstr ""
 
-#: src/cli/main_cli.c:34 src/cli/main_cli.c:44
+#: src/cli/main_cli.c:41 src/cli/main_cli.c:51
 msgid "Config settings"
 msgstr ""
 
-#: src/cli/main_cli.c:40
+#: src/cli/main_cli.c:47
 #, c-format
 msgid "The functions are listed below:\n"
 msgstr ""
 
-#: src/cli/main_cli.c:50
+#: src/cli/main_cli.c:57
 msgid "Debug"
 msgstr ""
 
-#: src/cli/main_cli.c:55
+#: src/cli/main_cli.c:62
 msgid "Please enter a number or an option"
 msgstr ""
 
-#: src/cli/main_cli.c:89
+#: src/cli/main_cli.c:96
 msgid "The CLI/TUI interface of dhlrc"
 msgstr ""

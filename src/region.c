@@ -18,8 +18,10 @@
 #include "region.h"
 #include "common_info.h"
 #include "create_nbt.h"
+#include "dh_bit.h"
 #include "dh_string_util.h"
 #include "dhlrc_list.h"
+#include "glib.h"
 #include "glibconfig.h"
 #include "nbt_interface/libnbt/nbt.h"
 #include "litematica_region.h"
@@ -669,5 +671,36 @@ NbtInstance* nbt_instance_new_from_region(Region* region)
     dh_nbt_instance_free_only_instance(blocks_nbt);
     dh_nbt_instance_free_only_instance(palette_nbt);
     dh_nbt_instance_free_only_instance(data_version_nbt);
+    return ret;
+}
+
+gint64* region_get_palette_num_from_region(Region* region, int* length)
+{
+    PaletteArray* arr = region->palette_array;
+    int num = arr->len;
+    BlockInfoArray* info_array = region->block_info_array;
+    int block_num = info_array->len;
+    int move_bits = g_bit_storage(num) <= 2 ? 2 : g_bit_storage(num);
+
+    DhBit* bit = dh_bit_new();
+    gint64* ret = NULL;
+
+    for(int id = 0 ; id < block_num ; id++)
+    {
+        int palette = 0;
+        for(int i = 0 ; i < block_num ; i++)
+        {
+            BlockInfo* info = info_array->pdata[i];
+            if(info->index == id)
+            {
+                palette = info->palette;
+                break;
+            }
+        }
+        dh_bit_push_back_val(bit, move_bits, palette);
+    }
+
+    ret = dh_bit_dup_array(bit, length);
+    dh_bit_free(bit);
     return ret;
 }

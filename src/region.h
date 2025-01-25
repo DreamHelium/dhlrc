@@ -75,6 +75,7 @@ ItemList* item_list_new_from_multi_region(const char** region_uuid_arr);
 NBT* nbt_new_from_region(Region* region);
 NbtInstance* nbt_instance_new_from_region(Region* region);
 void region_free(Region* region);
+gint64* region_get_palette_num_from_region(Region* region, int* len);
 
 #ifdef __cplusplus
 }

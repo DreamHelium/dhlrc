@@ -19,6 +19,7 @@
 #include "dh_string_util.h"
 #include "dhlrc_list.h"
 #include "nbt_interface/libnbt/nbt.h"
+#include "region.h"
 #include <string.h>
 #include <stdlib.h>
 #include <time.h>
@@ -116,6 +117,48 @@ static void tmpitem_list_free(TmpItemList* til)
     g_list_free_full(til, tmpitem_free);
 }
 
+/* TODO: finish all
+static NbtInstance* create_lr_instance(Region* region)
+{
+    NbtInstance* region_name = dh_nbt_instance_new_compound("");
+
+    int len = 0;
+    gint64* states = region_get_palette_num_from_region(region, &len);
+    NbtInstance* block_states = dh_nbt_instance_new_long_array(states, len, "BlockStates");
+    free(states);
+    dh_nbt_instance_insert_before(region_name, NULL, block_states);
+    dh_nbt_instance_free_only_instance(block_states);
+
+    NbtInstance* pending_block_ticks = dh_nbt_instance_new_list("PendingBlockTicks");
+    dh_nbt_instance_insert_before(region_name, NULL, pending_block_ticks);
+
+    NbtInstance* pos_x = dh_nbt_instance_new_int(0, "x");
+    NbtInstance* pos_y = dh_nbt_instance_new_int(0, "y");
+    NbtInstance* pos_z = dh_nbt_instance_new_int(0, "z");
+
+    NbtInstance* pos = dh_nbt_instance_new_compound("Position");
+    dh_nbt_instance_insert_before(pos, NULL, pos_x);
+    dh_nbt_instance_insert_before(pos, NULL, pos_y);
+    dh_nbt_instance_insert_before(pos, NULL, pos_z);
+
+    dh_nbt_instance_insert_before(region_name, NULL, pos);
+    dh_nbt_instance_free_only_instance(pos);
+    dh_nbt_instance_free_only_instance(pos_x);
+    dh_nbt_instance_free_only_instance(pos_y);
+    dh_nbt_instance_free_only_instance(pos_z);
+
+    return region_name;
+}
+
+LiteRegion* lite_region_create_from_region(void* p)
+{
+    Region* region = (Region*)p;
+    LiteRegion* out = g_new0(LiteRegion, 1);
+
+    NbtInstance* instance = create_lr_instance(region);
+}
+*/
+
 LiteRegion* lite_region_create_instance(NbtInstance* instance, int r_num)
 {
     LiteRegion* out = g_new0(LiteRegion, 1);
@@ -164,10 +207,8 @@ LiteRegion* lite_region_create_instance(NbtInstance* instance, int r_num)
         dh_nbt_instance_free(states);
 
         /* Try to get move bits */
-        int bits = 0;
-        while(out->blocks->num > (1 << bits))
-            bits++;
-        if(bits <= 2) bits = 2;
+        int bits = g_bit_storage(out->blocks->num);
+        bits = bits <= 2 ? 2 : bits;
         out->move_bits = bits;
 
         /* Replace name of block here so you don't have to do it in the following step */

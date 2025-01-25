@@ -5,12 +5,19 @@
 #include "manage_nbt.h"
 #include "../nbt_interface/nbt_interface.h"
 #include "../litematica_region.h"
+#include "../region.h"
 #define DH_EDITLINE_USED
 
 static int debug()
 {
     NbtInstance* instance = dh_nbt_instance_parse("/home/dream_he/下载/Station2.1-S.litematic");
-    g_message("%d", lite_region_num_instance(instance));
+    LiteRegion* lr = lite_region_create_instance(instance, 0);
+    Region* region = region_new_from_lite_region(lr);
+
+    int len = 0;
+    gint64* val = region_get_palette_num_from_region(region, &len);
+    for(int i = 0 ; i < len ; i++)
+        g_message("%ld", val[i]);
     return 0;
 }
 

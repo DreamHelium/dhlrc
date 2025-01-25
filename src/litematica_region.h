@@ -35,10 +35,12 @@ extern "C"{
 
 /** Infomation of a region */
 typedef struct _LiteRegion LiteRegion;
+typedef struct _Region Region;
 
 G_DEPRECATED_FOR(lite_region_create_instance)
 LiteRegion* lite_region_create(NBT* root, int r_num);
 LiteRegion* lite_region_create_instance(NbtInstance* instance, int r);
+LiteRegion* lite_region_create_from_region(Region* region);
 void        lite_region_free(LiteRegion* lr);
 
 /** Get region numbers in litematica file */

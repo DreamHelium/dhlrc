@@ -786,17 +786,3 @@ static guint get_key_nums(const char* str, char key)
     }
     return i;
 }
-
-DhList* dh_list_new()
-{
-    DhList* ret = g_new0(DhList, 1);
-    g_rw_lock_init(&ret->lock);
-    return ret;
-}
-
-void    dh_list_free(DhList* list)
-{
-    g_list_free(list->list);
-    g_rw_lock_clear(&list->lock);
-    g_free(list);
-}
