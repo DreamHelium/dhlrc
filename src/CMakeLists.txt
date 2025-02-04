@@ -22,18 +22,19 @@ set( DHLRC_MAIN_POT_FILE_DEPENDS
 # configure_file(dhlrc_config.h.in dhlrc_config.h)
 add_subdirectory(dhutil)
 add_subdirectory(nbt_interface)
+add_subdirectory(recipe_handler)
 
-add_library(dhlrc_recipe_full SHARED
-			json_util.c json_util.h
-		    recipe_class_ng/recipes_general.h
-	        recipe_class_ng/recipes_general.c
-	        recipe_class_ng/recipes_shaped.h
-	        recipe_class_ng/recipes_shaped.c
-	        recipe_class_ng/recipes_shapeless.h
-	        recipe_class_ng/recipes_shapeless.c
-	        recipe_class_ng/recipes_smelting.h
-	        recipe_class_ng/recipes_smelting.c
-)
+# add_library(dhlrc_recipe_full SHARED
+# 			json_util.c json_util.h
+# 		    recipe_class_ng/recipes_general.h
+# 	        recipe_class_ng/recipes_general.c
+# 	        recipe_class_ng/recipes_shaped.h
+# 	        recipe_class_ng/recipes_shaped.c
+# 	        recipe_class_ng/recipes_shapeless.h
+# 	        recipe_class_ng/recipes_shapeless.c
+# 	        recipe_class_ng/recipes_smelting.h
+# 	        recipe_class_ng/recipes_smelting.c
+# )
 
 add_library(dhlrc SHARED
            mcdir/path.c mcdir/path.h
@@ -66,11 +67,12 @@ add_library(dhlrc SHARED
 		   create_nbt.c
 )
 
-target_link_libraries(dhlrc_recipe_full PUBLIC dhutil cjson)
+# target_link_libraries(dhlrc_recipe_full PUBLIC dhutil cjson)
 
-target_link_libraries(dhlrc PUBLIC z cjson ${minizip_LIBRARIES} dhutil dhlrc_recipe_full dhnbt_interface
+target_link_libraries(dhlrc PUBLIC z cjson ${minizip_LIBRARIES} dhutil 
+						dhnbt_interface
 )
-
+# dhlrc_recipe_full
 if(${minizip_VERSION} LESS 4.0.0)
 	add_definitions(-DDHLRC_MZ_VERSION_LESS_THAN_FOUR)
 endif()
@@ -88,10 +90,10 @@ target_link_libraries(dhlrc.bin PUBLIC dhlrc gmodule-2.0)
 
 set_target_properties(dhlrc.bin PROPERTIES INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib64")
 
-install(TARGETS dhlrc dhlrc_recipe_full
-    BUNDLE DESTINATION .
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-)
+# install(TARGETS dhlrc dhlrc_recipe_full
+#     BUNDLE DESTINATION .
+#     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+# )
 
 install(TARGETS dhlrc.bin
     BUNDLE DESTINATION .
