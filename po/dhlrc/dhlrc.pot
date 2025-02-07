@@ -15,7 +15,7 @@ msgstr ""
 "#-#-#-#-#  dhlrc.pot (dhlrc)  #-#-#-#-#\n"
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-01-22 22:30+0800\n"
+"POT-Creation-Date: 2025-02-07 13:37+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -431,17 +431,17 @@ msgid ""
 "reconfigure."
 msgstr ""
 
-#: src/dhlrc_list.c:330
+#: src/dhlrc_list.c:321
 #, c-format
 msgid "Combined %d items to the new item list."
 msgstr ""
 
-#: src/litematica_region.c:600
+#: src/litematica_region.c:643
 #, c-format
 msgid "[%.2f%%] Processing Blocks %lu/%lu, (%3d,%3d,%3d)/(%3d,%3d,%3d)"
 msgstr ""
 
-#: src/litematica_region.c:649
+#: src/litematica_region.c:692
 #, c-format
 msgid "Add %%d items from region %s"
 msgstr ""
@@ -490,22 +490,22 @@ msgid ""
 "the program (b): "
 msgstr ""
 
-#: src/main.c:268
+#: src/main.c:276
 #, c-format
 msgid "dhlrc - Program to handle litematic or other struct of Minecraft.\n"
 msgstr ""
 
-#: src/main.c:270
+#: src/main.c:278
 #, c-format
 msgid "Modules:\n"
 msgstr ""
 
-#: src/main.c:292
+#: src/main.c:300
 #, c-format
 msgid "Unrecognized options "
 msgstr ""
 
-#: src/main.c:367
+#: src/main.c:375
 msgid "[FILE] - Read a litematic file."
 msgstr ""
 

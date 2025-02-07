@@ -70,7 +70,7 @@ add_library(dhlrc SHARED
 # target_link_libraries(dhlrc_recipe_full PUBLIC dhutil cjson)
 
 target_link_libraries(dhlrc PUBLIC z cjson ${minizip_LIBRARIES} dhutil 
-						dhnbt_interface
+						dhnbt_interface dhrecipe_handler
 )
 # dhlrc_recipe_full
 if(${minizip_VERSION} LESS 4.0.0)

@@ -21,21 +21,12 @@
 #include <string.h>
 #include <stdio.h>
 #include <cjson/cJSON.h>
+#include "recipe_handler/handler.h"
 #include "recipe_util.h"
 #include "translation.h"
 #include "json_util.h"
 
-static gboolean enable_shaped = TRUE;
-static gboolean enable_smelting = TRUE;
-static gboolean enable_shapeless = TRUE;
 static gboolean type_is_supported(const char* type);
-
-void recipe_list_enable_feature(gboolean shaped, gboolean smelting,gboolean shapeless)
-{
-    enable_shaped = shaped;
-    enable_smelting = smelting;
-    enable_shapeless = shapeless;
-}
 
 typedef struct RListData{
     char* o_name;
@@ -581,22 +572,7 @@ static RecipeListBaseData* rlbasedata_init(const char* dir, const char* filename
 
 static gboolean type_is_supported(const char* type)
 {
-    if(enable_shaped)
-    {
-        if(g_str_has_suffix(type, "crafting_shaped"))
-            return TRUE;
-    }
-    if(enable_smelting)
-    {
-        if(g_str_has_suffix(type, "blasting") || g_str_has_suffix(type, "smelting"))
-            return TRUE;
-    }
-    if(enable_shapeless)
-    {
-        if(g_str_has_suffix(type, "crafting_shapeless"))
-            return TRUE;
-    }
-    return FALSE;
+    return recipes_is_supported_type(type);
 }
 
 static void get_name(cJSON* json, char** namespace, char** item_name)

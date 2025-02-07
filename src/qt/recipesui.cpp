@@ -14,7 +14,7 @@
 #include <qmessagebox.h>
 #include <qnamespace.h>
 #include "../translation.h"
-#include "../recipe_class_ng/recipes_general.h"
+#include "../recipe_handler/handler.h"
 #include "glibconfig.h"
 #include "recipesshowui.h"
 #include <QFileDialog>
@@ -313,7 +313,7 @@ void RecipesUI::okbtn_clicked()
 
 ItemList* RecipesUI::recipesProcess(const char* item, const char* filepos ,quint32 num)
 {
-    Recipes* r = recipes_get_recipes(filepos);
+    auto r = recipes_get_recipes(filepos);
 
     ItemList* new_il = nullptr;
 

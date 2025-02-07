@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-01-21 15:59+0800\n"
+"POT-Creation-Date: 2025-02-07 13:24+0800\n"
 "PO-Revision-Date: 2024-11-30 07:00+0800\n"
 "Last-Translator: dream_he <48383878+DreamHelium@users.noreply.github.com>\n"
 "Language-Team: Chinese <kde-i18n-doc@kde.org>\n"
@@ -431,17 +431,17 @@ msgid ""
 "reconfigure."
 msgstr ""
 
-#: src/dhlrc_list.c:330
+#: src/dhlrc_list.c:331
 #, c-format
 msgid "Combined %d items to the new item list."
 msgstr "合并了%d物品至新的物品列表。"
 
-#: src/litematica_region.c:600
+#: src/litematica_region.c:643
 #, c-format
 msgid "[%.2f%%] Processing Blocks %lu/%lu, (%3d,%3d,%3d)/(%3d,%3d,%3d)"
 msgstr "[%.2f%%] 处理方块中 %lu/%lu, (%3d,%3d,%3d)/(%3d,%3d,%3d) ……"
 
-#: src/litematica_region.c:649
+#: src/litematica_region.c:692
 #, c-format
 msgid "Add %%d items from region %s"
 msgstr "从区域%s添加%%d物品"
@@ -497,22 +497,22 @@ msgstr ""
 "请再次输入方块的坐标，或输入 “b” 选择其他区域，输入 “r” 阅读方块的细节，输入 "
 "“q” 退出程序 (b): "
 
-#: src/main.c:268
+#: src/main.c:276
 #, c-format
 msgid "dhlrc - Program to handle litematic or other struct of Minecraft.\n"
 msgstr ""
 
-#: src/main.c:270
+#: src/main.c:278
 #, c-format
 msgid "Modules:\n"
 msgstr ""
 
-#: src/main.c:292
+#: src/main.c:300
 #, c-format
 msgid "Unrecognized options "
 msgstr ""
 
-#: src/main.c:367
+#: src/main.c:375
 msgid "[FILE] - Read a litematic file."
 msgstr "[文件] - 读取一个投影文件。"
 

@@ -81,7 +81,6 @@ const char*     replace_list_replace(ReplaceList* rl, const char* o_name);
 DhStrArray*    replace_list_replace_str_array(ReplaceList* rl, const char* o_name);
 void            replace_list_free(ReplaceList* rl);
 
-void            recipe_list_enable_feature(gboolean shaped, gboolean smelting, gboolean shapeless);
 RecipeList*     recipe_list_init(const char* dir, ItemList* il);
 void            recipe_list_free(RecipeList* rcl);
 char*           recipe_list_filename(RecipeList* rcl);

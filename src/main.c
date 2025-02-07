@@ -29,6 +29,7 @@
 #include "translation.h"
 #include <dhutil.h>
 #include <ncursesw/ncurses.h>
+#include "recipe_handler/handler.h"
 
 #ifdef G_OS_WIN32
 #define LINK_PATH "PATH"
@@ -141,12 +142,19 @@ static void startup(GApplication* self, gpointer user_data)
     dhlrc_make_config();
     dhlrc_common_contents_init(user_data);
     common_infos_init();
+    char* prname = user_data;
+    char* prpath = dh_file_get_current_program_dir(prname);
+    char* recipes_module_path = g_strconcat(prpath, G_DIR_SEPARATOR_S, "recipes_module", NULL);
+    g_free(prpath);
+    recipe_handler_init(recipes_module_path);
+    g_free(recipes_module_path);
 }
 
 static void app_shutdown(GApplication* self, gpointer user_data)
 {
     common_infos_free();
     dhlrc_common_contents_free();
+    recipe_handler_free();
 }
 
 // static gboolean file_open(GFile* file, gboolean single)

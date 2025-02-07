@@ -5,7 +5,7 @@
 #include <QLabel>
 #include <QPainter>
 #include <QVBoxLayout>
-#include "../recipe_class_ng/recipes_general.h"
+#include "../recipe_handler/handler.h"
 
 namespace Ui {
 class RecipesShowUI;
@@ -28,7 +28,7 @@ public:
 
 private:
     QVBoxLayout* layout;
-    Recipes* r;
+    DhRecipes* r;
     QLabel* titleLabel;
     QLabel* pattern;
     ptg* pt_group = nullptr;
