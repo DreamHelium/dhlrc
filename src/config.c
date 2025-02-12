@@ -156,3 +156,21 @@ static cJSON* get_content()
     dhlrc_make_config();
     return dhlrc_file_to_json(config_file);
 }
+
+void dh_set_or_create_item(const char* item, const char* val, gboolean save)
+{
+    cJSON* content_d = get_content();
+    cJSON* json_item = cJSON_GetObjectItem(content_d, item);
+    if(json_item)
+        cJSON_SetValuestring(json_item, val);
+    else
+    {
+        cJSON_AddStringToObject(content, item, val);
+    }
+    if(save)
+    {
+        char* data = cJSON_Print(content_d);
+        dh_write_file(config_file, data, strlen(data));
+        free(data);
+    }
+}

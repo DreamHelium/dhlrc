@@ -73,6 +73,16 @@
         </property>
        </widget>
       </item>
+      <item>
+       <widget class="QLabel" name="label_9">
+        <property name="text">
+         <string>The directory will affect the search of translation file, thus affect the functions of the program.</string>
+        </property>
+        <property name="wordWrap">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
      </layout>
     </item>
     <item>
@@ -129,6 +139,13 @@
         </property>
        </widget>
       </item>
+      <item>
+       <widget class="QLabel" name="validDirLabel">
+        <property name="text">
+         <string>Validated?</string>
+        </property>
+       </widget>
+      </item>
      </layout>
     </item>
    </layout>
@@ -162,7 +179,69 @@
    </layout>
   </widget>
   <widget class="QWizardPage" name="wizardPage_3">
-   <layout class="QVBoxLayout" name="verticalLayout_9"/>
+   <layout class="QVBoxLayout" name="verticalLayout_8">
+    <item>
+     <widget class="QLabel" name="label_10">
+      <property name="text">
+       <string>Translation file will be checked now. You can choose a custom file or use the one in the game directory.</string>
+      </property>
+      <property name="wordWrap">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QLabel" name="label_11">
+      <property name="text">
+       <string>Warning: if a translation file is found in game directory, the custom one might not be used.</string>
+      </property>
+      <property name="wordWrap">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QRadioButton" name="radioButton_6">
+      <property name="text">
+       <string>I want &amp;to use the one in the game directory.</string>
+      </property>
+      <property name="checked">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QRadioButton" name="radioButton_5">
+      <property name="text">
+       <string>&amp;I want to choose a custom one.</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout_2">
+      <item>
+       <widget class="QLineEdit" name="lineEdit_2"/>
+      </item>
+      <item>
+       <widget class="QPushButton" name="pushButton_3">
+        <property name="text">
+         <string/>
+        </property>
+        <property name="icon">
+         <iconset theme="document-open"/>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <widget class="QLabel" name="validFileLabel">
+      <property name="text">
+       <string>TextLabel</string>
+      </property>
+     </widget>
+    </item>
+   </layout>
   </widget>
   <widget class="QWizardPage" name="wizardPage2">
    <layout class="QVBoxLayout" name="verticalLayout_7">

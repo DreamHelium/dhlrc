@@ -14,4 +14,7 @@ public:
 
 private:
     Ui::WizardUI* ui;
+
+private Q_SLOTS:
+    void finished(int id);
 };

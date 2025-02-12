@@ -18,7 +18,6 @@
 #ifndef RECIPE_UTIL_H
 #define RECIPE_UTIL_H
 
-#include "dhlrc_list.h"
 #include <cjson/cJSON.h>
 #include <dhutil.h>
 
@@ -30,7 +29,7 @@ extern "C"{
 long *      num_array_get_from_input(int *array_num, int max_num);
 
 const char* name_block_translate(const char* block_name);
-gboolean    dh_game_file_extract();
+gboolean    dhlrc_found_transfile();
 int         dh_exit();
 
 #ifdef __cplusplus

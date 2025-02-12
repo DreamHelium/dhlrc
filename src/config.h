@@ -39,6 +39,8 @@ char* dh_get_recipe_dir();
 /** This is used by mcdir file */
 char* dh_get_translation_dir();
 
+void dh_set_or_create_item(const char* item, const char* val, gboolean save);
+
 
 #ifdef __cplusplus
 }

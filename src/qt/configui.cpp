@@ -39,7 +39,8 @@ void ConfigUI::setTextContent()
     ui->lineEdit_4->setText(searchText("gameDir"));
     ui->lineEdit_5->setText(searchText("cacheDir"));
     ui->lineEdit_6->setText(searchText("overrideVersion"));
-    ui->comboBox->setCurrentText(searchText("showWizardOnStart"));
+    QString showWizard = tr(searchText("showWizardOnStart").toUtf8());
+    ui->comboBox->setCurrentText(showWizard);
 }
 
 void ConfigUI::initSignalSlots()
@@ -121,9 +122,12 @@ void ConfigUI::okBtn_clicked()
     setOrCreateItem("gameDir", ui->lineEdit_4->text().toStdString().c_str());
     setOrCreateItem("cacheDir", ui->lineEdit_5->text().toStdString().c_str());
     setOrCreateItem("overrideVersion", ui->lineEdit_6->text().toStdString().c_str());
-    setOrCreateItem("showWizardOnStart", ui->comboBox->currentText().toUtf8());
+    if(ui->comboBox->currentText() == tr("true"))
+        setOrCreateItem("showWizardOnStart", "true");
+    else setOrCreateItem("showWizardOnStart", "false");
     char* data = cJSON_Print(configFile);
-    dh_write_file(configFilePath.toStdString().c_str(), data, strlen(data)); 
+    dh_write_file(configFilePath.toUtf8(), data, strlen(data));
+    free(data);
 }
 
 void ConfigUI::setOrCreateItem(const char* item, const char* val)

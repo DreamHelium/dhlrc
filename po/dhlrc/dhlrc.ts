@@ -19,42 +19,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qt/blocklistui.ui" line="57"/>
-        <source>id</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../src/qt/blocklistui.ui" line="62"/>
-        <source>id Name</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../src/qt/blocklistui.ui" line="67"/>
-        <source>Block Name</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../src/qt/blocklistui.ui" line="72"/>
-        <source>x</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../../src/qt/blocklistui.ui" line="77"/>
-        <source>y</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../src/qt/blocklistui.ui" line="82"/>
-        <source>z</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../src/qt/blocklistui.ui" line="87"/>
-        <source>Palette</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../src/qt/blocklistui.ui" line="116"/>
         <source>&amp;Close</source>
         <translation type="unfinished"></translation>
     </message>
@@ -383,47 +348,82 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qt/wizardui.ui" line="83"/>
+        <location filename="../../src/qt/wizardui.ui" line="79"/>
+        <source>The directory will affect the search of translation file, thus affect the functions of the program.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qt/wizardui.ui" line="93"/>
         <source>I want to &amp;configure the game directory.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qt/wizardui.ui" line="95"/>
+        <location filename="../../src/qt/wizardui.ui" line="105"/>
         <source>Game directory:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qt/wizardui.ui" line="117"/>
+        <location filename="../../src/qt/wizardui.ui" line="127"/>
         <source>&amp;Reset</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qt/wizardui.ui" line="128"/>
+        <location filename="../../src/qt/wizardui.ui" line="138"/>
         <source>&amp;I do not want to set the game directory</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qt/wizardui.ui" line="141"/>
-        <source>Please select the logic of finding corresponding files.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../src/qt/wizardui.ui" line="148"/>
-        <source>Select &amp;a specific version to use the files.</source>
+        <location filename="../../src/qt/wizardui.ui" line="145"/>
+        <source>Validated?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../src/qt/wizardui.ui" line="158"/>
+        <source>Please select the logic of finding corresponding files.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qt/wizardui.ui" line="165"/>
+        <source>Select &amp;a specific version to use the files.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qt/wizardui.ui" line="175"/>
         <source>&amp;Decide by NBT file</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qt/wizardui.ui" line="172"/>
+        <location filename="../../src/qt/wizardui.ui" line="186"/>
+        <source>Translation file will be checked now. You can choose a custom file or use the one in the game directory.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qt/wizardui.ui" line="196"/>
+        <source>Warning: if a translation file is found in game directory, the custom one might not be used.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qt/wizardui.ui" line="206"/>
+        <source>I want &amp;to use the one in the game directory.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qt/wizardui.ui" line="216"/>
+        <source>&amp;I want to choose a custom one.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qt/wizardui.ui" line="240"/>
+        <source>TextLabel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qt/wizardui.ui" line="251"/>
         <source>The wizard is finished!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qt/wizardui.ui" line="179"/>
+        <location filename="../../src/qt/wizardui.ui" line="258"/>
         <source>If you want to configure again, select &quot;Utility&quot;-&gt;&quot;Config Wizard&quot; to reconfigure.</source>
         <translation type="unfinished"></translation>
     </message>

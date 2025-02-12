@@ -20,42 +20,7 @@ msgctxt "BlockListUI|"
 msgid "Search block name"
 msgstr ""
 
-#: ../../src/qt/blocklistui.ui:57
-msgctxt "BlockListUI|"
-msgid "id"
-msgstr ""
-
-#: ../../src/qt/blocklistui.ui:62
-msgctxt "BlockListUI|"
-msgid "id Name"
-msgstr ""
-
-#: ../../src/qt/blocklistui.ui:67
-msgctxt "BlockListUI|"
-msgid "Block Name"
-msgstr ""
-
-#: ../../src/qt/blocklistui.ui:72
-msgctxt "BlockListUI|"
-msgid "x"
-msgstr ""
-
 #: ../../src/qt/blocklistui.ui:77
-msgctxt "BlockListUI|"
-msgid "y"
-msgstr ""
-
-#: ../../src/qt/blocklistui.ui:82
-msgctxt "BlockListUI|"
-msgid "z"
-msgstr ""
-
-#: ../../src/qt/blocklistui.ui:87
-msgctxt "BlockListUI|"
-msgid "Palette"
-msgstr ""
-
-#: ../../src/qt/blocklistui.ui:116
 msgctxt "BlockListUI|"
 msgid "&Close"
 msgstr ""
@@ -365,47 +330,88 @@ msgid ""
 "press \"Reset\" if it's not the right position."
 msgstr ""
 
-#: ../../src/qt/wizardui.ui:83
+#: ../../src/qt/wizardui.ui:79
+msgctxt "WizardUI|"
+msgid ""
+"The directory will affect the search of translation file, thus affect the "
+"functions of the program."
+msgstr ""
+
+#: ../../src/qt/wizardui.ui:93
 msgctxt "WizardUI|"
 msgid "I want to &configure the game directory."
 msgstr ""
 
-#: ../../src/qt/wizardui.ui:95
+#: ../../src/qt/wizardui.ui:105
 msgctxt "WizardUI|"
 msgid "Game directory:"
 msgstr ""
 
-#: ../../src/qt/wizardui.ui:117
+#: ../../src/qt/wizardui.ui:127
 msgctxt "WizardUI|"
 msgid "&Reset"
 msgstr ""
 
-#: ../../src/qt/wizardui.ui:128
+#: ../../src/qt/wizardui.ui:138
 msgctxt "WizardUI|"
 msgid "&I do not want to set the game directory"
 msgstr ""
 
-#: ../../src/qt/wizardui.ui:141
+#: ../../src/qt/wizardui.ui:145
 msgctxt "WizardUI|"
-msgid "Please select the logic of finding corresponding files."
-msgstr ""
-
-#: ../../src/qt/wizardui.ui:148
-msgctxt "WizardUI|"
-msgid "Select &a specific version to use the files."
+msgid "Validated?"
 msgstr ""
 
 #: ../../src/qt/wizardui.ui:158
 msgctxt "WizardUI|"
+msgid "Please select the logic of finding corresponding files."
+msgstr ""
+
+#: ../../src/qt/wizardui.ui:165
+msgctxt "WizardUI|"
+msgid "Select &a specific version to use the files."
+msgstr ""
+
+#: ../../src/qt/wizardui.ui:175
+msgctxt "WizardUI|"
 msgid "&Decide by NBT file"
 msgstr ""
 
-#: ../../src/qt/wizardui.ui:172
+#: ../../src/qt/wizardui.ui:186
+msgctxt "WizardUI|"
+msgid ""
+"Translation file will be checked now. You can choose a custom file or use "
+"the one in the game directory."
+msgstr ""
+
+#: ../../src/qt/wizardui.ui:196
+msgctxt "WizardUI|"
+msgid ""
+"Warning: if a translation file is found in game directory, the custom one "
+"might not be used."
+msgstr ""
+
+#: ../../src/qt/wizardui.ui:206
+msgctxt "WizardUI|"
+msgid "I want &to use the one in the game directory."
+msgstr ""
+
+#: ../../src/qt/wizardui.ui:216
+msgctxt "WizardUI|"
+msgid "&I want to choose a custom one."
+msgstr ""
+
+#: ../../src/qt/wizardui.ui:240
+msgctxt "WizardUI|"
+msgid "TextLabel"
+msgstr ""
+
+#: ../../src/qt/wizardui.ui:251
 msgctxt "WizardUI|"
 msgid "The wizard is finished!"
 msgstr ""
 
-#: ../../src/qt/wizardui.ui:179
+#: ../../src/qt/wizardui.ui:258
 msgctxt "WizardUI|"
 msgid ""
 "If you want to configure again, select \"Utility\"->\"Config Wizard\" to "

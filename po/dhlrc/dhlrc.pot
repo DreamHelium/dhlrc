@@ -15,7 +15,7 @@ msgstr ""
 "#-#-#-#-#  dhlrc.pot (dhlrc)  #-#-#-#-#\n"
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-02-07 13:37+0800\n"
+"POT-Creation-Date: 2025-02-13 02:25+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -39,42 +39,7 @@ msgctxt "BlockListUI|"
 msgid "Search block name"
 msgstr ""
 
-#: ../../src/qt/blocklistui.ui:57
-msgctxt "BlockListUI|"
-msgid "id"
-msgstr ""
-
-#: ../../src/qt/blocklistui.ui:62
-msgctxt "BlockListUI|"
-msgid "id Name"
-msgstr ""
-
-#: ../../src/qt/blocklistui.ui:67
-msgctxt "BlockListUI|"
-msgid "Block Name"
-msgstr ""
-
-#: ../../src/qt/blocklistui.ui:72
-msgctxt "BlockListUI|"
-msgid "x"
-msgstr ""
-
 #: ../../src/qt/blocklistui.ui:77
-msgctxt "BlockListUI|"
-msgid "y"
-msgstr ""
-
-#: ../../src/qt/blocklistui.ui:82
-msgctxt "BlockListUI|"
-msgid "z"
-msgstr ""
-
-#: ../../src/qt/blocklistui.ui:87
-msgctxt "BlockListUI|"
-msgid "Palette"
-msgstr ""
-
-#: ../../src/qt/blocklistui.ui:116
 msgctxt "BlockListUI|"
 msgid "&Close"
 msgstr ""
@@ -384,47 +349,88 @@ msgid ""
 "press \"Reset\" if it's not the right position."
 msgstr ""
 
-#: ../../src/qt/wizardui.ui:83
+#: ../../src/qt/wizardui.ui:79
+msgctxt "WizardUI|"
+msgid ""
+"The directory will affect the search of translation file, thus affect the "
+"functions of the program."
+msgstr ""
+
+#: ../../src/qt/wizardui.ui:93
 msgctxt "WizardUI|"
 msgid "I want to &configure the game directory."
 msgstr ""
 
-#: ../../src/qt/wizardui.ui:95
+#: ../../src/qt/wizardui.ui:105
 msgctxt "WizardUI|"
 msgid "Game directory:"
 msgstr ""
 
-#: ../../src/qt/wizardui.ui:117
+#: ../../src/qt/wizardui.ui:127
 msgctxt "WizardUI|"
 msgid "&Reset"
 msgstr ""
 
-#: ../../src/qt/wizardui.ui:128
+#: ../../src/qt/wizardui.ui:138
 msgctxt "WizardUI|"
 msgid "&I do not want to set the game directory"
 msgstr ""
 
-#: ../../src/qt/wizardui.ui:141
+#: ../../src/qt/wizardui.ui:145
 msgctxt "WizardUI|"
-msgid "Please select the logic of finding corresponding files."
-msgstr ""
-
-#: ../../src/qt/wizardui.ui:148
-msgctxt "WizardUI|"
-msgid "Select &a specific version to use the files."
+msgid "Validated?"
 msgstr ""
 
 #: ../../src/qt/wizardui.ui:158
 msgctxt "WizardUI|"
+msgid "Please select the logic of finding corresponding files."
+msgstr ""
+
+#: ../../src/qt/wizardui.ui:165
+msgctxt "WizardUI|"
+msgid "Select &a specific version to use the files."
+msgstr ""
+
+#: ../../src/qt/wizardui.ui:175
+msgctxt "WizardUI|"
 msgid "&Decide by NBT file"
 msgstr ""
 
-#: ../../src/qt/wizardui.ui:172
+#: ../../src/qt/wizardui.ui:186
+msgctxt "WizardUI|"
+msgid ""
+"Translation file will be checked now. You can choose a custom file or use "
+"the one in the game directory."
+msgstr ""
+
+#: ../../src/qt/wizardui.ui:196
+msgctxt "WizardUI|"
+msgid ""
+"Warning: if a translation file is found in game directory, the custom one "
+"might not be used."
+msgstr ""
+
+#: ../../src/qt/wizardui.ui:206
+msgctxt "WizardUI|"
+msgid "I want &to use the one in the game directory."
+msgstr ""
+
+#: ../../src/qt/wizardui.ui:216
+msgctxt "WizardUI|"
+msgid "&I want to choose a custom one."
+msgstr ""
+
+#: ../../src/qt/wizardui.ui:240
+msgctxt "WizardUI|"
+msgid "TextLabel"
+msgstr ""
+
+#: ../../src/qt/wizardui.ui:251
 msgctxt "WizardUI|"
 msgid "The wizard is finished!"
 msgstr ""
 
-#: ../../src/qt/wizardui.ui:179
+#: ../../src/qt/wizardui.ui:258
 msgctxt "WizardUI|"
 msgid ""
 "If you want to configure again, select \"Utility\"->\"Config Wizard\" to "
@@ -685,14 +691,14 @@ msgid "locked"
 msgstr ""
 
 #: src/qt/ilchooseui.cpp:49 src/qt/ilchooseui.cpp:68 src/qt/lrchooseui.cpp:62
-#: src/qt/nbtselectui.cpp:45 src/qt/nbtselectui.cpp:64 src/qt/recipesui.cpp:229
+#: src/qt/nbtselectui.cpp:45 src/qt/nbtselectui.cpp:64 src/qt/recipesui.cpp:138
 #: src/qt/regionchooseui.cpp:66 src/qt/regionchooseui.cpp:85
 #: src/qt/saveregionselectui.cpp:41 src/gtk/manage_window.c:118
 msgid "&OK"
 msgstr ""
 
 #: src/qt/ilchooseui.cpp:50 src/qt/lrchooseui.cpp:63 src/qt/nbtselectui.cpp:46
-#: src/qt/recipesui.cpp:230 src/qt/regionchooseui.cpp:67
+#: src/qt/recipesui.cpp:139 src/qt/regionchooseui.cpp:67
 #: src/qt/saveregionselectui.cpp:42 src/gtk/manage_window.c:121
 msgid "&Close"
 msgstr ""
@@ -879,63 +885,75 @@ msgstr ""
 msgid "The pattern is:"
 msgstr ""
 
-#: src/qt/recipesui.cpp:67
-msgid "No recipe file found!"
+#: src/qt/recipesui.cpp:105
+msgid "No items? Get recipe files from file."
 msgstr ""
 
-#: src/qt/recipesui.cpp:68
-msgid "No recipe file found! Do you want to extract game file?"
-msgstr ""
-
-#: src/qt/recipesui.cpp:77
-msgid "Please select a game jar"
-msgstr ""
-
-#: src/qt/recipesui.cpp:77
-msgid "Jar File (*.jar)"
-msgstr ""
-
-#: src/qt/recipesui.cpp:136
+#: src/qt/recipesui.cpp:106
 msgid "Please select items:"
 msgstr ""
 
-#: src/qt/recipesui.cpp:138
+#: src/qt/recipesui.cpp:108
 msgid "Search block name"
 msgstr ""
 
-#: src/qt/recipesui.cpp:164
-msgid "Show recipe"
-msgstr ""
-
-#: src/qt/recipesui.cpp:219
+#: src/qt/recipesui.cpp:128
 msgid "Combine items to this item list."
 msgstr ""
 
-#: src/qt/recipesui.cpp:221
+#: src/qt/recipesui.cpp:130
 msgid "New item list name:"
 msgstr ""
 
-#: src/qt/recipesui.cpp:222
+#: src/qt/recipesui.cpp:131
 msgid "Generated from material list combiner."
 msgstr ""
 
-#: src/qt/recipesui.cpp:295
+#: src/qt/recipesui.cpp:204
 #, c-format
 msgid "\"Delete\" %d items from material list combiner."
 msgstr ""
 
-#: src/qt/recipesui.cpp:325
+#: src/qt/recipesui.cpp:234
 msgid "Mod decide"
 msgstr ""
 
-#: src/qt/recipesui.cpp:325
+#: src/qt/recipesui.cpp:234
 #, c-format
 msgid "There's a remainder with %d and %d, continue?"
 msgstr ""
 
-#: src/qt/recipesui.cpp:349
+#: src/qt/recipesui.cpp:258
 #, c-format
 msgid "Add %d items from material list combiner."
+msgstr ""
+
+#: src/qt/recipesui.cpp:321
+msgid "Please select a game jar"
+msgstr ""
+
+#: src/qt/recipesui.cpp:321
+msgid "Jar File (*.jar)"
+msgstr ""
+
+#: src/qt/recipesui.cpp:360
+msgid "Show recipe"
+msgstr ""
+
+#: src/qt/recipesui.cpp:421
+msgid "Unzip failed!"
+msgstr ""
+
+#: src/qt/recipesui.cpp:430
+msgid "Please select a destination."
+msgstr ""
+
+#: src/qt/recipesui.cpp:463
+msgid "No Unzip Found!"
+msgstr ""
+
+#: src/qt/recipesui.cpp:463
+msgid "No unzip program found!"
 msgstr ""
 
 #: src/qt/regionchooseui.cpp:22

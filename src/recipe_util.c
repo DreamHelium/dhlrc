@@ -22,15 +22,12 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <ctype.h>
 #include "config.h"
-#include "dhlrc_list.h"
 #include <dhutil.h>
 #include "mcdir/path.h"
-#include "translation.h"
 
 static cJSON* translation_json = NULL;
-
+static gboolean first_try = FALSE;
 static gchar* find_transfile();
 
 /*
@@ -93,8 +90,9 @@ long* num_array_get_from_input(int* array_num, int max_num)
 
 const char* name_block_translate(const char *block_name)
 {
-    if(!translation_json)
+    if(!translation_json && !first_try) /* No translation json and not try */
     {
+        first_try = TRUE;
         gchar* filename = find_transfile();
         cJSON* trans_data = dhlrc_file_to_json(filename);
         translation_json = trans_data;
@@ -150,11 +148,26 @@ static gchar* find_transfile()
     const char* const* locales = g_get_language_names();
     char* ret = dh_mcdir_get_translation_file(gamedir, "1.18", locales[0]);
     g_free(gamedir);
-    return ret;
+    if(dh_file_exist(ret))
+        return ret;
+    else
+    {
+        g_free(ret);
+        return dh_get_recipe_dir();
+    }
 }
 
 int dh_exit()
 {
     cJSON_Delete(translation_json);
     return 0;
+}
+
+gboolean dhlrc_found_transfile()
+{
+    /* Try to initilize the file. */
+    name_block_translate("minecraft:air");
+    if(!translation_json)
+        return FALSE;
+    return TRUE;
 }
