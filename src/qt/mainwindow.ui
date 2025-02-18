@@ -158,6 +158,13 @@
             </property>
            </widget>
           </item>
+          <item>
+           <widget class="QPushButton" name="downloadBtn">
+            <property name="text">
+             <string>Download Manifest</string>
+            </property>
+           </widget>
+          </item>
          </layout>
         </item>
        </layout>

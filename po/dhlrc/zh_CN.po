@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-02-13 01:58+0800\n"
+"POT-Creation-Date: 2025-02-19 00:39+0800\n"
 "PO-Revision-Date: 2024-11-30 07:00+0800\n"
 "Last-Translator: dream_he <48383878+DreamHelium@users.noreply.github.com>\n"
 "Language-Team: Chinese <kde-i18n-doc@kde.org>\n"
@@ -729,10 +729,10 @@ msgstr "关闭(&C)"
 msgid "No item list available!"
 msgstr "没有物品列表可用！"
 
-#: src/qt/ilchooseui.cpp:92 src/qt/ilreaderui.cpp:111 src/qt/mainwindow.cpp:142
-#: src/qt/mainwindow.cpp:161 src/qt/mainwindow.cpp:183
-#: src/qt/mainwindow.cpp:186 src/qt/mainwindow.cpp:203
-#: src/qt/mainwindow.cpp:206 src/qt/mainwindow.cpp:231 src/qt/manage.cpp:28
+#: src/qt/ilchooseui.cpp:92 src/qt/ilreaderui.cpp:111 src/qt/mainwindow.cpp:145
+#: src/qt/mainwindow.cpp:164 src/qt/mainwindow.cpp:186
+#: src/qt/mainwindow.cpp:189 src/qt/mainwindow.cpp:206
+#: src/qt/mainwindow.cpp:209 src/qt/mainwindow.cpp:234 src/qt/manage.cpp:28
 #: src/qt/manage.cpp:291 src/qt/manage.cpp:304 src/qt/manage.cpp:411
 #: src/qt/nbtselectui.cpp:116 src/qt/regionchooseui.cpp:121
 #: src/qt/saveregionselectui.cpp:79 src/qt/utility.cpp:31 src/qt/utility.cpp:54
@@ -780,8 +780,8 @@ msgstr "追踪"
 msgid "Show history"
 msgstr "展示历史"
 
-#: src/qt/ilreaderui.cpp:111 src/qt/mainwindow.cpp:142
-#: src/qt/mainwindow.cpp:161
+#: src/qt/ilreaderui.cpp:111 src/qt/mainwindow.cpp:145
+#: src/qt/mainwindow.cpp:164
 msgid "The item list is locked!"
 msgstr "此材料列表被锁定！"
 
@@ -803,27 +803,27 @@ msgstr ""
 msgid "Enter description here."
 msgstr ""
 
-#: src/qt/mainwindow.cpp:177 src/qt/saveregionselectui.cpp:73
+#: src/qt/mainwindow.cpp:180 src/qt/saveregionselectui.cpp:73
 msgid "Enter Name for Item List"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:177 src/qt/saveregionselectui.cpp:73
+#: src/qt/mainwindow.cpp:180 src/qt/saveregionselectui.cpp:73
 msgid "Enter the name for item list"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:183 src/qt/saveregionselectui.cpp:79
+#: src/qt/mainwindow.cpp:186 src/qt/saveregionselectui.cpp:79
 msgid "Description is empty!"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:186 src/qt/mainwindow.cpp:206
+#: src/qt/mainwindow.cpp:189 src/qt/mainwindow.cpp:209
 msgid "No Region or no Region selected!"
 msgstr "没有Region或没有Region选中！"
 
-#: src/qt/mainwindow.cpp:203
+#: src/qt/mainwindow.cpp:206
 msgid "Region is locked!"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:231
+#: src/qt/mainwindow.cpp:234
 msgid "No NBT is selected!"
 msgstr ""
 

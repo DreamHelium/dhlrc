@@ -16,6 +16,8 @@
 #include <qobject.h>
 #include <qpushbutton.h>
 #include "blockreaderui.h"
+#include "dh_file_util.h"
+#include "gio/gio.h"
 #include "ilchooseui.h"
 #include "ilreaderui.h"
 #include "manage.h"
@@ -32,9 +34,9 @@
 #include "utility.h"
 #include "wizardui.h"
 #include "../common_info.h"
+#include "../download_file.h"
 
 static bool nbtRead = false;
-int verbose_level;
 static dh::ManageRegion* mr = nullptr;
 static dh::ManageNbtInterface* mni = nullptr;
 
@@ -94,6 +96,7 @@ void MainWindow::initSignalSlots()
     QObject::connect(ui->mrBtn, &QPushButton::clicked, this, &MainWindow::mrBtn_clicked);
     QObject::connect(ui->nbtReaderBtn_2, &QPushButton::clicked, this, &MainWindow::nbtReaderBtn_clicked);
     QObject::connect(ui->configBtn, &QPushButton::clicked, this, &MainWindow::configAction_triggered);
+    QObject::connect(ui->downloadBtn, &QPushButton::clicked, this, &MainWindow::downloadBtn_clicked);
 }
 
 void MainWindow::dragEnterEvent(QDragEnterEvent* event)
@@ -229,4 +232,15 @@ void MainWindow::nbtReaderBtn_finished(int ret)
         nrui->show();
     }
     else QMessageBox::critical(this, _("Error!"), _("No NBT is selected!"));
+}
+
+static void finish_callback(GObject* source_object, GAsyncResult* res, gpointer data)
+{
+    int ret = g_task_propagate_int(G_TASK(res), NULL);
+    qDebug() << ret;
+}
+
+void MainWindow::downloadBtn_clicked()
+{
+    dh_file_download_async("https://launchermeta.mojang.com/mc/game/version_manifest.json", "/tmp", dh_file_progress_callback, NULL, true, finish_callback);
 }

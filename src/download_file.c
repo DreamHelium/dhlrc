@@ -15,6 +15,7 @@
     You should have received a copy of the GNU Lesser General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>. */
 
+#include "download_file.h"
 
 // gboolean dh_download_version_manifest(const char *dir, DhProgressCallback callback)
 // {
@@ -23,12 +24,12 @@
 //     return ret;
 // }
 
-// int dh_file_progress_callback(void* data, curl_off_t total, curl_off_t current, curl_off_t unused0, curl_off_t unused1)
-// {
-//     char* description = data;
-//     double percentage = (double)current / total * 100;
+int dh_file_progress_callback(void* data, curl_off_t total, curl_off_t current, curl_off_t unused0, curl_off_t unused1)
+{
+    char* description = data;
+    double percentage = (double)current / total * 100;
 
-//     fprintf(stderr, "[%.2f%%] Copying %s."" (%"CURL_FORMAT_CURL_OFF_T"/%"CURL_FORMAT_CURL_OFF_T").\r", percentage, description, current, total);
-//     if(current == total && total != 0) fprintf(stderr, "\n");
-//     return 0;
-// }
+    fprintf(stderr, "[%.2f%%] Copying %s."" (%"CURL_FORMAT_CURL_OFF_T"/%"CURL_FORMAT_CURL_OFF_T").\r", percentage, description, current, total);
+    if(current == total && total != 0) fprintf(stderr, "\n");
+    return 0;
+}

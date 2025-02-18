@@ -23,7 +23,7 @@
 G_BEGIN_DECLS
 
 // gboolean dh_download_version_manifest(const char* dir, DhProgressCallback callback);
-// int dh_file_progress_callback(void* data, curl_off_t total, curl_off_t current, curl_off_t unused0, curl_off_t unused1);
+int dh_file_progress_callback(void* data, curl_off_t total, curl_off_t current, curl_off_t unused0, curl_off_t unused1);
 
 G_END_DECLS
 
