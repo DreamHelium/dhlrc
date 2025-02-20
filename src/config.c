@@ -18,6 +18,7 @@
 #include "config.h"
 #include <cjson/cJSON.h>
 #include <gio/gio.h>
+#include "glib.h"
 #include "json_util.h"
 #include "dh_string_util.h"
 #include "dh_file_util.h"
@@ -28,8 +29,36 @@ static cJSON* content = NULL;
 static DhStrArray* settings_strv = NULL;
 static DhStrArray* value_strv = NULL;
 static gchar* config_file = NULL;
+static GTask* task = NULL;
+static GFile* file = NULL;
+static GMainLoop* loop = NULL;
 
 static cJSON* get_content();
+
+static void file_changed_cb()
+{
+    g_message("Changed!");
+}
+
+static void monitor_task(GTask* task, gpointer source_object, gpointer task_data, GCancellable* cancellable)
+{
+    GFile* file = source_object;
+    GFileMonitor* monitor = g_file_monitor_file(file, G_FILE_MONITOR_NONE,NULL, NULL);
+    if(monitor)
+    {
+        loop = g_main_loop_new(NULL, FALSE);
+        g_signal_connect(monitor, "changed", G_CALLBACK(file_changed_cb), NULL);
+        g_main_loop_run(loop);
+        g_object_unref(monitor);
+        g_message("Free monitor");
+        g_main_loop_unref(loop);
+        g_task_return_boolean(task, TRUE);
+    }
+    else
+    {
+        g_task_return_new_error(task, G_IO_ERROR, G_IO_ERROR_FAILED, "Failed!");
+    }
+}
 
 void dhlrc_make_config()
 {
@@ -67,12 +96,19 @@ void dhlrc_make_config()
         /* content = config; */
         free(config_text);
     }
+
+    file = g_file_new_for_path(config_file);
+    task = g_task_new(file, NULL, NULL, NULL);
+    g_task_run_in_thread(task, monitor_task);
 }
 
 void dh_exit1()
 {
     /* cJSON_Delete(content); */
     g_free(config_file);
+    g_main_loop_quit(loop);
+    g_object_unref(task);
+    g_object_unref(file);
 }
 
 char* dh_get_translation_dir()

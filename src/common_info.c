@@ -75,13 +75,13 @@ static void common_info_single_free(gpointer mem)
 {
     CommonInfoSingle* single = mem;
     single->full_free = TRUE;
-    if(single->uuid_list)
-    {
+    // if(single->uuid_list)
+    // {
         if(single->table) dh_mt_table_destroy(single->table);
         g_list_free(single->uuid_list);
         if(single->uuid_array) dh_str_array_free(single->uuid_array);
         g_ptr_array_free(single->update_notifiers, TRUE);
-    }
+    // }
     g_free(mem);
 }
 
