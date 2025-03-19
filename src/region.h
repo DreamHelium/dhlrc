@@ -60,6 +60,7 @@ typedef struct _Region
 {
     /** The base information */
     int data_version;
+    char* region_name;
     /** The size of region */
     RegionSize* region_size;
     /** The block info array */
@@ -69,7 +70,9 @@ typedef struct _Region
 } Region;
 
 Region* region_new_from_lite_region(LiteRegion* lr);
+G_DEPRECATED_FOR(region_new_from_nbt_file)
 Region* region_new_from_nbt(NBT* root);
+Region* region_new_from_nbt_file(const char* filepos);
 ItemList* item_list_new_from_region(Region* region);
 ItemList* item_list_new_from_multi_region(const char** region_uuid_arr);
 NBT* nbt_new_from_region(Region* region);

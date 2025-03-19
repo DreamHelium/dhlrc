@@ -72,6 +72,7 @@ int           lite_region_size_x(LiteRegion* lr);
 int           lite_region_size_y(LiteRegion* lr);
 int           lite_region_size_z(LiteRegion* lr);
 NbtInstance*  lite_region_region_instance(LiteRegion* lr);
+const char*   lite_region_name(LiteRegion* lr);
 
 /** Directly into the BlockStatePalette (Do not need to go to child) */
 

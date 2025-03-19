@@ -498,6 +498,11 @@ NbtInstance* lite_region_region_instance(LiteRegion* lr)
     return lr->region_nbt_instance;
 }
 
+const char*   lite_region_name(LiteRegion* lr)
+{
+    return lr->name;
+}
+
 uint64_t* lite_region_block_states_array(NBT* root, int r_num, int* len)
 {
     NBT* state = NBT_GetChild(lite_region_nbt_region(root,r_num),"BlockStates");

@@ -223,6 +223,11 @@ msgctxt "MainWindow|"
 msgid "Config &Wizard"
 msgstr ""
 
+#: ../../src/qt/mainwindow.ui:164
+msgctxt "MainWindow|"
+msgid "Download Manifest"
+msgstr ""
+
 #: ../../src/qt/manageui.ui:14
 msgctxt "ManageUI|"
 msgid "Form"

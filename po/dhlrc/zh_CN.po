@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-02-19 00:39+0800\n"
+"POT-Creation-Date: 2025-03-20 01:54+0800\n"
 "PO-Revision-Date: 2024-11-30 07:00+0800\n"
 "Last-Translator: dream_he <48383878+DreamHelium@users.noreply.github.com>\n"
 "Language-Team: Chinese <kde-i18n-doc@kde.org>\n"
@@ -240,6 +240,11 @@ msgctxt "MainWindow|"
 msgid "Config &Wizard"
 msgstr ""
 
+#: ../../src/qt/mainwindow.ui:164
+msgctxt "MainWindow|"
+msgid "Download Manifest"
+msgstr ""
+
 #: ../../src/qt/manageui.ui:14
 msgctxt "ManageUI|"
 msgid "Form"
@@ -442,12 +447,12 @@ msgstr ""
 msgid "Combined %d items to the new item list."
 msgstr "合并了%d物品至新的物品列表。"
 
-#: src/litematica_region.c:643
+#: src/litematica_region.c:648
 #, c-format
 msgid "[%.2f%%] Processing Blocks %lu/%lu, (%3d,%3d,%3d)/(%3d,%3d,%3d)"
 msgstr "[%.2f%%] 处理方块中 %lu/%lu, (%3d,%3d,%3d)/(%3d,%3d,%3d) ……"
 
-#: src/litematica_region.c:692
+#: src/litematica_region.c:697
 #, c-format
 msgid "Add %%d items from region %s"
 msgstr "从区域%s添加%%d物品"

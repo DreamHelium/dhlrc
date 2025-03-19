@@ -70,7 +70,7 @@ add_library(dhlrc SHARED
 
 target_link_libraries(dhlrc PUBLIC z cjson 
 # ${minizip_LIBRARIES} 
-					  dhutil 
+					  dhutil_base
 					  dhnbt_interface dhrecipe_handler
 )
 # dhlrc_recipe_full
@@ -104,4 +104,4 @@ install(TARGETS dhlrc.bin
 add_subdirectory(qt)
 #add_subdirectory(gtk)
 add_subdirectory(cli)
-
+add_subdirectory(conv)

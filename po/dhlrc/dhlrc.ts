@@ -233,6 +233,11 @@
         <source>Config &amp;Wizard</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <location filename="../../src/qt/mainwindow.ui" line="164"/>
+        <source>Download Manifest</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ManageUI</name>

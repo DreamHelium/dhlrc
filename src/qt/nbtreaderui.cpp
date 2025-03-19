@@ -159,24 +159,27 @@ void NbtReaderUI::treeview_clicked()
 {
     auto index = ui->treeView->selectionModel()->selection();
     auto selection = proxyModel->mapSelectionToSource(index);
-    auto indexx = selection.indexes()[0];
-    QList<int> treeRow;
-    for(; indexx.isValid() ; indexx = indexx.parent())
+    if(!selection.isEmpty())
     {
-        treeRow.prepend(indexx.row());
+        auto indexx = selection.indexes()[0];
+        QList<int> treeRow;
+        for(; indexx.isValid() ; indexx = indexx.parent())
+        {
+            treeRow.prepend(indexx.row());
+        }
+        dh_nbt_instance_goto_root(instance);
+        for(int j = 0 ; j < treeRow.length() ; j++)
+        {
+            if(j != 0 ) dh_nbt_instance_child(instance);
+            auto row = treeRow[j];
+            for(int i = 0 ; i < row ; i++)
+                dh_nbt_instance_next(instance);
+        }
+        ui->typeLabel->setText(ret_type_instance(dh_nbt_get_type(instance)));
+        const char* key = dh_nbt_instance_get_key(instance);
+        ui->keyLabel->setText(key ? key : "(NULL)");
+        ui->valueLabel->setText(ret_var(instance));
     }
-    dh_nbt_instance_goto_root(instance);
-    for(int j = 0 ; j < treeRow.length() ; j++)
-    {
-        if(j != 0 ) dh_nbt_instance_child(instance);
-        auto row = treeRow[j];
-        for(int i = 0 ; i < row ; i++)
-            dh_nbt_instance_next(instance);
-    }
-    ui->typeLabel->setText(ret_type_instance(dh_nbt_get_type(instance)));
-    const char* key = dh_nbt_instance_get_key(instance);
-    ui->keyLabel->setText(key ? key : "(NULL)");
-    ui->valueLabel->setText(ret_var(instance));
 }
 
 void NbtReaderUI::textChanged_cb(QString str)

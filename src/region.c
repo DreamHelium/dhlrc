@@ -80,6 +80,7 @@ static void block_info_free(gpointer mem);
 void region_free(Region* region)
 {
     g_free(region->region_size);
+    g_free(region->region_name);
     g_ptr_array_unref(region->block_info_array);
     g_ptr_array_unref(region->palette_array);
     g_free(region);
@@ -232,13 +233,13 @@ static BlockInfoArray* get_block_full_info_from_lr(LiteRegion* lr)
         gint64 z = dh_nbt_instance_get_int(tile_entities);
         dh_nbt_instance_parent(tile_entities);
 
-        NBT* new_tile_entities = nbt_dup((NBT*)dh_nbt_instance_get_real_current_nbt(tile_entities));
-        new_tile_entities = nbt_rm(new_tile_entities, "x");
-        new_tile_entities = nbt_rm(new_tile_entities, "y");
-        new_tile_entities = nbt_rm(new_tile_entities, "z");
-        gint64 index = lite_region_block_index(lr, x, y, z);
-        ((BlockInfo*)array->pdata[index])->nbt = new_tile_entities;
-        new_tile_entities->key = dh_strdup("nbt");
+        // NBT* new_tile_entities = nbt_dup((NBT*)dh_nbt_instance_get_real_current_nbt(tile_entities));
+        // new_tile_entities = nbt_rm(new_tile_entities, "x");
+        // new_tile_entities = nbt_rm(new_tile_entities, "y");
+        // new_tile_entities = nbt_rm(new_tile_entities, "z");
+        // gint64 index = lite_region_block_index(lr, x, y, z);
+        // ((BlockInfo*)array->pdata[index])->nbt = new_tile_entities;
+        // new_tile_entities->key = dh_strdup("nbt");
     }
     return array;
 }
@@ -272,6 +273,7 @@ Region* region_new_from_lite_region(LiteRegion *lr)
 
     /* Fill DataVersion */
     region->data_version = lite_region_data_version(lr); 
+    region->region_name = g_strdup(lite_region_name(lr));
 
     /* Fill RegionSize */
     RegionSize* rs = g_new0(RegionSize, 1);
@@ -317,7 +319,8 @@ Region* region_new_from_nbt(NBT* root)
         /* Fill Data Version */
         NBT* data_version = NBT_GetChild(root, "DataVersion");
         region->data_version = data_version->value_i;
-        
+        region->region_name = NULL;
+
         return region;
     }
     else 
@@ -326,6 +329,16 @@ Region* region_new_from_nbt(NBT* root)
         g_free(rs);
         return NULL;
     }
+}
+
+Region* region_new_from_nbt_file(const char* filepos)
+{
+    gsize size = 0;
+    char* data = dh_read_file(filepos, &size);
+    NBT* nbt = NBT_Parse((guint8*)data, size);
+    g_free(data);
+
+    return region_new_from_nbt(nbt);
 }
 
 ItemList* item_list_new_from_region(Region* region)
