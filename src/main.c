@@ -26,6 +26,7 @@
 #include "glibconfig.h"
 #include "gmodule.h"
 #include "dh_file_util.h"
+#include "recipe_util.h"
 #include "translation.h"
 #include <dhutil.h>
 #include <ncursesw/ncurses.h>
@@ -155,6 +156,8 @@ static void app_shutdown(GApplication* self, gpointer user_data)
     common_infos_free();
     dhlrc_common_contents_free();
     recipe_handler_free();
+    dh_exit1();
+    dh_exit();
 }
 
 // static gboolean file_open(GFile* file, gboolean single)
@@ -330,7 +333,7 @@ static gint run_app (GApplication* self, GApplicationCommandLine* command_line, 
     }
     else printf("Not supported!\n");
 
-
+    modules_free(modules, len);
     g_strfreev (argv);
 
     return ret;
