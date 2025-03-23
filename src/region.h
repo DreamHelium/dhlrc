@@ -36,6 +36,12 @@ typedef struct Pos{
 
 typedef Pos RegionSize;
 
+typedef struct Palette{
+    char* id_name;
+    DhStrArray* property_name;
+    DhStrArray* property_data;
+} Palette;
+
 typedef struct BlockInfo{
     int index;
     Pos* pos;
@@ -43,13 +49,8 @@ typedef struct BlockInfo{
     int palette;
     NBT* nbt;
     NbtInstance* instance;
+    void* nbt_instance;
 } BlockInfo;
-
-typedef struct Palette{
-    char* id_name;
-    DhStrArray* property_name;
-    DhStrArray* property_data;
-} Palette;
 
 /** Just like `GPtrArray<BlockInfo>` */
 typedef GPtrArray BlockInfoArray;
@@ -83,6 +84,5 @@ gint64* region_get_palette_num_from_region(Region* region, int* len);
 #ifdef __cplusplus
 }
 #endif
-
 
 #endif /* REGION_H */

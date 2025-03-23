@@ -15,7 +15,7 @@ msgstr ""
 "#-#-#-#-#  dhlrc.pot (dhlrc)  #-#-#-#-#\n"
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-20 02:05+0800\n"
+"POT-Creation-Date: 2025-03-24 00:32+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -501,22 +501,22 @@ msgid ""
 "the program (b): "
 msgstr ""
 
-#: src/main.c:276
+#: src/main.c:279
 #, c-format
 msgid "dhlrc - Program to handle litematic or other struct of Minecraft.\n"
 msgstr ""
 
-#: src/main.c:278
+#: src/main.c:281
 #, c-format
 msgid "Modules:\n"
 msgstr ""
 
-#: src/main.c:300
+#: src/main.c:303
 #, c-format
 msgid "Unrecognized options "
 msgstr ""
 
-#: src/main.c:375
+#: src/main.c:378
 msgid "[FILE] - Read a litematic file."
 msgstr ""
 

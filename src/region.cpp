@@ -27,6 +27,7 @@
 #include "litematica_region.h"
 #include "nbt_interface/nbt_if_common.h"
 #include "nbt_interface/nbt_interface.h"
+#include "nbt_interface_cpp/nbt_interface.hpp"
 #include <time.h>
 
 /* TODO and maybe never do, since property can be too much */
@@ -42,7 +43,7 @@ typedef GList TmpItemList;
 
 static int tmpitem_strcmp(gconstpointer a, gconstpointer b)
 {
-    return strcmp( ((TmpItem*)a)->name , b );
+    return strcmp( ((TmpItem*)a)->name , (const char*)b );
 }
 
 static void tmp_item_list_add_num(TmpItemList** til, char* item_name)
@@ -50,7 +51,7 @@ static void tmp_item_list_add_num(TmpItemList** til, char* item_name)
     TmpItemList* il = g_list_find_custom(*til, item_name, tmpitem_strcmp);
     if(il)
     {
-        TmpItem* ti = il->data;
+        TmpItem* ti = (TmpItem*)(il->data);
         ti->total++;
     }
     else
@@ -64,7 +65,7 @@ static void tmp_item_list_add_num(TmpItemList** til, char* item_name)
 
 static void tmpitem_free(gpointer ti)
 {
-    TmpItem* item = ti;
+    TmpItem* item = (TmpItem*)ti;
     g_free(item->name);
     g_free(item);
 }
@@ -88,47 +89,37 @@ void region_free(Region* region)
 
 static void palette_free(gpointer mem)
 {
-    Palette* palette = mem;
+    Palette* palette = (Palette*)mem;
     g_free(palette->id_name);
     dh_str_array_free(palette->property_name);
     dh_str_array_free(palette->property_data);
     g_free(mem);
 }
 
-static DhStrArray* get_property_name_from_nbt_instance(NbtInstance* instance)
+static DhStrArray* get_property_name_from_nbt_instance_cpp(DhNbtInstance instance)
 {
-    DhStrArray* array = NULL;
-    if(!dh_nbt_instance_is_non_null(instance))
-        return NULL;
+    if(!instance.is_non_null())
+        return nullptr;
     else
     {
-        NbtInstance* new_instance = dh_nbt_instance_dup(instance);
-        for(; dh_nbt_instance_is_non_null(new_instance) ; dh_nbt_instance_next(new_instance))
-        {
-            dh_str_array_add_str(&array, dh_nbt_instance_get_key(new_instance));
-        }
-        dh_nbt_instance_free(new_instance);
+        DhStrArray* arr = nullptr;
+        for(; instance.is_non_null() ; instance.next())
+            dh_str_array_add_str(&arr, instance.get_key());
+        return arr;
     }
-    return array;
 }
 
-static DhStrArray* get_property_data_from_nbt_instance(NbtInstance* instance)
+static DhStrArray* get_property_data_from_nbt_instance_cpp(DhNbtInstance instance)
 {
-    DhStrArray* array = NULL;
-    if(!dh_nbt_instance_is_non_null(instance))
-        return NULL;
+    if(!instance.is_non_null())
+        return nullptr;
     else
     {
-        NbtInstance* new_instance = dh_nbt_instance_dup(instance);
-        for(; dh_nbt_instance_is_non_null(new_instance) ; dh_nbt_instance_next(new_instance))
-        {
-            const char* str = dh_nbt_instance_get_string(new_instance);
-            dh_str_array_add_str(&array, str);
-            free((void*)str);
-        }
-        dh_nbt_instance_free(new_instance);
+        DhStrArray* arr = nullptr;
+        for(; instance.is_non_null() ; instance.next())
+            dh_str_array_add_str(&arr, instance.get_string());
+        return arr;
     }
-    return array;
 }
 
 static PaletteArray* get_palette_full_info_from_lr(LiteRegion* lr)
@@ -142,8 +133,10 @@ static PaletteArray* get_palette_full_info_from_lr(LiteRegion* lr)
 
         NbtInstance** block_properties = lite_region_block_properties(lr);
         NbtInstance* property = block_properties[i];
-        DhStrArray* name = get_property_name_from_nbt_instance(property);
-        DhStrArray* data = get_property_data_from_nbt_instance(property);
+        NBT* property_nbt = (NBT*)dh_nbt_instance_get_real_current_nbt(property);
+        DhNbtInstance property_instance(property_nbt, true);
+        DhStrArray* name = get_property_name_from_nbt_instance_cpp(property_instance);
+        DhStrArray* data = get_property_data_from_nbt_instance_cpp(property_instance);
 
         palette->property_name = name;
         palette->property_data = data;
@@ -153,23 +146,26 @@ static PaletteArray* get_palette_full_info_from_lr(LiteRegion* lr)
     return array;
 }
 
-static PaletteArray* get_palette_full_info_from_nbt(NBT* root)
+
+
+static PaletteArray* get_palette_full_info_from_nbt_instance(DhNbtInstance instance)
 {
     GPtrArray* array = g_ptr_array_new_with_free_func(palette_free);
-    NBT* palette_parent = NBT_GetChild(root, "palette");
-    NBT* palette_nbt = palette_parent->child;
-    for(; palette_nbt; palette_nbt = palette_nbt->next)
+    instance.child("palette");
+    instance.child();
+    for(; instance.child() ;)
     {
+        auto palette_instance(instance);
         Palette* palette = g_new0(Palette, 1);
-        palette->id_name = g_strdup(NBT_GetChild(palette_nbt, "Name")->value_a.value);
+        palette_instance.child("Name");
+        palette->id_name = g_strdup(palette_instance.get_string());
 
-        NbtInstance* property = dh_nbt_instance_new_from_real_nbt((RealNbt*)palette_nbt);
-        dh_nbt_instance_child_to_node(property, "Properties");
-        if(dh_nbt_instance_is_non_null(property))
-            dh_nbt_instance_child(property);
-        DhStrArray* name = get_property_name_from_nbt_instance(property);
-        DhStrArray* data = get_property_data_from_nbt_instance(property);
-        dh_nbt_instance_free_only_instance(property);
+        palette_instance.parent();
+        if(palette_instance.child("Properties"))
+            palette_instance.child();
+
+        DhStrArray* name = get_property_name_from_nbt_instance_cpp(palette_instance);
+        DhStrArray* data = get_property_data_from_nbt_instance_cpp(palette_instance);
 
         palette->property_name = name;
         palette->property_data = data;
@@ -181,12 +177,13 @@ static PaletteArray* get_palette_full_info_from_nbt(NBT* root)
 
 static void block_info_free(gpointer mem)
 {
-    BlockInfo* info = mem;
+    BlockInfo* info = (BlockInfo*)mem;
     if(info->nbt) NBT_Free(info->nbt);
     dh_nbt_instance_free_only_instance(info->instance);
     g_free(info->pos);
     g_free(info->id_name);
     g_free(mem);
+    dh_nbt_instance_cpp_free(info->nbt_instance);
 }
 
 static BlockInfoArray* get_block_full_info_from_lr(LiteRegion* lr)
@@ -233,13 +230,13 @@ static BlockInfoArray* get_block_full_info_from_lr(LiteRegion* lr)
         gint64 z = dh_nbt_instance_get_int(tile_entities);
         dh_nbt_instance_parent(tile_entities);
 
-        // NBT* new_tile_entities = nbt_dup((NBT*)dh_nbt_instance_get_real_current_nbt(tile_entities));
-        // new_tile_entities = nbt_rm(new_tile_entities, "x");
-        // new_tile_entities = nbt_rm(new_tile_entities, "y");
-        // new_tile_entities = nbt_rm(new_tile_entities, "z");
-        // gint64 index = lite_region_block_index(lr, x, y, z);
-        // ((BlockInfo*)array->pdata[index])->nbt = new_tile_entities;
-        // new_tile_entities->key = dh_strdup("nbt");
+        NBT* new_tile_entities = nbt_dup((NBT*)dh_nbt_instance_get_real_current_nbt(tile_entities));
+        new_tile_entities = nbt_rm(new_tile_entities, "x");
+        new_tile_entities = nbt_rm(new_tile_entities, "y");
+        new_tile_entities = nbt_rm(new_tile_entities, "z");
+        gint64 index = lite_region_block_index(lr, x, y, z);
+        ((BlockInfo*)array->pdata[index])->nbt = new_tile_entities;
+        new_tile_entities->key = dh_strdup("nbt");
     }
     return array;
 }
@@ -260,7 +257,7 @@ static BlockInfoArray* get_block_full_info_from_nbt(NBT* root, PaletteArray* pa)
         block->nbt = nbt_dup(NBT_GetChild(blocks_nbt, "nbt"));
         /* WARNING: This is a temporary thing */
         block->instance = dh_nbt_instance_new_from_real_nbt((RealNbt*)block->nbt);
-        Palette* block_palette = pa->pdata[block->palette];
+        Palette* block_palette = (Palette*)(pa->pdata[block->palette]);
         block->id_name = g_strdup(block_palette->id_name);
         g_ptr_array_add(array, block);
     }
@@ -295,21 +292,25 @@ Region* region_new_from_lite_region(LiteRegion *lr)
 
 Region* region_new_from_nbt(NBT* root)
 {
+    DhNbtInstance instance(root, true);
     Region* region = g_new0(Region, 1);
 
     /* Fill RegionSize */
     RegionSize* rs = g_new0(RegionSize, 1);
-    NBT* size_nbt = NBT_GetChild(root, "size");
-    if(size_nbt)
+    auto size_instance(instance);
+    size_instance.child("size");
+    if(size_instance.is_non_null())
     {
-        size_nbt = size_nbt->child;
-        rs->x = size_nbt->value_i;
-        rs->y = size_nbt->next->value_i;
-        rs->z = size_nbt->next->next->value_i;
+        size_instance.child();
+        rs->x = size_instance.get_int();
+        size_instance.next();
+        rs->y = size_instance.get_int();
+        size_instance.next();
+        rs->z = size_instance.get_int();
         region->region_size = rs;
 
         /* Fill PaletteArray */
-        PaletteArray* pa = get_palette_full_info_from_nbt(root);
+        PaletteArray* pa = get_palette_full_info_from_nbt_instance(instance);
         region->palette_array = pa;
 
         /* Fill BlockInfoArray */
@@ -333,12 +334,9 @@ Region* region_new_from_nbt(NBT* root)
 
 Region* region_new_from_nbt_file(const char* filepos)
 {
-    gsize size = 0;
-    char* data = dh_read_file(filepos, &size);
-    NBT* nbt = NBT_Parse((guint8*)data, size);
-    g_free(data);
+    DhNbtInstance instance(filepos);
 
-    return region_new_from_nbt(nbt);
+    return region_new_from_nbt(instance.get_original_nbt());
 }
 
 ItemList* item_list_new_from_region(Region* region)
@@ -346,17 +344,17 @@ ItemList* item_list_new_from_region(Region* region)
     TmpItemList* til = NULL;
     for(int i = 0 ; i < region->block_info_array->len ; i++)
     {
-        BlockInfo* bi = region->block_info_array->pdata[i];
+        BlockInfo* bi = (BlockInfo*)(region->block_info_array->pdata[i]);
         tmp_item_list_add_num(&til, bi->id_name);
     }
 
-    gchar* description = "Add items from Region.";
+    const gchar* description = "Add items from Region.";
     ItemList* oblock = NULL;
 
     /* Copy items to the ItemList */
     for(TmpItemList* tild = til; tild ; tild = tild->next)
     {
-        TmpItem* data = tild->data;
+        TmpItem* data = (TmpItem*)(tild->data);
         oblock = item_list_add_item(&oblock, data->total, data->name, description);
     }
 
@@ -492,7 +490,7 @@ static NBT* blocks_nbt_new(BlockInfoArray* array)
     NBT* cur = NULL;
     for(int i = 0 ; i < array->len ; i++)
     {
-        cur = block_nbt_new(array->pdata[i]);
+        cur = block_nbt_new((BlockInfo*)(array->pdata[i]));
         cur->prev = prev;
         if(prev) prev->next = cur;
         if(i == 0) head = cur;
@@ -511,7 +509,7 @@ static NbtInstance* blocks_nbt_instance_new(BlockInfoArray* array)
     NbtInstance* ret = dh_nbt_instance_new_list("blocks");
     for(int i = 0 ; i < array->len ; i++)
     {
-        NbtInstance* cur = block_nbt_instance_new(array->pdata[i]); 
+        NbtInstance* cur = block_nbt_instance_new((BlockInfo*)(array->pdata[i])); 
         dh_nbt_instance_insert_before(ret, NULL, cur);
         dh_nbt_instance_free_only_instance(cur);
     }
@@ -605,7 +603,7 @@ static NBT* palettes_nbt_new(PaletteArray* array)
     NBT* cur = NULL;
     for(int i = 0 ; i < array->len ; i++)
     {
-        cur = palette_nbt_new(array->pdata[i]);
+        cur = palette_nbt_new((Palette*)(array->pdata[i]));
         cur->prev = prev;
         if(prev) prev->next = cur;
         if(i == 0) head = cur;
@@ -624,7 +622,7 @@ static NbtInstance* palettes_nbt_instance_new(PaletteArray* array)
     NbtInstance* ret = dh_nbt_instance_new_list("palette");
     for(int i = 0 ; i < array->len ; i++)
     {
-        NbtInstance* cur = palette_nbt_instance_new(array->pdata[i]);
+        NbtInstance* cur = palette_nbt_instance_new((Palette*)(array->pdata[i]));
         dh_nbt_instance_insert_before(ret, NULL, cur);
         dh_nbt_instance_free_only_instance(cur);
     }
@@ -703,7 +701,7 @@ gint64* region_get_palette_num_from_region(Region* region, int* length)
         int palette = 0;
         for(int i = 0 ; i < block_num ; i++)
         {
-            BlockInfo* info = info_array->pdata[i];
+            BlockInfo* info = (BlockInfo*)(info_array->pdata[i]);
             if(info->index == id)
             {
                 palette = info->palette;

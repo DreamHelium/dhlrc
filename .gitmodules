@@ -4,6 +4,6 @@
 [submodule "nbtlib_interface"]
 	path = src/nbt_interface
 	url = https://github.com/DreamHelium/nbtlib_interface.git
-[submodule "nbtlib_interface_cpp"]
+[submodule "src/nbt_interface_cpp"]
 	path = src/nbt_interface_cpp
 	url = https://github.com/DreamHelium/nbtlib_interface_cpp.git

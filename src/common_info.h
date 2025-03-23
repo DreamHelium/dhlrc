@@ -26,6 +26,7 @@ typedef enum DhInfoTypes{
     DH_TYPE_Region,
     DH_TYPE_Item_List,
     DH_TYPE_NBT_INTERFACE,
+    DH_TYPE_NBT_INTERFACE_CPP,
     N_TYPES
 } DhInfoTypes;
 

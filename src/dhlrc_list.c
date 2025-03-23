@@ -242,7 +242,7 @@ static ItemTrack** item_track_add_track(gchar* description, guint num, ItemTrack
     return o_track;
 }
 
-ItemList* item_list_add_item(ItemList **il, guint num, gchar *item_name, gchar *description)
+ItemList* item_list_add_item(ItemList **il, guint num, gchar *item_name, const gchar *description)
 {
     ItemList* item = g_list_find_custom(*il, item_name, ilistdata_strcmp);
     if(item)

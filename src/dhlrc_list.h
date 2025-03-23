@@ -55,7 +55,7 @@ int         item_list_init_new_item(ItemList **oBlock, const char* block_name);
 int         item_list_init_new_item_with_tag(ItemList **oBlock, const char* block_name, gboolean is_tag);
 G_DEPRECATED_FOR(item_list_add_item)
 int         item_list_add_num(ItemList** bl, int num , char* block_name);
-ItemList*   item_list_add_item(ItemList**il, guint num, gchar* item_name, gchar* description);
+ItemList*   item_list_add_item(ItemList**il, guint num, gchar* item_name, const gchar* description);
 int         item_list_scan_repeated(ItemList* bl,char* block_name);
 int         item_list_delete_item(ItemList** bl,char* block_name);
 void        item_list_delete_zero_item(ItemList** bl);

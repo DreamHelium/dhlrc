@@ -21,6 +21,7 @@
 #include "dhlrc_list.h"
 #include "glib.h"
 #include "nbt_interface/nbt_interface.h"
+#include "nbt_interface_cpp/nbt_interface.hpp"
 #include "region.h"
 
 /* Include an instance
@@ -105,6 +106,8 @@ void common_infos_init()
             instance->table = dh_mt_table_new(g_str_hash, is_same_string, g_free, item_list_info_free);
         else if(i == DH_TYPE_NBT_INTERFACE)
             instance->table = dh_mt_table_new(g_str_hash, is_same_string, g_free, nbt_interface_info_free);
+        else if(i == DH_TYPE_NBT_INTERFACE_CPP)
+            instance->table = dh_mt_table_new(g_str_hash, is_same_string, g_free, dh_nbt_instance_cpp_free);
         else instance->table = NULL;
         instance->uuid_list = NULL;
         instance->uuid_array = NULL;

@@ -162,7 +162,7 @@ NBT* nbt_rm(NBT* root, const char* node)
         NBT_Free(node_nbt);
 
         if(prev) prev->next = next;
-        next->prev = prev;
+        if(next) next->prev = prev;
         if(!prev) root->child = next;
     }
     return root;
