@@ -25,8 +25,6 @@
 #include "glibconfig.h"
 #include "nbt_interface/libnbt/nbt.h"
 #include "litematica_region.h"
-#include "nbt_interface/nbt_if_common.h"
-#include "nbt_interface/nbt_interface.h"
 #include "nbt_interface_cpp/nbt_interface.hpp"
 #include <time.h>
 
@@ -131,12 +129,17 @@ static PaletteArray* get_palette_full_info_from_lr(LiteRegion* lr)
         Palette* palette = g_new0(Palette, 1);
         palette->id_name = g_strdup(blocks->val[i]);
 
-        NbtInstance** block_properties = lite_region_block_properties(lr);
-        NbtInstance* property = block_properties[i];
-        NBT* property_nbt = (NBT*)dh_nbt_instance_get_real_current_nbt(property);
-        DhNbtInstance property_instance(property_nbt, true);
-        DhStrArray* name = get_property_name_from_nbt_instance_cpp(property_instance);
-        DhStrArray* data = get_property_data_from_nbt_instance_cpp(property_instance);
+        auto instance = lite_region_get_instance(lr);
+        auto instance_dup(instance);
+        instance_dup.child("BlockStatePalette");
+        instance_dup.child();
+        for(int j = 0 ; j < i ; j++)
+            instance_dup.next();
+        if(instance_dup.child("Properties"))
+            instance_dup.child();
+        else instance_dup.make_invalid();
+        DhStrArray* name = get_property_name_from_nbt_instance_cpp(instance_dup);
+        DhStrArray* data = get_property_data_from_nbt_instance_cpp(instance_dup);
 
         palette->property_name = name;
         palette->property_data = data;
@@ -153,7 +156,7 @@ static PaletteArray* get_palette_full_info_from_nbt_instance(DhNbtInstance insta
     GPtrArray* array = g_ptr_array_new_with_free_func(palette_free);
     instance.child("palette");
     instance.child();
-    for(; instance.child() ;)
+    for(; instance.next() ;)
     {
         auto palette_instance(instance);
         Palette* palette = g_new0(Palette, 1);
@@ -163,7 +166,7 @@ static PaletteArray* get_palette_full_info_from_nbt_instance(DhNbtInstance insta
         palette_instance.parent();
         if(palette_instance.child("Properties"))
             palette_instance.child();
-
+        else palette_instance.make_invalid();
         DhStrArray* name = get_property_name_from_nbt_instance_cpp(palette_instance);
         DhStrArray* data = get_property_data_from_nbt_instance_cpp(palette_instance);
 
@@ -212,25 +215,24 @@ static BlockInfoArray* get_block_full_info_from_lr(LiteRegion* lr)
         }
     }
 
-    NbtInstance* region_instance = lite_region_region_instance(lr);
-    NbtInstance* tile_entities = dh_nbt_instance_dup(region_instance);
-    dh_nbt_instance_child_to_node(tile_entities, "TileEntities");
-    dh_nbt_instance_child(tile_entities);
-    for(; dh_nbt_instance_is_non_null(tile_entities) ; dh_nbt_instance_next(tile_entities))
+    auto region_instance(lite_region_get_instance(lr));
+    region_instance.child("TileEntities");
+    region_instance.child();
+    for(; region_instance.is_non_null() ; region_instance.next())
     {
-        dh_nbt_instance_child_to_node(tile_entities, "x");
-        gint64 x = dh_nbt_instance_get_int(tile_entities);
-        dh_nbt_instance_parent(tile_entities);
+        region_instance.child("x");
+        gint64 x = region_instance.get_int();
+        region_instance.parent();
 
-        dh_nbt_instance_child_to_node(tile_entities, "y");
-        gint64 y = dh_nbt_instance_get_int(tile_entities);
-        dh_nbt_instance_parent(tile_entities);
+        region_instance.child("y");
+        gint64 y = region_instance.get_int();
+        region_instance.parent();
 
-        dh_nbt_instance_child_to_node(tile_entities, "z");
-        gint64 z = dh_nbt_instance_get_int(tile_entities);
-        dh_nbt_instance_parent(tile_entities);
+        region_instance.child("z");
+        gint64 z = region_instance.get_int();
+        region_instance.parent();
 
-        NBT* new_tile_entities = nbt_dup((NBT*)dh_nbt_instance_get_real_current_nbt(tile_entities));
+        NBT* new_tile_entities = nbt_dup(region_instance.get_current_nbt());
         new_tile_entities = nbt_rm(new_tile_entities, "x");
         new_tile_entities = nbt_rm(new_tile_entities, "y");
         new_tile_entities = nbt_rm(new_tile_entities, "z");

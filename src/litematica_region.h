@@ -39,7 +39,6 @@ typedef struct _Region Region;
 
 G_DEPRECATED_FOR(lite_region_create_instance)
 LiteRegion* lite_region_create(NBT* root, int r_num);
-LiteRegion* lite_region_create_instance(NbtInstance* instance, int r);
 LiteRegion* lite_region_create_from_region(Region* region);
 void        lite_region_free(LiteRegion* lr);
 
@@ -57,26 +56,14 @@ DhStrArray* lite_region_name_array(NBT* root);
 
 DhStrArray* lite_region_name_array_instance(NbtInstance* instance);
 
-NBT*         lite_region_nbt_block_state_palette(NBT* root, int r_num);
-NBT*         lite_region_nbt_specific_block_state_palette(NBT* root,int r_num,int id);
-
 /** Get block numbers in a region */
-int           lite_region_block_num(NBT* root, int r_num);
-G_DEPRECATED_FOR(lite_region_block_name_array)
-char**        lite_region_block_names(NBT* root, int r_num ,int bNum);
 DhStrArray*  lite_region_block_name_array(LiteRegion* lr);
 
-NbtInstance** lite_region_block_properties(LiteRegion* lr);
 int           lite_region_data_version(LiteRegion* lr);
 int           lite_region_size_x(LiteRegion* lr);
 int           lite_region_size_y(LiteRegion* lr);
 int           lite_region_size_z(LiteRegion* lr);
-NbtInstance*  lite_region_region_instance(LiteRegion* lr);
 const char*   lite_region_name(LiteRegion* lr);
-
-/** Directly into the BlockStatePalette (Do not need to go to child) */
-
-uint64_t* lite_region_block_states_array(NBT* root, int r_num, int* len);
 
 /** Improved version of getting id */
 int  lite_region_block_id(LiteRegion* lr, uint64_t index);
@@ -85,15 +72,22 @@ int  lite_region_block_id_xyz(LiteRegion* lr, int x, int y, int z);
 
 /** Improved version of getting index */
 uint64_t  lite_region_block_index(LiteRegion* lr, int x, int y, int z);
-char*     lite_region_block_type(NBT* root,int r_num, int id);
-ItemList* lite_region_item_list(NBT* root,int r_num);
+// ItemList* lite_region_item_list(NBT* root,int r_num);
 /**  Make ItemList but not init item numbers (support extend) */
 ItemList* lite_region_item_list_without_num(LiteRegion* lr, ItemList *o_il);
-ItemList* lite_region_item_list_extend(NBT* root, int r_num, ItemList *oBlock, int print_process);
-gboolean  lite_region_block_properties_equal(LiteRegion* lr, int id, char* key, char* val);
+// ItemList* lite_region_item_list_extend(NBT* root, int r_num, ItemList *oBlock, int print_process);
+// gboolean  lite_region_block_properties_equal(LiteRegion* lr, int id, char* key, char* val);
 
 #ifdef __cplusplus
 }
+#endif
+
+#ifdef __cplusplus
+#include "nbt_interface_cpp/nbt_interface.hpp"
+
+DhNbtInstance lite_region_get_instance(LiteRegion* lr);
+LiteRegion*   lite_region_create_from_root_instance_cpp(DhNbtInstance root, int r_num);
+
 #endif
 
 #endif // LITEMATICA_REGION_H

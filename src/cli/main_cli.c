@@ -10,15 +10,15 @@
 
 static int debug()
 {
-    NbtInstance* instance = dh_nbt_instance_parse("/home/dream_he/下载/Station2.1-S.litematic");
-    LiteRegion* lr = lite_region_create_instance(instance, 0);
-    Region* region = region_new_from_lite_region(lr);
+    // NbtInstance* instance = dh_nbt_instance_parse("/home/dream_he/下载/Station2.1-S.litematic");
+    // LiteRegion* lr = lite_region_create_instance(instance, 0);
+    // Region* region = region_new_from_lite_region(lr);
 
-    int len = 0;
-    gint64* val = region_get_palette_num_from_region(region, &len);
-    for(int i = 0 ; i < len ; i++)
-        g_message("%ld", val[i]);
-    return 0;
+    // int len = 0;
+    // gint64* val = region_get_palette_num_from_region(region, &len);
+    // for(int i = 0 ; i < len ; i++)
+    //     g_message("%ld", val[i]);
+    // return 0;
 }
 
 static void add_args_common(void* arg, char c, const char* first, const char* second, const char* description)

@@ -1,18 +1,19 @@
 #include "main_conv.h"
 #include "../translation.h"
 #include "../region.h"
+#include "litematica_region.h"
 
 enum format{DH_NBT, DH_LITEMATIC, DH_SCHEMATIC};
 
 static void analyse(const char* input_file, const char* output_format)
 {
     GPtrArray* region_array = g_ptr_array_new_with_free_func((GDestroyNotify)region_free);
-    enum format if_format_val = -1;
+    auto if_format_val = -1;
     
     /* Load region */
     if(g_file_test(input_file, G_FILE_TEST_IS_REGULAR))
     {
-        char* if_format = strrchr(input_file, '.') + 1;
+        const char* if_format = strrchr(input_file, '.') + 1;
 
         if(g_str_equal(if_format, "nbt"))
         {
@@ -30,7 +31,7 @@ static void analyse(const char* input_file, const char* output_format)
             for(int i = 0 ; i < litematic_len ; i++)
             {
                 printf("test\n");
-                LiteRegion* lr = lite_region_create_instance(instance, i);
+                LiteRegion* lr = lite_region_create_from_root_instance_cpp(DhNbtInstance(input_file), i);
                 Region* region = region_new_from_lite_region(lr);
                 lite_region_free(lr);
                 g_ptr_array_add(region_array, region);
@@ -62,7 +63,7 @@ static void analyse(const char* input_file, const char* output_format)
             goto same_format_return;
         for(int i = 0 ; i < region_array->len ; i++)
         {
-            Region* region = region_array->pdata[i];
+            Region* region = (Region*)(region_array->pdata[i]);
 
             /* Get filename */
             char* output_filename = g_path_get_basename(input_file);

@@ -10,6 +10,7 @@
 #include "../common_info.h"
 #include "../region.h"
 #include "../nbt_interface/nbt_interface.h"
+#include "nbt_interface_cpp/nbt_interface.hpp"
 
 LrChooseUI::LrChooseUI(QWidget *parent) :
     QDialog(parent)
@@ -106,7 +107,7 @@ void LrChooseUI::okBtn_clicked()
         {
             QString des = lineEdit->text().arg(common_info_get_description(DH_TYPE_NBT_INTERFACE, uuid))
                                           .arg(arr->val[i]);
-            LiteRegion* lr = lite_region_create_instance(instance, i);
+            LiteRegion* lr = lite_region_create_from_root_instance_cpp(DhNbtInstance((NBT*)dh_nbt_instance_get_real_original_nbt(instance), true), i);
             Region* region = region_new_from_lite_region(lr);
             common_info_new(DH_TYPE_Region, region, g_date_time_new_now_local(), des.toUtf8());
             lite_region_free(lr);

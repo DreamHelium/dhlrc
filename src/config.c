@@ -20,24 +20,24 @@
 #include <gio/gio.h>
 #include "glib.h"
 #include "json_util.h"
-#include "dh_string_util.h"
 #include "dh_file_util.h"
 
-/* Unused until I get understand of monitor */
 static cJSON* content = NULL;
-/* Now it's a temporary value */
-static DhStrArray* settings_strv = NULL;
-static DhStrArray* value_strv = NULL;
+
 static gchar* config_file = NULL;
 static GTask* task = NULL;
 static GFile* file = NULL;
 static GMainLoop* loop = NULL;
 
-static cJSON* get_content();
-
 static void file_changed_cb()
 {
-    g_message("Changed!");
+    /* Reload file */
+    cJSON_Delete(content);
+    gchar* content_val = NULL;
+    gboolean get_file = g_file_load_contents(file, NULL, &content_val, NULL, NULL , NULL);
+    if(!get_file) g_error("Get file failed!");
+    content = cJSON_Parse(content_val);
+    g_free(content_val);
 }
 
 static void monitor_task(GTask* task, gpointer source_object, gpointer task_data, GCancellable* cancellable)
@@ -48,14 +48,21 @@ static void monitor_task(GTask* task, gpointer source_object, gpointer task_data
     {
         loop = g_main_loop_new(NULL, FALSE);
         g_signal_connect(monitor, "changed", G_CALLBACK(file_changed_cb), NULL);
+        /* Make the "content" */
+        gchar* content_val = NULL;
+        gboolean get_file = g_file_load_contents(file, NULL, &content_val, NULL, NULL , NULL);
+        if(!get_file) g_error("Get file failed!");
+        content = cJSON_Parse(content_val);
+        g_free(content_val);
         g_main_loop_run(loop);
+
         g_object_unref(monitor);
-        g_message("Free monitor");
         g_main_loop_unref(loop);
         g_task_return_boolean(task, TRUE);
     }
     else
     {
+        g_error("The file monitor is not created correctly!");
         g_task_return_new_error(task, G_IO_ERROR, G_IO_ERROR_FAILED, "Failed!");
     }
 }
@@ -104,7 +111,7 @@ void dhlrc_make_config()
 
 void dh_exit1()
 {
-    /* cJSON_Delete(content); */
+    cJSON_Delete(content);
     g_free(config_file);
     g_main_loop_quit(loop);
     g_object_unref(task);
@@ -113,56 +120,47 @@ void dh_exit1()
 
 char* dh_get_translation_dir()
 {
-    cJSON* content_d = get_content();
-    cJSON* translate_obj = cJSON_GetObjectItem(content_d, "itemTranslate");
+    cJSON* translate_obj = cJSON_GetObjectItem(content, "itemTranslate");
     char* ret = NULL;
     if(translate_obj)
         ret = g_strdup(cJSON_GetStringValue(translate_obj));
     else ret = NULL;
-    cJSON_Delete(content_d);
     return ret;
 }
 
 char* dh_get_game_dir()
 {
-    cJSON* content_d = get_content();
-    cJSON* gamedir_obj = cJSON_GetObjectItem(content_d, "gameDir");
+    cJSON* gamedir_obj = cJSON_GetObjectItem(content, "gameDir");
     char* ret = NULL;
     if(gamedir_obj)
         ret = g_strdup(cJSON_GetStringValue(gamedir_obj));
     else ret = NULL;
-    cJSON_Delete(content_d);
     return ret;
 }
 
 char* dh_get_cache_dir()
 {
-    cJSON* content_d = get_content();
-    cJSON* cachedir_obj = cJSON_GetObjectItem(content_d, "cacheDir");
+    cJSON* cachedir_obj = cJSON_GetObjectItem(content, "cacheDir");
     char* ret = NULL;
     if(cachedir_obj)
         ret = g_strdup(cJSON_GetStringValue(cachedir_obj));
     else ret = g_strconcat(g_get_user_cache_dir(), "/dhlrc", NULL);
-    cJSON_Delete(content_d);
     return ret;
 }
 
 char* dh_get_version()
 {
-    cJSON* content_d = get_content();
-    cJSON* version_obj = cJSON_GetObjectItem(content_d, "overrideVersion");
+    cJSON* version_obj = cJSON_GetObjectItem(content, "overrideVersion");
     char* ret = NULL;
     if(version_obj)
         ret = g_strdup(cJSON_GetStringValue(version_obj));
     else ret = g_strdup("1.18.2");
-    cJSON_Delete(content_d);
     return ret;
 }
 
 char* dh_get_recipe_dir()
 {
-    cJSON* content_d = get_content();
-    cJSON* recipe_obj = cJSON_GetObjectItem(content_d, "recipeConfig");
+    cJSON* recipe_obj = cJSON_GetObjectItem(content, "recipeConfig");
     char* ret = NULL;
     if(recipe_obj)
     {
@@ -177,7 +175,6 @@ no_recipe_dir:
         char* cache_dir = dh_get_cache_dir();
         ret = g_strconcat(cache_dir, "/", version, "/extracted/data/minecraft/recipes/", NULL);
     }
-    cJSON_Delete(content_d);
     return ret;
 }
 
@@ -187,16 +184,9 @@ void dhlrc_reread_config()
     content = dhlrc_file_to_json(config_file);
 }
 
-static cJSON* get_content()
-{
-    dhlrc_make_config();
-    return dhlrc_file_to_json(config_file);
-}
-
 void dh_set_or_create_item(const char* item, const char* val, gboolean save)
 {
-    cJSON* content_d = get_content();
-    cJSON* json_item = cJSON_GetObjectItem(content_d, item);
+    cJSON* json_item = cJSON_GetObjectItem(content, item);
     if(json_item)
         cJSON_SetValuestring(json_item, val);
     else
@@ -205,7 +195,7 @@ void dh_set_or_create_item(const char* item, const char* val, gboolean save)
     }
     if(save)
     {
-        char* data = cJSON_Print(content_d);
+        char* data = cJSON_Print(content);
         dh_write_file(config_file, data, strlen(data));
         free(data);
     }

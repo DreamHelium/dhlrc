@@ -44,7 +44,7 @@ add_library(dhlrc SHARED
 		   dh_bit.c dh_bit.h
 		   translation.h
 		   translation.c
-	       litematica_region.c
+	       litematica_region.cpp
 	       litematica_region.h
 	       dhlrc_list.h
 	       dhlrc_list.c
