@@ -77,9 +77,9 @@ static void analyse(const char* input_file, const char* output_format)
 
             /* Transform Region to NBT */
             printf(_("Saving file: %s.\n"), output_filename);
-            NbtInstance* instance = nbt_instance_new_from_region(region);
-            dh_nbt_instance_save_to_file(instance, output_filename);
-            dh_nbt_instance_free(instance);
+            // NbtInstance* instance = nbt_instance_new_from_region(region);
+            // dh_nbt_instance_save_to_file(instance, output_filename);
+            // dh_nbt_instance_free(instance);
 
             g_free(output_filename);
         }

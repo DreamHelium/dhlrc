@@ -8,8 +8,8 @@
 #include <qpushbutton.h>
 #include <qradiobutton.h>
 #include "../common_info.h"
-#include "../nbt_interface/nbt_interface.h"
 #include "../region.h"
+#include "nbt_interface_cpp/nbt_interface.hpp"
 
 SaveRegionSelectUI::SaveRegionSelectUI(QWidget* parent):
     QDialog(parent)
@@ -57,14 +57,15 @@ void SaveRegionSelectUI::okBtn_clicked()
     auto arr = common_info_list_get_multi_uuid(DH_TYPE_Region);
     if(saveAsNbtBtn->isChecked())
     {
-        GList* nbtUuidList = (GList*)common_info_list_get_uuid_list(DH_TYPE_NBT_INTERFACE);
+        GList* nbtUuidList = (GList*)common_info_list_get_uuid_list(DH_TYPE_NBT_INTERFACE_CPP);
         for( ; *arr ; arr++)
         {
             auto des = common_info_get_description(DH_TYPE_Region, *arr);
             auto region = (Region*)common_info_get_data(DH_TYPE_Region, *arr);
             // NBT* newNBT = nbt_new_from_region(info->root);
-            NbtInstance* instance = nbt_instance_new_from_region(region);
-            common_info_new(DH_TYPE_NBT_INTERFACE, instance, g_date_time_new_now_local(), des);
+            auto nbt = nbt_new_from_region(region);
+            DhNbtInstance* instance = new DhNbtInstance(nbt, false);
+            common_info_new(DH_TYPE_NBT_INTERFACE_CPP, instance, g_date_time_new_now_local(), des);
         }
     }
     else if(saveAsIlBtn->isChecked())

@@ -4,7 +4,7 @@
 #include <qstandarditemmodel.h>
 #include <qwidget.h>
 #include <QSortFilterProxyModel>
-#include "../nbt_interface/nbt_interface.h"
+#include "../nbt_interface_cpp/nbt_interface.hpp"
 
 namespace Ui {
 class NbtReaderUI;
@@ -21,10 +21,10 @@ public:
 private:
     Ui::NbtReaderUI *ui;
     QStandardItemModel* model;
-    NbtInstance* instance;
+    DhNbtInstance* instance;
     QSortFilterProxyModel* proxyModel;
     void initModel();
-    void addModelTree(NbtInstance* instance, QStandardItem* iroot);
+    void addModelTree(DhNbtInstance instance, QStandardItem* iroot);
 
 private Q_SLOTS:
     void treeview_clicked();

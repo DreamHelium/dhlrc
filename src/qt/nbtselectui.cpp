@@ -19,17 +19,17 @@ NbtSelectUI::NbtSelectUI(QWidget *parent) :
     QDialog(parent)
 {
     initUI();
-    common_info_list_add_update_notifier(DH_TYPE_NBT_INTERFACE, (void*)this, update_extern);
+    common_info_list_add_update_notifier(DH_TYPE_NBT_INTERFACE_CPP, (void*)this, update_extern);
 }
 
 NbtSelectUI::~NbtSelectUI()
 {
-    common_info_list_remove_update_notifier(DH_TYPE_NBT_INTERFACE, (void*)this);
+    common_info_list_remove_update_notifier(DH_TYPE_NBT_INTERFACE_CPP, (void*)this);
 }
 
 void NbtSelectUI::initUI()
 {
-    GList* list = (GList*)common_info_list_get_uuid_list(DH_TYPE_NBT_INTERFACE);
+    GList* list = (GList*)common_info_list_get_uuid_list(DH_TYPE_NBT_INTERFACE_CPP);
     auto len = list ? g_list_length(list) : 0;
     group = new QButtonGroup();
     layout = new QVBoxLayout();
@@ -81,21 +81,21 @@ void NbtSelectUI::updateUI()
         btnLayout->removeWidget(b);
         delete b;
     }
-    GList* list = (GList*)common_info_list_get_uuid_list(DH_TYPE_NBT_INTERFACE);
+    GList* list = (GList*)common_info_list_get_uuid_list(DH_TYPE_NBT_INTERFACE_CPP);
     auto len = list ? g_list_length(list) : 0;
 
     for(int i = 0 ; i < len ; i++)
     {
         auto uuid = (const char*)g_list_nth_data(list, i);
         QRadioButton* btn = nullptr;
-        if(common_info_reader_trylock(DH_TYPE_NBT_INTERFACE, uuid))
+        if(common_info_reader_trylock(DH_TYPE_NBT_INTERFACE_CPP, uuid))
         {
-            gchar* time_literal = g_date_time_format(common_info_get_time(DH_TYPE_NBT_INTERFACE, uuid), "%T");
-            QString str = QString("(UUID: %1) %2 (%3)").arg(uuid).arg(common_info_get_description(DH_TYPE_NBT_INTERFACE, uuid))
+            gchar* time_literal = g_date_time_format(common_info_get_time(DH_TYPE_NBT_INTERFACE_CPP, uuid), "%T");
+            QString str = QString("(UUID: %1) %2 (%3)").arg(uuid).arg(common_info_get_description(DH_TYPE_NBT_INTERFACE_CPP, uuid))
             .arg(time_literal);
             btn = new QRadioButton(str);
             g_free(time_literal);
-            common_info_reader_unlock(DH_TYPE_NBT_INTERFACE, uuid);
+            common_info_reader_unlock(DH_TYPE_NBT_INTERFACE_CPP, uuid);
         }
         else btn = new QRadioButton(_("locked!"));
         btnLayout->addWidget(btn);
@@ -107,8 +107,8 @@ void NbtSelectUI::okBtn_clicked()
 {
     if(group->checkedId() != -1)
     {
-        GList* list = (GList*)common_info_list_get_uuid_list(DH_TYPE_NBT_INTERFACE);
-        common_info_list_set_uuid(DH_TYPE_NBT_INTERFACE, (gchar*)g_list_nth_data(list, group->checkedId()));
+        GList* list = (GList*)common_info_list_get_uuid_list(DH_TYPE_NBT_INTERFACE_CPP);
+        common_info_list_set_uuid(DH_TYPE_NBT_INTERFACE_CPP, (gchar*)g_list_nth_data(list, group->checkedId()));
         accept();
     }
     else

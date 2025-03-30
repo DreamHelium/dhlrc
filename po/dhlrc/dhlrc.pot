@@ -15,7 +15,7 @@ msgstr ""
 "#-#-#-#-#  dhlrc.pot (dhlrc)  #-#-#-#-#\n"
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-24 00:32+0800\n"
+"POT-Creation-Date: 2025-03-30 19:54+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -169,80 +169,85 @@ msgstr ""
 
 #: ../../src/qt/mainwindow.ui:47
 msgctxt "MainWindow|"
-msgid "You can do things below for the NBT file."
+msgid "&Manage NBT Interface CPP (Test)"
 msgstr ""
 
 #: ../../src/qt/mainwindow.ui:54
 msgctxt "MainWindow|"
+msgid "You can do things below for the NBT file."
+msgstr ""
+
+#: ../../src/qt/mainwindow.ui:61
+msgctxt "MainWindow|"
 msgid "N&BT Reader"
 msgstr ""
 
-#: ../../src/qt/mainwindow.ui:64
+#: ../../src/qt/mainwindow.ui:71
 msgctxt "MainWindow|"
 msgid "&Region"
 msgstr ""
 
-#: ../../src/qt/mainwindow.ui:72
+#: ../../src/qt/mainwindow.ui:79
 msgctxt "MainWindow|"
 msgid "First, you need to create a Region struct."
 msgstr ""
 
-#: ../../src/qt/mainwindow.ui:79
+#: ../../src/qt/mainwindow.ui:86
 msgctxt "MainWindow|"
 msgid "&Create Region from NBT"
 msgstr ""
 
-#: ../../src/qt/mainwindow.ui:86
+#: ../../src/qt/mainwindow.ui:93
 msgctxt "MainWindow|"
 msgid "Second, you can do lots of things with the Region."
 msgstr ""
 
-#: ../../src/qt/mainwindow.ui:93
+#: ../../src/qt/mainwindow.ui:100
 msgctxt "MainWindow|"
 msgid "&Manage Region"
 msgstr ""
 
-#: ../../src/qt/mainwindow.ui:100
+#: ../../src/qt/mainwindow.ui:107
 msgctxt "MainWindow|"
 msgid "&Generate item list"
 msgstr ""
 
-#: ../../src/qt/mainwindow.ui:107
+#: ../../src/qt/mainwindow.ui:114
 msgctxt "MainWindow|"
 msgid "&Block reader"
 msgstr ""
 
-#: ../../src/qt/mainwindow.ui:117
+#: ../../src/qt/mainwindow.ui:124
 msgctxt "MainWindow|"
 msgid "&Item List"
 msgstr ""
 
-#: ../../src/qt/mainwindow.ui:125
+#: ../../src/qt/mainwindow.ui:132
 msgctxt "MainWindow|"
 msgid "I&tem list reader and modifier"
 msgstr ""
 
-#: ../../src/qt/mainwindow.ui:132
+#: ../../src/qt/mainwindow.ui:139
 msgctxt "MainWindow|"
 msgid "R&ecipe combiner"
 msgstr ""
 
-#: ../../src/qt/mainwindow.ui:142
+#: ../../src/qt/mainwindow.ui:149
 msgctxt "MainWindow|"
 msgid "Utility"
 msgstr ""
 
-#: ../../src/qt/mainwindow.ui:150
+#: ../../src/qt/mainwindow.ui:157
 msgctxt "MainWindow|"
 msgid "&Config Setting"
 msgstr ""
 
-#: ../../src/qt/mainwindow.ui:157
+#: ../../src/qt/mainwindow.ui:164
 msgctxt "MainWindow|"
 msgid "Config &Wizard"
 msgstr ""
 
-#: ../../src/qt/mainwindow.ui:164
+#: ../../src/qt/mainwindow.ui:171
 msgctxt "MainWindow|"
 msgid "Download Manifest"
 msgstr ""
@@ -447,60 +452,6 @@ msgstr ""
 msgid "Combined %d items to the new item list."
 msgstr ""
 
-#: src/litematica_region.c:648
-#, c-format
-msgid "[%.2f%%] Processing Blocks %lu/%lu, (%3d,%3d,%3d)/(%3d,%3d,%3d)"
-msgstr ""
-
-#: src/litematica_region.c:697
-#, c-format
-msgid "Add %%d items from region %s"
-msgstr ""
-
-#: src/lrc_extend.c:42 src/main_isoc.c:186
-#, c-format
-msgid "There are %d regions:\n"
-msgstr ""
-
-#: src/lrc_extend.c:49
-#, c-format
-msgid "Enter the region number, or enter 'q' to exit program (q): "
-msgstr ""
-
-#: src/lrc_extend.c:65 src/lrc_extend.c:152
-#, c-format
-msgid ""
-"You are reading region: [%2d] %s:\n"
-"The size of the region is (%d, %d, %d).\n"
-"\n"
-msgstr ""
-
-#: src/lrc_extend.c:68
-#, c-format
-msgid ""
-"Please enter the coordination of the block (just numbers of x y z without "
-"additional character\n"
-"or enter 'b' to choose another region, enter 'q' to exit the program (b): "
-msgstr ""
-
-#: src/lrc_extend.c:160
-#, c-format
-msgid "The block in (%ld, %ld, %ld) is %s.\n"
-msgstr ""
-
-#: src/lrc_extend.c:161
-#, c-format
-msgid "The block's position in BlockStatePalette is %d.\n"
-msgstr ""
-
-#: src/lrc_extend.c:162
-#, c-format
-msgid ""
-"Please enter the coordination of the block again, or enter 'b' to choose "
-"another region, enter 'r' to read the detail of the block, enter 'q' to exit "
-"the program (b): "
-msgstr ""
-
 #: src/main.c:279
 #, c-format
 msgid "dhlrc - Program to handle litematic or other struct of Minecraft.\n"
@@ -548,6 +499,11 @@ msgstr ""
 
 #: src/main_isoc.c:140
 msgid "Please select an option, or enter 'q' to exit the program (q): "
+msgstr ""
+
+#: src/main_isoc.c:186
+#, c-format
+msgid "There are %d regions:\n"
 msgstr ""
 
 #: src/main_isoc.c:199
@@ -689,8 +645,8 @@ msgstr ""
 msgid "Please choose a item list:"
 msgstr ""
 
-#: src/qt/ilchooseui.cpp:40 src/qt/manage.cpp:59 src/qt/manage.cpp:60
-#: src/qt/manage.cpp:61 src/qt/regionchooseui.cpp:57
+#: src/qt/ilchooseui.cpp:40 src/qt/manage.cpp:60 src/qt/manage.cpp:61
+#: src/qt/manage.cpp:62 src/qt/regionchooseui.cpp:57
 #: src/qt/regionchooseui.cpp:58
 msgid "locked"
 msgstr ""
@@ -715,10 +671,10 @@ msgstr ""
 #: src/qt/ilchooseui.cpp:92 src/qt/ilreaderui.cpp:111 src/qt/mainwindow.cpp:145
 #: src/qt/mainwindow.cpp:164 src/qt/mainwindow.cpp:186
 #: src/qt/mainwindow.cpp:189 src/qt/mainwindow.cpp:206
-#: src/qt/mainwindow.cpp:209 src/qt/mainwindow.cpp:234 src/qt/manage.cpp:28
-#: src/qt/manage.cpp:291 src/qt/manage.cpp:304 src/qt/manage.cpp:411
+#: src/qt/mainwindow.cpp:209 src/qt/mainwindow.cpp:234 src/qt/manage.cpp:29
+#: src/qt/manage.cpp:292 src/qt/manage.cpp:305 src/qt/manage.cpp:412
 #: src/qt/nbtselectui.cpp:116 src/qt/regionchooseui.cpp:121
-#: src/qt/saveregionselectui.cpp:79 src/qt/utility.cpp:31 src/qt/utility.cpp:54
+#: src/qt/saveregionselectui.cpp:80 src/qt/utility.cpp:31 src/qt/utility.cpp:54
 #: src/qt/utility.cpp:60 src/qt/utility.cpp:67 src/qt/utility.cpp:124
 msgid "Error!"
 msgstr ""
@@ -786,15 +742,15 @@ msgstr ""
 msgid "Enter description here."
 msgstr ""
 
-#: src/qt/mainwindow.cpp:180 src/qt/saveregionselectui.cpp:73
+#: src/qt/mainwindow.cpp:180 src/qt/saveregionselectui.cpp:74
 msgid "Enter Name for Item List"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:180 src/qt/saveregionselectui.cpp:73
+#: src/qt/mainwindow.cpp:180 src/qt/saveregionselectui.cpp:74
 msgid "Enter the name for item list"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:186 src/qt/saveregionselectui.cpp:79
+#: src/qt/mainwindow.cpp:186 src/qt/saveregionselectui.cpp:80
 msgid "Description is empty!"
 msgstr ""
 
@@ -810,63 +766,63 @@ msgstr ""
 msgid "No NBT is selected!"
 msgstr ""
 
-#: src/qt/manage.cpp:28
+#: src/qt/manage.cpp:29
 msgid "No row is selected!"
 msgstr ""
 
-#: src/qt/manage.cpp:70
+#: src/qt/manage.cpp:71
 msgid "Description"
 msgstr ""
 
-#: src/qt/manage.cpp:70
+#: src/qt/manage.cpp:71
 msgid "UUID"
 msgstr ""
 
-#: src/qt/manage.cpp:70
+#: src/qt/manage.cpp:71
 msgid "Time"
 msgstr ""
 
-#: src/qt/manage.cpp:215 src/cli/main_cli.c:39 src/cli/main_cli.c:49
+#: src/qt/manage.cpp:216 src/cli/main_cli.c:39 src/cli/main_cli.c:49
 msgid "Manage Region"
 msgstr ""
 
-#: src/qt/manage.cpp:291
+#: src/qt/manage.cpp:292
 msgid "Not a valid NBT List!"
 msgstr ""
 
-#: src/qt/manage.cpp:304
+#: src/qt/manage.cpp:305
 msgid "Not a valid NBT UUID!"
 msgstr ""
 
-#: src/qt/manage.cpp:319
+#: src/qt/manage.cpp:320
 msgid "Manage NBT Interface"
 msgstr ""
 
-#: src/qt/manage.cpp:332
+#: src/qt/manage.cpp:333
 msgid "Select a file"
 msgstr ""
 
-#: src/qt/manage.cpp:332
+#: src/qt/manage.cpp:333
 msgid "Litematic file (*.litematic);;NBT File (*.nbt)"
 msgstr ""
 
-#: src/qt/manage.cpp:369
+#: src/qt/manage.cpp:370
 msgid "Save File"
 msgstr ""
 
-#: src/qt/manage.cpp:380
+#: src/qt/manage.cpp:381
 msgid "Info Locked!"
 msgstr ""
 
-#: src/qt/manage.cpp:380
+#: src/qt/manage.cpp:381
 msgid "The NBT info is locked!"
 msgstr ""
 
-#: src/qt/manage.cpp:385
+#: src/qt/manage.cpp:386
 msgid "Save Files"
 msgstr ""
 
-#: src/qt/manage.cpp:405
+#: src/qt/manage.cpp:406
 msgid "The following infos are locked:\n"
 msgstr ""
 

@@ -1,4 +1,5 @@
 #include "manage.h"
+#include "../nbt_interface_cpp/nbt_interface.hpp"
 #include "dh_string_util.h"
 #include "dhtableview.h"
 #include "glib.h"
@@ -21,7 +22,7 @@
 #include <QMessageBox>
 #include "../common_info.h"
 #include "saveregionselectui.h"
-#include "../nbt_interface/nbt_interface.h"
+
 
 static void messageNoRow(QWidget* parent)
 {
@@ -318,7 +319,7 @@ ManageNbtInterface::ManageNbtInterface()
     model = new QStandardItemModel();
     mui->setWindowTitle(_("Manage NBT Interface"));
     QObject::connect(mui, &ManageUI::dnd, this, &ManageNbtInterface::dnd_triggered);
-    common_info_list_add_update_notifier(DH_TYPE_NBT_INTERFACE, (void*)this, update_interface_model);
+    common_info_list_add_update_notifier(DH_TYPE_NBT_INTERFACE_CPP, (void*)this, update_interface_model);
 }
 
 ManageNbtInterface::~ManageNbtInterface()
@@ -337,7 +338,7 @@ void ManageNbtInterface::add_triggered()
 
 void ManageNbtInterface::updateModel()
 {
-    update_model(DH_TYPE_NBT_INTERFACE, model);
+    update_model(DH_TYPE_NBT_INTERFACE_CPP, model);
 }
 
 void ManageNbtInterface::refresh_triggered()
@@ -356,7 +357,7 @@ void ManageNbtInterface::closeSig_triggered()
 
 void ManageNbtInterface::remove_triggered(QList<int> rows)
 {
-    remove_items(DH_TYPE_NBT_INTERFACE, rows, this);
+    remove_items(DH_TYPE_NBT_INTERFACE_CPP, rows, this);
 }
 
 void ManageNbtInterface::save_triggered(QList<int> rows)
@@ -369,13 +370,13 @@ void ManageNbtInterface::save_triggered(QList<int> rows)
             QString filepos = QFileDialog::getSaveFileName(mui, _("Save File"));
             if(!filepos.isEmpty())
             {
-                auto uuidlist = (GList*)common_info_list_get_uuid_list(DH_TYPE_NBT_INTERFACE);
+                auto uuidlist = (GList*)common_info_list_get_uuid_list(DH_TYPE_NBT_INTERFACE_CPP);
                 auto uuid = (char*)g_list_nth_data(uuidlist, row);
-                if(common_info_reader_trylock(DH_TYPE_NBT_INTERFACE, uuid))
+                if(common_info_reader_trylock(DH_TYPE_NBT_INTERFACE_CPP, uuid))
                 {
-                    auto instance = (NbtInstance*)common_info_get_data(DH_TYPE_NBT_INTERFACE, uuid);
-                    dh_nbt_instance_save_to_file(instance, filepos.toUtf8());
-                    common_info_reader_unlock(DH_TYPE_NBT_INTERFACE, uuid);
+                    auto instance = (DhNbtInstance*)common_info_get_data(DH_TYPE_NBT_INTERFACE_CPP, uuid);
+                    instance->save_to_file(filepos.toUtf8());
+                    common_info_reader_unlock(DH_TYPE_NBT_INTERFACE_CPP, uuid);
                 }
                 else QMessageBox::critical(mui, _("Info Locked!"), _("The NBT info is locked!"));
             }
@@ -388,15 +389,15 @@ void ManageNbtInterface::save_triggered(QList<int> rows)
                 QStringList lockedInfo;
                 for(auto row : rows)
                 {
-                    auto uuidlist = (GList*)common_info_list_get_uuid_list(DH_TYPE_NBT_INTERFACE);
+                    auto uuidlist = (GList*)common_info_list_get_uuid_list(DH_TYPE_NBT_INTERFACE_CPP);
                     auto uuid = (char*)g_list_nth_data(uuidlist, row);
-                    auto description = common_info_get_description(DH_TYPE_NBT_INTERFACE, uuid);
+                    auto description = common_info_get_description(DH_TYPE_NBT_INTERFACE_CPP, uuid);
                     QString filepos = (dir + G_DIR_SEPARATOR + description);
-                    if(common_info_reader_trylock(DH_TYPE_NBT_INTERFACE, uuid))
+                    if(common_info_reader_trylock(DH_TYPE_NBT_INTERFACE_CPP, uuid))
                     {
-                        auto instance = (NbtInstance*)common_info_get_data(DH_TYPE_NBT_INTERFACE, uuid);
-                        dh_nbt_instance_save_to_file(instance, filepos.toUtf8());
-                        common_info_reader_unlock(DH_TYPE_NBT_INTERFACE, uuid);
+                        auto instance = (DhNbtInstance*)common_info_get_data(DH_TYPE_NBT_INTERFACE_CPP, uuid);
+                        instance->save_to_file(filepos.toUtf8());
+                        common_info_reader_unlock(DH_TYPE_NBT_INTERFACE_CPP, uuid);
                     }
                     else lockedInfo << description;
                 }

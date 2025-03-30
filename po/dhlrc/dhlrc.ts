@@ -160,81 +160,86 @@
     </message>
     <message>
         <location filename="../../src/qt/mainwindow.ui" line="47"/>
-        <source>You can do things below for the NBT file.</source>
+        <source>&amp;Manage NBT Interface CPP (Test)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../src/qt/mainwindow.ui" line="54"/>
+        <source>You can do things below for the NBT file.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qt/mainwindow.ui" line="61"/>
         <source>N&amp;BT Reader</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qt/mainwindow.ui" line="64"/>
+        <location filename="../../src/qt/mainwindow.ui" line="71"/>
         <source>&amp;Region</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qt/mainwindow.ui" line="72"/>
+        <location filename="../../src/qt/mainwindow.ui" line="79"/>
         <source>First, you need to create a Region struct.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qt/mainwindow.ui" line="79"/>
+        <location filename="../../src/qt/mainwindow.ui" line="86"/>
         <source>&amp;Create Region from NBT</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qt/mainwindow.ui" line="86"/>
+        <location filename="../../src/qt/mainwindow.ui" line="93"/>
         <source>Second, you can do lots of things with the Region.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qt/mainwindow.ui" line="93"/>
+        <location filename="../../src/qt/mainwindow.ui" line="100"/>
         <source>&amp;Manage Region</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qt/mainwindow.ui" line="100"/>
+        <location filename="../../src/qt/mainwindow.ui" line="107"/>
         <source>&amp;Generate item list</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qt/mainwindow.ui" line="107"/>
+        <location filename="../../src/qt/mainwindow.ui" line="114"/>
         <source>&amp;Block reader</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qt/mainwindow.ui" line="117"/>
+        <location filename="../../src/qt/mainwindow.ui" line="124"/>
         <source>&amp;Item List</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qt/mainwindow.ui" line="125"/>
+        <location filename="../../src/qt/mainwindow.ui" line="132"/>
         <source>I&amp;tem list reader and modifier</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qt/mainwindow.ui" line="132"/>
+        <location filename="../../src/qt/mainwindow.ui" line="139"/>
         <source>R&amp;ecipe combiner</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qt/mainwindow.ui" line="142"/>
+        <location filename="../../src/qt/mainwindow.ui" line="149"/>
         <source>Utility</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qt/mainwindow.ui" line="150"/>
+        <location filename="../../src/qt/mainwindow.ui" line="157"/>
         <source>&amp;Config Setting</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qt/mainwindow.ui" line="157"/>
+        <location filename="../../src/qt/mainwindow.ui" line="164"/>
         <source>Config &amp;Wizard</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qt/mainwindow.ui" line="164"/>
+        <location filename="../../src/qt/mainwindow.ui" line="171"/>
         <source>Download Manifest</source>
         <translation type="unfinished"></translation>
     </message>

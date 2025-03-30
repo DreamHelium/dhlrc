@@ -42,6 +42,13 @@
            </widget>
           </item>
           <item>
+           <widget class="QPushButton" name="manageBtn_3">
+            <property name="text">
+             <string>&amp;Manage NBT Interface CPP (Test)</string>
+            </property>
+           </widget>
+          </item>
+          <item>
            <widget class="QLabel" name="label_3">
             <property name="text">
              <string>You can do things below for the NBT file.</string>

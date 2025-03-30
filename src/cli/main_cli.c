@@ -64,7 +64,7 @@ start_point (int argc, char **argv, const char* prpath)
     if(G_VALUE_HOLDS_UCHAR(&val)) 
     {
         ret_val_c = g_value_get_uchar(&val);
-        if(ret_val_c == 'n') return manage_nbt_instance();
+        // if(ret_val_c == 'n') return manage_nbt_instance();
     }
     else return -1;
 

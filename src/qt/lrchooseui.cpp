@@ -9,7 +9,6 @@
 #include "dh_string_util.h"
 #include "../common_info.h"
 #include "../region.h"
-#include "../nbt_interface/nbt_interface.h"
 #include "nbt_interface_cpp/nbt_interface.hpp"
 
 LrChooseUI::LrChooseUI(QWidget *parent) :
@@ -30,10 +29,10 @@ void LrChooseUI::initUI()
     vLayout->addWidget(label);
     vLayout->addStretch();
 
-    auto uuid = common_info_list_get_uuid(DH_TYPE_NBT_INTERFACE);
-    auto instance = (NbtInstance*)common_info_get_data(DH_TYPE_NBT_INTERFACE, uuid);
+    auto uuid = common_info_list_get_uuid(DH_TYPE_NBT_INTERFACE_CPP);
+    auto instance = (DhNbtInstance*)common_info_get_data(DH_TYPE_NBT_INTERFACE_CPP, uuid);
 
-    arr = lite_region_name_array_instance(instance); 
+    arr = lite_region_name_array(instance->get_original_nbt()); 
     group = new QButtonGroup();
     group->setExclusive(false);
 
@@ -101,13 +100,13 @@ void LrChooseUI::okBtn_clicked()
     auto buttons = group->buttons();
     for(int i = 0 ; i < buttons.length() ; i++)
     {
-        auto uuid = common_info_list_get_uuid(DH_TYPE_NBT_INTERFACE);
-        auto instance = (NbtInstance*)common_info_get_data(DH_TYPE_NBT_INTERFACE, uuid);
+        auto uuid = common_info_list_get_uuid(DH_TYPE_NBT_INTERFACE_CPP);
+        auto instance = (DhNbtInstance*)common_info_get_data(DH_TYPE_NBT_INTERFACE_CPP, uuid);
         if(buttons[i]->isChecked())
         {
-            QString des = lineEdit->text().arg(common_info_get_description(DH_TYPE_NBT_INTERFACE, uuid))
+            QString des = lineEdit->text().arg(common_info_get_description(DH_TYPE_NBT_INTERFACE_CPP, uuid))
                                           .arg(arr->val[i]);
-            LiteRegion* lr = lite_region_create_from_root_instance_cpp(DhNbtInstance((NBT*)dh_nbt_instance_get_real_original_nbt(instance), true), i);
+            LiteRegion* lr = lite_region_create_from_root_instance_cpp(*instance, i);
             Region* region = region_new_from_lite_region(lr);
             common_info_new(DH_TYPE_Region, region, g_date_time_new_now_local(), des.toUtf8());
             lite_region_free(lr);

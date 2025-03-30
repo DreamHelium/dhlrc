@@ -9,15 +9,15 @@
 #include <QSvgRenderer>
 #include <QPixmap>
 #include <QPainter>
-#include "../nbt_interface/nbt_interface.h"
-#include "../common_info.h"
 #include "../region.h"
+#include "../nbt_interface_cpp/nbt_interface.hpp"
+#include "../common_info.h"
 
 void dh::loadRegion(QWidget* parent)
 {
     /* The lock for Region info should begin in main func */
 
-    GList* list = (GList*)common_info_list_get_uuid_list(DH_TYPE_NBT_INTERFACE);
+    GList* list = (GList*)common_info_list_get_uuid_list(DH_TYPE_NBT_INTERFACE_CPP);
     /* Lock for NBT info start */
     NbtSelectUI* nsui = new NbtSelectUI();
     nsui->setAttribute(Qt::WA_DeleteOnClose);
@@ -25,7 +25,7 @@ void dh::loadRegion(QWidget* parent)
     /* Lock for NBT info end */
     if(res == QDialog::Accepted)
     {
-        dh::loadRegion(parent, common_info_list_get_uuid(DH_TYPE_NBT_INTERFACE));
+        dh::loadRegion(parent, common_info_list_get_uuid(DH_TYPE_NBT_INTERFACE_CPP));
     }
     /* No option given for the NBT selection */
     else QMessageBox::critical(parent, _("Error!"), _("No NBT or no NBT selected!"));
@@ -33,11 +33,11 @@ void dh::loadRegion(QWidget* parent)
 
 void dh::loadRegion(QWidget* parent, const char* uuid)
 {
-    auto instance = (NbtInstance*)common_info_get_data(DH_TYPE_NBT_INTERFACE, uuid);
-    if(common_info_reader_trylock(DH_TYPE_NBT_INTERFACE, uuid))
+    auto instance = (DhNbtInstance*)common_info_get_data(DH_TYPE_NBT_INTERFACE_CPP, uuid);
+    if(common_info_reader_trylock(DH_TYPE_NBT_INTERFACE_CPP, uuid))
     {
         /* Lock NBT start */
-        if(lite_region_num_instance(instance))
+        if(lite_region_num(instance->get_original_nbt()))
         {   
             LrChooseUI* lcui = new LrChooseUI(parent);
             lcui->setAttribute(Qt::WA_DeleteOnClose);
@@ -45,11 +45,11 @@ void dh::loadRegion(QWidget* parent, const char* uuid)
         }
         else
         {
-            Region* region = region_new_from_nbt((NBT*)dh_nbt_instance_get_real_original_nbt(instance));
+            Region* region = region_new_from_nbt(instance->get_original_nbt());
             if(region)
             {
                 auto str = QInputDialog::getText(parent, _("Enter Region Name"), _("Enter name for the new Region."), QLineEdit::Normal, 
-                                                 common_info_get_description(DH_TYPE_NBT_INTERFACE, uuid));
+                                                 common_info_get_description(DH_TYPE_NBT_INTERFACE_CPP, uuid));
                 if(str.isEmpty())
                     QMessageBox::critical(parent, _("Error!"), _("No description for the Region!"));
                 else
@@ -61,7 +61,7 @@ void dh::loadRegion(QWidget* parent, const char* uuid)
         }
         
         /* Lock NBT end */
-        common_info_reader_unlock(DH_TYPE_NBT_INTERFACE, uuid);
+        common_info_reader_unlock(DH_TYPE_NBT_INTERFACE_CPP, uuid);
     }
     /* Lock NBT fail */
     else QMessageBox::critical(parent, _("Error!"), _("This NBT is locked!"));
@@ -85,10 +85,10 @@ bool dh::loadNbtInstance(QWidget* parent, QString filedir, bool askForDes, bool 
     else des = defaultDes;
     if(des)
     {
-        NbtInstance* instance = dh_nbt_if_parse(filedir.toUtf8());
+        auto instance = new DhNbtInstance(filedir.toUtf8());
         if(instance)
         {
-            common_info_new(DH_TYPE_NBT_INTERFACE, instance, g_date_time_new_now_local(), des);
+            common_info_new(DH_TYPE_NBT_INTERFACE_CPP, instance, g_date_time_new_now_local(), des);
             ret = true;
         }
         else if(tipForFail)

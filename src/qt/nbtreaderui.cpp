@@ -8,7 +8,7 @@
 #include <qtreeview.h>
 #include <qvariant.h>
 #include "../common_info.h"
-#include "../nbt_interface/nbt_interface.h"
+#include "../nbt_interface_cpp/nbt_interface.hpp"
 #include <cstdlib>
 #include <QDebug>
 #include <QLineEdit>
@@ -35,36 +35,35 @@ static QString ret_type_instance(DhNbtType type)
     }
 }
 
-static QString ret_var(NbtInstance* instance)
+static QString ret_var(DhNbtInstance instance)
 {
-    auto type = dh_nbt_get_type(instance);
+    auto type = instance.get_type();
     QString ret;
     int len = 0;
     switch(type)
     {
         case DH_TYPE_Byte:
-            return QString::number(dh_nbt_instance_get_byte(instance));
+            return QString::number(instance.get_byte());
         case DH_TYPE_Int:
-            return QString::number(dh_nbt_instance_get_int(instance));
+            return QString::number(instance.get_int());
         case DH_TYPE_Short:
-            return QString::number(dh_nbt_instance_get_short(instance));
+            return QString::number(instance.get_short());
         case DH_TYPE_Long:
-            return QString::number(dh_nbt_instance_get_long(instance));
+            return QString::number(instance.get_long());
         case DH_TYPE_Float:
-            return QString::number(dh_nbt_instance_get_float(instance));
+            return QString::number(instance.get_float());
         case DH_TYPE_Double:
-            return QString::number(dh_nbt_instance_get_double(instance));
+            return QString::number(instance.get_double());
         case DH_TYPE_String:
         {
-            const char* s = dh_nbt_instance_get_string(instance);
+            const char* s = instance.get_string();
             ret = s;
-            free((void*)s);
             return ret;
         }
         case DH_TYPE_Byte_Array:
         {
             len = 0;
-            auto arr_b = dh_nbt_instance_get_byte_array(instance, &len);
+            auto arr_b = instance.get_byte_array(len);
             for(int i = 0 ; i < len ; i ++)
             {
                 ret.append(QString::number(arr_b[i]));
@@ -75,7 +74,7 @@ static QString ret_var(NbtInstance* instance)
         case DH_TYPE_Int_Array:
         {
             len = 0;
-            auto arr_i = dh_nbt_instance_get_int_array(instance, &len);
+            auto arr_i = instance.get_int_array(len);
             for(int i = 0 ; i < len ; i ++)
             {
                 ret.append(QString::number(arr_i[i]));
@@ -86,7 +85,7 @@ static QString ret_var(NbtInstance* instance)
         case DH_TYPE_Long_Array:
         {
             len = 0;
-            auto arr_i = dh_nbt_instance_get_long_array(instance, &len);
+            auto arr_i = instance.get_long_array(len);
             for(int i = 0 ; i < len ; i ++)
             {
                 ret.append(QString::number(arr_i[i]));
@@ -106,9 +105,9 @@ NbtReaderUI::NbtReaderUI(QWidget *parent)
     ui(new Ui::NbtReaderUI)
 {
     ui->setupUi(this);
-    uuid = common_info_list_get_uuid(DH_TYPE_NBT_INTERFACE);
+    uuid = common_info_list_get_uuid(DH_TYPE_NBT_INTERFACE_CPP);
     if(!uuid.isEmpty())
-        instance = (NbtInstance*)common_info_get_data(DH_TYPE_NBT_INTERFACE, uuid.toUtf8());
+        instance = (DhNbtInstance*)common_info_get_data(DH_TYPE_NBT_INTERFACE_CPP, uuid.toUtf8());
     
     model = new QStandardItemModel(this);
     proxyModel = new DhTreeFilter(this);
@@ -130,26 +129,24 @@ NbtReaderUI::~NbtReaderUI()
 void NbtReaderUI::initModel()
 {
     auto modelRoot = model->invisibleRootItem();
-    addModelTree(instance, modelRoot);
+    addModelTree(*instance, modelRoot);
 }
 
-void NbtReaderUI::addModelTree(NbtInstance* instance, QStandardItem* iroot)
+void NbtReaderUI::addModelTree(DhNbtInstance instance, QStandardItem* iroot)
 {
-    for(; dh_nbt_instance_is_non_null(instance) ; dh_nbt_instance_next(instance))
+    for(; instance.is_non_null() ; instance.next())
     {
-        const char* key = dh_nbt_instance_get_key(instance);
+        const char* key = instance.get_key();
         QString str = key ? key : "(NULL)";
         
         auto item = new QStandardItem(str);
         item->setEditable(false);
-        if(dh_nbt_instance_is_type(instance, DH_TYPE_Compound) || 
-           dh_nbt_instance_is_type(instance, DH_TYPE_List))
+        if(instance.is_type(DH_TYPE_Compound) || 
+           instance.is_type(DH_TYPE_List))
         {
-            auto new_instance = dh_nbt_instance_dup(instance);
-            dh_nbt_instance_child(new_instance);
+            auto new_instance(instance);
+            new_instance.child();
             addModelTree(new_instance, item);
-            /* Go back */
-            dh_nbt_instance_free(new_instance);
         }
         iroot->appendRow(item); /* Add item to root */
     }
@@ -167,18 +164,18 @@ void NbtReaderUI::treeview_clicked()
         {
             treeRow.prepend(indexx.row());
         }
-        dh_nbt_instance_goto_root(instance);
+        instance->goto_root();
         for(int j = 0 ; j < treeRow.length() ; j++)
         {
-            if(j != 0 ) dh_nbt_instance_child(instance);
+            if(j != 0 ) instance->child();
             auto row = treeRow[j];
             for(int i = 0 ; i < row ; i++)
-                dh_nbt_instance_next(instance);
+                instance->next();
         }
-        ui->typeLabel->setText(ret_type_instance(dh_nbt_get_type(instance)));
-        const char* key = dh_nbt_instance_get_key(instance);
+        ui->typeLabel->setText(ret_type_instance(instance->get_type()));
+        const char* key = instance->get_key();
         ui->keyLabel->setText(key ? key : "(NULL)");
-        ui->valueLabel->setText(ret_var(instance));
+        ui->valueLabel->setText(ret_var(*instance));
     }
 }
 

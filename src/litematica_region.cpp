@@ -246,24 +246,6 @@ int lite_region_num(NBT* root)
     }
 }
 
-int lite_region_num_instance(NbtInstance* instance)
-{
-    NbtInstance* new_instance = dh_nbt_instance_dup(instance);
-    dh_nbt_instance_goto_root(new_instance);
-    dh_nbt_instance_child_to_node(new_instance, "Regions");
-    int ret = 0;
-    if(dh_nbt_instance_is_non_null(new_instance))
-    {
-        if(dh_nbt_instance_child(new_instance))
-        {
-            for(; dh_nbt_instance_is_non_null(new_instance) ; dh_nbt_instance_next(new_instance))
-                ret++;
-        }
-    }
-    dh_nbt_instance_free(new_instance);
-    return ret;
-}
-
 char** lite_region_names(NBT* root, int rNum, int* err)
 {
     NBT* regionParent = NBT_GetChild(root,"Regions");
@@ -525,19 +507,6 @@ DhStrArray* lite_region_name_array(NBT* root)
         region_nbt = region_nbt->next;
     }
     return str_arr;
-}
-
-DhStrArray* lite_region_name_array_instance(NbtInstance* instance)
-{
-    NbtInstance* new_instance = dh_nbt_instance_dup(instance);
-    dh_nbt_instance_goto_root(new_instance);
-    dh_nbt_instance_child_to_node(new_instance, "Regions");
-    dh_nbt_instance_child(new_instance);
-    DhStrArray* arr = NULL;
-    for(; dh_nbt_instance_is_non_null(new_instance) ; dh_nbt_instance_next(new_instance))
-        dh_str_array_add_str(&arr, dh_nbt_instance_get_key(new_instance));
-    dh_nbt_instance_free(new_instance);
-    return arr;
 }
 
 // gboolean lite_region_block_properties_equal(LiteRegion* lr, int id, char* key, char* val)

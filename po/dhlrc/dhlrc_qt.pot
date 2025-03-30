@@ -150,80 +150,85 @@ msgstr ""
 
 #: ../../src/qt/mainwindow.ui:47
 msgctxt "MainWindow|"
-msgid "You can do things below for the NBT file."
+msgid "&Manage NBT Interface CPP (Test)"
 msgstr ""
 
 #: ../../src/qt/mainwindow.ui:54
 msgctxt "MainWindow|"
+msgid "You can do things below for the NBT file."
+msgstr ""
+
+#: ../../src/qt/mainwindow.ui:61
+msgctxt "MainWindow|"
 msgid "N&BT Reader"
 msgstr ""
 
-#: ../../src/qt/mainwindow.ui:64
+#: ../../src/qt/mainwindow.ui:71
 msgctxt "MainWindow|"
 msgid "&Region"
 msgstr ""
 
-#: ../../src/qt/mainwindow.ui:72
+#: ../../src/qt/mainwindow.ui:79
 msgctxt "MainWindow|"
 msgid "First, you need to create a Region struct."
 msgstr ""
 
-#: ../../src/qt/mainwindow.ui:79
+#: ../../src/qt/mainwindow.ui:86
 msgctxt "MainWindow|"
 msgid "&Create Region from NBT"
 msgstr ""
 
-#: ../../src/qt/mainwindow.ui:86
+#: ../../src/qt/mainwindow.ui:93
 msgctxt "MainWindow|"
 msgid "Second, you can do lots of things with the Region."
 msgstr ""
 
-#: ../../src/qt/mainwindow.ui:93
+#: ../../src/qt/mainwindow.ui:100
 msgctxt "MainWindow|"
 msgid "&Manage Region"
 msgstr ""
 
-#: ../../src/qt/mainwindow.ui:100
+#: ../../src/qt/mainwindow.ui:107
 msgctxt "MainWindow|"
 msgid "&Generate item list"
 msgstr ""
 
-#: ../../src/qt/mainwindow.ui:107
+#: ../../src/qt/mainwindow.ui:114
 msgctxt "MainWindow|"
 msgid "&Block reader"
 msgstr ""
 
-#: ../../src/qt/mainwindow.ui:117
+#: ../../src/qt/mainwindow.ui:124
 msgctxt "MainWindow|"
 msgid "&Item List"
 msgstr ""
 
-#: ../../src/qt/mainwindow.ui:125
+#: ../../src/qt/mainwindow.ui:132
 msgctxt "MainWindow|"
 msgid "I&tem list reader and modifier"
 msgstr ""
 
-#: ../../src/qt/mainwindow.ui:132
+#: ../../src/qt/mainwindow.ui:139
 msgctxt "MainWindow|"
 msgid "R&ecipe combiner"
 msgstr ""
 
-#: ../../src/qt/mainwindow.ui:142
+#: ../../src/qt/mainwindow.ui:149
 msgctxt "MainWindow|"
 msgid "Utility"
 msgstr ""
 
-#: ../../src/qt/mainwindow.ui:150
+#: ../../src/qt/mainwindow.ui:157
 msgctxt "MainWindow|"
 msgid "&Config Setting"
 msgstr ""
 
-#: ../../src/qt/mainwindow.ui:157
+#: ../../src/qt/mainwindow.ui:164
 msgctxt "MainWindow|"
 msgid "Config &Wizard"
 msgstr ""
 
-#: ../../src/qt/mainwindow.ui:164
+#: ../../src/qt/mainwindow.ui:171
 msgctxt "MainWindow|"
 msgid "Download Manifest"
 msgstr ""

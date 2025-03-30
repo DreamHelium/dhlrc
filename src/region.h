@@ -20,7 +20,6 @@
 
 #include "litematica_region.h"
 #include <glib.h>
-#include "nbt_interface/nbt_interface.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -48,7 +47,6 @@ typedef struct BlockInfo{
     char* id_name;
     int palette;
     NBT* nbt;
-    NbtInstance* instance;
     void* nbt_instance;
 } BlockInfo;
 
@@ -77,7 +75,7 @@ Region* region_new_from_nbt_file(const char* filepos);
 ItemList* item_list_new_from_region(Region* region);
 ItemList* item_list_new_from_multi_region(const char** region_uuid_arr);
 NBT* nbt_new_from_region(Region* region);
-NbtInstance* nbt_instance_new_from_region(Region* region);
+// NbtInstance* nbt_instance_new_from_region(Region* region);
 void region_free(Region* region);
 gint64* region_get_palette_num_from_region(Region* region, int* len);
 
