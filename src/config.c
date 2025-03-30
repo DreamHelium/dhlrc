@@ -18,8 +18,8 @@
 #include "config.h"
 #include <cjson/cJSON.h>
 #include <gio/gio.h>
+#include <string.h>
 #include "glib.h"
-#include "json_util.h"
 #include "dh_file_util.h"
 
 static cJSON* content = NULL;
@@ -109,6 +109,18 @@ void dhlrc_make_config()
     g_task_run_in_thread(task, monitor_task);
 }
 
+char* dh_get_config_item(const char* item)
+{
+    cJSON* obj = cJSON_GetObjectItem(content, item);
+    char* ret = NULL;
+    if(obj)
+    {
+        char* val = cJSON_GetStringValue(obj);
+        if(val && *val != 0) ret = g_strdup(val);
+    }
+    return ret;
+}
+
 void dh_exit1()
 {
     cJSON_Delete(content);
@@ -120,68 +132,43 @@ void dh_exit1()
 
 char* dh_get_translation_dir()
 {
-    cJSON* translate_obj = cJSON_GetObjectItem(content, "itemTranslate");
-    char* ret = NULL;
-    if(translate_obj)
-        ret = g_strdup(cJSON_GetStringValue(translate_obj));
-    else ret = NULL;
-    return ret;
+    return dh_get_config_item("itemTranslate");
 }
 
 char* dh_get_game_dir()
 {
-    cJSON* gamedir_obj = cJSON_GetObjectItem(content, "gameDir");
-    char* ret = NULL;
-    if(gamedir_obj)
-        ret = g_strdup(cJSON_GetStringValue(gamedir_obj));
-    else ret = NULL;
-    return ret;
+    return dh_get_config_item("gameDir");
 }
 
 char* dh_get_cache_dir()
 {
-    cJSON* cachedir_obj = cJSON_GetObjectItem(content, "cacheDir");
-    char* ret = NULL;
-    if(cachedir_obj)
-        ret = g_strdup(cJSON_GetStringValue(cachedir_obj));
-    else ret = g_strconcat(g_get_user_cache_dir(), "/dhlrc", NULL);
-    return ret;
+    char* ret = dh_get_config_item("cacheDir");
+    if(ret) return ret;
+    else return g_strconcat(g_get_user_cache_dir(), "/dhlrc", NULL);
 }
 
 char* dh_get_version()
 {
-    cJSON* version_obj = cJSON_GetObjectItem(content, "overrideVersion");
-    char* ret = NULL;
-    if(version_obj)
-        ret = g_strdup(cJSON_GetStringValue(version_obj));
-    else ret = g_strdup("1.18.2");
-    return ret;
+    char* ret = dh_get_config_item("overrideVersion");
+    if(ret) return ret;
+    else return g_strdup("1.18.2");
 }
 
 char* dh_get_recipe_dir()
 {
-    cJSON* recipe_obj = cJSON_GetObjectItem(content, "recipeConfig");
-    char* ret = NULL;
-    if(recipe_obj)
-    {
-        ret = g_strdup(cJSON_GetStringValue(recipe_obj));
-        if(*ret == 0)
-            goto no_recipe_dir;
-    }
-    else
-no_recipe_dir:
-    {
-        char* version = dh_get_version();
-        char* cache_dir = dh_get_cache_dir();
-        ret = g_strconcat(cache_dir, "/", version, "/extracted/data/minecraft/recipes/", NULL);
-    }
-    return ret;
+    return dh_get_config_item("recipeConfig");
 }
 
-void dhlrc_reread_config()
+char* dh_get_assets_dir()
 {
-    cJSON_Delete(content);
-    content = dhlrc_file_to_json(config_file);
+    return dh_get_config_item("assetsDir");
+}
+
+gboolean dh_get_show_wizard()
+{
+    char* ret = dh_get_config_item("showWizardOnStart");
+    if(g_str_equal(ret, "false")) return FALSE;
+    else return TRUE;
 }
 
 void dh_set_or_create_item(const char* item, const char* val, gboolean save)

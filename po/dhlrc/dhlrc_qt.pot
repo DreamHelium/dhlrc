@@ -81,9 +81,9 @@ msgid "Cache Directory"
 msgstr ""
 
 #: ../../src/qt/configui.ui:39 ../../src/qt/configui.ui:60
-#: ../../src/qt/configui.ui:81 ../../src/qt/configui.ui:102
-#: ../../src/qt/configui.ui:123 ../../src/qt/configui.ui:144
-#: ../../src/qt/configui.ui:176
+#: ../../src/qt/configui.ui:81 ../../src/qt/configui.ui:109
+#: ../../src/qt/configui.ui:130 ../../src/qt/configui.ui:151
+#: ../../src/qt/configui.ui:183 ../../src/qt/configui.ui:204
 msgctxt "ConfigUI|"
 msgid "Reset"
 msgstr ""
@@ -103,29 +103,39 @@ msgctxt "ConfigUI|"
 msgid "Translation File"
 msgstr ""
 
-#: ../../src/qt/configui.ui:113
+#: ../../src/qt/configui.ui:102
+msgctxt "ConfigUI|"
+msgid "The file used for translating block/item."
+msgstr ""
+
+#: ../../src/qt/configui.ui:120
 msgctxt "ConfigUI|"
 msgid "Game Directory"
 msgstr ""
 
-#: ../../src/qt/configui.ui:134
+#: ../../src/qt/configui.ui:141
 msgctxt "ConfigUI|"
 msgid "Override Version"
 msgstr ""
 
-#: ../../src/qt/configui.ui:155
+#: ../../src/qt/configui.ui:162
 msgctxt "ConfigUI|"
 msgid "Show Wizard On Start"
 msgstr ""
 
-#: ../../src/qt/configui.ui:163
+#: ../../src/qt/configui.ui:170
 msgctxt "ConfigUI|"
 msgid "true"
 msgstr ""
 
-#: ../../src/qt/configui.ui:168
+#: ../../src/qt/configui.ui:175
 msgctxt "ConfigUI|"
 msgid "false"
+msgstr ""
+
+#: ../../src/qt/configui.ui:194
+msgctxt "ConfigUI|"
+msgid "Assets Directory"
 msgstr ""
 
 #: ../../src/qt/mainwindow.ui:14
@@ -150,87 +160,82 @@ msgstr ""
 
 #: ../../src/qt/mainwindow.ui:47
 msgctxt "MainWindow|"
-msgid "&Manage NBT Interface CPP (Test)"
+msgid "You can do things below for the NBT file."
 msgstr ""
 
 #: ../../src/qt/mainwindow.ui:54
 msgctxt "MainWindow|"
-msgid "You can do things below for the NBT file."
-msgstr ""
-
-#: ../../src/qt/mainwindow.ui:61
-msgctxt "MainWindow|"
 msgid "N&BT Reader"
 msgstr ""
 
-#: ../../src/qt/mainwindow.ui:71
+#: ../../src/qt/mainwindow.ui:64
 msgctxt "MainWindow|"
 msgid "&Region"
 msgstr ""
 
-#: ../../src/qt/mainwindow.ui:79
+#: ../../src/qt/mainwindow.ui:72
 msgctxt "MainWindow|"
 msgid "First, you need to create a Region struct."
 msgstr ""
 
-#: ../../src/qt/mainwindow.ui:86
+#: ../../src/qt/mainwindow.ui:79
 msgctxt "MainWindow|"
 msgid "&Create Region from NBT"
 msgstr ""
 
-#: ../../src/qt/mainwindow.ui:93
+#: ../../src/qt/mainwindow.ui:86
 msgctxt "MainWindow|"
 msgid "Second, you can do lots of things with the Region."
 msgstr ""
 
-#: ../../src/qt/mainwindow.ui:100
+#: ../../src/qt/mainwindow.ui:93
 msgctxt "MainWindow|"
 msgid "&Manage Region"
 msgstr ""
 
-#: ../../src/qt/mainwindow.ui:107
+#: ../../src/qt/mainwindow.ui:100
 msgctxt "MainWindow|"
 msgid "&Generate item list"
 msgstr ""
 
-#: ../../src/qt/mainwindow.ui:114
+#: ../../src/qt/mainwindow.ui:107
 msgctxt "MainWindow|"
 msgid "&Block reader"
 msgstr ""
 
-#: ../../src/qt/mainwindow.ui:124
+#: ../../src/qt/mainwindow.ui:117
 msgctxt "MainWindow|"
 msgid "&Item List"
 msgstr ""
 
-#: ../../src/qt/mainwindow.ui:132
+#: ../../src/qt/mainwindow.ui:125
 msgctxt "MainWindow|"
 msgid "I&tem list reader and modifier"
 msgstr ""
 
-#: ../../src/qt/mainwindow.ui:139
+#: ../../src/qt/mainwindow.ui:132
 msgctxt "MainWindow|"
 msgid "R&ecipe combiner"
 msgstr ""
 
-#: ../../src/qt/mainwindow.ui:149
+#: ../../src/qt/mainwindow.ui:142
 msgctxt "MainWindow|"
 msgid "Utility"
 msgstr ""
 
-#: ../../src/qt/mainwindow.ui:157
+#: ../../src/qt/mainwindow.ui:150
 msgctxt "MainWindow|"
 msgid "&Config Setting"
 msgstr ""
 
-#: ../../src/qt/mainwindow.ui:164
-msgctxt "MainWindow|"
-msgid "Config &Wizard"
-msgstr ""
-
-#: ../../src/qt/mainwindow.ui:171
+#: ../../src/qt/mainwindow.ui:157
 msgctxt "MainWindow|"
 msgid "Download Manifest"
+msgstr ""
+
+#: ../../src/qt/mainwindow.ui:164
+msgctxt "MainWindow|"
+msgid "Unzip Resource Jar"
 msgstr ""
 
 #: ../../src/qt/manageui.ui:14
@@ -303,127 +308,83 @@ msgctxt "NbtReaderUI|"
 msgid "Close"
 msgstr ""
 
-#: ../../src/qt/wizardui.ui:14
-msgctxt "WizardUI|"
+#: ../../src/qt/unzipwizard.ui:14
+msgctxt "UnzipWizard|"
 msgid "Wizard"
 msgstr ""
 
-#: ../../src/qt/wizardui.ui:23
-msgctxt "WizardUI|"
-msgid "Welcome to the guide!"
+#: ../../src/qt/unzipwizard.ui:21
+msgctxt "UnzipWizard|"
+msgid "Let's unzip the resource jar here!"
 msgstr ""
 
-#: ../../src/qt/wizardui.ui:30
-msgctxt "WizardUI|"
-msgid "We will help you configure the options."
+#: ../../src/qt/unzipwizard.ui:32
+msgctxt "UnzipWizard|"
+msgid "First, enter the resource jar here!"
 msgstr ""
 
-#: ../../src/qt/wizardui.ui:37
-msgctxt "WizardUI|"
-msgid "If you don't want to show the wizard, click \"Never show again.\""
+#: ../../src/qt/unzipwizard.ui:56
+msgctxt "UnzipWizard|"
+msgid "And the destination directory here!"
 msgstr ""
 
-#: ../../src/qt/wizardui.ui:44
-msgctxt "WizardUI|"
-msgid "Never show the wizard again."
+#: ../../src/qt/unzipwizard.ui:80
+msgctxt "UnzipWizard|"
+msgid "Meanwhile, you can reset translation and resource file directory."
 msgstr ""
 
-#: ../../src/qt/wizardui.ui:59
-msgctxt "WizardUI|"
-msgid "First, let's configure the game directory."
+#: ../../src/qt/unzipwizard.ui:87
+msgctxt "UnzipWizard|"
+msgid "Reset Directory"
 msgstr ""
 
-#: ../../src/qt/wizardui.ui:66
-msgctxt "WizardUI|"
-msgid ""
-"If you are using the default directory, just keep the default option or "
-"press \"Reset\" if it's not the right position."
+#: ../../src/qt/unzipwizard.ui:98
+msgctxt "UnzipWizard|"
+msgid "Unzip is in progress......"
 msgstr ""
 
-#: ../../src/qt/wizardui.ui:79
-msgctxt "WizardUI|"
-msgid ""
-"The directory will affect the search of translation file, thus affect the "
-"functions of the program."
+#: ../../src/qt/unzipwizard.ui:109
+msgctxt "UnzipWizard|"
+msgid "Please enter the domain of the resource."
 msgstr ""
 
-#: ../../src/qt/wizardui.ui:93
-msgctxt "WizardUI|"
-msgid "I want to &configure the game directory."
+#: ../../src/qt/unzipwizard.ui:116
+msgctxt "UnzipWizard|"
+msgid "minecraft"
 msgstr ""
 
-#: ../../src/qt/wizardui.ui:105
-msgctxt "WizardUI|"
-msgid "Game directory:"
+#: ../../src/qt/unzipwizard.ui:119
+msgctxt "UnzipWizard|"
+msgid "Domain"
 msgstr ""
 
-#: ../../src/qt/wizardui.ui:127
-msgctxt "WizardUI|"
-msgid "&Reset"
+#: ../../src/qt/unzipwizard.ui:126
+msgctxt "UnzipWizard|"
+msgid "You can rechoose the directory of resource."
 msgstr ""
 
-#: ../../src/qt/wizardui.ui:138
-msgctxt "WizardUI|"
-msgid "&I do not want to set the game directory"
+#: ../../src/qt/unzipwizard.ui:135
+msgctxt "UnzipWizard|"
+msgid "Translation file"
 msgstr ""
 
-#: ../../src/qt/wizardui.ui:145
-msgctxt "WizardUI|"
-msgid "Validated?"
+#: ../../src/qt/unzipwizard.ui:142 ../../src/qt/unzipwizard.ui:170
+#: ../../src/qt/unzipwizard.ui:198
+msgctxt "UnzipWizard|"
+msgid "Not found!"
 msgstr ""
 
-#: ../../src/qt/wizardui.ui:158
-msgctxt "WizardUI|"
-msgid "Please select the logic of finding corresponding files."
+#: ../../src/qt/unzipwizard.ui:163
+msgctxt "UnzipWizard|"
+msgid "Recipes file"
 msgstr ""
 
-#: ../../src/qt/wizardui.ui:165
-msgctxt "WizardUI|"
-msgid "Select &a specific version to use the files."
+#: ../../src/qt/unzipwizard.ui:191
+msgctxt "UnzipWizard|"
+msgid "Assets file"
 msgstr ""
 
-#: ../../src/qt/wizardui.ui:175
-msgctxt "WizardUI|"
-msgid "&Decide by NBT file"
-msgstr ""
-
-#: ../../src/qt/wizardui.ui:186
-msgctxt "WizardUI|"
-msgid ""
-"Translation file will be checked now. You can choose a custom file or use "
-"the one in the game directory."
-msgstr ""
-
-#: ../../src/qt/wizardui.ui:196
-msgctxt "WizardUI|"
-msgid ""
-"Warning: if a translation file is found in game directory, the custom one "
-"might not be used."
-msgstr ""
-
-#: ../../src/qt/wizardui.ui:206
-msgctxt "WizardUI|"
-msgid "I want &to use the one in the game directory."
-msgstr ""
-
-#: ../../src/qt/wizardui.ui:216
-msgctxt "WizardUI|"
-msgid "&I want to choose a custom one."
-msgstr ""
-
-#: ../../src/qt/wizardui.ui:240
-msgctxt "WizardUI|"
-msgid "TextLabel"
-msgstr ""
-
-#: ../../src/qt/wizardui.ui:251
-msgctxt "WizardUI|"
-msgid "The wizard is finished!"
-msgstr ""
-
-#: ../../src/qt/wizardui.ui:258
-msgctxt "WizardUI|"
-msgid ""
-"If you want to configure again, select \"Utility\"->\"Config Wizard\" to "
-"reconfigure."
+#: ../../src/qt/unzipwizard.ui:221
+msgctxt "UnzipWizard|"
+msgid "The progress is finished!"
 msgstr ""

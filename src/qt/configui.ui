@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>519</width>
-    <height>366</height>
+    <width>606</width>
+    <height>425</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -94,7 +94,14 @@
           </widget>
          </item>
          <item>
-          <widget class="QLineEdit" name="lineEdit_3"/>
+          <widget class="QLineEdit" name="lineEdit_3">
+           <property name="inputMask">
+            <string/>
+           </property>
+           <property name="placeholderText">
+            <string>The file used for translating block/item.</string>
+           </property>
+          </widget>
          </item>
          <item>
           <widget class="QPushButton" name="resetButton3">
@@ -172,6 +179,27 @@
          </item>
          <item>
           <widget class="QPushButton" name="resetButton7">
+           <property name="text">
+            <string>Reset</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_11">
+         <item>
+          <widget class="QLabel" name="label_11">
+           <property name="text">
+            <string>Assets Directory</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="lineEdit_8"/>
+         </item>
+         <item>
+          <widget class="QPushButton" name="resetButton8">
            <property name="text">
             <string>Reset</string>
            </property>

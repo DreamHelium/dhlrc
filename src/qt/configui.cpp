@@ -40,6 +40,7 @@ void ConfigUI::setTextContent()
     ui->lineEdit_5->setText(searchText("cacheDir"));
     ui->lineEdit_6->setText(searchText("overrideVersion"));
     QString showWizard = tr(searchText("showWizardOnStart").toUtf8());
+    ui->lineEdit_8->setText(searchText("assetsDir"));
     ui->comboBox->setCurrentText(showWizard);
 }
 

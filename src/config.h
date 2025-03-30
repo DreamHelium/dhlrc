@@ -26,7 +26,6 @@ extern "C"{
 #endif
 
 void dhlrc_make_config();
-void dhlrc_reread_config();
 void dh_exit1();
 /** Get game directory in config, if fail return NULL */
 char* dh_get_game_dir();
@@ -34,13 +33,16 @@ char* dh_get_game_dir();
 char* dh_get_cache_dir();
 /** Get Override Game Version in config, if fail return 1.18.2 */
 char* dh_get_version();
-/** Get recipe directory, if fail return decompressed position */
+/** Get recipe directory, if fail return NULL */
 char* dh_get_recipe_dir();
 /** This is used by mcdir file */
 char* dh_get_translation_dir();
-
+/** This is the assets directory */
+char* dh_get_assets_dir();
+/** Get status of using wizard. */
+gboolean dh_get_show_wizard();
 void dh_set_or_create_item(const char* item, const char* val, gboolean save);
-
+char* dh_get_config_item(const char* item);
 
 #ifdef __cplusplus
 }

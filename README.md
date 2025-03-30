@@ -38,5 +38,19 @@ If not, install one.
 
 ## Usage
 
-I recommend using the GUI's `dhlrc_qt`. Although `dhlrc_isoc` can be still used.
-The programs now have a better interactive interface, for more information, see source code.
+Just run `dhlrc.bin`, and the Qt backend will start unless you are using Linux tty.
+If you just want to convert file, just run `dhlrc.bin conv --help` and do with the instruction.
+
+## For developer
+
+The program uses `launcher` to load module, if you want to add new module for the program, just implement the 5 functions below and compile it as library (or executable?), and put it under `module`:
+
+```c
+    extern const char* module_name();
+    extern DhStrArray* module_name_array();
+    extern const char* module_description();
+    extern const char* help_description();
+    extern int start_point(int argc, char** argv, const char* prpath);
+```
+
+**WARNING: Add `extern "C"` in C++ project! Otherwise it couldn't be recognized!**

@@ -156,7 +156,7 @@ static PaletteArray* get_palette_full_info_from_nbt_instance(DhNbtInstance insta
     GPtrArray* array = g_ptr_array_new_with_free_func(palette_free);
     instance.child("palette");
     instance.child();
-    for(; instance.next() ;)
+    for(; instance.is_non_null() ; instance.next())
     {
         auto palette_instance(instance);
         Palette* palette = g_new0(Palette, 1);

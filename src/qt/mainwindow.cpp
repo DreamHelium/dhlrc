@@ -18,6 +18,7 @@
 #include "blockreaderui.h"
 #include "dh_file_util.h"
 #include "gio/gio.h"
+#include "glib.h"
 #include "ilchooseui.h"
 #include "ilreaderui.h"
 #include "manage.h"
@@ -32,9 +33,9 @@
 #include <QProgressDialog>
 #include "../region.h"
 #include "utility.h"
-#include "wizardui.h"
 #include "../common_info.h"
 #include "../download_file.h"
+#include "unzipwizard.h"
 
 static bool nbtRead = false;
 static dh::ManageRegion* mr = nullptr;
@@ -62,9 +63,6 @@ MainWindow::MainWindow(QWidget *parent)
     mw = this;
     // pd.hide();
     initSignalSlots();
-    WizardUI* wui = new WizardUI();
-    wui->setAttribute(Qt::WA_DeleteOnClose);
-    wui->exec();
 }
 
 MainWindow::~MainWindow()
@@ -97,6 +95,7 @@ void MainWindow::initSignalSlots()
     QObject::connect(ui->nbtReaderBtn_2, &QPushButton::clicked, this, &MainWindow::nbtReaderBtn_clicked);
     QObject::connect(ui->configBtn, &QPushButton::clicked, this, &MainWindow::configAction_triggered);
     QObject::connect(ui->downloadBtn, &QPushButton::clicked, this, &MainWindow::downloadBtn_clicked);
+    QObject::connect(ui->unzipBtn, &QPushButton::clicked, this, &MainWindow::unzipBtn_clicked);
 }
 
 void MainWindow::dragEnterEvent(QDragEnterEvent* event)
@@ -244,4 +243,17 @@ void MainWindow::downloadBtn_clicked()
 {
     dh_file_download_async("https://piston-data.mojang.com/v1/objects/e8340a01da734194c35fd35fbfa93e5bb96627b1/client.jar", "/tmp", dh_file_progress_callback, NULL, true, finish_callback);
     g_message("test");
+}
+
+void MainWindow::unzipBtn_clicked()
+{
+    char* unzipDir = g_find_program_in_path("unzip");
+    if(unzipDir)
+    {
+        g_free(unzipDir);
+        auto wizard = new UnzipWizard();
+        wizard->setAttribute(Qt::WA_DeleteOnClose);
+        wizard->exec();
+    }
+    else QMessageBox::critical(this, _("No Unzip Program found!"), _("No unzip program found, we couldn't unzip the file!"));
 }

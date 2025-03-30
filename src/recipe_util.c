@@ -88,6 +88,24 @@ long* num_array_get_from_input(int* array_num, int max_num)
 }
 */
 
+static const char* get_translation(const char* domain, const char* pure_name)
+{
+    if(!domain || (domain && *domain == 0))
+        domain = "minecraft";
+    char* origin_name = g_strconcat("item.", domain, ".", pure_name, NULL);
+    cJSON* trans_line = cJSON_GetObjectItem(translation_json, origin_name);
+    g_free(origin_name);
+    if(cJSON_IsString(trans_line)) return cJSON_GetStringValue(trans_line);
+    else
+    {
+        origin_name = g_strconcat("block.", domain, ".", pure_name, NULL);
+        cJSON* trans_line = cJSON_GetObjectItem(translation_json, origin_name);
+        g_free(origin_name);
+        if(cJSON_IsString(trans_line)) return cJSON_GetStringValue(trans_line);
+        else return NULL;
+    }
+}
+
 const char* name_block_translate(const char *block_name)
 {
     if(!translation_json && !first_try) /* No translation json and not try */
@@ -100,46 +118,14 @@ const char* name_block_translate(const char *block_name)
     }
     if(!translation_json)
         return block_name;
-
+    
+    char* domain_name = dh_strdup(block_name);
+    *strchr(domain_name, ':') = 0;
     char* pure_name = strchr(block_name,':') + 1;
 
-    int len = strlen(pure_name) + 1 + 5 + 10;
-
-    char* origin_name = (char*) malloc(len * sizeof(char));
-    strcpy(origin_name,"item.minecraft.");
-    strcat(origin_name,pure_name);
-    cJSON* trans_line = cJSON_GetObjectItem(translation_json,origin_name);
-    if(cJSON_IsString(trans_line))
-    {
-        char* trans_name = cJSON_GetStringValue(trans_line);
-        free(origin_name);
-
-        return trans_name;
-    }
-    else
-    {
-        len++;
-        free(origin_name);
-        origin_name = NULL;
-        origin_name = (char*)malloc(len * sizeof(char));
-        strcpy(origin_name,"block.minecraft.");
-        strcat(origin_name,pure_name);
-        trans_line = cJSON_GetObjectItem(translation_json,origin_name);
-
-        if(cJSON_IsString(trans_line))
-        {
-            char* trans_name = cJSON_GetStringValue(trans_line);
-            free(origin_name);
-
-            return trans_name;
-        }
-        else
-        {
-            free(origin_name);
-
-            return block_name;
-        }
-    }
+    const char* trans_name = get_translation(domain_name, pure_name);
+    free(domain_name);
+    return trans_name ? trans_name : block_name;
 }
 
 static gchar* find_transfile()

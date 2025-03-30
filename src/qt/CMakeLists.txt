@@ -27,7 +27,6 @@ set(PROJECT_SOURCES
         showtrackui.cpp
         showtrackui.h
         configui.h configui.cpp configui.ui
-        wizardui.h wizardui.cpp wizardui.ui
         nbtselectui.h nbtselectui.cpp
         regionchooseui.h regionchooseui.cpp
         blocklistui.cpp blocklistui.h blocklistui.ui
@@ -41,6 +40,7 @@ set(PROJECT_SOURCES
         utility.h utility.cpp
         saveregionselectui.h saveregionselectui.cpp
         dhtreefilter.h dhtreefilter.cpp
+        unzipwizard.h unzipwizard.cpp unzipwizard.ui
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)

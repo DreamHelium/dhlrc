@@ -88,10 +88,11 @@
         <location filename="../../src/qt/configui.ui" line="39"/>
         <location filename="../../src/qt/configui.ui" line="60"/>
         <location filename="../../src/qt/configui.ui" line="81"/>
-        <location filename="../../src/qt/configui.ui" line="102"/>
-        <location filename="../../src/qt/configui.ui" line="123"/>
-        <location filename="../../src/qt/configui.ui" line="144"/>
-        <location filename="../../src/qt/configui.ui" line="176"/>
+        <location filename="../../src/qt/configui.ui" line="109"/>
+        <location filename="../../src/qt/configui.ui" line="130"/>
+        <location filename="../../src/qt/configui.ui" line="151"/>
+        <location filename="../../src/qt/configui.ui" line="183"/>
+        <location filename="../../src/qt/configui.ui" line="204"/>
         <source>Reset</source>
         <translation type="unfinished"></translation>
     </message>
@@ -111,28 +112,38 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qt/configui.ui" line="113"/>
+        <location filename="../../src/qt/configui.ui" line="102"/>
+        <source>The file used for translating block/item.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qt/configui.ui" line="120"/>
         <source>Game Directory</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qt/configui.ui" line="134"/>
+        <location filename="../../src/qt/configui.ui" line="141"/>
         <source>Override Version</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qt/configui.ui" line="155"/>
+        <location filename="../../src/qt/configui.ui" line="162"/>
         <source>Show Wizard On Start</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qt/configui.ui" line="163"/>
+        <location filename="../../src/qt/configui.ui" line="170"/>
         <source>true</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qt/configui.ui" line="168"/>
+        <location filename="../../src/qt/configui.ui" line="175"/>
         <source>false</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qt/configui.ui" line="194"/>
+        <source>Assets Directory</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -160,87 +171,82 @@
     </message>
     <message>
         <location filename="../../src/qt/mainwindow.ui" line="47"/>
-        <source>&amp;Manage NBT Interface CPP (Test)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../src/qt/mainwindow.ui" line="54"/>
         <source>You can do things below for the NBT file.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qt/mainwindow.ui" line="61"/>
+        <location filename="../../src/qt/mainwindow.ui" line="54"/>
         <source>N&amp;BT Reader</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qt/mainwindow.ui" line="71"/>
+        <location filename="../../src/qt/mainwindow.ui" line="64"/>
         <source>&amp;Region</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qt/mainwindow.ui" line="79"/>
+        <location filename="../../src/qt/mainwindow.ui" line="72"/>
         <source>First, you need to create a Region struct.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qt/mainwindow.ui" line="86"/>
+        <location filename="../../src/qt/mainwindow.ui" line="79"/>
         <source>&amp;Create Region from NBT</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qt/mainwindow.ui" line="93"/>
+        <location filename="../../src/qt/mainwindow.ui" line="86"/>
         <source>Second, you can do lots of things with the Region.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qt/mainwindow.ui" line="100"/>
+        <location filename="../../src/qt/mainwindow.ui" line="93"/>
         <source>&amp;Manage Region</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qt/mainwindow.ui" line="107"/>
+        <location filename="../../src/qt/mainwindow.ui" line="100"/>
         <source>&amp;Generate item list</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qt/mainwindow.ui" line="114"/>
+        <location filename="../../src/qt/mainwindow.ui" line="107"/>
         <source>&amp;Block reader</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qt/mainwindow.ui" line="124"/>
+        <location filename="../../src/qt/mainwindow.ui" line="117"/>
         <source>&amp;Item List</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qt/mainwindow.ui" line="132"/>
+        <location filename="../../src/qt/mainwindow.ui" line="125"/>
         <source>I&amp;tem list reader and modifier</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qt/mainwindow.ui" line="139"/>
+        <location filename="../../src/qt/mainwindow.ui" line="132"/>
         <source>R&amp;ecipe combiner</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qt/mainwindow.ui" line="149"/>
+        <location filename="../../src/qt/mainwindow.ui" line="142"/>
         <source>Utility</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qt/mainwindow.ui" line="157"/>
+        <location filename="../../src/qt/mainwindow.ui" line="150"/>
         <source>&amp;Config Setting</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qt/mainwindow.ui" line="164"/>
-        <source>Config &amp;Wizard</source>
+        <location filename="../../src/qt/mainwindow.ui" line="157"/>
+        <source>Download Manifest</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qt/mainwindow.ui" line="171"/>
-        <source>Download Manifest</source>
+        <location filename="../../src/qt/mainwindow.ui" line="164"/>
+        <source>Unzip Resource Jar</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -321,120 +327,87 @@
     </message>
 </context>
 <context>
-    <name>WizardUI</name>
+    <name>UnzipWizard</name>
     <message>
-        <location filename="../../src/qt/wizardui.ui" line="14"/>
+        <location filename="../../src/qt/unzipwizard.ui" line="14"/>
         <source>Wizard</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qt/wizardui.ui" line="23"/>
-        <source>Welcome to the guide!</source>
+        <location filename="../../src/qt/unzipwizard.ui" line="21"/>
+        <source>Let&apos;s unzip the resource jar here!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qt/wizardui.ui" line="30"/>
-        <source>We will help you configure the options.</source>
+        <location filename="../../src/qt/unzipwizard.ui" line="32"/>
+        <source>First, enter the resource jar here!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qt/wizardui.ui" line="37"/>
-        <source>If you don&apos;t want to show the wizard, click &quot;Never show again.&quot;</source>
+        <location filename="../../src/qt/unzipwizard.ui" line="56"/>
+        <source>And the destination directory here!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qt/wizardui.ui" line="44"/>
-        <source>Never show the wizard again.</source>
+        <location filename="../../src/qt/unzipwizard.ui" line="80"/>
+        <source>Meanwhile, you can reset translation and resource file directory.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qt/wizardui.ui" line="59"/>
-        <source>First, let&apos;s configure the game directory.</source>
+        <location filename="../../src/qt/unzipwizard.ui" line="87"/>
+        <source>Reset Directory</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qt/wizardui.ui" line="66"/>
-        <source>If you are using the default directory, just keep the default option or press &quot;Reset&quot; if it&apos;s not the right position.</source>
+        <location filename="../../src/qt/unzipwizard.ui" line="98"/>
+        <source>Unzip is in progress......</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qt/wizardui.ui" line="79"/>
-        <source>The directory will affect the search of translation file, thus affect the functions of the program.</source>
+        <location filename="../../src/qt/unzipwizard.ui" line="109"/>
+        <source>Please enter the domain of the resource.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qt/wizardui.ui" line="93"/>
-        <source>I want to &amp;configure the game directory.</source>
+        <location filename="../../src/qt/unzipwizard.ui" line="116"/>
+        <source>minecraft</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qt/wizardui.ui" line="105"/>
-        <source>Game directory:</source>
+        <location filename="../../src/qt/unzipwizard.ui" line="119"/>
+        <source>Domain</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qt/wizardui.ui" line="127"/>
-        <source>&amp;Reset</source>
+        <location filename="../../src/qt/unzipwizard.ui" line="126"/>
+        <source>You can rechoose the directory of resource.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qt/wizardui.ui" line="138"/>
-        <source>&amp;I do not want to set the game directory</source>
+        <location filename="../../src/qt/unzipwizard.ui" line="135"/>
+        <source>Translation file</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qt/wizardui.ui" line="145"/>
-        <source>Validated?</source>
+        <location filename="../../src/qt/unzipwizard.ui" line="142"/>
+        <location filename="../../src/qt/unzipwizard.ui" line="170"/>
+        <location filename="../../src/qt/unzipwizard.ui" line="198"/>
+        <source>Not found!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qt/wizardui.ui" line="158"/>
-        <source>Please select the logic of finding corresponding files.</source>
+        <location filename="../../src/qt/unzipwizard.ui" line="163"/>
+        <source>Recipes file</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qt/wizardui.ui" line="165"/>
-        <source>Select &amp;a specific version to use the files.</source>
+        <location filename="../../src/qt/unzipwizard.ui" line="191"/>
+        <source>Assets file</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qt/wizardui.ui" line="175"/>
-        <source>&amp;Decide by NBT file</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../src/qt/wizardui.ui" line="186"/>
-        <source>Translation file will be checked now. You can choose a custom file or use the one in the game directory.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../src/qt/wizardui.ui" line="196"/>
-        <source>Warning: if a translation file is found in game directory, the custom one might not be used.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../src/qt/wizardui.ui" line="206"/>
-        <source>I want &amp;to use the one in the game directory.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../src/qt/wizardui.ui" line="216"/>
-        <source>&amp;I want to choose a custom one.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../src/qt/wizardui.ui" line="240"/>
-        <source>TextLabel</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../src/qt/wizardui.ui" line="251"/>
-        <source>The wizard is finished!</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../src/qt/wizardui.ui" line="258"/>
-        <source>If you want to configure again, select &quot;Utility&quot;-&gt;&quot;Config Wizard&quot; to reconfigure.</source>
+        <location filename="../../src/qt/unzipwizard.ui" line="221"/>
+        <source>The progress is finished!</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

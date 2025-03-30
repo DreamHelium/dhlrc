@@ -42,13 +42,6 @@
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="manageBtn_3">
-            <property name="text">
-             <string>&amp;Manage NBT Interface CPP (Test)</string>
-            </property>
-           </widget>
-          </item>
-          <item>
            <widget class="QLabel" name="label_3">
             <property name="text">
              <string>You can do things below for the NBT file.</string>
@@ -159,16 +152,16 @@
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="configBtn_3">
+           <widget class="QPushButton" name="downloadBtn">
             <property name="text">
-             <string>Config &amp;Wizard</string>
+             <string>Download Manifest</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="downloadBtn">
+           <widget class="QPushButton" name="unzipBtn">
             <property name="text">
-             <string>Download Manifest</string>
+             <string>Unzip Resource Jar</string>
             </property>
            </widget>
           </item>

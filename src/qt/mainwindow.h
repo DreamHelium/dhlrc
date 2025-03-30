@@ -45,6 +45,7 @@ private Q_SLOTS:
     void nbtReaderBtn_clicked();
     void nbtReaderBtn_finished(int ret);
     void downloadBtn_clicked();
+    void unzipBtn_clicked();
 
 };
 #endif // MAINWINDOW_H

@@ -35,8 +35,19 @@ cmake --build build
 
 ## 使用
 
-### 主程序
+只用运行`dhlrc.bin`，Qt后端将会启动，除非你用的是Linux tty。
+如果你只想转换文件，只用运行`dhlrc.bin conv --help`然后按照指引操作。
 
-我建议使用图形界面的`dhlrc_qt`。虽然`dhlrc_isoc`仍然可用。
-程序现在有更好的交互界面，但若需更多信息，参见源代码。
+## 对于开发者
 
+本程序使用`启动器`来运行模组，如果你想添加新的模组，只用实现以下五个函数并且编译成动态库（或可执行程序？）然后将其放在`module`中：
+
+```c
+    extern const char* module_name();
+    extern DhStrArray* module_name_array();
+    extern const char* module_description();
+    extern const char* help_description();
+    extern int start_point(int argc, char** argv, const char* prpath);
+```
+
+**警告：在C++项目中添加`extern "C"`！否则将会无法识别！**
