@@ -39,9 +39,7 @@ void ConfigUI::setTextContent()
     ui->lineEdit_4->setText(searchText("gameDir"));
     ui->lineEdit_5->setText(searchText("cacheDir"));
     ui->lineEdit_6->setText(searchText("overrideVersion"));
-    QString showWizard = tr(searchText("showWizardOnStart").toUtf8());
     ui->lineEdit_8->setText(searchText("assetsDir"));
-    ui->comboBox->setCurrentText(showWizard);
 }
 
 void ConfigUI::initSignalSlots()
@@ -52,7 +50,6 @@ void ConfigUI::initSignalSlots()
     QObject::connect(ui->resetButton4, &QPushButton::clicked, this, &ConfigUI::reset4Btn_clicked);
     QObject::connect(ui->resetButton5, &QPushButton::clicked, this, &ConfigUI::reset5Btn_clicked);
     QObject::connect(ui->resetButton6, &QPushButton::clicked, this, &ConfigUI::reset6Btn_clicked);
-    QObject::connect(ui->resetButton7, &QPushButton::clicked, this, &ConfigUI::reset7Btn_clicked);
     QObject::connect(ui->buttonBox, &QDialogButtonBox::accepted, this, &ConfigUI::okBtn_clicked);
 }
 
@@ -98,11 +95,6 @@ void ConfigUI::reset6Btn_clicked()
     ui->lineEdit_6->setText("1.18.2");
 }
 
-void ConfigUI::reset7Btn_clicked()
-{
-    ui->comboBox->setCurrentIndex(0);
-}
-
 QString ConfigUI::searchText(const char* str)
 {
     QString ret = QString("");
@@ -123,9 +115,6 @@ void ConfigUI::okBtn_clicked()
     setOrCreateItem("gameDir", ui->lineEdit_4->text().toStdString().c_str());
     setOrCreateItem("cacheDir", ui->lineEdit_5->text().toStdString().c_str());
     setOrCreateItem("overrideVersion", ui->lineEdit_6->text().toStdString().c_str());
-    if(ui->comboBox->currentText() == tr("true"))
-        setOrCreateItem("showWizardOnStart", "true");
-    else setOrCreateItem("showWizardOnStart", "false");
     char* data = cJSON_Print(configFile);
     dh_write_file(configFilePath.toUtf8(), data, strlen(data));
     free(data);

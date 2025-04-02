@@ -41,6 +41,7 @@ set(PROJECT_SOURCES
         saveregionselectui.h saveregionselectui.cpp
         dhtreefilter.h dhtreefilter.cpp
         unzipwizard.h unzipwizard.cpp unzipwizard.ui
+        selectassetsui.h selectassetsui.cpp selectassetsui.ui
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)

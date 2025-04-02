@@ -91,8 +91,7 @@
         <location filename="../../src/qt/configui.ui" line="109"/>
         <location filename="../../src/qt/configui.ui" line="130"/>
         <location filename="../../src/qt/configui.ui" line="151"/>
-        <location filename="../../src/qt/configui.ui" line="183"/>
-        <location filename="../../src/qt/configui.ui" line="204"/>
+        <location filename="../../src/qt/configui.ui" line="172"/>
         <source>Reset</source>
         <translation type="unfinished"></translation>
     </message>
@@ -128,21 +127,6 @@
     </message>
     <message>
         <location filename="../../src/qt/configui.ui" line="162"/>
-        <source>Show Wizard On Start</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../src/qt/configui.ui" line="170"/>
-        <source>true</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../src/qt/configui.ui" line="175"/>
-        <source>false</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../src/qt/configui.ui" line="194"/>
         <source>Assets Directory</source>
         <translation type="unfinished"></translation>
     </message>
@@ -249,6 +233,11 @@
         <source>Unzip Resource Jar</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <location filename="../../src/qt/mainwindow.ui" line="171"/>
+        <source>Select Assets File</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ManageUI</name>
@@ -323,6 +312,34 @@
     <message>
         <location filename="../../src/qt/nbtreaderui.ui" line="128"/>
         <source>Close</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>SelectAssetsUI</name>
+    <message>
+        <location filename="../../src/qt/selectassetsui.ui" line="14"/>
+        <source>Form</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qt/selectassetsui.ui" line="22"/>
+        <source>Select game directory here.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qt/selectassetsui.ui" line="46"/>
+        <source>Select large version here.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qt/selectassetsui.ui" line="56"/>
+        <source>Select asset here.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qt/selectassetsui.ui" line="66"/>
+        <source>Select output directory here.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

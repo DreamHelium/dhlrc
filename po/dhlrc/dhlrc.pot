@@ -15,7 +15,7 @@ msgstr ""
 "#-#-#-#-#  dhlrc.pot (dhlrc)  #-#-#-#-#\n"
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-31 00:58+0800\n"
+"POT-Creation-Date: 2025-04-03 01:23+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -102,7 +102,7 @@ msgstr ""
 #: ../../src/qt/configui.ui:39 ../../src/qt/configui.ui:60
 #: ../../src/qt/configui.ui:81 ../../src/qt/configui.ui:109
 #: ../../src/qt/configui.ui:130 ../../src/qt/configui.ui:151
-#: ../../src/qt/configui.ui:183 ../../src/qt/configui.ui:204
+#: ../../src/qt/configui.ui:172
 msgctxt "ConfigUI|"
 msgid "Reset"
 msgstr ""
@@ -138,21 +138,6 @@ msgid "Override Version"
 msgstr ""
 
 #: ../../src/qt/configui.ui:162
-msgctxt "ConfigUI|"
-msgid "Show Wizard On Start"
-msgstr ""
-
-#: ../../src/qt/configui.ui:170
-msgctxt "ConfigUI|"
-msgid "true"
-msgstr ""
-
-#: ../../src/qt/configui.ui:175
-msgctxt "ConfigUI|"
-msgid "false"
-msgstr ""
-
-#: ../../src/qt/configui.ui:194
 msgctxt "ConfigUI|"
 msgid "Assets Directory"
 msgstr ""
@@ -257,6 +242,11 @@ msgctxt "MainWindow|"
 msgid "Unzip Resource Jar"
 msgstr ""
 
+#: ../../src/qt/mainwindow.ui:171
+msgctxt "MainWindow|"
+msgid "Select Assets File"
+msgstr ""
+
 #: ../../src/qt/manageui.ui:14
 msgctxt "ManageUI|"
 msgid "Form"
@@ -325,6 +315,31 @@ msgstr ""
 #: ../../src/qt/nbtreaderui.ui:128
 msgctxt "NbtReaderUI|"
 msgid "Close"
+msgstr ""
+
+#: ../../src/qt/selectassetsui.ui:14
+msgctxt "SelectAssetsUI|"
+msgid "Form"
+msgstr ""
+
+#: ../../src/qt/selectassetsui.ui:22
+msgctxt "SelectAssetsUI|"
+msgid "Select game directory here."
+msgstr ""
+
+#: ../../src/qt/selectassetsui.ui:46
+msgctxt "SelectAssetsUI|"
+msgid "Select large version here."
+msgstr ""
+
+#: ../../src/qt/selectassetsui.ui:56
+msgctxt "SelectAssetsUI|"
+msgid "Select asset here."
+msgstr ""
+
+#: ../../src/qt/selectassetsui.ui:66
+msgctxt "SelectAssetsUI|"
+msgid "Select output directory here."
 msgstr ""
 
 #: ../../src/qt/unzipwizard.ui:14
@@ -629,10 +644,10 @@ msgstr ""
 msgid "No item list available!"
 msgstr ""
 
-#: src/qt/ilchooseui.cpp:92 src/qt/ilreaderui.cpp:111 src/qt/mainwindow.cpp:144
-#: src/qt/mainwindow.cpp:163 src/qt/mainwindow.cpp:185
-#: src/qt/mainwindow.cpp:188 src/qt/mainwindow.cpp:205
-#: src/qt/mainwindow.cpp:208 src/qt/mainwindow.cpp:233 src/qt/manage.cpp:29
+#: src/qt/ilchooseui.cpp:92 src/qt/ilreaderui.cpp:111 src/qt/mainwindow.cpp:146
+#: src/qt/mainwindow.cpp:165 src/qt/mainwindow.cpp:187
+#: src/qt/mainwindow.cpp:190 src/qt/mainwindow.cpp:207
+#: src/qt/mainwindow.cpp:210 src/qt/mainwindow.cpp:235 src/qt/manage.cpp:29
 #: src/qt/manage.cpp:292 src/qt/manage.cpp:305 src/qt/manage.cpp:412
 #: src/qt/nbtselectui.cpp:116 src/qt/regionchooseui.cpp:121
 #: src/qt/saveregionselectui.cpp:80 src/qt/utility.cpp:31 src/qt/utility.cpp:54
@@ -680,8 +695,8 @@ msgstr ""
 msgid "Show history"
 msgstr ""
 
-#: src/qt/ilreaderui.cpp:111 src/qt/mainwindow.cpp:144
-#: src/qt/mainwindow.cpp:163
+#: src/qt/ilreaderui.cpp:111 src/qt/mainwindow.cpp:146
+#: src/qt/mainwindow.cpp:165
 msgid "The item list is locked!"
 msgstr ""
 
@@ -703,35 +718,35 @@ msgstr ""
 msgid "Enter description here."
 msgstr ""
 
-#: src/qt/mainwindow.cpp:179 src/qt/saveregionselectui.cpp:74
+#: src/qt/mainwindow.cpp:181 src/qt/saveregionselectui.cpp:74
 msgid "Enter Name for Item List"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:179 src/qt/saveregionselectui.cpp:74
+#: src/qt/mainwindow.cpp:181 src/qt/saveregionselectui.cpp:74
 msgid "Enter the name for item list"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:185 src/qt/saveregionselectui.cpp:80
+#: src/qt/mainwindow.cpp:187 src/qt/saveregionselectui.cpp:80
 msgid "Description is empty!"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:188 src/qt/mainwindow.cpp:208
+#: src/qt/mainwindow.cpp:190 src/qt/mainwindow.cpp:210
 msgid "No Region or no Region selected!"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:205
+#: src/qt/mainwindow.cpp:207
 msgid "Region is locked!"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:233
+#: src/qt/mainwindow.cpp:235
 msgid "No NBT is selected!"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:258
+#: src/qt/mainwindow.cpp:260
 msgid "No Unzip Program found!"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:258
+#: src/qt/mainwindow.cpp:260
 msgid "No unzip program found, we couldn't unzip the file!"
 msgstr ""
 
@@ -904,6 +919,22 @@ msgstr ""
 
 #: src/qt/saveregionselectui.cpp:34
 msgid "Save as &item list."
+msgstr ""
+
+#: src/qt/selectassetsui.cpp:39
+msgid "Select Game Directory"
+msgstr ""
+
+#: src/qt/selectassetsui.cpp:45
+msgid "Select Output Directory"
+msgstr ""
+
+#: src/qt/selectassetsui.cpp:101
+msgid "No Corresponding object!"
+msgstr ""
+
+#: src/qt/selectassetsui.cpp:101
+msgid "No corresponding object, you need to download again!"
 msgstr ""
 
 #: src/qt/showtrackui.cpp:18

@@ -27,6 +27,7 @@
 #include "recipesui.h"
 #include "regionchooseui.h"
 #include "configui.h"
+#include "selectassetsui.h"
 #include "ui_mainwindow.h"
 #include <QMimeData>
 #include <QInputDialog>
@@ -96,6 +97,7 @@ void MainWindow::initSignalSlots()
     QObject::connect(ui->configBtn, &QPushButton::clicked, this, &MainWindow::configAction_triggered);
     QObject::connect(ui->downloadBtn, &QPushButton::clicked, this, &MainWindow::downloadBtn_clicked);
     QObject::connect(ui->unzipBtn, &QPushButton::clicked, this, &MainWindow::unzipBtn_clicked);
+    QObject::connect(ui->selectBtn, &QPushButton::clicked, this, &MainWindow::selectBtn_clicked);
 }
 
 void MainWindow::dragEnterEvent(QDragEnterEvent* event)
@@ -256,4 +258,11 @@ void MainWindow::unzipBtn_clicked()
         wizard->exec();
     }
     else QMessageBox::critical(this, _("No Unzip Program found!"), _("No unzip program found, we couldn't unzip the file!"));
+}
+
+void MainWindow::selectBtn_clicked()
+{
+    auto saui = new SelectAssetsUI();
+    saui->setAttribute(Qt::WA_DeleteOnClose);
+    saui->show();
 }

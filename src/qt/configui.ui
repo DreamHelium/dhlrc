@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>606</width>
-    <height>425</height>
+    <width>583</width>
+    <height>356</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -147,38 +147,6 @@
          </item>
          <item>
           <widget class="QPushButton" name="resetButton6">
-           <property name="text">
-            <string>Reset</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_7">
-         <item>
-          <widget class="QLabel" name="label_7">
-           <property name="text">
-            <string>Show Wizard On Start</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QComboBox" name="comboBox">
-           <item>
-            <property name="text">
-             <string>true</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>false</string>
-            </property>
-           </item>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="resetButton7">
            <property name="text">
             <string>Reset</string>
            </property>
