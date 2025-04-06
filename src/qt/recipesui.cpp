@@ -23,7 +23,9 @@
 #include "../config.h"
 #include <QAbstractItemView>
 #include <QDebug>
+#include <qtransform.h>
 #include "../common_info.h"
+#include "utility.h"
 
 typedef struct RecipesInternal{
     QString itemName;
@@ -345,7 +347,7 @@ void RecipesUI::drawLayout()
     rpl.clear();
     for(int i = 0 ; i < list.length() ; i++)
     {
-        QString str = trm(list[i].itemName.toStdString().c_str());
+        QString str = trm(list[i].itemName.toUtf8());
         str += " ";
         str += QString::number(list[i].num);
 
@@ -361,6 +363,7 @@ void RecipesUI::drawLayout()
         rpl.append(r);
 
         rpl[i].checkBox->setText(str);
+        rpl[i].checkBox->setIcon(dh::getIcon(dh::findIcon(list[i].itemName)));
         recipesLayout->addWidget(rpl[i].checkBox);
 
         rpl[i].slider->setMinimum(0);

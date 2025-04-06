@@ -11,6 +11,8 @@ Although it was named as `litematica_reader_c`, **it's not only intended to read
 
 It uses [libnbt](https://github.com/djytw/libnbt) as the library to read litematica file.
 
+Since it's a general-purpose project, the `assets` and `data` file should be provided by user. Luckily, there's a simple wizard in `utility` in Qt module which helps you to do this.
+
 ## Dependencies
 
 - [libnbt](https://github.com/djytw/libnbt) (already in submodule of the repo)
@@ -39,6 +41,7 @@ If not, install one.
 ## Usage
 
 Just run `dhlrc.bin`, and the Qt backend will start unless you are using Linux tty.
+
 If you just want to convert file, just run `dhlrc.bin conv --help` and do with the instruction.
 
 ## For developer

@@ -1,119 +1,108 @@
 #include "recipesshowui.h"
 #include "../translation.h"
+#include "recipe_handler/handler.h"
+#include "utility.h"
 #include <QDebug>
+#include <qboxlayout.h>
+#include <qcontainerfwd.h>
+#include <qnamespace.h>
+#include <QMessageBox>
+
+static auto findPattern = [](DhRecipes* r, char val) -> int
+{
+    for(int i = 0 ; i < r->pt_num ; i++)
+        if(r->pt[i].pattern == val)
+            return i;
+    return -1;
+};
 
 RecipesShowUI::RecipesShowUI(QString filename ,QWidget *parent) :
     QWidget(parent)
 {
     recipesInit(filename);
-    initUI();
+    if(r)
+        initUI();
+    else QMessageBox::critical(parent, _("Not supported recipe!"), _("The recipe is not supported!"));
 }
 
 RecipesShowUI::~RecipesShowUI()
 {
-    recipes_free(r);
-    delete[] pt_group;
+    if(r) recipes_free(r);
 }
 
 void RecipesShowUI::recipesInit(QString filename)
 {
-    r = recipes_get_recipes(filename.toStdString().c_str());
+    r = recipes_get_recipes(filename.toUtf8());
 }
 
 void RecipesShowUI::initUI()
 {
     layout = new QVBoxLayout(this);
     titleLabel = new QLabel(_("The pattern is:"), this);
-    QString patternStr = QString();
-
-    for(int i = 0 ; i < r->pattern->num ; i++)
-    {
-        patternStr += r->pattern->val[i];
-        patternStr += "\n";
-    }
-    pattern = new QLabel(patternStr, this);
-    pattern->setFont(QFont("mono"));
     layout->addWidget(titleLabel);
-    layout->addWidget(pattern);
 
-    pt_group = new ptg[r->pt_num];
-    for(int i = 0 ; i < r->pt_num ; i++)
+    QStringList list;
+    layout->addLayout(getRecipePic(r, list));
+
+    if(list.length())
     {
-        pt_group[i].pattern = new QLabel(QString(r->pt[i].pattern), this);
-        pt_group[i].pattern->setFont(QFont("mono"));
-        layout->addWidget(pt_group[i].pattern);
-        QString itemStr = QString();
-        for(int j = 0 ; j < r->pt[i].item_string->num ; j++)
+        auto extLabel = new QLabel(_("The item is:"));
+        layout->addWidget(extLabel);
+        for(auto str : list)
         {
-            itemStr += trm(r->pt[i].item_string->val[j]);
-            itemStr += "\n";
+            auto pos = findPattern(r, str[0].toLatin1());
+            if(pos != -1)
+            {
+                QString labelStr = str + ": " + "\n";
+                for(int i = 0 ; i < r->pt[pos].item_string->num ; i++)
+                    labelStr += "  " + QString(trm(r->pt[pos].item_string->val[i])) + "\n";
+                auto label = new QLabel(labelStr);
+                layout->addWidget(label);
+            }
         }
-        pt_group[i].item_string = new QLabel(itemStr, this);
-        layout->addWidget(pt_group[i].item_string);
-
-        QString imgFile = getPicFilename(r->pt[i].item_string->val[0]);
-        qDebug() << imgFile;
-        pt_group[i].img = new QImage(imgFile);
-
-        QLabel* pic = new QLabel();
-        pic->setPixmap(QPixmap::fromImage(*(pt_group[i].img)));
-        layout->addWidget(pic);
-
     }
-    this->setLayout(layout);
 }
 
 QString RecipesShowUI::getPicFilename(const char* item)
 {
-    QString str = QString();
-    const char* item_str = item;
-    while(item_str)
+    return dh::findIcon(item);
+}
+
+QVBoxLayout* RecipesShowUI::getRecipePic(DhRecipes* r, QStringList& p)
+{
+    auto ret = new QVBoxLayout();
+    for(int i = 0 ; i < r->pattern->num ; i++)
     {
-        if(*item_str != ':')
-            item_str++;
-        else
+        auto val = r->pattern->val[i];
+        auto len = strlen(val);
+        auto hLayout = new QHBoxLayout();
+        for(int j = 0 ; j < len ; j++)
         {
-            item_str++;
-            break;
-        }
-    }
-    GList* item_filenames = dh_file_list_search_in_dir("1.18.2/assets/minecraft/textures/item/", item_str);
-    if(item_filenames)
-    {
-        GList* ifd = item_filenames;
-        while(ifd)
-        {
-            if(g_str_has_prefix((char*)ifd->data, item_str))
+            auto pos = findPattern(r, val[j]);
+            QString dir;
+            if(pos != -1 && r->pt[pos].item_string->num == 1)
+                dir = dh::findIcon(r->pt[pos].item_string->val[0]);
+            auto label = new QLabel();
+            if(!dir.isEmpty())
             {
-                str = QString("1.18.2/assets/minecraft/textures/item/");
-                str += QString((char*)(ifd->data));
+                auto pixmap = dh::getIcon(dir).pixmap(16, 16);
+                label->setPixmap(pixmap);
+                label->setToolTip(trm(r->pt[pos].item_string->val[0]));
             }
-            ifd = ifd -> next;
-        }
-        g_list_free_full(item_filenames, free);
-        return str;
-    }
-    else {
-        g_list_free_full(item_filenames, free);
-        item_filenames = dh_file_list_search_in_dir("1.18.2/assets/minecraft/textures/block/", item_str);
-        if(item_filenames)
-        {
-            GList* ifd = item_filenames;
-            while(ifd)
+            else
             {
-                if(g_str_has_prefix((char*)ifd->data, item_str))
-                {
-                    str = QString("1.18.2/assets/minecraft/textures/block/");
-                    str += QString((char*)(ifd->data));
-                }
-                ifd = ifd -> next;
+                label->setText(QString(val[j]));
+                label->setFont(QFont("mono"));
+                label->setFixedHeight(16);
+                label->setFixedWidth(16);
+                if(val[j] != ' ' && !p.contains(QString(val[j])))
+                    p << QString(val[j]);
             }
-            g_list_free_full(item_filenames, free);
-            return str;
+            hLayout->addWidget(label);
         }
-        else {
-            g_list_free_full(item_filenames, free);
-            return str;
-        }
+        hLayout->setAlignment(Qt::AlignLeft);
+        layout->addLayout(hLayout);
     }
+    layout->setAlignment(Qt::AlignTop);
+    return layout;
 }

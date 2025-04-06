@@ -164,18 +164,19 @@ void NbtReaderUI::treeview_clicked()
         {
             treeRow.prepend(indexx.row());
         }
-        instance->goto_root();
+        auto instance_dup(*instance);
+        instance_dup.goto_root();
         for(int j = 0 ; j < treeRow.length() ; j++)
         {
-            if(j != 0 ) instance->child();
+            if(j != 0 ) instance_dup.child();
             auto row = treeRow[j];
             for(int i = 0 ; i < row ; i++)
-                instance->next();
+                instance_dup.next();
         }
-        ui->typeLabel->setText(ret_type_instance(instance->get_type()));
-        const char* key = instance->get_key();
+        ui->typeLabel->setText(ret_type_instance(instance_dup.get_type()));
+        const char* key = instance_dup.get_key();
         ui->keyLabel->setText(key ? key : "(NULL)");
-        ui->valueLabel->setText(ret_var(*instance));
+        ui->valueLabel->setText(ret_var(instance_dup));
     }
 }
 

@@ -24,6 +24,7 @@
 #include "manage.h"
 #include "nbtreaderui.h"
 #include "nbtselectui.h"
+#include "recipeselectui.h"
 #include "recipesui.h"
 #include "regionchooseui.h"
 #include "configui.h"
@@ -98,6 +99,7 @@ void MainWindow::initSignalSlots()
     QObject::connect(ui->downloadBtn, &QPushButton::clicked, this, &MainWindow::downloadBtn_clicked);
     QObject::connect(ui->unzipBtn, &QPushButton::clicked, this, &MainWindow::unzipBtn_clicked);
     QObject::connect(ui->selectBtn, &QPushButton::clicked, this, &MainWindow::selectBtn_clicked);
+    QObject::connect(ui->recipeBtn, &QPushButton::clicked, this, &MainWindow::recipeBtn_clicked);
 }
 
 void MainWindow::dragEnterEvent(QDragEnterEvent* event)
@@ -265,4 +267,11 @@ void MainWindow::selectBtn_clicked()
     auto saui = new SelectAssetsUI();
     saui->setAttribute(Qt::WA_DeleteOnClose);
     saui->show();
+}
+
+void MainWindow::recipeBtn_clicked()
+{
+    auto rsui = new RecipeSelectUI();
+    rsui->setAttribute(Qt::WA_DeleteOnClose);
+    rsui->show();
 }

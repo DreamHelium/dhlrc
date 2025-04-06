@@ -172,6 +172,13 @@
             </property>
            </widget>
           </item>
+          <item>
+           <widget class="QPushButton" name="recipeBtn">
+            <property name="text">
+             <string>Show Recipe</string>
+            </property>
+           </widget>
+          </item>
          </layout>
         </item>
        </layout>

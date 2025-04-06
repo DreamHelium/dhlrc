@@ -238,6 +238,11 @@
         <source>Select Assets File</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <location filename="../../src/qt/mainwindow.ui" line="178"/>
+        <source>Show Recipe</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ManageUI</name>
@@ -312,6 +317,19 @@
     <message>
         <location filename="../../src/qt/nbtreaderui.ui" line="128"/>
         <source>Close</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>RecipeSelectUI</name>
+    <message>
+        <location filename="../../src/qt/recipeselectui.ui" line="14"/>
+        <source>Form</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qt/recipeselectui.ui" line="20"/>
+        <source>Please select a recipe file:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

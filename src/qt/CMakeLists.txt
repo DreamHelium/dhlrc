@@ -42,6 +42,7 @@ set(PROJECT_SOURCES
         dhtreefilter.h dhtreefilter.cpp
         unzipwizard.h unzipwizard.cpp unzipwizard.ui
         selectassetsui.h selectassetsui.cpp selectassetsui.ui
+        recipeselectui.h recipeselectui.cpp recipeselectui.ui
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)

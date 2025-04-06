@@ -228,6 +228,11 @@ msgctxt "MainWindow|"
 msgid "Select Assets File"
 msgstr ""
 
+#: ../../src/qt/mainwindow.ui:178
+msgctxt "MainWindow|"
+msgid "Show Recipe"
+msgstr ""
+
 #: ../../src/qt/manageui.ui:14
 msgctxt "ManageUI|"
 msgid "Form"
@@ -296,6 +301,16 @@ msgstr ""
 #: ../../src/qt/nbtreaderui.ui:128
 msgctxt "NbtReaderUI|"
 msgid "Close"
+msgstr ""
+
+#: ../../src/qt/recipeselectui.ui:14
+msgctxt "RecipeSelectUI|"
+msgid "Form"
+msgstr ""
+
+#: ../../src/qt/recipeselectui.ui:20
+msgctxt "RecipeSelectUI|"
+msgid "Please select a recipe file:"
 msgstr ""
 
 #: ../../src/qt/selectassetsui.ui:14

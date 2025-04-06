@@ -5,18 +5,12 @@
 #include <QLabel>
 #include <QPainter>
 #include <QVBoxLayout>
+#include <qboxlayout.h>
 #include "../recipe_handler/handler.h"
 
 namespace Ui {
 class RecipesShowUI;
 }
-
-typedef struct ptg{
-    QLabel* pattern;
-    QLabel* item_string;
-    QImage* img;
-    QPainter* painter;
-} ptg;
 
 class RecipesShowUI : public QWidget
 {
@@ -31,10 +25,10 @@ private:
     DhRecipes* r;
     QLabel* titleLabel;
     QLabel* pattern;
-    ptg* pt_group = nullptr;
 
     void recipesInit(QString filename);
     void initUI();
+    QVBoxLayout* getRecipePic(DhRecipes* r, QStringList& p);
     QString getPicFilename(const char* item);
 
 private Q_SLOTS:

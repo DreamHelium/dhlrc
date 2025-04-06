@@ -12,6 +12,7 @@
 #include "../region.h"
 #include "../nbt_interface_cpp/nbt_interface.hpp"
 #include "../common_info.h"
+#include "../config.h"
 
 void dh::loadRegion(QWidget* parent)
 {
@@ -142,4 +143,43 @@ QPixmap* dh::loadSvgResourceFile(const char* pos)
     QPixmap* pixmap = dh::loadSvgFile((const char*)iconResBytes);
     g_bytes_unref(iconRes);
     return pixmap;
+}
+
+QString dh::findIcon(QString obj)
+{
+    gchar* domainStr = g_strdup(obj.toUtf8());
+    *strchr(domainStr, ':') = 0;
+    QString domain = domainStr;
+    g_free(domainStr);
+
+    auto index = obj.indexOf(':');
+    obj.remove(0, index + 1);
+
+    char* assetsDir = dh_get_assets_dir();
+    QString assetsDirDup = assetsDir;
+    g_free(assetsDir);
+    assetsDirDup += (QString(G_DIR_SEPARATOR) + domain + G_DIR_SEPARATOR + "textures" + G_DIR_SEPARATOR);
+    QString testItemDir = assetsDirDup + "item" + G_DIR_SEPARATOR + obj + ".png";
+    if(g_file_test(testItemDir.toUtf8(), G_FILE_TEST_IS_REGULAR))
+        return testItemDir;
+    else
+    {
+        QString testBlockDir = assetsDirDup + "block" + G_DIR_SEPARATOR + obj + ".png";
+        if(g_file_test(testBlockDir.toUtf8(), G_FILE_TEST_IS_REGULAR))
+            return testBlockDir;
+        else 
+        {
+            testBlockDir = assetsDirDup + "block" + G_DIR_SEPARATOR + obj + "_front" + ".png";
+            if(g_file_test(testBlockDir.toUtf8(), G_FILE_TEST_IS_REGULAR))
+                return testBlockDir;
+            else return QString();
+        }
+    }
+}
+
+QIcon dh::getIcon(QString dir)
+{
+    QPixmap pixmap(dir);
+    pixmap = pixmap.copy(0, 0, 16, 16);
+    return QIcon(pixmap);
 }

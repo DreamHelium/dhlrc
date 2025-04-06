@@ -13,6 +13,8 @@ namespace dh {
     void loadNbtInstances(QWidget* parent, QStringList filelist);
     QPixmap* loadSvgFile(const char* contents);
     QPixmap* loadSvgResourceFile(const char* pos);
+    QString findIcon(QString obj);
+    QIcon getIcon(QString dir);
 }
 
 #endif /* UTILITY_H */

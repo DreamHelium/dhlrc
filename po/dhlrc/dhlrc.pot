@@ -15,7 +15,7 @@ msgstr ""
 "#-#-#-#-#  dhlrc.pot (dhlrc)  #-#-#-#-#\n"
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-04-03 01:23+0800\n"
+"POT-Creation-Date: 2025-04-06 23:50+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -247,6 +247,11 @@ msgctxt "MainWindow|"
 msgid "Select Assets File"
 msgstr ""
 
+#: ../../src/qt/mainwindow.ui:178
+msgctxt "MainWindow|"
+msgid "Show Recipe"
+msgstr ""
+
 #: ../../src/qt/manageui.ui:14
 msgctxt "ManageUI|"
 msgid "Form"
@@ -315,6 +320,16 @@ msgstr ""
 #: ../../src/qt/nbtreaderui.ui:128
 msgctxt "NbtReaderUI|"
 msgid "Close"
+msgstr ""
+
+#: ../../src/qt/recipeselectui.ui:14
+msgctxt "RecipeSelectUI|"
+msgid "Form"
+msgstr ""
+
+#: ../../src/qt/recipeselectui.ui:20
+msgctxt "RecipeSelectUI|"
+msgid "Please select a recipe file:"
 msgstr ""
 
 #: ../../src/qt/selectassetsui.ui:14
@@ -451,7 +466,7 @@ msgstr ""
 msgid "Error when reading file."
 msgstr ""
 
-#: src/main_isoc.c:108 src/qt/utility.cpp:95
+#: src/main_isoc.c:108 src/qt/utility.cpp:96
 msgid "Not a valid NBT file!"
 msgstr ""
 
@@ -628,14 +643,14 @@ msgid "locked"
 msgstr ""
 
 #: src/qt/ilchooseui.cpp:49 src/qt/ilchooseui.cpp:68 src/qt/lrchooseui.cpp:62
-#: src/qt/nbtselectui.cpp:45 src/qt/nbtselectui.cpp:64 src/qt/recipesui.cpp:138
+#: src/qt/nbtselectui.cpp:45 src/qt/nbtselectui.cpp:64 src/qt/recipesui.cpp:140
 #: src/qt/regionchooseui.cpp:66 src/qt/regionchooseui.cpp:85
 #: src/qt/saveregionselectui.cpp:41 src/gtk/manage_window.c:118
 msgid "&OK"
 msgstr ""
 
 #: src/qt/ilchooseui.cpp:50 src/qt/lrchooseui.cpp:63 src/qt/nbtselectui.cpp:46
-#: src/qt/recipesui.cpp:139 src/qt/regionchooseui.cpp:67
+#: src/qt/recipesui.cpp:141 src/qt/regionchooseui.cpp:67
 #: src/qt/saveregionselectui.cpp:42 src/gtk/manage_window.c:121
 msgid "&Close"
 msgstr ""
@@ -644,14 +659,14 @@ msgstr ""
 msgid "No item list available!"
 msgstr ""
 
-#: src/qt/ilchooseui.cpp:92 src/qt/ilreaderui.cpp:111 src/qt/mainwindow.cpp:146
-#: src/qt/mainwindow.cpp:165 src/qt/mainwindow.cpp:187
-#: src/qt/mainwindow.cpp:190 src/qt/mainwindow.cpp:207
-#: src/qt/mainwindow.cpp:210 src/qt/mainwindow.cpp:235 src/qt/manage.cpp:29
+#: src/qt/ilchooseui.cpp:92 src/qt/ilreaderui.cpp:111 src/qt/mainwindow.cpp:148
+#: src/qt/mainwindow.cpp:167 src/qt/mainwindow.cpp:189
+#: src/qt/mainwindow.cpp:192 src/qt/mainwindow.cpp:209
+#: src/qt/mainwindow.cpp:212 src/qt/mainwindow.cpp:237 src/qt/manage.cpp:29
 #: src/qt/manage.cpp:292 src/qt/manage.cpp:305 src/qt/manage.cpp:412
 #: src/qt/nbtselectui.cpp:116 src/qt/regionchooseui.cpp:121
-#: src/qt/saveregionselectui.cpp:80 src/qt/utility.cpp:31 src/qt/utility.cpp:54
-#: src/qt/utility.cpp:60 src/qt/utility.cpp:67 src/qt/utility.cpp:124
+#: src/qt/saveregionselectui.cpp:80 src/qt/utility.cpp:32 src/qt/utility.cpp:55
+#: src/qt/utility.cpp:61 src/qt/utility.cpp:68 src/qt/utility.cpp:125
 msgid "Error!"
 msgstr ""
 
@@ -695,8 +710,8 @@ msgstr ""
 msgid "Show history"
 msgstr ""
 
-#: src/qt/ilreaderui.cpp:111 src/qt/mainwindow.cpp:146
-#: src/qt/mainwindow.cpp:165
+#: src/qt/ilreaderui.cpp:111 src/qt/mainwindow.cpp:148
+#: src/qt/mainwindow.cpp:167
 msgid "The item list is locked!"
 msgstr ""
 
@@ -718,35 +733,35 @@ msgstr ""
 msgid "Enter description here."
 msgstr ""
 
-#: src/qt/mainwindow.cpp:181 src/qt/saveregionselectui.cpp:74
+#: src/qt/mainwindow.cpp:183 src/qt/saveregionselectui.cpp:74
 msgid "Enter Name for Item List"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:181 src/qt/saveregionselectui.cpp:74
+#: src/qt/mainwindow.cpp:183 src/qt/saveregionselectui.cpp:74
 msgid "Enter the name for item list"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:187 src/qt/saveregionselectui.cpp:80
+#: src/qt/mainwindow.cpp:189 src/qt/saveregionselectui.cpp:80
 msgid "Description is empty!"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:190 src/qt/mainwindow.cpp:210
+#: src/qt/mainwindow.cpp:192 src/qt/mainwindow.cpp:212
 msgid "No Region or no Region selected!"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:207
+#: src/qt/mainwindow.cpp:209
 msgid "Region is locked!"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:235
+#: src/qt/mainwindow.cpp:237
 msgid "No NBT is selected!"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:260
+#: src/qt/mainwindow.cpp:262
 msgid "No Unzip Program found!"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:260
+#: src/qt/mainwindow.cpp:262
 msgid "No unzip program found, we couldn't unzip the file!"
 msgstr ""
 
@@ -826,78 +841,90 @@ msgstr ""
 msgid "No NBT selected!"
 msgstr ""
 
-#: src/qt/recipesshowui.cpp:26
+#: src/qt/recipesshowui.cpp:25
+msgid "Not supported recipe!"
+msgstr ""
+
+#: src/qt/recipesshowui.cpp:25
+msgid "The recipe is not supported!"
+msgstr ""
+
+#: src/qt/recipesshowui.cpp:41
 msgid "The pattern is:"
 msgstr ""
 
-#: src/qt/recipesui.cpp:105
+#: src/qt/recipesshowui.cpp:49
+msgid "The item is:"
+msgstr ""
+
+#: src/qt/recipesui.cpp:107
 msgid "No items? Get recipe files from file."
 msgstr ""
 
-#: src/qt/recipesui.cpp:106
+#: src/qt/recipesui.cpp:108
 msgid "Please select items:"
 msgstr ""
 
-#: src/qt/recipesui.cpp:108
+#: src/qt/recipesui.cpp:110
 msgid "Search block name"
 msgstr ""
 
-#: src/qt/recipesui.cpp:128
+#: src/qt/recipesui.cpp:130
 msgid "Combine items to this item list."
 msgstr ""
 
-#: src/qt/recipesui.cpp:130
+#: src/qt/recipesui.cpp:132
 msgid "New item list name:"
 msgstr ""
 
-#: src/qt/recipesui.cpp:131
+#: src/qt/recipesui.cpp:133
 msgid "Generated from material list combiner."
 msgstr ""
 
-#: src/qt/recipesui.cpp:204
+#: src/qt/recipesui.cpp:206
 #, c-format
 msgid "\"Delete\" %d items from material list combiner."
 msgstr ""
 
-#: src/qt/recipesui.cpp:234
+#: src/qt/recipesui.cpp:236
 msgid "Mod decide"
 msgstr ""
 
-#: src/qt/recipesui.cpp:234
+#: src/qt/recipesui.cpp:236
 #, c-format
 msgid "There's a remainder with %d and %d, continue?"
 msgstr ""
 
-#: src/qt/recipesui.cpp:258
+#: src/qt/recipesui.cpp:260
 #, c-format
 msgid "Add %d items from material list combiner."
 msgstr ""
 
-#: src/qt/recipesui.cpp:321
+#: src/qt/recipesui.cpp:323
 msgid "Please select a game jar"
 msgstr ""
 
-#: src/qt/recipesui.cpp:321 src/qt/unzipwizard.cpp:73
+#: src/qt/recipesui.cpp:323 src/qt/unzipwizard.cpp:73
 msgid "Jar File (*.jar)"
 msgstr ""
 
-#: src/qt/recipesui.cpp:360
+#: src/qt/recipesui.cpp:362
 msgid "Show recipe"
 msgstr ""
 
-#: src/qt/recipesui.cpp:421 src/qt/unzipwizard.cpp:89
+#: src/qt/recipesui.cpp:424 src/qt/unzipwizard.cpp:89
 msgid "Unzip failed!"
 msgstr ""
 
-#: src/qt/recipesui.cpp:430
+#: src/qt/recipesui.cpp:433
 msgid "Please select a destination."
 msgstr ""
 
-#: src/qt/recipesui.cpp:463
+#: src/qt/recipesui.cpp:466
 msgid "No Unzip Found!"
 msgstr ""
 
-#: src/qt/recipesui.cpp:463
+#: src/qt/recipesui.cpp:466
 msgid "No unzip program found!"
 msgstr ""
 
@@ -957,51 +984,51 @@ msgstr ""
 msgid "Invalid file/directory."
 msgstr ""
 
-#: src/qt/utility.cpp:31
+#: src/qt/utility.cpp:32
 msgid "No NBT or no NBT selected!"
 msgstr ""
 
-#: src/qt/utility.cpp:51
+#: src/qt/utility.cpp:52
 msgid "Enter Region Name"
 msgstr ""
 
-#: src/qt/utility.cpp:51
+#: src/qt/utility.cpp:52
 msgid "Enter name for the new Region."
 msgstr ""
 
-#: src/qt/utility.cpp:54
+#: src/qt/utility.cpp:55
 msgid "No description for the Region!"
 msgstr ""
 
-#: src/qt/utility.cpp:60
+#: src/qt/utility.cpp:61
 msgid "The NBT Struct is unsupported!"
 msgstr ""
 
-#: src/qt/utility.cpp:67
+#: src/qt/utility.cpp:68
 msgid "This NBT is locked!"
 msgstr ""
 
-#: src/qt/utility.cpp:78 src/gtk/manage_nbt.c:131
+#: src/qt/utility.cpp:79 src/gtk/manage_nbt.c:131
 msgid "Enter Desciption"
 msgstr ""
 
-#: src/qt/utility.cpp:78
+#: src/qt/utility.cpp:79
 msgid "Enter desciption for the NBT file."
 msgstr ""
 
-#: src/qt/utility.cpp:80
+#: src/qt/utility.cpp:81
 msgid "No Description Entered!"
 msgstr ""
 
-#: src/qt/utility.cpp:80
+#: src/qt/utility.cpp:81
 msgid "No desciption entered! Will not add the NBT file!"
 msgstr ""
 
-#: src/qt/utility.cpp:95
+#: src/qt/utility.cpp:96
 msgid "Not Valid File!"
 msgstr ""
 
-#: src/qt/utility.cpp:118
+#: src/qt/utility.cpp:119
 msgid "The following files couldn't be added:\n"
 msgstr ""
 

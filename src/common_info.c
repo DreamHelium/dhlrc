@@ -242,7 +242,11 @@ const char* common_info_list_get_uuid(DhInfoTypes type)
 void common_info_list_set_multi_uuid(DhInfoTypes type, const char** arr)
 {
     CommonInfoSingle* instance = infos->pdata[type];
-    if(instance->uuid_array) dh_str_array_free(instance->uuid_array);
+    if(instance->uuid_array) 
+    {
+        dh_str_array_free(instance->uuid_array);
+        instance->uuid_array = NULL;
+    }
     for(; *arr ; arr++)
         dh_str_array_add_str(&(instance->uuid_array), *arr);
 }

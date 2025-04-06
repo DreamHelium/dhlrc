@@ -133,7 +133,7 @@ void UnzipWizard::reaction()
 void UnzipWizard::searchDir()
 {
     QString domain = ui->domainEdit->text();
-    gchar* assetDir = g_build_path(G_DIR_SEPARATOR_S, destdir.toUtf8(), "assets", static_cast<const char*>(domain.toUtf8()), NULL);
+    gchar* assetDir = g_build_path(G_DIR_SEPARATOR_S, destdir.toUtf8(), "assets", NULL);
     gchar* transFile = nullptr;
     const char* const* locales = g_get_language_names();
     const char* locale = locales[0];
