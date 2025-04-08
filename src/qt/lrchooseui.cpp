@@ -9,7 +9,7 @@
 #include "dh_string_util.h"
 #include "../common_info.h"
 #include "../region.h"
-#include "nbt_interface_cpp/nbt_interface.hpp"
+#include "../nbt_interface_cpp/nbt_interface.hpp"
 
 LrChooseUI::LrChooseUI(QWidget *parent) :
     QDialog(parent)

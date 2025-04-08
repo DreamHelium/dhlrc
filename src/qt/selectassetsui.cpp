@@ -1,11 +1,11 @@
 #include "selectassetsui.h"
-#include "config.h"
+#include "../config.h"
 #include "../translation.h"
 #include "dh_file_util.h"
 #include "gio/gio.h"
 #include "glib.h"
 #include "glibconfig.h"
-#include "json_util.h"
+#include "../json_util.h"
 #include "ui_selectassetsui.h"
 #include <cjson/cJSON.h>
 #include <qdialogbuttonbox.h>

@@ -13,7 +13,7 @@ find_package(PkgConfig)
 
 pkg_search_module(GIO REQUIRED gio-2.0)
 pkg_search_module(gm REQUIRED gmodule-2.0)
-# pkg_search_module(minizip REQUIRED minizip-ng)
+pkg_search_module(minizip REQUIRED minizip-ng)
 
 set(DH_ENABLE_TRANSLATION true)
 

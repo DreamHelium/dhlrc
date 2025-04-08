@@ -1,6 +1,6 @@
 #include "recipesshowui.h"
 #include "../translation.h"
-#include "recipe_handler/handler.h"
+#include "../recipe_handler/handler.h"
 #include "utility.h"
 #include <QDebug>
 #include <qboxlayout.h>

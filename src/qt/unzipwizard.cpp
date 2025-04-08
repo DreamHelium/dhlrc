@@ -5,11 +5,15 @@
 #include <qwizard.h>
 #include "../translation.h"
 #include "../config.h"
+#include "../uncompress.h"
+
+static UnzipWizard* uw;
 
 UnzipWizard::UnzipWizard(QWidget *parent) :
     QWizard(parent),
     ui(new Ui::UnzipWizard)
 {
+    uw = this;
     ui->setupUi(this);
     QObject::connect(ui->resetBtn, &QPushButton::clicked, this, &UnzipWizard::resetBtn_clicked);
     QObject::connect(this, &QWizard::finished, this, &UnzipWizard::finished);
@@ -90,6 +94,66 @@ static void finish_extract(GPid pid, gint status, gpointer user_data)
     else uw->label->setText(_("Unzip finished!"));
 }
 
+static auto unzip_by_unzip = [](QString jar, QString dir)
+{
+    GPid pid;
+    GError* err = nullptr;
+    DhStrArray* arr = nullptr;
+    gchar* prpath = g_find_program_in_path("unzip");
+    dh_str_array_add_str(&arr, prpath);
+    dh_str_array_add_str(&arr, "-q");
+    dh_str_array_add_str(&arr, jar.toUtf8());
+    g_free(prpath);
+    if(!g_spawn_async(dir.toUtf8(), arr->val, nullptr, G_SPAWN_DO_NOT_REAP_CHILD, nullptr, nullptr, &pid, &err))
+    {
+        dh_str_array_free(arr);
+        // ui->label_3->setText(err->message);
+        g_error_free(err);
+    }
+    else
+    {
+        dh_str_array_free(arr);
+        g_child_watch_add(pid, finish_extract, uw);
+        uw->destdir = dir;
+    }
+};
+
+static void finish_extract_minizip(GObject* obj, GAsyncResult* res, gpointer data)
+{
+    GTask* task = G_TASK(res);
+    int ret = g_task_propagate_int(task, nullptr);
+    uw->label->setText(QString::number(ret));
+}
+
+typedef struct DhUnzipSt
+{
+    char* jar;
+    char* dir;
+} DhUnzipSt;
+
+static void real_task_func(GTask* task, gpointer source_object, gpointer task_data, GCancellable* cancellable)
+{
+    DhUnzipSt* data = (DhUnzipSt*)task_data;
+    DhStrArray* arr = nullptr;
+    dh_str_array_add_str(&arr, "data");
+    dh_str_array_add_str(&arr, "assets");
+    int ret = dhlrc_extract_part(data->jar, data->dir, arr);
+    dh_str_array_free(arr);
+    g_free(data->jar);
+    g_free(data->dir);
+    g_task_return_int(task, ret);
+}
+
+
+static auto unzip_by_minizip = [](const char* jar, const char* dir)
+{
+    GTask* task = g_task_new(nullptr, nullptr, finish_extract_minizip, uw);
+    DhUnzipSt* fullData = new DhUnzipSt{g_strdup(jar), g_strdup(dir)};
+    g_task_set_task_data(task, fullData, [](gpointer data){delete (DhUnzipSt*)data;});
+    g_task_run_in_thread(task, real_task_func);
+    g_object_unref(task);
+};
+
 void UnzipWizard::reaction()
 {
     if(currentPage() == ui->wizardPage)
@@ -102,26 +166,8 @@ void UnzipWizard::reaction()
             label = ui->label_3;
             if(!g_file_test(dir.toUtf8(), G_FILE_TEST_IS_DIR))
                 dh_file_create(dir.toUtf8(), false);
-            GPid pid;
-            GError* err = nullptr;
-            DhStrArray* arr = nullptr;
-            gchar* prpath = g_find_program_in_path("unzip");
-            dh_str_array_add_str(&arr, prpath);
-            dh_str_array_add_str(&arr, "-q");
-            dh_str_array_add_str(&arr, jar.toUtf8());
-            g_free(prpath);
-            if(!g_spawn_async(dir.toUtf8(), arr->val, nullptr, G_SPAWN_DO_NOT_REAP_CHILD, nullptr, nullptr, &pid, &err))
-            {
-                dh_str_array_free(arr);
-                ui->label_3->setText(err->message);
-                g_error_free(err);
-            }
-            else
-            {
-                dh_str_array_free(arr);
-                g_child_watch_add(pid, finish_extract, this);
-                destdir = dir;
-            }
+            unzip_by_minizip(jar.toUtf8(), dir.toUtf8());
+            destdir = dir;
         }
         else
             ui->label_3->setText(_("Invalid file/directory."));

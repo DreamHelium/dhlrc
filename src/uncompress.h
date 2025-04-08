@@ -18,11 +18,13 @@
 #ifndef UNCOMPRESS_H
 #define UNCOMPRESS_H
 
+#include "dh_string_util.h"
 #ifdef __cplusplus
 extern "C"{
 #endif
 
 int dhlrc_extract(const char* path, const char* dest);
+int dhlrc_extract_part(const char* path, const char* dest, DhStrArray* arr);
 
 #ifdef __cplusplus
 }

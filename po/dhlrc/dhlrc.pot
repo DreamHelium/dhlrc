@@ -15,7 +15,7 @@ msgstr ""
 "#-#-#-#-#  dhlrc.pot (dhlrc)  #-#-#-#-#\n"
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-04-06 23:50+0800\n"
+"POT-Creation-Date: 2025-04-09 01:44+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -904,7 +904,7 @@ msgstr ""
 msgid "Please select a game jar"
 msgstr ""
 
-#: src/qt/recipesui.cpp:323 src/qt/unzipwizard.cpp:73
+#: src/qt/recipesui.cpp:323 src/qt/unzipwizard.cpp:77
 msgid "Jar File (*.jar)"
 msgstr ""
 
@@ -912,7 +912,7 @@ msgstr ""
 msgid "Show recipe"
 msgstr ""
 
-#: src/qt/recipesui.cpp:424 src/qt/unzipwizard.cpp:89
+#: src/qt/recipesui.cpp:424 src/qt/unzipwizard.cpp:93
 msgid "Unzip failed!"
 msgstr ""
 
@@ -968,19 +968,19 @@ msgstr ""
 msgid "The track information is:\n"
 msgstr ""
 
-#: src/qt/unzipwizard.cpp:73
+#: src/qt/unzipwizard.cpp:77
 msgid "Please select a resource file"
 msgstr ""
 
-#: src/qt/unzipwizard.cpp:79
+#: src/qt/unzipwizard.cpp:83
 msgid "Please select a destination directory."
 msgstr ""
 
-#: src/qt/unzipwizard.cpp:90
+#: src/qt/unzipwizard.cpp:94
 msgid "Unzip finished!"
 msgstr ""
 
-#: src/qt/unzipwizard.cpp:127
+#: src/qt/unzipwizard.cpp:173
 msgid "Invalid file/directory."
 msgstr ""
 

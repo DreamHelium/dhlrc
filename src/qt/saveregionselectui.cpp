@@ -9,7 +9,7 @@
 #include <qradiobutton.h>
 #include "../common_info.h"
 #include "../region.h"
-#include "nbt_interface_cpp/nbt_interface.hpp"
+#include "../nbt_interface_cpp/nbt_interface.hpp"
 
 SaveRegionSelectUI::SaveRegionSelectUI(QWidget* parent):
     QDialog(parent)

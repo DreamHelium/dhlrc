@@ -53,7 +53,7 @@ add_library(dhlrc SHARED
 	    #    nbt_pos.h
 	       config.c
 	       config.h
-	    #    uncompress.c uncompress.h
+	       uncompress.c uncompress.h
 	    #    nbt_util.h
 	    #    nbt_util.c
 		   json_util.c
@@ -69,14 +69,14 @@ add_library(dhlrc SHARED
 # target_link_libraries(dhlrc_recipe_full PUBLIC dhutil cjson)
 
 target_link_libraries(dhlrc PUBLIC z cjson 
-# ${minizip_LIBRARIES} 
+					  ${minizip_LIBRARIES} 
 					  dhutil_base
-					 dhrecipe_handler dhnbt_interface_cpp
+					  dhrecipe_handler dhnbt_interface_cpp
 )
 # dhlrc_recipe_full
-# if(${minizip_VERSION} LESS 4.0.0)
-# 	add_definitions(-DDHLRC_MZ_VERSION_LESS_THAN_FOUR)
-# endif()
+if(${minizip_VERSION} LESS 4.0.0)
+	add_definitions(-DDHLRC_MZ_VERSION_LESS_THAN_FOUR)
+endif()
 
 
 target_include_directories(dhlrc PUBLIC

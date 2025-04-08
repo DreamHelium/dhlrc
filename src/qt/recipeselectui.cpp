@@ -1,6 +1,6 @@
 #include "dh_file_util.h"
 #include "recipeselectui.h"
-#include "config.h"
+#include "../config.h"
 #include "glibconfig.h"
 #include "recipesshowui.h"
 #include "ui_recipeselectui.h"

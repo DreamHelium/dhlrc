@@ -1,7 +1,7 @@
 #include "main_conv.h"
 #include "../translation.h"
 #include "../region.h"
-#include "litematica_region.h"
+#include "../litematica_region.h"
 
 enum format{DH_NBT, DH_LITEMATIC, DH_SCHEMATIC};
 

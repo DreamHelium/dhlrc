@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-04-06 23:40+0800\n"
+"POT-Creation-Date: 2025-04-09 01:28+0800\n"
 "PO-Revision-Date: 2024-11-30 07:00+0800\n"
 "Last-Translator: dream_he <48383878+DreamHelium@users.noreply.github.com>\n"
 "Language-Team: Chinese <kde-i18n-doc@kde.org>\n"
@@ -917,7 +917,7 @@ msgstr "从材料列表合成器添加%d物品。"
 msgid "Please select a game jar"
 msgstr ""
 
-#: src/qt/recipesui.cpp:323 src/qt/unzipwizard.cpp:73
+#: src/qt/recipesui.cpp:323 src/qt/unzipwizard.cpp:77
 msgid "Jar File (*.jar)"
 msgstr ""
 
@@ -925,7 +925,7 @@ msgstr ""
 msgid "Show recipe"
 msgstr "展示配方"
 
-#: src/qt/recipesui.cpp:424 src/qt/unzipwizard.cpp:89
+#: src/qt/recipesui.cpp:424 src/qt/unzipwizard.cpp:93
 msgid "Unzip failed!"
 msgstr ""
 
@@ -981,19 +981,19 @@ msgstr ""
 msgid "The track information is:\n"
 msgstr "追踪信息如下：\n"
 
-#: src/qt/unzipwizard.cpp:73
+#: src/qt/unzipwizard.cpp:77
 msgid "Please select a resource file"
 msgstr ""
 
-#: src/qt/unzipwizard.cpp:79
+#: src/qt/unzipwizard.cpp:83
 msgid "Please select a destination directory."
 msgstr ""
 
-#: src/qt/unzipwizard.cpp:90
+#: src/qt/unzipwizard.cpp:94
 msgid "Unzip finished!"
 msgstr ""
 
-#: src/qt/unzipwizard.cpp:127
+#: src/qt/unzipwizard.cpp:173
 msgid "Invalid file/directory."
 msgstr ""
 
