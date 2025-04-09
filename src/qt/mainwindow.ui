@@ -179,6 +179,13 @@
             </property>
            </widget>
           </item>
+          <item>
+           <widget class="QPushButton" name="openglBtn">
+            <property name="text">
+             <string>Test OpenGL</string>
+            </property>
+           </widget>
+          </item>
          </layout>
         </item>
        </layout>

@@ -243,6 +243,11 @@
         <source>Show Recipe</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <location filename="../../src/qt/mainwindow.ui" line="185"/>
+        <source>Test OpenGL</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ManageUI</name>

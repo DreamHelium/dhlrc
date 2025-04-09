@@ -17,14 +17,13 @@
 
 #include "litematica_region.h"
 #include "dh_string_util.h"
-#include "nbt_interface/libnbt/nbt.h"
+#include "nbt_interface_cpp/libnbt/nbt.h"
 #include "nbt_interface_cpp/nbt_interface.hpp"
 #include "region.h"
 #include <string.h>
 #include <stdlib.h>
 #include <time.h>
 #include "translation.h"
-#include "nbt_interface/nbt_if_common.h"
 
 typedef struct _LiteRegion{
 

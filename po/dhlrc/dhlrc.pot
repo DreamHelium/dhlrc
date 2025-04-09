@@ -15,7 +15,7 @@ msgstr ""
 "#-#-#-#-#  dhlrc.pot (dhlrc)  #-#-#-#-#\n"
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-04-09 01:44+0800\n"
+"POT-Creation-Date: 2025-04-09 09:41+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -250,6 +250,11 @@ msgstr ""
 #: ../../src/qt/mainwindow.ui:178
 msgctxt "MainWindow|"
 msgid "Show Recipe"
+msgstr ""
+
+#: ../../src/qt/mainwindow.ui:185
+msgctxt "MainWindow|"
+msgid "Test OpenGL"
 msgstr ""
 
 #: ../../src/qt/manageui.ui:14
@@ -659,10 +664,10 @@ msgstr ""
 msgid "No item list available!"
 msgstr ""
 
-#: src/qt/ilchooseui.cpp:92 src/qt/ilreaderui.cpp:111 src/qt/mainwindow.cpp:148
-#: src/qt/mainwindow.cpp:167 src/qt/mainwindow.cpp:189
-#: src/qt/mainwindow.cpp:192 src/qt/mainwindow.cpp:209
-#: src/qt/mainwindow.cpp:212 src/qt/mainwindow.cpp:237 src/qt/manage.cpp:29
+#: src/qt/ilchooseui.cpp:92 src/qt/ilreaderui.cpp:111 src/qt/mainwindow.cpp:150
+#: src/qt/mainwindow.cpp:169 src/qt/mainwindow.cpp:191
+#: src/qt/mainwindow.cpp:194 src/qt/mainwindow.cpp:211
+#: src/qt/mainwindow.cpp:214 src/qt/mainwindow.cpp:239 src/qt/manage.cpp:29
 #: src/qt/manage.cpp:292 src/qt/manage.cpp:305 src/qt/manage.cpp:412
 #: src/qt/nbtselectui.cpp:116 src/qt/regionchooseui.cpp:121
 #: src/qt/saveregionselectui.cpp:80 src/qt/utility.cpp:32 src/qt/utility.cpp:55
@@ -710,8 +715,8 @@ msgstr ""
 msgid "Show history"
 msgstr ""
 
-#: src/qt/ilreaderui.cpp:111 src/qt/mainwindow.cpp:148
-#: src/qt/mainwindow.cpp:167
+#: src/qt/ilreaderui.cpp:111 src/qt/mainwindow.cpp:150
+#: src/qt/mainwindow.cpp:169
 msgid "The item list is locked!"
 msgstr ""
 
@@ -733,35 +738,35 @@ msgstr ""
 msgid "Enter description here."
 msgstr ""
 
-#: src/qt/mainwindow.cpp:183 src/qt/saveregionselectui.cpp:74
+#: src/qt/mainwindow.cpp:185 src/qt/saveregionselectui.cpp:74
 msgid "Enter Name for Item List"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:183 src/qt/saveregionselectui.cpp:74
+#: src/qt/mainwindow.cpp:185 src/qt/saveregionselectui.cpp:74
 msgid "Enter the name for item list"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:189 src/qt/saveregionselectui.cpp:80
+#: src/qt/mainwindow.cpp:191 src/qt/saveregionselectui.cpp:80
 msgid "Description is empty!"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:192 src/qt/mainwindow.cpp:212
+#: src/qt/mainwindow.cpp:194 src/qt/mainwindow.cpp:214
 msgid "No Region or no Region selected!"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:209
+#: src/qt/mainwindow.cpp:211
 msgid "Region is locked!"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:237
+#: src/qt/mainwindow.cpp:239
 msgid "No NBT is selected!"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:262
+#: src/qt/mainwindow.cpp:264
 msgid "No Unzip Program found!"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:262
+#: src/qt/mainwindow.cpp:264
 msgid "No unzip program found, we couldn't unzip the file!"
 msgstr ""
 
@@ -904,7 +909,7 @@ msgstr ""
 msgid "Please select a game jar"
 msgstr ""
 
-#: src/qt/recipesui.cpp:323 src/qt/unzipwizard.cpp:77
+#: src/qt/recipesui.cpp:323 src/qt/unzipwizard.cpp:83
 msgid "Jar File (*.jar)"
 msgstr ""
 
@@ -912,7 +917,7 @@ msgstr ""
 msgid "Show recipe"
 msgstr ""
 
-#: src/qt/recipesui.cpp:424 src/qt/unzipwizard.cpp:93
+#: src/qt/recipesui.cpp:424
 msgid "Unzip failed!"
 msgstr ""
 
@@ -968,19 +973,23 @@ msgstr ""
 msgid "The track information is:\n"
 msgstr ""
 
-#: src/qt/unzipwizard.cpp:77
+#: src/qt/unzipwizard.cpp:83
 msgid "Please select a resource file"
 msgstr ""
 
-#: src/qt/unzipwizard.cpp:83
+#: src/qt/unzipwizard.cpp:89
 msgid "Please select a destination directory."
 msgstr ""
 
-#: src/qt/unzipwizard.cpp:94
-msgid "Unzip finished!"
+#: src/qt/unzipwizard.cpp:99
+msgid "Unzip successfully!"
 msgstr ""
 
-#: src/qt/unzipwizard.cpp:173
+#: src/qt/unzipwizard.cpp:103
+msgid "Unzip unsuccessfully with code "
+msgstr ""
+
+#: src/qt/unzipwizard.cpp:154
 msgid "Invalid file/directory."
 msgstr ""
 

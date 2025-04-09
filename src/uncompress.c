@@ -35,8 +35,6 @@ static void set_to_path(void* handler, const char* path)
     char* pattern = g_strconcat(path, "/*", NULL);
     mz_zip_reader_set_pattern(handler, pattern, FALSE);
     int err = mz_zip_reader_goto_first_entry(handler);
-    // int err = mz_zip_reader_locate_entry(handler, path, FALSE);
-    printf("Error code: %d\n", err);
 }
 
 /* The source code below is from "minizip.c" in "minizip-ng"
@@ -100,7 +98,6 @@ int dhlrc_extract_part(const char* path, const char* dest, DhStrArray* arr)
                 const char* filename = info->filename;
                 gboolean is_file = mz_zip_reader_entry_is_dir(reader);
                 gchar* dir = g_build_path(G_DIR_SEPARATOR_S, dest, filename, NULL);
-                printf("%s\n", dir);
                 err = mz_zip_reader_entry_save_file(reader, dir);
                 g_free(dir);
             }
@@ -108,7 +105,6 @@ int dhlrc_extract_part(const char* path, const char* dest, DhStrArray* arr)
             g_free(pattern);
         }
     }
-    g_usleep(10 * G_USEC_PER_SEC);
     mz_zip_reader_close(reader);
     mz_zip_reader_delete(&reader);
     return err;

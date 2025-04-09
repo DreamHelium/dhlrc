@@ -1,11 +1,14 @@
 #include "unzipwizard.h"
 #include "dh_string_util.h"
+#include "glib.h"
 #include "ui_unzipwizard.h"
 #include <QFileDialog>
+#include <qlineedit.h>
 #include <qwizard.h>
 #include "../translation.h"
 #include "../config.h"
 #include "../uncompress.h"
+#include "unzippage.h"
 
 static UnzipWizard* uw;
 
@@ -21,6 +24,9 @@ UnzipWizard::UnzipWizard(QWidget *parent) :
     QObject::connect(ui->openBtn_2, &QPushButton::clicked, this, &UnzipWizard::openBtn2_clicked);
     QObject::connect(this, &QWizard::currentIdChanged, this, &UnzipWizard::reaction);
     QObject::connect(ui->domainEdit, &QLineEdit::textChanged, this, &UnzipWizard::searchDir);
+    QObject::connect(this, &UnzipWizard::unzip, ui->wizardPage, &UnzipPage::completeChanged);
+    QObject::connect(ui->lineEdit, &QLineEdit::textChanged, this, &UnzipWizard::lineedit_validate);
+    QObject::connect(ui->lineEdit_2, &QLineEdit::textChanged, this, &UnzipWizard::lineedit_validate);
 }
 
 UnzipWizard::~UnzipWizard()
@@ -84,45 +90,17 @@ void UnzipWizard::openBtn2_clicked()
     ui->lineEdit_2->setText(dir);
 }
 
-static void finish_extract(GPid pid, gint status, gpointer user_data)
-{
-    auto uw = (UnzipWizard*)user_data;
-    g_spawn_close_pid(pid);
-    // uw->nextBtn->setCheckable(true);
-    if(status != 0)
-        uw->label->setText(_("Unzip failed!"));
-    else uw->label->setText(_("Unzip finished!"));
-}
-
-static auto unzip_by_unzip = [](QString jar, QString dir)
-{
-    GPid pid;
-    GError* err = nullptr;
-    DhStrArray* arr = nullptr;
-    gchar* prpath = g_find_program_in_path("unzip");
-    dh_str_array_add_str(&arr, prpath);
-    dh_str_array_add_str(&arr, "-q");
-    dh_str_array_add_str(&arr, jar.toUtf8());
-    g_free(prpath);
-    if(!g_spawn_async(dir.toUtf8(), arr->val, nullptr, G_SPAWN_DO_NOT_REAP_CHILD, nullptr, nullptr, &pid, &err))
-    {
-        dh_str_array_free(arr);
-        // ui->label_3->setText(err->message);
-        g_error_free(err);
-    }
-    else
-    {
-        dh_str_array_free(arr);
-        g_child_watch_add(pid, finish_extract, uw);
-        uw->destdir = dir;
-    }
-};
-
 static void finish_extract_minizip(GObject* obj, GAsyncResult* res, gpointer data)
 {
     GTask* task = G_TASK(res);
     int ret = g_task_propagate_int(task, nullptr);
-    uw->label->setText(QString::number(ret));
+    if(ret == 0)
+    {
+        uw->label->setText(_("Unzip successfully!"));
+        uw->unzipPage->status = true;
+        emit uw->unzip();
+    }
+    else uw->label->setText(_("Unzip unsuccessfully with code ") + QString::number(ret) + '.');
 }
 
 typedef struct DhUnzipSt
@@ -158,10 +136,13 @@ void UnzipWizard::reaction()
 {
     if(currentPage() == ui->wizardPage)
     {
+        unzipPage = ui->wizardPage;
         auto jar = ui->lineEdit->text();
         auto dir = ui->lineEdit_2->text();
         if(!jar.isEmpty() && !dir.isEmpty())
         {
+            unzipPage->status = false;
+            emit unzip();
             nextBtn = button(QWizard::NextButton);
             label = ui->label_3;
             if(!g_file_test(dir.toUtf8(), G_FILE_TEST_IS_DIR))
@@ -218,4 +199,18 @@ void UnzipWizard::resetBtn_clicked()
     dh_set_or_create_item("assetsDir", "", TRUE);
     dh_set_or_create_item("recipeConfig", "", TRUE);
     dh_set_or_create_item("itemTranslate", "", TRUE);
+}
+
+void UnzipWizard::lineedit_validate()
+{
+    bool validated = true;
+    if(!ui->lineEdit->text().isEmpty())
+    {
+        if(!g_file_test(ui->lineEdit->text().toUtf8(), G_FILE_TEST_IS_REGULAR))
+            validated = false;
+        if(validated)
+            if(ui->lineEdit_2->text().isEmpty()) validated = false;
+    }
+    ui->wizardPage2->status = validated;
+    emit ui->wizardPage2->completeChanged();
 }

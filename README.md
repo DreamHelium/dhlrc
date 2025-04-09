@@ -38,6 +38,16 @@ cmake --build build
 ```
 If not, install one.
 
+## Features
+
+- NBT management (NBT `interface` support and NBT Reader).
+  Note: if you want to modify the content, you might need to use the `get_current_nbt` method and modify by yourself.
+- Partly support of `NBT Struct` and `Litematic` using general `Region`.
+  Note: support easily read block state and palette, generate block list (~Although it's called item list~), generate `NBT Struct` from `Region`.
+- Partly recipe support
+- Customize module
+  Note: see `For developer`.
+
 ## Usage
 
 Just run `dhlrc.bin`, and the Qt backend will start unless you are using Linux tty.

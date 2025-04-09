@@ -19,8 +19,7 @@
 #define LITEMATICA_REGION_H
 
 #include "dh_string_util.h"
-#include "nbt_interface/libnbt/nbt.h"
-#include "nbt_interface/nbt_interface.h"
+#include "nbt_interface_cpp/libnbt/nbt.h"
 #include "dhlrc_list.h"
 #include <dhutil.h>
 
@@ -45,7 +44,6 @@ void        lite_region_free(LiteRegion* lr);
 /** Get region numbers in litematica file */
 G_DEPRECATED_FOR(lite_region_num_instance)
 int          lite_region_num(NBT* root);
-int          lite_region_num_instance(NbtInstance* instance);
 G_DEPRECATED_FOR(lite_region_name_array)
 char**       lite_region_names(NBT* root, int rNum, int* err);
 G_DEPRECATED
@@ -53,8 +51,6 @@ void         lite_region_free_names(char** region, int rNum);
 /** Improved version to get region name */
 G_DEPRECATED_FOR(lite_region_name_array_instance)
 DhStrArray* lite_region_name_array(NBT* root);
-
-DhStrArray* lite_region_name_array_instance(NbtInstance* instance);
 
 /** Get block numbers in a region */
 DhStrArray*  lite_region_block_name_array(LiteRegion* lr);

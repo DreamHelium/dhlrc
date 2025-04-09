@@ -103,5 +103,5 @@ install(TARGETS dhlrc.bin
 
 add_subdirectory(qt)
 #add_subdirectory(gtk)
-add_subdirectory(cli)
-add_subdirectory(conv)
+# add_subdirectory(cli)
+# add_subdirectory(conv)

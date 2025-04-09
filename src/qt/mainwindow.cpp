@@ -29,6 +29,7 @@
 #include "regionchooseui.h"
 #include "configui.h"
 #include "selectassetsui.h"
+#include "testopenglui.h"
 #include "ui_mainwindow.h"
 #include <QMimeData>
 #include <QInputDialog>
@@ -100,6 +101,7 @@ void MainWindow::initSignalSlots()
     QObject::connect(ui->unzipBtn, &QPushButton::clicked, this, &MainWindow::unzipBtn_clicked);
     QObject::connect(ui->selectBtn, &QPushButton::clicked, this, &MainWindow::selectBtn_clicked);
     QObject::connect(ui->recipeBtn, &QPushButton::clicked, this, &MainWindow::recipeBtn_clicked);
+    QObject::connect(ui->openglBtn, &QPushButton::clicked, this, &MainWindow::openglBtn_clicked);
 }
 
 void MainWindow::dragEnterEvent(QDragEnterEvent* event)
@@ -274,4 +276,11 @@ void MainWindow::recipeBtn_clicked()
     auto rsui = new RecipeSelectUI();
     rsui->setAttribute(Qt::WA_DeleteOnClose);
     rsui->show();
+}
+
+void MainWindow::openglBtn_clicked()
+{
+    auto toui = new TestOpenglUI();
+    toui->setAttribute(Qt::WA_DeleteOnClose);
+    toui->show();
 }

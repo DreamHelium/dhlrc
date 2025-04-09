@@ -1,3 +1,4 @@
+#include "unzippage.h"
 #include <QWizard>
 #include <QLabel>
 
@@ -15,10 +16,13 @@ public:
     QAbstractButton* nextBtn;
     QLabel* label;
     QString destdir;
+    UnzipPage* unzipPage;
 
 private:
     Ui::UnzipWizard* ui;
-    
+
+Q_SIGNALS:
+    void unzip();
 
 private Q_SLOTS:
     void finished(int id);
@@ -27,4 +31,5 @@ private Q_SLOTS:
     void reaction();
     void searchDir();
     void resetBtn_clicked();
+    void lineedit_validate();
 };

@@ -23,7 +23,6 @@
 #include "dhlrc_list.h"
 #include "glib.h"
 #include "glibconfig.h"
-#include "nbt_interface/libnbt/nbt.h"
 #include "litematica_region.h"
 #include "nbt_interface_cpp/nbt_interface.hpp"
 #include <time.h>

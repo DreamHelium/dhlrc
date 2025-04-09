@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>427</width>
-    <height>334</height>
+    <height>333</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -24,7 +24,7 @@
     </item>
    </layout>
   </widget>
-  <widget class="QWizardPage" name="wizardPage2">
+  <widget class="UnzipPage" name="wizardPage2">
    <layout class="QVBoxLayout" name="verticalLayout_2">
     <item>
      <widget class="QLabel" name="label_2">
@@ -90,7 +90,7 @@
     </item>
    </layout>
   </widget>
-  <widget class="QWizardPage" name="wizardPage">
+  <widget class="UnzipPage" name="wizardPage">
    <layout class="QVBoxLayout" name="verticalLayout_3">
     <item>
      <widget class="QLabel" name="label_3">
@@ -225,6 +225,14 @@
    </layout>
   </widget>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>UnzipPage</class>
+   <extends>QWizardPage</extends>
+   <header>unzippage.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

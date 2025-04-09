@@ -35,6 +35,16 @@ cmake -B build
 cmake --build build
 ```
 
+## 功能
+
+- NBT管理（NBT`接口`支持和NBT阅读器）
+  注：如果你想要修改内容，你可能需要使用`get_current_nbt`方法来自己修改。
+- 使用通用`Region`部分支持`NBT结构`和`Litematica投影`
+  注：支持简单阅读方块偏移板和状态，生成方块列表（~虽说是物品列表~），从`Region`生成`NBT结构`。
+- 部分的配方表支持
+- 自定模组
+  注：见`对于开发者`。
+
 ## 使用
 
 只用运行`dhlrc.bin`，Qt后端将会启动，除非你用的是Linux tty。
