@@ -110,7 +110,7 @@
        <item>
         <spacer name="horizontalSpacer">
          <property name="orientation">
-          <enum>Qt::Horizontal</enum>
+          <enum>Qt::Orientation::Horizontal</enum>
          </property>
          <property name="sizeHint" stdset="0">
           <size>
@@ -119,6 +119,13 @@
           </size>
          </property>
         </spacer>
+       </item>
+       <item>
+        <widget class="QPushButton" name="entityBtn">
+         <property name="text">
+          <string>&amp;Show Entity NBT</string>
+         </property>
+        </widget>
        </item>
        <item>
         <widget class="QPushButton" name="listBtn">

@@ -46,7 +46,6 @@ typedef struct BlockInfo{
     Pos* pos;
     char* id_name;
     int palette;
-    NBT* nbt;
     void* nbt_instance;
 } BlockInfo;
 
@@ -69,13 +68,12 @@ typedef struct _Region
 } Region;
 
 Region* region_new_from_lite_region(LiteRegion* lr);
-G_DEPRECATED_FOR(region_new_from_nbt_file)
-Region* region_new_from_nbt(NBT* root);
 Region* region_new_from_nbt_file(const char* filepos);
-ItemList* item_list_new_from_region(Region* region);
+Region* region_new_from_nbt_instance_ptr(void* instance_ptr);
 ItemList* item_list_new_from_multi_region(const char** region_uuid_arr);
+G_DEPRECATED_FOR(nbt_instance_ptr_new_from_region)
 NBT* nbt_new_from_region(Region* region);
-// NbtInstance* nbt_instance_new_from_region(Region* region);
+void* nbt_instance_ptr_new_from_region(Region* region);
 void region_free(Region* region);
 gint64* region_get_palette_num_from_region(Region* region, int* len);
 

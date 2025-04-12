@@ -62,10 +62,15 @@ msgstr ""
 
 #: ../../src/qt/blockreaderui.ui:126
 msgctxt "BlockReaderUI|"
-msgid "&List blocks"
+msgid "&Show Entity NBT"
 msgstr ""
 
 #: ../../src/qt/blockreaderui.ui:133
+msgctxt "BlockReaderUI|"
+msgid "&List blocks"
+msgstr ""
+
+#: ../../src/qt/blockreaderui.ui:140
 msgctxt "BlockReaderUI|"
 msgid "&Close"
 msgstr ""

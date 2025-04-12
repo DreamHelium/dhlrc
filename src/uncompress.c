@@ -32,7 +32,7 @@ static char* pattern = NULL;
 static void set_to_path(void* handler, const char* path)
 {
     mz_zip_reader_goto_first_entry(handler);
-    char* pattern = g_strconcat(path, "/*", NULL);
+    pattern = g_strconcat(path, "/*", NULL);
     mz_zip_reader_set_pattern(handler, pattern, FALSE);
     int err = mz_zip_reader_goto_first_entry(handler);
 }

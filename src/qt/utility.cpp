@@ -46,7 +46,7 @@ void dh::loadRegion(QWidget* parent, const char* uuid)
         }
         else
         {
-            Region* region = region_new_from_nbt(instance->get_original_nbt());
+            Region* region = region_new_from_nbt_instance_ptr(instance);
             if(region)
             {
                 auto str = QInputDialog::getText(parent, _("Enter Region Name"), _("Enter name for the new Region."), QLineEdit::Normal, 

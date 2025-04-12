@@ -6,5 +6,6 @@
     <file>region.svg</file>
     <file>item_list.svg</file>
     <file>data_version.csv</file>
+    <file>handle_block.json</file>
   </gresource>
 </gresources>

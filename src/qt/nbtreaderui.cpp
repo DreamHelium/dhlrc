@@ -3,15 +3,17 @@
 #include "ui_nbtreaderui.h"
 #include <qitemselectionmodel.h>
 #include <qnamespace.h>
+#include <qpushbutton.h>
 #include <qsortfilterproxymodel.h>
 #include <qstandarditemmodel.h>
 #include <qtreeview.h>
 #include <qvariant.h>
-#include "../common_info.h"
 #include "../nbt_interface_cpp/nbt_interface.hpp"
 #include <cstdlib>
 #include <QDebug>
 #include <QLineEdit>
+#include <QInputDialog>
+#include "../translation.h"
 
 static QString uuid;
 
@@ -100,15 +102,12 @@ static QString ret_var(DhNbtInstance instance)
     }
 }
 
-NbtReaderUI::NbtReaderUI(QWidget *parent)
+NbtReaderUI::NbtReaderUI(DhNbtInstance instance, QWidget *parent)
     : QWidget(parent),
     ui(new Ui::NbtReaderUI)
 {
     ui->setupUi(this);
-    uuid = common_info_list_get_uuid(DH_TYPE_NBT_INTERFACE_CPP);
-    if(!uuid.isEmpty())
-        instance = (DhNbtInstance*)common_info_get_data(DH_TYPE_NBT_INTERFACE_CPP, uuid.toUtf8());
-    
+    this->instance = instance;
     model = new QStandardItemModel(this);
     proxyModel = new DhTreeFilter(this);
     initModel();
@@ -117,6 +116,7 @@ NbtReaderUI::NbtReaderUI(QWidget *parent)
     auto selectionModel = ui->treeView->selectionModel();
     QObject::connect(selectionModel, &QItemSelectionModel::selectionChanged, this, &NbtReaderUI::treeview_clicked);
     QObject::connect(ui->lineEdit, &QLineEdit::textChanged, this, &NbtReaderUI::textChanged_cb);
+    QObject::connect(ui->modifyButton, &QPushButton::clicked, this, &NbtReaderUI::modifyBtn_clicked);
 }
 
 NbtReaderUI::~NbtReaderUI()
@@ -129,7 +129,7 @@ NbtReaderUI::~NbtReaderUI()
 void NbtReaderUI::initModel()
 {
     auto modelRoot = model->invisibleRootItem();
-    addModelTree(*instance, modelRoot);
+    addModelTree(instance, modelRoot);
 }
 
 void NbtReaderUI::addModelTree(DhNbtInstance instance, QStandardItem* iroot)
@@ -164,8 +164,7 @@ void NbtReaderUI::treeview_clicked()
         {
             treeRow.prepend(indexx.row());
         }
-        auto instance_dup(*instance);
-        instance_dup.goto_root();
+        auto instance_dup(instance);
         for(int j = 0 ; j < treeRow.length() ; j++)
         {
             if(j != 0 ) instance_dup.child();
@@ -183,4 +182,30 @@ void NbtReaderUI::treeview_clicked()
 void NbtReaderUI::textChanged_cb(QString str)
 {
     proxyModel->setFilterRegularExpression(str);
+}
+
+void NbtReaderUI::modifyBtn_clicked()
+{
+    auto index = ui->treeView->selectionModel()->selection();
+    auto selection = proxyModel->mapSelectionToSource(index);
+    if(!selection.isEmpty())
+    {
+        auto indexx = selection.indexes()[0];
+        QList<int> treeRow;
+        for(; indexx.isValid() ; indexx = indexx.parent())
+        {
+            treeRow.prepend(indexx.row());
+        }
+        auto instance_dup(instance);
+        instance_dup.goto_root();
+        for(int j = 0 ; j < treeRow.length() ; j++)
+        {
+            if(j != 0 ) instance_dup.child();
+            auto row = treeRow[j];
+            for(int i = 0 ; i < row ; i++)
+                instance_dup.next();
+        }
+        auto str = QInputDialog::getText(this, _(" "), _(" "));
+        instance_dup.set_string(str.toUtf8());
+    }
 }

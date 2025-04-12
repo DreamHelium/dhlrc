@@ -15,13 +15,13 @@ class NbtReaderUI : public QWidget
     Q_OBJECT
 
 public:
-    explicit NbtReaderUI(QWidget *parent = nullptr);
+    explicit NbtReaderUI(DhNbtInstance instance, QWidget *parent = nullptr);
     ~NbtReaderUI();
     
 private:
     Ui::NbtReaderUI *ui;
     QStandardItemModel* model;
-    DhNbtInstance* instance;
+    DhNbtInstance instance;
     QSortFilterProxyModel* proxyModel;
     void initModel();
     void addModelTree(DhNbtInstance instance, QStandardItem* iroot);
@@ -29,6 +29,7 @@ private:
 private Q_SLOTS:
     void treeview_clicked();
     void textChanged_cb(QString str);
+    void modifyBtn_clicked();
 };
 
 #endif // NBTREADERUI_H

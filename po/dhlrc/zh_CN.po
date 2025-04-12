@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-04-09 09:24+0800\n"
+"POT-Creation-Date: 2025-04-12 14:41+0800\n"
 "PO-Revision-Date: 2024-11-30 07:00+0800\n"
 "Last-Translator: dream_he <48383878+DreamHelium@users.noreply.github.com>\n"
 "Language-Team: Chinese <kde-i18n-doc@kde.org>\n"
@@ -79,10 +79,15 @@ msgstr "方块信息为："
 
 #: ../../src/qt/blockreaderui.ui:126
 msgctxt "BlockReaderUI|"
+msgid "&Show Entity NBT"
+msgstr ""
+
+#: ../../src/qt/blockreaderui.ui:133
+msgctxt "BlockReaderUI|"
 msgid "&List blocks"
 msgstr "列出方块（&L）"
 
-#: ../../src/qt/blockreaderui.ui:133
+#: ../../src/qt/blockreaderui.ui:140
 msgctxt "BlockReaderUI|"
 msgid "&Close"
 msgstr "关闭(&C)"
@@ -441,7 +446,7 @@ msgctxt "UnzipWizard|"
 msgid "The progress is finished!"
 msgstr ""
 
-#: src/dhlrc_list.c:321
+#: src/dhlrc_list.c:322
 #, c-format
 msgid "Combined %d items to the new item list."
 msgstr "合并了%d物品至新的物品列表。"
@@ -629,7 +634,7 @@ msgstr ""
 msgid "Palette"
 msgstr ""
 
-#: src/qt/blockreaderui.cpp:60
+#: src/qt/blockreaderui.cpp:65
 msgid ""
 "Name: %1\n"
 "Translation name: %2\n"
@@ -638,11 +643,11 @@ msgid ""
 "Properties:\n"
 msgstr ""
 
-#: src/qt/blockreaderui.cpp:80
+#: src/qt/blockreaderui.cpp:88
 msgid "Not valid!"
 msgstr ""
 
-#: src/qt/blockreaderui.cpp:89
+#: src/qt/blockreaderui.cpp:97
 msgid "With DataVersion %4."
 msgstr ""
 
@@ -680,7 +685,7 @@ msgstr "没有物品列表可用！"
 #: src/qt/ilchooseui.cpp:92 src/qt/ilreaderui.cpp:111 src/qt/mainwindow.cpp:150
 #: src/qt/mainwindow.cpp:169 src/qt/mainwindow.cpp:191
 #: src/qt/mainwindow.cpp:194 src/qt/mainwindow.cpp:211
-#: src/qt/mainwindow.cpp:214 src/qt/mainwindow.cpp:239 src/qt/manage.cpp:29
+#: src/qt/mainwindow.cpp:214 src/qt/mainwindow.cpp:246 src/qt/manage.cpp:29
 #: src/qt/manage.cpp:292 src/qt/manage.cpp:305 src/qt/manage.cpp:412
 #: src/qt/nbtselectui.cpp:116 src/qt/regionchooseui.cpp:121
 #: src/qt/saveregionselectui.cpp:80 src/qt/utility.cpp:32 src/qt/utility.cpp:55
@@ -771,15 +776,15 @@ msgstr "没有Region或没有Region选中！"
 msgid "Region is locked!"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:239
+#: src/qt/mainwindow.cpp:246
 msgid "No NBT is selected!"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:264
+#: src/qt/mainwindow.cpp:271
 msgid "No Unzip Program found!"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:264
+#: src/qt/mainwindow.cpp:271
 msgid "No unzip program found, we couldn't unzip the file!"
 msgstr ""
 
@@ -845,6 +850,10 @@ msgstr ""
 
 #: src/qt/module.cpp:56
 msgid "The Qt interface of dhlrc."
+msgstr ""
+
+#: src/qt/nbtreaderui.cpp:208
+msgid " "
 msgstr ""
 
 #: src/qt/nbtselectui.cpp:61

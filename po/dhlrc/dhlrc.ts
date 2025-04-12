@@ -63,11 +63,16 @@
     </message>
     <message>
         <location filename="../../src/qt/blockreaderui.ui" line="126"/>
-        <source>&amp;List blocks</source>
+        <source>&amp;Show Entity NBT</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../src/qt/blockreaderui.ui" line="133"/>
+        <source>&amp;List blocks</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qt/blockreaderui.ui" line="140"/>
         <source>&amp;Close</source>
         <translation type="unfinished"></translation>
     </message>

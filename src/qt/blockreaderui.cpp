@@ -1,8 +1,10 @@
 #include "blockreaderui.h"
 #include "blocklistui.h"
+#include "nbtreaderui.h"
 #include "ui_blockreaderui.h"
 #include <qlineedit.h>
 #include <qnamespace.h>
+#include <qpushbutton.h>
 #include <qvalidator.h>
 #include "../translation.h"
 #include "../common_info.h"
@@ -19,6 +21,8 @@ BlockReaderUI::BlockReaderUI(QWidget *parent)
     QObject::connect(ui->yEdit, &QLineEdit::textChanged, this, &BlockReaderUI::textChanged_cb);
     QObject::connect(ui->zEdit, &QLineEdit::textChanged, this, &BlockReaderUI::textChanged_cb);
     QObject::connect(ui->listBtn, &QPushButton::clicked, this, &BlockReaderUI::listBtn_clicked);
+    QObject::connect(ui->entityBtn, &QPushButton::clicked, this, &BlockReaderUI::entityBtn_clicked);
+    ui->entityBtn->setEnabled(false);
 }
 
 BlockReaderUI::~BlockReaderUI()
@@ -46,6 +50,7 @@ void BlockReaderUI::textChanged_cb(const QString & str)
             for(int i = 0 ; i < info->len ; i++)
             {
                 auto blockInfo = (BlockInfo*)(info->pdata[i]);
+                this->info = blockInfo;
                 if(blockInfo->pos->x == xText.toInt() &&
                    blockInfo->pos->y == yText.toInt() &&
                    blockInfo->pos->z == zText.toInt())
@@ -72,6 +77,9 @@ void BlockReaderUI::textChanged_cb(const QString & str)
                             infos += "\n";
                         }
                     }
+                    if(this->info->nbt_instance)
+                        ui->entityBtn->setEnabled(true);
+                    else ui->entityBtn->setEnabled(false);
                     break;
                 }
             }
@@ -100,4 +108,11 @@ void BlockReaderUI::listBtn_clicked()
     BlockListUI* blui = new BlockListUI(region);
     blui->setAttribute(Qt::WA_DeleteOnClose);
     blui->show();
+}
+
+void BlockReaderUI::entityBtn_clicked()
+{
+    auto nrui = new NbtReaderUI(*(DhNbtInstance*)(this->info->nbt_instance));
+    nrui->setAttribute(Qt::WA_DeleteOnClose);
+    nrui->show();
 }

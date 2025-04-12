@@ -232,9 +232,16 @@ void MainWindow::nbtReaderBtn_finished(int ret)
 {
     if(ret == QDialog::Accepted)
     {
-        auto nrui = new NbtReaderUI();
-        nrui->setAttribute(Qt::WA_DeleteOnClose);
-        nrui->show();
+        auto uuid = common_info_list_get_uuid(DH_TYPE_NBT_INTERFACE_CPP);
+        DhNbtInstance* instance = nullptr;
+        if(uuid)
+            instance = (DhNbtInstance*)common_info_get_data(DH_TYPE_NBT_INTERFACE_CPP, uuid);
+        if(instance)
+        {
+            auto nrui = new NbtReaderUI(*instance);
+            nrui->setAttribute(Qt::WA_DeleteOnClose);
+            nrui->show();
+        }
     }
     else QMessageBox::critical(this, _("Error!"), _("No NBT is selected!"));
 }

@@ -21,10 +21,11 @@ private:
     Region* region;
     const char* uuid = nullptr;
     void setText();
+    BlockInfo* info = nullptr;
 
 private Q_SLOTS:
     void textChanged_cb(const QString & str);
     void listBtn_clicked();
-
+    void entityBtn_clicked();
 };
 #endif // BLOCKREADERUI_H

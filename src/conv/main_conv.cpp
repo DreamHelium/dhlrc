@@ -24,19 +24,17 @@ static void analyse(const char* input_file, const char* output_format)
         else if(g_str_equal(if_format, "litematic"))
         {
             if_format_val = DH_LITEMATIC;
-            NbtInstance* instance = dh_nbt_instance_parse(input_file);
-            int litematic_len = lite_region_num_instance(instance);
+            DhNbtInstance instance(input_file);
+            int litematic_len = lite_region_num(instance.get_original_nbt());
 
             /* Make regions */
             for(int i = 0 ; i < litematic_len ; i++)
             {
-                printf("test\n");
-                LiteRegion* lr = lite_region_create_from_root_instance_cpp(DhNbtInstance(input_file), i);
+                LiteRegion* lr = lite_region_create_from_root_instance_cpp(instance, i);
                 Region* region = region_new_from_lite_region(lr);
                 lite_region_free(lr);
                 g_ptr_array_add(region_array, region);
             }
-            dh_nbt_instance_free(instance);
         }
         else if(g_str_equal(if_format, "schematic")) 
         {
@@ -77,9 +75,8 @@ static void analyse(const char* input_file, const char* output_format)
 
             /* Transform Region to NBT */
             printf(_("Saving file: %s.\n"), output_filename);
-            // NbtInstance* instance = nbt_instance_new_from_region(region);
-            // dh_nbt_instance_save_to_file(instance, output_filename);
-            // dh_nbt_instance_free(instance);
+            auto instance = (DhNbtInstance*)nbt_instance_ptr_new_from_region(region);
+            instance->save_to_file(output_filename);
 
             g_free(output_filename);
         }

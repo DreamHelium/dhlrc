@@ -16,6 +16,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>. */
 
 #include "dhlrc_list.h"
+#include "dh_string_util.h"
 #include "glib.h"
 #include <stdlib.h>
 #include <string.h>
@@ -326,10 +327,16 @@ int item_list_combine(ItemList** dest, ItemList* src)
 
 BlackList* black_list_init()
 {
-    GList* bl = NULL;
-    cJSON *black_list = dhlrc_file_to_json("config/ignored_blocks.json");
-    if(black_list)
+    BlackList* bl = NULL;
+
+    GBytes* data = g_resources_lookup_data("/cn/dh/dhlrc/handle_block.json", G_RESOURCE_LOOKUP_FLAGS_NONE, NULL);
+    gsize len = 0;
+    const char* data_bytes = g_bytes_get_data(data, &len);
+    cJSON* json = cJSON_Parse(data_bytes);
+    g_bytes_unref(data);
+    if(json)
     {
+        cJSON* black_list = cJSON_GetObjectItem(json, "ignore_block");
         if(cJSON_IsArray(black_list))
         {
             int n = cJSON_GetArraySize(black_list);
@@ -339,7 +346,7 @@ BlackList* black_list_init()
                 bl = black_list_extend(bl,item);
             }
         }
-        cJSON_Delete(black_list);
+        cJSON_Delete(json);
         return bl;
     }
     else
@@ -379,28 +386,34 @@ int black_list_scan(BlackList* bl,const char* name)
 ReplaceList* replace_list_init()
 {
     ReplaceList* rl = NULL;
-    cJSON* rlist_o = dhlrc_file_to_json("config/block_items.json");
-    if(rlist_o)
+
+    GBytes* data = g_resources_lookup_data("/cn/dh/dhlrc/handle_block.json", G_RESOURCE_LOOKUP_FLAGS_NONE, NULL);
+    gsize len = 0;
+    const char* data_bytes = g_bytes_get_data(data, &len);
+    cJSON* json = cJSON_Parse(data_bytes);
+    g_bytes_unref(data);
+    if(json)
     {
-        cJSON* rlist = rlist_o->child;
-        while(rlist)
+        cJSON* single_block = cJSON_GetObjectItem(json, "replace_single_block");
+        if(single_block)
         {
-            if(cJSON_IsString(rlist))
-                rl = replace_list_extend(rl,rlist->string,rlist->valuestring);
-            else if(cJSON_IsArray(rlist))
-            {
-                int size = cJSON_GetArraySize(rlist);
-                DhStrArray* str = NULL;
-                for(int i = 0; i < size ; i++)
-                {
-                    char* r_name = cJSON_GetStringValue( cJSON_GetArrayItem(rlist, i) );
-                    dh_str_array_add_str( &str, r_name);
-                }
-                rl = replace_list_extend_str_array(rl, rlist->string, str);
-            }
-            rlist = rlist->next;
+            single_block = single_block->child;
+            for(; single_block ; single_block = single_block->next)
+                rl = replace_list_extend(rl, single_block->string, cJSON_GetStringValue(single_block));
         }
-        cJSON_Delete(rlist_o);
+        cJSON* multi_block = cJSON_GetObjectItem(json, "replace_multi_block");
+        if(multi_block)
+        {
+            multi_block = multi_block->child;
+            for(; multi_block ; multi_block = multi_block->next)
+            {
+                DhStrArray* arr = NULL;
+                for(int i = 0 ; i < cJSON_GetArraySize(multi_block) ; i++)
+                    dh_str_array_add_str(&arr, cJSON_GetStringValue(cJSON_GetArrayItem(multi_block, i)));
+                rl = replace_list_extend_str_array(rl, multi_block->string, arr);
+            }
+        }
+        cJSON_Delete(json);
         return rl;
     }
     else
