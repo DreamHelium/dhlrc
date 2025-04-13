@@ -15,7 +15,7 @@ msgstr ""
 "#-#-#-#-#  dhlrc.pot (dhlrc)  #-#-#-#-#\n"
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-04-12 21:34+0800\n"
+"POT-Creation-Date: 2025-04-14 03:01+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -476,7 +476,7 @@ msgstr ""
 msgid "Error when reading file."
 msgstr ""
 
-#: src/main_isoc.c:108 src/qt/utility.cpp:96
+#: src/main_isoc.c:108 src/qt/utility.cpp:108
 msgid "Not a valid NBT file!"
 msgstr ""
 
@@ -621,7 +621,7 @@ msgstr ""
 msgid "Palette"
 msgstr ""
 
-#: src/qt/blockreaderui.cpp:65
+#: src/qt/blockreaderui.cpp:66
 msgid ""
 "Name: %1\n"
 "Translation name: %2\n"
@@ -630,12 +630,12 @@ msgid ""
 "Properties:\n"
 msgstr ""
 
-#: src/qt/blockreaderui.cpp:88
+#: src/qt/blockreaderui.cpp:89
 msgid "Not valid!"
 msgstr ""
 
-#: src/qt/blockreaderui.cpp:97
-msgid "With DataVersion %4."
+#: src/qt/blockreaderui.cpp:98
+msgid "With DataVersion %4, version %5."
 msgstr ""
 
 #: src/qt/ilchooseui.cpp:14
@@ -675,8 +675,8 @@ msgstr ""
 #: src/qt/mainwindow.cpp:214 src/qt/mainwindow.cpp:246 src/qt/manage.cpp:29
 #: src/qt/manage.cpp:292 src/qt/manage.cpp:305 src/qt/manage.cpp:412
 #: src/qt/nbtselectui.cpp:116 src/qt/regionchooseui.cpp:121
-#: src/qt/saveregionselectui.cpp:80 src/qt/utility.cpp:32 src/qt/utility.cpp:55
-#: src/qt/utility.cpp:61 src/qt/utility.cpp:68 src/qt/utility.cpp:125
+#: src/qt/saveregionselectui.cpp:80 src/qt/utility.cpp:44 src/qt/utility.cpp:67
+#: src/qt/utility.cpp:73 src/qt/utility.cpp:80 src/qt/utility.cpp:137
 msgid "Error!"
 msgstr ""
 
@@ -1002,51 +1002,51 @@ msgstr ""
 msgid "Invalid file/directory."
 msgstr ""
 
-#: src/qt/utility.cpp:32
+#: src/qt/utility.cpp:44
 msgid "No NBT or no NBT selected!"
 msgstr ""
 
-#: src/qt/utility.cpp:52
+#: src/qt/utility.cpp:64
 msgid "Enter Region Name"
 msgstr ""
 
-#: src/qt/utility.cpp:52
+#: src/qt/utility.cpp:64
 msgid "Enter name for the new Region."
 msgstr ""
 
-#: src/qt/utility.cpp:55
+#: src/qt/utility.cpp:67
 msgid "No description for the Region!"
 msgstr ""
 
-#: src/qt/utility.cpp:61
+#: src/qt/utility.cpp:73
 msgid "The NBT Struct is unsupported!"
 msgstr ""
 
-#: src/qt/utility.cpp:68
+#: src/qt/utility.cpp:80
 msgid "This NBT is locked!"
 msgstr ""
 
-#: src/qt/utility.cpp:79 src/gtk/manage_nbt.c:131
+#: src/qt/utility.cpp:91 src/gtk/manage_nbt.c:131
 msgid "Enter Desciption"
 msgstr ""
 
-#: src/qt/utility.cpp:79
+#: src/qt/utility.cpp:91
 msgid "Enter desciption for the NBT file."
 msgstr ""
 
-#: src/qt/utility.cpp:81
+#: src/qt/utility.cpp:93
 msgid "No Description Entered!"
 msgstr ""
 
-#: src/qt/utility.cpp:81
+#: src/qt/utility.cpp:93
 msgid "No desciption entered! Will not add the NBT file!"
 msgstr ""
 
-#: src/qt/utility.cpp:96
+#: src/qt/utility.cpp:108
 msgid "Not Valid File!"
 msgstr ""
 
-#: src/qt/utility.cpp:119
+#: src/qt/utility.cpp:131
 msgid "The following files couldn't be added:\n"
 msgstr ""
 

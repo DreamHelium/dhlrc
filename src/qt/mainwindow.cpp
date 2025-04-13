@@ -254,7 +254,7 @@ static void finish_callback(GObject* source_object, GAsyncResult* res, gpointer 
 
 void MainWindow::downloadBtn_clicked()
 {
-    dh_file_download_async("https://piston-data.mojang.com/v1/objects/e8340a01da734194c35fd35fbfa93e5bb96627b1/client.jar", "/tmp", dh_file_progress_callback, NULL, true, finish_callback);
+    dh_file_download_async("https://launchermeta.mojang.com/mc/game/version_manifest.json", "/tmp", dh_file_progress_callback, NULL, true, finish_callback);
     g_message("test");
 }
 

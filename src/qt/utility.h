@@ -15,6 +15,7 @@ namespace dh {
     QPixmap* loadSvgResourceFile(const char* pos);
     QString findIcon(QString obj);
     QIcon getIcon(QString dir);
+    QString getVersion(int dataversion);
 }
 
 #endif /* UTILITY_H */

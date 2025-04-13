@@ -1,4 +1,5 @@
 #include "utility.h"
+#include "glib.h"
 #include "nbtselectui.h"
 #include <QInputDialog>
 #include <QMessageBox>
@@ -9,10 +10,21 @@
 #include <QSvgRenderer>
 #include <QPixmap>
 #include <QPainter>
+#include <string>
 #include "../region.h"
 #include "../nbt_interface_cpp/nbt_interface.hpp"
 #include "../common_info.h"
 #include "../config.h"
+#include "../csv_parser.h"
+
+typedef struct Version
+{
+    QString version;
+    int dataversion;
+} Version;
+
+static QList<Version> versions;
+static bool version_inited = false;
 
 void dh::loadRegion(QWidget* parent)
 {
@@ -182,4 +194,30 @@ QIcon dh::getIcon(QString dir)
     QPixmap pixmap(dir);
     pixmap = pixmap.copy(0, 0, 16, 16);
     return QIcon(pixmap);
+}
+
+QString dh::getVersion(int dataversion)
+{
+    if(!version_inited)
+    {
+        auto datas = g_resources_lookup_data("/cn/dh/dhlrc/data_version.csv", G_RESOURCE_LOOKUP_FLAGS_NONE, nullptr);
+        auto data = (const char*)g_bytes_get_data(datas, nullptr);
+        auto array = dh_csv_parse(data);
+        for(int i = 0 ; i < array->len ; i++)
+        {
+            auto val = (char**)array->pdata[i];
+            Version v{};
+            v.version = val[0];
+            v.dataversion = std::stoi(val[1]);
+            versions.append(v);
+        }
+        g_bytes_unref(datas);
+        g_ptr_array_free(array, true);
+    }
+    for(int i = 0 ; i < versions.length() ; i++)
+    {
+        if(versions[i].dataversion == dataversion)
+            return versions[i].version;
+    }
+    return {};
 }

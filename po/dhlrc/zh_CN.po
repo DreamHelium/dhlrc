@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-04-12 14:41+0800\n"
+"POT-Creation-Date: 2025-04-14 02:15+0800\n"
 "PO-Revision-Date: 2024-11-30 07:00+0800\n"
 "Last-Translator: dream_he <48383878+DreamHelium@users.noreply.github.com>\n"
 "Language-Team: Chinese <kde-i18n-doc@kde.org>\n"
@@ -474,7 +474,7 @@ msgstr "[文件] - 读取一个投影文件。"
 msgid "Error when reading file."
 msgstr "在读取文件时出错。"
 
-#: src/main_isoc.c:108 src/qt/utility.cpp:96
+#: src/main_isoc.c:108 src/qt/utility.cpp:108
 msgid "Not a valid NBT file!"
 msgstr "不是一个有效的NBT文件！"
 
@@ -620,21 +620,21 @@ msgstr ""
 
 #: src/qt/blocklistui.cpp:42
 msgid "x"
-msgstr ""
+msgstr "x"
 
 #: src/qt/blocklistui.cpp:43
 msgid "y"
-msgstr ""
+msgstr "y"
 
 #: src/qt/blocklistui.cpp:43
 msgid "z"
-msgstr ""
+msgstr "z"
 
 #: src/qt/blocklistui.cpp:43
 msgid "Palette"
-msgstr ""
+msgstr "偏移码"
 
-#: src/qt/blockreaderui.cpp:65
+#: src/qt/blockreaderui.cpp:66
 msgid ""
 "Name: %1\n"
 "Translation name: %2\n"
@@ -642,14 +642,19 @@ msgid ""
 "Palette: %4\n"
 "Properties:\n"
 msgstr ""
+"名称：%1\n"
+"翻译名称：%2\n"
+"索引：%3\n"
+"偏移量：%4\n"
+"属性：\n"
 
-#: src/qt/blockreaderui.cpp:88
+#: src/qt/blockreaderui.cpp:89
 msgid "Not valid!"
 msgstr ""
 
-#: src/qt/blockreaderui.cpp:97
-msgid "With DataVersion %4."
-msgstr ""
+#: src/qt/blockreaderui.cpp:98
+msgid "With DataVersion %4, version %5."
+msgstr "数据版本%4，版本%5。"
 
 #: src/qt/ilchooseui.cpp:14
 msgid "Select a item list."
@@ -688,8 +693,8 @@ msgstr "没有物品列表可用！"
 #: src/qt/mainwindow.cpp:214 src/qt/mainwindow.cpp:246 src/qt/manage.cpp:29
 #: src/qt/manage.cpp:292 src/qt/manage.cpp:305 src/qt/manage.cpp:412
 #: src/qt/nbtselectui.cpp:116 src/qt/regionchooseui.cpp:121
-#: src/qt/saveregionselectui.cpp:80 src/qt/utility.cpp:32 src/qt/utility.cpp:55
-#: src/qt/utility.cpp:61 src/qt/utility.cpp:68 src/qt/utility.cpp:125
+#: src/qt/saveregionselectui.cpp:80 src/qt/utility.cpp:44 src/qt/utility.cpp:67
+#: src/qt/utility.cpp:73 src/qt/utility.cpp:80 src/qt/utility.cpp:137
 msgid "Error!"
 msgstr "错误！"
 
@@ -850,7 +855,7 @@ msgstr ""
 
 #: src/qt/module.cpp:56
 msgid "The Qt interface of dhlrc."
-msgstr ""
+msgstr "dhlrc的Qt界面。"
 
 #: src/qt/nbtreaderui.cpp:208
 msgid " "
@@ -1015,51 +1020,51 @@ msgstr ""
 msgid "Invalid file/directory."
 msgstr ""
 
-#: src/qt/utility.cpp:32
+#: src/qt/utility.cpp:44
 msgid "No NBT or no NBT selected!"
 msgstr "无NBT或没有NBT被选中！"
 
-#: src/qt/utility.cpp:52
+#: src/qt/utility.cpp:64
 msgid "Enter Region Name"
 msgstr "输入Region名称"
 
-#: src/qt/utility.cpp:52
+#: src/qt/utility.cpp:64
 msgid "Enter name for the new Region."
 msgstr "输入新Region的名称。"
 
-#: src/qt/utility.cpp:55
+#: src/qt/utility.cpp:67
 msgid "No description for the Region!"
 msgstr "没有Region的描述！"
 
-#: src/qt/utility.cpp:61
+#: src/qt/utility.cpp:73
 msgid "The NBT Struct is unsupported!"
 msgstr "此NBT结构不受支持！"
 
-#: src/qt/utility.cpp:68
+#: src/qt/utility.cpp:80
 msgid "This NBT is locked!"
 msgstr "此NBT被锁定！"
 
-#: src/qt/utility.cpp:79 src/gtk/manage_nbt.c:131
+#: src/qt/utility.cpp:91 src/gtk/manage_nbt.c:131
 msgid "Enter Desciption"
 msgstr "输入描述"
 
-#: src/qt/utility.cpp:79
+#: src/qt/utility.cpp:91
 msgid "Enter desciption for the NBT file."
 msgstr "输入NBT文件的描述。"
 
-#: src/qt/utility.cpp:81
+#: src/qt/utility.cpp:93
 msgid "No Description Entered!"
 msgstr "没有输入的描述！"
 
-#: src/qt/utility.cpp:81
+#: src/qt/utility.cpp:93
 msgid "No desciption entered! Will not add the NBT file!"
 msgstr "没有描述输入！将不会添加NBT文件！"
 
-#: src/qt/utility.cpp:96
+#: src/qt/utility.cpp:108
 msgid "Not Valid File!"
 msgstr "不是有效的文件！"
 
-#: src/qt/utility.cpp:119
+#: src/qt/utility.cpp:131
 msgid "The following files couldn't be added:\n"
 msgstr ""
 

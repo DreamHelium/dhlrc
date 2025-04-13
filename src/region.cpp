@@ -204,7 +204,7 @@ static BlockInfoArray* get_block_full_info_from_lr(LiteRegion* lr)
     return array;
 }
 
-static BlockInfoArray* get_block_full_info_from_nbt_instance(DhNbtInstance instance, PaletteArray* pa)
+static BlockInfoArray* get_block_full_info_from_nbt_instance(DhNbtInstance instance, PaletteArray* pa, Pos* pos)
 {
     GPtrArray* array = g_ptr_array_new_with_free_func(block_info_free);
     DhNbtInstance blocks(instance);
@@ -214,24 +214,33 @@ static BlockInfoArray* get_block_full_info_from_nbt_instance(DhNbtInstance insta
     {
         BlockInfo* block_info = g_new0(BlockInfo, 1);
         block_info->pos = g_new0(Pos, 1);
-        block_info->index = 0 /* TODO */;
+        // lr->region_size.x * lr->region_size.z * y + lr->region_size.x * z + x
+        
         
         auto palette(blocks);
         palette.child("state");
         block_info->palette = palette.get_int();
 
-        auto pos(blocks);
-        pos.child("pos");
-        pos.child();
-        block_info->pos->x = pos.get_int();
-        pos.next();
-        block_info->pos->y = pos.get_int();
-        pos.next();
-        block_info->pos->z = pos.get_int();
+        auto pos_instance(blocks);
+        pos_instance.child("pos");
+        pos_instance.child();
+        int x = pos_instance.get_int();
+        block_info->pos->x = x;
+        pos_instance.next();
+        int y = pos_instance.get_int();
+        block_info->pos->y = y;
+        pos_instance.next();
+        int z = pos_instance.get_int();
+        block_info->pos->z = z;
 
+        block_info->index = pos->x * pos->z * y + pos->x * z + x /* TODO */;
+        
         auto nbt(blocks);
         if(nbt.child("nbt"))
-            block_info->nbt_instance = new DhNbtInstance(nbt);
+        {
+            DhNbtInstance ni = nbt.dup_current_as_original(false);
+            block_info->nbt_instance = new DhNbtInstance(ni);
+        }
         else block_info->nbt_instance = nullptr;
 
         auto block_palette = (Palette*)(pa->pdata[block_info->palette]);
@@ -290,7 +299,7 @@ static Region* region_new_from_nbt_instance(DhNbtInstance instance)
         region->palette_array = pa;
 
         /* Fill BlockInfoArray */
-        BlockInfoArray* bia = get_block_full_info_from_nbt_instance(instance, pa);
+        BlockInfoArray* bia = get_block_full_info_from_nbt_instance(instance, pa, rs);
         region->block_info_array = bia;
 
         /* Fill Data Version */

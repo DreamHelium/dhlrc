@@ -8,6 +8,7 @@
 #include <qvalidator.h>
 #include "../translation.h"
 #include "../common_info.h"
+#include "utility.h"
 
 BlockReaderUI::BlockReaderUI(QWidget *parent)
     : QWidget(parent),
@@ -94,8 +95,8 @@ void BlockReaderUI::setText()
 {
     auto size = region->region_size;
     QString str = "(%1, %2, %3) ";
-    str += _("With DataVersion %4.");
-    QString sizeStr = str.arg(size->x).arg(size->y).arg(size->z).arg(region->data_version);
+    str += _("With DataVersion %4, version %5.");
+    QString sizeStr = str.arg(size->x).arg(size->y).arg(size->z).arg(region->data_version).arg(dh::getVersion(region->data_version));
     ui->sizeLabel->setText(sizeStr);
 
     ui->xEdit->setValidator(new QIntValidator(0, size->x));

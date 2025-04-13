@@ -118,11 +118,14 @@ char* dh_get_config_item(const char* item)
         char* val = cJSON_GetStringValue(obj);
         if(val && *val != 0) ret = g_strdup(val);
     }
-    return ret;
+    if(ret)
+        return ret;
+    else return g_strdup("");
 }
 
 void dh_exit1()
 {
+    dh_rm_cache_dir();
     cJSON_Delete(content);
     g_free(config_file);
     g_main_loop_quit(loop);
@@ -186,4 +189,17 @@ void dh_set_or_create_item(const char* item, const char* val, gboolean save)
         dh_write_file(config_file, data, strlen(data));
         free(data);
     }
+}
+
+void dh_rm_cache_dir()
+{
+    char* cache_dir = dh_get_cache_dir();
+    GList* all_file = dh_file_list_create_recursive(cache_dir);
+    g_free(cache_dir);
+
+    GList* tmp_list = all_file;
+    for(; tmp_list ; tmp_list = tmp_list->next)
+        dh_file_rm_file(tmp_list->data);
+
+    g_list_free_full(all_file, free);
 }

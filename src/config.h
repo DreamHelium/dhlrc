@@ -43,6 +43,7 @@ char* dh_get_assets_dir();
 gboolean dh_get_show_wizard();
 void dh_set_or_create_item(const char* item, const char* val, gboolean save);
 char* dh_get_config_item(const char* item);
+void dh_rm_cache_dir();
 
 #ifdef __cplusplus
 }

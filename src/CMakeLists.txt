@@ -55,6 +55,7 @@ add_library(dhlrc SHARED
 	       config.h
 	       uncompress.c uncompress.h
 		   process_state.c process_state.h
+		   csv_parser.c csv_parser.h
 	    #    nbt_util.h
 	    #    nbt_util.c
 		   json_util.c
