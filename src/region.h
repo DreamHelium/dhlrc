@@ -73,7 +73,7 @@ Region* region_new_from_nbt_instance_ptr(void* instance_ptr);
 ItemList* item_list_new_from_multi_region(const char** region_uuid_arr);
 G_DEPRECATED_FOR(nbt_instance_ptr_new_from_region)
 NBT* nbt_new_from_region(Region* region);
-void* nbt_instance_ptr_new_from_region(Region* region);
+void* nbt_instance_ptr_new_from_region(Region* region, gboolean temp_root);
 void region_free(Region* region);
 gint64* region_get_palette_num_from_region(Region* region, int* len);
 

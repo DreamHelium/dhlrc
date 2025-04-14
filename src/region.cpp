@@ -164,7 +164,13 @@ static BlockInfoArray* get_block_full_info_from_lr(LiteRegion* lr)
                 block->pos->z = z;
                 block->nbt_instance = nullptr;
                 DhStrArray* blocks = lite_region_block_name_array(lr);
-                block->id_name = g_strdup(blocks->val[block->palette]);
+                if(block->palette < blocks->num)
+                    block->id_name = g_strdup(blocks->val[block->palette]);
+                else
+                {
+                    g_critical("Palette out of range! will fall back to air!");
+                    block->id_name = g_strdup("minecraft:air");
+                }
                 g_ptr_array_add(array, block);
             }
         }
@@ -464,7 +470,8 @@ static DhNbtInstance blocks_nbt_instance_new(BlockInfoArray* array)
     for(int i = 0 ; i < array->len ; i++)
     {
         DhNbtInstance cur = block_nbt_instance_new((BlockInfo*)(array->pdata[i])); 
-        ret.insert_before({}, cur);
+        /* before is too slow */
+        ret.insert_after({}, cur);
     }
     return ret;
 }
@@ -590,7 +597,7 @@ NBT* nbt_new_from_region(Region* region)
     blocks_nbt->next = palette_nbt;
     palette_nbt->prev = blocks_nbt;
     /* Fifth is DataVersion */
-    NBT* data_version_nbt = data_version_nbt_new(2230);
+    NBT* data_version_nbt = data_version_nbt_new(region->data_version);
     palette_nbt->next = data_version_nbt;
     data_version_nbt->prev = palette_nbt;
 
@@ -607,9 +614,9 @@ static DhNbtInstance entities_nbt_instance_new()
     return DhNbtInstance(DH_TYPE_List, "entities", true);
 }
 
-void* nbt_instance_ptr_new_from_region(Region* region)
+void* nbt_instance_ptr_new_from_region(Region* region, gboolean temp_root)
 {
-    DhNbtInstance ret(DH_TYPE_Compound, NULL, false);
+    DhNbtInstance ret(DH_TYPE_Compound, NULL, temp_root);
     /* First is size */
     DhNbtInstance size_nbt = size_nbt_instance_new(region->region_size, "size");
     ret.insert_before({}, size_nbt);
@@ -623,7 +630,7 @@ void* nbt_instance_ptr_new_from_region(Region* region)
     DhNbtInstance palette_nbt = palettes_nbt_instance_new(region->palette_array);
     ret.insert_before({}, palette_nbt);
     /* Fifth is DataVersion */
-     DhNbtInstance data_version_nbt(region->data_version, "DataVersion", true);
+    DhNbtInstance data_version_nbt(region->data_version, "DataVersion", true);
     ret.insert_before({}, data_version_nbt);
     return new DhNbtInstance(ret);
 }

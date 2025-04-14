@@ -2,10 +2,11 @@
 #include "../translation.h"
 #include "../region.h"
 #include "../litematica_region.h"
+#include "glib.h"
 
 enum format{DH_NBT, DH_LITEMATIC, DH_SCHEMATIC};
 
-static void analyse(const char* input_file, const char* output_format)
+static void analyse(const char* input_file, const char* output_format, bool fast_mode)
 {
     GPtrArray* region_array = g_ptr_array_new_with_free_func((GDestroyNotify)region_free);
     auto if_format_val = -1;
@@ -75,9 +76,20 @@ static void analyse(const char* input_file, const char* output_format)
 
             /* Transform Region to NBT */
             printf(_("Saving file: %s.\n"), output_filename);
-            auto instance = (DhNbtInstance*)nbt_instance_ptr_new_from_region(region);
-            instance->save_to_file(output_filename);
-
+            if(!fast_mode)
+            {
+                auto instance = (DhNbtInstance*)nbt_instance_ptr_new_from_region(region, true);
+                instance->save_to_file(output_filename);
+                instance->self_free();
+                delete instance;
+            }
+            else
+            {
+                auto nbt = nbt_new_from_region(region);
+                DhNbtInstance instance(nbt, false);
+                instance.save_to_file(output_filename);
+            }
+            
             g_free(output_filename);
         }
         goto free_array_return;
@@ -119,7 +131,11 @@ start_point (int argc, char **argv, const char* prpath)
     }
     else if(argc == 4 && g_str_equal(argv[2], "-of"))
     {
-        analyse(argv[1], argv[3]);
+        analyse(argv[1], argv[3], false);
+    }
+    else if(argc == 5 && g_str_equal(argv[2], "-of") && g_str_equal(argv[4], "--fast"))
+    {
+        analyse(argv[1], argv[3], true);
     }
     else printf(_("Unrecognized arguments, see \"--help\" for help.\n"));
     return 0;

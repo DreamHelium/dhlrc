@@ -25,6 +25,8 @@
 #include <time.h>
 #include "translation.h"
 
+#define TEST_OFFSET 2
+
 typedef struct _LiteRegion{
 
     /** Data Version */
@@ -45,7 +47,7 @@ typedef struct _LiteRegion{
     /** Region NBT */
     // NBT* region_nbt;
     // NbtInstance* region_nbt_instance;
-    DhNbtInstance region_nbt_instance_cpp;
+    DhNbtInstance* region_nbt_instance_cpp;
 
     /** Block states */
     const int64_t* states;
@@ -180,13 +182,12 @@ LiteRegion* lite_region_create_from_root_instance_cpp(DhNbtInstance root, int r_
         {
             g_free(out);
             return nullptr;
-            printf("%s", region.get_key());
         }
     }
 
     out->name = region.get_key();
     out->region_num = r_num;
-    out->region_nbt_instance_cpp = region;
+    out->region_nbt_instance_cpp = new DhNbtInstance(region.dup_current_as_original(false));
     auto region_dup(region);
 
     out->blocks = get_blocks(region_dup);
@@ -205,8 +206,8 @@ LiteRegion* lite_region_create_from_root_instance_cpp(DhNbtInstance root, int r_
     out->region_size.y = get_pos(rsize, "y");
     out->region_size.z = get_pos(rsize, "z");
 
-    int bits = g_bit_storage(out->blocks->num);
-    bits = bits <= 2 ? 2 : bits;
+    int bits = g_bit_storage(out->blocks->num - 1);
+    bits = bits <= TEST_OFFSET ? TEST_OFFSET : bits;
     out->move_bits = bits;
 
     return out;
@@ -221,6 +222,7 @@ LiteRegion* lite_region_create(NBT* root, int r_num)
 
 void lite_region_free(LiteRegion* lr)
 {
+    delete lr->region_nbt_instance_cpp;
     dh_str_array_free(lr->blocks);
     g_free(lr);
 }
@@ -322,7 +324,7 @@ const char*   lite_region_name(LiteRegion* lr)
 
 DhNbtInstance lite_region_get_instance(LiteRegion *lr)
 {
-    return lr->region_nbt_instance_cpp;
+    return *(lr->region_nbt_instance_cpp);
 }
 
 uint64_t lite_region_block_index(LiteRegion* lr, int x, int y, int z)
@@ -357,7 +359,7 @@ int lite_region_block_id(LiteRegion* lr, uint64_t index)
         int move_num_2 = 64 - move_num;
         if( start_state + 1 >= lr->states_num)
             g_error("Out of range!");
-        id = ((uint64_t)state[start_state] >> move_num | state[start_state + 1] << move_num_2)& and_num;
+        id = ((uint64_t)state[start_state] >> move_num | (uint64_t)state[start_state + 1] << move_num_2)& and_num;
     }
     return id;
 }

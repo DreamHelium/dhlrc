@@ -396,7 +396,7 @@ void ManageNbtInterface::save_triggered(QList<int> rows)
                     if(common_info_reader_trylock(DH_TYPE_NBT_INTERFACE_CPP, uuid))
                     {
                         auto instance = (DhNbtInstance*)common_info_get_data(DH_TYPE_NBT_INTERFACE_CPP, uuid);
-                        instance->save_to_file(filepos.toUtf8());
+                        qDebug() << instance->save_to_file(filepos.toUtf8());
                         common_info_reader_unlock(DH_TYPE_NBT_INTERFACE_CPP, uuid);
                     }
                     else lockedInfo << description;
