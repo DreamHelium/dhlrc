@@ -121,6 +121,13 @@
         </spacer>
        </item>
        <item>
+        <widget class="QPushButton" name="assetsBtn">
+         <property name="text">
+          <string>&amp;Find assets file</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QPushButton" name="entityBtn">
          <property name="text">
           <string>&amp;Show Entity NBT</string>

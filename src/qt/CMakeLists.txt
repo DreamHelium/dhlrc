@@ -43,6 +43,7 @@ set(PROJECT_SOURCES
         unzipwizard.h unzipwizard.cpp unzipwizard.ui
         selectassetsui.h selectassetsui.cpp selectassetsui.ui
         recipeselectui.h recipeselectui.cpp recipeselectui.ui
+        findassetsui.h findassetsui.cpp findassetsui.ui
         unzippage.h unzippage.cpp
         testopenglui.h testopenglui.cpp
 )

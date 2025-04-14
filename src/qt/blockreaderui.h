@@ -27,5 +27,6 @@ private Q_SLOTS:
     void textChanged_cb(const QString & str);
     void listBtn_clicked();
     void entityBtn_clicked();
+    void assetsBtn_clicked();
 };
 #endif // BLOCKREADERUI_H

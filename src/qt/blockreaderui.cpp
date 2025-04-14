@@ -1,5 +1,6 @@
 #include "blockreaderui.h"
 #include "blocklistui.h"
+#include "findassetsui.h"
 #include "nbtreaderui.h"
 #include "ui_blockreaderui.h"
 #include <qlineedit.h>
@@ -23,6 +24,7 @@ BlockReaderUI::BlockReaderUI(QWidget *parent)
     QObject::connect(ui->zEdit, &QLineEdit::textChanged, this, &BlockReaderUI::textChanged_cb);
     QObject::connect(ui->listBtn, &QPushButton::clicked, this, &BlockReaderUI::listBtn_clicked);
     QObject::connect(ui->entityBtn, &QPushButton::clicked, this, &BlockReaderUI::entityBtn_clicked);
+    QObject::connect(ui->assetsBtn, &QPushButton::clicked, this, &BlockReaderUI::assetsBtn_clicked);
     ui->entityBtn->setEnabled(false);
 }
 
@@ -116,4 +118,11 @@ void BlockReaderUI::entityBtn_clicked()
     auto nrui = new NbtReaderUI(*(DhNbtInstance*)(this->info->nbt_instance));
     nrui->setAttribute(Qt::WA_DeleteOnClose);
     nrui->show();
+}
+
+void BlockReaderUI::assetsBtn_clicked()
+{
+    auto faui = new FindAssetsUI(dh::getVersion(region->data_version));
+    faui->setAttribute(Qt::WA_DeleteOnClose);
+    faui->show();
 }

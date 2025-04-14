@@ -63,16 +63,21 @@
     </message>
     <message>
         <location filename="../../src/qt/blockreaderui.ui" line="126"/>
-        <source>&amp;Show Entity NBT</source>
+        <source>&amp;Find assets file</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../src/qt/blockreaderui.ui" line="133"/>
-        <source>&amp;List blocks</source>
+        <source>&amp;Show Entity NBT</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../src/qt/blockreaderui.ui" line="140"/>
+        <source>&amp;List blocks</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qt/blockreaderui.ui" line="147"/>
         <source>&amp;Close</source>
         <translation type="unfinished"></translation>
     </message>
@@ -133,6 +138,89 @@
     <message>
         <location filename="../../src/qt/configui.ui" line="162"/>
         <source>Assets Directory</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>FindAssetsUI</name>
+    <message>
+        <location filename="../../src/qt/findassetsui.ui" line="14"/>
+        <source>Find Assets</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qt/findassetsui.ui" line="21"/>
+        <source>Let&apos;s find the assets here!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qt/findassetsui.ui" line="32"/>
+        <source>First we could download the version manifest file.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qt/findassetsui.ui" line="39"/>
+        <source>Choose the download directrory, or use the cache directory.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qt/findassetsui.ui" line="51"/>
+        <source>Set to the cache dir</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qt/findassetsui.ui" line="70"/>
+        <source>Download version manifest</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qt/findassetsui.ui" line="77"/>
+        <source>The version manifest is invalid!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qt/findassetsui.ui" line="88"/>
+        <source>Then you can choose the game directory to download the file, Or leave empty to use the cache directory.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qt/findassetsui.ui" line="115"/>
+        <source>Choose a version.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qt/findassetsui.ui" line="129"/>
+        <source>Download version json</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qt/findassetsui.ui" line="138"/>
+        <source>Assets index file:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qt/findassetsui.ui" line="154"/>
+        <source>Download assets index file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qt/findassetsui.ui" line="161"/>
+        <source>Download game cilent jar</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qt/findassetsui.ui" line="172"/>
+        <source>Now you can choose the assets file to copy from, and extract the game jar to get extra information.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qt/findassetsui.ui" line="182"/>
+        <source>Select Assets File</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qt/findassetsui.ui" line="189"/>
+        <source>Unzip Resource Jar</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

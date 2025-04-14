@@ -15,7 +15,7 @@ msgstr ""
 "#-#-#-#-#  dhlrc.pot (dhlrc)  #-#-#-#-#\n"
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-04-14 15:53+0800\n"
+"POT-Creation-Date: 2025-04-15 01:15+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -81,15 +81,20 @@ msgstr ""
 
 #: ../../src/qt/blockreaderui.ui:126
 msgctxt "BlockReaderUI|"
-msgid "&Show Entity NBT"
+msgid "&Find assets file"
 msgstr ""
 
 #: ../../src/qt/blockreaderui.ui:133
 msgctxt "BlockReaderUI|"
-msgid "&List blocks"
+msgid "&Show Entity NBT"
 msgstr ""
 
 #: ../../src/qt/blockreaderui.ui:140
+msgctxt "BlockReaderUI|"
+msgid "&List blocks"
+msgstr ""
+
+#: ../../src/qt/blockreaderui.ui:147
 msgctxt "BlockReaderUI|"
 msgid "&Close"
 msgstr ""
@@ -145,6 +150,90 @@ msgstr ""
 #: ../../src/qt/configui.ui:162
 msgctxt "ConfigUI|"
 msgid "Assets Directory"
+msgstr ""
+
+#: ../../src/qt/findassetsui.ui:14
+msgctxt "FindAssetsUI|"
+msgid "Find Assets"
+msgstr ""
+
+#: ../../src/qt/findassetsui.ui:21
+msgctxt "FindAssetsUI|"
+msgid "Let's find the assets here!"
+msgstr ""
+
+#: ../../src/qt/findassetsui.ui:32
+msgctxt "FindAssetsUI|"
+msgid "First we could download the version manifest file."
+msgstr ""
+
+#: ../../src/qt/findassetsui.ui:39
+msgctxt "FindAssetsUI|"
+msgid "Choose the download directrory, or use the cache directory."
+msgstr ""
+
+#: ../../src/qt/findassetsui.ui:51
+msgctxt "FindAssetsUI|"
+msgid "Set to the cache dir"
+msgstr ""
+
+#: ../../src/qt/findassetsui.ui:70
+msgctxt "FindAssetsUI|"
+msgid "Download version manifest"
+msgstr ""
+
+#: ../../src/qt/findassetsui.ui:77
+msgctxt "FindAssetsUI|"
+msgid "The version manifest is invalid!"
+msgstr ""
+
+#: ../../src/qt/findassetsui.ui:88
+msgctxt "FindAssetsUI|"
+msgid ""
+"Then you can choose the game directory to download the file, Or leave empty "
+"to use the cache directory."
+msgstr ""
+
+#: ../../src/qt/findassetsui.ui:115
+msgctxt "FindAssetsUI|"
+msgid "Choose a version."
+msgstr ""
+
+#: ../../src/qt/findassetsui.ui:129
+msgctxt "FindAssetsUI|"
+msgid "Download version json"
+msgstr ""
+
+#: ../../src/qt/findassetsui.ui:138
+msgctxt "FindAssetsUI|"
+msgid "Assets index file:"
+msgstr ""
+
+#: ../../src/qt/findassetsui.ui:154
+msgctxt "FindAssetsUI|"
+msgid "Download assets index file"
+msgstr ""
+
+#: ../../src/qt/findassetsui.ui:161
+msgctxt "FindAssetsUI|"
+msgid "Download game cilent jar"
+msgstr ""
+
+#: ../../src/qt/findassetsui.ui:172
+msgctxt "FindAssetsUI|"
+msgid ""
+"Now you can choose the assets file to copy from, and extract the game jar to "
+"get extra information."
+msgstr ""
+
+#: ../../src/qt/findassetsui.ui:182
+msgctxt "FindAssetsUI|"
+msgid "Select Assets File"
+msgstr ""
+
+#: ../../src/qt/findassetsui.ui:189
+msgctxt "FindAssetsUI|"
+msgid "Unzip Resource Jar"
 msgstr ""
 
 #: ../../src/qt/mainwindow.ui:14
@@ -621,7 +710,7 @@ msgstr ""
 msgid "Palette"
 msgstr ""
 
-#: src/qt/blockreaderui.cpp:66
+#: src/qt/blockreaderui.cpp:68
 msgid ""
 "Name: %1\n"
 "Translation name: %2\n"
@@ -630,12 +719,24 @@ msgid ""
 "Properties:\n"
 msgstr ""
 
-#: src/qt/blockreaderui.cpp:89
+#: src/qt/blockreaderui.cpp:91
 msgid "Not valid!"
 msgstr ""
 
-#: src/qt/blockreaderui.cpp:98
+#: src/qt/blockreaderui.cpp:100
 msgid "With DataVersion %4, version %5."
+msgstr ""
+
+#: src/qt/findassetsui.cpp:57 src/qt/findassetsui.cpp:63
+msgid "Open Download Directory"
+msgstr ""
+
+#: src/qt/findassetsui.cpp:73
+msgid "The version manifest is valid."
+msgstr ""
+
+#: src/qt/findassetsui.cpp:79
+msgid "The version manifest is invalid with error code %1"
 msgstr ""
 
 #: src/qt/ilchooseui.cpp:14
