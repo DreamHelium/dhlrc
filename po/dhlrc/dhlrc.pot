@@ -15,7 +15,7 @@ msgstr ""
 "#-#-#-#-#  dhlrc.pot (dhlrc)  #-#-#-#-#\n"
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-04-15 01:15+0800\n"
+"POT-Creation-Date: 2025-04-16 02:04+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -349,6 +349,11 @@ msgstr ""
 #: ../../src/qt/mainwindow.ui:185
 msgctxt "MainWindow|"
 msgid "Test OpenGL"
+msgstr ""
+
+#: ../../src/qt/mainwindow.ui:208 ../../src/qt/mainwindow.ui:217
+msgctxt "MainWindow|"
+msgid "&About"
 msgstr ""
 
 #: ../../src/qt/manageui.ui:14
@@ -770,10 +775,10 @@ msgstr ""
 msgid "No item list available!"
 msgstr ""
 
-#: src/qt/ilchooseui.cpp:92 src/qt/ilreaderui.cpp:111 src/qt/mainwindow.cpp:150
-#: src/qt/mainwindow.cpp:169 src/qt/mainwindow.cpp:191
-#: src/qt/mainwindow.cpp:194 src/qt/mainwindow.cpp:211
-#: src/qt/mainwindow.cpp:214 src/qt/mainwindow.cpp:246 src/qt/manage.cpp:29
+#: src/qt/ilchooseui.cpp:92 src/qt/ilreaderui.cpp:111 src/qt/mainwindow.cpp:151
+#: src/qt/mainwindow.cpp:170 src/qt/mainwindow.cpp:192
+#: src/qt/mainwindow.cpp:195 src/qt/mainwindow.cpp:212
+#: src/qt/mainwindow.cpp:215 src/qt/mainwindow.cpp:247 src/qt/manage.cpp:29
 #: src/qt/manage.cpp:292 src/qt/manage.cpp:305 src/qt/manage.cpp:412
 #: src/qt/nbtselectui.cpp:116 src/qt/regionchooseui.cpp:121
 #: src/qt/saveregionselectui.cpp:80 src/qt/utility.cpp:44 src/qt/utility.cpp:67
@@ -821,8 +826,8 @@ msgstr ""
 msgid "Show history"
 msgstr ""
 
-#: src/qt/ilreaderui.cpp:111 src/qt/mainwindow.cpp:150
-#: src/qt/mainwindow.cpp:169
+#: src/qt/ilreaderui.cpp:111 src/qt/mainwindow.cpp:151
+#: src/qt/mainwindow.cpp:170
 msgid "The item list is locked!"
 msgstr ""
 
@@ -844,36 +849,44 @@ msgstr ""
 msgid "Enter description here."
 msgstr ""
 
-#: src/qt/mainwindow.cpp:185 src/qt/saveregionselectui.cpp:74
+#: src/qt/mainwindow.cpp:186 src/qt/saveregionselectui.cpp:74
 msgid "Enter Name for Item List"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:185 src/qt/saveregionselectui.cpp:74
+#: src/qt/mainwindow.cpp:186 src/qt/saveregionselectui.cpp:74
 msgid "Enter the name for item list"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:191 src/qt/saveregionselectui.cpp:80
+#: src/qt/mainwindow.cpp:192 src/qt/saveregionselectui.cpp:80
 msgid "Description is empty!"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:194 src/qt/mainwindow.cpp:214
+#: src/qt/mainwindow.cpp:195 src/qt/mainwindow.cpp:215
 msgid "No Region or no Region selected!"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:211
+#: src/qt/mainwindow.cpp:212
 msgid "Region is locked!"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:246
+#: src/qt/mainwindow.cpp:247
 msgid "No NBT is selected!"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:271
+#: src/qt/mainwindow.cpp:272
 msgid "No Unzip Program found!"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:271
+#: src/qt/mainwindow.cpp:272
 msgid "No unzip program found, we couldn't unzip the file!"
+msgstr ""
+
+#: src/qt/mainwindow.cpp:298
+msgid "Version: "
+msgstr ""
+
+#: src/qt/mainwindow.cpp:299
+msgid "About Litematica Reader"
 msgstr ""
 
 #: src/qt/manage.cpp:29
@@ -1310,4 +1323,36 @@ msgstr ""
 
 #: src/cli/main_cli.c:96
 msgid "The CLI/TUI interface of dhlrc"
+msgstr ""
+
+#: src/region.cpp:33
+msgid "waterlogged"
+msgstr ""
+
+#: src/region.cpp:34
+msgid "facing"
+msgstr ""
+
+#: src/region.cpp:35
+msgid "true"
+msgstr ""
+
+#: src/region.cpp:36
+msgid "false"
+msgstr ""
+
+#: src/region.cpp:37
+msgid "south"
+msgstr ""
+
+#: src/region.cpp:38
+msgid "east"
+msgstr ""
+
+#: src/region.cpp:39
+msgid "north"
+msgstr ""
+
+#: src/region.cpp:40
+msgid "west"
 msgstr ""

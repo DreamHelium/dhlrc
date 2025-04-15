@@ -341,6 +341,12 @@
         <source>Test OpenGL</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <location filename="../../src/qt/mainwindow.ui" line="208"/>
+        <location filename="../../src/qt/mainwindow.ui" line="217"/>
+        <source>&amp;About</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ManageUI</name>

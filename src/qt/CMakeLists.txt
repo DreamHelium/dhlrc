@@ -1,6 +1,10 @@
 cmake_minimum_required(VERSION 3.12)
 
-project(dhlrc_qt VERSION 0.3.1 LANGUAGES CXX)
+project(dhlrc_qt VERSION 0.3.5 LANGUAGES CXX)
+
+add_definitions(-DDHLRC_VERSION="${dhlrc_qt_VERSION}")
+string(TIMESTAMP CURRENT_DAY %Y%m%d)
+add_definitions(-DDHLRC_COMPILE_DATE=${CURRENT_DAY})
 
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)

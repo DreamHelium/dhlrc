@@ -5,6 +5,7 @@ set( DHLRC_MAIN_POT_FILE_DEPENDS
         src/litematica_region.c
         src/recipe_util.c
         src/dhlrc_list.c
+		src/region.cpp
 		src/qt/configui.cpp
         src/qt/mainwindow.cpp
         src/qt/ilreaderui.cpp

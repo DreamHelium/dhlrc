@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-04-15 01:12+0800\n"
+"POT-Creation-Date: 2025-04-16 02:03+0800\n"
 "PO-Revision-Date: 2024-11-30 07:00+0800\n"
 "Last-Translator: dream_he <48383878+DreamHelium@users.noreply.github.com>\n"
 "Language-Team: Chinese <kde-i18n-doc@kde.org>\n"
@@ -80,17 +80,17 @@ msgstr "方块信息为："
 #: ../../src/qt/blockreaderui.ui:126
 msgctxt "BlockReaderUI|"
 msgid "&Find assets file"
-msgstr ""
+msgstr "寻找资源文件(&F)"
 
 #: ../../src/qt/blockreaderui.ui:133
 msgctxt "BlockReaderUI|"
 msgid "&Show Entity NBT"
-msgstr ""
+msgstr "展示实体NBT(&S)"
 
 #: ../../src/qt/blockreaderui.ui:140
 msgctxt "BlockReaderUI|"
 msgid "&List blocks"
-msgstr "列出方块（&L）"
+msgstr "列出方块(&L)"
 
 #: ../../src/qt/blockreaderui.ui:147
 msgctxt "BlockReaderUI|"
@@ -302,7 +302,7 @@ msgstr "方块阅读器（&B）"
 #: ../../src/qt/mainwindow.ui:117
 msgctxt "MainWindow|"
 msgid "&Item List"
-msgstr ""
+msgstr "物品列表(&I)"
 
 #: ../../src/qt/mainwindow.ui:125
 msgctxt "MainWindow|"
@@ -317,7 +317,7 @@ msgstr "配方合成器（&E）"
 #: ../../src/qt/mainwindow.ui:142
 msgctxt "MainWindow|"
 msgid "Utility"
-msgstr ""
+msgstr "工具"
 
 #: ../../src/qt/mainwindow.ui:150
 msgctxt "MainWindow|"
@@ -347,6 +347,11 @@ msgstr ""
 #: ../../src/qt/mainwindow.ui:185
 msgctxt "MainWindow|"
 msgid "Test OpenGL"
+msgstr ""
+
+#: ../../src/qt/mainwindow.ui:208 ../../src/qt/mainwindow.ui:217
+msgctxt "MainWindow|"
+msgid "&About"
 msgstr ""
 
 #: ../../src/qt/manageui.ui:14
@@ -548,7 +553,7 @@ msgstr ""
 #: src/main.c:281
 #, c-format
 msgid "Modules:\n"
-msgstr ""
+msgstr "模组：\n"
 
 #: src/main.c:303
 #, c-format
@@ -697,15 +702,15 @@ msgstr "您想要忽略空气吗？"
 
 #: src/qt/blocklistui.cpp:42
 msgid "id"
-msgstr ""
+msgstr "索引"
 
 #: src/qt/blocklistui.cpp:42
 msgid "id Name"
-msgstr ""
+msgstr "id名称"
 
 #: src/qt/blocklistui.cpp:42
 msgid "Block Name"
-msgstr ""
+msgstr "方块名称"
 
 #: src/qt/blocklistui.cpp:42
 msgid "x"
@@ -788,10 +793,10 @@ msgstr "关闭(&C)"
 msgid "No item list available!"
 msgstr "没有物品列表可用！"
 
-#: src/qt/ilchooseui.cpp:92 src/qt/ilreaderui.cpp:111 src/qt/mainwindow.cpp:150
-#: src/qt/mainwindow.cpp:169 src/qt/mainwindow.cpp:191
-#: src/qt/mainwindow.cpp:194 src/qt/mainwindow.cpp:211
-#: src/qt/mainwindow.cpp:214 src/qt/mainwindow.cpp:246 src/qt/manage.cpp:29
+#: src/qt/ilchooseui.cpp:92 src/qt/ilreaderui.cpp:111 src/qt/mainwindow.cpp:151
+#: src/qt/mainwindow.cpp:170 src/qt/mainwindow.cpp:192
+#: src/qt/mainwindow.cpp:195 src/qt/mainwindow.cpp:212
+#: src/qt/mainwindow.cpp:215 src/qt/mainwindow.cpp:247 src/qt/manage.cpp:29
 #: src/qt/manage.cpp:292 src/qt/manage.cpp:305 src/qt/manage.cpp:412
 #: src/qt/nbtselectui.cpp:116 src/qt/regionchooseui.cpp:121
 #: src/qt/saveregionselectui.cpp:80 src/qt/utility.cpp:44 src/qt/utility.cpp:67
@@ -839,8 +844,8 @@ msgstr "追踪"
 msgid "Show history"
 msgstr "展示历史"
 
-#: src/qt/ilreaderui.cpp:111 src/qt/mainwindow.cpp:150
-#: src/qt/mainwindow.cpp:169
+#: src/qt/ilreaderui.cpp:111 src/qt/mainwindow.cpp:151
+#: src/qt/mainwindow.cpp:170
 msgid "The item list is locked!"
 msgstr "此材料列表被锁定！"
 
@@ -862,37 +867,45 @@ msgstr ""
 msgid "Enter description here."
 msgstr ""
 
-#: src/qt/mainwindow.cpp:185 src/qt/saveregionselectui.cpp:74
+#: src/qt/mainwindow.cpp:186 src/qt/saveregionselectui.cpp:74
 msgid "Enter Name for Item List"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:185 src/qt/saveregionselectui.cpp:74
+#: src/qt/mainwindow.cpp:186 src/qt/saveregionselectui.cpp:74
 msgid "Enter the name for item list"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:191 src/qt/saveregionselectui.cpp:80
+#: src/qt/mainwindow.cpp:192 src/qt/saveregionselectui.cpp:80
 msgid "Description is empty!"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:194 src/qt/mainwindow.cpp:214
+#: src/qt/mainwindow.cpp:195 src/qt/mainwindow.cpp:215
 msgid "No Region or no Region selected!"
 msgstr "没有Region或没有Region选中！"
 
-#: src/qt/mainwindow.cpp:211
+#: src/qt/mainwindow.cpp:212
 msgid "Region is locked!"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:246
+#: src/qt/mainwindow.cpp:247
 msgid "No NBT is selected!"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:271
+#: src/qt/mainwindow.cpp:272
 msgid "No Unzip Program found!"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:271
+#: src/qt/mainwindow.cpp:272
 msgid "No unzip program found, we couldn't unzip the file!"
 msgstr ""
+
+#: src/qt/mainwindow.cpp:298
+msgid "Version: "
+msgstr "版本： "
+
+#: src/qt/mainwindow.cpp:299
+msgid "About Litematica Reader"
+msgstr "关于投影文件阅读器"
 
 #: src/qt/manage.cpp:29
 msgid "No row is selected!"
@@ -1329,6 +1342,38 @@ msgstr ""
 #: src/cli/main_cli.c:96
 msgid "The CLI/TUI interface of dhlrc"
 msgstr ""
+
+#: src/region.cpp:33
+msgid "waterlogged"
+msgstr "含水"
+
+#: src/region.cpp:34
+msgid "facing"
+msgstr "面向"
+
+#: src/region.cpp:35
+msgid "true"
+msgstr "是"
+
+#: src/region.cpp:36
+msgid "false"
+msgstr "否"
+
+#: src/region.cpp:37
+msgid "south"
+msgstr "南"
+
+#: src/region.cpp:38
+msgid "east"
+msgstr "东"
+
+#: src/region.cpp:39
+msgid "north"
+msgstr "北"
+
+#: src/region.cpp:40
+msgid "west"
+msgstr "西"
 
 #~ msgctxt "ConfigUI|"
 #~ msgid "true"

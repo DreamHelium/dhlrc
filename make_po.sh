@@ -1,7 +1,7 @@
 #! /bin/bash
 
 xgettext -k_ -kN_ --default-domain=dhlrc --package-name=dhlrc \
---output=po/dhlrc/dhlrc.pot src/*.c src/qt/*.cpp src/gtk/*.c src/cli/*.c
+--output=po/dhlrc/dhlrc.pot src/*.c src/qt/*.cpp src/gtk/*.c src/cli/*.c src/*.cpp
 echo "Extract the po source file"
 
 lupdate6 src/qt/*.ui -ts po/dhlrc/dhlrc.ts

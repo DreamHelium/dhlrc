@@ -27,10 +27,17 @@
 #include "nbt_interface_cpp/nbt_interface.hpp"
 #include <time.h>
 #include "process_state.h"
+#include "../translation.h"
 
 /* TODO and maybe never do, since property can be too much */
-const char* property[] = {"", ""};
-const char* data[] = {"", ""};
+const char* property[] = {N_("waterlogged"),
+                          N_("facing")};
+const char* data[] = {N_("true"), 
+                      N_("false"),
+                      N_("south"),
+                      N_("east"),
+                      N_("north"),
+                      N_("west")};
 
 static void palette_free(gpointer mem);
 static void block_info_free(gpointer mem);

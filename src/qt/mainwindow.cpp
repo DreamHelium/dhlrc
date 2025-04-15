@@ -102,6 +102,7 @@ void MainWindow::initSignalSlots()
     QObject::connect(ui->selectBtn, &QPushButton::clicked, this, &MainWindow::selectBtn_clicked);
     QObject::connect(ui->recipeBtn, &QPushButton::clicked, this, &MainWindow::recipeBtn_clicked);
     QObject::connect(ui->openglBtn, &QPushButton::clicked, this, &MainWindow::openglBtn_clicked);
+    QObject::connect(ui->action_about, &QAction::triggered, this, &MainWindow::showabout);
 }
 
 void MainWindow::dragEnterEvent(QDragEnterEvent* event)
@@ -290,4 +291,10 @@ void MainWindow::openglBtn_clicked()
     auto toui = new TestOpenglUI();
     toui->setAttribute(Qt::WA_DeleteOnClose);
     toui->show();
+}
+
+void MainWindow::showabout()
+{
+    QString str = _("Version: ") + QString(DHLRC_VERSION) + '-' + QString::number(DHLRC_COMPILE_DATE);
+    QMessageBox::about(this, _("About Litematica Reader"), str);
 }

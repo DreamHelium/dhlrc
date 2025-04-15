@@ -332,6 +332,11 @@ msgctxt "MainWindow|"
 msgid "Test OpenGL"
 msgstr ""
 
+#: ../../src/qt/mainwindow.ui:208 ../../src/qt/mainwindow.ui:217
+msgctxt "MainWindow|"
+msgid "&About"
+msgstr ""
+
 #: ../../src/qt/manageui.ui:14
 msgctxt "ManageUI|"
 msgid "Form"
