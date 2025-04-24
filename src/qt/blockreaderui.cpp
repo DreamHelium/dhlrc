@@ -98,7 +98,15 @@ void BlockReaderUI::setText()
     auto size = region->region_size;
     QString str = "(%1, %2, %3) ";
     str += _("With DataVersion %4, version %5.");
-    QString sizeStr = str.arg(size->x).arg(size->y).arg(size->z).arg(region->data_version).arg(dh::getVersion(region->data_version));
+    str += '\n';
+    str += _("Created time: %6, Modified time: %7, Author: %8, Name: %9");
+    str += '\n';
+    str += _("Description: %10");
+    gchar* ct_str = g_date_time_format(region->data->create_time, "%F %T");
+    gchar* mt_str = g_date_time_format(region->data->modify_time, "%F %T");
+
+    QString sizeStr = str.arg(size->x).arg(size->y).arg(size->z).arg(region->data_version).arg(dh::getVersion(region->data_version))
+    .arg(ct_str).arg(mt_str).arg(region->data->author).arg(region->data->name).arg(region->data->description);
     ui->sizeLabel->setText(sizeStr);
 
     ui->xEdit->setValidator(new QIntValidator(0, size->x));

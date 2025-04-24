@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-04-16 02:03+0800\n"
+"POT-Creation-Date: 2025-04-24 23:04+0800\n"
 "PO-Revision-Date: 2024-11-30 07:00+0800\n"
 "Last-Translator: dream_he <48383878+DreamHelium@users.noreply.github.com>\n"
 "Language-Team: Chinese <kde-i18n-doc@kde.org>\n"
@@ -749,6 +749,14 @@ msgstr ""
 #: src/qt/blockreaderui.cpp:100
 msgid "With DataVersion %4, version %5."
 msgstr "数据版本%4，版本%5。"
+
+#: src/qt/blockreaderui.cpp:102
+msgid "Created time: %6, Modified time: %7, Author: %8, Name: %9"
+msgstr ""
+
+#: src/qt/blockreaderui.cpp:104
+msgid "Description: %10"
+msgstr ""
 
 #: src/qt/findassetsui.cpp:57 src/qt/findassetsui.cpp:63
 msgid "Open Download Directory"

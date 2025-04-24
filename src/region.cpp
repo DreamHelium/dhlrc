@@ -41,11 +41,12 @@ const char* data[] = {N_("true"),
 
 static void palette_free(gpointer mem);
 static void block_info_free(gpointer mem);
+static void base_data_free(gpointer mem);
 
 void region_free(Region* region)
 {
     g_free(region->region_size);
-    g_free(region->region_name);
+    base_data_free(region->data);
     g_ptr_array_unref(region->block_info_array);
     g_ptr_array_unref(region->palette_array);
     g_free(region);
@@ -204,7 +205,7 @@ static BlockInfoArray* get_block_full_info_from_lr(LiteRegion* lr)
         tile_entities.rm_node("x");
         tile_entities.rm_node("y");
         tile_entities.rm_node("z");
-        tile_entities.get_current_nbt()->key = dh_strdup("nbt");
+        tile_entities.set_key("nbt");
         // NBT* new_tile_entities = nbt_dup(region_instance.get_current_nbt());
         // new_tile_entities = nbt_rm(new_tile_entities, "x");
         // new_tile_entities = nbt_rm(new_tile_entities, "y");
@@ -263,13 +264,25 @@ static BlockInfoArray* get_block_full_info_from_nbt_instance(DhNbtInstance insta
     return array;
 }
 
+static BaseData* base_data_new_from_lr(LiteRegion* lr)
+{
+    auto ret = g_new0(BaseData, 1);
+    ret->create_time = g_date_time_new_from_unix_utc(lite_region_create_time(lr) / 1000);
+    ret->modify_time = g_date_time_new_from_unix_utc(lite_region_modify_time(lr) / 1000);
+    ret->author = g_strdup(lite_region_author(lr));
+    ret->name = g_strdup(lite_region_name(lr));
+    ret->description = g_strdup(lite_region_description(lr));
+    
+    return ret;
+}
+
 Region* region_new_from_lite_region(LiteRegion *lr)
 {
     Region* region = g_new0(Region, 1);
 
     /* Fill DataVersion */
     region->data_version = lite_region_data_version(lr); 
-    region->region_name = g_strdup(lite_region_name(lr));
+    region->data = base_data_new_from_lr(lr);
 
     /* Fill RegionSize */
     RegionSize* rs = g_new0(RegionSize, 1);
@@ -287,6 +300,32 @@ Region* region_new_from_lite_region(LiteRegion *lr)
     region->block_info_array = bia;
 
     return region;
+}
+
+static BaseData* base_data_new_null()
+{
+    auto ret = g_new0(BaseData, 1);
+    ret->create_time = g_date_time_new_now_local();
+    ret->modify_time = g_date_time_new_now_local();
+    ret->description = g_strdup("");
+    ret->author = g_strdup(g_get_user_name());
+    ret->name = g_strdup("Converted");
+
+    return ret;
+}
+
+static void base_data_free(gpointer mem)
+{
+    BaseData* data = (BaseData*)mem;
+    if(data)
+    {
+        g_date_time_unref(data->create_time);
+        g_date_time_unref(data->modify_time);
+        g_free(data->author);
+        g_free(data->description);
+        g_free(data->name);
+        g_free(data);
+    }
 }
 
 static Region* region_new_from_nbt_instance(DhNbtInstance instance)
@@ -319,7 +358,7 @@ static Region* region_new_from_nbt_instance(DhNbtInstance instance)
         auto version_instance(instance);
         version_instance.child("DataVersion");
         region->data_version = version_instance.get_int();
-        region->region_name = NULL;
+        region->data = base_data_new_null();
 
         return region;
     }

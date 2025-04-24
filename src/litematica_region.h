@@ -60,6 +60,10 @@ int           lite_region_size_x(LiteRegion* lr);
 int           lite_region_size_y(LiteRegion* lr);
 int           lite_region_size_z(LiteRegion* lr);
 const char*   lite_region_name(LiteRegion* lr);
+gint64        lite_region_create_time(LiteRegion* lr);
+gint64        lite_region_modify_time(LiteRegion* lr);
+const char*   lite_region_description(LiteRegion* lr);
+const char*   lite_region_author(LiteRegion* lr);
 
 /** Improved version of getting id */
 int  lite_region_block_id(LiteRegion* lr, uint64_t index);

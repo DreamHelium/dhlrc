@@ -33,7 +33,7 @@ typedef struct _LiteRegion{
     int data_version;
 
     /** Region name */
-    const char* name;
+    char* name;
 
     /** Number of the region */
     int region_num;
@@ -63,6 +63,11 @@ typedef struct _LiteRegion{
 
     /** In many cases you don't need it, it's used to get block id. */
     int move_bits;
+
+    gint64 create_time;
+    gint64 modify_time;
+    char* description;
+    char* author;
 
 } _LiteRegion;
 
@@ -172,6 +177,26 @@ LiteRegion* lite_region_create_from_root_instance_cpp(DhNbtInstance root, int r_
     data_version.child("MinecraftDataVersion");
     out->data_version = data_version.get_int();
 
+    auto metadata(root);
+    metadata.goto_root();
+    metadata.child("Metadata");
+
+    auto ct(metadata);
+    ct.child("TimeCreated");
+    out->create_time = ct.get_long();
+
+    auto mt(metadata);
+    mt.child("TimeModified");
+    out->modify_time = mt.get_long();
+
+    auto des(metadata);
+    des.child("Description");
+    out->description = g_strdup(des.get_string());
+
+    auto author(metadata);
+    author.child("Author");
+    out->author = g_strdup(author.get_string());
+
     auto region(root);
     region.goto_root();
     region.child("Regions");
@@ -185,7 +210,7 @@ LiteRegion* lite_region_create_from_root_instance_cpp(DhNbtInstance root, int r_
         }
     }
 
-    out->name = region.get_key();
+    out->name = g_strdup(region.get_key());
     out->region_num = r_num;
     out->region_nbt_instance_cpp = new DhNbtInstance(region.dup_current_as_original(false));
     auto region_dup(region);
@@ -222,6 +247,9 @@ LiteRegion* lite_region_create(NBT* root, int r_num)
 
 void lite_region_free(LiteRegion* lr)
 {
+    g_free(lr->name);
+    g_free(lr->author);
+    g_free(lr->description);
     delete lr->region_nbt_instance_cpp;
     dh_str_array_free(lr->blocks);
     g_free(lr);
@@ -320,6 +348,26 @@ int lite_region_size_z(LiteRegion* lr)
 const char*   lite_region_name(LiteRegion* lr)
 {
     return lr->name;
+}
+
+gint64        lite_region_create_time(LiteRegion* lr)
+{
+    return lr->create_time;
+}
+
+gint64        lite_region_modify_time(LiteRegion* lr)
+{
+    return lr->modify_time;
+}
+
+const char*   lite_region_description(LiteRegion* lr)
+{
+    return lr->description;
+}
+
+const char*   lite_region_author(LiteRegion* lr)
+{
+    return lr->author;
 }
 
 DhNbtInstance lite_region_get_instance(LiteRegion *lr)

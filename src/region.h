@@ -54,11 +54,25 @@ typedef GPtrArray BlockInfoArray;
 /** Just like `GPtrArray<Palette>` */
 typedef GPtrArray PaletteArray;
 
+typedef struct BaseData
+{
+    /* Default: time of generated */
+    GDateTime* create_time;
+    /* Default: time of generated */
+    GDateTime* modify_time;
+    /* Default: "" */
+    char* description;
+    /* Default: username */
+    char* author;
+    /* Default: Converted */
+    char* name;
+} BaseData;
+
 typedef struct _Region
 {
     /** The base information */
     int data_version;
-    char* region_name;
+    BaseData* data;
     /** The size of region */
     RegionSize* region_size;
     /** The block info array */

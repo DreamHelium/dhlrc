@@ -69,7 +69,13 @@ static void analyse(const char* input_file, const char* output_format, bool fast
             *strrchr(output_filename, '.') = 0;
             if(region_array->len != 1)
             {
-                char* new_of_name = g_strconcat(output_filename, "_", region->region_name, ".nbt",NULL);
+                char* new_of_name = g_strconcat(output_filename, "_", region->data->name, ".nbt",NULL);
+                g_free(output_filename);
+                output_filename = new_of_name;
+            }
+            else
+            {
+                char* new_of_name = g_strconcat(output_filename, ".nbt", NULL);
                 g_free(output_filename);
                 output_filename = new_of_name;
             }
