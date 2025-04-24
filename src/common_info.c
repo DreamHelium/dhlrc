@@ -66,6 +66,11 @@ static void item_list_info_free(gpointer mem)
     common_info_free(mem, (GFreeFunc)item_list_free);
 }
 
+static void nbt_interface_cpp_info_free(gpointer mem)
+{
+    common_info_free(mem, dh_nbt_instance_cpp_free);
+}
+
 static void common_info_single_free(gpointer mem)
 {
     CommonInfoSingle* single = mem;
@@ -99,7 +104,7 @@ void common_infos_init()
         else if(i == DH_TYPE_Item_List)
             instance->table = dh_mt_table_new(g_str_hash, is_same_string, g_free, item_list_info_free);
         else if(i == DH_TYPE_NBT_INTERFACE_CPP)
-            instance->table = dh_mt_table_new(g_str_hash, is_same_string, g_free, dh_nbt_instance_cpp_free);
+            instance->table = dh_mt_table_new(g_str_hash, is_same_string, g_free, nbt_interface_cpp_info_free);
         else instance->table = NULL;
         instance->uuid_list = NULL;
         instance->uuid_array = NULL;
