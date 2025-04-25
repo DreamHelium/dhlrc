@@ -19,11 +19,9 @@
 #include "dh_string_util.h"
 #include "nbt_interface_cpp/libnbt/nbt.h"
 #include "nbt_interface_cpp/nbt_interface.hpp"
-#include "region.h"
 #include <string.h>
 #include <stdlib.h>
 #include <time.h>
-#include "translation.h"
 
 #define TEST_OFFSET 2
 
@@ -111,48 +109,6 @@ static void tmpitem_list_free(TmpItemList* til)
 {
     g_list_free_full(til, tmpitem_free);
 }
-
-/* TODO: finish all
-static NbtInstance* create_lr_instance(Region* region)
-{
-    NbtInstance* region_name = dh_nbt_instance_new_compound("");
-
-    int len = 0;
-    gint64* states = region_get_palette_num_from_region(region, &len);
-    NbtInstance* block_states = dh_nbt_instance_new_long_array(states, len, "BlockStates");
-    free(states);
-    dh_nbt_instance_insert_before(region_name, NULL, block_states);
-    dh_nbt_instance_free_only_instance(block_states);
-
-    NbtInstance* pending_block_ticks = dh_nbt_instance_new_list("PendingBlockTicks");
-    dh_nbt_instance_insert_before(region_name, NULL, pending_block_ticks);
-
-    NbtInstance* pos_x = dh_nbt_instance_new_int(0, "x");
-    NbtInstance* pos_y = dh_nbt_instance_new_int(0, "y");
-    NbtInstance* pos_z = dh_nbt_instance_new_int(0, "z");
-
-    NbtInstance* pos = dh_nbt_instance_new_compound("Position");
-    dh_nbt_instance_insert_before(pos, NULL, pos_x);
-    dh_nbt_instance_insert_before(pos, NULL, pos_y);
-    dh_nbt_instance_insert_before(pos, NULL, pos_z);
-
-    dh_nbt_instance_insert_before(region_name, NULL, pos);
-    dh_nbt_instance_free_only_instance(pos);
-    dh_nbt_instance_free_only_instance(pos_x);
-    dh_nbt_instance_free_only_instance(pos_y);
-    dh_nbt_instance_free_only_instance(pos_z);
-
-    return region_name;
-}
-
-LiteRegion* lite_region_create_from_region(void* p)
-{
-    Region* region = (Region*)p;
-    LiteRegion* out = g_new0(LiteRegion, 1);
-
-    NbtInstance* instance = create_lr_instance(region);
-}
-*/
 
 static DhStrArray* get_blocks(DhNbtInstance region)
 {

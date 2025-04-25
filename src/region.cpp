@@ -372,9 +372,10 @@ static Region* region_new_from_nbt_instance(DhNbtInstance instance)
 
 Region* region_new_from_nbt_file(const char* filepos)
 {
-    DhNbtInstance instance(filepos);
-
-    return region_new_from_nbt_instance(instance);
+    DhNbtInstance instance(filepos, true);
+    Region* ret = region_new_from_nbt_instance(instance);
+    instance.self_free();
+    return ret;
 }
 
 Region* region_new_from_nbt_instance_ptr(void* instance_ptr)
@@ -660,6 +661,90 @@ static DhNbtInstance entities_nbt_instance_new()
     return DhNbtInstance(DH_TYPE_List, "entities", true);
 }
 
+static DhNbtInstance lite_metadata_new(Region* region)
+{
+    DhNbtInstance ret(DH_TYPE_Compound, "Metadata", true);
+    DhNbtInstance ct(g_date_time_to_unix(region->data->create_time) * 1000, "TimeCreated", true);
+    DhNbtInstance mt(g_date_time_to_unix(region->data->modify_time) * 1000, "TimeModified", true);
+    ret.insert_before({}, ct);
+    ret.insert_before({}, mt);
+
+    DhNbtInstance enclosing_size(DH_TYPE_Compound, "EnclosingSize", true);
+    DhNbtInstance x(region->region_size->x, "x", true);
+    DhNbtInstance y(region->region_size->y, "y", true);
+    DhNbtInstance z(region->region_size->z, "z", true);
+    enclosing_size.insert_before({}, x);
+    enclosing_size.insert_before({}, y);
+    enclosing_size.insert_before({}, z);
+    ret.insert_before({}, enclosing_size);
+
+    DhNbtInstance description(region->data->description, "Description", true);
+    DhNbtInstance author(region->data->author, "Author", true);
+    DhNbtInstance name(region->data->name, "Name", true);
+    ret.insert_before({}, description);
+    ret.insert_before({}, author);
+    ret.insert_before({}, name);
+
+    DhNbtInstance region_count((gint32)1, "RegionCount", true);
+    ret.insert_before({}, region_count);
+
+    gint32 volume = region->region_size->x * region->region_size->y * region->region_size->z;
+    DhNbtInstance total_blocks((gint32)(region->block_info_array->len), "TotalBlocks", true);
+    DhNbtInstance total_volume(volume, "TotalVolume", true);
+    ret.insert_before({}, total_blocks);
+    ret.insert_before({}, total_volume);
+
+    return ret;
+}
+
+static DhNbtInstance lite_regions_new(Region* region)
+{
+    DhNbtInstance ret(DH_TYPE_Compound, "Regions", true);
+    DhNbtInstance name(DH_TYPE_Compound, region->data->name, true);
+    ret.insert_before({}, name);
+
+    int len = 0;
+    gint64* states = region_get_palette_num_from_region(region, &len);
+    DhNbtInstance block_states(states, len, "BlockStates", true);
+    free(states);
+    name.insert_before({}, block_states);
+
+    DhNbtInstance pbt(DH_TYPE_List, "PendingBlockTicks", true);
+    DhNbtInstance pft(DH_TYPE_List, "PendingFluidTicks", true);
+    DhNbtInstance entities(DH_TYPE_List, "Entities", true);
+    name.insert_before({}, pbt);
+    name.insert_before({}, pft);
+    name.insert_before({}, entities);
+
+    DhNbtInstance position(DH_TYPE_Compound, "Position", true);
+    DhNbtInstance px((gint32)0, "x", true);
+    DhNbtInstance py((gint32)0, "y", true);
+    DhNbtInstance pz((gint32)0, "z", true);
+    position.insert_before({}, px);
+    position.insert_before({}, py);
+    position.insert_before({}, pz);
+    name.insert_before({}, position);
+
+    DhNbtInstance size(DH_TYPE_Compound, "Size", true);
+    DhNbtInstance sx(region->region_size->x, "x", true);
+    DhNbtInstance sy(region->region_size->y, "y", true);
+    DhNbtInstance sz(region->region_size->z, "z", true);
+    size.insert_before({}, sx);
+    size.insert_before({}, sy);
+    size.insert_before({}, sz);
+    name.insert_before({}, size);
+
+    DhNbtInstance palette = palettes_nbt_instance_new(region->palette_array);
+    palette.set_key("BlockStatePalette");
+    name.insert_before({}, palette);
+
+    DhNbtInstance tile_entities = entities_nbt_instance_new();
+    tile_entities.set_key("TileEntities");
+    name.insert_before({}, tile_entities);
+
+    return ret;
+}
+
 void* nbt_instance_ptr_new_from_region(Region* region, gboolean temp_root)
 {
     DhNbtInstance ret(DH_TYPE_Compound, NULL, temp_root);
@@ -678,6 +763,24 @@ void* nbt_instance_ptr_new_from_region(Region* region, gboolean temp_root)
     /* Fifth is DataVersion */
     DhNbtInstance data_version_nbt(region->data_version, "DataVersion", true);
     ret.insert_before({}, data_version_nbt);
+    return new DhNbtInstance(ret);
+}
+
+void* lite_instance_ptr_new_from_region(Region* region, gboolean temp_root)
+{
+    DhNbtInstance ret(DH_TYPE_Compound, nullptr, temp_root);
+    /* First is DataVersion */
+    DhNbtInstance data_version_nbt(region->data_version, "MinecraftDataVersion", true);
+    ret.insert_before({}, data_version_nbt);
+    /* Second is Version, default to 5 */
+    DhNbtInstance version_nbt((gint32)5, "Version", true);
+    ret.insert_before({}, version_nbt);
+    /* Third is metadata */
+    DhNbtInstance metadata_nbt = lite_metadata_new(region);
+    ret.insert_before({}, metadata_nbt);
+    /* Then is the regions */
+    DhNbtInstance regions = lite_regions_new(region);
+    ret.insert_before({}, regions);
     return new DhNbtInstance(ret);
 }
 

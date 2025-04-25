@@ -102,7 +102,40 @@ static void analyse(const char* input_file, const char* output_format, bool fast
     }
     else if(g_str_equal(output_format, "litematic"))
     {
+        if(if_format_val == DH_LITEMATIC)
+            goto same_format_return;
+        for(int i = 0 ; i < region_array->len ; i++)
+        {
+            Region* region = (Region*)(region_array->pdata[i]);
 
+            /* Get filename */
+            char* output_filename = g_path_get_basename(input_file);
+            *strrchr(output_filename, '.') = 0;
+            if(region_array->len != 1)
+            {
+                fprintf(stderr, _("Multiple file convertion to litematic is not supported yet!\n"));
+                g_free(output_filename);
+                goto free_array_return;                
+            }
+            else
+            {
+                char* new_of_name = g_strconcat(output_filename, ".litematic", NULL);
+                g_free(output_filename);
+                output_filename = new_of_name;
+            }
+
+            /* Transform Region to NBT */
+            printf(_("Saving file: %s.\n"), output_filename);
+            if(fast_mode)
+                fprintf(stderr, _("Fast mode is invalid in of-litematic mode.\n"));
+            auto instance = (DhNbtInstance*)lite_instance_ptr_new_from_region(region, true);
+            instance->save_to_file(output_filename);
+            instance->self_free();
+            delete instance;
+            
+            g_free(output_filename);
+        }
+        goto free_array_return;
     }
     else if(g_str_equal(output_format, "schematic"))
     {

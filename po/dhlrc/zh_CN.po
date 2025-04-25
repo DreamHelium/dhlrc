@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-04-24 23:04+0800\n"
+"POT-Creation-Date: 2025-04-26 02:17+0800\n"
 "PO-Revision-Date: 2024-11-30 07:00+0800\n"
 "Last-Translator: dream_he <48383878+DreamHelium@users.noreply.github.com>\n"
 "Language-Team: Chinese <kde-i18n-doc@kde.org>\n"
@@ -744,7 +744,7 @@ msgstr ""
 
 #: src/qt/blockreaderui.cpp:91
 msgid "Not valid!"
-msgstr ""
+msgstr "无效！"
 
 #: src/qt/blockreaderui.cpp:100
 msgid "With DataVersion %4, version %5."
@@ -752,11 +752,11 @@ msgstr "数据版本%4，版本%5。"
 
 #: src/qt/blockreaderui.cpp:102
 msgid "Created time: %6, Modified time: %7, Author: %8, Name: %9"
-msgstr ""
+msgstr "创建时间：%6，修改时间：%7，作者：%8，名字：%9"
 
 #: src/qt/blockreaderui.cpp:104
 msgid "Description: %10"
-msgstr ""
+msgstr "描述：%10"
 
 #: src/qt/findassetsui.cpp:57 src/qt/findassetsui.cpp:63
 msgid "Open Download Directory"
@@ -787,13 +787,13 @@ msgstr "已锁定"
 #: src/qt/ilchooseui.cpp:49 src/qt/ilchooseui.cpp:68 src/qt/lrchooseui.cpp:62
 #: src/qt/nbtselectui.cpp:45 src/qt/nbtselectui.cpp:64 src/qt/recipesui.cpp:140
 #: src/qt/regionchooseui.cpp:66 src/qt/regionchooseui.cpp:85
-#: src/qt/saveregionselectui.cpp:41 src/gtk/manage_window.c:118
+#: src/qt/saveregionselectui.cpp:43 src/gtk/manage_window.c:118
 msgid "&OK"
 msgstr "确定(&O)"
 
 #: src/qt/ilchooseui.cpp:50 src/qt/lrchooseui.cpp:63 src/qt/nbtselectui.cpp:46
 #: src/qt/recipesui.cpp:141 src/qt/regionchooseui.cpp:67
-#: src/qt/saveregionselectui.cpp:42 src/gtk/manage_window.c:121
+#: src/qt/saveregionselectui.cpp:44 src/gtk/manage_window.c:121
 msgid "&Close"
 msgstr "关闭(&C)"
 
@@ -807,7 +807,7 @@ msgstr "没有物品列表可用！"
 #: src/qt/mainwindow.cpp:215 src/qt/mainwindow.cpp:247 src/qt/manage.cpp:29
 #: src/qt/manage.cpp:292 src/qt/manage.cpp:305 src/qt/manage.cpp:412
 #: src/qt/nbtselectui.cpp:116 src/qt/regionchooseui.cpp:121
-#: src/qt/saveregionselectui.cpp:80 src/qt/utility.cpp:44 src/qt/utility.cpp:67
+#: src/qt/saveregionselectui.cpp:95 src/qt/utility.cpp:44 src/qt/utility.cpp:67
 #: src/qt/utility.cpp:73 src/qt/utility.cpp:80 src/qt/utility.cpp:137
 msgid "Error!"
 msgstr "错误！"
@@ -869,21 +869,21 @@ msgstr "全选 (&A)"
 msgid ""
 "Please enter the new Region(s)' name(s): (%1 represents the NBT description "
 "and %2 represents the original region's name):"
-msgstr ""
+msgstr "请输入新Region的名字：（%1代表NBT描述，%2代表原本的区域的名字）："
 
 #: src/qt/lrchooseui.cpp:55
 msgid "Enter description here."
-msgstr ""
+msgstr "在此输入描述。"
 
-#: src/qt/mainwindow.cpp:186 src/qt/saveregionselectui.cpp:74
+#: src/qt/mainwindow.cpp:186 src/qt/saveregionselectui.cpp:89
 msgid "Enter Name for Item List"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:186 src/qt/saveregionselectui.cpp:74
+#: src/qt/mainwindow.cpp:186 src/qt/saveregionselectui.cpp:89
 msgid "Enter the name for item list"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:192 src/qt/saveregionselectui.cpp:80
+#: src/qt/mainwindow.cpp:192 src/qt/saveregionselectui.cpp:95
 msgid "Description is empty!"
 msgstr ""
 
@@ -1099,6 +1099,10 @@ msgid "Save as &NBT struct."
 msgstr ""
 
 #: src/qt/saveregionselectui.cpp:34
+msgid "Save as &Litematic NBT struct."
+msgstr ""
+
+#: src/qt/saveregionselectui.cpp:35
 msgid "Save as &item list."
 msgstr ""
 
