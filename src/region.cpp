@@ -42,6 +42,8 @@ const char* data[] = {N_("true"),
 static void palette_free(gpointer mem);
 static void block_info_free(gpointer mem);
 static void base_data_free(gpointer mem);
+static gboolean find_palette(gconstpointer a, gconstpointer b);
+static int compare_block_info(gconstpointer a, gconstpointer b);
 
 void region_free(Region* region)
 {
@@ -118,17 +120,20 @@ static PaletteArray* get_palette_full_info_from_lr(LiteRegion* lr)
 
 
 
-static PaletteArray* get_palette_full_info_from_nbt_instance(DhNbtInstance instance)
+static PaletteArray* get_palette_full_info_from_nbt_instance(Region* region, DhNbtInstance instance)
 {
     GPtrArray* array = g_ptr_array_new_with_free_func(palette_free);
     instance.child("palette");
     instance.child();
+    bool find_air = false;
+    int air_palette = -1;
     for(; instance.is_non_null() ; instance.next())
     {
         auto palette_instance(instance);
         Palette* palette = g_new0(Palette, 1);
         palette_instance.child("Name");
         palette->id_name = g_strdup(palette_instance.get_string());
+        const char* id_name = palette_instance.get_string();
 
         palette_instance.parent();
         if(palette_instance.child("Properties"))
@@ -141,7 +146,30 @@ static PaletteArray* get_palette_full_info_from_nbt_instance(DhNbtInstance insta
         palette->property_data = data;
 
         g_ptr_array_add(array, palette);
+        if(g_str_equal(id_name, "minecraft:air") && !find_air)
+        {
+            find_air = true;
+            air_palette = array->len - 1;
+        }
     }
+    if(!find_air)
+    {
+        Palette* palette = g_new0(Palette, 1);
+        palette->id_name = g_strdup("minecraft:air");
+        palette->property_name = nullptr;
+        palette->property_data = nullptr;
+        g_ptr_array_add(array, palette);
+        air_palette = array->len - 1;
+    }
+    if(find_air && air_palette != 0)
+    {
+        Palette* temp_non_air = (Palette*)array->pdata[0];
+        Palette* air = (Palette*)array->pdata[air_palette];
+        array->pdata[0] = air;
+        array->pdata[air_palette] = temp_non_air;
+    }
+    region->air_palette = air_palette;
+
     return array;
 }
 
@@ -218,7 +246,14 @@ static BlockInfoArray* get_block_full_info_from_lr(LiteRegion* lr)
     return array;
 }
 
-static BlockInfoArray* get_block_full_info_from_nbt_instance(DhNbtInstance instance, PaletteArray* pa, Pos* pos)
+static int compare_block_info(gconstpointer a, gconstpointer b)
+{
+    BlockInfo* info_a = (BlockInfo*)a;
+    BlockInfo* info_b = (BlockInfo*)b;
+    return info_a->index - info_b->index;
+}
+
+static BlockInfoArray* get_block_full_info_from_nbt_instance(DhNbtInstance instance, PaletteArray* pa, Pos* pos, Region* region)
 {
     GPtrArray* array = g_ptr_array_new_with_free_func(block_info_free);
     DhNbtInstance blocks(instance);
@@ -234,6 +269,10 @@ static BlockInfoArray* get_block_full_info_from_nbt_instance(DhNbtInstance insta
         auto palette(blocks);
         palette.child("state");
         block_info->palette = palette.get_int();
+        if(block_info->palette == region->air_palette)
+            block_info->palette = 0;
+        else if(block_info->palette == 0)
+            block_info->palette = region->air_palette;
 
         auto pos_instance(blocks);
         pos_instance.child("pos");
@@ -261,6 +300,7 @@ static BlockInfoArray* get_block_full_info_from_nbt_instance(DhNbtInstance insta
         block_info->id_name = g_strdup(block_palette->id_name);
         g_ptr_array_add(array, block_info);
     }
+    g_ptr_array_sort_values(array, compare_block_info);
     return array;
 }
 
@@ -347,11 +387,11 @@ static Region* region_new_from_nbt_instance(DhNbtInstance instance)
         region->region_size = rs;
 
         /* Fill PaletteArray */
-        PaletteArray* pa = get_palette_full_info_from_nbt_instance(instance);
+        PaletteArray* pa = get_palette_full_info_from_nbt_instance(region, instance);
         region->palette_array = pa;
 
         /* Fill BlockInfoArray */
-        BlockInfoArray* bia = get_block_full_info_from_nbt_instance(instance, pa, rs);
+        BlockInfoArray* bia = get_block_full_info_from_nbt_instance(instance, pa, rs, region);
         region->block_info_array = bia;
 
         /* Fill Data Version */
@@ -790,23 +830,25 @@ gint64* region_get_palette_num_from_region(Region* region, int* length)
     int num = arr->len;
     BlockInfoArray* info_array = region->block_info_array;
     int block_num = info_array->len;
-    int move_bits = g_bit_storage(num) <= 2 ? 2 : g_bit_storage(num);
+    int move_bits = g_bit_storage(num - 1) <= 2 ? 2 : g_bit_storage(num - 1);
+    int len = move_bits * block_num / 64 + 1;
 
-    DhBit* bit = dh_bit_new();
+    DhBit* bit = dh_bit_new_with_len(len);
     gint64* ret = NULL;
+    int before = -1;
 
     for(int id = 0 ; id < block_num ; id++)
     {
-        int palette = 0;
-        for(int i = 0 ; i < block_num ; i++)
+        guint palette = region->air_palette;
+        BlockInfo* info = (BlockInfo*)region->block_info_array->pdata[id];
+        if(before + 1 != info->index) /* Before and index has air */
         {
-            BlockInfo* info = (BlockInfo*)(info_array->pdata[i]);
-            if(info->index == id)
-            {
-                palette = info->palette;
-                break;
-            }
+            for(int i = before + 1 ; i < info->index ; i++)
+                dh_bit_push_back_val(bit, move_bits, palette);
+            /* Fill air */
         }
+        before = info->index;
+        palette = info->palette;
         dh_bit_push_back_val(bit, move_bits, palette);
     }
 

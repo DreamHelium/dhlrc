@@ -79,6 +79,7 @@ typedef struct _Region
     BlockInfoArray* block_info_array;
     /** The Palette info array*/
     PaletteArray* palette_array;
+    int air_palette;
 } Region;
 
 Region* region_new_from_lite_region(LiteRegion* lr);

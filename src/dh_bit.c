@@ -14,8 +14,12 @@ void dh_bit_push_back_bit(DhBit* bit, int b)
 {
     if(bit->bits % 64 == 0)
     {
-        bit->array = realloc(bit->array, (bit->bits / 64 + 1) * sizeof(int64_t));
-        bit->array[bit->bits / 64] = 0;
+        if(bit->real_len * 64 <= bit->bits)
+        {
+            bit->array = realloc(bit->array, (bit->bits / 64 + 1) * sizeof(int64_t));
+            bit->array[bit->bits / 64] = 0;
+            bit->real_len++;
+        }
     }
     bit->array[bit->bits / 64] |= ((int64_t)!!b << (bit->bits % 64));
     bit->bits++;
@@ -27,6 +31,22 @@ DhBit* dh_bit_new()
     if(ret)
     {
         memset(ret, 0, sizeof(DhBit));
+        ret->real_len = 0;
+        ret->stepping = 1;
+        return ret;
+    }
+    else abort();
+}
+
+DhBit* dh_bit_new_with_len(int len)
+{
+    DhBit* ret = malloc(sizeof(DhBit));
+    if(ret)
+    {
+        memset(ret, 0, sizeof(DhBit));
+        ret->real_len = 0;
+        ret->stepping = 1;
+        ret->array = malloc(len * sizeof(int64_t));
         return ret;
     }
     else abort();
