@@ -19,7 +19,7 @@ public:
 private:
     Ui::BlockReaderUI *ui;
     Region* region;
-    const char* uuid = nullptr;
+    QString uuid = {};
     void setText();
     BlockInfo* info = nullptr;
 

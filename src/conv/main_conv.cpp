@@ -82,19 +82,12 @@ static void analyse(const char* input_file, const char* output_format, bool fast
 
             /* Transform Region to NBT */
             printf(_("Saving file: %s.\n"), output_filename);
-            if(!fast_mode)
-            {
-                auto instance = (DhNbtInstance*)nbt_instance_ptr_new_from_region(region, true);
-                instance->save_to_file(output_filename);
-                instance->self_free();
-                delete instance;
-            }
-            else
-            {
-                auto nbt = nbt_new_from_region(region);
-                DhNbtInstance instance(nbt, false);
-                instance.save_to_file(output_filename);
-            }
+            if(fast_mode)
+                fprintf(stderr, _("Fast mode is invalid!"));
+            auto instance = (DhNbtInstance*)nbt_instance_ptr_new_from_region(region, true);
+            instance->save_to_file(output_filename);
+            instance->self_free();
+            delete instance;
             
             g_free(output_filename);
         }

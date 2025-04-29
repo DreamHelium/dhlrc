@@ -66,9 +66,21 @@ void dh::loadRegion(QWidget* parent, const char* uuid)
                 if(str.isEmpty())
                     QMessageBox::critical(parent, _("Error!"), _("No description for the Region!"));
                 else
-                {
                     common_info_new(DH_TYPE_Region, region, g_date_time_new_now_local(), str.toLocal8Bit());
+            }
+            else if(file_is_new_schem(instance))
+            {
+                Region* region = region_new_from_new_schem(instance);
+                if(region)
+                {
+                    auto str = QInputDialog::getText(parent, _("Enter Region Name"), _("Enter name for the new Region."), QLineEdit::Normal, 
+                                                 common_info_get_description(DH_TYPE_NBT_INTERFACE_CPP, uuid));
+                    if(str.isEmpty())
+                        QMessageBox::critical(parent, _("Error!"), _("No description for the Region!"));
+                    else
+                        common_info_new(DH_TYPE_Region, region, g_date_time_new_now_local(), str.toLocal8Bit());
                 }
+                else QMessageBox::critical(parent, _("Error!"), _("Unknown error!"));
             }
             else QMessageBox::critical(parent, _("Error!"), _("The NBT Struct is unsupported!"));
         }

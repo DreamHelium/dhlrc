@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-04-26 02:17+0800\n"
+"POT-Creation-Date: 2025-04-30 00:55+0800\n"
 "PO-Revision-Date: 2024-11-30 07:00+0800\n"
 "Last-Translator: dream_he <48383878+DreamHelium@users.noreply.github.com>\n"
 "Language-Team: Chinese <kde-i18n-doc@kde.org>\n"
@@ -118,17 +118,17 @@ msgstr "重置"
 #: ../../src/qt/configui.ui:50
 msgctxt "ConfigUI|"
 msgid "Override Language"
-msgstr ""
+msgstr "覆盖语言"
 
 #: ../../src/qt/configui.ui:71
 msgctxt "ConfigUI|"
 msgid "Recipe Directory"
-msgstr ""
+msgstr "配方文件夹"
 
 #: ../../src/qt/configui.ui:92
 msgctxt "ConfigUI|"
 msgid "Translation File"
-msgstr ""
+msgstr "翻译文件"
 
 #: ../../src/qt/configui.ui:102
 msgctxt "ConfigUI|"
@@ -138,12 +138,12 @@ msgstr ""
 #: ../../src/qt/configui.ui:120
 msgctxt "ConfigUI|"
 msgid "Game Directory"
-msgstr ""
+msgstr "游戏目录"
 
 #: ../../src/qt/configui.ui:141
 msgctxt "ConfigUI|"
 msgid "Override Version"
-msgstr ""
+msgstr "覆盖版本"
 
 #: ../../src/qt/configui.ui:162
 msgctxt "ConfigUI|"
@@ -568,7 +568,7 @@ msgstr "[文件] - 读取一个投影文件。"
 msgid "Error when reading file."
 msgstr "在读取文件时出错。"
 
-#: src/main_isoc.c:108 src/qt/utility.cpp:108
+#: src/main_isoc.c:108 src/qt/utility.cpp:120
 msgid "Not a valid NBT file!"
 msgstr "不是一个有效的NBT文件！"
 
@@ -729,6 +729,7 @@ msgid "Palette"
 msgstr "偏移码"
 
 #: src/qt/blockreaderui.cpp:68
+#, qt-format
 msgid ""
 "Name: %1\n"
 "Translation name: %2\n"
@@ -747,14 +748,17 @@ msgid "Not valid!"
 msgstr "无效！"
 
 #: src/qt/blockreaderui.cpp:100
+#, qt-format
 msgid "With DataVersion %4, version %5."
 msgstr "数据版本%4，版本%5。"
 
 #: src/qt/blockreaderui.cpp:102
+#, qt-format
 msgid "Created time: %6, Modified time: %7, Author: %8, Name: %9"
 msgstr "创建时间：%6，修改时间：%7，作者：%8，名字：%9"
 
 #: src/qt/blockreaderui.cpp:104
+#, qt-format
 msgid "Description: %10"
 msgstr "描述：%10"
 
@@ -767,6 +771,7 @@ msgid "The version manifest is valid."
 msgstr ""
 
 #: src/qt/findassetsui.cpp:79
+#, qt-format
 msgid "The version manifest is invalid with error code %1"
 msgstr ""
 
@@ -785,9 +790,10 @@ msgid "locked"
 msgstr "已锁定"
 
 #: src/qt/ilchooseui.cpp:49 src/qt/ilchooseui.cpp:68 src/qt/lrchooseui.cpp:62
-#: src/qt/nbtselectui.cpp:45 src/qt/nbtselectui.cpp:64 src/qt/recipesui.cpp:140
-#: src/qt/regionchooseui.cpp:66 src/qt/regionchooseui.cpp:85
-#: src/qt/saveregionselectui.cpp:43 src/gtk/manage_window.c:118
+#: src/qt/nbtselectui.cpp:45 src/qt/nbtselectui.cpp:64
+#: src/qt/recipesui.cpp:140 src/qt/regionchooseui.cpp:66
+#: src/qt/regionchooseui.cpp:85 src/qt/saveregionselectui.cpp:43
+#: src/gtk/manage_window.c:118
 msgid "&OK"
 msgstr "确定(&O)"
 
@@ -801,14 +807,16 @@ msgstr "关闭(&C)"
 msgid "No item list available!"
 msgstr "没有物品列表可用！"
 
-#: src/qt/ilchooseui.cpp:92 src/qt/ilreaderui.cpp:111 src/qt/mainwindow.cpp:151
-#: src/qt/mainwindow.cpp:170 src/qt/mainwindow.cpp:192
-#: src/qt/mainwindow.cpp:195 src/qt/mainwindow.cpp:212
-#: src/qt/mainwindow.cpp:215 src/qt/mainwindow.cpp:247 src/qt/manage.cpp:29
-#: src/qt/manage.cpp:292 src/qt/manage.cpp:305 src/qt/manage.cpp:412
-#: src/qt/nbtselectui.cpp:116 src/qt/regionchooseui.cpp:121
-#: src/qt/saveregionselectui.cpp:95 src/qt/utility.cpp:44 src/qt/utility.cpp:67
-#: src/qt/utility.cpp:73 src/qt/utility.cpp:80 src/qt/utility.cpp:137
+#: src/qt/ilchooseui.cpp:92 src/qt/ilreaderui.cpp:111
+#: src/qt/mainwindow.cpp:151 src/qt/mainwindow.cpp:170
+#: src/qt/mainwindow.cpp:192 src/qt/mainwindow.cpp:195
+#: src/qt/mainwindow.cpp:212 src/qt/mainwindow.cpp:215
+#: src/qt/mainwindow.cpp:247 src/qt/manage.cpp:29 src/qt/manage.cpp:292
+#: src/qt/manage.cpp:305 src/qt/manage.cpp:412 src/qt/nbtselectui.cpp:116
+#: src/qt/regionchooseui.cpp:121 src/qt/saveregionselectui.cpp:95
+#: src/qt/utility.cpp:44 src/qt/utility.cpp:67 src/qt/utility.cpp:79
+#: src/qt/utility.cpp:83 src/qt/utility.cpp:85 src/qt/utility.cpp:92
+#: src/qt/utility.cpp:149
 msgid "Error!"
 msgstr "错误！"
 
@@ -866,6 +874,7 @@ msgid "&All"
 msgstr "全选 (&A)"
 
 #: src/qt/lrchooseui.cpp:53
+#, qt-format
 msgid ""
 "Please enter the new Region(s)' name(s): (%1 represents the NBT description "
 "and %2 represents the original region's name):"
@@ -1150,47 +1159,51 @@ msgstr ""
 msgid "No NBT or no NBT selected!"
 msgstr "无NBT或没有NBT被选中！"
 
-#: src/qt/utility.cpp:64
+#: src/qt/utility.cpp:64 src/qt/utility.cpp:76
 msgid "Enter Region Name"
 msgstr "输入Region名称"
 
-#: src/qt/utility.cpp:64
+#: src/qt/utility.cpp:64 src/qt/utility.cpp:76
 msgid "Enter name for the new Region."
 msgstr "输入新Region的名称。"
 
-#: src/qt/utility.cpp:67
+#: src/qt/utility.cpp:67 src/qt/utility.cpp:79
 msgid "No description for the Region!"
 msgstr "没有Region的描述！"
 
-#: src/qt/utility.cpp:73
+#: src/qt/utility.cpp:83
+msgid "Unknown error!"
+msgstr ""
+
+#: src/qt/utility.cpp:85
 msgid "The NBT Struct is unsupported!"
 msgstr "此NBT结构不受支持！"
 
-#: src/qt/utility.cpp:80
+#: src/qt/utility.cpp:92
 msgid "This NBT is locked!"
 msgstr "此NBT被锁定！"
 
-#: src/qt/utility.cpp:91 src/gtk/manage_nbt.c:131
+#: src/qt/utility.cpp:103 src/gtk/manage_nbt.c:131
 msgid "Enter Desciption"
 msgstr "输入描述"
 
-#: src/qt/utility.cpp:91
+#: src/qt/utility.cpp:103
 msgid "Enter desciption for the NBT file."
 msgstr "输入NBT文件的描述。"
 
-#: src/qt/utility.cpp:93
+#: src/qt/utility.cpp:105
 msgid "No Description Entered!"
 msgstr "没有输入的描述！"
 
-#: src/qt/utility.cpp:93
+#: src/qt/utility.cpp:105
 msgid "No desciption entered! Will not add the NBT file!"
 msgstr "没有描述输入！将不会添加NBT文件！"
 
-#: src/qt/utility.cpp:108
+#: src/qt/utility.cpp:120
 msgid "Not Valid File!"
 msgstr "不是有效的文件！"
 
-#: src/qt/utility.cpp:131
+#: src/qt/utility.cpp:143
 msgid "The following files couldn't be added:\n"
 msgstr ""
 
@@ -1355,35 +1368,35 @@ msgstr ""
 msgid "The CLI/TUI interface of dhlrc"
 msgstr ""
 
-#: src/region.cpp:33
+#: src/region.cpp:32
 msgid "waterlogged"
 msgstr "含水"
 
-#: src/region.cpp:34
+#: src/region.cpp:33
 msgid "facing"
 msgstr "面向"
 
-#: src/region.cpp:35
+#: src/region.cpp:34
 msgid "true"
 msgstr "是"
 
-#: src/region.cpp:36
+#: src/region.cpp:35
 msgid "false"
 msgstr "否"
 
-#: src/region.cpp:37
+#: src/region.cpp:36
 msgid "south"
 msgstr "南"
 
-#: src/region.cpp:38
+#: src/region.cpp:37
 msgid "east"
 msgstr "东"
 
-#: src/region.cpp:39
+#: src/region.cpp:38
 msgid "north"
 msgstr "北"
 
-#: src/region.cpp:40
+#: src/region.cpp:39
 msgid "west"
 msgstr "西"
 
@@ -1441,9 +1454,7 @@ msgstr "西"
 #~ "Please enter the coordination of the block again, or enter 'b' to choose "
 #~ "another region, enter 'r' to read the detail of the block, enter 'q' to "
 #~ "exit the program (b): "
-#~ msgstr ""
-#~ "请再次输入方块的坐标，或输入 “b” 选择其他区域，输入 “r” 阅读方块的细节，输"
-#~ "入 “q” 退出程序 (b): "
+#~ msgstr "请再次输入方块的坐标，或输入 “b” 选择其他区域，输入 “r” 阅读方块的细节，输入 “q” 退出程序 (b): "
 
 #, c-format
 #~ msgid "[%.2f%%] Processing Blocks %lu/%lu, (%3d,%3d,%3d)/(%3d,%3d,%3d)"
@@ -1746,8 +1757,7 @@ msgstr "西"
 #~ "to save NBT file, 'q' to exit the program, 'e' to upper instance (q): "
 #~ msgstr ""
 #~ "\n"
-#~ "请输入数字以继续，或输入 “m” 进入修改模式，“s” 保存NBT文件，“q” 退出程"
-#~ "序，“e” 至上层实例 (q): "
+#~ "请输入数字以继续，或输入 “m” 进入修改模式，“s” 保存NBT文件，“q” 退出程序，“e” 至上层实例 (q): "
 
 #, c-format
 #~ msgid ""
@@ -1757,8 +1767,7 @@ msgstr "西"
 #~ "instance (p): "
 #~ msgstr ""
 #~ "\n"
-#~ "请输入数字以继续，或输入 “m” 进入修改模式，“p” 至上层NBT，“s” 保存NBT文"
-#~ "件，“q” 退出程序，“e” 至上层实例 (p)： "
+#~ "请输入数字以继续，或输入 “m” 进入修改模式，“p” 至上层NBT，“s” 保存NBT文件，“q” 退出程序，“e” 至上层实例 (p)： "
 
 #, c-format
 #~ msgid ""
@@ -1767,8 +1776,7 @@ msgstr "西"
 #~ "'s' to save NBT file, 'q' to exit the program, 'e' to upper instance (p): "
 #~ msgstr ""
 #~ "\n"
-#~ "没有子NBT数据，请输入 “m” 进入修改模式，“p” 至上层NBT，“s” 保存NBT文"
-#~ "件，“q” 退出程序，“e” 至上层实例 (p): "
+#~ "没有子NBT数据，请输入 “m” 进入修改模式，“p” 至上层NBT，“s” 保存NBT文件，“q” 退出程序，“e” 至上层实例 (p): "
 
 #~ msgid "Please select a function:"
 #~ msgstr "请选择一项功能："
@@ -1791,8 +1799,7 @@ msgstr "西"
 #~ "to save NBT file, 'q' to exit the program (q): "
 #~ msgstr ""
 #~ "\n"
-#~ "请输入数字以继续，或输入 “m” 进入修改模式，“s” 保存NBT文件，\"q\" 退出程"
-#~ "序 (q): "
+#~ "请输入数字以继续，或输入 “m” 进入修改模式，“s” 保存NBT文件，\"q\" 退出程序 (q): "
 
 #, c-format
 #~ msgid ""
@@ -1801,8 +1808,7 @@ msgstr "西"
 #~ "to upper NBT, 's' to save NBT file, 'q' to exit the program (p): "
 #~ msgstr ""
 #~ "\n"
-#~ "请输入数字以继续，或输入 “m” 进入修改模式，“p” 至上层NBT，“s” 保存NBT文"
-#~ "件，“q” 退出程序 (p)： "
+#~ "请输入数字以继续，或输入 “m” 进入修改模式，“p” 至上层NBT，“s” 保存NBT文件，“q” 退出程序 (p)： "
 
 #, c-format
 #~ msgid ""
@@ -1811,12 +1817,10 @@ msgstr "西"
 #~ "'s' to save NBT file, 'q' to exit the program (p): "
 #~ msgstr ""
 #~ "\n"
-#~ "没有子NBT数据，请输入 “m” 进入修改模式，“p” 至上层NBT，“s” 保存NBT文"
-#~ "件，“q” 退出程序 (p): "
+#~ "没有子NBT数据，请输入 “m” 进入修改模式，“p” 至上层NBT，“s” 保存NBT文件，“q” 退出程序 (p): "
 
 #, c-format
 #~ msgid ""
 #~ "Please enter the coordination of the block again, or enter 'b' to choose "
 #~ "another region, enter 'q' to exit the program (b): "
-#~ msgstr ""
-#~ "请再次输入方块的坐标，或输入 “b” 选择其他区域，输入 “q” 退出程序 (b): "
+#~ msgstr "请再次输入方块的坐标，或输入 “b” 选择其他区域，输入 “q” 退出程序 (b): "

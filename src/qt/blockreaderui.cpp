@@ -17,7 +17,7 @@ BlockReaderUI::BlockReaderUI(QWidget *parent)
 {
     ui->setupUi(this);
     uuid = common_info_list_get_uuid(DH_TYPE_Region);
-    region = (Region*)common_info_get_data(DH_TYPE_Region, uuid);
+    region = (Region*)common_info_get_data(DH_TYPE_Region, uuid.toUtf8());
     setText();
     QObject::connect(ui->xEdit, &QLineEdit::textChanged, this, &BlockReaderUI::textChanged_cb);
     QObject::connect(ui->yEdit, &QLineEdit::textChanged, this, &BlockReaderUI::textChanged_cb);
@@ -31,7 +31,7 @@ BlockReaderUI::BlockReaderUI(QWidget *parent)
 BlockReaderUI::~BlockReaderUI()
 {
     delete ui;
-    common_info_reader_unlock(DH_TYPE_Region, uuid);
+    common_info_reader_unlock(DH_TYPE_Region, uuid.toUtf8());
 }
 
 void BlockReaderUI::textChanged_cb(const QString & str)

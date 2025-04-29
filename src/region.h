@@ -82,12 +82,12 @@ typedef struct _Region
     int air_palette;
 } Region;
 
+gboolean file_is_new_schem(void* instance_ptr);
+Region* region_new_from_new_schem(void* instance_ptr);
 Region* region_new_from_lite_region(LiteRegion* lr);
 Region* region_new_from_nbt_file(const char* filepos);
 Region* region_new_from_nbt_instance_ptr(void* instance_ptr);
 ItemList* item_list_new_from_multi_region(const char** region_uuid_arr);
-G_DEPRECATED_FOR(nbt_instance_ptr_new_from_region)
-NBT* nbt_new_from_region(Region* region);
 void* nbt_instance_ptr_new_from_region(Region* region, gboolean temp_root);
 void* lite_instance_ptr_new_from_region(Region* region, gboolean temp_root);
 void region_free(Region* region);
