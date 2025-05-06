@@ -20,6 +20,7 @@ private:
     QLabel* label;
     QRadioButton* saveAsNbtBtn;
     QRadioButton* saveAsLiteNbtBtn;
+    QRadioButton* saveAsSchemaNbtBtn;
     QRadioButton* saveAsIlBtn;
     QHBoxLayout* hLayout;
     QPushButton* okBtn;

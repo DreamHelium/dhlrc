@@ -15,7 +15,7 @@ msgstr ""
 "#-#-#-#-#  dhlrc.pot (dhlrc)  #-#-#-#-#\n"
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-04-30 00:59+0800\n"
+"POT-Creation-Date: 2025-05-06 15:49+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -769,13 +769,13 @@ msgstr ""
 #: src/qt/ilchooseui.cpp:49 src/qt/ilchooseui.cpp:68 src/qt/lrchooseui.cpp:62
 #: src/qt/nbtselectui.cpp:45 src/qt/nbtselectui.cpp:64 src/qt/recipesui.cpp:140
 #: src/qt/regionchooseui.cpp:66 src/qt/regionchooseui.cpp:85
-#: src/qt/saveregionselectui.cpp:43 src/gtk/manage_window.c:118
+#: src/qt/saveregionselectui.cpp:45 src/gtk/manage_window.c:118
 msgid "&OK"
 msgstr ""
 
 #: src/qt/ilchooseui.cpp:50 src/qt/lrchooseui.cpp:63 src/qt/nbtselectui.cpp:46
 #: src/qt/recipesui.cpp:141 src/qt/regionchooseui.cpp:67
-#: src/qt/saveregionselectui.cpp:44 src/gtk/manage_window.c:121
+#: src/qt/saveregionselectui.cpp:46 src/gtk/manage_window.c:121
 msgid "&Close"
 msgstr ""
 
@@ -789,9 +789,9 @@ msgstr ""
 #: src/qt/mainwindow.cpp:215 src/qt/mainwindow.cpp:247 src/qt/manage.cpp:29
 #: src/qt/manage.cpp:292 src/qt/manage.cpp:305 src/qt/manage.cpp:412
 #: src/qt/nbtselectui.cpp:116 src/qt/regionchooseui.cpp:121
-#: src/qt/saveregionselectui.cpp:95 src/qt/utility.cpp:44 src/qt/utility.cpp:67
-#: src/qt/utility.cpp:79 src/qt/utility.cpp:83 src/qt/utility.cpp:85
-#: src/qt/utility.cpp:92 src/qt/utility.cpp:149
+#: src/qt/saveregionselectui.cpp:110 src/qt/utility.cpp:44
+#: src/qt/utility.cpp:67 src/qt/utility.cpp:79 src/qt/utility.cpp:83
+#: src/qt/utility.cpp:85 src/qt/utility.cpp:92 src/qt/utility.cpp:149
 msgid "Error!"
 msgstr ""
 
@@ -858,15 +858,15 @@ msgstr ""
 msgid "Enter description here."
 msgstr ""
 
-#: src/qt/mainwindow.cpp:186 src/qt/saveregionselectui.cpp:89
+#: src/qt/mainwindow.cpp:186 src/qt/saveregionselectui.cpp:104
 msgid "Enter Name for Item List"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:186 src/qt/saveregionselectui.cpp:89
+#: src/qt/mainwindow.cpp:186 src/qt/saveregionselectui.cpp:104
 msgid "Enter the name for item list"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:192 src/qt/saveregionselectui.cpp:95
+#: src/qt/mainwindow.cpp:192 src/qt/saveregionselectui.cpp:110
 msgid "Description is empty!"
 msgstr ""
 
@@ -1086,6 +1086,10 @@ msgid "Save as &Litematic NBT struct."
 msgstr ""
 
 #: src/qt/saveregionselectui.cpp:35
+msgid "Save as new &Schematic NBT struct."
+msgstr ""
+
+#: src/qt/saveregionselectui.cpp:36
 msgid "Save as &item list."
 msgstr ""
 

@@ -32,9 +32,11 @@ void SaveRegionSelectUI::initUI()
     saveAsNbtBtn = new QRadioButton(_("Save as &NBT struct."));
     saveAsNbtBtn->setChecked(true);
     saveAsLiteNbtBtn = new QRadioButton(_("Save as &Litematic NBT struct."));
+    saveAsSchemaNbtBtn = new QRadioButton(_("Save as new &Schematic NBT struct."));
     saveAsIlBtn = new QRadioButton(_("Save as &item list."));
     layout->addWidget(saveAsNbtBtn);
     layout->addWidget(saveAsLiteNbtBtn);
+    layout->addWidget(saveAsSchemaNbtBtn);
     layout->addWidget(saveAsIlBtn);
     layout->addStretch();
 
@@ -79,6 +81,19 @@ void SaveRegionSelectUI::okBtn_clicked()
             auto region = (Region*)common_info_get_data(DH_TYPE_Region, *arr);
             // NBT* newNBT = nbt_new_from_region(info->root);
             auto nbt = lite_instance_ptr_new_from_region(region, false);
+            DhNbtInstance* instance = (DhNbtInstance*)nbt;
+            common_info_new(DH_TYPE_NBT_INTERFACE_CPP, instance, g_date_time_new_now_local(), des);
+        }
+    }
+    else if(saveAsSchemaNbtBtn->isChecked())
+    {
+        GList* nbtUuidList = (GList*)common_info_list_get_uuid_list(DH_TYPE_NBT_INTERFACE_CPP);
+        for( ; *arr ; arr++)
+        {
+            auto des = common_info_get_description(DH_TYPE_Region, *arr);
+            auto region = (Region*)common_info_get_data(DH_TYPE_Region, *arr);
+            // NBT* newNBT = nbt_new_from_region(info->root);
+            auto nbt = new_schema_instance_ptr_new_from_region(region, false);
             DhNbtInstance* instance = (DhNbtInstance*)nbt;
             common_info_new(DH_TYPE_NBT_INTERFACE_CPP, instance, g_date_time_new_now_local(), des);
         }
