@@ -22,6 +22,7 @@ set( DHLRC_MAIN_POT_FILE_DEPENDS
 
 # configure_file(dhlrc_config.h.in dhlrc_config.h)
 add_subdirectory(dhutil)
+add_subdirectory(dhmcdir)
 add_subdirectory(nbt_interface_cpp)
 add_subdirectory(recipe_handler)
 
@@ -38,7 +39,6 @@ add_subdirectory(recipe_handler)
 # )
 
 add_library(dhlrc SHARED
-           mcdir/path.c mcdir/path.h
 		   common_info.c common_info.h
 		   common.c common.h
 		   dh_bit.c dh_bit.h
@@ -74,7 +74,7 @@ add_library(dhlrc SHARED
 target_link_libraries(dhlrc PUBLIC z cjson 
 					  ${minizip_LIBRARIES} 
 					  dhutil_base
-					  dhrecipe_handler dhnbt_interface_cpp
+					  dhrecipe_handler dhnbt_interface_cpp dhmcdir
 )
 # dhlrc_recipe_full
 if(${minizip_VERSION} LESS 4.0.0)

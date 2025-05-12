@@ -24,7 +24,7 @@
 #include <stdlib.h>
 #include "config.h"
 #include <dhutil.h>
-#include "mcdir/path.h"
+#include "dhmcdir/path.h"
 
 static cJSON* translation_json = NULL;
 static gboolean first_try = FALSE;

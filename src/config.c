@@ -21,6 +21,7 @@
 #include <string.h>
 #include "glib.h"
 #include "dh_file_util.h"
+#include "dhmcdir/internal_config.h"
 
 static cJSON* content = NULL;
 
@@ -37,6 +38,7 @@ static void file_changed_cb()
     gboolean get_file = g_file_load_contents(file, NULL, &content_val, NULL, NULL , NULL);
     if(!get_file) g_error("Get file failed!");
     content = cJSON_Parse(content_val);
+    dhmcdir_update_content(content);
     g_free(content_val);
 }
 
@@ -165,13 +167,6 @@ char* dh_get_recipe_dir()
 char* dh_get_assets_dir()
 {
     return dh_get_config_item("assetsDir");
-}
-
-gboolean dh_get_show_wizard()
-{
-    char* ret = dh_get_config_item("showWizardOnStart");
-    if(g_str_equal(ret, "false")) return FALSE;
-    else return TRUE;
 }
 
 void dh_set_or_create_item(const char* item, const char* val, gboolean save)

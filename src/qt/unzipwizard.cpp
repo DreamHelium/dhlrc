@@ -39,14 +39,18 @@ void UnzipWizard::finished(int id)
     if(id == QDialog::Accepted)
     {
         gchar* trans_file = dh_get_translation_dir();
-        if(trans_file)
+        if(trans_file && !g_str_equal(trans_file, ""))
         {
             const char* new_f = ui->label_9->text().toUtf8();
             gchar* new_trans_file = g_strconcat(trans_file, ":", new_f, NULL);
             g_free(trans_file);
             trans_file = new_trans_file;
         }
-        else trans_file = g_strdup(ui->label_9->text().toUtf8());
+        else
+        {
+            g_free(trans_file);
+            trans_file = g_strdup(ui->label_9->text().toUtf8());
+        }
 
         gchar* asset_file = dh_get_assets_dir();
         if(asset_file)
