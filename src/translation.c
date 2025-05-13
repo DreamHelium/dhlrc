@@ -52,7 +52,7 @@ static gboolean set_locale_to_utf8()
         setlocale(LC_MESSAGES, "");
         return TRUE;
     }
-    else
+    else if (current_locale)
     {
         current_locale = g_strdup(current_locale);
         gchar* current_locale_d = current_locale;
@@ -62,7 +62,7 @@ static gboolean set_locale_to_utf8()
                 break;
             current_locale_d++;
         }
-        if(*current_locale_d == '.')
+        if(current_locale_d && *current_locale_d == '.')
             *current_locale_d = 0;
         /* Set new locale */
         gchar* new_locale = NULL;
@@ -94,6 +94,7 @@ static gboolean set_locale_to_utf8()
             return FALSE;
         }
     }
+    else return FALSE;
 }
 
 char* replace_at_with_slash(char* str)
