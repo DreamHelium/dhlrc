@@ -111,10 +111,7 @@ const char* name_block_translate(const char *block_name)
     if(!translation_json && !first_try) /* No translation json and not try */
     {
         first_try = TRUE;
-        gchar* filename = find_transfile();
-        cJSON* trans_data = dhlrc_file_to_json(filename);
-        translation_json = trans_data;
-        g_free(filename);
+        dhlrc_update_transfile ();
     }
     if(!translation_json)
         return block_name;
@@ -131,16 +128,31 @@ const char* name_block_translate(const char *block_name)
 static gchar* find_transfile()
 {
     char* gamedir = dh_get_game_dir();
+    char* override_lang = dh_get_override_lang();
+    const char* real_lang = NULL;
     const char* const* locales = g_get_language_names();
-    char* ret = dh_mcdir_get_translation_file(gamedir, "1.18", locales[0]);
-    g_free(gamedir);
+    const char* locale_lang = locales[0];
+    if (g_str_equal(override_lang, ""))
+        {
+            real_lang = locale_lang;
+        }
+    else real_lang = override_lang;
+    char* ret = dhmcdir_get_translation_file(gamedir, "1.18", real_lang);
+    g_free(override_lang);
     if(dh_file_exist(ret))
-        return ret;
-    else
-    {
-        g_free(ret);
-        return dh_get_recipe_dir();
-    }
+        goto success_going;
+    /* Try second time */
+    g_free(ret);
+    ret = dhmcdir_get_translation_file(gamedir, "1.18", locale_lang);
+    if (dh_file_exist(ret))
+        goto success_going;
+    g_free(ret);
+    g_free(gamedir);
+    return NULL;
+
+    success_going:
+    g_free(gamedir);
+    return ret;
 }
 
 int dh_exit()
@@ -149,11 +161,21 @@ int dh_exit()
     return 0;
 }
 
-gboolean dhlrc_found_transfile()
+gboolean
+dhlrc_found_transfile ()
 {
     /* Try to initilize the file. */
-    name_block_translate("minecraft:air");
-    if(!translation_json)
+    name_block_translate ("minecraft:air");
+    if (!translation_json)
         return FALSE;
     return TRUE;
+}
+void
+dhlrc_update_transfile ()
+{
+    cJSON_Delete(translation_json);
+    gchar* filename = find_transfile();
+    cJSON* trans_data = dhlrc_file_to_json(filename);
+    translation_json = trans_data;
+    g_free(filename);
 }

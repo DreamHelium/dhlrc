@@ -39,6 +39,8 @@ char* dh_get_recipe_dir();
 char* dh_get_translation_dir();
 /** This is the assets directory */
 char* dh_get_assets_dir();
+    /** This is the override lang */
+    char* dh_get_override_lang();
 void dh_set_or_create_item(const char* item, const char* val, gboolean save);
 char* dh_get_config_item(const char* item);
 void dh_rm_cache_dir();

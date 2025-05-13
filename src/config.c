@@ -16,12 +16,13 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>. */
 
 #include "config.h"
+#include "dh_file_util.h"
+#include "dhmcdir/internal_config.h"
+#include "glib.h"
+#include "recipe_util.h"
 #include <cjson/cJSON.h>
 #include <gio/gio.h>
 #include <string.h>
-#include "glib.h"
-#include "dh_file_util.h"
-#include "dhmcdir/internal_config.h"
 
 static cJSON* content = NULL;
 
@@ -39,6 +40,7 @@ static void file_changed_cb()
     if(!get_file) g_error("Get file failed!");
     content = cJSON_Parse(content_val);
     dhmcdir_update_content(content);
+    dhlrc_update_transfile ();
     g_free(content_val);
 }
 
@@ -164,9 +166,15 @@ char* dh_get_recipe_dir()
     return dh_get_config_item("recipeConfig");
 }
 
-char* dh_get_assets_dir()
+char *
+dh_get_assets_dir ()
 {
-    return dh_get_config_item("assetsDir");
+    return dh_get_config_item ("assetsDir");
+}
+char *
+dh_get_override_lang ()
+{
+    return dh_get_config_item("overrideLang");
 }
 
 void dh_set_or_create_item(const char* item, const char* val, gboolean save)

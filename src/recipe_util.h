@@ -30,6 +30,7 @@ long *      num_array_get_from_input(int *array_num, int max_num);
 
 const char* name_block_translate(const char* block_name);
 gboolean    dhlrc_found_transfile();
+    void dhlrc_update_transfile();
 int         dh_exit();
 
 #ifdef __cplusplus
