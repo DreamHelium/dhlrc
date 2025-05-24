@@ -51,7 +51,6 @@ static MainWindow *mw;
 MainWindow::MainWindow (QWidget *parent)
     : QMainWindow (parent), ui (new Ui::MainWindow)
 {
-    dhlrc_make_config ();
     ui->setupUi (this);
     auto pixmap0 = dh::loadSvgResourceFile ("/cn/dh/dhlrc/nbt_tree.svg");
     ui->tabWidget->setTabIcon (0, *pixmap0);
@@ -72,10 +71,9 @@ MainWindow::MainWindow (QWidget *parent)
 
 MainWindow::~MainWindow ()
 {
-    delete ui;
     delete mr;
     delete mni;
-    dh_exit1 ();
+    delete ui;
 }
 /*
 static int mw_download_progress(void* data, curl_off_t total, curl_off_t cur,

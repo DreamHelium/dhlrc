@@ -1,6 +1,6 @@
-/*  common - Common Functions
+/*  path - Get Path of the game
     Copyright (C) 2024 Dream Helium
-    This file is part of litematica_reader_c.
+    This file is part of dhmcdir.
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU Lesser General Public License as published by
@@ -15,20 +15,14 @@
     You should have received a copy of the GNU Lesser General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>. */
 
-#ifndef MAIN_H
-#define MAIN_H
+#ifndef PATH_H
+#define PATH_H
 
-#include <glib.h>
-#include <gio/gio.h>
+char *dhmcdir_get_translation_file (const char *gamedir, const char *version,
+                                    const char *lang);
+char *dhmcdir_get_object_hash (const char *gamedir, const char *version,
+                               const char *object);
+char *dhmcdir_get_object_dir (const char *gamedir, const char *version,
+                              const char *object);
 
-G_BEGIN_DECLS
-
-gboolean dhlrc_common_contents_init(const char* prname);
-void     dhlrc_common_contents_free();
-GResource* dhlrc_get_resource();
-void    dhlrc_init(const char* prname);
-void    dhlrc_cleanup();
-
-G_END_DECLS
-
-#endif /* MAIN_H */
+#endif /* PATH_H */

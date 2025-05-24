@@ -25,15 +25,17 @@ extern "C"
     };
 
     extern int
-    start_qt (int argc, char *argv[], const char *prpath)
+    start_qt (int argc, char *argv[], const char *prname)
     {
 #ifdef G_OS_UNIX
         /* This is a terrible start...... */
-        qputenv ("QT_NO_GLIB", "1");
+        // qputenv ("QT_NO_GLIB", "1");
 #endif
         QApplication a (argc, argv);
         SelfTranslator st;
         QCoreApplication::installTranslator (&st);
+
+        dhlrc_init(prname);
 
         auto pixmap = dh::loadSvgResourceFile ("/cn/dh/dhlrc/dhlrc.svg");
         QApplication::setWindowIcon (QIcon (*pixmap));

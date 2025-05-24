@@ -1,6 +1,6 @@
-/*  common - Common Functions
-    Copyright (C) 2024 Dream Helium
-    This file is part of litematica_reader_c.
+/*  conv_feature - Converter features
+Copyright (C) 2025 Dream Helium
+    This file is part of dhlrc.
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU Lesser General Public License as published by
@@ -15,20 +15,23 @@
     You should have received a copy of the GNU Lesser General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>. */
 
-#ifndef MAIN_H
-#define MAIN_H
+#include "conv_feature.h"
 
-#include <glib.h>
-#include <gio/gio.h>
+static gboolean enabled = FALSE;
 
-G_BEGIN_DECLS
+DhlrcMainFunc
+dhlrc_conv_enable (GModule *module)
+{
+    DhlrcMainFunc func = NULL;
+    if (!g_module_symbol (module, "start_point", (gpointer *)&func))
+        return NULL;
+    enabled = TRUE;
+    return func;
+}
 
-gboolean dhlrc_common_contents_init(const char* prname);
-void     dhlrc_common_contents_free();
-GResource* dhlrc_get_resource();
-void    dhlrc_init(const char* prname);
-void    dhlrc_cleanup();
+gboolean
+dhlrc_conv_enabled ()
+{
+    return enabled;
+}
 
-G_END_DECLS
-
-#endif /* MAIN_H */

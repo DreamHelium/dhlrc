@@ -22,6 +22,7 @@
 #include "common.h"
 #include "common_info.h"
 #include "config.h"
+#include "conv_feature.h"
 #include "dh_file_util.h"
 #include "dh_string_util.h"
 #include "glibconfig.h"
@@ -29,22 +30,27 @@
 #include "recipe_util.h"
 #include "translation.h"
 
-#include "dhmcdir/internal_config.h"
+#include "mcdir/internal_config.h"
 #include "recipe_handler/handler.h"
 
 #ifdef G_OS_WIN32
 #define LINK_PATH "PATH"
 #define MIDD_SEP ";"
+#define QT_MODULE_NAME "dhlrc_qt.dll"
+#define CONV_MODULE_NAME "libdhlrc_conv.dll"
 #else
 #define LINK_PATH "LD_LIBRARY_PATH"
 #define MIDD_SEP ":"
+#define QT_MODULE_NAME "libdhlrc_qt.so"
+#define CONV_MODULE_NAME "libdhlrc_conv.so"
 #endif
 
 gchar *log_filename = NULL;
 
 typedef int (*DhlrcMainFunc) (int argc, char **argv, const char *);
 
-static GModule *module = NULL;
+static GModule *qt_module = NULL;
+static GModule *conv_module = NULL;
 static DhlrcMainFunc qt_main = NULL;
 static DhlrcMainFunc conv_main = NULL;
 
@@ -54,7 +60,7 @@ debug (int argc, char **argv)
 }
 
 static gboolean
-get_module (const char *arg_zero)
+get_module (const char *arg_zero, const char* module_name)
 {
     char *prpath = dh_file_get_current_program_dir (arg_zero);
     /* All platforms the module will be in module directory, sorry */
@@ -62,10 +68,14 @@ get_module (const char *arg_zero)
         = g_strconcat (prpath, G_DIR_SEPARATOR_S, "module", NULL);
 
     g_free (prpath);
-    char *dir = g_build_path (G_DIR_SEPARATOR_S, module_path, "libdhlrc_qt.so",
+    char *dir = g_build_path (G_DIR_SEPARATOR_S, module_path, module_name,
                               NULL);
     GError *err = NULL;
-    GModule *new_module = g_module_open_full (dir, G_MODULE_BIND_MASK, &err);
+    GModule *new_module = g_module_open_full (dir, 0, &err);
+    if (module_name == QT_MODULE_NAME)
+        qt_module = new_module;
+    else if (module_name == CONV_MODULE_NAME)
+        conv_module = new_module;
     g_free (dir);
 
     if (err)
@@ -75,36 +85,21 @@ get_module (const char *arg_zero)
             return FALSE;
         }
 
-    if (!g_module_symbol (new_module, "start_qt", (gpointer *)&qt_main))
+    if (module_name == QT_MODULE_NAME)
         {
-            g_critical ("Load Qt module failed!");
-            return FALSE;
+            if (!g_module_symbol (new_module, "start_qt", (gpointer *)&qt_main))
+                {
+                    g_critical ("Load Qt module failed!");
+                    return FALSE;
+                }
+        }
+   else if (module_name == CONV_MODULE_NAME)
+        {
+            conv_main = dhlrc_conv_enable(conv_module);
+            if (!conv_main) return FALSE;
         }
 
     return TRUE;
-}
-
-static void
-dhlrc_startup (const char *prname)
-{
-    dhlrc_common_contents_init (prname);
-    common_infos_init ();
-    char *prpath = dh_file_get_current_program_dir (prname);
-    char *recipes_module_path
-        = g_build_path (G_DIR_SEPARATOR_S, prpath, "recipes_module", NULL);
-    g_free (prpath);
-    recipe_handler_init (recipes_module_path);
-    g_free (recipes_module_path);
-}
-
-static void
-dhlrc_shutdown ()
-{
-    common_infos_free ();
-    dhlrc_common_contents_free ();
-    recipe_handler_free ();
-    dh_exit ();
-    dhmcdir_exit ();
 }
 
 // static int load_module(DhlrcModule* modules, int len, const char*
@@ -139,10 +134,11 @@ dhlrc_run (int argc, char **argv)
         g_error ("The program is not supported!\n");
 
     // debug(argc, argv);
-    gboolean success = get_module (argv[0]);
+    get_module (argv[0], QT_MODULE_NAME);
+    get_module(argv[0], CONV_MODULE_NAME);
     int ret = 0;
 
-    if ((argc >= 2 && g_str_equal (argv[1], "--help")))
+    if (argc >= 2 && g_str_equal (argv[1], "--help"))
         {
             if (argc == 2)
                 {
@@ -150,6 +146,10 @@ dhlrc_run (int argc, char **argv)
                                "struct of Minecraft.\n"));
                     printf ("\n");
                     printf (_ ("Modules:\n"));
+                    if (qt_module)
+                        printf(_("qt: The Graphical Interface.\n"));
+                    if (conv_module)
+                        printf(_("conv: The Simple Converter.\n"));
 
                     printf ("\n");
                 }
@@ -161,26 +161,23 @@ dhlrc_run (int argc, char **argv)
                     printf (".\n");
                 }
         }
-    else if (argc == 1 && success)
+    else if (argc == 1)
         {
 #if defined G_OS_WIN32 || defined __APPLE__
-            load_module (modules, len, "qt", argv[0], argc, argv, &success);
-            if (!success)
-                printf ("Failed to load qt module!\n");
+            ret = qt_main (argc, argv, argv[0]);
 #else
             if (g_getenv ("XDG_SESSION_DESKTOP"))
-                {
-                    char *prpath = dh_file_get_current_program_dir (argv[0]);
-                    ret = qt_main (argc, argv, prpath);
-                    g_free (prpath);
-                }
+                ret = qt_main (argc, argv, argv[0]);
             else
-                {
-                }
+                g_error(_("CLI interface is not supported yet!"));
 #endif
         }
     else if (argc >= 2)
         {
+            if (g_str_equal (argv[1], "qt"))
+                ret = qt_main (argc - 1, argv + 1, argv[0]);
+            else if (g_str_equal (argv[1], "conv"))
+                ret = conv_main(argc - 1, argv + 1, argv[0]);
         }
     else
         printf ("Not supported!\n");
@@ -191,13 +188,8 @@ dhlrc_run (int argc, char **argv)
 int
 main (int argc, char **argb)
 {
-    /* There's not a good idea to load the library, but we will try */
-    translation_init (argb[0]);
-
-    dhlrc_startup (argb[0]);
-
     int ret = dhlrc_run (argc, argb);
-    dhlrc_shutdown ();
+    g_module_close (qt_module);
 
     return ret;
 }

@@ -1,6 +1,6 @@
-/*  common - Common Functions
-    Copyright (C) 2024 Dream Helium
-    This file is part of litematica_reader_c.
+/*  internal_config - Internal config settings
+    Copyright (C) 2025 Dream Helium
+    This file is part of dhmcdir.
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU Lesser General Public License as published by
@@ -15,20 +15,16 @@
     You should have received a copy of the GNU Lesser General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>. */
 
-#ifndef MAIN_H
-#define MAIN_H
+#ifndef INTERNAL_CONFIG_H
+#define INTERNAL_CONFIG_H
 
-#include <glib.h>
-#include <gio/gio.h>
+#include "../dhutil/dh_string_util.h"
+#include <cjson/cJSON.h>
 
-G_BEGIN_DECLS
+void dhmcdir_exit ();
+void dhmcdir_update_content ();
+void dhmcdir_set_single_translation_dir (const char *dir);
+void dhmcdir_set_multi_translation_dir (DhStrArray *arr);
+const DhStrArray *dhmcdir_get_translation_dir ();
 
-gboolean dhlrc_common_contents_init(const char* prname);
-void     dhlrc_common_contents_free();
-GResource* dhlrc_get_resource();
-void    dhlrc_init(const char* prname);
-void    dhlrc_cleanup();
-
-G_END_DECLS
-
-#endif /* MAIN_H */
+#endif // INTERNAL_CONFIG_H

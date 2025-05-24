@@ -4,6 +4,3 @@
 [submodule "src/nbt_interface_cpp"]
 	path = src/nbt_interface_cpp
 	url = https://github.com/DreamHelium/nbtlib_interface_cpp.git
-[submodule "src/dhmcdir"]
-	path = src/dhmcdir
-	url = https://github.com/DreamHelium/dhmcdir

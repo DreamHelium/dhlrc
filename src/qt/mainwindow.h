@@ -34,7 +34,6 @@ protected:
 
 private Q_SLOTS:
     void configAction_triggered();
-    void manageBtn_clicked();
     void manageBtn_2_clicked();
     void ilReaderBtn_clicked();
     void recipeCombineBtn_clicked();

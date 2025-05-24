@@ -22,7 +22,7 @@ set( DHLRC_MAIN_POT_FILE_DEPENDS
 
 # configure_file(dhlrc_config.h.in dhlrc_config.h)
 add_subdirectory(dhutil)
-add_subdirectory(dhmcdir)
+add_subdirectory(mcdir)
 add_subdirectory(nbt_interface_cpp)
 add_subdirectory(recipe_handler)
 
@@ -67,6 +67,8 @@ add_library(dhlrc SHARED
 		   download_file.c
 		   create_nbt.h
 		   create_nbt.c
+		conv_feature.c
+		conv_feature.h
 )
 
 # target_link_libraries(dhlrc_recipe_full PUBLIC dhutil cjson)
