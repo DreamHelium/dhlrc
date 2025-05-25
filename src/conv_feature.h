@@ -18,6 +18,7 @@
 #ifndef CONV_FEATURE_H
 #define CONV_FEATURE_H
 
+#include "region.h"
 #include <glib.h>
 #include <gmodule.h>
 
@@ -25,10 +26,12 @@ G_BEGIN_DECLS
 
 typedef int (*DhlrcMainFunc) (int argc, char **argv, const char *);
 
-DhlrcMainFunc dhlrc_conv_enable(GModule* module);
-gboolean dhlrc_conv_enabled();
-
+DhlrcMainFunc dhlrc_conv_enable (GModule *module);
+gboolean dhlrc_conv_enabled ();
+void *dhlrc_conv_region_to_nbt (Region *region, gboolean temp_root);
+void *dhlrc_conv_region_to_lite_nbt (Region *region, gboolean temp_root);
+void *dhlrc_conv_region_to_schema_nbt (Region *region, gboolean temp_root);
 
 G_END_DECLS
 
-#endif //CONV_FEATURE_H
+#endif // CONV_FEATURE_H

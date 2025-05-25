@@ -22,77 +22,77 @@
 #include <glib.h>
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
-typedef struct _Region Region;
+    typedef struct _Region Region;
 
-typedef struct Pos{
-    int x;
-    int y;
-    int z;
-} Pos;
+    typedef struct Pos
+    {
+        int x;
+        int y;
+        int z;
+    } Pos;
 
-typedef Pos RegionSize;
+    typedef Pos RegionSize;
 
-typedef struct Palette{
-    char* id_name;
-    DhStrArray* property_name;
-    DhStrArray* property_data;
-} Palette;
+    typedef struct Palette
+    {
+        char *id_name;
+        DhStrArray *property_name;
+        DhStrArray *property_data;
+    } Palette;
 
-typedef struct BlockInfo{
-    int index;
-    Pos* pos;
-    char* id_name;
-    int palette;
-    void* nbt_instance;
-} BlockInfo;
+    typedef struct BlockInfo
+    {
+        int index;
+        Pos *pos;
+        char *id_name;
+        int palette;
+        void *nbt_instance;
+    } BlockInfo;
 
-/** Just like `GPtrArray<BlockInfo>` */
-typedef GPtrArray BlockInfoArray;
-/** Just like `GPtrArray<Palette>` */
-typedef GPtrArray PaletteArray;
+    /** Just like `GPtrArray<BlockInfo>` */
+    typedef GPtrArray BlockInfoArray;
+    /** Just like `GPtrArray<Palette>` */
+    typedef GPtrArray PaletteArray;
 
-typedef struct BaseData
-{
-    /* Default: time of generated */
-    GDateTime* create_time;
-    /* Default: time of generated */
-    GDateTime* modify_time;
-    /* Default: "" */
-    char* description;
-    /* Default: username */
-    char* author;
-    /* Default: Converted */
-    char* name;
-} BaseData;
+    typedef struct BaseData
+    {
+        /* Default: time of generated */
+        GDateTime *create_time;
+        /* Default: time of generated */
+        GDateTime *modify_time;
+        /* Default: "" */
+        char *description;
+        /* Default: username */
+        char *author;
+        /* Default: Converted */
+        char *name;
+    } BaseData;
 
-typedef struct _Region
-{
-    /** The base information */
-    int data_version;
-    BaseData* data;
-    /** The size of region */
-    RegionSize* region_size;
-    /** The block info array */
-    BlockInfoArray* block_info_array;
-    /** The Palette info array*/
-    PaletteArray* palette_array;
-    int air_palette;
-} Region;
+    typedef struct _Region
+    {
+        /** The base information */
+        int data_version;
+        BaseData *data;
+        /** The size of region */
+        RegionSize *region_size;
+        /** The block info array */
+        BlockInfoArray *block_info_array;
+        /** The Palette info array*/
+        PaletteArray *palette_array;
+        int air_palette;
+    } Region;
 
-gboolean file_is_new_schem(void* instance_ptr);
-Region* region_new_from_new_schem(void* instance_ptr);
-Region* region_new_from_lite_region(LiteRegion* lr);
-Region* region_new_from_nbt_file(const char* filepos);
-Region* region_new_from_nbt_instance_ptr(void* instance_ptr);
-ItemList* item_list_new_from_multi_region(const char** region_uuid_arr);
-void* nbt_instance_ptr_new_from_region(Region* region, gboolean temp_root);
-void* lite_instance_ptr_new_from_region(Region* region, gboolean temp_root);
-void* new_schema_instance_ptr_new_from_region(Region* region, gboolean temp_root);
-void region_free(Region* region);
-gint64* region_get_palette_num_from_region(Region* region, int* len);
+    gboolean file_is_new_schem (void *instance_ptr);
+    Region *region_new_from_new_schem (void *instance_ptr);
+    Region *region_new_from_lite_region (LiteRegion *lr);
+    Region *region_new_from_nbt_file (const char *filepos);
+    Region *region_new_from_nbt_instance_ptr (void *instance_ptr);
+    ItemList *item_list_new_from_multi_region (const char **region_uuid_arr);
+    void region_free (Region *region);
 
 #ifdef __cplusplus
 }

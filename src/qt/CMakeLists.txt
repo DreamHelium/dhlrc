@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.12)
 
-project(dhlrc_qt VERSION 0.3.5 LANGUAGES CXX)
+project(dhlrc_qt VERSION 0.3.6 LANGUAGES CXX)
 
 add_definitions(-DDHLRC_VERSION="${dhlrc_qt_VERSION}")
 string(TIMESTAMP CURRENT_DAY %Y%m%d)

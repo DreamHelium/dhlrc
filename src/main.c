@@ -60,7 +60,7 @@ debug (int argc, char **argv)
 }
 
 static gboolean
-get_module (const char *arg_zero, const char* module_name)
+get_module (const char *arg_zero, const char *module_name)
 {
     char *prpath = dh_file_get_current_program_dir (arg_zero);
     /* All platforms the module will be in module directory, sorry */
@@ -68,8 +68,8 @@ get_module (const char *arg_zero, const char* module_name)
         = g_strconcat (prpath, G_DIR_SEPARATOR_S, "module", NULL);
 
     g_free (prpath);
-    char *dir = g_build_path (G_DIR_SEPARATOR_S, module_path, module_name,
-                              NULL);
+    char *dir
+        = g_build_path (G_DIR_SEPARATOR_S, module_path, module_name, NULL);
     GError *err = NULL;
     GModule *new_module = g_module_open_full (dir, 0, &err);
     if (module_name == QT_MODULE_NAME)
@@ -80,23 +80,25 @@ get_module (const char *arg_zero, const char* module_name)
 
     if (err)
         {
-            g_critical ("%s", err->message);
+            g_critical ("%d", err->domain);
             g_error_free (err);
             return FALSE;
         }
 
     if (module_name == QT_MODULE_NAME)
         {
-            if (!g_module_symbol (new_module, "start_qt", (gpointer *)&qt_main))
+            if (!g_module_symbol (new_module, "start_qt",
+                                  (gpointer *)&qt_main))
                 {
                     g_critical ("Load Qt module failed!");
                     return FALSE;
                 }
         }
-   else if (module_name == CONV_MODULE_NAME)
+    else if (module_name == CONV_MODULE_NAME)
         {
-            conv_main = dhlrc_conv_enable(conv_module);
-            if (!conv_main) return FALSE;
+            conv_main = dhlrc_conv_enable (conv_module);
+            if (!conv_main)
+                return FALSE;
         }
 
     return TRUE;
@@ -135,7 +137,7 @@ dhlrc_run (int argc, char **argv)
 
     // debug(argc, argv);
     get_module (argv[0], QT_MODULE_NAME);
-    get_module(argv[0], CONV_MODULE_NAME);
+    get_module (argv[0], CONV_MODULE_NAME);
     int ret = 0;
 
     if (argc >= 2 && g_str_equal (argv[1], "--help"))
@@ -147,9 +149,9 @@ dhlrc_run (int argc, char **argv)
                     printf ("\n");
                     printf (_ ("Modules:\n"));
                     if (qt_module)
-                        printf(_("qt: The Graphical Interface.\n"));
+                        printf (_ ("qt: The Graphical Interface.\n"));
                     if (conv_module)
-                        printf(_("conv: The Simple Converter.\n"));
+                        printf (_ ("conv: The Simple Converter.\n"));
 
                     printf ("\n");
                 }
@@ -169,7 +171,7 @@ dhlrc_run (int argc, char **argv)
             if (g_getenv ("XDG_SESSION_DESKTOP"))
                 ret = qt_main (argc, argv, argv[0]);
             else
-                g_error(_("CLI interface is not supported yet!"));
+                g_error (_ ("CLI interface is not supported yet!"));
 #endif
         }
     else if (argc >= 2)
@@ -177,7 +179,7 @@ dhlrc_run (int argc, char **argv)
             if (g_str_equal (argv[1], "qt"))
                 ret = qt_main (argc - 1, argv + 1, argv[0]);
             else if (g_str_equal (argv[1], "conv"))
-                ret = conv_main(argc - 1, argv + 1, argv[0]);
+                ret = conv_main (argc - 1, argv + 1, argv[0]);
         }
     else
         printf ("Not supported!\n");

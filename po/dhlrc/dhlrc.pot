@@ -15,7 +15,7 @@ msgstr ""
 "#-#-#-#-#  dhlrc.pot (dhlrc)  #-#-#-#-#\n"
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-06 15:49+0800\n"
+"POT-Creation-Date: 2025-05-26 03:08+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -547,23 +547,33 @@ msgstr ""
 msgid "Combined %d items to the new item list."
 msgstr ""
 
-#: src/main.c:279
+#: src/main.c:147
 #, c-format
 msgid "dhlrc - Program to handle litematic or other struct of Minecraft.\n"
 msgstr ""
 
-#: src/main.c:281
+#: src/main.c:150
 #, c-format
 msgid "Modules:\n"
 msgstr ""
 
-#: src/main.c:303
+#: src/main.c:152
+#, c-format
+msgid "qt: The Graphical Interface.\n"
+msgstr ""
+
+#: src/main.c:154
+#, c-format
+msgid "conv: The Simple Converter.\n"
+msgstr ""
+
+#: src/main.c:160
 #, c-format
 msgid "Unrecognized options "
 msgstr ""
 
-#: src/main.c:378
-msgid "[FILE] - Read a litematic file."
+#: src/main.c:174
+msgid "CLI interface is not supported yet!"
 msgstr ""
 
 #: src/main_isoc.c:92
@@ -760,8 +770,8 @@ msgstr ""
 msgid "Please choose a item list:"
 msgstr ""
 
-#: src/qt/ilchooseui.cpp:40 src/qt/manage.cpp:60 src/qt/manage.cpp:61
-#: src/qt/manage.cpp:62 src/qt/regionchooseui.cpp:57
+#: src/qt/ilchooseui.cpp:40 src/qt/manage.cpp:63 src/qt/manage.cpp:64
+#: src/qt/manage.cpp:65 src/qt/regionchooseui.cpp:57
 #: src/qt/regionchooseui.cpp:58
 msgid "locked"
 msgstr ""
@@ -769,13 +779,13 @@ msgstr ""
 #: src/qt/ilchooseui.cpp:49 src/qt/ilchooseui.cpp:68 src/qt/lrchooseui.cpp:62
 #: src/qt/nbtselectui.cpp:45 src/qt/nbtselectui.cpp:64 src/qt/recipesui.cpp:140
 #: src/qt/regionchooseui.cpp:66 src/qt/regionchooseui.cpp:85
-#: src/qt/saveregionselectui.cpp:45 src/gtk/manage_window.c:118
+#: src/qt/saveregionselectui.cpp:50 src/gtk/manage_window.c:118
 msgid "&OK"
 msgstr ""
 
 #: src/qt/ilchooseui.cpp:50 src/qt/lrchooseui.cpp:63 src/qt/nbtselectui.cpp:46
 #: src/qt/recipesui.cpp:141 src/qt/regionchooseui.cpp:67
-#: src/qt/saveregionselectui.cpp:46 src/gtk/manage_window.c:121
+#: src/qt/saveregionselectui.cpp:51 src/gtk/manage_window.c:121
 msgid "&Close"
 msgstr ""
 
@@ -783,13 +793,13 @@ msgstr ""
 msgid "No item list available!"
 msgstr ""
 
-#: src/qt/ilchooseui.cpp:92 src/qt/ilreaderui.cpp:111 src/qt/mainwindow.cpp:151
-#: src/qt/mainwindow.cpp:170 src/qt/mainwindow.cpp:192
-#: src/qt/mainwindow.cpp:195 src/qt/mainwindow.cpp:212
-#: src/qt/mainwindow.cpp:215 src/qt/mainwindow.cpp:247 src/qt/manage.cpp:29
-#: src/qt/manage.cpp:292 src/qt/manage.cpp:305 src/qt/manage.cpp:412
+#: src/qt/ilchooseui.cpp:92 src/qt/ilreaderui.cpp:111 src/qt/mainwindow.cpp:179
+#: src/qt/mainwindow.cpp:201 src/qt/mainwindow.cpp:233
+#: src/qt/mainwindow.cpp:238 src/qt/mainwindow.cpp:260
+#: src/qt/mainwindow.cpp:265 src/qt/mainwindow.cpp:305 src/qt/manage.cpp:28
+#: src/qt/manage.cpp:326 src/qt/manage.cpp:341 src/qt/manage.cpp:490
 #: src/qt/nbtselectui.cpp:116 src/qt/regionchooseui.cpp:121
-#: src/qt/saveregionselectui.cpp:110 src/qt/utility.cpp:44
+#: src/qt/saveregionselectui.cpp:127 src/qt/utility.cpp:44
 #: src/qt/utility.cpp:67 src/qt/utility.cpp:79 src/qt/utility.cpp:83
 #: src/qt/utility.cpp:85 src/qt/utility.cpp:92 src/qt/utility.cpp:149
 msgid "Error!"
@@ -835,8 +845,8 @@ msgstr ""
 msgid "Show history"
 msgstr ""
 
-#: src/qt/ilreaderui.cpp:111 src/qt/mainwindow.cpp:151
-#: src/qt/mainwindow.cpp:170
+#: src/qt/ilreaderui.cpp:111 src/qt/mainwindow.cpp:180
+#: src/qt/mainwindow.cpp:202
 msgid "The item list is locked!"
 msgstr ""
 
@@ -858,108 +868,108 @@ msgstr ""
 msgid "Enter description here."
 msgstr ""
 
-#: src/qt/mainwindow.cpp:186 src/qt/saveregionselectui.cpp:104
+#: src/qt/mainwindow.cpp:221 src/qt/saveregionselectui.cpp:116
 msgid "Enter Name for Item List"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:186 src/qt/saveregionselectui.cpp:104
+#: src/qt/mainwindow.cpp:222 src/qt/saveregionselectui.cpp:117
 msgid "Enter the name for item list"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:192 src/qt/saveregionselectui.cpp:110
+#: src/qt/mainwindow.cpp:234 src/qt/saveregionselectui.cpp:128
 msgid "Description is empty!"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:195 src/qt/mainwindow.cpp:215
+#: src/qt/mainwindow.cpp:239 src/qt/mainwindow.cpp:266
 msgid "No Region or no Region selected!"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:212
+#: src/qt/mainwindow.cpp:261
 msgid "Region is locked!"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:247
+#: src/qt/mainwindow.cpp:305
 msgid "No NBT is selected!"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:272
+#: src/qt/mainwindow.cpp:337
 msgid "No Unzip Program found!"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:272
+#: src/qt/mainwindow.cpp:338
 msgid "No unzip program found, we couldn't unzip the file!"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:298
+#: src/qt/mainwindow.cpp:368
 msgid "Version: "
 msgstr ""
 
-#: src/qt/mainwindow.cpp:299
+#: src/qt/mainwindow.cpp:370
 msgid "About Litematica Reader"
 msgstr ""
 
-#: src/qt/manage.cpp:29
+#: src/qt/manage.cpp:28
 msgid "No row is selected!"
 msgstr ""
 
-#: src/qt/manage.cpp:71
+#: src/qt/manage.cpp:74
 msgid "Description"
 msgstr ""
 
-#: src/qt/manage.cpp:71
+#: src/qt/manage.cpp:74
 msgid "UUID"
 msgstr ""
 
-#: src/qt/manage.cpp:71
+#: src/qt/manage.cpp:74
 msgid "Time"
 msgstr ""
 
-#: src/qt/manage.cpp:216 src/cli/main_cli.c:39 src/cli/main_cli.c:49
+#: src/qt/manage.cpp:228 src/cli/main_cli.c:39 src/cli/main_cli.c:49
 msgid "Manage Region"
 msgstr ""
 
-#: src/qt/manage.cpp:292
+#: src/qt/manage.cpp:281
+msgid "No item selected!"
+msgstr ""
+
+#: src/qt/manage.cpp:326
 msgid "Not a valid NBT List!"
 msgstr ""
 
-#: src/qt/manage.cpp:305
+#: src/qt/manage.cpp:342
 msgid "Not a valid NBT UUID!"
 msgstr ""
 
-#: src/qt/manage.cpp:320
+#: src/qt/manage.cpp:358
 msgid "Manage NBT Interface"
 msgstr ""
 
-#: src/qt/manage.cpp:333
+#: src/qt/manage.cpp:375
 msgid "Select a file"
 msgstr ""
 
-#: src/qt/manage.cpp:333
+#: src/qt/manage.cpp:376
 msgid "Litematic file (*.litematic);;NBT File (*.nbt)"
 msgstr ""
 
-#: src/qt/manage.cpp:370
+#: src/qt/manage.cpp:421
 msgid "Save File"
 msgstr ""
 
-#: src/qt/manage.cpp:381
+#: src/qt/manage.cpp:441
 msgid "Info Locked!"
 msgstr ""
 
-#: src/qt/manage.cpp:381
+#: src/qt/manage.cpp:442
 msgid "The NBT info is locked!"
 msgstr ""
 
-#: src/qt/manage.cpp:386
+#: src/qt/manage.cpp:448
 msgid "Save Files"
 msgstr ""
 
-#: src/qt/manage.cpp:406
+#: src/qt/manage.cpp:484
 msgid "The following infos are locked:\n"
-msgstr ""
-
-#: src/qt/module.cpp:56
-msgid "The Qt interface of dhlrc."
 msgstr ""
 
 #: src/qt/nbtreaderui.cpp:208
@@ -1041,7 +1051,7 @@ msgstr ""
 msgid "Please select a game jar"
 msgstr ""
 
-#: src/qt/recipesui.cpp:323 src/qt/unzipwizard.cpp:83
+#: src/qt/recipesui.cpp:323 src/qt/unzipwizard.cpp:87
 msgid "Jar File (*.jar)"
 msgstr ""
 
@@ -1073,24 +1083,24 @@ msgstr ""
 msgid "No Region available!"
 msgstr ""
 
-#: src/qt/saveregionselectui.cpp:28
+#: src/qt/saveregionselectui.cpp:27
 msgid "Please select a save option:"
 msgstr ""
 
-#: src/qt/saveregionselectui.cpp:32
-msgid "Save as &NBT struct."
-msgstr ""
-
-#: src/qt/saveregionselectui.cpp:34
-msgid "Save as &Litematic NBT struct."
+#: src/qt/saveregionselectui.cpp:30
+msgid "Save as &item list."
 msgstr ""
 
 #: src/qt/saveregionselectui.cpp:35
-msgid "Save as new &Schematic NBT struct."
+msgid "Save as &NBT struct."
 msgstr ""
 
-#: src/qt/saveregionselectui.cpp:36
-msgid "Save as &item list."
+#: src/qt/saveregionselectui.cpp:38
+msgid "Save as &Litematic NBT struct."
+msgstr ""
+
+#: src/qt/saveregionselectui.cpp:40
+msgid "Save as new &Schematic NBT struct."
 msgstr ""
 
 #: src/qt/selectassetsui.cpp:39
@@ -1113,23 +1123,23 @@ msgstr ""
 msgid "The track information is:\n"
 msgstr ""
 
-#: src/qt/unzipwizard.cpp:83
+#: src/qt/unzipwizard.cpp:87
 msgid "Please select a resource file"
 msgstr ""
 
-#: src/qt/unzipwizard.cpp:89
+#: src/qt/unzipwizard.cpp:93
 msgid "Please select a destination directory."
 msgstr ""
 
-#: src/qt/unzipwizard.cpp:99
+#: src/qt/unzipwizard.cpp:103
 msgid "Unzip successfully!"
 msgstr ""
 
-#: src/qt/unzipwizard.cpp:103
+#: src/qt/unzipwizard.cpp:107
 msgid "Unzip unsuccessfully with code "
 msgstr ""
 
-#: src/qt/unzipwizard.cpp:154
+#: src/qt/unzipwizard.cpp:158
 msgid "Invalid file/directory."
 msgstr ""
 
@@ -1350,30 +1360,30 @@ msgstr ""
 msgid "waterlogged"
 msgstr ""
 
-#: src/region.cpp:33
+#: src/region.cpp:32
 msgid "facing"
 msgstr ""
 
-#: src/region.cpp:34
+#: src/region.cpp:33
 msgid "true"
 msgstr ""
 
-#: src/region.cpp:35
+#: src/region.cpp:33
 msgid "false"
 msgstr ""
 
-#: src/region.cpp:36
+#: src/region.cpp:33
 msgid "south"
 msgstr ""
 
-#: src/region.cpp:37
+#: src/region.cpp:34
 msgid "east"
 msgstr ""
 
-#: src/region.cpp:38
+#: src/region.cpp:34
 msgid "north"
 msgstr ""
 
-#: src/region.cpp:39
+#: src/region.cpp:34
 msgid "west"
 msgstr ""

@@ -21,25 +21,23 @@
 #ifndef DH_DISABLE_TRANSLATION
 
 #undef signals
+#include "recipe_util.h"
 #include <libintl.h>
 #include <locale.h>
-#include "recipe_util.h"
 
 #define _(str) gettext (str)
 #define N_(str) str
 #define trm(str) name_block_translate (str)
-#else
-#define _(str) str
-#define trm(str) str
-#define N_(str) str
+#define ERROR_TITLE _ ("Error!")
 #endif
 
 #ifdef __cplusplus
-extern "C"{
+extern "C"
+{
 #endif
 
-void translation_init(const char* prog_name);
-char* replace_at_with_slash(char*  str);
+    void translation_init (const char *prog_name);
+    char *replace_at_with_slash (char *str);
 
 #ifdef __cplusplus
 }
