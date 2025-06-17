@@ -274,7 +274,7 @@ compare_block_info (gconstpointer a, gconstpointer b)
 }
 
 static BlockInfoArray *
-get_block_full_info_from_nbt_instance (DhNbtInstance instance,
+get_block_full_info_from_nbt_instance (const DhNbtInstance& instance,
                                        PaletteArray *pa, Pos *pos,
                                        Region *region)
 {

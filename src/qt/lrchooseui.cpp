@@ -32,7 +32,7 @@ void LrChooseUI::initUI()
     auto uuid = common_info_list_get_uuid(DH_TYPE_NBT_INTERFACE_CPP);
     auto instance = (DhNbtInstance*)common_info_get_data(DH_TYPE_NBT_INTERFACE_CPP, uuid);
 
-    arr = lite_region_name_array(instance->get_original_nbt()); 
+    arr = lite_region_name_array_instance(instance);
     group = new QButtonGroup();
     group->setExclusive(false);
 

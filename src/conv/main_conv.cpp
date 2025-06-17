@@ -34,7 +34,7 @@ analyse (const char *input_file, const char *output_format, bool fast_mode)
                     if_format_val = DH_LITEMATIC;
                     DhNbtInstance instance (input_file);
                     int litematic_len
-                        = lite_region_num (instance.get_original_nbt ());
+                        = lite_region_num_instance (&instance);
 
                     /* Make regions */
                     for (int i = 0; i < litematic_len; i++)
