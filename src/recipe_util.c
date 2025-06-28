@@ -16,17 +16,16 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>. */
 
 #include "recipe_util.h"
+#include "config.h"
 #include "glib.h"
-#include "json_util.h"
-#include <cjson/cJSON.h>
-#include <string.h>
+#include "mcdata_feature.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include "config.h"
-#include <dhutil.h>
-#include "mcdir/path.h"
+#include <string.h>
 
-static cJSON* translation_json = NULL;
+#include "mcdir/path.h"
+#include <dhutil.h>
+
 static gboolean first_try = FALSE;
 static gchar* find_transfile();
 
@@ -88,44 +87,19 @@ long* num_array_get_from_input(int* array_num, int max_num)
 }
 */
 
-static const char* get_translation(const char* domain, const char* pure_name)
-{
-    if(!domain || (domain && *domain == 0))
-        domain = "minecraft";
-    char* origin_name = g_strconcat("item.", domain, ".", pure_name, NULL);
-    cJSON* trans_line = cJSON_GetObjectItem(translation_json, origin_name);
-    g_free(origin_name);
-    if(cJSON_IsString(trans_line)) return cJSON_GetStringValue(trans_line);
-    else
-    {
-        origin_name = g_strconcat("block.", domain, ".", pure_name, NULL);
-        cJSON* trans_line = cJSON_GetObjectItem(translation_json, origin_name);
-        g_free(origin_name);
-        if(cJSON_IsString(trans_line)) return cJSON_GetStringValue(trans_line);
-        else return NULL;
-    }
-}
-
 const char* name_block_translate(const char *block_name)
 {
-    if(!translation_json && !first_try) /* No translation json and not try */
+    if(!dhlrc_has_translation () && !first_try) /* No translation json and not try */
     {
         first_try = TRUE;
-        dhlrc_update_transfile ();
+        dhlrc_update_transfile ("1.18");
     }
-    if(!translation_json)
-        return block_name;
-    
-    char* domain_name = dh_strdup(block_name);
-    *strchr(domain_name, ':') = 0;
-    char* pure_name = strchr(block_name,':') + 1;
 
-    const char* trans_name = get_translation(domain_name, pure_name);
-    free(domain_name);
+    const char* trans_name = dhlrc_get_translation(block_name);
     return trans_name ? trans_name : block_name;
 }
 
-static gchar* find_transfile()
+static gchar* find_transfile(const char* version)
 {
     char* gamedir = dh_get_game_dir();
     char* override_lang = dh_get_override_lang();
@@ -137,9 +111,10 @@ static gchar* find_transfile()
             real_lang = locale_lang;
         }
     else real_lang = override_lang;
-    char* ret = dhmcdir_get_translation_file(gamedir, "1.18", real_lang);
+    char* large_version = dhlrc_get_version_json_string (version);
+    char* ret = dhmcdir_get_translation_file(gamedir, large_version, real_lang);
     g_free(override_lang);
-    if(dh_file_exist(ret))
+    if(ret && dh_file_exist(ret))
         goto success_going;
     /* Try second time */
     g_free(ret);
@@ -157,7 +132,7 @@ static gchar* find_transfile()
 
 int dh_exit()
 {
-    cJSON_Delete(translation_json);
+    dhlrc_cleanup_translation();
     return 0;
 }
 
@@ -165,17 +140,17 @@ gboolean
 dhlrc_found_transfile ()
 {
     /* Try to initilize the file. */
-    name_block_translate ("minecraft:air");
-    if (!translation_json)
+    const char* tr = name_block_translate ("minecraft:air");
+    if (g_str_equal(tr, "minecraft:air"))
         return FALSE;
     return TRUE;
 }
+
 void
-dhlrc_update_transfile ()
+dhlrc_update_transfile (const char* version)
 {
-    cJSON_Delete(translation_json);
-    gchar* filename = find_transfile();
-    cJSON* trans_data = dhlrc_file_to_json(filename);
-    translation_json = trans_data;
+    dhlrc_cleanup_translation();
+    gchar* filename = find_transfile(version);
+    dhlrc_init_translation_from_file (filename);
     g_free(filename);
 }

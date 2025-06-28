@@ -27,6 +27,7 @@
 #include "dh_string_util.h"
 #include "glibconfig.h"
 #include "gmodule.h"
+#include "mcdata_feature.h"
 #include "recipe_util.h"
 #include "translation.h"
 
@@ -38,11 +39,13 @@
 #define MIDD_SEP ";"
 #define QT_MODULE_NAME "dhlrc_qt.dll"
 #define CONV_MODULE_NAME "libdhlrc_conv.dll"
+#define MCDATA_MODULE_NAME "libdhlrc_mcdata.dll"
 #else
 #define LINK_PATH "LD_LIBRARY_PATH"
 #define MIDD_SEP ":"
 #define QT_MODULE_NAME "libdhlrc_qt.so"
 #define CONV_MODULE_NAME "libdhlrc_conv.so"
+#define MCDATA_MODULE_NAME "libdhlrc_mcdata.so"
 #endif
 
 gchar *log_filename = NULL;
@@ -51,6 +54,7 @@ typedef int (*DhlrcMainFunc) (int argc, char **argv, const char *);
 
 static GModule *qt_module = NULL;
 static GModule *conv_module = NULL;
+static GModule *mcdata_module = NULL;
 static DhlrcMainFunc qt_main = NULL;
 static DhlrcMainFunc conv_main = NULL;
 
@@ -76,6 +80,8 @@ get_module (const char *arg_zero, const char *module_name)
         qt_module = new_module;
     else if (module_name == CONV_MODULE_NAME)
         conv_module = new_module;
+    else if (module_name == MCDATA_MODULE_NAME)
+        mcdata_module = new_module;
     g_free (dir);
 
     if (err)
@@ -100,6 +106,8 @@ get_module (const char *arg_zero, const char *module_name)
             if (!conv_main)
                 return FALSE;
         }
+    else if (module_name == MCDATA_MODULE_NAME)
+            dhlrc_mcdata_enable (mcdata_module);
 
     return TRUE;
 }
@@ -138,6 +146,7 @@ dhlrc_run (int argc, char **argv)
     // debug(argc, argv);
     get_module (argv[0], QT_MODULE_NAME);
     get_module (argv[0], CONV_MODULE_NAME);
+    get_module (argv[0], MCDATA_MODULE_NAME);
     int ret = 0;
 
     if (argc >= 2 && g_str_equal (argv[1], "--help"))
@@ -192,6 +201,8 @@ main (int argc, char **argb)
 {
     int ret = dhlrc_run (argc, argb);
     g_module_close (qt_module);
+    g_module_close (conv_module);
+    g_module_close (mcdata_module);
 
     return ret;
 }

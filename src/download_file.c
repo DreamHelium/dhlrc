@@ -30,6 +30,5 @@ int dh_file_progress_callback(void* data, curl_off_t total, curl_off_t current, 
     double percentage = (double)current / total * 100;
 
     fprintf(stderr, "[%.2f%%] Copying %s."" (%"CURL_FORMAT_CURL_OFF_T"/%"CURL_FORMAT_CURL_OFF_T").\r", percentage, description, current, total);
-    if(current == total && total != 0) fprintf(stderr, "\n");
     return 0;
 }

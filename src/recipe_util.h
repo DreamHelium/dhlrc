@@ -26,11 +26,11 @@ extern "C"{
 #endif
 
 /** Get recipes and combine to ItemList (discard all the items) */
-long *      num_array_get_from_input(int *array_num, int max_num);
+// long *      num_array_get_from_input(int *array_num, int max_num);
 
 const char* name_block_translate(const char* block_name);
 gboolean    dhlrc_found_transfile();
-    void dhlrc_update_transfile();
+    void dhlrc_update_transfile(const char* version);
 int         dh_exit();
 
 #ifdef __cplusplus

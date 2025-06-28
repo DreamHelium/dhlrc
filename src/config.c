@@ -40,7 +40,9 @@ static void file_changed_cb()
     if(!get_file) g_error("Get file failed!");
     content = cJSON_Parse(content_val);
     dhmcdir_update_content(content);
-    dhlrc_update_transfile ();
+    gchar* version = dh_get_version();
+    dhlrc_update_transfile (version);
+    g_free(version);
     g_free(content_val);
 }
 

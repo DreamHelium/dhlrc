@@ -29,7 +29,7 @@ void dhlrc_make_config();
 void dh_exit1();
 /** Get game directory in config, if fail return NULL */
 char* dh_get_game_dir();
-/** Get cache directory in config, if fail return what should be default */
+/** Get cache directory in config, if fail return what should be defaulted */
 char* dh_get_cache_dir();
 /** Get Override Game Version in config, if fail return 1.18.2 */
 char* dh_get_version();

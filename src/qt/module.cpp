@@ -27,10 +27,6 @@ extern "C"
     extern int
     start_qt (int argc, char *argv[], const char *prname)
     {
-#ifdef G_OS_UNIX
-        /* This is a terrible start...... */
-        // qputenv ("QT_NO_GLIB", "1");
-#endif
         QApplication a (argc, argv);
         SelfTranslator st;
         QCoreApplication::installTranslator (&st);
@@ -47,6 +43,7 @@ extern "C"
         w.show ();
 
         int ret = a.exec ();
+        dhlrc_cleanup ();
         return ret;
     }
 }

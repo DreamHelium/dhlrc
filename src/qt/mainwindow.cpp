@@ -3,6 +3,7 @@
 #include "../common_info.h"
 #include "../config.h"
 #include "../download_file.h"
+#include "../mcdata_feature.h"
 #include "../region.h"
 #include "blockreaderui.h"
 #include "configui.h"
@@ -41,10 +42,8 @@
 #include <qobject.h>
 #include <qpushbutton.h>
 
-static bool nbtRead = false;
 static dh::ManageRegion *mr = nullptr;
 static dh::ManageNbtInterface *mni = nullptr;
-static GMainContext *main_context = nullptr;
 
 static MainWindow *mw;
 
@@ -315,10 +314,7 @@ finish_callback (GObject *source_object, GAsyncResult *res, gpointer data)
 void
 MainWindow::downloadBtn_clicked ()
 {
-    dh_file_download_async (
-        "https://launchermeta.mojang.com/mc/game/version_manifest.json",
-        "/tmp", dh_file_progress_callback, NULL, true, finish_callback);
-    g_message ("test");
+    dhlrc_download_manifest("/tmp", NULL, NULL);
 }
 
 void

@@ -233,7 +233,6 @@ ManageRegion::ManageRegion ()
 ManageRegion::~ManageRegion ()
 {
     delete model;
-    common_info_list_remove_update_notifier (DH_TYPE_Region, (void *)this);
 }
 
 void
@@ -365,7 +364,6 @@ ManageNbtInterface::ManageNbtInterface ()
 ManageNbtInterface::~ManageNbtInterface ()
 {
     delete model;
-    common_info_list_remove_update_notifier (DH_TYPE_Region, (void *)this);
 }
 
 void

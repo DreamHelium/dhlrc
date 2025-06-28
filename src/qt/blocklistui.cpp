@@ -1,15 +1,17 @@
 #include "blocklistui.h"
+#include "../translation.h"
 #include "ui_blocklistui.h"
+#include <QList>
 #include <QMessageBox>
 #include <qline.h>
 #include <qlineedit.h>
 #include <qmessagebox.h>
 #include <qnamespace.h>
 #include <qobject.h>
-#include <QList>
 #include <qsortfilterproxymodel.h>
 #include <qstandarditemmodel.h>
-#include "../translation.h"
+
+#include <utility.h>
 
 static gboolean find_block(gconstpointer a, gconstpointer b)
 {
@@ -22,6 +24,7 @@ BlockListUI::BlockListUI(Region* region, QWidget *parent)
     ui(new Ui::BlockListUI)
 {
     this->region = region;
+    dhlrc_update_transfile (dh::getVersion(region->data_version).toUtf8());
     model = new QStandardItemModel(this);
     proxyModel = new QSortFilterProxyModel(this);
     auto btn = QMessageBox::question(this, _("Ignore Air?"), _("Do you want to ignore air?"));

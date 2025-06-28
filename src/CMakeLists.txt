@@ -1,27 +1,28 @@
-set( DHLRC_MAIN_POT_FILE_DEPENDS 
-        src/main.c
-        src/main_isoc.c
-        src/nbt_litereader.c
-        src/litematica_region.c
-        src/recipe_util.c
-        src/dhlrc_list.c
-		src/region.cpp
-		src/qt/configui.cpp
-        src/qt/mainwindow.cpp
-        src/qt/ilreaderui.cpp
-		src/qt/ilchooseui.cpp
-		src/qt/recipesshowui.cpp
-		src/qt/recipesui.cpp
-		src/qt/showtrackui.cpp
-		src/qt/nbtselectui.cpp
-		src/qt/blocklistui.cpp
-		src/qt/manageui.cpp
-		src/qt/manage.cpp
-	PARENT_SCOPE
-)
+#set( DHLRC_MAIN_POT_FILE_DEPENDS
+#        src/main.c
+#        src/main_isoc.c
+#        src/nbt_litereader.c
+#        src/litematica_region.c
+#        src/recipe_util.c
+#        src/dhlrc_list.c
+#		src/region.cpp
+#		src/qt/configui.cpp
+#        src/qt/mainwindow.cpp
+#        src/qt/ilreaderui.cpp
+#		src/qt/ilchooseui.cpp
+#		src/qt/recipesshowui.cpp
+#		src/qt/recipesui.cpp
+#		src/qt/showtrackui.cpp
+#		src/qt/nbtselectui.cpp
+#		src/qt/blocklistui.cpp
+#		src/qt/manageui.cpp
+#		src/qt/manage.cpp
+#	PARENT_SCOPE
+#)
 
 # configure_file(dhlrc_config.h.in dhlrc_config.h)
 add_subdirectory(dhutil)
+add_subdirectory(mcdata)
 add_subdirectory(mcdir)
 add_subdirectory(nbt_interface_cpp)
 add_subdirectory(recipe_handler)
@@ -69,6 +70,8 @@ add_library(dhlrc SHARED
 		   create_nbt.c
 		conv_feature.c
 		conv_feature.h
+		mcdata_feature.c
+		mcdata_feature.h
 )
 
 # target_link_libraries(dhlrc_recipe_full PUBLIC dhutil cjson)

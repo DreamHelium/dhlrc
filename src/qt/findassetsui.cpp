@@ -109,7 +109,7 @@ static void finish_callback_2(GObject* source_object, GAsyncResult* res, gpointe
 
 void FindAssetsUI::download_manifest()
 {
-    dh_file_download_async("https://launchermeta.mojang.com/mc/game/version_manifest.json", ui->lineEdit->text().toUtf8(), dh_file_progress_callback, NULL, true, finish_callback);
+    // dh_file_download_async("https://launchermeta.mojang.com/mc/game/version_manifest.json", ui->lineEdit->text().toUtf8(), dh_file_progress_callback, NULL, true, finish_callback);
 }
 
 void FindAssetsUI::find_index()
@@ -169,7 +169,7 @@ void FindAssetsUI::comboBox_changedcb()
 
 void FindAssetsUI::downloadUrl()
 {
-    dh_file_download_async(url.toUtf8(), ui->lineEdit->text().toUtf8(), dh_file_progress_callback, NULL, true, finish_callback_2);
+    // dh_file_download_async(url.toUtf8(), ui->lineEdit->text().toUtf8(), dh_file_progress_callback, NULL, true, finish_callback_2);
 }
 
 void FindAssetsUI::gameBtn_clicked()
