@@ -5,25 +5,28 @@
 #define MCDATA_H
 
 #include <cjson/cJSON.h>
-#include <glib.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 typedef void (*Sig)(void*);
+typedef void (*SetFunc)(void*, int);
+typedef void (*SigWithSet)(void*, SetFunc, void*);
+
 
 int init_translation_from_file(const char *filename);
 int has_translation();
 void cleanup_translation();
 const char* get_translation(const char* name);
-int download_manifest(const char* dir, Sig sig, void* data);
+int download_manifest(const char* dir, SigWithSet sig,
+ SetFunc func, void* data, void* klass);
 int download_manifest_sync(const char* dir);
 int manifest_downloaded();
 int manifest_download_code();
 void manifest_reset_code();
 const cJSON* get_manifest();
-char* get_version_json_string(const char* version);
+char* get_version_json_string(const char* version, SetFunc set_func, void* klass);
 
 /* Some random code here:
  * bool success = false;

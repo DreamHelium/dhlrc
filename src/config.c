@@ -41,7 +41,7 @@ static void file_changed_cb()
     content = cJSON_Parse(content_val);
     dhmcdir_update_content(content);
     gchar* version = dh_get_version();
-    dhlrc_update_transfile (version);
+    dhlrc_update_transfile (version, NULL, NULL);
     g_free(version);
     g_free(content_val);
 }

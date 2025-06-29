@@ -25,6 +25,8 @@
 G_BEGIN_DECLS
 
 typedef void (*Sig)(void* data);
+typedef void (*SetFunc)(void*, int);
+typedef void (*SigWithSet)(void*, SetFunc, void*);
 
 void dhlrc_mcdata_enable(GModule* module);
 gboolean dhlrc_mcdata_enabled();
@@ -32,12 +34,13 @@ int dhlrc_init_translation_from_file(const char* filename);
 void dhlrc_cleanup_translation();
 const char* dhlrc_get_translation(const char* name);
 int dhlrc_has_translation();
-int dhlrc_download_manifest(const char* dir, Sig sig, void* data);
+int dhlrc_download_manifest(const char* dir, SigWithSet sig,
+ SetFunc func, void* data, void* klass);
 int dhlrc_manifest_download_code();
 void dhlrc_manifest_reset_code();
 int dhlrc_manifest_downloaded();
 const cJSON* dhlrc_get_manifest();
-char* dhlrc_get_version_json_string(const char* version);
+char* dhlrc_get_version_json_string(const char* version, SetFunc set_func, void* klass);
 
 G_END_DECLS
 

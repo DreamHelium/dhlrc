@@ -11,13 +11,22 @@
 #include "../common_info.h"
 #include "utility.h"
 
+static void set_func(void* klass, int value)
+{
+    auto bar = static_cast<QProgressBar *> (klass);
+    bar->setValue(value);
+}
+
 BlockReaderUI::BlockReaderUI(QWidget *parent)
     : QWidget(parent),
     ui(new Ui::BlockReaderUI)
 {
     ui->setupUi(this);
+
     uuid = common_info_list_get_uuid(DH_TYPE_Region);
     region = (Region*)common_info_get_data(DH_TYPE_Region, uuid.toUtf8());
+    auto version = dh::getVersion (region->data_version);
+    dhlrc_update_transfile (version.toUtf8 (), set_func, ui->progressBar);
     setText();
     QObject::connect(ui->xEdit, &QLineEdit::textChanged, this, &BlockReaderUI::textChanged_cb);
     QObject::connect(ui->yEdit, &QLineEdit::textChanged, this, &BlockReaderUI::textChanged_cb);

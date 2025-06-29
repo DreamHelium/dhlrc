@@ -23,10 +23,10 @@ typedef int (*InitTr)(const char*);
 typedef void(*CleanupTr)();
 typedef const char* (*GetTr)(const char*);
 typedef int (*HasTr)();
-typedef int (*Download)(const char*, Sig, void*);
+typedef int (*Download)(const char*, SigWithSet, SetFunc, void*, void*);
 typedef int (*Downloaded)();
 typedef const cJSON* (*GetJSON)();
-typedef char* (*GetString)(const char*);
+typedef char* (*GetString)(const char*, SetFunc, void*);
 
 static gboolean enabled = FALSE;
 
@@ -88,10 +88,11 @@ int dhlrc_has_translation()
     return FALSE;
 }
 
-int dhlrc_download_manifest(const char* dir, Sig sig, void* data)
+int dhlrc_download_manifest(const char* dir, SigWithSet sig,
+ SetFunc func, void* data, void* klass)
 {
     if (download)
-        return download(dir, sig, data);
+        return download(dir, sig, func, data, klass);
     return FALSE;
 }
 
@@ -122,9 +123,9 @@ void dhlrc_manifest_reset_code()
         reset_code();
 }
 
-char* dhlrc_get_version_json_string(const char* version)
+char* dhlrc_get_version_json_string(const char* version, SetFunc set_func, void* klass)
 {
     if (get_string)
-        return get_string(version);
+        return get_string(version, set_func, klass);
     return NULL;
 }

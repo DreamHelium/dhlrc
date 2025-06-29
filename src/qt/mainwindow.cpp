@@ -314,7 +314,7 @@ finish_callback (GObject *source_object, GAsyncResult *res, gpointer data)
 void
 MainWindow::downloadBtn_clicked ()
 {
-    dhlrc_download_manifest("/tmp", NULL, NULL);
+    dhlrc_download_manifest("/tmp", NULL, NULL, NULL, NULL);
 }
 
 void

@@ -18,6 +18,8 @@
 #ifndef RECIPE_UTIL_H
 #define RECIPE_UTIL_H
 
+#include "mcdata/mcdata.h"
+
 #include <cjson/cJSON.h>
 #include <dhutil.h>
 
@@ -28,9 +30,10 @@ extern "C"{
 /** Get recipes and combine to ItemList (discard all the items) */
 // long *      num_array_get_from_input(int *array_num, int max_num);
 
+G_DEPRECATED
 const char* name_block_translate(const char* block_name);
 gboolean    dhlrc_found_transfile();
-    void dhlrc_update_transfile(const char* version);
+    void dhlrc_update_transfile(const char* version, SetFunc set_func, void* klass);
 int         dh_exit();
 
 #ifdef __cplusplus

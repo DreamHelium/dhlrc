@@ -92,14 +92,14 @@ const char* name_block_translate(const char *block_name)
     if(!dhlrc_has_translation () && !first_try) /* No translation json and not try */
     {
         first_try = TRUE;
-        dhlrc_update_transfile ("1.18");
+        dhlrc_update_transfile ("1.18", NULL, NULL);
     }
 
     const char* trans_name = dhlrc_get_translation(block_name);
     return trans_name ? trans_name : block_name;
 }
 
-static gchar* find_transfile(const char* version)
+static gchar* find_transfile(const char* version, SetFunc set_func, void* klass)
 {
     char* gamedir = dh_get_game_dir();
     char* override_lang = dh_get_override_lang();
@@ -111,7 +111,7 @@ static gchar* find_transfile(const char* version)
             real_lang = locale_lang;
         }
     else real_lang = override_lang;
-    char* large_version = dhlrc_get_version_json_string (version);
+    char* large_version = dhlrc_get_version_json_string (version, set_func, klass);
     char* ret = dhmcdir_get_translation_file(gamedir, large_version, real_lang);
     g_free(override_lang);
     if(ret && dh_file_exist(ret))
@@ -146,11 +146,37 @@ dhlrc_found_transfile ()
     return TRUE;
 }
 
-void
-dhlrc_update_transfile (const char* version)
+typedef struct UpdateInfo
 {
+    char* version;
+    SetFunc set_func;
+    void* klass;
+}UpdateInfo;
+
+static void
+real_update_transfile(GTask* task, gpointer source_object, gpointer task_data, GCancellable* cancellable)
+{
+    UpdateInfo* data = task_data;
+    char* version = data->version;
+    SetFunc set_func = data->set_func;
+    void* klass = data->klass;
     dhlrc_cleanup_translation();
-    gchar* filename = find_transfile(version);
+    gchar* filename = find_transfile(version, set_func, klass);
     dhlrc_init_translation_from_file (filename);
     g_free(filename);
+    g_free(version);
+}
+
+void
+dhlrc_update_transfile (const char* version, SetFunc set_func, void* klass)
+{
+   GTask* task = g_task_new(NULL, NULL, NULL, NULL);
+    UpdateInfo* info = g_new0(UpdateInfo, 1);
+    info->version = g_strdup(version);
+    info->set_func = set_func;
+    info->klass = klass;
+    g_task_set_task_data(task, info, g_free);
+    g_task_run_in_thread(task, real_update_transfile);
+
+    g_object_unref(task);
 }

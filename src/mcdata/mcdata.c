@@ -88,8 +88,10 @@ int has_translation()
 
 typedef struct SigWithData
 {
-    Sig sig;
+    SigWithSet sig;
+    SetFunc func;
     void* data;
+    void* klass;
 } SigWithData;
 
 static void
@@ -114,7 +116,7 @@ finish_callback (GObject *source_object, GAsyncResult *res, gpointer data)
             if (manifest_json) cJSON_Delete(manifest_json);
             manifest_json = dhlrc_file_to_json (dir);
             g_free(dir);
-            sig_data->sig(sig_data->data);
+            sig_data->sig(sig_data->data, sig_data->func, sig_data->klass);
             g_free(sig_data);
         }
 }
@@ -129,7 +131,7 @@ void manifest_reset_code()
     ret_code = -1;
 }
 
-int download_manifest(const char* dir, Sig sig, void* data)
+int download_manifest(const char* dir, SigWithSet sig, SetFunc func, void* data, void* klass)
 {
     manifest_reset_code();
     if (dh_file_is_directory(dir))
@@ -137,7 +139,9 @@ int download_manifest(const char* dir, Sig sig, void* data)
             manifest_dir = g_strdup(dir);
             SigWithData* sig_with_data = g_new0(SigWithData, 1);
             sig_with_data->sig = sig;
+            sig_with_data->func = func;
             sig_with_data->data = data;
+            sig_with_data->klass = klass;
             dh_file_download_async (
                 "https://launchermeta.mojang.com/mc/game/version_manifest.json",
                 dir, dh_file_progress_callback, NULL, TRUE, finish_callback, sig_with_data);
@@ -171,8 +175,10 @@ static void wait(GTask* task, gpointer source_object, gpointer task_data, GCance
 static GMainLoop* loop = NULL;
 static char* output = NULL;
 
-static void get_output(void* data)
+static void get_output(void* data, SetFunc func, void* klass)
 {
+    if (func && klass)
+        func(klass, 50);
     const char* version = data;
     /* Second get version json */
     cJSON* versions = cJSON_GetObjectItem(manifest_json, "versions");
@@ -205,16 +211,29 @@ static void get_output(void* data)
     g_main_loop_quit(loop);
 }
 
-char* get_version_json_string(const char* version)
+char* get_version_json_string(const char* version, SetFunc set_func, void* klass)
 {
+    gboolean first = TRUE;
     /* First get manifest_json */
     if (!manifest_json)
         {
+            first = FALSE;
             gchar* cache_dir = dh_get_cache_dir();
-            download_manifest(cache_dir, get_output, (void*)version);
+            download_manifest(cache_dir, get_output, set_func,(void*)version, klass);
+
+            loop = g_main_loop_new (NULL, FALSE);
+            g_main_loop_run (loop);
+            g_main_loop_unref (loop);
+            if (set_func && klass)
+                set_func(klass, 100);
         }
-    loop = g_main_loop_new (NULL, FALSE);
-    g_main_loop_run (loop);
+    if (manifest_json && first)
+        {
+            get_output((void*)version, set_func, klass);
+            if (set_func && klass)
+                set_func(klass, 100);
+        }
+
 
     return output;
 }

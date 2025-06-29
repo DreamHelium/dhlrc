@@ -3,6 +3,7 @@
 #include "ui_blocklistui.h"
 #include <QList>
 #include <QMessageBox>
+#include <QProgressDialog>
 #include <qline.h>
 #include <qlineedit.h>
 #include <qmessagebox.h>
@@ -24,7 +25,7 @@ BlockListUI::BlockListUI(Region* region, QWidget *parent)
     ui(new Ui::BlockListUI)
 {
     this->region = region;
-    dhlrc_update_transfile (dh::getVersion(region->data_version).toUtf8());
+
     model = new QStandardItemModel(this);
     proxyModel = new QSortFilterProxyModel(this);
     auto btn = QMessageBox::question(this, _("Ignore Air?"), _("Do you want to ignore air?"));
