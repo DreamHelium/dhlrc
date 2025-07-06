@@ -39,10 +39,6 @@ static void file_changed_cb()
     gboolean get_file = g_file_load_contents(file, NULL, &content_val, NULL, NULL , NULL);
     if(!get_file) g_error("Get file failed!");
     content = cJSON_Parse(content_val);
-    dhmcdir_update_content(content);
-    gchar* version = dh_get_version();
-    dhlrc_update_transfile (version, NULL, NULL);
-    g_free(version);
     g_free(content_val);
 }
 
@@ -71,6 +67,16 @@ static void monitor_task(GTask* task, gpointer source_object, gpointer task_data
         g_error("The file monitor is not created correctly!");
         g_task_return_new_error(task, G_IO_ERROR, G_IO_ERROR_FAILED, "Failed!");
     }
+}
+
+void dhlrc_mkconfig_gsettings()
+{
+    gchar* config_dir = g_build_filename(g_get_user_config_dir(), "dhlrc", "/", NULL);
+    gchar* config_file = g_build_filename(config_dir, "cn.dh.dhlrc.gschema.xml", NULL);
+    dh_file_create (config_file, TRUE);
+    g_message("Config directory: %s", config_file);
+    GSettings* settings = g_settings_new_with_path ("cn.dh.dhlrc", config_dir);
+    g_settings_set_boolean (settings, "debug", FALSE);
 }
 
 void dhlrc_make_config()

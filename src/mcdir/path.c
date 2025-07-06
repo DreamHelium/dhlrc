@@ -28,9 +28,10 @@ file_to_json (const char *path)
     char *data = NULL;
     gsize len = 0;
     g_file_load_contents (file, NULL, &data, &len, NULL, NULL);
-    g_object_unref (file);
+
 
     cJSON *json = cJSON_Parse (data);
+    g_object_unref (file);
     g_free (data);
     return json;
 }

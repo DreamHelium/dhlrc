@@ -19,21 +19,18 @@
 
 #include <cjson/cJSON.h>
 
-typedef int (*InitTr)(const char*);
+typedef int (*InitTr)(const char*, const char*);
 typedef void(*CleanupTr)();
-typedef const char* (*GetTr)(const char*);
-typedef int (*HasTr)();
+typedef const char* (*GetTr)(const char*, const char*);
 typedef int (*Download)(const char*, SigWithSet, SetFunc, void*, void*);
 typedef int (*Downloaded)();
 typedef const cJSON* (*GetJSON)();
-typedef char* (*GetString)(const char*, SetFunc, void*);
+typedef char* (*GetString)(const char*, SetFunc, void*, int, int);
 
 static gboolean enabled = FALSE;
 
 static InitTr init_tr = NULL;
-static CleanupTr cleanup_tr = NULL;
 static GetTr get_tr = NULL;
-static HasTr has_tr = NULL;
 static Download download = NULL;
 static Downloaded downloaded = NULL;
 static Downloaded code = NULL;
@@ -44,9 +41,7 @@ static GetString get_string = NULL;
 void dhlrc_mcdata_enable(GModule* module)
 {
     if (module && g_module_symbol(module, "init_translation_from_file", (gpointer*)&init_tr)
-        && g_module_symbol(module, "cleanup_translation", (gpointer*)&cleanup_tr)
         && g_module_symbol(module, "get_translation", (gpointer*)&get_tr)
-        && g_module_symbol(module, "has_translation", (gpointer*)&has_tr)
         && g_module_symbol(module, "download_manifest", (gpointer*)&download)
         && g_module_symbol(module, "manifest_downloaded", (gpointer*)&downloaded)
         && g_module_symbol(module, "get_manifest", (gpointer*)&getJSON)
@@ -61,31 +56,18 @@ gboolean dhlrc_mcdata_enabled ()
     return enabled;
 }
 
-int dhlrc_init_translation_from_file(const char* filename)
+int dhlrc_init_translation_from_file(const char* filename, const char* large_version)
 {
     if (init_tr)
-        return init_tr(filename);
+        return init_tr(filename, large_version);
     return FALSE;
 }
 
-void dhlrc_cleanup_translation()
-{
-    if (cleanup_tr)
-        cleanup_tr();
-}
-
-const char* dhlrc_get_translation(const char* name)
+const char* dhlrc_get_translation(const char* name, const char* large_version)
 {
     if (get_tr)
-        return get_tr(name);
+        return get_tr(name, large_version);
     return NULL;
-}
-
-int dhlrc_has_translation()
-{
-    if (has_tr)
-        return has_tr();
-    return FALSE;
 }
 
 int dhlrc_download_manifest(const char* dir, SigWithSet sig,
@@ -123,9 +105,9 @@ void dhlrc_manifest_reset_code()
         reset_code();
 }
 
-char* dhlrc_get_version_json_string(const char* version, SetFunc set_func, void* klass)
+char* dhlrc_get_version_json_string(const char* version, SetFunc set_func, void* klass, int min, int max)
 {
     if (get_string)
-        return get_string(version, set_func, klass);
+        return get_string(version, set_func, klass, min, max);
     return NULL;
 }

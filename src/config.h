@@ -25,6 +25,7 @@
 extern "C"{
 #endif
 
+void dhlrc_mkconfig_gsettings();
 void dhlrc_make_config();
 void dh_exit1();
 /** Get game directory in config, if fail return NULL */

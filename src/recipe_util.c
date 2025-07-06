@@ -89,57 +89,61 @@ long* num_array_get_from_input(int* array_num, int max_num)
 
 const char* name_block_translate(const char *block_name)
 {
-    if(!dhlrc_has_translation () && !first_try) /* No translation json and not try */
-    {
-        first_try = TRUE;
-        dhlrc_update_transfile ("1.18", NULL, NULL);
-    }
-
-    const char* trans_name = dhlrc_get_translation(block_name);
-    return trans_name ? trans_name : block_name;
+    // if(!dhlrc_has_translation () && !first_try) /* No translation json and not try */
+    // {
+    //     first_try = TRUE;
+    //     dhlrc_update_transfile ("1.18", NULL, NULL);
+    // }
+    //
+    // const char* trans_name = dhlrc_get_translation(block_name);
+    return block_name;
 }
 
-static gchar* find_transfile(const char* version, SetFunc set_func, void* klass)
+static gchar* find_transfile(const char* version, SetFunc set_func, void* klass, char** large_version)
 {
     char* gamedir = dh_get_game_dir();
+    char* ret = NULL;
+    if (strchr (gamedir, ':'))
+        g_error ("Multiple game directory is not supported!");
     char* override_lang = dh_get_override_lang();
-    const char* real_lang = NULL;
+    char* real_lang = NULL;
     const char* const* locales = g_get_language_names();
     const char* locale_lang = locales[0];
     if (g_str_equal(override_lang, ""))
-        {
-            real_lang = locale_lang;
-        }
+            real_lang = g_strdup(locale_lang);
     else real_lang = override_lang;
-    char* large_version = dhlrc_get_version_json_string (version, set_func, klass);
-    char* ret = dhmcdir_get_translation_file(gamedir, large_version, real_lang);
-    g_free(override_lang);
+    *large_version = dhlrc_get_version_json_string (version, set_func, klass, 0 , 50);
+    g_message ("Looking for %s...", *large_version);
+    if (*large_version)
+        ret = dhmcdir_get_translation_file(gamedir, *large_version, real_lang);
     if(ret && dh_file_exist(ret))
         goto success_going;
     /* Try second time */
     g_free(ret);
-    ret = dhmcdir_get_translation_file(gamedir, "1.18", locale_lang);
+    ret = dhmcdir_get_translation_file(gamedir, "1.18", real_lang);
+    *large_version = g_strdup("1.18");
     if (dh_file_exist(ret))
         goto success_going;
     g_free(ret);
     g_free(gamedir);
+    g_free(real_lang);
     return NULL;
 
     success_going:
+    g_free(real_lang);
     g_free(gamedir);
     return ret;
 }
 
 int dh_exit()
 {
-    dhlrc_cleanup_translation();
     return 0;
 }
 
 gboolean
 dhlrc_found_transfile ()
 {
-    /* Try to initilize the file. */
+    /* Try to initialize the file. */
     const char* tr = name_block_translate ("minecraft:air");
     if (g_str_equal(tr, "minecraft:air"))
         return FALSE;
@@ -153,6 +157,13 @@ typedef struct UpdateInfo
     void* klass;
 }UpdateInfo;
 
+static void update_info_free(gpointer data)
+{
+    UpdateInfo* info = data;
+    g_free(info->version);
+    g_free(info);
+}
+
 static void
 real_update_transfile(GTask* task, gpointer source_object, gpointer task_data, GCancellable* cancellable)
 {
@@ -160,22 +171,22 @@ real_update_transfile(GTask* task, gpointer source_object, gpointer task_data, G
     char* version = data->version;
     SetFunc set_func = data->set_func;
     void* klass = data->klass;
-    dhlrc_cleanup_translation();
-    gchar* filename = find_transfile(version, set_func, klass);
-    dhlrc_init_translation_from_file (filename);
+    gchar* large_version = NULL;
+    gchar* filename = find_transfile(version, set_func, klass, &large_version);
+
+    dhlrc_init_translation_from_file (filename, large_version);
     g_free(filename);
-    g_free(version);
 }
 
 void
 dhlrc_update_transfile (const char* version, SetFunc set_func, void* klass)
 {
-   GTask* task = g_task_new(NULL, NULL, NULL, NULL);
+    GTask* task = g_task_new(NULL, NULL, NULL, NULL);
     UpdateInfo* info = g_new0(UpdateInfo, 1);
     info->version = g_strdup(version);
     info->set_func = set_func;
     info->klass = klass;
-    g_task_set_task_data(task, info, g_free);
+    g_task_set_task_data(task, info, update_info_free);
     g_task_run_in_thread(task, real_update_transfile);
 
     g_object_unref(task);

@@ -1,10 +1,10 @@
 cmake_minimum_required(VERSION 3.15)
 
-project(dhlrc_mcdata LANGUAGES C)
+project(dhlrc_mcdata LANGUAGES CXX)
 
 set(LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR}/module)
 
-set(SOURCES mcdata.c)
+set(SOURCES mcdata.cpp)
 set(HEADERS
         mcdata.h)
 
