@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-26 03:00+0800\n"
+"POT-Creation-Date: 2025-07-07 22:45+0800\n"
 "PO-Revision-Date: 2024-11-30 07:00+0800\n"
 "Last-Translator: dream_he <48383878+DreamHelium@users.noreply.github.com>\n"
 "Language-Team: Chinese <kde-i18n-doc@kde.org>\n"
@@ -49,50 +49,50 @@ msgstr ""
 
 #: ../../src/qt/blockreaderui.ui:26
 msgctxt "BlockReaderUI|"
+msgid "Translation loading progress:"
+msgstr "翻译加载进度："
+
+#: ../../src/qt/blockreaderui.ui:40
+msgctxt "BlockReaderUI|"
 msgid "The sizes of the region is:"
 msgstr "区域的大小为："
 
-#: ../../src/qt/blockreaderui.ui:40
+#: ../../src/qt/blockreaderui.ui:54
 msgctxt "BlockReaderUI|"
 msgid "Please enter the coordination of the block:"
 msgstr "请输入方块的坐标："
 
-#: ../../src/qt/blockreaderui.ui:53
+#: ../../src/qt/blockreaderui.ui:67
 msgctxt "BlockReaderUI|"
 msgid "x"
 msgstr "x"
 
-#: ../../src/qt/blockreaderui.ui:67
+#: ../../src/qt/blockreaderui.ui:81
 msgctxt "BlockReaderUI|"
 msgid "y"
 msgstr "y"
 
-#: ../../src/qt/blockreaderui.ui:81
+#: ../../src/qt/blockreaderui.ui:95
 msgctxt "BlockReaderUI|"
 msgid "z"
 msgstr "z"
 
-#: ../../src/qt/blockreaderui.ui:95
+#: ../../src/qt/blockreaderui.ui:109
 msgctxt "BlockReaderUI|"
 msgid "The information is:"
 msgstr "方块信息为："
 
-#: ../../src/qt/blockreaderui.ui:126
-msgctxt "BlockReaderUI|"
-msgid "&Find assets file"
-msgstr "寻找资源文件(&F)"
-
-#: ../../src/qt/blockreaderui.ui:133
+#: ../../src/qt/blockreaderui.ui:140
 msgctxt "BlockReaderUI|"
 msgid "&Show Entity NBT"
 msgstr "展示实体NBT(&S)"
 
-#: ../../src/qt/blockreaderui.ui:140
+#: ../../src/qt/blockreaderui.ui:147
 msgctxt "BlockReaderUI|"
 msgid "&List blocks"
 msgstr "列出方块(&L)"
 
-#: ../../src/qt/blockreaderui.ui:147
+#: ../../src/qt/blockreaderui.ui:154
 msgctxt "BlockReaderUI|"
 msgid "&Close"
 msgstr "关闭(&C)"
@@ -150,90 +150,6 @@ msgctxt "ConfigUI|"
 msgid "Assets Directory"
 msgstr ""
 
-#: ../../src/qt/findassetsui.ui:14
-msgctxt "FindAssetsUI|"
-msgid "Find Assets"
-msgstr ""
-
-#: ../../src/qt/findassetsui.ui:21
-msgctxt "FindAssetsUI|"
-msgid "Let's find the assets here!"
-msgstr ""
-
-#: ../../src/qt/findassetsui.ui:32
-msgctxt "FindAssetsUI|"
-msgid "First we could download the version manifest file."
-msgstr ""
-
-#: ../../src/qt/findassetsui.ui:39
-msgctxt "FindAssetsUI|"
-msgid "Choose the download directrory, or use the cache directory."
-msgstr ""
-
-#: ../../src/qt/findassetsui.ui:51
-msgctxt "FindAssetsUI|"
-msgid "Set to the cache dir"
-msgstr ""
-
-#: ../../src/qt/findassetsui.ui:70
-msgctxt "FindAssetsUI|"
-msgid "Download version manifest"
-msgstr ""
-
-#: ../../src/qt/findassetsui.ui:77
-msgctxt "FindAssetsUI|"
-msgid "The version manifest is invalid!"
-msgstr ""
-
-#: ../../src/qt/findassetsui.ui:88
-msgctxt "FindAssetsUI|"
-msgid ""
-"Then you can choose the game directory to download the file, Or leave empty "
-"to use the cache directory."
-msgstr ""
-
-#: ../../src/qt/findassetsui.ui:115
-msgctxt "FindAssetsUI|"
-msgid "Choose a version."
-msgstr ""
-
-#: ../../src/qt/findassetsui.ui:129
-msgctxt "FindAssetsUI|"
-msgid "Download version json"
-msgstr ""
-
-#: ../../src/qt/findassetsui.ui:138
-msgctxt "FindAssetsUI|"
-msgid "Assets index file:"
-msgstr ""
-
-#: ../../src/qt/findassetsui.ui:154
-msgctxt "FindAssetsUI|"
-msgid "Download assets index file"
-msgstr ""
-
-#: ../../src/qt/findassetsui.ui:161
-msgctxt "FindAssetsUI|"
-msgid "Download game cilent jar"
-msgstr ""
-
-#: ../../src/qt/findassetsui.ui:172
-msgctxt "FindAssetsUI|"
-msgid ""
-"Now you can choose the assets file to copy from, and extract the game jar to "
-"get extra information."
-msgstr ""
-
-#: ../../src/qt/findassetsui.ui:182
-msgctxt "FindAssetsUI|"
-msgid "Select Assets File"
-msgstr ""
-
-#: ../../src/qt/findassetsui.ui:189
-msgctxt "FindAssetsUI|"
-msgid "Unzip Resource Jar"
-msgstr ""
-
 #: ../../src/qt/mainwindow.ui:14
 msgctxt "MainWindow|"
 msgid "Litematica reader"
@@ -252,7 +168,7 @@ msgstr "让我们在此添加NBT文件吧！"
 #: ../../src/qt/mainwindow.ui:40
 msgctxt "MainWindow|"
 msgid "&Manage NBT Interface (Test)"
-msgstr ""
+msgstr "管理NBT接口（测试）(&M)"
 
 #: ../../src/qt/mainwindow.ui:47
 msgctxt "MainWindow|"
@@ -326,30 +242,15 @@ msgstr "配置设置（&C）"
 
 #: ../../src/qt/mainwindow.ui:157
 msgctxt "MainWindow|"
-msgid "Download Manifest"
-msgstr ""
+msgid "Show Recipe"
+msgstr "展示材料"
 
 #: ../../src/qt/mainwindow.ui:164
 msgctxt "MainWindow|"
-msgid "Unzip Resource Jar"
-msgstr ""
-
-#: ../../src/qt/mainwindow.ui:171
-msgctxt "MainWindow|"
-msgid "Select Assets File"
-msgstr ""
-
-#: ../../src/qt/mainwindow.ui:178
-msgctxt "MainWindow|"
-msgid "Show Recipe"
-msgstr ""
-
-#: ../../src/qt/mainwindow.ui:185
-msgctxt "MainWindow|"
 msgid "Test OpenGL"
-msgstr ""
+msgstr "测试OpenGL"
 
-#: ../../src/qt/mainwindow.ui:208 ../../src/qt/mainwindow.ui:217
+#: ../../src/qt/mainwindow.ui:187 ../../src/qt/mainwindow.ui:196
 msgctxt "MainWindow|"
 msgid "&About"
 msgstr "关于(&A)"
@@ -434,143 +335,37 @@ msgctxt "RecipeSelectUI|"
 msgid "Please select a recipe file:"
 msgstr "请选择一个配方文件："
 
-#: ../../src/qt/selectassetsui.ui:14
-msgctxt "SelectAssetsUI|"
-msgid "Form"
-msgstr ""
-
-#: ../../src/qt/selectassetsui.ui:22
-msgctxt "SelectAssetsUI|"
-msgid "Select game directory here."
-msgstr ""
-
-#: ../../src/qt/selectassetsui.ui:46
-msgctxt "SelectAssetsUI|"
-msgid "Select large version here."
-msgstr ""
-
-#: ../../src/qt/selectassetsui.ui:56
-msgctxt "SelectAssetsUI|"
-msgid "Select asset here."
-msgstr ""
-
-#: ../../src/qt/selectassetsui.ui:66
-msgctxt "SelectAssetsUI|"
-msgid "Select output directory here."
-msgstr ""
-
-#: ../../src/qt/unzipwizard.ui:14
-msgctxt "UnzipWizard|"
-msgid "Wizard"
-msgstr ""
-
-#: ../../src/qt/unzipwizard.ui:21
-msgctxt "UnzipWizard|"
-msgid "Let's unzip the resource jar here!"
-msgstr "让我们在此解压资源包！"
-
-#: ../../src/qt/unzipwizard.ui:32
-msgctxt "UnzipWizard|"
-msgid "First, enter the resource jar here!"
-msgstr ""
-
-#: ../../src/qt/unzipwizard.ui:56
-msgctxt "UnzipWizard|"
-msgid "And the destination directory here!"
-msgstr ""
-
-#: ../../src/qt/unzipwizard.ui:80
-msgctxt "UnzipWizard|"
-msgid "Meanwhile, you can reset translation and resource file directory."
-msgstr ""
-
-#: ../../src/qt/unzipwizard.ui:87
-msgctxt "UnzipWizard|"
-msgid "Reset Directory"
-msgstr ""
-
-#: ../../src/qt/unzipwizard.ui:98
-msgctxt "UnzipWizard|"
-msgid "Unzip is in progress......"
-msgstr ""
-
-#: ../../src/qt/unzipwizard.ui:109
-msgctxt "UnzipWizard|"
-msgid "Please enter the domain of the resource."
-msgstr ""
-
-#: ../../src/qt/unzipwizard.ui:116
-msgctxt "UnzipWizard|"
-msgid "minecraft"
-msgstr ""
-
-#: ../../src/qt/unzipwizard.ui:119
-msgctxt "UnzipWizard|"
-msgid "Domain"
-msgstr ""
-
-#: ../../src/qt/unzipwizard.ui:126
-msgctxt "UnzipWizard|"
-msgid "You can rechoose the directory of resource."
-msgstr ""
-
-#: ../../src/qt/unzipwizard.ui:135
-msgctxt "UnzipWizard|"
-msgid "Translation file"
-msgstr ""
-
-#: ../../src/qt/unzipwizard.ui:142 ../../src/qt/unzipwizard.ui:170
-#: ../../src/qt/unzipwizard.ui:198
-msgctxt "UnzipWizard|"
-msgid "Not found!"
-msgstr ""
-
-#: ../../src/qt/unzipwizard.ui:163
-msgctxt "UnzipWizard|"
-msgid "Recipes file"
-msgstr ""
-
-#: ../../src/qt/unzipwizard.ui:191
-msgctxt "UnzipWizard|"
-msgid "Assets file"
-msgstr ""
-
-#: ../../src/qt/unzipwizard.ui:221
-msgctxt "UnzipWizard|"
-msgid "The progress is finished!"
-msgstr ""
-
 #: src/dhlrc_list.c:322
 #, c-format
 msgid "Combined %d items to the new item list."
 msgstr "合并了%d物品至新的物品列表。"
 
-#: src/main.c:145
+#: src/main.c:155
 #, c-format
 msgid "dhlrc - Program to handle litematic or other struct of Minecraft.\n"
 msgstr ""
 
-#: src/main.c:148
+#: src/main.c:158
 #, c-format
 msgid "Modules:\n"
 msgstr "模组：\n"
 
-#: src/main.c:150
+#: src/main.c:160
 #, c-format
 msgid "qt: The Graphical Interface.\n"
 msgstr ""
 
-#: src/main.c:152
+#: src/main.c:162
 #, c-format
 msgid "conv: The Simple Converter.\n"
 msgstr ""
 
-#: src/main.c:158
+#: src/main.c:168
 #, c-format
 msgid "Unrecognized options "
 msgstr ""
 
-#: src/main.c:172
+#: src/main.c:182
 msgid "CLI interface is not supported yet!"
 msgstr ""
 
@@ -578,7 +373,7 @@ msgstr ""
 msgid "Error when reading file."
 msgstr "在读取文件时出错。"
 
-#: src/main_isoc.c:108 src/qt/utility.cpp:120
+#: src/main_isoc.c:108 src/qt/utility.cpp:119
 msgid "Not a valid NBT file!"
 msgstr "不是一个有效的NBT文件！"
 
@@ -702,43 +497,47 @@ msgstr "是"
 msgid "No"
 msgstr "否"
 
-#: src/qt/blocklistui.cpp:27
+#: src/qt/blocklistui.cpp:31
 msgid "Ignore Air?"
 msgstr "忽略空气？"
 
-#: src/qt/blocklistui.cpp:27
+#: src/qt/blocklistui.cpp:31
 msgid "Do you want to ignore air?"
 msgstr "您想要忽略空气吗？"
 
-#: src/qt/blocklistui.cpp:42
+#: src/qt/blocklistui.cpp:48 src/qt/blocklistui.cpp:50
 msgid "id"
 msgstr "索引"
 
-#: src/qt/blocklistui.cpp:42
+#: src/qt/blocklistui.cpp:48 src/qt/blocklistui.cpp:50
 msgid "id Name"
 msgstr "id名称"
 
-#: src/qt/blocklistui.cpp:42
+#: src/qt/blocklistui.cpp:48
 msgid "Block Name"
 msgstr "方块名称"
 
-#: src/qt/blocklistui.cpp:42
+#: src/qt/blocklistui.cpp:48 src/qt/blocklistui.cpp:50
 msgid "x"
 msgstr "x"
 
-#: src/qt/blocklistui.cpp:43
+#: src/qt/blocklistui.cpp:49 src/qt/blocklistui.cpp:51
 msgid "y"
 msgstr "y"
 
-#: src/qt/blocklistui.cpp:43
+#: src/qt/blocklistui.cpp:49 src/qt/blocklistui.cpp:51
 msgid "z"
 msgstr "z"
 
-#: src/qt/blocklistui.cpp:43
+#: src/qt/blocklistui.cpp:49 src/qt/blocklistui.cpp:51
 msgid "Palette"
 msgstr "偏移码"
 
-#: src/qt/blockreaderui.cpp:68
+#: src/qt/blockreaderui.cpp:41
+msgid "Lack the translation module, will not try to get translation!"
+msgstr "缺少翻译模块，将不会尝试获取翻译！"
+
+#: src/qt/blockreaderui.cpp:87
 msgid ""
 "Name: %1\n"
 "Translation name: %2\n"
@@ -752,78 +551,72 @@ msgstr ""
 "偏移量：%4\n"
 "属性：\n"
 
-#: src/qt/blockreaderui.cpp:91
+#: src/qt/blockreaderui.cpp:92
+msgid ""
+"Name: %1\n"
+"Index: %2\n"
+"Palette: %3\n"
+"Properties:\n"
+msgstr ""
+"名称：%1\n"
+"索引：%2\n"
+"偏移量：%3\n"
+"属性：\n"
+
+#: src/qt/blockreaderui.cpp:114
 msgid "Not valid!"
 msgstr "无效！"
 
-#: src/qt/blockreaderui.cpp:100
+#: src/qt/blockreaderui.cpp:123
 msgid "With DataVersion %4, version %5."
 msgstr "数据版本%4，版本%5。"
 
-#: src/qt/blockreaderui.cpp:102
+#: src/qt/blockreaderui.cpp:125
 msgid "Created time: %6, Modified time: %7, Author: %8, Name: %9"
 msgstr "创建时间：%6，修改时间：%7，作者：%8，名字：%9"
 
-#: src/qt/blockreaderui.cpp:104
+#: src/qt/blockreaderui.cpp:127
 msgid "Description: %10"
 msgstr "描述：%10"
 
-#: src/qt/findassetsui.cpp:57 src/qt/findassetsui.cpp:63
-msgid "Open Download Directory"
-msgstr ""
+#: src/qt/generalchooseui.cpp:22
+msgid "Please select object(s):"
+msgstr "请选择项目："
 
-#: src/qt/findassetsui.cpp:73
-msgid "The version manifest is valid."
-msgstr ""
-
-#: src/qt/findassetsui.cpp:79
-msgid "The version manifest is invalid with error code %1"
-msgstr ""
-
-#: src/qt/ilchooseui.cpp:14
-msgid "Select a item list."
-msgstr "选择一个物品列表。"
-
-#: src/qt/ilchooseui.cpp:16
-msgid "Please choose a item list:"
-msgstr "请选择一个物品列表："
-
-#: src/qt/ilchooseui.cpp:40 src/qt/manage.cpp:60 src/qt/manage.cpp:61
-#: src/qt/manage.cpp:62 src/qt/regionchooseui.cpp:57
-#: src/qt/regionchooseui.cpp:58
+#: src/qt/generalchooseui.cpp:57 src/qt/generalchooseui.cpp:58
+#: src/qt/manage.cpp:63 src/qt/manage.cpp:64 src/qt/manage.cpp:65
 msgid "locked"
 msgstr "已锁定"
 
-#: src/qt/ilchooseui.cpp:49 src/qt/ilchooseui.cpp:68 src/qt/lrchooseui.cpp:62
-#: src/qt/nbtselectui.cpp:45 src/qt/nbtselectui.cpp:64 src/qt/recipesui.cpp:140
-#: src/qt/regionchooseui.cpp:66 src/qt/regionchooseui.cpp:85
+#: src/qt/generalchooseui.cpp:66 src/qt/generalchooseui.cpp:85
+#: src/qt/lrchooseui.cpp:62 src/qt/recipesui.cpp:140
 #: src/qt/saveregionselectui.cpp:50 src/gtk/manage_window.c:118
 msgid "&OK"
 msgstr "确定(&O)"
 
-#: src/qt/ilchooseui.cpp:50 src/qt/lrchooseui.cpp:63 src/qt/nbtselectui.cpp:46
-#: src/qt/recipesui.cpp:141 src/qt/regionchooseui.cpp:67
-#: src/qt/saveregionselectui.cpp:51 src/gtk/manage_window.c:121
+#: src/qt/generalchooseui.cpp:67 src/qt/lrchooseui.cpp:63
+#: src/qt/recipesui.cpp:141 src/qt/saveregionselectui.cpp:51
+#: src/gtk/manage_window.c:121
 msgid "&Close"
 msgstr "关闭(&C)"
 
-#: src/qt/ilchooseui.cpp:65
-msgid "No item list available!"
-msgstr "没有物品列表可用！"
+#: src/qt/generalchooseui.cpp:82
+msgid "No object available!"
+msgstr "没有项目可用！"
 
-#: src/qt/ilchooseui.cpp:92 src/qt/ilreaderui.cpp:111 src/qt/mainwindow.cpp:179
-#: src/qt/mainwindow.cpp:201 src/qt/mainwindow.cpp:233
-#: src/qt/mainwindow.cpp:238 src/qt/mainwindow.cpp:260
-#: src/qt/mainwindow.cpp:265 src/qt/mainwindow.cpp:305 src/qt/manage.cpp:29
-#: src/qt/manage.cpp:300 src/qt/manage.cpp:313 src/qt/manage.cpp:420
-#: src/qt/nbtselectui.cpp:116 src/qt/regionchooseui.cpp:121
-#: src/qt/saveregionselectui.cpp:108 src/qt/utility.cpp:44
-#: src/qt/utility.cpp:67 src/qt/utility.cpp:79 src/qt/utility.cpp:83
-#: src/qt/utility.cpp:85 src/qt/utility.cpp:92 src/qt/utility.cpp:149
+#: src/qt/generalchooseui.cpp:121 src/qt/ilreaderui.cpp:111
+#: src/qt/mainwindow.cpp:153 src/qt/mainwindow.cpp:173
+#: src/qt/mainwindow.cpp:204 src/qt/mainwindow.cpp:209
+#: src/qt/mainwindow.cpp:230 src/qt/mainwindow.cpp:235
+#: src/qt/mainwindow.cpp:267 src/qt/manage.cpp:28 src/qt/manage.cpp:325
+#: src/qt/manage.cpp:340 src/qt/manage.cpp:488
+#: src/qt/saveregionselectui.cpp:127 src/qt/utility.cpp:43
+#: src/qt/utility.cpp:66 src/qt/utility.cpp:78 src/qt/utility.cpp:82
+#: src/qt/utility.cpp:84 src/qt/utility.cpp:91 src/qt/utility.cpp:148
 msgid "Error!"
 msgstr "错误！"
 
-#: src/qt/ilchooseui.cpp:92 src/qt/regionchooseui.cpp:121
+#: src/qt/generalchooseui.cpp:121
 msgid "No item list selected!"
 msgstr "无选择的材料列表！"
 
@@ -863,8 +656,8 @@ msgstr "追踪"
 msgid "Show history"
 msgstr "展示历史"
 
-#: src/qt/ilreaderui.cpp:111 src/qt/mainwindow.cpp:180
-#: src/qt/mainwindow.cpp:202
+#: src/qt/ilreaderui.cpp:111 src/qt/mainwindow.cpp:154
+#: src/qt/mainwindow.cpp:174
 msgid "The item list is locked!"
 msgstr "此材料列表被锁定！"
 
@@ -886,125 +679,105 @@ msgstr "请输入新Region的名字：（%1代表NBT描述，%2代表原本的�
 msgid "Enter description here."
 msgstr "在此输入描述。"
 
-#: src/qt/mainwindow.cpp:221 src/qt/saveregionselectui.cpp:102
+#: src/qt/mainwindow.cpp:192 src/qt/saveregionselectui.cpp:116
 msgid "Enter Name for Item List"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:222 src/qt/saveregionselectui.cpp:102
+#: src/qt/mainwindow.cpp:193 src/qt/saveregionselectui.cpp:117
 msgid "Enter the name for item list"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:234 src/qt/saveregionselectui.cpp:108
+#: src/qt/mainwindow.cpp:205 src/qt/saveregionselectui.cpp:128
 msgid "Description is empty!"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:239 src/qt/mainwindow.cpp:266
+#: src/qt/mainwindow.cpp:210 src/qt/mainwindow.cpp:236
 msgid "No Region or no Region selected!"
 msgstr "没有Region或没有Region选中！"
 
-#: src/qt/mainwindow.cpp:261
+#: src/qt/mainwindow.cpp:231
 msgid "Region is locked!"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:305
+#: src/qt/mainwindow.cpp:267
 msgid "No NBT is selected!"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:337
-msgid "No Unzip Program found!"
-msgstr ""
-
-#: src/qt/mainwindow.cpp:338
-msgid "No unzip program found, we couldn't unzip the file!"
-msgstr ""
-
-#: src/qt/mainwindow.cpp:368
+#: src/qt/mainwindow.cpp:295
 msgid "Version: "
 msgstr "版本： "
 
-#: src/qt/mainwindow.cpp:370
+#: src/qt/mainwindow.cpp:297
 msgid "About Litematica Reader"
 msgstr "关于投影文件阅读器"
 
-#: src/qt/manage.cpp:29
+#: src/qt/manage.cpp:28
 msgid "No row is selected!"
 msgstr "没有选择行！"
 
-#: src/qt/manage.cpp:71
+#: src/qt/manage.cpp:74
 msgid "Description"
 msgstr "描述"
 
-#: src/qt/manage.cpp:71
+#: src/qt/manage.cpp:74
 msgid "UUID"
 msgstr "唯一码"
 
-#: src/qt/manage.cpp:71
+#: src/qt/manage.cpp:74
 msgid "Time"
 msgstr "时间"
 
-#: src/qt/manage.cpp:216 src/cli/main_cli.c:39 src/cli/main_cli.c:49
+#: src/qt/manage.cpp:228 src/cli/main_cli.c:39 src/cli/main_cli.c:49
 msgid "Manage Region"
 msgstr ""
 
-#: src/qt/manage.cpp:262
+#: src/qt/manage.cpp:280
 msgid "No item selected!"
 msgstr ""
 
-#: src/qt/manage.cpp:300
+#: src/qt/manage.cpp:325
 msgid "Not a valid NBT List!"
 msgstr ""
 
-#: src/qt/manage.cpp:313
+#: src/qt/manage.cpp:341
 msgid "Not a valid NBT UUID!"
 msgstr ""
 
-#: src/qt/manage.cpp:328
+#: src/qt/manage.cpp:357
 msgid "Manage NBT Interface"
 msgstr ""
 
-#: src/qt/manage.cpp:341
+#: src/qt/manage.cpp:373
 msgid "Select a file"
 msgstr "选择一个文件"
 
-#: src/qt/manage.cpp:341
+#: src/qt/manage.cpp:374
 msgid "Litematic file (*.litematic);;NBT File (*.nbt)"
 msgstr "投影文件 (*.litematic);;NBT文件 (*.nbt)"
 
-#: src/qt/manage.cpp:378
+#: src/qt/manage.cpp:419
 msgid "Save File"
 msgstr "保存文件"
 
-#: src/qt/manage.cpp:389
+#: src/qt/manage.cpp:439
 msgid "Info Locked!"
 msgstr "信息被锁定！"
 
-#: src/qt/manage.cpp:389
+#: src/qt/manage.cpp:440
 msgid "The NBT info is locked!"
 msgstr "NBT信息被锁定！"
 
-#: src/qt/manage.cpp:394
+#: src/qt/manage.cpp:446
 msgid "Save Files"
 msgstr ""
 
-#: src/qt/manage.cpp:414
+#: src/qt/manage.cpp:482
 msgid "The following infos are locked:\n"
 msgstr ""
 
 #: src/qt/nbtreaderui.cpp:208
 msgid " "
 msgstr ""
-
-#: src/qt/nbtselectui.cpp:61
-msgid "No NBT available!"
-msgstr "没有NBT可用！"
-
-#: src/qt/nbtselectui.cpp:100
-msgid "locked!"
-msgstr ""
-
-#: src/qt/nbtselectui.cpp:116
-msgid "No NBT selected!"
-msgstr "没有NBT被选中！"
 
 #: src/qt/recipesshowui.cpp:25
 msgid "Not supported recipe!"
@@ -1069,7 +842,7 @@ msgstr "从材料列表合成器添加%d物品。"
 msgid "Please select a game jar"
 msgstr ""
 
-#: src/qt/recipesui.cpp:323 src/qt/unzipwizard.cpp:87
+#: src/qt/recipesui.cpp:323
 msgid "Jar File (*.jar)"
 msgstr ""
 
@@ -1093,27 +866,19 @@ msgstr ""
 msgid "No unzip program found!"
 msgstr ""
 
-#: src/qt/regionchooseui.cpp:22
-msgid "Please select a Region:"
-msgstr ""
-
-#: src/qt/regionchooseui.cpp:82
-msgid "No Region available!"
-msgstr ""
-
-#: src/qt/saveregionselectui.cpp:29
+#: src/qt/saveregionselectui.cpp:27
 msgid "Please select a save option:"
 msgstr ""
 
-#: src/qt/saveregionselectui.cpp:32
+#: src/qt/saveregionselectui.cpp:30
 msgid "Save as &item list."
 msgstr "保存为物品列表(&I)。"
 
-#: src/qt/saveregionselectui.cpp:37
+#: src/qt/saveregionselectui.cpp:35
 msgid "Save as &NBT struct."
 msgstr "保存为&NBT结构。"
 
-#: src/qt/saveregionselectui.cpp:39
+#: src/qt/saveregionselectui.cpp:38
 msgid "Save as &Litematic NBT struct."
 msgstr "保存为投影NBT结构(&L)。"
 
@@ -1121,95 +886,59 @@ msgstr "保存为投影NBT结构(&L)。"
 msgid "Save as new &Schematic NBT struct."
 msgstr "保存为新式&Schematic NBT结构。"
 
-#: src/qt/selectassetsui.cpp:39
-msgid "Select Game Directory"
-msgstr ""
-
-#: src/qt/selectassetsui.cpp:45
-msgid "Select Output Directory"
-msgstr ""
-
-#: src/qt/selectassetsui.cpp:101
-msgid "No Corresponding object!"
-msgstr ""
-
-#: src/qt/selectassetsui.cpp:101
-msgid "No corresponding object, you need to download again!"
-msgstr ""
-
 #: src/qt/showtrackui.cpp:18
 msgid "The track information is:\n"
 msgstr "追踪信息如下：\n"
 
-#: src/qt/unzipwizard.cpp:87
-msgid "Please select a resource file"
-msgstr ""
-
-#: src/qt/unzipwizard.cpp:93
-msgid "Please select a destination directory."
-msgstr ""
-
-#: src/qt/unzipwizard.cpp:103
-msgid "Unzip successfully!"
-msgstr ""
-
-#: src/qt/unzipwizard.cpp:107
-msgid "Unzip unsuccessfully with code "
-msgstr ""
-
-#: src/qt/unzipwizard.cpp:158
-msgid "Invalid file/directory."
-msgstr ""
-
-#: src/qt/utility.cpp:44
+#: src/qt/utility.cpp:43
 msgid "No NBT or no NBT selected!"
 msgstr "无NBT或没有NBT被选中！"
 
-#: src/qt/utility.cpp:64 src/qt/utility.cpp:76
+#: src/qt/utility.cpp:63 src/qt/utility.cpp:75
 msgid "Enter Region Name"
 msgstr "输入Region名称"
 
-#: src/qt/utility.cpp:64 src/qt/utility.cpp:76
+#: src/qt/utility.cpp:63 src/qt/utility.cpp:75
 msgid "Enter name for the new Region."
 msgstr "输入新Region的名称。"
 
-#: src/qt/utility.cpp:67 src/qt/utility.cpp:79
+#: src/qt/utility.cpp:66 src/qt/utility.cpp:78
 msgid "No description for the Region!"
 msgstr "没有Region的描述！"
 
-#: src/qt/utility.cpp:83
+#: src/qt/utility.cpp:82
 msgid "Unknown error!"
 msgstr ""
 
-#: src/qt/utility.cpp:85
+#: src/qt/utility.cpp:84
 msgid "The NBT Struct is unsupported!"
 msgstr "此NBT结构不受支持！"
 
-#: src/qt/utility.cpp:92
+#: src/qt/utility.cpp:91
 msgid "This NBT is locked!"
 msgstr "此NBT被锁定！"
 
-#: src/qt/utility.cpp:103 src/gtk/manage_nbt.c:131
+#: src/qt/utility.cpp:102 src/gtk/manage_nbt.c:131
 msgid "Enter Desciption"
 msgstr "输入描述"
 
-#: src/qt/utility.cpp:103
+#: src/qt/utility.cpp:102
 msgid "Enter desciption for the NBT file."
 msgstr "输入NBT文件的描述。"
 
-#: src/qt/utility.cpp:105
+#: src/qt/utility.cpp:104
 msgid "No Description Entered!"
 msgstr "没有输入的描述！"
 
-#: src/qt/utility.cpp:105
+#: src/qt/utility.cpp:104
 msgid "No desciption entered! Will not add the NBT file!"
 msgstr "没有描述输入！将不会添加NBT文件！"
 
-#: src/qt/utility.cpp:120
+#: src/qt/utility.cpp:119
 msgid "Not Valid File!"
 msgstr "不是有效的文件！"
 
-#: src/qt/utility.cpp:143
+#: src/qt/utility.cpp:142
 msgid "The following files couldn't be added:\n"
 msgstr ""
 
@@ -1378,33 +1107,56 @@ msgstr ""
 msgid "waterlogged"
 msgstr "含水"
 
-#: src/region.cpp:33
+#: src/region.cpp:32
 msgid "facing"
 msgstr "面向"
 
-#: src/region.cpp:34
+#: src/region.cpp:33
 msgid "true"
 msgstr "是"
 
-#: src/region.cpp:35
+#: src/region.cpp:33
 msgid "false"
 msgstr "否"
 
-#: src/region.cpp:36
+#: src/region.cpp:33
 msgid "south"
 msgstr "南"
 
-#: src/region.cpp:37
+#: src/region.cpp:34
 msgid "east"
 msgstr "东"
 
-#: src/region.cpp:38
+#: src/region.cpp:34
 msgid "north"
 msgstr "北"
 
-#: src/region.cpp:39
+#: src/region.cpp:34
 msgid "west"
 msgstr "西"
+
+#~ msgid "Select a item list."
+#~ msgstr "选择一个物品列表。"
+
+#~ msgid "Please choose a item list:"
+#~ msgstr "请选择一个物品列表："
+
+#~ msgid "No item list available!"
+#~ msgstr "没有物品列表可用！"
+
+#~ msgid "No NBT available!"
+#~ msgstr "没有NBT可用！"
+
+#~ msgid "No NBT selected!"
+#~ msgstr "没有NBT被选中！"
+
+#~ msgctxt "BlockReaderUI|"
+#~ msgid "&Find assets file"
+#~ msgstr "寻找资源文件(&F)"
+
+#~ msgctxt "UnzipWizard|"
+#~ msgid "Let's unzip the resource jar here!"
+#~ msgstr "让我们在此解压资源包！"
 
 #~ msgid "[FILE] - Read a litematic file."
 #~ msgstr "[文件] - 读取一个投影文件。"

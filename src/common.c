@@ -20,7 +20,6 @@
 #include "common_info.h"
 #include "config.h"
 #include "dh_file_util.h"
-#include "mcdir/internal_config.h"
 #include "recipe_handler/handler.h"
 #include "recipe_util.h"
 #include "translation.h"
@@ -74,9 +73,9 @@ dhlrc_cleanup ()
     common_infos_free ();
     dhlrc_common_contents_free ();
     recipe_handler_free ();
+    dhlrc_cleanup_manifest ();
     dh_exit ();
     dh_exit1 ();
-    dhmcdir_exit ();
 }
 
 void dhlrc_common_contents_free()

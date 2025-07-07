@@ -22,12 +22,14 @@
 
 #undef signals
 #include "recipe_util.h"
+#include "mcdata_feature.h"
 #include <libintl.h>
 #include <locale.h>
 
 #define _(str) gettext (str)
 #define N_(str) str
 #define trm(str) name_block_translate (str)
+#define mctr(str, large_version) dhlrc_get_translation (str, large_version)
 #define ERROR_TITLE _ ("Error!")
 #endif
 

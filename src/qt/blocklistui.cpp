@@ -20,12 +20,12 @@ static gboolean find_block(gconstpointer a, gconstpointer b)
     return g_str_equal(info->id_name, b);
 }
 
-BlockListUI::BlockListUI(Region* region, QWidget *parent)
+BlockListUI::BlockListUI(Region* region, const char* large_version, QWidget *parent)
     : QWidget(parent),
     ui(new Ui::BlockListUI)
 {
     this->region = region;
-
+    this->large_version = large_version;
     model = new QStandardItemModel(this);
     proxyModel = new QSortFilterProxyModel(this);
     auto btn = QMessageBox::question(this, _("Ignore Air?"), _("Do you want to ignore air?"));
@@ -37,13 +37,17 @@ BlockListUI::BlockListUI(Region* region, QWidget *parent)
 
 BlockListUI::~BlockListUI()
 {
+    model->clear();
     delete ui;
 }
 
 void BlockListUI::drawList()
 {
     QStringList stringList;
-    stringList << _("id") << _("id Name") << _("Block Name") << _("x")
+    if (dhlrc_mcdata_enabled () && large_version)
+        stringList << _("id") << _("id Name") << _("Block Name") << _("x")
+               << _("y") << _("z") << _("Palette");
+    else stringList << _("id") << _("id Name") << _("x")
                << _("y") << _("z") << _("Palette");
     model->setHorizontalHeaderLabels(stringList);
     for(int i = 0 ; i < region->block_info_array->len ; i++)
@@ -51,9 +55,11 @@ void BlockListUI::drawList()
         BlockInfo* info = (BlockInfo*)region->block_info_array->pdata[i];
         if(!strcmp(info->id_name, "minecraft:air") && ignoreAir)
             continue;
+        QStandardItem* item2 = nullptr;
         QStandardItem* item0 = new QStandardItem(QString::number(info->index));
         QStandardItem* item1 = new QStandardItem(info->id_name);
-        QStandardItem* item2 = new QStandardItem(trm(info->id_name));
+        if (dhlrc_mcdata_enabled () && large_version)
+                item2 = new QStandardItem(mctr(info->id_name, large_version));
         QStandardItem* item3 = new QStandardItem(QString::number(info->pos->x));
         QStandardItem* item4 = new QStandardItem(QString::number(info->pos->y));
         QStandardItem* item5 = new QStandardItem(QString::number(info->pos->z));
@@ -65,16 +71,19 @@ void BlockListUI::drawList()
             for(int j = 0 ; j < palette->property_data->num ; j++)
             {
                 /* `tr()` is same as `gettext()` in this program...... */
-                str += tr(palette->property_name->val[j]);
+                str += gettext(palette->property_name->val[j]);
                 str += ": ";
-                str += tr(palette->property_data->val[j]);
+                str += gettext(palette->property_data->val[j]);
                 if(j != palette->property_name->num - 1)
                     str += "\n";
             }
         }
 
         item6->setToolTip(str);
-        QList<QStandardItem*> itemList = {item0, item1, item2, item3, item4, item5, item6};
+        QList<QStandardItem*> itemList;
+        if (item2)
+            itemList = {item0, item1, item2, item3, item4, item5, item6};
+        else itemList = {item0, item1, item3, item4, item5, item6};
         model->appendRow(itemList);
     }
     proxyModel->setSourceModel(model);

@@ -30,14 +30,11 @@ extern "C"
         QApplication a (argc, argv);
         SelfTranslator st;
         QCoreApplication::installTranslator (&st);
-
         dhlrc_init(prname);
 
         auto pixmap = dh::loadSvgResourceFile ("/cn/dh/dhlrc/dhlrc.svg");
         QApplication::setWindowIcon (QIcon (*pixmap));
         delete pixmap;
-
-        // qDebug() << g_main_context_get_thread_default();
 
         MainWindow w;
         w.show ();

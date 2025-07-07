@@ -21,12 +21,15 @@ private:
     Region* region;
     QString uuid = {};
     void setText();
+    char* large_version = nullptr;
     BlockInfo* info = nullptr;
+
+Q_SIGNALS:
+    void changeVal(int value);
 
 private Q_SLOTS:
     void textChanged_cb(const QString & str);
     void listBtn_clicked();
     void entityBtn_clicked();
-    void assetsBtn_clicked();
 };
 #endif // BLOCKREADERUI_H

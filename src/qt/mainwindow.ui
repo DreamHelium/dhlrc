@@ -152,27 +152,6 @@
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="downloadBtn">
-            <property name="text">
-             <string>Download Manifest</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="unzipBtn">
-            <property name="text">
-             <string>Unzip Resource Jar</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="selectBtn">
-            <property name="text">
-             <string>Select Assets File</string>
-            </property>
-           </widget>
-          </item>
-          <item>
            <widget class="QPushButton" name="recipeBtn">
             <property name="text">
              <string>Show Recipe</string>

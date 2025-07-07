@@ -25,17 +25,11 @@ int manifest_download_code();
 void manifest_reset_code();
 const cJSON* get_manifest();
 char* get_version_json_string(const char* version, SetFunc set_func, void* klass, int min, int max);
+char* get_object_hash(const char* gamedir, const char* large_version, const char* object);
+char* get_object_dir(const char* gamedir, const char* hash);
+char* get_translation_file(const char* gamedir, const char* large_version, const char* lang);
+void cleanup_manifest();
 
-/* Some random code here:
- * bool success = false;
- * while(!success)
- * {
- *    download_manifest(dir);
- *    while(manifest_download_code() == -1); // Not finished
- *    if(manifest_download_code() == 0) // Or manifest_downloaded()
- *    { success = true; }
- * }
- */
 
 #ifdef __cplusplus
 }

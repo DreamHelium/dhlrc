@@ -1,21 +1,22 @@
 #include "utility.h"
-#include "glib.h"
-#include "nbtselectui.h"
-#include <QInputDialog>
-#include <QMessageBox>
-#include <qcontainerfwd.h>
-#include <qinputdialog.h>
-#include "../translation.h"
-#include "lrchooseui.h"
-#include <QSvgRenderer>
-#include <QPixmap>
-#include <QPainter>
-#include <string>
-#include "../region.h"
-#include "../nbt_interface_cpp/nbt_interface.hpp"
 #include "../common_info.h"
 #include "../config.h"
 #include "../csv_parser.h"
+#include "../nbt_interface_cpp/nbt_interface.hpp"
+#include "../region.h"
+#include "../translation.h"
+#include "glib.h"
+#include "lrchooseui.h"
+#include <QInputDialog>
+#include <QMessageBox>
+#include <QPainter>
+#include <QPixmap>
+#include <QSvgRenderer>
+#include <qcontainerfwd.h>
+#include <qinputdialog.h>
+#include <string>
+
+#include <generalchooseui.h>
 
 typedef struct Version
 {
@@ -29,12 +30,10 @@ static bool version_inited = false;
 void dh::loadRegion(QWidget* parent)
 {
     /* The lock for Region info should begin in main func */
-
-    GList* list = (GList*)common_info_list_get_uuid_list(DH_TYPE_NBT_INTERFACE_CPP);
     /* Lock for NBT info start */
-    NbtSelectUI* nsui = new NbtSelectUI();
-    nsui->setAttribute(Qt::WA_DeleteOnClose);
-    auto res = nsui->exec();
+    GeneralChooseUI* gcui = new GeneralChooseUI(DH_TYPE_NBT_INTERFACE_CPP, false);
+    gcui->setAttribute(Qt::WA_DeleteOnClose);
+    auto res = gcui->exec();
     /* Lock for NBT info end */
     if(res == QDialog::Accepted)
     {

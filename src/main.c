@@ -31,7 +31,6 @@
 #include "recipe_util.h"
 #include "translation.h"
 
-#include "mcdir/internal_config.h"
 #include "recipe_handler/handler.h"
 
 #ifdef G_OS_WIN32
@@ -86,7 +85,7 @@ get_module (const char *arg_zero, const char *module_name)
 
     if (err)
         {
-            g_critical ("%d", err->domain);
+            g_critical ("%s", err->message);
             g_error_free (err);
             return FALSE;
         }

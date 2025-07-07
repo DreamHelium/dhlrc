@@ -43,9 +43,6 @@ private Q_SLOTS:
     void mrBtn_clicked();
     void nbtReaderBtn_clicked();
     void nbtReaderBtn_finished(int ret);
-    void downloadBtn_clicked();
-    void unzipBtn_clicked();
-    void selectBtn_clicked();
     void recipeBtn_clicked();
     void openglBtn_clicked();
     void showabout();

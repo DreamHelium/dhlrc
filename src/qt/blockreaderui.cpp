@@ -1,20 +1,20 @@
 #include "blockreaderui.h"
+#include "../common_info.h"
+#include "../translation.h"
 #include "blocklistui.h"
-#include "findassetsui.h"
 #include "nbtreaderui.h"
 #include "ui_blockreaderui.h"
+#include "utility.h"
 #include <qlineedit.h>
 #include <qnamespace.h>
 #include <qpushbutton.h>
 #include <qvalidator.h>
-#include "../translation.h"
-#include "../common_info.h"
-#include "utility.h"
+#include "../mcdata_feature.h"
 
 static void set_func(void* klass, int value)
 {
-    auto bar = static_cast<QProgressBar *> (klass);
-    bar->setValue(value);
+    auto brui = static_cast<BlockReaderUI*> (klass);
+    emit brui->changeVal (value);
 }
 
 BlockReaderUI::BlockReaderUI(QWidget *parent)
@@ -22,25 +22,32 @@ BlockReaderUI::BlockReaderUI(QWidget *parent)
     ui(new Ui::BlockReaderUI)
 {
     ui->setupUi(this);
-
     uuid = common_info_list_get_uuid(DH_TYPE_Region);
     region = (Region*)common_info_get_data(DH_TYPE_Region, uuid.toUtf8());
     auto version = dh::getVersion (region->data_version);
-    dhlrc_update_transfile (version.toUtf8 (), set_func, ui->progressBar);
     setText();
     QObject::connect(ui->xEdit, &QLineEdit::textChanged, this, &BlockReaderUI::textChanged_cb);
     QObject::connect(ui->yEdit, &QLineEdit::textChanged, this, &BlockReaderUI::textChanged_cb);
     QObject::connect(ui->zEdit, &QLineEdit::textChanged, this, &BlockReaderUI::textChanged_cb);
     QObject::connect(ui->listBtn, &QPushButton::clicked, this, &BlockReaderUI::listBtn_clicked);
     QObject::connect(ui->entityBtn, &QPushButton::clicked, this, &BlockReaderUI::entityBtn_clicked);
-    QObject::connect(ui->assetsBtn, &QPushButton::clicked, this, &BlockReaderUI::assetsBtn_clicked);
+    QObject::connect(this, &BlockReaderUI::changeVal, ui->progressBar, &QProgressBar::setValue);
     ui->entityBtn->setEnabled(false);
+    if (dhlrc_mcdata_enabled())
+        dhlrc_update_transfile(version.toUtf8 (), set_func, this
+            , &large_version);
+    else
+        {
+            ui->label_7->setText (_("Lack the translation module, will not try to get translation!"));
+            ui->progressBar->hide ();
+        }
 }
 
 BlockReaderUI::~BlockReaderUI()
 {
     delete ui;
     common_info_reader_unlock(DH_TYPE_Region, uuid.toUtf8());
+    g_free(large_version);
 }
 
 void BlockReaderUI::textChanged_cb(const QString & str)
@@ -67,18 +74,25 @@ void BlockReaderUI::textChanged_cb(const QString & str)
                    blockInfo->pos->y == yText.toInt() &&
                    blockInfo->pos->z == zText.toInt())
                 {
+                    const char* transName = nullptr;
                     auto name = blockInfo->id_name;
-                    auto transName = trm(blockInfo->id_name);
+                    if (large_version && ui->progressBar->value () == 100)
+                        transName = mctr(blockInfo->id_name, large_version);
                     auto index = blockInfo->index;
                     auto palette = blockInfo->palette;
                     auto paletteInfo = (Palette*)(region->palette_array->pdata[palette]);
                     auto paletteNames = paletteInfo->property_name;
                     auto paletteDatas = paletteInfo->property_data;
+                    if (transName)
                     infos = QString(_("Name: %1\n"
                                             "Translation name: %2\n"
                                             "Index: %3\n"
                                             "Palette: %4\n"
                                             "Properties:\n")).arg(name).arg(transName).arg(index).arg(palette);
+                    else infos = QString(_("Name: %1\n"
+                                        "Index: %2\n"
+                                        "Palette: %3\n"
+                                        "Properties:\n")).arg(name).arg(index).arg(palette);
                     if(paletteNames)
                     {
                         for(int i = 0 ; i < paletteNames->num ; i++)
@@ -125,7 +139,7 @@ void BlockReaderUI::setText()
 
 void BlockReaderUI::listBtn_clicked()
 {
-    BlockListUI* blui = new BlockListUI(region);
+    BlockListUI* blui = new BlockListUI(region, large_version);
     blui->setAttribute(Qt::WA_DeleteOnClose);
     blui->show();
 }
@@ -135,11 +149,4 @@ void BlockReaderUI::entityBtn_clicked()
     auto nrui = new NbtReaderUI(*(DhNbtInstance*)(this->info->nbt_instance));
     nrui->setAttribute(Qt::WA_DeleteOnClose);
     nrui->show();
-}
-
-void BlockReaderUI::assetsBtn_clicked()
-{
-    auto faui = new FindAssetsUI(dh::getVersion(region->data_version));
-    faui->setAttribute(Qt::WA_DeleteOnClose);
-    faui->show();
 }

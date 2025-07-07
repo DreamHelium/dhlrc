@@ -19,20 +19,11 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets Svg OpenGL OpenGL
 
 set(PROJECT_SOURCES
         module.h module.cpp
-        mainwindow.ui
-        mainwindow.cpp
-        mainwindow.h
-        recipesui.cpp
-        recipesui.h
-        recipesshowui.cpp
-        recipesshowui.h
-        ilchooseui.cpp
-        ilchooseui.h
-        showtrackui.cpp
-        showtrackui.h
+        mainwindow.ui mainwindow.cpp mainwindow.h
+        recipesui.cpp recipesui.h
+        recipesshowui.cpp recipesshowui.h
+        showtrackui.cpp showtrackui.h
         configui.h configui.cpp configui.ui
-        nbtselectui.h nbtselectui.cpp
-        regionchooseui.h regionchooseui.cpp
         blocklistui.cpp blocklistui.h blocklistui.ui
         blockreaderui.cpp blockreaderui.h blockreaderui.ui
         nbtreaderui.cpp nbtreaderui.h nbtreaderui.ui
@@ -44,12 +35,9 @@ set(PROJECT_SOURCES
         utility.h utility.cpp
         saveregionselectui.h saveregionselectui.cpp
         dhtreefilter.h dhtreefilter.cpp
-        unzipwizard.h unzipwizard.cpp unzipwizard.ui
-        selectassetsui.h selectassetsui.cpp selectassetsui.ui
         recipeselectui.h recipeselectui.cpp recipeselectui.ui
-        findassetsui.h findassetsui.cpp findassetsui.ui
-        unzippage.h unzippage.cpp
         testopenglui.h testopenglui.cpp
+        generalchooseui.cpp generalchooseui.h
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)

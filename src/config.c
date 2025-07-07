@@ -18,7 +18,6 @@
 #include "config.h"
 #include "dh_file_util.h"
 #include "glib.h"
-#include "mcdir/internal_config.h"
 #include "recipe_util.h"
 #include <cjson/cJSON.h>
 #include <gio/gio.h>

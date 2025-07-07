@@ -33,7 +33,7 @@ extern "C"{
 G_DEPRECATED
 const char* name_block_translate(const char* block_name);
 gboolean    dhlrc_found_transfile();
-    void dhlrc_update_transfile(const char* version, SetFunc set_func, void* klass);
+    void dhlrc_update_transfile(const char* version, SetFunc set_func, void* klass, char** large_version);
 int         dh_exit();
 
 #ifdef __cplusplus

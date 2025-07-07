@@ -39,6 +39,8 @@ void dhlrc_manifest_reset_code();
 int dhlrc_manifest_downloaded();
 const cJSON* dhlrc_get_manifest();
 char* dhlrc_get_version_json_string(const char* version, SetFunc set_func, void* klass, int min, int max);
+char* dhlrc_get_translation_file(const char* filename, const char* large_version, const char* lang);
+void dhlrc_cleanup_manifest();
 
 G_END_DECLS
 

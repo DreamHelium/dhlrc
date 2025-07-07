@@ -1,42 +1,25 @@
-#include "../translation.h"
 #include "mainwindow.h"
+#include "../translation.h"
 #include "../common_info.h"
-#include "../config.h"
-#include "../download_file.h"
-#include "../mcdata_feature.h"
 #include "../region.h"
 #include "blockreaderui.h"
 #include "configui.h"
 #include "dh_file_util.h"
-#include "gio/gio.h"
 #include "glib.h"
-#include "ilchooseui.h"
 #include "ilreaderui.h"
 #include "manage.h"
 #include "nbtreaderui.h"
-#include "nbtselectui.h"
 #include "recipeselectui.h"
 #include "recipesui.h"
-#include "regionchooseui.h"
-#include "selectassetsui.h"
 #include "testopenglui.h"
 #include "ui_mainwindow.h"
-#include "unzipwizard.h"
 #include "utility.h"
-#include <QDebug>
 #include <QFileDialog>
-#include <QInputDialog>
-#include <QMenuBar>
-#include <QMessageBox>
-#include <QMimeData>
-#include <QProgressDialog>
-#include <QToolBar>
-#include <dhutil.h>
+#include <generalchooseui.h>
 #include <qcontainerfwd.h>
 #include <qdialog.h>
 #include <qevent.h>
 #include <qinputdialog.h>
-#include <qlineedit.h>
 #include <qmessagebox.h>
 #include <qnamespace.h>
 #include <qobject.h>
@@ -109,12 +92,6 @@ MainWindow::initSignalSlots ()
                       &MainWindow::nbtReaderBtn_clicked);
     QObject::connect (ui->configBtn, &QPushButton::clicked, this,
                       &MainWindow::configAction_triggered);
-    QObject::connect (ui->downloadBtn, &QPushButton::clicked, this,
-                      &MainWindow::downloadBtn_clicked);
-    QObject::connect (ui->unzipBtn, &QPushButton::clicked, this,
-                      &MainWindow::unzipBtn_clicked);
-    QObject::connect (ui->selectBtn, &QPushButton::clicked, this,
-                      &MainWindow::selectBtn_clicked);
     QObject::connect (ui->recipeBtn, &QPushButton::clicked, this,
                       &MainWindow::recipeBtn_clicked);
     QObject::connect (ui->openglBtn, &QPushButton::clicked, this,
@@ -160,9 +137,7 @@ MainWindow::manageBtn_2_clicked ()
 void
 MainWindow::ilReaderBtn_clicked ()
 {
-    ilChooseUI *iui = new ilChooseUI ();
-    iui->setAttribute (Qt::WA_DeleteOnClose);
-    int ret = iui->exec ();
+    GENERALCHOOSEUI_START (DH_TYPE_Item_List, false)
 
     if (ret == QDialog::Accepted)
         {
@@ -183,9 +158,7 @@ MainWindow::ilReaderBtn_clicked ()
 void
 MainWindow::recipeCombineBtn_clicked ()
 {
-    ilChooseUI *iui = new ilChooseUI ();
-    iui->setAttribute (Qt::WA_DeleteOnClose);
-    int ret = iui->exec ();
+    GENERALCHOOSEUI_START (DH_TYPE_Item_List, false)
 
     if (ret == QDialog::Accepted)
         {
@@ -211,9 +184,8 @@ MainWindow::createBtn_clicked ()
 void
 MainWindow::generateBtn_clicked ()
 {
-    RegionChooseUI *rcui = new RegionChooseUI (true);
-    rcui->setAttribute (Qt::WA_DeleteOnClose);
-    auto ret = rcui->exec ();
+    GENERALCHOOSEUI_START (DH_TYPE_Region, true)
+
     if (ret == QDialog::Accepted)
         {
             auto str
@@ -241,9 +213,8 @@ MainWindow::generateBtn_clicked ()
 void
 MainWindow::brBtn_clicked ()
 {
-    RegionChooseUI *rcui = new RegionChooseUI (false);
-    rcui->setAttribute (Qt::WA_DeleteOnClose);
-    auto ret = rcui->exec ();
+    GENERALCHOOSEUI_START (DH_TYPE_Region, false)
+
     if (ret == QDialog::Accepted)
         {
             if (common_info_reader_trylock (
@@ -276,16 +247,8 @@ MainWindow::mrBtn_clicked ()
 void
 MainWindow::nbtReaderBtn_clicked ()
 {
-    auto nui = new NbtSelectUI (this);
-    nui->setAttribute (Qt::WA_DeleteOnClose);
-    nui->show ();
-    QObject::connect (nui, &NbtSelectUI::finished, this,
-                      &MainWindow::nbtReaderBtn_finished);
-}
+    GENERALCHOOSEUI_START (DH_TYPE_NBT_INTERFACE_CPP, false)
 
-void
-MainWindow::nbtReaderBtn_finished (int ret)
-{
     if (ret == QDialog::Accepted)
         {
             auto uuid = common_info_list_get_uuid (DH_TYPE_NBT_INTERFACE_CPP);
@@ -304,42 +267,10 @@ MainWindow::nbtReaderBtn_finished (int ret)
         QMessageBox::critical (this, _ ("Error!"), _ ("No NBT is selected!"));
 }
 
-static void
-finish_callback (GObject *source_object, GAsyncResult *res, gpointer data)
-{
-    int ret = g_task_propagate_int (G_TASK (res), NULL);
-    qDebug () << ret;
-}
-
 void
-MainWindow::downloadBtn_clicked ()
+MainWindow::nbtReaderBtn_finished (int ret)
 {
-    dhlrc_download_manifest("/tmp", NULL, NULL, NULL, NULL);
-}
 
-void
-MainWindow::unzipBtn_clicked ()
-{
-    char *unzipDir = g_find_program_in_path ("unzip");
-    if (unzipDir)
-        {
-            g_free (unzipDir);
-            auto wizard = new UnzipWizard ();
-            wizard->setAttribute (Qt::WA_DeleteOnClose);
-            wizard->exec ();
-        }
-    else
-        QMessageBox::critical (
-            this, _ ("No Unzip Program found!"),
-            _ ("No unzip program found, we couldn't unzip the file!"));
-}
-
-void
-MainWindow::selectBtn_clicked ()
-{
-    auto saui = new SelectAssetsUI ();
-    saui->setAttribute (Qt::WA_DeleteOnClose);
-    saui->show ();
 }
 
 void

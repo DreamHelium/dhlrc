@@ -16,10 +16,11 @@ class BlockListUI : public QWidget
     Q_OBJECT
 
 public:
-    BlockListUI(Region* region, QWidget *parent = nullptr);
+    BlockListUI(Region* region, const char* large_version, QWidget *parent = nullptr);
     ~BlockListUI();
 
 private:
+    const char* large_version;
     Ui::BlockListUI *ui;
     void drawList();
     Region* region;

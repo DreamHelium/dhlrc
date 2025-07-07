@@ -23,7 +23,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "mcdir/path.h"
 #include <dhutil.h>
 
 static gboolean first_try = FALSE;
@@ -105,32 +104,29 @@ static gchar* find_transfile(const char* version, SetFunc set_func, void* klass,
     char* ret = NULL;
     if (strchr (gamedir, ':'))
         g_error ("Multiple game directory is not supported!");
-    char* override_lang = dh_get_override_lang();
-    char* real_lang = NULL;
+    /* OverrideLang is deprecated. */
+    // char* override_lang = dh_get_override_lang();
+    const char* real_lang = NULL;
     const char* const* locales = g_get_language_names();
     const char* locale_lang = locales[0];
-    if (g_str_equal(override_lang, ""))
-            real_lang = g_strdup(locale_lang);
-    else real_lang = override_lang;
-    *large_version = dhlrc_get_version_json_string (version, set_func, klass, 0 , 50);
-    g_message ("Looking for %s...", *large_version);
-    if (*large_version)
-        ret = dhmcdir_get_translation_file(gamedir, *large_version, real_lang);
-    if(ret && dh_file_exist(ret))
-        goto success_going;
-    /* Try second time */
-    g_free(ret);
-    ret = dhmcdir_get_translation_file(gamedir, "1.18", real_lang);
-    *large_version = g_strdup("1.18");
-    if (dh_file_exist(ret))
-        goto success_going;
-    g_free(ret);
-    g_free(gamedir);
-    g_free(real_lang);
-    return NULL;
+    real_lang = locale_lang;
 
-    success_going:
-    g_free(real_lang);
+    *large_version = dhlrc_get_version_json_string (version, set_func, klass, 0 , 75);
+
+    if (!*large_version)
+        {
+            *large_version = g_strdup("1.18");
+            g_message("Large version not found, fall back to 1.18.");
+        }
+
+    ret = dhlrc_get_translation_file(gamedir, *large_version, real_lang);
+    if(!ret || !dh_file_exist(ret))
+        {
+            g_free(ret);
+            ret = NULL;
+        }
+    else if (set_func && klass)
+        set_func(klass, 100);
     g_free(gamedir);
     return ret;
 }
@@ -155,6 +151,7 @@ typedef struct UpdateInfo
     char* version;
     SetFunc set_func;
     void* klass;
+    char** large_version;
 }UpdateInfo;
 
 static void update_info_free(gpointer data)
@@ -171,21 +168,22 @@ real_update_transfile(GTask* task, gpointer source_object, gpointer task_data, G
     char* version = data->version;
     SetFunc set_func = data->set_func;
     void* klass = data->klass;
-    gchar* large_version = NULL;
-    gchar* filename = find_transfile(version, set_func, klass, &large_version);
-
-    dhlrc_init_translation_from_file (filename, large_version);
+    char** large_version = data->large_version;
+    gchar* filename = find_transfile(version, set_func, klass, large_version);
+    if (filename)
+        dhlrc_init_translation_from_file (filename, *large_version);
     g_free(filename);
 }
 
 void
-dhlrc_update_transfile (const char* version, SetFunc set_func, void* klass)
+dhlrc_update_transfile (const char* version, SetFunc set_func, void* klass, char** large_version)
 {
     GTask* task = g_task_new(NULL, NULL, NULL, NULL);
     UpdateInfo* info = g_new0(UpdateInfo, 1);
     info->version = g_strdup(version);
     info->set_func = set_func;
     info->klass = klass;
+    info->large_version = large_version;
     g_task_set_task_data(task, info, update_info_free);
     g_task_run_in_thread(task, real_update_transfile);
 

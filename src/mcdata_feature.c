@@ -26,6 +26,7 @@ typedef int (*Download)(const char*, SigWithSet, SetFunc, void*, void*);
 typedef int (*Downloaded)();
 typedef const cJSON* (*GetJSON)();
 typedef char* (*GetString)(const char*, SetFunc, void*, int, int);
+typedef char* (*GetTrFile)(const char*, const char*, const char*);
 
 static gboolean enabled = FALSE;
 
@@ -37,6 +38,8 @@ static Downloaded code = NULL;
 static CleanupTr reset_code = NULL;
 static GetJSON getJSON = NULL;
 static GetString get_string = NULL;
+static GetTrFile get_tr_file = NULL;
+static CleanupTr cleanup_manifest = NULL;
 
 void dhlrc_mcdata_enable(GModule* module)
 {
@@ -47,7 +50,9 @@ void dhlrc_mcdata_enable(GModule* module)
         && g_module_symbol(module, "get_manifest", (gpointer*)&getJSON)
         && g_module_symbol(module, "manifest_download_code", (gpointer*)&code)
         && g_module_symbol(module, "manifest_reset_code", (gpointer*)&reset_code)
-        && g_module_symbol(module, "get_version_json_string", (gpointer*)&get_string))
+        && g_module_symbol(module, "get_version_json_string", (gpointer*)&get_string)
+        && g_module_symbol(module, "get_translation_file", (gpointer*)&get_tr_file)
+        && g_module_symbol(module, "cleanup_manifest", (gpointer*)&cleanup_manifest))
         enabled = TRUE;
 }
 
@@ -67,7 +72,7 @@ const char* dhlrc_get_translation(const char* name, const char* large_version)
 {
     if (get_tr)
         return get_tr(name, large_version);
-    return NULL;
+    return name;
 }
 
 int dhlrc_download_manifest(const char* dir, SigWithSet sig,
@@ -110,4 +115,17 @@ char* dhlrc_get_version_json_string(const char* version, SetFunc set_func, void*
     if (get_string)
         return get_string(version, set_func, klass, min, max);
     return NULL;
+}
+
+char* dhlrc_get_translation_file(const char* filename, const char* large_version, const char* lang)
+{
+    if (get_tr_file)
+        return get_tr_file(filename, large_version, lang);
+    return NULL;
+}
+
+void dhlrc_cleanup_manifest()
+{
+    if (cleanup_manifest)
+        cleanup_manifest();
 }
