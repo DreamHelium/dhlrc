@@ -38,6 +38,9 @@ set(PROJECT_SOURCES
         recipeselectui.h recipeselectui.cpp recipeselectui.ui
         testopenglui.h testopenglui.cpp
         generalchooseui.cpp generalchooseui.h
+        propertymodifyui.cpp
+        propertymodifyui.h
+        propertymodifyui.ui
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)

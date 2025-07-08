@@ -27,7 +27,7 @@ msgstr ""
 
 #: ../../src/qt/blockreaderui.ui:14
 msgctxt "BlockReaderUI|"
-msgid "Form"
+msgid "Read Blocks"
 msgstr ""
 
 #: ../../src/qt/blockreaderui.ui:26
@@ -67,15 +67,20 @@ msgstr ""
 
 #: ../../src/qt/blockreaderui.ui:140
 msgctxt "BlockReaderUI|"
-msgid "&Show Entity NBT"
+msgid "&Modify Property"
 msgstr ""
 
 #: ../../src/qt/blockreaderui.ui:147
 msgctxt "BlockReaderUI|"
-msgid "&List blocks"
+msgid "&Show Entity NBT"
 msgstr ""
 
 #: ../../src/qt/blockreaderui.ui:154
+msgctxt "BlockReaderUI|"
+msgid "&List blocks"
+msgstr ""
+
+#: ../../src/qt/blockreaderui.ui:161
 msgctxt "BlockReaderUI|"
 msgid "&Close"
 msgstr ""
@@ -306,6 +311,26 @@ msgstr ""
 #: ../../src/qt/nbtreaderui.ui:128
 msgctxt "NbtReaderUI|"
 msgid "Close"
+msgstr ""
+
+#: ../../src/qt/propertymodifyui.ui:14
+msgctxt "PropertyModifyUI|"
+msgid "Modify Property of Block(s)"
+msgstr ""
+
+#: ../../src/qt/propertymodifyui.ui:20
+msgctxt "PropertyModifyUI|"
+msgid "Modify the property of the block in:"
+msgstr ""
+
+#: ../../src/qt/propertymodifyui.ui:34
+msgctxt "PropertyModifyUI|"
+msgid "With the block that is the same property"
+msgstr ""
+
+#: ../../src/qt/propertymodifyui.ui:41
+msgctxt "PropertyModifyUI|"
+msgid "Properties:"
 msgstr ""
 
 #: ../../src/qt/recipeselectui.ui:14

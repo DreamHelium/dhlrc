@@ -34,7 +34,16 @@ typedef struct CommonInfoSingle
     GPtrArray *update_notifiers;
 } CommonInfoSingle;
 
+typedef struct CommonInfo{
+    void* data;
+    GDateTime* time;
+    gchar* description;
+    GRWLock info_lock;
+} CommonInfo;
+
 typedef GPtrArray CommonInfos;
+
+static CommonInfo* common_info_list_get_common_info(DhInfoTypes type, const gchar* uuid);
 
 /* Array<CommonInfoSingle> */
 static CommonInfos *infos = NULL;
@@ -175,7 +184,7 @@ common_info_list_remove_item (DhInfoTypes type, const gchar *uuid)
         return FALSE;
 }
 
-CommonInfo *
+static CommonInfo *
 common_info_list_get_common_info (DhInfoTypes type, const gchar *uuid)
 {
     CommonInfoSingle *instance = infos->pdata[type];

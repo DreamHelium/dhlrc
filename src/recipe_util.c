@@ -170,6 +170,7 @@ real_update_transfile(GTask* task, gpointer source_object, gpointer task_data, G
     void* klass = data->klass;
     char** large_version = data->large_version;
     gchar* filename = find_transfile(version, set_func, klass, large_version);
+    /* The en_US translation is in the jar file, so ...... */
     if (filename)
         dhlrc_init_translation_from_file (filename, *large_version);
     g_free(filename);

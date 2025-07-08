@@ -1,15 +1,17 @@
 #include "blockreaderui.h"
 #include "../common_info.h"
+#include "../mcdata_feature.h"
 #include "../translation.h"
 #include "blocklistui.h"
 #include "nbtreaderui.h"
 #include "ui_blockreaderui.h"
 #include "utility.h"
+#include <QMessageBox>
+#include <propertymodifyui.h>
 #include <qlineedit.h>
 #include <qnamespace.h>
 #include <qpushbutton.h>
 #include <qvalidator.h>
-#include "../mcdata_feature.h"
 
 static void set_func(void* klass, int value)
 {
@@ -32,7 +34,9 @@ BlockReaderUI::BlockReaderUI(QWidget *parent)
     QObject::connect(ui->listBtn, &QPushButton::clicked, this, &BlockReaderUI::listBtn_clicked);
     QObject::connect(ui->entityBtn, &QPushButton::clicked, this, &BlockReaderUI::entityBtn_clicked);
     QObject::connect(this, &BlockReaderUI::changeVal, ui->progressBar, &QProgressBar::setValue);
+    QObject::connect(ui->propertyBtn, &QPushButton::clicked, this, &BlockReaderUI::propertyBtn_clicked);
     ui->entityBtn->setEnabled(false);
+    ui->propertyBtn->setEnabled (false);
     if (dhlrc_mcdata_enabled())
         dhlrc_update_transfile(version.toUtf8 (), set_func, this
             , &large_version);
@@ -50,7 +54,7 @@ BlockReaderUI::~BlockReaderUI()
     g_free(large_version);
 }
 
-void BlockReaderUI::textChanged_cb(const QString & str)
+void BlockReaderUI::textChanged_cb ()
 {
     if(!ui->xEdit->text().isEmpty() &&
        !ui->yEdit->text().isEmpty() &&
@@ -102,7 +106,9 @@ void BlockReaderUI::textChanged_cb(const QString & str)
                             infos += gettext(paletteDatas->val[i]);
                             infos += "\n";
                         }
+                        ui->propertyBtn->setEnabled (true);
                     }
+                    else ui->propertyBtn->setEnabled (false);
                     if(this->info->nbt_instance)
                         ui->entityBtn->setEnabled(true);
                     else ui->entityBtn->setEnabled(false);
@@ -149,4 +155,38 @@ void BlockReaderUI::entityBtn_clicked()
     auto nrui = new NbtReaderUI(*(DhNbtInstance*)(this->info->nbt_instance));
     nrui->setAttribute(Qt::WA_DeleteOnClose);
     nrui->show();
+}
+
+void BlockReaderUI::propertyBtn_clicked()
+{
+    /* It seems that I can't write when it's locked with reader lock */
+    common_info_reader_unlock(DH_TYPE_Region, uuid.toUtf8 ());
+    /* It seems that it will lock multiple times,
+     * And doing so will break the infomation of the reader,
+     * so this **must** be blocked way.
+     */
+    if (common_info_writer_trylock (DH_TYPE_Region, uuid.toUtf8 ()))
+        {
+            auto ret = QMessageBox::question(this, _("Select an option."),
+        _("Do you want to modify the property of this block or blocks that has the same property?"
+            "\nWarning: if a wrong key is input, we don't take any warranty."),
+        QMessageBox::Yes | QMessageBox::YesAll | QMessageBox::No, QMessageBox::Yes);
+            bool all = false;
+            if (ret == QMessageBox::YesAll)
+                all = true;
+            else if (ret == QMessageBox::No)
+                {
+                    common_info_writer_unlock (DH_TYPE_Region, uuid.toUtf8 ());
+                    common_info_reader_trylock (DH_TYPE_Region, uuid.toUtf8 ());
+                    return;
+                }
+            auto pmui = new PropertyModifyUI(region, info, all);
+            pmui->setAttribute(Qt::WA_DeleteOnClose);
+            pmui->exec();
+
+            common_info_writer_unlock (DH_TYPE_Region, uuid.toUtf8 ());
+            common_info_reader_trylock (DH_TYPE_Region, uuid.toUtf8 ());
+            textChanged_cb ();
+        }
+
 }

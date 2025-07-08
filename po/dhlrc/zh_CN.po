@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-07-07 22:45+0800\n"
+"POT-Creation-Date: 2025-07-08 21:48+0800\n"
 "PO-Revision-Date: 2024-11-30 07:00+0800\n"
 "Last-Translator: dream_he <48383878+DreamHelium@users.noreply.github.com>\n"
 "Language-Team: Chinese <kde-i18n-doc@kde.org>\n"
@@ -44,8 +44,8 @@ msgstr "关闭(&C)"
 
 #: ../../src/qt/blockreaderui.ui:14
 msgctxt "BlockReaderUI|"
-msgid "Form"
-msgstr ""
+msgid "Read Blocks"
+msgstr "读取方块"
 
 #: ../../src/qt/blockreaderui.ui:26
 msgctxt "BlockReaderUI|"
@@ -84,15 +84,20 @@ msgstr "方块信息为："
 
 #: ../../src/qt/blockreaderui.ui:140
 msgctxt "BlockReaderUI|"
+msgid "&Modify Property"
+msgstr "修改属性(&M)"
+
+#: ../../src/qt/blockreaderui.ui:147
+msgctxt "BlockReaderUI|"
 msgid "&Show Entity NBT"
 msgstr "展示实体NBT(&S)"
 
-#: ../../src/qt/blockreaderui.ui:147
+#: ../../src/qt/blockreaderui.ui:154
 msgctxt "BlockReaderUI|"
 msgid "&List blocks"
 msgstr "列出方块(&L)"
 
-#: ../../src/qt/blockreaderui.ui:154
+#: ../../src/qt/blockreaderui.ui:161
 msgctxt "BlockReaderUI|"
 msgid "&Close"
 msgstr "关闭(&C)"
@@ -325,6 +330,26 @@ msgctxt "NbtReaderUI|"
 msgid "Close"
 msgstr "关闭"
 
+#: ../../src/qt/propertymodifyui.ui:14
+msgctxt "PropertyModifyUI|"
+msgid "Modify Property of Block(s)"
+msgstr "更改方块属性"
+
+#: ../../src/qt/propertymodifyui.ui:20
+msgctxt "PropertyModifyUI|"
+msgid "Modify the property of the block in:"
+msgstr "更改在此的方块属性："
+
+#: ../../src/qt/propertymodifyui.ui:34
+msgctxt "PropertyModifyUI|"
+msgid "With the block that is the same property"
+msgstr "以及同属性的方块"
+
+#: ../../src/qt/propertymodifyui.ui:41
+msgctxt "PropertyModifyUI|"
+msgid "Properties:"
+msgstr "属性："
+
 #: ../../src/qt/recipeselectui.ui:14
 msgctxt "RecipeSelectUI|"
 msgid "Form"
@@ -533,11 +558,11 @@ msgstr "z"
 msgid "Palette"
 msgstr "偏移码"
 
-#: src/qt/blockreaderui.cpp:41
+#: src/qt/blockreaderui.cpp:47
 msgid "Lack the translation module, will not try to get translation!"
 msgstr "缺少翻译模块，将不会尝试获取翻译！"
 
-#: src/qt/blockreaderui.cpp:87
+#: src/qt/blockreaderui.cpp:93
 msgid ""
 "Name: %1\n"
 "Translation name: %2\n"
@@ -551,7 +576,7 @@ msgstr ""
 "偏移量：%4\n"
 "属性：\n"
 
-#: src/qt/blockreaderui.cpp:92
+#: src/qt/blockreaderui.cpp:98
 msgid ""
 "Name: %1\n"
 "Index: %2\n"
@@ -563,28 +588,41 @@ msgstr ""
 "偏移量：%3\n"
 "属性：\n"
 
-#: src/qt/blockreaderui.cpp:114
+#: src/qt/blockreaderui.cpp:122
 msgid "Not valid!"
 msgstr "无效！"
 
-#: src/qt/blockreaderui.cpp:123
+#: src/qt/blockreaderui.cpp:131
 msgid "With DataVersion %4, version %5."
 msgstr "数据版本%4，版本%5。"
 
-#: src/qt/blockreaderui.cpp:125
+#: src/qt/blockreaderui.cpp:133
 msgid "Created time: %6, Modified time: %7, Author: %8, Name: %9"
 msgstr "创建时间：%6，修改时间：%7，作者：%8，名字：%9"
 
-#: src/qt/blockreaderui.cpp:127
+#: src/qt/blockreaderui.cpp:135
 msgid "Description: %10"
 msgstr "描述：%10"
+
+#: src/qt/blockreaderui.cpp:172
+msgid "Select an option."
+msgstr ""
+
+#: src/qt/blockreaderui.cpp:173
+msgid ""
+"Do you want to modify the property of this block or blocks that has the same "
+"property?\n"
+"Warning: if a wrong key is input, we don't take any warranty."
+msgstr ""
+"你想修改这个方块的属性或者同属性的方块吗？\n"
+"警告：如果一个错误的键被输入，我们不负任何担保。"
 
 #: src/qt/generalchooseui.cpp:22
 msgid "Please select object(s):"
 msgstr "请选择项目："
 
 #: src/qt/generalchooseui.cpp:57 src/qt/generalchooseui.cpp:58
-#: src/qt/manage.cpp:63 src/qt/manage.cpp:64 src/qt/manage.cpp:65
+#: src/qt/manage.cpp:62 src/qt/manage.cpp:63 src/qt/manage.cpp:64
 msgid "locked"
 msgstr "已锁定"
 
@@ -608,8 +646,8 @@ msgstr "没有项目可用！"
 #: src/qt/mainwindow.cpp:153 src/qt/mainwindow.cpp:173
 #: src/qt/mainwindow.cpp:204 src/qt/mainwindow.cpp:209
 #: src/qt/mainwindow.cpp:230 src/qt/mainwindow.cpp:235
-#: src/qt/mainwindow.cpp:267 src/qt/manage.cpp:28 src/qt/manage.cpp:325
-#: src/qt/manage.cpp:340 src/qt/manage.cpp:488
+#: src/qt/mainwindow.cpp:267 src/qt/manage.cpp:28 src/qt/manage.cpp:324
+#: src/qt/manage.cpp:339 src/qt/manage.cpp:487
 #: src/qt/saveregionselectui.cpp:127 src/qt/utility.cpp:43
 #: src/qt/utility.cpp:66 src/qt/utility.cpp:78 src/qt/utility.cpp:82
 #: src/qt/utility.cpp:84 src/qt/utility.cpp:91 src/qt/utility.cpp:148
@@ -715,63 +753,63 @@ msgstr "关于投影文件阅读器"
 msgid "No row is selected!"
 msgstr "没有选择行！"
 
-#: src/qt/manage.cpp:74
+#: src/qt/manage.cpp:73
 msgid "Description"
 msgstr "描述"
 
-#: src/qt/manage.cpp:74
+#: src/qt/manage.cpp:73
 msgid "UUID"
 msgstr "唯一码"
 
-#: src/qt/manage.cpp:74
+#: src/qt/manage.cpp:73
 msgid "Time"
 msgstr "时间"
 
-#: src/qt/manage.cpp:228 src/cli/main_cli.c:39 src/cli/main_cli.c:49
+#: src/qt/manage.cpp:227 src/cli/main_cli.c:39 src/cli/main_cli.c:49
 msgid "Manage Region"
 msgstr ""
 
-#: src/qt/manage.cpp:280
+#: src/qt/manage.cpp:279
 msgid "No item selected!"
 msgstr ""
 
-#: src/qt/manage.cpp:325
+#: src/qt/manage.cpp:324
 msgid "Not a valid NBT List!"
 msgstr ""
 
-#: src/qt/manage.cpp:341
+#: src/qt/manage.cpp:340
 msgid "Not a valid NBT UUID!"
 msgstr ""
 
-#: src/qt/manage.cpp:357
+#: src/qt/manage.cpp:356
 msgid "Manage NBT Interface"
 msgstr ""
 
-#: src/qt/manage.cpp:373
+#: src/qt/manage.cpp:372
 msgid "Select a file"
 msgstr "选择一个文件"
 
-#: src/qt/manage.cpp:374
+#: src/qt/manage.cpp:373
 msgid "Litematic file (*.litematic);;NBT File (*.nbt)"
 msgstr "投影文件 (*.litematic);;NBT文件 (*.nbt)"
 
-#: src/qt/manage.cpp:419
+#: src/qt/manage.cpp:418
 msgid "Save File"
 msgstr "保存文件"
 
-#: src/qt/manage.cpp:439
+#: src/qt/manage.cpp:438
 msgid "Info Locked!"
 msgstr "信息被锁定！"
 
-#: src/qt/manage.cpp:440
+#: src/qt/manage.cpp:439
 msgid "The NBT info is locked!"
 msgstr "NBT信息被锁定！"
 
-#: src/qt/manage.cpp:446
+#: src/qt/manage.cpp:445
 msgid "Save Files"
 msgstr ""
 
-#: src/qt/manage.cpp:482
+#: src/qt/manage.cpp:481
 msgid "The following infos are locked:\n"
 msgstr ""
 

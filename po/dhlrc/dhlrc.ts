@@ -28,7 +28,7 @@
     <name>BlockReaderUI</name>
     <message>
         <location filename="../../src/qt/blockreaderui.ui" line="14"/>
-        <source>Form</source>
+        <source>Read Blocks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -68,16 +68,21 @@
     </message>
     <message>
         <location filename="../../src/qt/blockreaderui.ui" line="140"/>
-        <source>&amp;Show Entity NBT</source>
+        <source>&amp;Modify Property</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../src/qt/blockreaderui.ui" line="147"/>
-        <source>&amp;List blocks</source>
+        <source>&amp;Show Entity NBT</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../src/qt/blockreaderui.ui" line="154"/>
+        <source>&amp;List blocks</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qt/blockreaderui.ui" line="161"/>
         <source>&amp;Close</source>
         <translation type="unfinished"></translation>
     </message>
@@ -323,6 +328,29 @@
     <message>
         <location filename="../../src/qt/nbtreaderui.ui" line="128"/>
         <source>Close</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>PropertyModifyUI</name>
+    <message>
+        <location filename="../../src/qt/propertymodifyui.ui" line="14"/>
+        <source>Modify Property of Block(s)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qt/propertymodifyui.ui" line="20"/>
+        <source>Modify the property of the block in:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qt/propertymodifyui.ui" line="34"/>
+        <source>With the block that is the same property</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qt/propertymodifyui.ui" line="41"/>
+        <source>Properties:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

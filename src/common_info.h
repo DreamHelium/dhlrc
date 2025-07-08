@@ -29,13 +29,6 @@ typedef enum DhInfoTypes{
     N_TYPES
 } DhInfoTypes;
 
-typedef struct CommonInfo{
-    void* data;
-    GDateTime* time;
-    gchar* description;
-    GRWLock info_lock;
-} CommonInfo;
-
 typedef void (*DhUpdateFunc)(void*);
 
 typedef struct UpdateNotifier{
@@ -47,7 +40,6 @@ gboolean common_info_new(DhInfoTypes type, void* data, GDateTime* time, const gc
 void     common_infos_init();
 void     common_infos_free();
 gboolean common_info_list_remove_item(DhInfoTypes type, const gchar* uuid);
-CommonInfo* common_info_list_get_common_info(DhInfoTypes type, const gchar* uuid);
 void*    common_info_get_data(DhInfoTypes type, const gchar* uuid);
 GDateTime* common_info_get_time(DhInfoTypes type, const gchar* uuid);
 gchar*     common_info_get_description(DhInfoTypes type, const gchar* uuid);

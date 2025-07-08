@@ -23,13 +23,15 @@ private:
     void setText();
     char* large_version = nullptr;
     BlockInfo* info = nullptr;
+    bool readerIsUnlocked = false;
 
 Q_SIGNALS:
     void changeVal(int value);
 
 private Q_SLOTS:
-    void textChanged_cb(const QString & str);
+    void textChanged_cb ();
     void listBtn_clicked();
     void entityBtn_clicked();
+    void propertyBtn_clicked();
 };
 #endif // BLOCKREADERUI_H

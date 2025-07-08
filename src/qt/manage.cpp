@@ -39,8 +39,7 @@ update_model (DhInfoTypes type, QStandardItemModel *model)
     guint len = fullList ? g_list_length (fullList) : 0;
     for (int i = 0; i < len; i++)
         {
-            auto info = common_info_list_get_common_info (
-                type, (gchar *)g_list_nth_data (fullList, i));
+            auto uuid_s = (gchar*)g_list_nth_data (fullList, i);
             QStandardItem *description = new QStandardItem;
             QStandardItem *uuid = new QStandardItem;
             QStandardItem *time = new QStandardItem;
@@ -48,15 +47,15 @@ update_model (DhInfoTypes type, QStandardItemModel *model)
             uuid->setEditable (false);
             time->setEditable (false);
             // type->setEditable(false);
-            if (g_rw_lock_reader_trylock (&info->info_lock))
+            if (common_info_reader_trylock (type,uuid_s))
                 {
-                    description->setData (QString (info->description), 2);
+                    description->setData (QString (common_info_get_description (type, uuid_s)), 2);
                     uuid->setData (
-                        QString ((gchar *)g_list_nth_data (fullList, i)), 0);
+                        QString (uuid_s), 0);
                     time->setData (
-                        QString (g_date_time_format (info->time, "%T")), 0);
+                        QString (g_date_time_format (common_info_get_time(type, uuid_s), "%T")), 0);
                     // type->setData(getTypeOfNbt(info->type), 0);
-                    g_rw_lock_reader_unlock (&info->info_lock);
+                    common_info_reader_unlock (type, uuid_s);
                 }
             else
                 {
