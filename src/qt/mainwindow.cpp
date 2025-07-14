@@ -1,7 +1,7 @@
 #include "mainwindow.h"
-#include "../translation.h"
 #include "../common_info.h"
 #include "../region.h"
+#include "../translation.h"
 #include "blockreaderui.h"
 #include "configui.h"
 #include "dh_file_util.h"
@@ -15,6 +15,7 @@
 #include "ui_mainwindow.h"
 #include "utility.h"
 #include <QFileDialog>
+#include <addtranslationui.h>
 #include <generalchooseui.h>
 #include <qcontainerfwd.h>
 #include <qdialog.h>
@@ -98,6 +99,8 @@ MainWindow::initSignalSlots ()
                       &MainWindow::openglBtn_clicked);
     QObject::connect (ui->action_about, &QAction::triggered, this,
                       &MainWindow::showabout);
+    QObject::connect (ui->addBtn, &QPushButton::clicked, this,
+                      &MainWindow::addBtn_clicked);
 }
 
 void
@@ -270,7 +273,6 @@ MainWindow::nbtReaderBtn_clicked ()
 void
 MainWindow::nbtReaderBtn_finished (int ret)
 {
-
 }
 
 void
@@ -295,4 +297,12 @@ MainWindow::showabout ()
     QString str = _ ("Version: ") + QString (DHLRC_VERSION) + '-'
                   + QString::number (DHLRC_COMPILE_DATE);
     QMessageBox::about (this, _ ("About Litematica Reader"), str);
+}
+
+void
+MainWindow::addBtn_clicked ()
+{
+    auto atui = new AddTranslationUI();
+    atui->setAttribute (Qt::WA_DeleteOnClose);
+    atui->exec ();
 }

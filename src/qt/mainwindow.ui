@@ -165,6 +165,20 @@
             </property>
            </widget>
           </item>
+          <item>
+           <widget class="QPushButton" name="trBtn">
+            <property name="text">
+             <string>Block and Translation</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="addBtn">
+            <property name="text">
+             <string>Add Translation</string>
+            </property>
+           </widget>
+          </item>
          </layout>
         </item>
        </layout>

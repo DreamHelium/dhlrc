@@ -39,7 +39,7 @@ update_model (DhInfoTypes type, QStandardItemModel *model)
     guint len = fullList ? g_list_length (fullList) : 0;
     for (int i = 0; i < len; i++)
         {
-            auto uuid_s = (gchar*)g_list_nth_data (fullList, i);
+            auto uuid_s = (gchar *)g_list_nth_data (fullList, i);
             QStandardItem *description = new QStandardItem;
             QStandardItem *uuid = new QStandardItem;
             QStandardItem *time = new QStandardItem;
@@ -47,13 +47,16 @@ update_model (DhInfoTypes type, QStandardItemModel *model)
             uuid->setEditable (false);
             time->setEditable (false);
             // type->setEditable(false);
-            if (common_info_reader_trylock (type,uuid_s))
+            if (common_info_reader_trylock (type, uuid_s))
                 {
-                    description->setData (QString (common_info_get_description (type, uuid_s)), 2);
-                    uuid->setData (
-                        QString (uuid_s), 0);
+                    description->setData (
+                        QString (common_info_get_description (type, uuid_s)),
+                        2);
+                    uuid->setData (QString (uuid_s), 0);
                     time->setData (
-                        QString (g_date_time_format (common_info_get_time(type, uuid_s), "%T")), 0);
+                        QString (g_date_time_format (
+                            common_info_get_time (type, uuid_s), "%T")),
+                        0);
                     // type->setData(getTypeOfNbt(info->type), 0);
                     common_info_reader_unlock (type, uuid_s);
                 }
@@ -229,10 +232,7 @@ ManageRegion::ManageRegion ()
                                           update_region_model);
 }
 
-ManageRegion::~ManageRegion ()
-{
-    delete model;
-}
+ManageRegion::~ManageRegion () { delete model; }
 
 void
 ManageRegion::updateModel ()
@@ -360,10 +360,7 @@ ManageNbtInterface::ManageNbtInterface ()
         DH_TYPE_NBT_INTERFACE_CPP, (void *)this, update_interface_model);
 }
 
-ManageNbtInterface::~ManageNbtInterface ()
-{
-    delete model;
-}
+ManageNbtInterface::~ManageNbtInterface () { delete model; }
 
 void
 ManageNbtInterface::add_triggered ()

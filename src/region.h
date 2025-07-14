@@ -48,7 +48,6 @@ extern "C"
     {
         int index;
         Pos *pos;
-        char *id_name;
         int palette;
         void *nbt_instance;
     } BlockInfo;
@@ -91,6 +90,11 @@ extern "C"
     Region *region_new_from_lite_region (LiteRegion *lr);
     Region *region_new_from_nbt_file (const char *filepos);
     Region *region_new_from_nbt_instance_ptr (void *instance_ptr);
+    gboolean palette_is_same (Palette *a, Palette *b);
+    char *block_info_get_id_name (Region *region, BlockInfo *info);
+    void region_modify_property (Region *region, BlockInfo *info,
+                                 gboolean all_modify, DhStrArray *new_data);
+    Palette *region_get_palette (Region *region, int val);
     ItemList *item_list_new_from_multi_region (const char **region_uuid_arr);
     void region_free (Region *region);
 

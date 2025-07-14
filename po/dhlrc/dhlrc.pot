@@ -15,7 +15,7 @@ msgstr ""
 "#-#-#-#-#  dhlrc.pot (dhlrc)  #-#-#-#-#\n"
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-07-08 21:53+0800\n"
+"POT-Creation-Date: 2025-07-14 16:25+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -23,6 +23,31 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+
+#: ../../src/qt/addtranslationui.ui:14
+msgctxt "AddTranslationUI|"
+msgid "Add Translation"
+msgstr ""
+
+#: ../../src/qt/addtranslationui.ui:20
+msgctxt "AddTranslationUI|"
+msgid "Choose the translation file and version"
+msgstr ""
+
+#: ../../src/qt/addtranslationui.ui:29
+msgctxt "AddTranslationUI|"
+msgid "File directory:"
+msgstr ""
+
+#: ../../src/qt/addtranslationui.ui:53
+msgctxt "AddTranslationUI|"
+msgid "Version:"
+msgstr ""
+
+#: ../../src/qt/addtranslationui.ui:63
+msgctxt "AddTranslationUI|"
+msgid "version"
+msgstr ""
 
 #: ../../src/qt/blocklistui.ui:14
 msgctxt "BlockListUI|"
@@ -257,7 +282,17 @@ msgctxt "MainWindow|"
 msgid "Test OpenGL"
 msgstr ""
 
-#: ../../src/qt/mainwindow.ui:187 ../../src/qt/mainwindow.ui:196
+#: ../../src/qt/mainwindow.ui:171
+msgctxt "MainWindow|"
+msgid "Block and Translation"
+msgstr ""
+
+#: ../../src/qt/mainwindow.ui:178
+msgctxt "MainWindow|"
+msgid "Add Translation"
+msgstr ""
+
+#: ../../src/qt/mainwindow.ui:201 ../../src/qt/mainwindow.ui:210
 msgctxt "MainWindow|"
 msgid "&About"
 msgstr ""
@@ -317,17 +352,17 @@ msgctxt "NbtReaderUI|"
 msgid "Key:"
 msgstr ""
 
-#: ../../src/qt/nbtreaderui.ui:99
+#: ../../src/qt/nbtreaderui.ui:101
 msgctxt "NbtReaderUI|"
 msgid "Value:"
 msgstr ""
 
-#: ../../src/qt/nbtreaderui.ui:121
+#: ../../src/qt/nbtreaderui.ui:123
 msgctxt "NbtReaderUI|"
 msgid "Modify"
 msgstr ""
 
-#: ../../src/qt/nbtreaderui.ui:128
+#: ../../src/qt/nbtreaderui.ui:130
 msgctxt "NbtReaderUI|"
 msgid "Close"
 msgstr ""
@@ -400,7 +435,7 @@ msgstr ""
 msgid "Error when reading file."
 msgstr ""
 
-#: src/main_isoc.c:108 src/qt/utility.cpp:119
+#: src/main_isoc.c:108 src/qt/utility.cpp:163
 msgid "Not a valid NBT file!"
 msgstr ""
 
@@ -509,47 +544,55 @@ msgstr ""
 msgid "No"
 msgstr ""
 
-#: src/qt/blocklistui.cpp:31
+#: src/qt/addtranslationui.cpp:25
+msgid "Select Translation File"
+msgstr ""
+
+#: src/qt/addtranslationui.cpp:39 src/qt/addtranslationui.cpp:41
+msgid "Invalid!"
+msgstr ""
+
+#: src/qt/blocklistui.cpp:25
 msgid "Ignore Air?"
 msgstr ""
 
-#: src/qt/blocklistui.cpp:31
+#: src/qt/blocklistui.cpp:26
 msgid "Do you want to ignore air?"
 msgstr ""
 
-#: src/qt/blocklistui.cpp:48 src/qt/blocklistui.cpp:50
+#: src/qt/blocklistui.cpp:46 src/qt/blocklistui.cpp:49
 msgid "id"
 msgstr ""
 
-#: src/qt/blocklistui.cpp:48 src/qt/blocklistui.cpp:50
+#: src/qt/blocklistui.cpp:46 src/qt/blocklistui.cpp:49
 msgid "id Name"
 msgstr ""
 
-#: src/qt/blocklistui.cpp:48
+#: src/qt/blocklistui.cpp:46
 msgid "Block Name"
 msgstr ""
 
-#: src/qt/blocklistui.cpp:48 src/qt/blocklistui.cpp:50
+#: src/qt/blocklistui.cpp:46 src/qt/blocklistui.cpp:49
 msgid "x"
 msgstr ""
 
-#: src/qt/blocklistui.cpp:49 src/qt/blocklistui.cpp:51
+#: src/qt/blocklistui.cpp:47 src/qt/blocklistui.cpp:49
 msgid "y"
 msgstr ""
 
-#: src/qt/blocklistui.cpp:49 src/qt/blocklistui.cpp:51
+#: src/qt/blocklistui.cpp:47 src/qt/blocklistui.cpp:50
 msgid "z"
 msgstr ""
 
-#: src/qt/blocklistui.cpp:49 src/qt/blocklistui.cpp:51
+#: src/qt/blocklistui.cpp:47 src/qt/blocklistui.cpp:50
 msgid "Palette"
 msgstr ""
 
-#: src/qt/blockreaderui.cpp:47
+#: src/qt/blockreaderui.cpp:52
 msgid "Lack the translation module, will not try to get translation!"
 msgstr ""
 
-#: src/qt/blockreaderui.cpp:93
+#: src/qt/blockreaderui.cpp:109
 msgid ""
 "Name: %1\n"
 "Translation name: %2\n"
@@ -558,7 +601,7 @@ msgid ""
 "Properties:\n"
 msgstr ""
 
-#: src/qt/blockreaderui.cpp:98
+#: src/qt/blockreaderui.cpp:119
 msgid ""
 "Name: %1\n"
 "Index: %2\n"
@@ -566,27 +609,27 @@ msgid ""
 "Properties:\n"
 msgstr ""
 
-#: src/qt/blockreaderui.cpp:122
+#: src/qt/blockreaderui.cpp:151
 msgid "Not valid!"
 msgstr ""
 
-#: src/qt/blockreaderui.cpp:131
+#: src/qt/blockreaderui.cpp:161
 msgid "With DataVersion %4, version %5."
 msgstr ""
 
-#: src/qt/blockreaderui.cpp:133
+#: src/qt/blockreaderui.cpp:163
 msgid "Created time: %6, Modified time: %7, Author: %8, Name: %9"
 msgstr ""
 
-#: src/qt/blockreaderui.cpp:135
+#: src/qt/blockreaderui.cpp:165
 msgid "Description: %10"
 msgstr ""
 
-#: src/qt/blockreaderui.cpp:172
+#: src/qt/blockreaderui.cpp:214
 msgid "Select an option."
 msgstr ""
 
-#: src/qt/blockreaderui.cpp:173
+#: src/qt/blockreaderui.cpp:215
 msgid ""
 "Do you want to modify the property of this block or blocks that has the same "
 "property?\n"
@@ -597,40 +640,40 @@ msgstr ""
 msgid "Please select object(s):"
 msgstr ""
 
-#: src/qt/generalchooseui.cpp:57 src/qt/generalchooseui.cpp:58
-#: src/qt/manage.cpp:62 src/qt/manage.cpp:63 src/qt/manage.cpp:64
+#: src/qt/generalchooseui.cpp:64 src/qt/generalchooseui.cpp:66
+#: src/qt/manage.cpp:65 src/qt/manage.cpp:66 src/qt/manage.cpp:67
 msgid "locked"
 msgstr ""
 
-#: src/qt/generalchooseui.cpp:66 src/qt/generalchooseui.cpp:85
-#: src/qt/lrchooseui.cpp:62 src/qt/recipesui.cpp:140
+#: src/qt/generalchooseui.cpp:74 src/qt/generalchooseui.cpp:95
+#: src/qt/lrchooseui.cpp:61 src/qt/recipesui.cpp:140
 #: src/qt/saveregionselectui.cpp:50 src/gtk/manage_window.c:118
 msgid "&OK"
 msgstr ""
 
-#: src/qt/generalchooseui.cpp:67 src/qt/lrchooseui.cpp:63
+#: src/qt/generalchooseui.cpp:75 src/qt/lrchooseui.cpp:62
 #: src/qt/recipesui.cpp:141 src/qt/saveregionselectui.cpp:51
 #: src/gtk/manage_window.c:121
 msgid "&Close"
 msgstr ""
 
-#: src/qt/generalchooseui.cpp:82
+#: src/qt/generalchooseui.cpp:92
 msgid "No object available!"
 msgstr ""
 
-#: src/qt/generalchooseui.cpp:121 src/qt/ilreaderui.cpp:111
-#: src/qt/mainwindow.cpp:153 src/qt/mainwindow.cpp:173
-#: src/qt/mainwindow.cpp:204 src/qt/mainwindow.cpp:209
-#: src/qt/mainwindow.cpp:230 src/qt/mainwindow.cpp:235
-#: src/qt/mainwindow.cpp:267 src/qt/manage.cpp:28 src/qt/manage.cpp:324
-#: src/qt/manage.cpp:339 src/qt/manage.cpp:487
-#: src/qt/saveregionselectui.cpp:127 src/qt/utility.cpp:43
-#: src/qt/utility.cpp:66 src/qt/utility.cpp:78 src/qt/utility.cpp:82
-#: src/qt/utility.cpp:84 src/qt/utility.cpp:91 src/qt/utility.cpp:148
+#: src/qt/generalchooseui.cpp:138 src/qt/ilreaderui.cpp:111
+#: src/qt/mainwindow.cpp:156 src/qt/mainwindow.cpp:176
+#: src/qt/mainwindow.cpp:207 src/qt/mainwindow.cpp:212
+#: src/qt/mainwindow.cpp:233 src/qt/mainwindow.cpp:238
+#: src/qt/mainwindow.cpp:270 src/qt/manage.cpp:28 src/qt/manage.cpp:324
+#: src/qt/manage.cpp:339 src/qt/manage.cpp:484
+#: src/qt/saveregionselectui.cpp:127 src/qt/utility.cpp:47
+#: src/qt/utility.cpp:79 src/qt/utility.cpp:100 src/qt/utility.cpp:110
+#: src/qt/utility.cpp:115 src/qt/utility.cpp:124 src/qt/utility.cpp:195
 msgid "Error!"
 msgstr ""
 
-#: src/qt/generalchooseui.cpp:121
+#: src/qt/generalchooseui.cpp:139
 msgid "No item list selected!"
 msgstr ""
 
@@ -670,58 +713,58 @@ msgstr ""
 msgid "Show history"
 msgstr ""
 
-#: src/qt/ilreaderui.cpp:111 src/qt/mainwindow.cpp:154
-#: src/qt/mainwindow.cpp:174
+#: src/qt/ilreaderui.cpp:111 src/qt/mainwindow.cpp:157
+#: src/qt/mainwindow.cpp:177
 msgid "The item list is locked!"
 msgstr ""
 
-#: src/qt/lrchooseui.cpp:27
+#: src/qt/lrchooseui.cpp:21
 msgid "Please select region(s) of the Litematic"
 msgstr ""
 
-#: src/qt/lrchooseui.cpp:46
+#: src/qt/lrchooseui.cpp:42
 msgid "&All"
 msgstr ""
 
-#: src/qt/lrchooseui.cpp:53
+#: src/qt/lrchooseui.cpp:51
 msgid ""
 "Please enter the new Region(s)' name(s): (%1 represents the NBT description "
 "and %2 represents the original region's name):"
 msgstr ""
 
-#: src/qt/lrchooseui.cpp:55
+#: src/qt/lrchooseui.cpp:54
 msgid "Enter description here."
 msgstr ""
 
-#: src/qt/mainwindow.cpp:192 src/qt/saveregionselectui.cpp:116
+#: src/qt/mainwindow.cpp:195 src/qt/saveregionselectui.cpp:116
 msgid "Enter Name for Item List"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:193 src/qt/saveregionselectui.cpp:117
+#: src/qt/mainwindow.cpp:196 src/qt/saveregionselectui.cpp:117
 msgid "Enter the name for item list"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:205 src/qt/saveregionselectui.cpp:128
+#: src/qt/mainwindow.cpp:208 src/qt/saveregionselectui.cpp:128
 msgid "Description is empty!"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:210 src/qt/mainwindow.cpp:236
+#: src/qt/mainwindow.cpp:213 src/qt/mainwindow.cpp:239
 msgid "No Region or no Region selected!"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:231
+#: src/qt/mainwindow.cpp:234
 msgid "Region is locked!"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:267
+#: src/qt/mainwindow.cpp:270
 msgid "No NBT is selected!"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:295
+#: src/qt/mainwindow.cpp:297
 msgid "Version: "
 msgstr ""
 
-#: src/qt/mainwindow.cpp:297
+#: src/qt/mainwindow.cpp:299
 msgid "About Litematica Reader"
 msgstr ""
 
@@ -729,19 +772,19 @@ msgstr ""
 msgid "No row is selected!"
 msgstr ""
 
-#: src/qt/manage.cpp:73
+#: src/qt/manage.cpp:76
 msgid "Description"
 msgstr ""
 
-#: src/qt/manage.cpp:73
+#: src/qt/manage.cpp:76
 msgid "UUID"
 msgstr ""
 
-#: src/qt/manage.cpp:73
+#: src/qt/manage.cpp:76
 msgid "Time"
 msgstr ""
 
-#: src/qt/manage.cpp:227 src/cli/main_cli.c:39 src/cli/main_cli.c:49
+#: src/qt/manage.cpp:230 src/cli/main_cli.c:39 src/cli/main_cli.c:49
 msgid "Manage Region"
 msgstr ""
 
@@ -761,31 +804,31 @@ msgstr ""
 msgid "Manage NBT Interface"
 msgstr ""
 
-#: src/qt/manage.cpp:372
+#: src/qt/manage.cpp:369
 msgid "Select a file"
 msgstr ""
 
-#: src/qt/manage.cpp:373
+#: src/qt/manage.cpp:370
 msgid "Litematic file (*.litematic);;NBT File (*.nbt)"
 msgstr ""
 
-#: src/qt/manage.cpp:418
+#: src/qt/manage.cpp:415
 msgid "Save File"
 msgstr ""
 
-#: src/qt/manage.cpp:438
+#: src/qt/manage.cpp:435
 msgid "Info Locked!"
 msgstr ""
 
-#: src/qt/manage.cpp:439
+#: src/qt/manage.cpp:436
 msgid "The NBT info is locked!"
 msgstr ""
 
-#: src/qt/manage.cpp:445
+#: src/qt/manage.cpp:442
 msgid "Save Files"
 msgstr ""
 
-#: src/qt/manage.cpp:481
+#: src/qt/manage.cpp:478
 msgid "The following infos are locked:\n"
 msgstr ""
 
@@ -797,15 +840,15 @@ msgstr ""
 msgid "Not supported recipe!"
 msgstr ""
 
-#: src/qt/recipesshowui.cpp:25
+#: src/qt/recipesshowui.cpp:26
 msgid "The recipe is not supported!"
 msgstr ""
 
-#: src/qt/recipesshowui.cpp:41
+#: src/qt/recipesshowui.cpp:45
 msgid "The pattern is:"
 msgstr ""
 
-#: src/qt/recipesshowui.cpp:49
+#: src/qt/recipesshowui.cpp:53
 msgid "The item is:"
 msgstr ""
 
@@ -904,55 +947,55 @@ msgstr ""
 msgid "The track information is:\n"
 msgstr ""
 
-#: src/qt/utility.cpp:43
+#: src/qt/utility.cpp:48
 msgid "No NBT or no NBT selected!"
 msgstr ""
 
-#: src/qt/utility.cpp:63 src/qt/utility.cpp:75
+#: src/qt/utility.cpp:72 src/qt/utility.cpp:93
 msgid "Enter Region Name"
 msgstr ""
 
-#: src/qt/utility.cpp:63 src/qt/utility.cpp:75
+#: src/qt/utility.cpp:73 src/qt/utility.cpp:94
 msgid "Enter name for the new Region."
 msgstr ""
 
-#: src/qt/utility.cpp:66 src/qt/utility.cpp:78
+#: src/qt/utility.cpp:80 src/qt/utility.cpp:101
 msgid "No description for the Region!"
 msgstr ""
 
-#: src/qt/utility.cpp:82
+#: src/qt/utility.cpp:111
 msgid "Unknown error!"
 msgstr ""
 
-#: src/qt/utility.cpp:84
+#: src/qt/utility.cpp:116
 msgid "The NBT Struct is unsupported!"
 msgstr ""
 
-#: src/qt/utility.cpp:91
+#: src/qt/utility.cpp:125
 msgid "This NBT is locked!"
 msgstr ""
 
-#: src/qt/utility.cpp:102 src/gtk/manage_nbt.c:131
+#: src/qt/utility.cpp:139 src/gtk/manage_nbt.c:131
 msgid "Enter Desciption"
 msgstr ""
 
-#: src/qt/utility.cpp:102
+#: src/qt/utility.cpp:140
 msgid "Enter desciption for the NBT file."
 msgstr ""
 
-#: src/qt/utility.cpp:104
+#: src/qt/utility.cpp:144
 msgid "No Description Entered!"
 msgstr ""
 
-#: src/qt/utility.cpp:104
+#: src/qt/utility.cpp:145
 msgid "No desciption entered! Will not add the NBT file!"
 msgstr ""
 
-#: src/qt/utility.cpp:119
+#: src/qt/utility.cpp:162
 msgid "Not Valid File!"
 msgstr ""
 
-#: src/qt/utility.cpp:142
+#: src/qt/utility.cpp:189
 msgid "The following files couldn't be added:\n"
 msgstr ""
 

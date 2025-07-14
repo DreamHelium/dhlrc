@@ -5,6 +5,31 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Qt-Contexts: true\n"
 
+#: ../../src/qt/addtranslationui.ui:14
+msgctxt "AddTranslationUI|"
+msgid "Add Translation"
+msgstr ""
+
+#: ../../src/qt/addtranslationui.ui:20
+msgctxt "AddTranslationUI|"
+msgid "Choose the translation file and version"
+msgstr ""
+
+#: ../../src/qt/addtranslationui.ui:29
+msgctxt "AddTranslationUI|"
+msgid "File directory:"
+msgstr ""
+
+#: ../../src/qt/addtranslationui.ui:53
+msgctxt "AddTranslationUI|"
+msgid "Version:"
+msgstr ""
+
+#: ../../src/qt/addtranslationui.ui:63
+msgctxt "AddTranslationUI|"
+msgid "version"
+msgstr ""
+
 #: ../../src/qt/blocklistui.ui:14
 msgctxt "BlockListUI|"
 msgid "Show Block Lists"
@@ -238,7 +263,17 @@ msgctxt "MainWindow|"
 msgid "Test OpenGL"
 msgstr ""
 
-#: ../../src/qt/mainwindow.ui:187 ../../src/qt/mainwindow.ui:196
+#: ../../src/qt/mainwindow.ui:171
+msgctxt "MainWindow|"
+msgid "Block and Translation"
+msgstr ""
+
+#: ../../src/qt/mainwindow.ui:178
+msgctxt "MainWindow|"
+msgid "Add Translation"
+msgstr ""
+
+#: ../../src/qt/mainwindow.ui:201 ../../src/qt/mainwindow.ui:210
 msgctxt "MainWindow|"
 msgid "&About"
 msgstr ""
@@ -298,17 +333,17 @@ msgctxt "NbtReaderUI|"
 msgid "Key:"
 msgstr ""
 
-#: ../../src/qt/nbtreaderui.ui:99
+#: ../../src/qt/nbtreaderui.ui:101
 msgctxt "NbtReaderUI|"
 msgid "Value:"
 msgstr ""
 
-#: ../../src/qt/nbtreaderui.ui:121
+#: ../../src/qt/nbtreaderui.ui:123
 msgctxt "NbtReaderUI|"
 msgid "Modify"
 msgstr ""
 
-#: ../../src/qt/nbtreaderui.ui:128
+#: ../../src/qt/nbtreaderui.ui:130
 msgctxt "NbtReaderUI|"
 msgid "Close"
 msgstr ""

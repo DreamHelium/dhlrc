@@ -24,27 +24,29 @@
 #include "recipe_util.h"
 #include "translation.h"
 
-static GResource* res = NULL;
+static GResource *res = NULL;
 
-gboolean dhlrc_common_contents_init(const char* prname)
+gboolean
+dhlrc_common_contents_init (const char *prname)
 {
-    char* prpath = dh_file_get_current_program_dir(prname);
-    char* res_path = g_strconcat(prpath, G_DIR_SEPARATOR_S, "dhlrc_resources", NULL);
-    GError* err = NULL;
-    res = g_resource_load(res_path, &err);
-    g_free(prpath);
-    g_free(res_path);
-    if(err)
-    {
-        g_message("Load resource error with message: %s.", err->message);
-        g_error_free(err);
-        return FALSE;
-    }
+    char *prpath = dh_file_get_current_program_dir (prname);
+    char *res_path
+        = g_strconcat (prpath, G_DIR_SEPARATOR_S, "dhlrc_resources", NULL);
+    GError *err = NULL;
+    res = g_resource_load (res_path, &err);
+    g_free (prpath);
+    g_free (res_path);
+    if (err)
+        {
+            g_message ("Load resource error with message: %s.", err->message);
+            g_error_free (err);
+            return FALSE;
+        }
     else
-    {
-        g_resources_register(res);
-        return TRUE;
-    }
+        {
+            g_resources_register (res);
+            return TRUE;
+        }
 }
 
 GResource *
@@ -53,7 +55,7 @@ dhlrc_get_resource ()
     return res;
 }
 void
-dhlrc_init (const char* prname)
+dhlrc_init (const char *prname)
 {
     translation_init (prname);
     dhlrc_make_config ();
@@ -78,7 +80,8 @@ dhlrc_cleanup ()
     dh_exit1 ();
 }
 
-void dhlrc_common_contents_free()
+void
+dhlrc_common_contents_free ()
 {
-    g_resource_unref(res);
+    g_resource_unref (res);
 }

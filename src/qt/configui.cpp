@@ -1,4 +1,5 @@
 #include "configui.h"
+#include "../json_util.h"
 #include "dh_file_util.h"
 #include "glibconfig.h"
 #include "ui_configui.h"
@@ -7,126 +8,153 @@
 #include <glib.h>
 #include <qobject.h>
 #include <qpushbutton.h>
-#include "../json_util.h"
 
-static cJSON* configFile = nullptr;
+static cJSON *configFile = nullptr;
 
 static QString configFilePath;
 
-ConfigUI::ConfigUI(QWidget *parent) :
-    QDialog(parent),
-    ui(new Ui::ConfigUI)
+ConfigUI::ConfigUI (QWidget *parent) : QDialog (parent), ui (new Ui::ConfigUI)
 {
-    ui->setupUi(this);
-    initSignalSlots();
-    setTextContent();
+    ui->setupUi (this);
+    initSignalSlots ();
+    setTextContent ();
 }
 
-ConfigUI::~ConfigUI()
+ConfigUI::~ConfigUI ()
 {
-    cJSON_Delete(configFile);
+    cJSON_Delete (configFile);
     delete ui;
 }
 
-void ConfigUI::setTextContent()
+void
+ConfigUI::setTextContent ()
 {
-    configFilePath = g_get_user_config_dir();
+    configFilePath = g_get_user_config_dir ();
     configFilePath += "/dhlrc/config.json";
-    configFile = dhlrc_file_to_json(configFilePath.toStdString().c_str());
-    ui->lineEdit->setText(searchText("overrideLang"));
-    ui->lineEdit_2->setText(searchText("recipeConfig"));
-    ui->lineEdit_3->setText(searchText("itemTranslate"));
-    ui->lineEdit_4->setText(searchText("gameDir"));
-    ui->lineEdit_5->setText(searchText("cacheDir"));
-    ui->lineEdit_6->setText(searchText("overrideVersion"));
-    ui->lineEdit_8->setText(searchText("assetsDir"));
+    configFile = dhlrc_file_to_json (configFilePath.toStdString ().c_str ());
+    ui->lineEdit->setText (searchText ("overrideLang"));
+    ui->lineEdit_2->setText (searchText ("recipeConfig"));
+    ui->lineEdit_3->setText (searchText ("itemTranslate"));
+    ui->lineEdit_4->setText (searchText ("gameDir"));
+    ui->lineEdit_5->setText (searchText ("cacheDir"));
+    ui->lineEdit_6->setText (searchText ("overrideVersion"));
+    ui->lineEdit_8->setText (searchText ("assetsDir"));
 }
 
-void ConfigUI::initSignalSlots()
+void
+ConfigUI::initSignalSlots ()
 {
-    QObject::connect(ui->resetButton1, &QPushButton::clicked, this, &ConfigUI::reset1Btn_clicked);
-    QObject::connect(ui->resetButton2, &QPushButton::clicked, this, &ConfigUI::reset2Btn_clicked);
-    QObject::connect(ui->resetButton3, &QPushButton::clicked, this, &ConfigUI::reset3Btn_clicked);
-    QObject::connect(ui->resetButton4, &QPushButton::clicked, this, &ConfigUI::reset4Btn_clicked);
-    QObject::connect(ui->resetButton5, &QPushButton::clicked, this, &ConfigUI::reset5Btn_clicked);
-    QObject::connect(ui->resetButton6, &QPushButton::clicked, this, &ConfigUI::reset6Btn_clicked);
-    QObject::connect(ui->buttonBox, &QDialogButtonBox::accepted, this, &ConfigUI::okBtn_clicked);
+    QObject::connect (ui->resetButton1, &QPushButton::clicked, this,
+                      &ConfigUI::reset1Btn_clicked);
+    QObject::connect (ui->resetButton2, &QPushButton::clicked, this,
+                      &ConfigUI::reset2Btn_clicked);
+    QObject::connect (ui->resetButton3, &QPushButton::clicked, this,
+                      &ConfigUI::reset3Btn_clicked);
+    QObject::connect (ui->resetButton4, &QPushButton::clicked, this,
+                      &ConfigUI::reset4Btn_clicked);
+    QObject::connect (ui->resetButton5, &QPushButton::clicked, this,
+                      &ConfigUI::reset5Btn_clicked);
+    QObject::connect (ui->resetButton6, &QPushButton::clicked, this,
+                      &ConfigUI::reset6Btn_clicked);
+    QObject::connect (ui->buttonBox, &QDialogButtonBox::accepted, this,
+                      &ConfigUI::okBtn_clicked);
 }
 
-void ConfigUI::reset1Btn_clicked()
+void
+ConfigUI::reset1Btn_clicked ()
 {
-    ui->lineEdit->setText("");
+    ui->lineEdit->setText ("");
 }
 
-void ConfigUI::reset2Btn_clicked()
+void
+ConfigUI::reset2Btn_clicked ()
 {
     QString str = "recipes";
     str += G_DIR_SEPARATOR;
-    ui->lineEdit_2->setText(str);
+    ui->lineEdit_2->setText (str);
 }
 
-void ConfigUI::reset3Btn_clicked()
+void
+ConfigUI::reset3Btn_clicked ()
 {
-    ui->lineEdit_3->setText("translation.json");
+    ui->lineEdit_3->setText ("translation.json");
 }
 
-void ConfigUI::reset4Btn_clicked()
+void
+ConfigUI::reset4Btn_clicked ()
 {
 #ifdef __APPLE__
-    gchar* minecraft_dir = g_strconcat(g_get_home_dir(), "/Library/Application Support/minecraft", NULL);
+    gchar *minecraft_dir = g_strconcat (
+        g_get_home_dir (), "/Library/Application Support/minecraft", NULL);
 #elif defined G_OS_WIN32
-    gchar* minecraft_dir = g_strconcat(g_getenv("APPDATA"), "\\.minecraft", NULL);
+    gchar *minecraft_dir
+        = g_strconcat (g_getenv ("APPDATA"), "\\.minecraft", NULL);
 #else
-    gchar* minecraft_dir = g_strconcat(g_get_home_dir(), "/.minecraft", NULL);
+    gchar *minecraft_dir
+        = g_strconcat (g_get_home_dir (), "/.minecraft", NULL);
 #endif
-    ui->lineEdit_4->setText(minecraft_dir);
-    g_free(minecraft_dir);
+    ui->lineEdit_4->setText (minecraft_dir);
+    g_free (minecraft_dir);
 }
 
-void ConfigUI::reset5Btn_clicked()
+void
+ConfigUI::reset5Btn_clicked ()
 {
-    gchar* cache_dir = g_strconcat(g_get_user_cache_dir(), G_DIR_SEPARATOR_S ,"dhlrc", NULL);
-    ui->lineEdit_5->setText(cache_dir);
-    g_free(cache_dir);
+    gchar *cache_dir = g_strconcat (g_get_user_cache_dir (), G_DIR_SEPARATOR_S,
+                                    "dhlrc", NULL);
+    ui->lineEdit_5->setText (cache_dir);
+    g_free (cache_dir);
 }
 
-void ConfigUI::reset6Btn_clicked()
+void
+ConfigUI::reset6Btn_clicked ()
 {
-    ui->lineEdit_6->setText("1.18.2");
+    ui->lineEdit_6->setText ("1.18.2");
 }
 
-QString ConfigUI::searchText(const char* str)
+QString
+ConfigUI::searchText (const char *str)
 {
-    QString ret = QString("");
-    if(configFile)
-    {
-        char* retStr = cJSON_GetStringValue(cJSON_GetObjectItem(configFile, str));
-        
-        return retStr? retStr : ret;
-    }
-    else return ret;
-}
+    QString ret = QString ("");
+    if (configFile)
+        {
+            char *retStr
+                = cJSON_GetStringValue (cJSON_GetObjectItem (configFile, str));
 
-void ConfigUI::okBtn_clicked()
-{
-    setOrCreateItem("overrideLang", ui->lineEdit->text().toStdString().c_str());
-    setOrCreateItem("recipeConfig", ui->lineEdit_2->text().toStdString().c_str());
-    setOrCreateItem("itemTranslate", ui->lineEdit_3->text().toStdString().c_str());
-    setOrCreateItem("gameDir", ui->lineEdit_4->text().toStdString().c_str());
-    setOrCreateItem("cacheDir", ui->lineEdit_5->text().toStdString().c_str());
-    setOrCreateItem("overrideVersion", ui->lineEdit_6->text().toStdString().c_str());
-    char* data = cJSON_Print(configFile);
-    dh_write_file(configFilePath.toUtf8(), data, strlen(data));
-    free(data);
-}
-
-void ConfigUI::setOrCreateItem(const char* item, const char* val)
-{
-    cJSON* json_item = cJSON_GetObjectItem(configFile, item);
-    if(json_item)
-        cJSON_SetValuestring(json_item, val);
+            return retStr ? retStr : ret;
+        }
     else
-    {
-        cJSON_AddStringToObject(configFile, item, val);
-    };
+        return ret;
+}
+
+void
+ConfigUI::okBtn_clicked ()
+{
+    setOrCreateItem ("overrideLang",
+                     ui->lineEdit->text ().toStdString ().c_str ());
+    setOrCreateItem ("recipeConfig",
+                     ui->lineEdit_2->text ().toStdString ().c_str ());
+    setOrCreateItem ("itemTranslate",
+                     ui->lineEdit_3->text ().toStdString ().c_str ());
+    setOrCreateItem ("gameDir",
+                     ui->lineEdit_4->text ().toStdString ().c_str ());
+    setOrCreateItem ("cacheDir",
+                     ui->lineEdit_5->text ().toStdString ().c_str ());
+    setOrCreateItem ("overrideVersion",
+                     ui->lineEdit_6->text ().toStdString ().c_str ());
+    char *data = cJSON_Print (configFile);
+    dh_write_file (configFilePath.toUtf8 (), data, strlen (data));
+    free (data);
+}
+
+void
+ConfigUI::setOrCreateItem (const char *item, const char *val)
+{
+    cJSON *json_item = cJSON_GetObjectItem (configFile, item);
+    if (json_item)
+        cJSON_SetValuestring (json_item, val);
+    else
+        {
+            cJSON_AddStringToObject (configFile, item, val);
+        };
 }

@@ -2,6 +2,34 @@
 <!DOCTYPE TS>
 <TS version="2.1">
 <context>
+    <name>AddTranslationUI</name>
+    <message>
+        <location filename="../../src/qt/addtranslationui.ui" line="14"/>
+        <source>Add Translation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qt/addtranslationui.ui" line="20"/>
+        <source>Choose the translation file and version</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qt/addtranslationui.ui" line="29"/>
+        <source>File directory:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qt/addtranslationui.ui" line="53"/>
+        <source>Version:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qt/addtranslationui.ui" line="63"/>
+        <source>version</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>BlockListUI</name>
     <message>
         <location filename="../../src/qt/blocklistui.ui" line="14"/>
@@ -249,8 +277,18 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qt/mainwindow.ui" line="187"/>
-        <location filename="../../src/qt/mainwindow.ui" line="196"/>
+        <location filename="../../src/qt/mainwindow.ui" line="171"/>
+        <source>Block and Translation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qt/mainwindow.ui" line="178"/>
+        <source>Add Translation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qt/mainwindow.ui" line="201"/>
+        <location filename="../../src/qt/mainwindow.ui" line="210"/>
         <source>&amp;About</source>
         <translation type="unfinished"></translation>
     </message>
@@ -316,17 +354,17 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qt/nbtreaderui.ui" line="99"/>
+        <location filename="../../src/qt/nbtreaderui.ui" line="101"/>
         <source>Value:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qt/nbtreaderui.ui" line="121"/>
+        <location filename="../../src/qt/nbtreaderui.ui" line="123"/>
         <source>Modify</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qt/nbtreaderui.ui" line="128"/>
+        <location filename="../../src/qt/nbtreaderui.ui" line="130"/>
         <source>Close</source>
         <translation type="unfinished"></translation>
     </message>

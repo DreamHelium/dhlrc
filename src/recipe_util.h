@@ -24,17 +24,19 @@
 #include <dhutil.h>
 
 #ifdef __cplusplus
-extern "C"{
+extern "C"
+{
 #endif
 
-/** Get recipes and combine to ItemList (discard all the items) */
-// long *      num_array_get_from_input(int *array_num, int max_num);
+    /** Get recipes and combine to ItemList (discard all the items) */
+    // long *      num_array_get_from_input(int *array_num, int max_num);
 
-G_DEPRECATED
-const char* name_block_translate(const char* block_name);
-gboolean    dhlrc_found_transfile();
-    void dhlrc_update_transfile(const char* version, SetFunc set_func, void* klass, char** large_version);
-int         dh_exit();
+    G_DEPRECATED
+    const char *name_block_translate (const char *block_name);
+    gboolean dhlrc_found_transfile ();
+    void dhlrc_update_transfile (const char *version, SetFunc set_func,
+                                 void *klass, char **large_version);
+    int dh_exit ();
 
 #ifdef __cplusplus
 }

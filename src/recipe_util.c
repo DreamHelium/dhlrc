@@ -26,7 +26,7 @@
 #include <dhutil.h>
 
 static gboolean first_try = FALSE;
-static gchar* find_transfile();
+static gchar *find_transfile ();
 
 /*
 long* num_array_get_from_input(int* array_num, int max_num)
@@ -41,12 +41,12 @@ long* num_array_get_from_input(int* array_num, int max_num)
     dh_arg_info_add_arg(arg, 'a', "all", N_("Choose all numbers"));
     dh_arg_info_add_arg(arg, 'q', "quit", N_("Quit application"));
     GValue val = {0};
-    dh_out_read_and_output(out, N_("Please enter numbers or option: "), 
+    dh_out_read_and_output(out, N_("Please enter numbers or option: "),
     "dhlrc", arg, DH_VALIDATOR(validator), TRUE, &val);
     g_object_unref(out);
     g_object_unref(validator);
     g_object_unref(arg);
-    
+
     if(G_VALUE_HOLDS_POINTER(&val))
     {
         GList* list = g_value_get_pointer(&val);
@@ -86,9 +86,11 @@ long* num_array_get_from_input(int* array_num, int max_num)
 }
 */
 
-const char* name_block_translate(const char *block_name)
+const char *
+name_block_translate (const char *block_name)
 {
-    // if(!dhlrc_has_translation () && !first_try) /* No translation json and not try */
+    // if(!dhlrc_has_translation () && !first_try) /* No translation json and
+    // not try */
     // {
     //     first_try = TRUE;
     //     dhlrc_update_transfile ("1.18", NULL, NULL);
@@ -98,40 +100,44 @@ const char* name_block_translate(const char *block_name)
     return block_name;
 }
 
-static gchar* find_transfile(const char* version, SetFunc set_func, void* klass, char** large_version)
+static gchar *
+find_transfile (const char *version, SetFunc set_func, void *klass,
+                char **large_version)
 {
-    char* gamedir = dh_get_game_dir();
-    char* ret = NULL;
+    char *gamedir = dh_get_game_dir ();
+    char *ret = NULL;
     if (strchr (gamedir, ':'))
         g_error ("Multiple game directory is not supported!");
     /* OverrideLang is deprecated. */
     // char* override_lang = dh_get_override_lang();
-    const char* real_lang = NULL;
-    const char* const* locales = g_get_language_names();
-    const char* locale_lang = locales[0];
+    const char *real_lang = NULL;
+    const char *const *locales = g_get_language_names ();
+    const char *locale_lang = locales[0];
     real_lang = locale_lang;
 
-    *large_version = dhlrc_get_version_json_string (version, set_func, klass, 0 , 75);
+    *large_version
+        = dhlrc_get_version_json_string (version, set_func, klass, 0, 75);
 
     if (!*large_version)
         {
-            *large_version = g_strdup("1.18");
-            g_message("Large version not found, fall back to 1.18.");
+            *large_version = g_strdup ("1.18");
+            g_message ("Large version not found, fall back to 1.18.");
         }
 
-    ret = dhlrc_get_translation_file(gamedir, *large_version, real_lang);
-    if(!ret || !dh_file_exist(ret))
+    ret = dhlrc_get_translation_file (gamedir, *large_version, real_lang);
+    if (!ret || !dh_file_exist (ret))
         {
-            g_free(ret);
+            g_free (ret);
             ret = NULL;
         }
     else if (set_func && klass)
-        set_func(klass, 100);
-    g_free(gamedir);
+        set_func (klass, 100);
+    g_free (gamedir);
     return ret;
 }
 
-int dh_exit()
+int
+dh_exit ()
 {
     return 0;
 }
@@ -140,53 +146,56 @@ gboolean
 dhlrc_found_transfile ()
 {
     /* Try to initialize the file. */
-    const char* tr = name_block_translate ("minecraft:air");
-    if (g_str_equal(tr, "minecraft:air"))
+    const char *tr = name_block_translate ("minecraft:air");
+    if (g_str_equal (tr, "minecraft:air"))
         return FALSE;
     return TRUE;
 }
 
 typedef struct UpdateInfo
 {
-    char* version;
+    char *version;
     SetFunc set_func;
-    void* klass;
-    char** large_version;
-}UpdateInfo;
+    void *klass;
+    char **large_version;
+} UpdateInfo;
 
-static void update_info_free(gpointer data)
+static void
+update_info_free (gpointer data)
 {
-    UpdateInfo* info = data;
-    g_free(info->version);
-    g_free(info);
+    UpdateInfo *info = data;
+    g_free (info->version);
+    g_free (info);
 }
 
 static void
-real_update_transfile(GTask* task, gpointer source_object, gpointer task_data, GCancellable* cancellable)
+real_update_transfile (GTask *task, gpointer source_object, gpointer task_data,
+                       GCancellable *cancellable)
 {
-    UpdateInfo* data = task_data;
-    char* version = data->version;
+    UpdateInfo *data = task_data;
+    char *version = data->version;
     SetFunc set_func = data->set_func;
-    void* klass = data->klass;
-    char** large_version = data->large_version;
-    gchar* filename = find_transfile(version, set_func, klass, large_version);
+    void *klass = data->klass;
+    char **large_version = data->large_version;
+    gchar *filename = find_transfile (version, set_func, klass, large_version);
     /* The en_US translation is in the jar file, so ...... */
     if (filename)
         dhlrc_init_translation_from_file (filename, *large_version);
-    g_free(filename);
+    g_free (filename);
 }
 
 void
-dhlrc_update_transfile (const char* version, SetFunc set_func, void* klass, char** large_version)
+dhlrc_update_transfile (const char *version, SetFunc set_func, void *klass,
+                        char **large_version)
 {
-    GTask* task = g_task_new(NULL, NULL, NULL, NULL);
-    UpdateInfo* info = g_new0(UpdateInfo, 1);
-    info->version = g_strdup(version);
+    GTask *task = g_task_new (NULL, NULL, NULL, NULL);
+    UpdateInfo *info = g_new0 (UpdateInfo, 1);
+    info->version = g_strdup (version);
     info->set_func = set_func;
     info->klass = klass;
     info->large_version = large_version;
-    g_task_set_task_data(task, info, update_info_free);
-    g_task_run_in_thread(task, real_update_transfile);
+    g_task_set_task_data (task, info, update_info_free);
+    g_task_run_in_thread (task, real_update_transfile);
 
-    g_object_unref(task);
+    g_object_unref (task);
 }

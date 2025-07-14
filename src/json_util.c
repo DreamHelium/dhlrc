@@ -18,16 +18,20 @@
 #include "json_util.h"
 #include <dhutil.h>
 
-cJSON* dhlrc_file_to_json(const char* pos)
+cJSON *
+dhlrc_file_to_json (const char *pos)
 {
     gsize size;
-    char* data = dh_read_file(pos, &size);
-    if(data)
-    {
-        cJSON* json_data = cJSON_ParseWithLength(data, size);
-        free(data);
-        if(json_data) return json_data;
-        else return NULL;
-    }
-    else return NULL;
+    char *data = dh_read_file (pos, &size);
+    if (data)
+        {
+            cJSON *json_data = cJSON_ParseWithLength (data, size);
+            free (data);
+            if (json_data)
+                return json_data;
+            else
+                return NULL;
+        }
+    else
+        return NULL;
 }

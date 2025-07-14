@@ -46,5 +46,6 @@ private Q_SLOTS:
     void recipeBtn_clicked();
     void openglBtn_clicked();
     void showabout();
+    void addBtn_clicked();
 };
 #endif // MAINWINDOW_H
