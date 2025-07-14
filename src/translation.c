@@ -30,7 +30,11 @@ void translation_init(const char* prog_name)
         char* dir = dh_file_get_current_program_dir(prog_name);
         set_locale_to_utf8();
         char* locale_dir = g_strconcat(dir, G_DIR_SEPARATOR_S, "locale", NULL);
+#ifdef LOCALEDIR
+        bindtextdomain("dhlrc", LOCALEDIR);
+#else
         bindtextdomain("dhlrc", locale_dir);
+#endif
         /* Force the output for UTF-8 */
         bind_textdomain_codeset("dhlrc", "UTF-8");
         textdomain("dhlrc");

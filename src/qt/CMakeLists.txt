@@ -93,11 +93,6 @@ set_target_properties(dhlrc_qt PROPERTIES
 )
 
 include(GNUInstallDirs)
-install(TARGETS dhlrc_qt
-        BUNDLE DESTINATION .
-        LIBRARY DESTINATION ${CMAKE_INSTALL_BINDIR}/module
-        #    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-)
 
 if (QT_VERSION_MAJOR EQUAL 6)
     qt_finalize_executable(dhlrc_qt)

@@ -65,14 +65,20 @@ debug (int argc, char **argv)
 static gboolean
 get_module (const char *arg_zero, const char *module_name)
 {
+    char* module_path = NULL;
     char *prpath = dh_file_get_current_program_dir (arg_zero);
     /* All platforms the module will be in module directory, sorry */
-    char *module_path
+#ifdef MODULEDIR
+    module_path = g_strdup(MODULEDIR);
+#else
+    module_path
         = g_strconcat (prpath, G_DIR_SEPARATOR_S, "module", NULL);
+#endif
 
     g_free (prpath);
     char *dir
         = g_build_path (G_DIR_SEPARATOR_S, module_path, module_name, NULL);
+    g_free(module_path);
     GError *err = NULL;
     GModule *new_module = g_module_open_full (dir, 0, &err);
     if (module_name == QT_MODULE_NAME)

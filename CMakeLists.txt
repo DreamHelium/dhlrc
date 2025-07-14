@@ -1,19 +1,24 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 3.16)
 PROJECT( dhlrc )
 
+set(INSTALL_NOW ON)
+
+include(GNUInstallDirs)
 set(CMAKE_BUILD_TYPE Debug)
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR})
-set(LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR}/lib/shared)
-set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_C_STANDARD 11)
+
+set(LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR})
 
 find_package(Gettext)
 find_package(PkgConfig)
 
 pkg_search_module(GIO REQUIRED gio-2.0)
 pkg_search_module(gm REQUIRED gmodule-2.0)
-pkg_search_module(minizip REQUIRED minizip-ng)
+#pkg_search_module(minizip REQUIRED minizip-ng)
+pkg_search_module(UTIL dhutil)
+pkg_search_module(INTERFACE dhnbt_interface_cpp)
 
 set(DH_ENABLE_TRANSLATION true)
 
@@ -35,5 +40,5 @@ if(DH_ENABLE_TRANSLATION)
     add_subdirectory( po )
 endif()
 
-#file(COPY ${dhlrc_SOURCE_DIR}/dhlrc.svg DESTINATION ${dhlrc_BINARY_DIR})
-install(FILES "${CMAKE_CURRENT_BINARY_DIR}/locale/zh_CN/LC_MESSAGES/dhlrc.mo" DESTINATION "${CMAKE_INSTALL_PREFIX}/bin/locale/zh_CN/LC_MESSAGES/")
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/locale/zh_CN/LC_MESSAGES/dhlrc.mo" DESTINATION
+        "${CMAKE_INSTALL_DATAROOTDIR}/locale/zh_CN/LC_MESSAGES/")
