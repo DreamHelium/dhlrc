@@ -57,9 +57,9 @@ target_link_libraries(dhlrc PUBLIC z cjson
         dhrecipe_handler dhnbt_interface_cpp
 )
 
-if (${minizip_VERSION} LESS 4.0.0)
-    add_definitions(-DDHLRC_MZ_VERSION_LESS_THAN_FOUR)
-endif ()
+#if (${minizip_VERSION} LESS 4.0.0)
+#    add_definitions(-DDHLRC_MZ_VERSION_LESS_THAN_FOUR)
+#endif ()
 
 target_include_directories(dhlrc PUBLIC
         "${GIO_INCLUDE_DIRS}" dhutil "${minizip_INCLUDE_DIRS}"
