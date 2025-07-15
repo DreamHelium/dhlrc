@@ -9,6 +9,7 @@ endif()
 if(${INSTALL_NOW})
     add_definitions(-DLOCALEDIR="/usr/share/locale")
     add_definitions(-DMODULEDIR="/usr/lib64/dhlrc/modules")
+    add_definitions(-DRESOURCEDIR="/usr/share/dhlrc/dhlrc_resources")
     message("Install Now.")
 endif ()
 
@@ -92,3 +93,4 @@ install(TARGETS dhlrc_conv dhlrc_mcdata dhlrc_qt
 install(TARGETS dhrecipe_handler
         LIBRARY DESTINATION ${CMAKE_INSTALL_FULL_LIBDIR}
 )
+install(FILES ${CMAKE_BINARY_DIR}/dhlrc_resources DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/dhlrc)

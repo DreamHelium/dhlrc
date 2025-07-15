@@ -29,9 +29,14 @@ static GResource *res = NULL;
 gboolean
 dhlrc_common_contents_init (const char *prname)
 {
+    char* res_path = NULL;
     char *prpath = dh_file_get_current_program_dir (prname);
-    char *res_path
+#ifdef RESOURCEDIR
+    res_path = g_strdup(RESOURCEDIR);
+#else
+    res_path
         = g_strconcat (prpath, G_DIR_SEPARATOR_S, "dhlrc_resources", NULL);
+#endif
     GError *err = NULL;
     res = g_resource_load (res_path, &err);
     g_free (prpath);
