@@ -1,8 +1,8 @@
-if(NOT DEFINED ${UTIL_FOUND})
+if(NOT UTIL_FOUND)
     add_subdirectory(dhutil)
 endif ()
 
-if(NOT DEFINED ${INTERFACE_FOUND})
+if(NOT INTERFACE_FOUND)
     add_subdirectory(nbt_interface_cpp)
 endif()
 
