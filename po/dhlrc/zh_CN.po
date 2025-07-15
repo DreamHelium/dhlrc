@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-07-12 22:21+0800\n"
+"POT-Creation-Date: 2025-07-14 23:35+0800\n"
 "PO-Revision-Date: 2024-11-30 07:00+0800\n"
 "Last-Translator: dream_he <48383878+DreamHelium@users.noreply.github.com>\n"
 "Language-Team: Chinese <kde-i18n-doc@kde.org>\n"
@@ -400,32 +400,32 @@ msgstr "请选择一个配方文件："
 msgid "Combined %d items to the new item list."
 msgstr "合并了%d物品至新的物品列表。"
 
-#: src/main.c:155
+#: src/main.c:161
 #, c-format
 msgid "dhlrc - Program to handle litematic or other struct of Minecraft.\n"
 msgstr ""
 
-#: src/main.c:158
+#: src/main.c:164
 #, c-format
 msgid "Modules:\n"
 msgstr "模组：\n"
 
-#: src/main.c:160
+#: src/main.c:166
 #, c-format
 msgid "qt: The Graphical Interface.\n"
 msgstr ""
 
-#: src/main.c:162
+#: src/main.c:168
 #, c-format
 msgid "conv: The Simple Converter.\n"
 msgstr ""
 
-#: src/main.c:168
+#: src/main.c:174
 #, c-format
 msgid "Unrecognized options "
 msgstr ""
 
-#: src/main.c:182
+#: src/main.c:188
 msgid "CLI interface is not supported yet!"
 msgstr ""
 

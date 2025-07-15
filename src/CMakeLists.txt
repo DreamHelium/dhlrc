@@ -87,11 +87,8 @@ add_subdirectory(qt)
 add_subdirectory(conv)
 add_subdirectory(mcdata)
 
-install(FILES "${CMAKE_BINARY_DIR}/module/libdhlrc_conv.so"
-        "${CMAKE_BINARY_DIR}/module/libdhlrc_mcdata.so"
-        "${CMAKE_BINARY_DIR}/module/libdhlrc_qt.so"
-        DESTINATION
-        ${CMAKE_INSTALL_DATAROOTDIR}/dhlrc/modules)
+install(TARGETS dhlrc_conv dhlrc_mcdata dhlrc_qt
+        LIBRARY DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/dhlrc/modules)
 install(TARGETS dhrecipe_handler
         LIBRARY DESTINATION ${CMAKE_INSTALL_FULL_LIBDIR}
 )
