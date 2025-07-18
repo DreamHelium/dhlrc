@@ -48,6 +48,8 @@ add_library(dhlrc SHARED
         conv_feature.h
         mcdata_feature.c
         mcdata_feature.h
+        unzip_feature.c
+        unzip_feature.h
 )
 
 # target_link_libraries(dhlrc_recipe_full PUBLIC dhutil cjson)
@@ -87,6 +89,7 @@ add_subdirectory(qt)
 # add_subdirectory(cli)
 add_subdirectory(conv)
 add_subdirectory(mcdata)
+add_subdirectory(unzip)
 
 install(TARGETS dhlrc_conv dhlrc_mcdata dhlrc_qt
         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}/dhlrc/modules)

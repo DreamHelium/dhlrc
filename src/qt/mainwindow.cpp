@@ -302,7 +302,7 @@ MainWindow::showabout ()
 void
 MainWindow::addBtn_clicked ()
 {
-    auto atui = new AddTranslationUI();
+    auto atui = new AddTranslationUI(0);
     atui->setAttribute (Qt::WA_DeleteOnClose);
     atui->exec ();
 }

@@ -31,6 +31,7 @@ typedef void (*SigWithSet)(void*, SetFunc, void*);
 void dhlrc_mcdata_enable(GModule* module);
 gboolean dhlrc_mcdata_enabled();
 int dhlrc_init_translation_from_file(const char* filename, const char* large_version);
+int dhlrc_init_translation_from_content(const char* content, const char* large_version);
 const char* dhlrc_get_translation(const char* name, const char* large_version);
 int dhlrc_download_manifest(const char* dir, SigWithSet sig,
  SetFunc func, void* data, void* klass);

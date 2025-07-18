@@ -33,18 +33,22 @@
 
 #include "recipe_handler/handler.h"
 
+#include <unzip_feature.h>
+
 #ifdef G_OS_WIN32
 #define LINK_PATH "PATH"
 #define MIDD_SEP ";"
 #define QT_MODULE_NAME "dhlrc_qt.dll"
 #define CONV_MODULE_NAME "libdhlrc_conv.dll"
 #define MCDATA_MODULE_NAME "libdhlrc_mcdata.dll"
+#define UNZIP_MODULE_NAME "libdhlrc_unzip.dll"
 #else
 #define LINK_PATH "LD_LIBRARY_PATH"
 #define MIDD_SEP ":"
 #define QT_MODULE_NAME "libdhlrc_qt.so"
 #define CONV_MODULE_NAME "libdhlrc_conv.so"
 #define MCDATA_MODULE_NAME "libdhlrc_mcdata.so"
+#define UNZIP_MODULE_NAME "libdhlrc_unzip.so"
 #endif
 
 gchar *log_filename = NULL;
@@ -54,8 +58,10 @@ typedef int (*DhlrcMainFunc) (int argc, char **argv, const char *);
 static GModule *qt_module = NULL;
 static GModule *conv_module = NULL;
 static GModule *mcdata_module = NULL;
+static GModule *unzip_module = NULL;
 static DhlrcMainFunc qt_main = NULL;
 static DhlrcMainFunc conv_main = NULL;
+
 
 static void
 debug (int argc, char **argv)
@@ -87,6 +93,8 @@ get_module (const char *arg_zero, const char *module_name)
         conv_module = new_module;
     else if (module_name == MCDATA_MODULE_NAME)
         mcdata_module = new_module;
+    else if (module_name == UNZIP_MODULE_NAME)
+        unzip_module = new_module;
     g_free (dir);
 
     if (err)
@@ -112,7 +120,9 @@ get_module (const char *arg_zero, const char *module_name)
                 return FALSE;
         }
     else if (module_name == MCDATA_MODULE_NAME)
-            dhlrc_mcdata_enable (mcdata_module);
+        dhlrc_mcdata_enable (mcdata_module);
+    else if (module_name == UNZIP_MODULE_NAME)
+        dhlrc_unzip_enable (unzip_module);
 
     return TRUE;
 }
@@ -152,6 +162,7 @@ dhlrc_run (int argc, char **argv)
     get_module (argv[0], QT_MODULE_NAME);
     get_module (argv[0], CONV_MODULE_NAME);
     get_module (argv[0], MCDATA_MODULE_NAME);
+    get_module (argv[0], UNZIP_MODULE_NAME);
     int ret = 0;
 
     if (argc >= 2 && g_str_equal (argv[1], "--help"))
@@ -208,6 +219,7 @@ main (int argc, char **argb)
     g_module_close (qt_module);
     g_module_close (conv_module);
     g_module_close (mcdata_module);
+    g_module_close(unzip_module);
 
     return ret;
 }

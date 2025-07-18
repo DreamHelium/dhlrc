@@ -31,6 +31,7 @@ typedef char* (*GetTrFile)(const char*, const char*, const char*);
 static gboolean enabled = FALSE;
 
 static InitTr init_tr = NULL;
+static InitTr init_tr_from_content = NULL;
 static GetTr get_tr = NULL;
 static Download download = NULL;
 static Downloaded downloaded = NULL;
@@ -44,6 +45,7 @@ static CleanupTr cleanup_manifest = NULL;
 void dhlrc_mcdata_enable(GModule* module)
 {
     if (module && g_module_symbol(module, "init_translation_from_file", (gpointer*)&init_tr)
+        && g_module_symbol(module, "init_translation_from_content", (gpointer*)&init_tr_from_content)
         && g_module_symbol(module, "get_translation", (gpointer*)&get_tr)
         && g_module_symbol(module, "download_manifest", (gpointer*)&download)
         && g_module_symbol(module, "manifest_downloaded", (gpointer*)&downloaded)
@@ -61,10 +63,21 @@ gboolean dhlrc_mcdata_enabled ()
     return enabled;
 }
 
-int dhlrc_init_translation_from_file(const char* filename, const char* large_version)
+int
+dhlrc_init_translation_from_file (const char *filename,
+                                  const char *large_version)
 {
     if (init_tr)
-        return init_tr(filename, large_version);
+        return init_tr (filename, large_version);
+    return FALSE;
+}
+
+int
+dhlrc_init_translation_from_content (const char *content,
+                                     const char *large_version)
+{
+    if (init_tr_from_content)
+        init_tr_from_content (content, large_version);
     return FALSE;
 }
 

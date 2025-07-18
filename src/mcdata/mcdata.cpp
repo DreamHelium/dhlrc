@@ -43,11 +43,21 @@ extern "C"
         return ret;
     }
 
-    static void
-    cache_translation (const char *filename,
-                       std::map<std::string, std::string> &translations)
+    static bool
+    is_repeated (const std::string &str,
+                 const std::map<std::string, std::string> &translations)
     {
-        cJSON *json = dhlrc_file_to_json (filename);
+        auto it = translations.find (str);
+        if (it == translations.end ())
+            return false;
+        return true;
+    }
+
+    static void
+    cache_translation_from_content (
+        const char *content, std::map<std::string, std::string> &translations)
+    {
+        cJSON *json = cJSON_Parse (content);
         if (json)
             {
                 cJSON *real_json = json->child;
@@ -68,7 +78,8 @@ extern "C"
                                 std::string name = block_name_p;
                                 std::string value
                                     = cJSON_GetStringValue (real_json);
-                                translations.insert (std::pair (name, value));
+                                if (!is_repeated (name, translations))
+                                    translations.insert (std::pair (name, value));
                                 g_free (block);
                             }
                     }
@@ -89,7 +100,8 @@ extern "C"
                                 std::string name = item_name_p;
                                 std::string value
                                     = cJSON_GetStringValue (real_json);
-                                translations.insert (std::pair (name, value));
+                                if (!is_repeated (name, translations))
+                                    translations.insert (std::pair (name, value));
                                 g_free (item);
                             }
                     }
@@ -97,8 +109,21 @@ extern "C"
                 cJSON_Delete (json);
             }
         else
-            /* It's a old file format */
+            /* It's an old file format */
             g_message ("The file is too old! couldn't get translation!");
+    }
+
+    static void
+    cache_translation (const char *filename,
+                       std::map<std::string, std::string> &translations)
+    {
+        gchar *content = nullptr;
+        gsize len = 0;
+        if (g_file_get_contents (filename, &content, &len, nullptr))
+            {
+                cache_translation_from_content (content, translations);
+                g_free (content);
+            }
     }
 
     int
@@ -136,6 +161,29 @@ extern "C"
                 return TRUE;
             }
         return 0;
+    }
+
+    int
+    init_translation_from_content (const char *content,
+                                   const char *large_version)
+    {
+        /* Searching for group */
+        for (auto group : translation_groups)
+            {
+                if (group.large_version == large_version)
+                    {
+                        cache_translation_from_content (content,
+                                                        group.translations);
+                        return TRUE;
+                    }
+            }
+        TranslationGroup group;
+        group.large_version = large_version;
+        cache_translation_from_content (content, group.translations);
+
+        translation_groups.emplace_back (group);
+
+        return TRUE;
     }
 
     const char *

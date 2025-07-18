@@ -17,6 +17,8 @@ extern "C"
 
     int init_translation_from_file (const char *filename,
                                     const char *large_version);
+    int init_translation_from_content (const char *content,
+                                       const char *large_version);
     const char *get_translation (const char *name, const char *large_version);
     int download_manifest (const char *dir, SigWithSet sig, SetFunc func,
                            void *data, void *klass);
