@@ -3,8 +3,8 @@
 #include "ui_addtranslationui.h"
 
 #include <QFileDialog>
-#include <unzip_feature.h>
-#include <utility.h>
+#include "../unzip_feature.h"
+#include "utility.h"
 
 AddTranslationUI::AddTranslationUI (int dataVersion, QWidget *parent)
     : QDialog (parent), ui (new Ui::AddTranslationUI)

@@ -19,21 +19,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 /*#include "dhlrc_config.h"*/
-#include "common.h"
-#include "common_info.h"
-#include "config.h"
 #include "conv_feature.h"
 #include "dh_file_util.h"
-#include "dh_string_util.h"
 #include "glibconfig.h"
 #include "gmodule.h"
 #include "mcdata_feature.h"
-#include "recipe_util.h"
 #include "translation.h"
-
-#include "recipe_handler/handler.h"
-
-#include <unzip_feature.h>
+#include "unzip_feature.h"
+#include "recipe_feature.h"
 
 #ifdef G_OS_WIN32
 #define LINK_PATH "PATH"
@@ -42,6 +35,7 @@
 #define CONV_MODULE_NAME "libdhlrc_conv.dll"
 #define MCDATA_MODULE_NAME "libdhlrc_mcdata.dll"
 #define UNZIP_MODULE_NAME "libdhlrc_unzip.dll"
+#define RECIPE_MODULE_NAME "libdhlrc_recipe.dll"
 #else
 #define LINK_PATH "LD_LIBRARY_PATH"
 #define MIDD_SEP ":"
@@ -49,6 +43,7 @@
 #define CONV_MODULE_NAME "libdhlrc_conv.so"
 #define MCDATA_MODULE_NAME "libdhlrc_mcdata.so"
 #define UNZIP_MODULE_NAME "libdhlrc_unzip.so"
+#define RECIPE_MODULE_NAME "libdhlrc_recipe.so"
 #endif
 
 gchar *log_filename = NULL;
@@ -59,6 +54,7 @@ static GModule *qt_module = NULL;
 static GModule *conv_module = NULL;
 static GModule *mcdata_module = NULL;
 static GModule *unzip_module = NULL;
+static GModule *recipe_module = NULL;
 static DhlrcMainFunc qt_main = NULL;
 static DhlrcMainFunc conv_main = NULL;
 
@@ -95,6 +91,8 @@ get_module (const char *arg_zero, const char *module_name)
         mcdata_module = new_module;
     else if (module_name == UNZIP_MODULE_NAME)
         unzip_module = new_module;
+    else if (module_name == RECIPE_MODULE_NAME)
+        recipe_module = new_module;
     g_free (dir);
 
     if (err)
@@ -163,6 +161,7 @@ dhlrc_run (int argc, char **argv)
     get_module (argv[0], CONV_MODULE_NAME);
     get_module (argv[0], MCDATA_MODULE_NAME);
     get_module (argv[0], UNZIP_MODULE_NAME);
+    get_module (argv[0], RECIPE_MODULE_NAME);
     int ret = 0;
 
     if (argc >= 2 && g_str_equal (argv[1], "--help"))
@@ -216,10 +215,11 @@ int
 main (int argc, char **argb)
 {
     int ret = dhlrc_run (argc, argb);
-    g_module_close (qt_module);
-    g_module_close (conv_module);
-    g_module_close (mcdata_module);
-    g_module_close(unzip_module);
+    if(qt_module) g_module_close (qt_module);
+    if(conv_module) g_module_close (conv_module);
+    if(mcdata_module) g_module_close (mcdata_module);
+    if(unzip_module) g_module_close(unzip_module);
+    if(recipe_module) g_module_close(recipe_module);
 
     return ret;
 }

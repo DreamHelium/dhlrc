@@ -6,7 +6,7 @@
 #include <QPainter>
 #include <QVBoxLayout>
 #include <qboxlayout.h>
-#include "../recipe_handler/handler.h"
+#include "../recipe_feature.h"
 
 namespace Ui {
 class RecipesShowUI;

@@ -10,6 +10,7 @@ if(${INSTALL_NOW})
     add_definitions(-DLOCALEDIR="/usr/share/locale")
     add_definitions(-DMODULEDIR="/usr/lib64/dhlrc/modules")
     add_definitions(-DRESOURCEDIR="/usr/share/dhlrc/dhlrc_resources")
+    add_definitions(-DRECIPESDIR="/usr/lib64/dhlrc/recipes_modules")
     message("Install Now.")
 endif ()
 
@@ -50,6 +51,7 @@ add_library(dhlrc SHARED
         mcdata_feature.h
         unzip_feature.c
         unzip_feature.h
+        recipe_feature.c recipe_feature.h
 )
 
 # target_link_libraries(dhlrc_recipe_full PUBLIC dhutil cjson)
@@ -57,7 +59,7 @@ add_library(dhlrc SHARED
 target_link_libraries(dhlrc PUBLIC z cjson
 #        ${minizip_LIBRARIES}
         dhutil_base
-        dhrecipe_handler dhnbt_interface_cpp
+        dhnbt_interface_cpp
 )
 
 #if (${minizip_VERSION} LESS 4.0.0)
@@ -91,9 +93,6 @@ add_subdirectory(conv)
 add_subdirectory(mcdata)
 add_subdirectory(unzip)
 
-install(TARGETS dhlrc_conv dhlrc_mcdata dhlrc_qt
+install(TARGETS dhlrc_conv dhlrc_mcdata dhlrc_qt dhlrc_recipe
         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}/dhlrc/modules)
-install(TARGETS dhrecipe_handler
-        LIBRARY DESTINATION ${CMAKE_INSTALL_FULL_LIBDIR}
-)
 install(FILES ${CMAKE_BINARY_DIR}/dhlrc_resources DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/dhlrc)

@@ -15,7 +15,7 @@ msgstr ""
 "#-#-#-#-#  dhlrc.pot (dhlrc)  #-#-#-#-#\n"
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-07-15 09:11+0800\n"
+"POT-Creation-Date: 2025-07-22 20:54+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -402,32 +402,32 @@ msgstr ""
 msgid "Combined %d items to the new item list."
 msgstr ""
 
-#: src/main.c:161
+#: src/main.c:171
 #, c-format
 msgid "dhlrc - Program to handle litematic or other struct of Minecraft.\n"
 msgstr ""
 
-#: src/main.c:164
+#: src/main.c:174
 #, c-format
 msgid "Modules:\n"
 msgstr ""
 
-#: src/main.c:166
+#: src/main.c:176
 #, c-format
 msgid "qt: The Graphical Interface.\n"
 msgstr ""
 
-#: src/main.c:168
+#: src/main.c:178
 #, c-format
 msgid "conv: The Simple Converter.\n"
 msgstr ""
 
-#: src/main.c:174
+#: src/main.c:184
 #, c-format
 msgid "Unrecognized options "
 msgstr ""
 
-#: src/main.c:188
+#: src/main.c:198
 msgid "CLI interface is not supported yet!"
 msgstr ""
 
@@ -544,11 +544,12 @@ msgstr ""
 msgid "No"
 msgstr ""
 
-#: src/qt/addtranslationui.cpp:25
-msgid "Select Translation File"
+#: src/qt/addtranslationui.cpp:33
+msgid "Select Translation File or Jar File"
 msgstr ""
 
-#: src/qt/addtranslationui.cpp:39 src/qt/addtranslationui.cpp:41
+#: src/qt/addtranslationui.cpp:48 src/qt/addtranslationui.cpp:51
+#: src/qt/addtranslationui.cpp:71
 msgid "Invalid!"
 msgstr ""
 

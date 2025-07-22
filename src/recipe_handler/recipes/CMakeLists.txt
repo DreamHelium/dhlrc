@@ -8,8 +8,8 @@ add_library(dhvshaped SHARED shaped.c)
 add_library(dhvshapeless SHARED shapeless.c)
 add_library(dhvsmelting SHARED smelting.c)
 
-target_link_libraries(dhvshaped PUBLIC dhrecipe_handler)
-target_link_libraries(dhvshapeless PUBLIC dhrecipe_handler)
-target_link_libraries(dhvsmelting PUBLIC dhrecipe_handler)
+target_link_libraries(dhvshaped PUBLIC dhlrc_recipe)
+target_link_libraries(dhvshapeless PUBLIC dhlrc_recipe)
+target_link_libraries(dhvsmelting PUBLIC dhlrc_recipe)
 
 

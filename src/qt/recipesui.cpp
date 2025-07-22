@@ -14,7 +14,7 @@
 #include <qmessagebox.h>
 #include <qnamespace.h>
 #include "../translation.h"
-#include "../recipe_handler/handler.h"
+#include "../recipe_feature.h"
 #include "dh_string_util.h"
 #include "glib.h"
 #include "glibconfig.h"
@@ -224,7 +224,7 @@ void RecipesUI::okbtn_clicked()
 
 ItemList* RecipesUI::recipesProcess(const char* item, const char* filepos ,quint32 num)
 {
-    auto r = recipes_get_recipes(filepos);
+    auto r = dhlrc_get_recipes(filepos);
 
     ItemList* new_il = nullptr;
 
@@ -239,7 +239,7 @@ ItemList* RecipesUI::recipesProcess(const char* item, const char* filepos ,quint
                 write_num++;
                 break;
             case QMessageBox::No:
-                recipes_free(r);
+                dhlrc_recipes_free(r);
                 return NULL;
             default:
                 break;
@@ -260,7 +260,7 @@ ItemList* RecipesUI::recipesProcess(const char* item, const char* filepos ,quint
             _("Add %d items from material list combiner."));
         }
     }
-    recipes_free(r);
+    dhlrc_recipes_free(r);
     return new_il;
 }
 

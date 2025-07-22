@@ -20,9 +20,9 @@
 #include "common_info.h"
 #include "config.h"
 #include "dh_file_util.h"
-#include "recipe_handler/handler.h"
 #include "recipe_util.h"
 #include "translation.h"
+#include "recipe_feature.h"
 
 static GResource *res = NULL;
 
@@ -59,6 +59,7 @@ dhlrc_get_resource ()
 {
     return res;
 }
+
 void
 dhlrc_init (const char *prname)
 {
@@ -66,11 +67,16 @@ dhlrc_init (const char *prname)
     dhlrc_make_config ();
     dhlrc_common_contents_init (prname);
     common_infos_init ();
+    char* recipes_module_path = NULL;
+#ifdef RECIPESDIR
+    recipes_module_path = g_strdup(RECIPESDIR);
+#else
     char *prpath = dh_file_get_current_program_dir (prname);
-    char *recipes_module_path
+    recipes_module_path
         = g_build_path (G_DIR_SEPARATOR_S, prpath, "recipes_module", NULL);
     g_free (prpath);
-    recipe_handler_init (recipes_module_path);
+#endif
+    dhlrc_recipe_init (recipes_module_path);
     g_free (recipes_module_path);
 }
 
@@ -79,7 +85,7 @@ dhlrc_cleanup ()
 {
     common_infos_free ();
     dhlrc_common_contents_free ();
-    recipe_handler_free ();
+    dhlrc_recipe_module_clean ();
     dhlrc_cleanup_manifest ();
     dh_exit ();
     dh_exit1 ();

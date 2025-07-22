@@ -1,5 +1,5 @@
 #include "recipesshowui.h"
-#include "../recipe_handler/handler.h"
+#include "../recipe_feature.h"
 #include "../translation.h"
 #include "utility.h"
 #include <QDebug>
@@ -29,13 +29,13 @@ RecipesShowUI::RecipesShowUI (QString filename, QWidget *parent)
 RecipesShowUI::~RecipesShowUI ()
 {
     if (r)
-        recipes_free (r);
+        dhlrc_recipes_free (r);
 }
 
 void
 RecipesShowUI::recipesInit (QString filename)
 {
-    r = recipes_get_recipes (filename.toUtf8 ());
+    r = dhlrc_get_recipes (filename.toUtf8 ());
 }
 
 void

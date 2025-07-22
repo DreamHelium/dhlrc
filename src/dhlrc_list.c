@@ -22,7 +22,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <cjson/cJSON.h>
-#include "recipe_handler/handler.h"
+#include "recipe_feature.h"
 #include "recipe_util.h"
 #include "translation.h"
 #include "json_util.h"
@@ -585,7 +585,7 @@ static RecipeListBaseData* rlbasedata_init(const char* dir, const char* filename
 
 static gboolean type_is_supported(const char* type)
 {
-    return recipes_is_supported_type(type);
+    return dhlrc_recipe_is_supported_type(type);
 }
 
 static void get_name(cJSON* json, char** namespace, char** item_name)
