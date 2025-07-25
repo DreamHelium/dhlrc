@@ -21,7 +21,7 @@
 #include "dh_string_util.h"
 #include "nbt_interface_cpp/libnbt/nbt.h"
 #include "dhlrc_list.h"
-#include <dhutil.h>
+#include "dh_string_util.h"
 
 #ifdef __cplusplus
 extern "C"{

@@ -11,7 +11,6 @@
 #include "nbtreaderui.h"
 #include "recipeselectui.h"
 #include "recipesui.h"
-#include "testopenglui.h"
 #include "ui_mainwindow.h"
 #include "utility.h"
 #include <QFileDialog>
@@ -58,19 +57,6 @@ MainWindow::~MainWindow ()
     delete mni;
     delete ui;
 }
-/*
-static int mw_download_progress(void* data, curl_off_t total, curl_off_t cur,
-curl_off_t unused0, curl_off_t unused1)
-{
-    mw->pd.show();
-    mw->pd.setWindowTitle("Downloading file ...");
-    if(total != 0) mw->pd.setMaximum(total);
-    mw->pd.setValue(cur);
-    mw->pd.setLabelText(QString::asprintf("Copying %s.""(%"
-CURL_FORMAT_CURL_OFF_T"/%" CURL_FORMAT_CURL_OFF_T").", (char*)data, cur,
-total)); return 0;
-}
-*/
 
 void
 MainWindow::initSignalSlots ()
@@ -95,8 +81,6 @@ MainWindow::initSignalSlots ()
                       &MainWindow::configAction_triggered);
     QObject::connect (ui->recipeBtn, &QPushButton::clicked, this,
                       &MainWindow::recipeBtn_clicked);
-    QObject::connect (ui->openglBtn, &QPushButton::clicked, this,
-                      &MainWindow::openglBtn_clicked);
     QObject::connect (ui->action_about, &QAction::triggered, this,
                       &MainWindow::showabout);
     QObject::connect (ui->addBtn, &QPushButton::clicked, this,
@@ -281,14 +265,6 @@ MainWindow::recipeBtn_clicked ()
     auto rsui = new RecipeSelectUI ();
     rsui->setAttribute (Qt::WA_DeleteOnClose);
     rsui->show ();
-}
-
-void
-MainWindow::openglBtn_clicked ()
-{
-    auto toui = new TestOpenglUI ();
-    toui->setAttribute (Qt::WA_DeleteOnClose);
-    toui->show ();
 }
 
 void

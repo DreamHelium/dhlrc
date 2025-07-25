@@ -5,23 +5,20 @@
 #define MCDATA_H
 
 #include <cjson/cJSON.h>
+#include <glib.h>
 
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
-    typedef void (*Sig) (void *);
     typedef void (*SetFunc) (void *, int);
-    typedef void (*SigWithSet) (void *, SetFunc, void *);
 
     int init_translation_from_file (const char *filename,
                                     const char *large_version);
     int init_translation_from_content (const char *content,
                                        const char *large_version);
     const char *get_translation (const char *name, const char *large_version);
-    int download_manifest (const char *dir, SigWithSet sig, SetFunc func,
-                           void *data, void *klass);
     int download_manifest_sync (const char *dir);
     int manifest_downloaded ();
     int manifest_download_code ();
@@ -35,6 +32,10 @@ extern "C"
     char *get_translation_file (const char *gamedir, const char *large_version,
                                 const char *lang);
     void cleanup_manifest ();
+    void load_jar(const char* filename, int data_version);
+    void load_version_map();
+    gboolean version_map_inited();
+    void* get_version_map();
 
 #ifdef __cplusplus
 }

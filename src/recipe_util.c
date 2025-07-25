@@ -18,12 +18,11 @@
 #include "recipe_util.h"
 #include "config.h"
 #include "glib.h"
-#include "mcdata_feature.h"
+#include "feature/mcdata_feature.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-#include <dhutil.h>
+#include "dh_file_util.h"
 
 static gboolean first_try = FALSE;
 static gchar *find_transfile ();

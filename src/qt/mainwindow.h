@@ -3,12 +3,8 @@
 
 #include <QMainWindow>
 #include <QLabel>
-#include <QButtonGroup>
-#include <QRadioButton>
-#include <QPushButton>
-#include <QVBoxLayout>
 #include <QDateTime>
-#include <qevent.h>
+#include <QEvent>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -44,7 +40,6 @@ private Q_SLOTS:
     void nbtReaderBtn_clicked();
     void nbtReaderBtn_finished(int ret);
     void recipeBtn_clicked();
-    void openglBtn_clicked();
     void showabout();
     void addBtn_clicked();
 };

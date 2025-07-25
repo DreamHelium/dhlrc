@@ -1,12 +1,12 @@
 #ifndef RECIPESSHOWUI_H
 #define RECIPESSHOWUI_H
 
-#include <QWidget>
+#include "../feature/recipe_feature.h"
 #include <QLabel>
 #include <QPainter>
 #include <QVBoxLayout>
+#include <QWidget>
 #include <qboxlayout.h>
-#include "../recipe_feature.h"
 
 namespace Ui {
 class RecipesShowUI;

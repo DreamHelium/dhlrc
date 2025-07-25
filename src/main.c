@@ -19,14 +19,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 /*#include "dhlrc_config.h"*/
-#include "conv_feature.h"
 #include "dh_file_util.h"
+#include "feature/conv_feature.h"
+#include "feature/unzip_feature.h"
 #include "glibconfig.h"
 #include "gmodule.h"
-#include "mcdata_feature.h"
+#include "feature/mcdata_feature.h"
+#include "feature/recipe_feature.h"
 #include "translation.h"
-#include "unzip_feature.h"
-#include "recipe_feature.h"
 
 #ifdef G_OS_WIN32
 #define LINK_PATH "PATH"

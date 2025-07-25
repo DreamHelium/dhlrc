@@ -12,5 +12,5 @@ set(SOURCES unzip.c)
 set(HEADERS unzip.h)
 
 add_library(dhlrc_unzip SHARED ${SOURCES} ${HEADERS})
-target_link_libraries(dhlrc_unzip PUBLIC zip ${GLIB_LIBRARIES} dhutil_base)
-target_include_directories(dhlrc_unzip PUBLIC ${GLIB_INCLUDE_DIRS})
+target_link_libraries(dhlrc_unzip PUBLIC zip ${GLIB_LIBRARIES} dhutil_string)
+target_include_directories(dhlrc_unzip PUBLIC ${GLIB_INCLUDE_DIRS} ../dhutil)

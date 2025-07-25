@@ -17,15 +17,17 @@
 
 #include "dhlrc_list.h"
 #include "dh_string_util.h"
+#include "dh_file_util.h"
+#include "dh_list_util.h"
+#include "feature/recipe_feature.h"
 #include "glib.h"
-#include <stdlib.h>
-#include <string.h>
-#include <stdio.h>
-#include <cjson/cJSON.h>
-#include "recipe_feature.h"
+#include "json_util.h"
 #include "recipe_util.h"
 #include "translation.h"
-#include "json_util.h"
+#include <cjson/cJSON.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 static gboolean type_is_supported(const char* type);
 

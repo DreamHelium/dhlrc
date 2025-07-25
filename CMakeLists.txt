@@ -1,7 +1,7 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 3.16)
 PROJECT( dhlrc )
 
-set(INSTALL_NOW OFF)
+option(INSTALL_NOW OFF)
 
 include(GNUInstallDirs)
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR})
@@ -15,7 +15,6 @@ find_package(PkgConfig)
 
 pkg_search_module(GIO REQUIRED gio-2.0)
 pkg_search_module(gm REQUIRED gmodule-2.0)
-#pkg_search_module(minizip REQUIRED minizip-ng)
 pkg_search_module(UTIL dhutil)
 pkg_search_module(INTERFACE dhnbt_interface_cpp)
 

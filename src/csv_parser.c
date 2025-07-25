@@ -22,7 +22,7 @@ DhCsvArray* dh_csv_parse(const char* data)
     char** split_line = g_strsplit(data, "\n", -1);
     char** sld = split_line;
     
-    DhCsvArray* ret = g_ptr_array_new_with_free_func((GDestroyNotify)g_strfreev);
+    DhCsvArray* ret = g_ptr_array_new_with_free_func(g_strfreev);
     for( ; *sld ; sld++)
     {
         if(**sld != 0)

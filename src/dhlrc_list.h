@@ -20,7 +20,7 @@
 
 #undef signals
 #include <glib.h>
-#include <dhutil.h>
+#include "dh_string_util.h"
 
 #ifdef __cplusplus
 extern "C" {

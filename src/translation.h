@@ -21,8 +21,8 @@
 #ifndef DH_DISABLE_TRANSLATION
 
 #undef signals
+#include "feature/mcdata_feature.h"
 #include "recipe_util.h"
-#include "mcdata_feature.h"
 #include <libintl.h>
 #include <locale.h>
 

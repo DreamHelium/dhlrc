@@ -1,6 +1,6 @@
-/*  uncompress.h - Uncompression functions
-    Copyright (C) 2024 Dream Helium
-    This file is part of litematica_reader_c.
+/*  conv_feature - Converter features
+    Copyright (C) 2025 Dream Helium
+    This file is part of dhlrc.
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU Lesser General Public License as published by
@@ -15,20 +15,23 @@
     You should have received a copy of the GNU Lesser General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>. */
 
-#ifndef UNCOMPRESS_H
-#define UNCOMPRESS_H
+#ifndef CONV_FEATURE_H
+#define CONV_FEATURE_H
 
-#include "dh_string_util.h"
-#ifdef __cplusplus
-extern "C"{
-#endif
+#include "../region.h"
+#include <glib.h>
+#include <gmodule.h>
 
-int dhlrc_extract(const char* path, const char* dest);
-int dhlrc_extract_part(const char* path, const char* dest, DhStrArray* arr);
+G_BEGIN_DECLS
 
-#ifdef __cplusplus
-}
-#endif
+typedef int (*DhlrcMainFunc) (int argc, char **argv, const char *);
 
+DhlrcMainFunc dhlrc_conv_enable (GModule *module);
+gboolean dhlrc_conv_enabled ();
+void *dhlrc_conv_region_to_nbt (Region *region, gboolean temp_root);
+void *dhlrc_conv_region_to_lite_nbt (Region *region, gboolean temp_root);
+void *dhlrc_conv_region_to_schema_nbt (Region *region, gboolean temp_root);
 
-#endif /* UNCOMPRESS_H */
+G_END_DECLS
+
+#endif // CONV_FEATURE_H

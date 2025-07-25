@@ -3,7 +3,7 @@
 
 #include <glib.h>
 #include <gmodule.h>
-#include <dh_string_util.h>
+#include "dh_string_util.h"
 #include <cjson/cJSON.h>
 
 G_BEGIN_DECLS

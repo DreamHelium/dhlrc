@@ -1,6 +1,6 @@
 #include "blockreaderui.h"
 #include "../common_info.h"
-#include "../mcdata_feature.h"
+#include "../feature/mcdata_feature.h"
 #include "../translation.h"
 #include "blocklistui.h"
 #include "nbtreaderui.h"

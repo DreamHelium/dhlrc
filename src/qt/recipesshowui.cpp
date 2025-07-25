@@ -1,5 +1,5 @@
 #include "recipesshowui.h"
-#include "../recipe_feature.h"
+#include "../feature/recipe_feature.h"
 #include "../translation.h"
 #include "utility.h"
 #include <QDebug>

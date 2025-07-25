@@ -4,6 +4,7 @@
 #include <QCheckBox>
 #include <QMessageBox>
 #include <QRadioButton>
+#include "dh_string_util.h"
 
 GeneralChooseUI::GeneralChooseUI (DhInfoTypes type, bool needMulti,
                                   QWidget *parent)

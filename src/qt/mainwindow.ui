@@ -159,13 +159,6 @@
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="openglBtn">
-            <property name="text">
-             <string>Test OpenGL</string>
-            </property>
-           </widget>
-          </item>
-          <item>
            <widget class="QPushButton" name="trBtn">
             <property name="text">
              <string>Block and Translation</string>
@@ -176,6 +169,13 @@
            <widget class="QPushButton" name="addBtn">
             <property name="text">
              <string>Add Translation</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="loadBtn">
+            <property name="text">
+             <string>&amp;Load Jar File for Resources</string>
             </property>
            </widget>
           </item>

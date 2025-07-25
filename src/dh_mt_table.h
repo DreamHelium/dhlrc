@@ -1,4 +1,4 @@
-/*  nbt_litereader - nbt lite reader
+/*  mt_table - MT Safe Table
     Copyright (C) 2022 Dream Helium
     This file is part of litematica_reader_c.
 
@@ -15,30 +15,26 @@
     You should have received a copy of the GNU Lesser General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>. */
 
-#ifndef NBT_LITEREADER_H
-#define NBT_LITEREADER_H
+#ifndef MT_TABLE_H
+#define MT_TABLE_H
 
-#include "libnbt/nbt.h"
-#include <dhutil.h>
-#include "nbt_pos.h"
+#include <glib.h>
 
-#ifdef __cplusplus
-extern "C"{
-#endif
+G_BEGIN_DECLS
 
-/** Just use this to start a reader instance.
- *  Please pass NULL in "parent" to start. */
-int         nbtlr_start(NBT* root);
+typedef struct DHMTTable {
+    GHashTable* table;
+    GRWLock lock;
+} DhMTTable;
 
-int         nbtlr_start_pos(NbtPos* pos);
-int         nbtlr_list(NBT* given_nbt, int read_next);
-int         nbtlr_list_item(NBT* given_nbt);
+DhMTTable* dh_mt_table_new(GHashFunc hash_func, GEqualFunc key_equal_func, GDestroyNotify key_destroy_func, GDestroyNotify value_destroy_func);
+gboolean dh_mt_table_insert(DhMTTable* table, gpointer key, gpointer value);
+gboolean dh_mt_table_replace(DhMTTable* table, gpointer key, gpointer value);
+GList* dh_mt_table_get_keys(DhMTTable* table);
+gpointer dh_mt_table_lookup(DhMTTable* table, gconstpointer key);
+gboolean dh_mt_table_remove(DhMTTable* table, gconstpointer key);
+gboolean dh_mt_table_destroy(DhMTTable* table);
 
-void nbtlr_modifier_start(NBT* root, int modify_list, GValue* value);
+G_END_DECLS
 
-
-#ifdef __cplusplus
-}
-#endif
-
-#endif // NBT_LITEREADER_H
+#endif /* MT_TABLE_H */

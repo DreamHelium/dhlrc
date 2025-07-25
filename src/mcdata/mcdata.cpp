@@ -2,6 +2,7 @@
 #include "../config.h"
 #include "../download_file.h"
 #include "../json_util.h"
+#include "../csv_parser.h"
 #include <dh_file_util.h>
 #include <dh_string_util.h>
 #include <future>
@@ -17,10 +18,11 @@ extern "C"
 
         std::vector<std::string> filenames;
         std::map<std::string, std::string> translations;
-        int cached = 0;
     } TranslationGroup;
 
 #define RESOURCES_URL "https://resources.download.minecraft.net/"
+#define MANIFEST_URL                                                          \
+    "https://launchermeta.mojang.com/mc/game/version_manifest.json"
 
     static std::vector<TranslationGroup> translation_groups;
 
@@ -28,6 +30,9 @@ extern "C"
     static cJSON *manifest_json = nullptr;
     static gchar *manifest_dir = nullptr;
     static int ret_code = -1;
+    static std::map<int, std::vector<std::string>> jar_files;
+    static std::map<int, std::string> version_map;
+    static bool map_inited = false;
 
     static int
     download_object (const char *hash, const char *gamedir)
@@ -79,7 +84,8 @@ extern "C"
                                 std::string value
                                     = cJSON_GetStringValue (real_json);
                                 if (!is_repeated (name, translations))
-                                    translations.insert (std::pair (name, value));
+                                    translations.insert (
+                                        std::pair (name, value));
                                 g_free (block);
                             }
                     }
@@ -101,7 +107,8 @@ extern "C"
                                 std::string value
                                     = cJSON_GetStringValue (real_json);
                                 if (!is_repeated (name, translations))
-                                    translations.insert (std::pair (name, value));
+                                    translations.insert (
+                                        std::pair (name, value));
                                 g_free (item);
                             }
                     }
@@ -146,7 +153,6 @@ extern "C"
                                 group.filenames.emplace_back (filename);
                                 cache_translation (filename,
                                                    group.translations);
-                                group.cached++;
                                 return TRUE;
                             }
                     }
@@ -154,7 +160,6 @@ extern "C"
                 group.large_version = large_version;
                 group.filenames.emplace_back (filename);
                 cache_translation (filename, group.translations);
-                group.cached++;
 
                 translation_groups.emplace_back (group);
 
@@ -203,46 +208,6 @@ extern "C"
         return name;
     }
 
-    typedef struct SigWithData
-    {
-        SigWithSet sig;
-        SetFunc func;
-        void *data;
-        void *klass;
-    } SigWithData;
-
-    static void
-    finish_callback (GObject *source_object, GAsyncResult *res, gpointer data)
-    {
-        int ret = g_task_propagate_int (G_TASK (res), NULL);
-        ret_code = ret;
-        auto *sig_data = (SigWithData *)data;
-        if (ret != 0)
-            {
-                g_message ("Download failed with code %d", ret);
-                manifest_download = FALSE;
-                g_free (manifest_dir);
-                if (manifest_json)
-                    cJSON_Delete (manifest_json);
-                g_free (sig_data);
-            }
-        else
-            {
-                gchar *dir = g_build_path (G_DIR_SEPARATOR_S, manifest_dir,
-                                           "version_manifest.json", NULL);
-                manifest_download = TRUE;
-                g_free (manifest_dir);
-                if (manifest_json)
-                    cJSON_Delete (manifest_json);
-                manifest_json = dhlrc_file_to_json (dir);
-                g_free (dir);
-                if (sig_data->sig)
-                    sig_data->sig (sig_data->data, sig_data->func,
-                                   sig_data->klass);
-                g_free (sig_data);
-            }
-    }
-
     int
     manifest_download_code ()
     {
@@ -256,34 +221,11 @@ extern "C"
     }
 
     int
-    download_manifest (const char *dir, SigWithSet sig, SetFunc func,
-                       void *data, void *klass)
-    {
-        manifest_reset_code ();
-        if (dh_file_is_directory (dir))
-            {
-                manifest_dir = g_strdup (dir);
-                SigWithData *sig_with_data = g_new0 (SigWithData, 1);
-                sig_with_data->sig = sig;
-                sig_with_data->func = func;
-                sig_with_data->data = data;
-                sig_with_data->klass = klass;
-                dh_file_download_async ("https://launchermeta.mojang.com/mc/"
-                                        "game/version_manifest.json",
-                                        dir, dh_file_progress_callback, NULL,
-                                        TRUE, finish_callback, sig_with_data);
-                return TRUE;
-            }
-        return FALSE;
-    }
-
-    int
     download_manifest_sync (const char *dir)
     {
         int ret = dh_file_download_full_arg (
-            "https://launchermeta.mojang.com/mc/game/version_manifest.json",
-            dir, dh_file_progress_callback, (void *)("Version Manifest"),
-            TRUE);
+            MANIFEST_URL, dir, dh_file_progress_callback,
+            (void *)("Version Manifest"), TRUE);
         if (ret == 0)
             {
                 gchar *json_dir
@@ -528,5 +470,54 @@ extern "C"
     cleanup_manifest ()
     {
         cJSON_Delete (manifest_json);
+    }
+
+    void
+    load_jar (const char *filename, int data_version)
+    {
+        auto it = jar_files.find (data_version);
+        if (it == jar_files.end ())
+            {
+                std::string jar_filename = filename;
+                std::vector files = { jar_filename };
+                jar_files.insert (std::make_pair (data_version, files));
+            }
+        else
+            {
+                auto files = it->second;
+                files.emplace_back (filename);
+            }
+    }
+
+    void
+    load_version_map ()
+    {
+        auto datas
+            = g_resources_lookup_data ("/cn/dh/dhlrc/data_version.csv",
+                                       G_RESOURCE_LOOKUP_FLAGS_NONE, nullptr);
+        auto data
+            = static_cast<const char *> (g_bytes_get_data (datas, nullptr));
+        auto array = dh_csv_parse (data);
+        for (int i = 0; i < array->len; i++)
+            {
+                auto val = (char **)array->pdata[i];
+                std::string version = val[0];
+                int dataversion = std::stoi (val[1]);
+                version_map.insert (std::make_pair (dataversion, version));
+            }
+        g_bytes_unref (datas);
+        g_ptr_array_free (array, true);
+        map_inited = true;
+    }
+
+    gboolean
+    version_map_inited ()
+    {
+        return map_inited;
+    }
+
+    void* get_version_map()
+    {
+        return &version_map;
     }
 }

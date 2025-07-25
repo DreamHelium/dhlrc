@@ -94,6 +94,11 @@ extern "C"
     char *block_info_get_id_name (Region *region, BlockInfo *info);
     void region_modify_property (Region *region, BlockInfo *info,
                                  gboolean all_modify, DhStrArray *new_data);
+    /* Modify a block need new properties, otherwise it might be unsafe */
+    void region_modify_block (Region *region, BlockInfo *info,
+                              gboolean all_modify, gboolean safe_mode,
+                              DhStrArray *property_name,
+                              DhStrArray *property_data);
     Palette *region_get_palette (Region *region, int val);
     ItemList *item_list_new_from_multi_region (const char **region_uuid_arr);
     void region_free (Region *region);

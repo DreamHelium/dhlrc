@@ -1,12 +1,12 @@
-if(NOT UTIL_FOUND)
+if (NOT UTIL_FOUND)
     add_subdirectory(dhutil)
 endif ()
 
-if(NOT INTERFACE_FOUND)
+if (NOT INTERFACE_FOUND)
     add_subdirectory(nbt_interface_cpp)
-endif()
+endif ()
 
-if(${INSTALL_NOW})
+if (${INSTALL_NOW})
     add_definitions(-DLOCALEDIR="/usr/share/locale")
     add_definitions(-DMODULEDIR="/usr/lib64/dhlrc/modules")
     add_definitions(-DRESOURCEDIR="/usr/share/dhlrc/dhlrc_resources")
@@ -24,47 +24,29 @@ add_library(dhlrc SHARED
         translation.c
         litematica_region.cpp
         litematica_region.h
+        dh_mt_table.h dh_mt_table.c
         dhlrc_list.h
         dhlrc_list.c
         recipe_util.h
         recipe_util.c
-        #    nbt_pos.c
-        #    nbt_pos.h
         config.c
         config.h
-#        uncompress.c uncompress.h
         process_state.c process_state.h
         csv_parser.c csv_parser.h
-        #    nbt_util.h
-        #    nbt_util.c
         json_util.c
         json_util.h
         region.cpp
         region.h
         download_file.h
         download_file.c
-        create_nbt.h
-        create_nbt.c
-        conv_feature.c
-        conv_feature.h
-        mcdata_feature.c
-        mcdata_feature.h
-        unzip_feature.c
-        unzip_feature.h
-        recipe_feature.c recipe_feature.h
 )
 
-# target_link_libraries(dhlrc_recipe_full PUBLIC dhutil cjson)
+add_subdirectory(feature)
 
 target_link_libraries(dhlrc PUBLIC z cjson
-#        ${minizip_LIBRARIES}
-        dhutil_base
+        dhutil_string dhutil_file
         dhnbt_interface_cpp
 )
-
-#if (${minizip_VERSION} LESS 4.0.0)
-#    add_definitions(-DDHLRC_MZ_VERSION_LESS_THAN_FOUR)
-#endif ()
 
 target_include_directories(dhlrc PUBLIC
         "${GIO_INCLUDE_DIRS}" dhutil "${minizip_INCLUDE_DIRS}"
@@ -74,7 +56,7 @@ target_link_directories(dhlrc PUBLIC "${GIO_LIBRARY_DIRS}")
 
 add_executable(dhlrc.bin main.c)
 
-target_link_libraries(dhlrc.bin PUBLIC dhlrc gmodule-2.0)
+target_link_libraries(dhlrc.bin PUBLIC dhlrc dhlrc_feature)
 
 set_target_properties(dhlrc.bin PROPERTIES INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib64")
 

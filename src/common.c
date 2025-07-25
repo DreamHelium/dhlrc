@@ -20,19 +20,20 @@
 #include "common_info.h"
 #include "config.h"
 #include "dh_file_util.h"
+#include "feature/recipe_feature.h"
 #include "recipe_util.h"
 #include "translation.h"
-#include "recipe_feature.h"
 
 static GResource *res = NULL;
+static gboolean res_load = FALSE;
 
 gboolean
 dhlrc_common_contents_init (const char *prname)
 {
-    char* res_path = NULL;
+    char *res_path = NULL;
     char *prpath = dh_file_get_current_program_dir (prname);
 #ifdef RESOURCEDIR
-    res_path = g_strdup(RESOURCEDIR);
+    res_path = g_strdup (RESOURCEDIR);
 #else
     res_path
         = g_strconcat (prpath, G_DIR_SEPARATOR_S, "dhlrc_resources", NULL);
@@ -50,8 +51,15 @@ dhlrc_common_contents_init (const char *prname)
     else
         {
             g_resources_register (res);
+            res_load = TRUE;
             return TRUE;
         }
+}
+
+gboolean
+dhlrc_common_contents_is_inited ()
+{
+    return res_load;
 }
 
 GResource *

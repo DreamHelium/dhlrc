@@ -20,9 +20,6 @@
 
 #include "mcdata/mcdata.h"
 
-#include <cjson/cJSON.h>
-#include <dhutil.h>
-
 #ifdef __cplusplus
 extern "C"
 {

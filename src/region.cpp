@@ -726,25 +726,27 @@ void
 region_modify_property (Region *region, BlockInfo *info, gboolean all_modify,
                         DhStrArray *new_data)
 {
-    auto new_palette = g_new0(Palette, 1);
+    auto new_palette = g_new0 (Palette, 1);
     auto old_palette = region_get_palette (region, info->palette);
-    new_palette->id_name = g_strdup(old_palette->id_name);
+    new_palette->id_name = g_strdup (old_palette->id_name);
     new_palette->property_name = dh_str_array_dup (old_palette->property_name);
     new_palette->property_data = dh_str_array_dup (new_data);
 
     if (all_modify)
         {
             /* First replace the old palette */
-            palette_free(old_palette);
+            palette_free (old_palette);
             region->palette_array->pdata[info->palette] = new_palette;
             /* Try to get the same palette */
-            for (int i = 0 ; i < region->palette_array->len ; i++)
+            for (int i = 0; i < region->palette_array->len; i++)
                 {
                     auto current_palette = region_get_palette (region, i);
-                    if (i != info->palette && palette_is_same (new_palette, current_palette))
+                    if (i != info->palette
+                        && palette_is_same (new_palette, current_palette))
                         {
-                            g_ptr_array_remove_index(region->palette_array, i);
-                            palette_minus_one(region, i, info->palette);
+                            g_ptr_array_remove_index (region->palette_array,
+                                                      i);
+                            palette_minus_one (region, i, info->palette);
                             return;
                         }
                 }
@@ -752,17 +754,24 @@ region_modify_property (Region *region, BlockInfo *info, gboolean all_modify,
         }
     else
         {
-            for (int i = 0 ; i < region->palette_array->len ; i++)
+            for (int i = 0; i < region->palette_array->len; i++)
                 {
                     auto current_palette = region_get_palette (region, i);
-                    if (i != info->palette && palette_is_same (new_palette, current_palette))
+                    if (i != info->palette
+                        && palette_is_same (new_palette, current_palette))
                         {
                             info->palette = i;
-                            palette_free(new_palette);
+                            palette_free (new_palette);
                             return;
                         }
                 }
-            g_ptr_array_add(region->palette_array, new_palette);
+            g_ptr_array_add (region->palette_array, new_palette);
             info->palette = region->palette_array->len - 1;
         }
+}
+void
+region_modify_block (Region *region, BlockInfo *info, gboolean all_modify,
+                     gboolean safe_mode, DhStrArray *property_name,
+                     DhStrArray *property_data)
+{
 }

@@ -1,13 +1,12 @@
 #include "utility.h"
 #include "../common_info.h"
 #include "../config.h"
-#include "../csv_parser.h"
 #include "../nbt_interface_cpp/nbt_interface.hpp"
 #include "../region.h"
 #include "../translation.h"
-#include "glib.h"
+#include <glib.h>
+#include <gio/gio.h>
 #include "lrchooseui.h"
-#include <QInputDialog>
 #include <QMessageBox>
 #include <QPainter>
 #include <QPixmap>
@@ -18,22 +17,12 @@
 
 #include <generalchooseui.h>
 
-typedef struct Version
-{
-    QString version;
-    int dataversion;
-} Version;
-
-static QList<Version> versions;
-static bool version_inited = false;
-
 void
 dh::loadRegion (QWidget *parent)
 {
     /* The lock for Region info should begin in main func */
     /* Lock for NBT info start */
-    GeneralChooseUI *gcui
-        = new GeneralChooseUI (DH_TYPE_NBT_INTERFACE_CPP, false);
+    auto *gcui = new GeneralChooseUI (DH_TYPE_NBT_INTERFACE_CPP, false);
     gcui->setAttribute (Qt::WA_DeleteOnClose);
     auto res = gcui->exec ();
     /* Lock for NBT info end */
@@ -266,30 +255,14 @@ dh::getIcon (QString dir)
 }
 
 QString
-dh::getVersion (int dataversion)
+dh::getVersion (int data_version)
 {
-    if (!version_inited)
-        {
-            auto datas = g_resources_lookup_data (
-                "/cn/dh/dhlrc/data_version.csv", G_RESOURCE_LOOKUP_FLAGS_NONE,
-                nullptr);
-            auto data = (const char *)g_bytes_get_data (datas, nullptr);
-            auto array = dh_csv_parse (data);
-            for (int i = 0; i < array->len; i++)
-                {
-                    auto val = (char **)array->pdata[i];
-                    Version v{};
-                    v.version = val[0];
-                    v.dataversion = std::stoi (val[1]);
-                    versions.append (v);
-                }
-            g_bytes_unref (datas);
-            g_ptr_array_free (array, true);
-        }
-    for (int i = 0; i < versions.length (); i++)
-        {
-            if (versions[i].dataversion == dataversion)
-                return versions[i].version;
-        }
+    if (!dhlrc_version_map_inited ())
+        dhlrc_load_version_map ();
+    auto map
+        = static_cast<std::map<int, std::string> *> (dhlrc_get_version_map ());
+    auto it = map->find (data_version);
+    if (it != map->end ())
+        return it->second.data ();
     return {};
 }

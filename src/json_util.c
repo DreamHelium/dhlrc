@@ -16,7 +16,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>. */
 
 #include "json_util.h"
-#include <dhutil.h>
+#include "dh_file_util.h"
 
 cJSON *
 dhlrc_file_to_json (const char *pos)

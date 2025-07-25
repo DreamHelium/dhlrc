@@ -24,6 +24,7 @@
 G_BEGIN_DECLS
 
 gboolean dhlrc_common_contents_init(const char* prname);
+gboolean dhlrc_common_contents_is_inited();
 void     dhlrc_common_contents_free();
 GResource* dhlrc_get_resource();
 void    dhlrc_init(const char* prname);
