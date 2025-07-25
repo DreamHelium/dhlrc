@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-07-22 20:45+0800\n"
+"POT-Creation-Date: 2025-07-26 01:45+0800\n"
 "PO-Revision-Date: 2024-11-30 07:00+0800\n"
 "Last-Translator: dream_he <48383878+DreamHelium@users.noreply.github.com>\n"
 "Language-Team: Chinese <kde-i18n-doc@kde.org>\n"
@@ -277,17 +277,17 @@ msgstr "展示材料"
 
 #: ../../src/qt/mainwindow.ui:164
 msgctxt "MainWindow|"
-msgid "Test OpenGL"
-msgstr "测试OpenGL"
+msgid "Block and Translation"
+msgstr ""
 
 #: ../../src/qt/mainwindow.ui:171
 msgctxt "MainWindow|"
-msgid "Block and Translation"
+msgid "Add Translation"
 msgstr ""
 
 #: ../../src/qt/mainwindow.ui:178
 msgctxt "MainWindow|"
-msgid "Add Translation"
+msgid "&Load Jar File for Resources"
 msgstr ""
 
 #: ../../src/qt/mainwindow.ui:201 ../../src/qt/mainwindow.ui:210
@@ -395,7 +395,7 @@ msgctxt "RecipeSelectUI|"
 msgid "Please select a recipe file:"
 msgstr "请选择一个配方文件："
 
-#: src/dhlrc_list.c:322
+#: src/dhlrc_list.c:324
 #, c-format
 msgid "Combined %d items to the new item list."
 msgstr "合并了%d物品至新的物品列表。"
@@ -428,134 +428,6 @@ msgstr ""
 #: src/main.c:198
 msgid "CLI interface is not supported yet!"
 msgstr ""
-
-#: src/main_isoc.c:92
-msgid "Error when reading file."
-msgstr "在读取文件时出错。"
-
-#: src/main_isoc.c:108 src/qt/utility.cpp:163
-msgid "Not a valid NBT file!"
-msgstr "不是一个有效的NBT文件！"
-
-#: src/main_isoc.c:114
-msgid "Valid NBT file!"
-msgstr "有效的NBT文件！"
-
-#: src/main_isoc.c:128
-#, c-format
-msgid ""
-"There are three functions:\n"
-"[0] NBT lite reader with modifier\n"
-"[1] Litematica material list with recipe combination\n"
-"[2] Litematica block reader\n"
-"\n"
-msgstr ""
-"有三个功能可供使用：\n"
-"[0] 小型NBT阅读器带修改器\n"
-"[1] 投影材料列表及合成表合成功能\n"
-"[2] 投影方块阅读器\n"
-"\n"
-
-#: src/main_isoc.c:135 src/nbt_litereader.c:78 src/nbt_litereader.c:302
-msgid "Quit application"
-msgstr "退出程序"
-
-#: src/main_isoc.c:140
-msgid "Please select an option, or enter 'q' to exit the program (q): "
-msgstr "请选择一个选项，或输入 “q” 退出程序 (q): "
-
-#: src/main_isoc.c:186
-#, c-format
-msgid "There are %d regions:\n"
-msgstr "有 %d 个区域：\n"
-
-#: src/main_isoc.c:199
-#, c-format
-msgid "Processing: region %d / %d : [%ld] %s"
-msgstr ""
-
-#: src/nbt_litereader.c:58
-#, c-format
-msgid ""
-"The detail of NBT \"%s\" is listed below:\n"
-"\n"
-msgstr ""
-"NBT \"%s\" 的细节如下：\n"
-"\n"
-
-#: src/nbt_litereader.c:79
-msgid "Enter modification mode"
-msgstr "进入修改模式"
-
-#: src/nbt_litereader.c:80
-msgid "Save NBT file"
-msgstr "保存NBT文件"
-
-#: src/nbt_litereader.c:81
-msgid "Enter upper instance"
-msgstr "进入上层实例"
-
-#: src/nbt_litereader.c:86
-msgid ""
-"\n"
-"Please enter a number or choose option to continue [Q/m/s/e/?]: "
-msgstr ""
-"\n"
-"请输入一个数字或选择选项以继续 [Q/m/s/e/?]： "
-
-#: src/nbt_litereader.c:90 src/nbt_litereader.c:98 src/nbt_litereader.c:301
-msgid "Enter upper NBT"
-msgstr "进入上层NBT"
-
-#: src/nbt_litereader.c:92
-msgid ""
-"\n"
-"Please enter a number or choose option to continue [P/q/m/s/e/?]: "
-msgstr ""
-"\n"
-"请输入一个数字或选择选项以继续 [P/q/m/s/e/?]： "
-
-#: src/nbt_litereader.c:100
-msgid ""
-"\n"
-"No deeper NBT, please choose option to continue [P/q/m/s/e/?]: "
-msgstr ""
-"\n"
-"没有深层NBT，请选择选项以继续 [P/q/m/s/e/?]： "
-
-#: src/nbt_litereader.c:261 src/nbt_litereader.c:360
-#, c-format
-msgid ""
-"\n"
-"Unsupported modification mode request, will exit to reading mode."
-msgstr ""
-"\n"
-"不支持的修改模式请求，将退回至阅读模式。"
-
-#: src/nbt_litereader.c:303
-msgid "Exit modification mode"
-msgstr "退出修改模式"
-
-#: src/nbt_litereader.c:309
-msgid ""
-"\n"
-"Please enter an integer or choose an option [P/q/b/?]: "
-msgstr ""
-
-#: src/nbt_litereader.c:323
-#, c-format
-msgid ""
-"\n"
-"The integer you input is %ld, please confirm [Y/n/?]:"
-msgstr ""
-
-#: src/nbt_litereader.c:325
-msgid "Yes"
-msgstr "是"
-
-#: src/nbt_litereader.c:326
-msgid "No"
-msgstr "否"
 
 #: src/qt/addtranslationui.cpp:33
 msgid "Select Translation File or Jar File"
@@ -671,13 +543,13 @@ msgid "locked"
 msgstr "已锁定"
 
 #: src/qt/generalchooseui.cpp:74 src/qt/generalchooseui.cpp:95
-#: src/qt/lrchooseui.cpp:61 src/qt/recipesui.cpp:140
+#: src/qt/lrchooseui.cpp:61 src/qt/recipesui.cpp:136
 #: src/qt/saveregionselectui.cpp:50 src/gtk/manage_window.c:118
 msgid "&OK"
 msgstr "确定(&O)"
 
 #: src/qt/generalchooseui.cpp:75 src/qt/lrchooseui.cpp:62
-#: src/qt/recipesui.cpp:141 src/qt/saveregionselectui.cpp:51
+#: src/qt/recipesui.cpp:137 src/qt/saveregionselectui.cpp:51
 #: src/gtk/manage_window.c:121
 msgid "&Close"
 msgstr "关闭(&C)"
@@ -687,14 +559,14 @@ msgid "No object available!"
 msgstr "没有项目可用！"
 
 #: src/qt/generalchooseui.cpp:138 src/qt/ilreaderui.cpp:111
-#: src/qt/mainwindow.cpp:156 src/qt/mainwindow.cpp:176
-#: src/qt/mainwindow.cpp:207 src/qt/mainwindow.cpp:212
-#: src/qt/mainwindow.cpp:233 src/qt/mainwindow.cpp:238
-#: src/qt/mainwindow.cpp:270 src/qt/manage.cpp:28 src/qt/manage.cpp:324
+#: src/qt/mainwindow.cpp:140 src/qt/mainwindow.cpp:160
+#: src/qt/mainwindow.cpp:191 src/qt/mainwindow.cpp:196
+#: src/qt/mainwindow.cpp:217 src/qt/mainwindow.cpp:222
+#: src/qt/mainwindow.cpp:254 src/qt/manage.cpp:28 src/qt/manage.cpp:324
 #: src/qt/manage.cpp:339 src/qt/manage.cpp:484
-#: src/qt/saveregionselectui.cpp:127 src/qt/utility.cpp:47
-#: src/qt/utility.cpp:79 src/qt/utility.cpp:100 src/qt/utility.cpp:110
-#: src/qt/utility.cpp:115 src/qt/utility.cpp:124 src/qt/utility.cpp:195
+#: src/qt/saveregionselectui.cpp:127 src/qt/utility.cpp:36
+#: src/qt/utility.cpp:68 src/qt/utility.cpp:89 src/qt/utility.cpp:99
+#: src/qt/utility.cpp:104 src/qt/utility.cpp:113 src/qt/utility.cpp:184
 msgid "Error!"
 msgstr "错误！"
 
@@ -738,8 +610,8 @@ msgstr "追踪"
 msgid "Show history"
 msgstr "展示历史"
 
-#: src/qt/ilreaderui.cpp:111 src/qt/mainwindow.cpp:157
-#: src/qt/mainwindow.cpp:177
+#: src/qt/ilreaderui.cpp:111 src/qt/mainwindow.cpp:141
+#: src/qt/mainwindow.cpp:161
 msgid "The item list is locked!"
 msgstr "此材料列表被锁定！"
 
@@ -761,35 +633,35 @@ msgstr "请输入新Region的名字：（%1代表NBT描述，%2代表原本的�
 msgid "Enter description here."
 msgstr "在此输入描述。"
 
-#: src/qt/mainwindow.cpp:195 src/qt/saveregionselectui.cpp:116
+#: src/qt/mainwindow.cpp:179 src/qt/saveregionselectui.cpp:116
 msgid "Enter Name for Item List"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:196 src/qt/saveregionselectui.cpp:117
+#: src/qt/mainwindow.cpp:180 src/qt/saveregionselectui.cpp:117
 msgid "Enter the name for item list"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:208 src/qt/saveregionselectui.cpp:128
+#: src/qt/mainwindow.cpp:192 src/qt/saveregionselectui.cpp:128
 msgid "Description is empty!"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:213 src/qt/mainwindow.cpp:239
+#: src/qt/mainwindow.cpp:197 src/qt/mainwindow.cpp:223
 msgid "No Region or no Region selected!"
 msgstr "没有Region或没有Region选中！"
 
-#: src/qt/mainwindow.cpp:234
+#: src/qt/mainwindow.cpp:218
 msgid "Region is locked!"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:270
+#: src/qt/mainwindow.cpp:254
 msgid "No NBT is selected!"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:297
+#: src/qt/mainwindow.cpp:273
 msgid "Version: "
 msgstr "版本： "
 
-#: src/qt/mainwindow.cpp:299
+#: src/qt/mainwindow.cpp:275
 msgid "About Litematica Reader"
 msgstr "关于投影文件阅读器"
 
@@ -877,74 +749,74 @@ msgstr ""
 msgid "The item is:"
 msgstr ""
 
-#: src/qt/recipesui.cpp:107
+#: src/qt/recipesui.cpp:103
 msgid "No items? Get recipe files from file."
 msgstr ""
 
-#: src/qt/recipesui.cpp:108
+#: src/qt/recipesui.cpp:104
 msgid "Please select items:"
 msgstr "请选择物品："
 
-#: src/qt/recipesui.cpp:110
+#: src/qt/recipesui.cpp:106
 msgid "Search block name"
 msgstr "搜索方块名称"
 
-#: src/qt/recipesui.cpp:130
+#: src/qt/recipesui.cpp:126
 msgid "Combine items to this item list."
 msgstr "合并物品至此物品列表。"
 
-#: src/qt/recipesui.cpp:132
+#: src/qt/recipesui.cpp:128
 msgid "New item list name:"
 msgstr "新的物品列表名字："
 
-#: src/qt/recipesui.cpp:133
+#: src/qt/recipesui.cpp:129
 msgid "Generated from material list combiner."
 msgstr "从材料列表合成器生成。"
 
-#: src/qt/recipesui.cpp:206
+#: src/qt/recipesui.cpp:202
 #, c-format
 msgid "\"Delete\" %d items from material list combiner."
 msgstr "从材料列表合成器\"删除\"%d物品。"
 
-#: src/qt/recipesui.cpp:236
+#: src/qt/recipesui.cpp:232
 msgid "Mod decide"
 msgstr "余数决定"
 
-#: src/qt/recipesui.cpp:236
+#: src/qt/recipesui.cpp:232
 #, c-format
 msgid "There's a remainder with %d and %d, continue?"
 msgstr "%d除以%d有余数，继续？"
 
-#: src/qt/recipesui.cpp:260
+#: src/qt/recipesui.cpp:256
 #, c-format
 msgid "Add %d items from material list combiner."
 msgstr "从材料列表合成器添加%d物品。"
 
-#: src/qt/recipesui.cpp:323
+#: src/qt/recipesui.cpp:319
 msgid "Please select a game jar"
 msgstr ""
 
-#: src/qt/recipesui.cpp:323
+#: src/qt/recipesui.cpp:319
 msgid "Jar File (*.jar)"
 msgstr ""
 
-#: src/qt/recipesui.cpp:362
+#: src/qt/recipesui.cpp:358
 msgid "Show recipe"
 msgstr "展示配方"
 
-#: src/qt/recipesui.cpp:424
+#: src/qt/recipesui.cpp:420
 msgid "Unzip failed!"
 msgstr ""
 
-#: src/qt/recipesui.cpp:433
+#: src/qt/recipesui.cpp:429
 msgid "Please select a destination."
 msgstr ""
 
-#: src/qt/recipesui.cpp:466
+#: src/qt/recipesui.cpp:462
 msgid "No Unzip Found!"
 msgstr ""
 
-#: src/qt/recipesui.cpp:466
+#: src/qt/recipesui.cpp:462
 msgid "No unzip program found!"
 msgstr ""
 
@@ -972,55 +844,59 @@ msgstr "保存为新式&Schematic NBT结构。"
 msgid "The track information is:\n"
 msgstr "追踪信息如下：\n"
 
-#: src/qt/utility.cpp:48
+#: src/qt/utility.cpp:37
 msgid "No NBT or no NBT selected!"
 msgstr "无NBT或没有NBT被选中！"
 
-#: src/qt/utility.cpp:72 src/qt/utility.cpp:93
+#: src/qt/utility.cpp:61 src/qt/utility.cpp:82
 msgid "Enter Region Name"
 msgstr "输入Region名称"
 
-#: src/qt/utility.cpp:73 src/qt/utility.cpp:94
+#: src/qt/utility.cpp:62 src/qt/utility.cpp:83
 msgid "Enter name for the new Region."
 msgstr "输入新Region的名称。"
 
-#: src/qt/utility.cpp:80 src/qt/utility.cpp:101
+#: src/qt/utility.cpp:69 src/qt/utility.cpp:90
 msgid "No description for the Region!"
 msgstr "没有Region的描述！"
 
-#: src/qt/utility.cpp:111
+#: src/qt/utility.cpp:100
 msgid "Unknown error!"
 msgstr ""
 
-#: src/qt/utility.cpp:116
+#: src/qt/utility.cpp:105
 msgid "The NBT Struct is unsupported!"
 msgstr "此NBT结构不受支持！"
 
-#: src/qt/utility.cpp:125
+#: src/qt/utility.cpp:114
 msgid "This NBT is locked!"
 msgstr "此NBT被锁定！"
 
-#: src/qt/utility.cpp:139 src/gtk/manage_nbt.c:131
+#: src/qt/utility.cpp:128 src/gtk/manage_nbt.c:131
 msgid "Enter Desciption"
 msgstr "输入描述"
 
-#: src/qt/utility.cpp:140
+#: src/qt/utility.cpp:129
 msgid "Enter desciption for the NBT file."
 msgstr "输入NBT文件的描述。"
 
-#: src/qt/utility.cpp:144
+#: src/qt/utility.cpp:133
 msgid "No Description Entered!"
 msgstr "没有输入的描述！"
 
-#: src/qt/utility.cpp:145
+#: src/qt/utility.cpp:134
 msgid "No desciption entered! Will not add the NBT file!"
 msgstr "没有描述输入！将不会添加NBT文件！"
 
-#: src/qt/utility.cpp:162
+#: src/qt/utility.cpp:151
 msgid "Not Valid File!"
 msgstr "不是有效的文件！"
 
-#: src/qt/utility.cpp:189
+#: src/qt/utility.cpp:152
+msgid "Not a valid NBT file!"
+msgstr "不是一个有效的NBT文件！"
+
+#: src/qt/utility.cpp:178
 msgid "The following files couldn't be added:\n"
 msgstr ""
 
@@ -1216,6 +1092,98 @@ msgstr "北"
 #: src/region.cpp:34
 msgid "west"
 msgstr "西"
+
+#~ msgctxt "MainWindow|"
+#~ msgid "Test OpenGL"
+#~ msgstr "测试OpenGL"
+
+#~ msgid "Error when reading file."
+#~ msgstr "在读取文件时出错。"
+
+#~ msgid "Valid NBT file!"
+#~ msgstr "有效的NBT文件！"
+
+#, c-format
+#~ msgid ""
+#~ "There are three functions:\n"
+#~ "[0] NBT lite reader with modifier\n"
+#~ "[1] Litematica material list with recipe combination\n"
+#~ "[2] Litematica block reader\n"
+#~ "\n"
+#~ msgstr ""
+#~ "有三个功能可供使用：\n"
+#~ "[0] 小型NBT阅读器带修改器\n"
+#~ "[1] 投影材料列表及合成表合成功能\n"
+#~ "[2] 投影方块阅读器\n"
+#~ "\n"
+
+#~ msgid "Quit application"
+#~ msgstr "退出程序"
+
+#~ msgid "Please select an option, or enter 'q' to exit the program (q): "
+#~ msgstr "请选择一个选项，或输入 “q” 退出程序 (q): "
+
+#, c-format
+#~ msgid "There are %d regions:\n"
+#~ msgstr "有 %d 个区域：\n"
+
+#, c-format
+#~ msgid ""
+#~ "The detail of NBT \"%s\" is listed below:\n"
+#~ "\n"
+#~ msgstr ""
+#~ "NBT \"%s\" 的细节如下：\n"
+#~ "\n"
+
+#~ msgid "Enter modification mode"
+#~ msgstr "进入修改模式"
+
+#~ msgid "Save NBT file"
+#~ msgstr "保存NBT文件"
+
+#~ msgid "Enter upper instance"
+#~ msgstr "进入上层实例"
+
+#~ msgid ""
+#~ "\n"
+#~ "Please enter a number or choose option to continue [Q/m/s/e/?]: "
+#~ msgstr ""
+#~ "\n"
+#~ "请输入一个数字或选择选项以继续 [Q/m/s/e/?]： "
+
+#~ msgid "Enter upper NBT"
+#~ msgstr "进入上层NBT"
+
+#~ msgid ""
+#~ "\n"
+#~ "Please enter a number or choose option to continue [P/q/m/s/e/?]: "
+#~ msgstr ""
+#~ "\n"
+#~ "请输入一个数字或选择选项以继续 [P/q/m/s/e/?]： "
+
+#~ msgid ""
+#~ "\n"
+#~ "No deeper NBT, please choose option to continue [P/q/m/s/e/?]: "
+#~ msgstr ""
+#~ "\n"
+#~ "没有深层NBT，请选择选项以继续 [P/q/m/s/e/?]： "
+
+#, c-format
+#~ msgid ""
+#~ "\n"
+#~ "Unsupported modification mode request, will exit to reading mode."
+#~ msgstr ""
+#~ "\n"
+#~ "不支持的修改模式请求，将退回至阅读模式。"
+
+#~ msgid "Exit modification mode"
+#~ msgstr "退出修改模式"
+
+#~ msgid "Yes"
+#~ msgstr "是"
+
+#~ msgid "No"
+#~ msgstr "否"
 
 #~ msgid "Select a item list."
 #~ msgstr "选择一个物品列表。"
