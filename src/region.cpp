@@ -40,8 +40,9 @@ static gboolean find_palette (gconstpointer a, gconstpointer b);
 static int compare_block_info (gconstpointer a, gconstpointer b);
 
 void
-region_free (Region *region)
+region_free (void *data)
 {
+    auto region = static_cast<Region *> (data);
     g_free (region->region_size);
     base_data_free (region->data);
     g_ptr_array_unref (region->block_info_array);
@@ -212,7 +213,8 @@ get_block_full_info_from_lr (LiteRegion *lr, Region *region)
                             if (block->palette < blocks->num)
                                 {
                                 }
-                            else g_critical ("Palette out of range!");
+                            else
+                                g_critical ("Palette out of range!");
                             g_ptr_array_add (array, block);
                         }
                 }
@@ -657,8 +659,8 @@ item_list_new_from_multi_region (const char **region_uuid_arr)
     ItemList *ret = NULL;
     for (; *region_uuid_arr; region_uuid_arr++)
         {
-            Region *region = (Region *)common_info_get_data (DH_TYPE_Region,
-                                                             *region_uuid_arr);
+            Region *region = (Region *)dh_info_get_data (DH_TYPE_REGION,
+                                                         *region_uuid_arr);
             ItemList *i_il = item_list_new_from_region (region);
             item_list_combine (&ret, i_il);
             item_list_free (i_il);
@@ -774,4 +776,14 @@ region_modify_block (Region *region, BlockInfo *info, gboolean all_modify,
                      gboolean safe_mode, DhStrArray *property_name,
                      DhStrArray *property_data)
 {
+}
+
+int
+region_get_index (Region *region, int x, int y, int z)
+{
+    if (x >= region->region_size->x && y >= region->region_size->y
+        && z >= region->region_size->z)
+        return -1;
+    return region->region_size->x * region->region_size->z * y
+           + region->region_size->x * z + x;
 }

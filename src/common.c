@@ -16,7 +16,6 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>. */
 
 #include "common.h"
-
 #include "common_info.h"
 #include "config.h"
 #include "dh_file_util.h"
@@ -26,6 +25,7 @@
 
 static GResource *res = NULL;
 static gboolean res_load = FALSE;
+static gboolean inited = FALSE;
 
 gboolean
 dhlrc_common_contents_init (const char *prname)
@@ -74,10 +74,9 @@ dhlrc_init (const char *prname)
     translation_init (prname);
     dhlrc_make_config ();
     dhlrc_common_contents_init (prname);
-    common_infos_init ();
-    char* recipes_module_path = NULL;
+    char *recipes_module_path = NULL;
 #ifdef RECIPESDIR
-    recipes_module_path = g_strdup(RECIPESDIR);
+    recipes_module_path = g_strdup (RECIPESDIR);
 #else
     char *prpath = dh_file_get_current_program_dir (prname);
     recipes_module_path
@@ -86,12 +85,19 @@ dhlrc_init (const char *prname)
 #endif
     dhlrc_recipe_init (recipes_module_path);
     g_free (recipes_module_path);
+    inited = TRUE;
+}
+
+gboolean
+dhlrc_is_inited ()
+{
+    return inited;
 }
 
 void
 dhlrc_cleanup ()
 {
-    common_infos_free ();
+    dh_type_free ();
     dhlrc_common_contents_free ();
     dhlrc_recipe_module_clean ();
     dhlrc_cleanup_manifest ();

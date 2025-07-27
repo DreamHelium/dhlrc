@@ -23,9 +23,9 @@ LrChooseUI::initUI ()
     vLayout->addWidget (label);
     vLayout->addStretch ();
 
-    auto uuid = common_info_list_get_uuid (DH_TYPE_NBT_INTERFACE_CPP);
-    auto instance = (DhNbtInstance *)common_info_get_data (
-        DH_TYPE_NBT_INTERFACE_CPP, uuid);
+    auto uuid = dh_info_get_uuid (DH_TYPE_NBT_INTERFACE_CPP);
+    auto instance = (DhNbtInstance *)dh_info_get_data (
+        DH_TYPE_NBT_INTERFACE_CPP, uuid->val[0]);
 
     arr = lite_region_name_array_instance (instance);
     group = new QButtonGroup ();
@@ -105,22 +105,22 @@ LrChooseUI::okBtn_clicked ()
     auto buttons = group->buttons ();
     for (int i = 0; i < buttons.length (); i++)
         {
-            auto uuid = common_info_list_get_uuid (DH_TYPE_NBT_INTERFACE_CPP);
-            auto instance = (DhNbtInstance *)common_info_get_data (
+            auto uuid = dh_info_get_uuid (DH_TYPE_NBT_INTERFACE_CPP)->val[0];
+            auto instance = (DhNbtInstance *)dh_info_get_data (
                 DH_TYPE_NBT_INTERFACE_CPP, uuid);
             if (buttons[i]->isChecked ())
                 {
                     QString des = lineEdit->text ()
-                                      .arg (common_info_get_description (
+                                      .arg (dh_info_get_description (
                                           DH_TYPE_NBT_INTERFACE_CPP, uuid))
                                       .arg (arr->val[i]);
                     LiteRegion *lr
                         = lite_region_create_from_root_instance_cpp (*instance,
                                                                      i);
                     Region *region = region_new_from_lite_region (lr);
-                    common_info_new (DH_TYPE_Region, region,
+                    dh_info_new (DH_TYPE_REGION, region,
                                      g_date_time_new_now_local (),
-                                     des.toUtf8 ());
+                                     des.toUtf8 (), nullptr, nullptr);
                     lite_region_free (lr);
                 }
         }

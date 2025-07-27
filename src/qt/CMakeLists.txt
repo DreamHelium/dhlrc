@@ -43,6 +43,9 @@ set(PROJECT_SOURCES
         addtranslationui.cpp
         addtranslationui.h
         addtranslationui.ui
+        blockshowui.cpp
+        blockshowui.h
+        blockshowui.ui
 )
 
 if (${QT_VERSION_MAJOR} GREATER_EQUAL 6)

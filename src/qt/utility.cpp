@@ -29,7 +29,7 @@ dh::loadRegion (QWidget *parent)
     if (res == QDialog::Accepted)
         {
             dh::loadRegion (
-                parent, common_info_list_get_uuid (DH_TYPE_NBT_INTERFACE_CPP));
+                parent, dh_info_get_uuid (DH_TYPE_NBT_INTERFACE_CPP)->val[0]);
         }
     /* No option given for the NBT selection */
     else
@@ -40,9 +40,9 @@ dh::loadRegion (QWidget *parent)
 void
 dh::loadRegion (QWidget *parent, const char *uuid)
 {
-    auto instance = (DhNbtInstance *)common_info_get_data (
+    auto instance = (DhNbtInstance *)dh_info_get_data (
         DH_TYPE_NBT_INTERFACE_CPP, uuid);
-    if (common_info_reader_trylock (DH_TYPE_NBT_INTERFACE_CPP, uuid))
+    if (dh_info_reader_trylock (DH_TYPE_NBT_INTERFACE_CPP, uuid))
         {
             /* Lock NBT start */
             if (lite_region_num_instance (instance))
@@ -61,16 +61,16 @@ dh::loadRegion (QWidget *parent, const char *uuid)
                                 parent, _ ("Enter Region Name"),
                                 _ ("Enter name for the new Region."),
                                 QLineEdit::Normal,
-                                common_info_get_description (
+                                dh_info_get_description (
                                     DH_TYPE_NBT_INTERFACE_CPP, uuid));
                             if (str.isEmpty ())
                                 QMessageBox::critical (
                                     parent, _ ("Error!"),
                                     _ ("No description for the Region!"));
                             else
-                                common_info_new (DH_TYPE_Region, region,
+                                dh_info_new (DH_TYPE_REGION, region,
                                                  g_date_time_new_now_local (),
-                                                 str.toLocal8Bit ());
+                                                 str.toLocal8Bit (), nullptr, nullptr);
                         }
                     else if (file_is_new_schem (instance))
                         {
@@ -82,7 +82,7 @@ dh::loadRegion (QWidget *parent, const char *uuid)
                                         parent, _ ("Enter Region Name"),
                                         _ ("Enter name for the new Region."),
                                         QLineEdit::Normal,
-                                        common_info_get_description (
+                                        dh_info_get_description (
                                             DH_TYPE_NBT_INTERFACE_CPP, uuid));
                                     if (str.isEmpty ())
                                         QMessageBox::critical (
@@ -90,10 +90,10 @@ dh::loadRegion (QWidget *parent, const char *uuid)
                                             _ ("No description for the "
                                                "Region!"));
                                     else
-                                        common_info_new (
-                                            DH_TYPE_Region, region,
+                                        dh_info_new (
+                                            DH_TYPE_REGION, region,
                                             g_date_time_new_now_local (),
-                                            str.toLocal8Bit ());
+                                            str.toLocal8Bit (), nullptr, nullptr);
                                 }
                             else
                                 QMessageBox::critical (parent, _ ("Error!"),
@@ -106,7 +106,7 @@ dh::loadRegion (QWidget *parent, const char *uuid)
                 }
 
             /* Lock NBT end */
-            common_info_reader_unlock (DH_TYPE_NBT_INTERFACE_CPP, uuid);
+            dh_info_reader_unlock (DH_TYPE_NBT_INTERFACE_CPP, uuid);
         }
     /* Lock NBT fail */
     else
@@ -141,10 +141,10 @@ dh::loadNbtInstance (QWidget *parent, QString filedir, bool askForDes,
     if (des)
         {
             auto instance = new DhNbtInstance (filedir.toUtf8 ());
-            if (instance)
+            if (instance->get_original_nbt ())
                 {
-                    common_info_new (DH_TYPE_NBT_INTERFACE_CPP, instance,
-                                     g_date_time_new_now_local (), des);
+                    dh_info_new (DH_TYPE_NBT_INTERFACE_CPP, instance,
+                                     g_date_time_new_now_local (), des, nullptr, nullptr);
                     ret = true;
                 }
             else if (tipForFail)

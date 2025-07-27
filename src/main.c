@@ -19,13 +19,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 /*#include "dhlrc_config.h"*/
+#include "common.h"
 #include "dh_file_util.h"
 #include "feature/conv_feature.h"
+#include "feature/mcdata_feature.h"
+#include "feature/recipe_feature.h"
 #include "feature/unzip_feature.h"
 #include "glibconfig.h"
 #include "gmodule.h"
-#include "feature/mcdata_feature.h"
-#include "feature/recipe_feature.h"
 #include "translation.h"
 
 #ifdef G_OS_WIN32
@@ -58,7 +59,6 @@ static GModule *recipe_module = NULL;
 static DhlrcMainFunc qt_main = NULL;
 static DhlrcMainFunc conv_main = NULL;
 
-
 static void
 debug (int argc, char **argv)
 {
@@ -67,20 +67,19 @@ debug (int argc, char **argv)
 static gboolean
 get_module (const char *arg_zero, const char *module_name)
 {
-    char* module_path = NULL;
+    char *module_path = NULL;
     char *prpath = dh_file_get_current_program_dir (arg_zero);
     /* All platforms the module will be in module directory, sorry */
 #ifdef MODULEDIR
-    module_path = g_strdup(MODULEDIR);
+    module_path = g_strdup (MODULEDIR);
 #else
-    module_path
-        = g_strconcat (prpath, G_DIR_SEPARATOR_S, "module", NULL);
+    module_path = g_strconcat (prpath, G_DIR_SEPARATOR_S, "module", NULL);
 #endif
 
     g_free (prpath);
     char *dir
         = g_build_path (G_DIR_SEPARATOR_S, module_path, module_name, NULL);
-    g_free(module_path);
+    g_free (module_path);
     GError *err = NULL;
     GModule *new_module = g_module_open_full (dir, 0, &err);
     if (module_name == QT_MODULE_NAME)
@@ -215,11 +214,18 @@ int
 main (int argc, char **argb)
 {
     int ret = dhlrc_run (argc, argb);
-    if(qt_module) g_module_close (qt_module);
-    if(conv_module) g_module_close (conv_module);
-    if(mcdata_module) g_module_close (mcdata_module);
-    if(unzip_module) g_module_close(unzip_module);
-    if(recipe_module) g_module_close(recipe_module);
+    if (dhlrc_is_inited ())
+        dhlrc_cleanup ();
+    if (qt_module)
+        g_module_close (qt_module);
+    if (conv_module)
+        g_module_close (conv_module);
+    if (mcdata_module)
+        g_module_close (mcdata_module);
+    if (unzip_module)
+        g_module_close (unzip_module);
+    if (recipe_module)
+        g_module_close (recipe_module);
 
     return ret;
 }

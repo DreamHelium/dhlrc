@@ -40,7 +40,6 @@ extern "C"
         w.show ();
 
         int ret = a.exec ();
-        dhlrc_cleanup ();
         return ret;
     }
 }

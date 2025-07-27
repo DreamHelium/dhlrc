@@ -17,54 +17,42 @@ endif ()
 add_subdirectory(recipe_handler)
 
 add_library(dhlrc SHARED
+        dh_bit.c dh_bit.h
+        litematica_region.cpp litematica_region.h
+        region.cpp region.h)
+
+add_library(dhlrc_ext SHARED
         common_info.c common_info.h
         common.c common.h
-        dh_bit.c dh_bit.h
-        translation.h
-        translation.c
-        litematica_region.cpp
-        litematica_region.h
-        dh_mt_table.h dh_mt_table.c
-        dhlrc_list.h
-        dhlrc_list.c
-        recipe_util.h
-        recipe_util.c
-        config.c
-        config.h
+        dhlrc_list.h dhlrc_list.c
+        recipe_util.h recipe_util.c
+        config.c config.h
         process_state.c process_state.h
         csv_parser.c csv_parser.h
-        json_util.c
-        json_util.h
-        region.cpp
-        region.h
-        download_file.h
-        download_file.c
-)
+        json_util.c json_util.h
+        translation.h translation.c
+        download_file.h download_file.c)
 
 add_subdirectory(feature)
 
-target_link_libraries(dhlrc PUBLIC z cjson
-        dhutil_string dhutil_file
-        dhnbt_interface_cpp
-)
+target_link_libraries(dhlrc PUBLIC
+        dhutil_string
+        dhnbt_interface_cpp)
 
-target_include_directories(dhlrc PUBLIC
-        "${GIO_INCLUDE_DIRS}" dhutil "${minizip_INCLUDE_DIRS}"
-)
+target_include_directories(dhlrc PUBLIC "${GIO_INCLUDE_DIRS}" dhutil)
 
-target_link_directories(dhlrc PUBLIC "${GIO_LIBRARY_DIRS}")
+target_link_libraries(dhlrc_ext PUBLIC dhutil_file dhutil_type cjson)
+target_include_directories(dhlrc_ext PUBLIC ${GIO_INCLUDE_DIRS} dhutil)
 
 add_executable(dhlrc.bin main.c)
 
-target_link_libraries(dhlrc.bin PUBLIC dhlrc dhlrc_feature)
-
-set_target_properties(dhlrc.bin PROPERTIES INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib64")
+target_link_libraries(dhlrc.bin PUBLIC dhlrc dhlrc_feature dhlrc_ext)
 
 install(TARGETS dhlrc.bin
         BUNDLE DESTINATION .
-        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-)
-install(TARGETS dhlrc
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+
+install(TARGETS dhlrc dhlrc_ext dhlrc_feature
         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
 )
 

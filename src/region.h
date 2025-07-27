@@ -85,6 +85,7 @@ extern "C"
         int air_palette;
     } Region;
 
+    int region_get_index(Region* region, int x, int y, int z);
     gboolean file_is_new_schem (void *instance_ptr);
     Region *region_new_from_new_schem (void *instance_ptr);
     Region *region_new_from_lite_region (LiteRegion *lr);
@@ -101,7 +102,7 @@ extern "C"
                               DhStrArray *property_data);
     Palette *region_get_palette (Region *region, int val);
     ItemList *item_list_new_from_multi_region (const char **region_uuid_arr);
-    void region_free (Region *region);
+    void region_free (void *region);
 
 #ifdef __cplusplus
 }

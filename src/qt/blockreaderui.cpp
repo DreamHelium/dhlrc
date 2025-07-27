@@ -7,11 +7,13 @@
 #include "ui_blockreaderui.h"
 #include "utility.h"
 #include <QMessageBox>
+#include <blockshowui.h>
 #include <propertymodifyui.h>
 #include <qlineedit.h>
 #include <qnamespace.h>
 #include <qpushbutton.h>
 #include <qvalidator.h>
+#include <ui_blockshowui.h>
 
 static void
 set_func (void *klass, int value)
@@ -24,8 +26,8 @@ BlockReaderUI::BlockReaderUI (QWidget *parent)
     : QWidget (parent), ui (new Ui::BlockReaderUI)
 {
     ui->setupUi (this);
-    uuid = common_info_list_get_uuid (DH_TYPE_Region);
-    region = (Region *)common_info_get_data (DH_TYPE_Region, uuid.toUtf8 ());
+    uuid = dh_info_get_uuid (DH_TYPE_REGION)->val[0];
+    region = (Region *)dh_info_get_data (DH_TYPE_REGION, uuid.toUtf8 ());
     auto version = dh::getVersion (region->data_version);
     setText ();
     QObject::connect (ui->xEdit, &QLineEdit::textChanged, this,
@@ -42,6 +44,7 @@ BlockReaderUI::BlockReaderUI (QWidget *parent)
                       &QProgressBar::setValue);
     QObject::connect (ui->propertyBtn, &QPushButton::clicked, this,
                       &BlockReaderUI::propertyBtn_clicked);
+    QObject::connect (ui->showBtn, &QPushButton::clicked, this, &BlockReaderUI::showBtn_clicked);
     ui->entityBtn->setEnabled (false);
     ui->propertyBtn->setEnabled (false);
     if (dhlrc_mcdata_enabled ())
@@ -58,7 +61,7 @@ BlockReaderUI::BlockReaderUI (QWidget *parent)
 BlockReaderUI::~BlockReaderUI ()
 {
     delete ui;
-    common_info_reader_unlock (DH_TYPE_Region, uuid.toUtf8 ());
+    dh_info_reader_unlock (DH_TYPE_REGION, uuid.toUtf8 ());
     g_free (large_version);
 }
 
@@ -203,12 +206,12 @@ void
 BlockReaderUI::propertyBtn_clicked ()
 {
     /* It seems that I can't write when it's locked with reader lock */
-    common_info_reader_unlock (DH_TYPE_Region, uuid.toUtf8 ());
+    dh_info_reader_unlock (DH_TYPE_REGION, uuid.toUtf8 ());
     /* It seems that it will lock multiple times,
      * And doing so will break the infomation of the reader,
      * so this **must** be blocked way.
      */
-    if (common_info_writer_trylock (DH_TYPE_Region, uuid.toUtf8 ()))
+    if (dh_info_writer_trylock (DH_TYPE_REGION, uuid.toUtf8 ()))
         {
             auto ret = QMessageBox::question (
                 this, _ ("Select an option."),
@@ -223,8 +226,8 @@ BlockReaderUI::propertyBtn_clicked ()
                 all = true;
             else if (ret == QMessageBox::No)
                 {
-                    common_info_writer_unlock (DH_TYPE_Region, uuid.toUtf8 ());
-                    common_info_reader_trylock (DH_TYPE_Region,
+                    dh_info_writer_unlock (DH_TYPE_REGION, uuid.toUtf8 ());
+                    dh_info_reader_trylock (DH_TYPE_REGION,
                                                 uuid.toUtf8 ());
                     return;
                 }
@@ -232,8 +235,15 @@ BlockReaderUI::propertyBtn_clicked ()
             pmui->setAttribute (Qt::WA_DeleteOnClose);
             pmui->exec ();
 
-            common_info_writer_unlock (DH_TYPE_Region, uuid.toUtf8 ());
-            common_info_reader_trylock (DH_TYPE_Region, uuid.toUtf8 ());
+            dh_info_writer_unlock (DH_TYPE_REGION, uuid.toUtf8 ());
+            dh_info_reader_trylock (DH_TYPE_REGION, uuid.toUtf8 ());
             textChanged_cb ();
         }
+}
+
+void BlockReaderUI::showBtn_clicked ()
+{
+    auto bsui = new BlockShowUI (uuid, large_version);
+    bsui->setAttribute (Qt::WA_DeleteOnClose);
+    bsui->show ();
 }

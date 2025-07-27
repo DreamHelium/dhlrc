@@ -6,7 +6,7 @@
 #include <QRadioButton>
 #include "dh_string_util.h"
 
-GeneralChooseUI::GeneralChooseUI (DhInfoTypes type, bool needMulti,
+GeneralChooseUI::GeneralChooseUI (int type, bool needMulti,
                                   QWidget *parent)
     : QDialog (parent)
 {
@@ -30,22 +30,20 @@ GeneralChooseUI::initUI ()
     if (needMulti)
         group->setExclusive (false);
 
-    auto list = const_cast<GList *> (common_info_list_get_uuid_list (type));
+    auto list = dh_info_get_all_uuid (type);
 
-    guint len = list ? g_list_length (list) : 0;
-
-    if (len)
+    if (list)
         {
-            for (int i = 0; i < len; i++)
+            for (int i = 0; i < list->num; i++)
                 {
-                    auto uuid = (char *)g_list_nth_data (list, i);
-                    if (common_info_reader_trylock (type, uuid))
+                    auto uuid = list->val[i];
+                    if (dh_info_reader_trylock (type, uuid))
                         {
                             gchar *time_literal = g_date_time_format (
-                                common_info_get_time (type, uuid), "%T");
+                                dh_info_get_time (type, uuid), "%T");
                             QString str
                                 = QString ("%1 (%2)")
-                                      .arg (common_info_get_description (type,
+                                      .arg (dh_info_get_description (type,
                                                                          uuid))
                                       .arg (time_literal);
                             QAbstractButton *btn;
@@ -56,7 +54,7 @@ GeneralChooseUI::initUI ()
                             g_free (time_literal);
                             layout->addWidget (btn);
                             group->addButton (btn, i);
-                            common_info_reader_unlock (type, uuid);
+                            dh_info_reader_unlock (type, uuid);
                         }
                     else
                         {
@@ -111,11 +109,11 @@ GeneralChooseUI::okBtn_clicked ()
     if (group->checkedId () != -1)
         {
             auto list
-                = const_cast<GList *> (common_info_list_get_uuid_list (type));
+                = dh_info_get_all_uuid (type);
             if (!needMulti)
-                common_info_list_set_uuid (
+                dh_info_set_single_uuid (
                     type,
-                    (gchar *)g_list_nth_data (list, group->checkedId ()));
+                    list->val[group->checkedId ()]);
             else
                 {
                     auto ids = group->buttons ();
@@ -124,13 +122,10 @@ GeneralChooseUI::okBtn_clicked ()
                         {
                             if (ids[i]->isChecked ())
                                 dh_str_array_add_str (
-                                    &arr, (gchar *)g_list_nth_data (list, i));
+                                    &arr, list->val[i]);
                         }
-                    auto plain_array = dh_str_array_dup_to_plain (arr);
-                    common_info_list_set_multi_uuid (
-                        type, (const char **)plain_array);
+                    dh_info_set_uuid (type, arr);
                     dh_str_array_free (arr);
-                    dh_str_array_free_plain (plain_array);
                 }
             accept ();
         }

@@ -5,6 +5,7 @@
 #include "blockreaderui.h"
 #include "configui.h"
 #include "dh_file_util.h"
+#include "dh_type.h"
 #include "glib.h"
 #include "ilreaderui.h"
 #include "manage.h"
@@ -124,13 +125,12 @@ MainWindow::manageBtn_2_clicked ()
 void
 MainWindow::ilReaderBtn_clicked ()
 {
-    GENERALCHOOSEUI_START (DH_TYPE_Item_List, false)
+    GENERALCHOOSEUI_START (DH_TYPE_ITEM_LIST, false)
 
     if (ret == QDialog::Accepted)
         {
-            if (common_info_reader_trylock (
-                    DH_TYPE_Item_List,
-                    common_info_list_get_uuid (DH_TYPE_Item_List)))
+            auto uuids = dh_info_get_uuid (DH_TYPE_ITEM_LIST);
+            if (dh_info_reader_trylock (DH_TYPE_ITEM_LIST, uuids->val[0]))
                 {
                     ilReaderUI *iui = new ilReaderUI ();
                     iui->setAttribute (Qt::WA_DeleteOnClose);
@@ -145,12 +145,12 @@ MainWindow::ilReaderBtn_clicked ()
 void
 MainWindow::recipeCombineBtn_clicked ()
 {
-    GENERALCHOOSEUI_START (DH_TYPE_Item_List, false)
+    GENERALCHOOSEUI_START (DH_TYPE_ITEM_LIST, false)
 
     if (ret == QDialog::Accepted)
         {
-            auto uuid = common_info_list_get_uuid (DH_TYPE_Item_List);
-            if (common_info_writer_trylock (DH_TYPE_Item_List, uuid))
+            auto uuid = dh_info_get_uuid (DH_TYPE_ITEM_LIST);
+            if (dh_info_writer_trylock (DH_TYPE_ITEM_LIST, uuid->val[0]))
                 {
                     RecipesUI *rui = new RecipesUI ((char *)uuid);
                     rui->setAttribute (Qt::WA_DeleteOnClose);
@@ -171,7 +171,7 @@ MainWindow::createBtn_clicked ()
 void
 MainWindow::generateBtn_clicked ()
 {
-    GENERALCHOOSEUI_START (DH_TYPE_Region, true)
+    GENERALCHOOSEUI_START (DH_TYPE_REGION, true)
 
     if (ret == QDialog::Accepted)
         {
@@ -180,12 +180,12 @@ MainWindow::generateBtn_clicked ()
                                          _ ("Enter the name for item list"));
             if (!str.isEmpty ())
                 {
+                    auto uuids = dh_info_get_uuid (DH_TYPE_REGION);
                     ItemList *newIl = item_list_new_from_multi_region (
-                        (const char **)common_info_list_get_multi_uuid (
-                            DH_TYPE_Region));
-                    common_info_new (DH_TYPE_Item_List, newIl,
-                                     g_date_time_new_now_local (),
-                                     str.toUtf8 ());
+                        (const char **)uuids->val);
+                    dh_info_new (DH_TYPE_ITEM_LIST, newIl,
+                                 g_date_time_new_now_local (), str.toUtf8 (),
+                                 nullptr, nullptr);
                 }
             else
                 QMessageBox::critical (this, _ ("Error!"),
@@ -200,13 +200,12 @@ MainWindow::generateBtn_clicked ()
 void
 MainWindow::brBtn_clicked ()
 {
-    GENERALCHOOSEUI_START (DH_TYPE_Region, false)
+    GENERALCHOOSEUI_START (DH_TYPE_REGION, false)
 
     if (ret == QDialog::Accepted)
         {
-            if (common_info_reader_trylock (
-                    DH_TYPE_Region,
-                    common_info_list_get_uuid (DH_TYPE_Region)))
+            auto uuids = dh_info_get_uuid (DH_TYPE_REGION);
+            if (dh_info_reader_trylock (DH_TYPE_REGION, uuids->val[0]))
                 {
                     BlockReaderUI *brui = new BlockReaderUI ();
                     brui->setAttribute (Qt::WA_DeleteOnClose);
@@ -238,11 +237,11 @@ MainWindow::nbtReaderBtn_clicked ()
 
     if (ret == QDialog::Accepted)
         {
-            auto uuid = common_info_list_get_uuid (DH_TYPE_NBT_INTERFACE_CPP);
+            auto uuid = dh_info_get_uuid (DH_TYPE_NBT_INTERFACE_CPP);
             DhNbtInstance *instance = nullptr;
             if (uuid)
-                instance = (DhNbtInstance *)common_info_get_data (
-                    DH_TYPE_NBT_INTERFACE_CPP, uuid);
+                instance = (DhNbtInstance *)dh_info_get_data (
+                    DH_TYPE_NBT_INTERFACE_CPP, uuid->val[0]);
             if (instance)
                 {
                     auto nrui = new NbtReaderUI (*instance);
@@ -278,7 +277,7 @@ MainWindow::showabout ()
 void
 MainWindow::addBtn_clicked ()
 {
-    auto atui = new AddTranslationUI(0);
+    auto atui = new AddTranslationUI (0);
     atui->setAttribute (Qt::WA_DeleteOnClose);
     atui->exec ();
 }

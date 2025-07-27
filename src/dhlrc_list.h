@@ -48,7 +48,7 @@ typedef struct IListData{
 
 /* ItemList utils */
 
-void        item_list_free(ItemList* target);
+void        item_list_free(void* target);
 void        item_list_sort(ItemList **oBlock);
 ItemList*   item_list_sort_by_total(ItemList* il);
 int         item_list_init_new_item(ItemList **oBlock, const char* block_name);

@@ -159,7 +159,7 @@ static void item_track_free(ItemTrack** it)
     g_free(it);
 }
 
-void item_list_free(ItemList* target)
+void item_list_free(void* target)
 {
     g_return_if_fail(target != NULL);
     GList* gld = target;

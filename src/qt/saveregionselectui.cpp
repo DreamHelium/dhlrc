@@ -67,47 +67,50 @@ SaveRegionSelectUI::initSignalSlots ()
 void
 SaveRegionSelectUI::okBtn_clicked ()
 {
-    auto arr = common_info_list_get_multi_uuid (DH_TYPE_Region);
+    auto arr = dh_info_get_uuid (DH_TYPE_REGION);
     if (saveAsNbtBtn->isChecked ())
         {
-            for (; *arr; arr++)
+            for (int i = 0 ; i < arr->num ; i++)
                 {
+                    auto uuid = arr->val[i];
                     auto des
-                        = common_info_get_description (DH_TYPE_Region, *arr);
-                    auto region = (Region *)common_info_get_data (
-                        DH_TYPE_Region, *arr);
+                        = dh_info_get_description (DH_TYPE_REGION, uuid);
+                    auto region = (Region *)dh_info_get_data (
+                        DH_TYPE_REGION, uuid);
                     auto nbt = dhlrc_conv_region_to_nbt (region, false);
                     DhNbtInstance *instance = (DhNbtInstance *)nbt;
-                    common_info_new (DH_TYPE_NBT_INTERFACE_CPP, instance,
-                                     g_date_time_new_now_local (), des);
+                    dh_info_new (DH_TYPE_NBT_INTERFACE_CPP, instance,
+                                     g_date_time_new_now_local (), des, nullptr, nullptr);
                 }
         }
     else if (saveAsLiteNbtBtn->isChecked ())
         {
-            for (; *arr; arr++)
+            for (int i = 0 ; i < arr->num ; i++)
                 {
+                    auto uuid = arr->val[i];
                     auto des
-                        = common_info_get_description (DH_TYPE_Region, *arr);
-                    auto region = (Region *)common_info_get_data (
-                        DH_TYPE_Region, *arr);
+                        = dh_info_get_description (DH_TYPE_REGION, uuid);
+                    auto region = (Region *)dh_info_get_data (
+                        DH_TYPE_REGION, uuid);
                     auto nbt = dhlrc_conv_region_to_lite_nbt (region, false);
                     DhNbtInstance *instance = (DhNbtInstance *)nbt;
-                    common_info_new (DH_TYPE_NBT_INTERFACE_CPP, instance,
-                                     g_date_time_new_now_local (), des);
+                    dh_info_new (DH_TYPE_NBT_INTERFACE_CPP, instance,
+                                     g_date_time_new_now_local (), des, nullptr, nullptr);
                 }
         }
     else if (saveAsSchemaNbtBtn->isChecked ())
         {
-            for (; *arr; arr++)
+            for (int i = 0 ; i < arr->num ; i++)
                 {
+                    auto uuid = arr->val[i];
                     auto des
-                        = common_info_get_description (DH_TYPE_Region, *arr);
-                    auto region = (Region *)common_info_get_data (
-                        DH_TYPE_Region, *arr);
+                        = dh_info_get_description (DH_TYPE_REGION, uuid);
+                    auto region = (Region *)dh_info_get_data (
+                        DH_TYPE_REGION, uuid);
                     auto nbt = dhlrc_conv_region_to_schema_nbt (region, false);
                     DhNbtInstance *instance = (DhNbtInstance *)nbt;
-                    common_info_new (DH_TYPE_NBT_INTERFACE_CPP, instance,
-                                     g_date_time_new_now_local (), des);
+                    dh_info_new (DH_TYPE_NBT_INTERFACE_CPP, instance,
+                                     g_date_time_new_now_local (), des, nullptr, nullptr);
                 }
         }
     else if (saveAsIlBtn->isChecked ())
@@ -118,10 +121,10 @@ SaveRegionSelectUI::okBtn_clicked ()
             if (!str.isEmpty ())
                 {
                     ItemList *newIl
-                        = item_list_new_from_multi_region ((const char **)arr);
-                    common_info_new (DH_TYPE_Item_List, newIl,
+                        = item_list_new_from_multi_region ((const char **)arr->val);
+                    dh_info_new (DH_TYPE_ITEM_LIST, newIl,
                                      g_date_time_new_now_local (),
-                                     str.toUtf8 ());
+                                     str.toUtf8 (), nullptr, nullptr);
                 }
             else
                 QMessageBox::critical (this, _ ("Error!"),

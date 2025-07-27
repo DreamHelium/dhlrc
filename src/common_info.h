@@ -18,46 +18,21 @@
 #ifndef COMMON_INFO_H
 #define COMMON_INFO_H
 
+#include "dh_type.h"
 #include <glib.h>
+#include "region.h"
+#include "dhlrc_list.h"
+#include "nbt_interface_cpp/nbt_interface.hpp"
 
 G_BEGIN_DECLS
 
-typedef enum DhInfoTypes{
-    DH_TYPE_Region,
-    DH_TYPE_Item_List,
-    DH_TYPE_NBT_INTERFACE_CPP,
-    N_TYPES
-} DhInfoTypes;
+#define DH_TYPE_REGION dh_region_get_type ()
+#define DH_TYPE_ITEM_LIST dh_item_list_get_type ()
+#define DH_TYPE_NBT_INTERFACE_CPP dh_nbt_interface_cpp_get_type ()
 
-typedef void (*DhUpdateFunc)(void*);
-
-typedef struct UpdateNotifier{
-    void* main_class;
-    DhUpdateFunc func;
-} UpdateNotifier;
-
-gboolean common_info_new(DhInfoTypes type, void* data, GDateTime* time, const gchar* description);
-void     common_infos_init();
-void     common_infos_free();
-gboolean common_info_list_remove_item(DhInfoTypes type, const gchar* uuid);
-void*    common_info_get_data(DhInfoTypes type, const gchar* uuid);
-GDateTime* common_info_get_time(DhInfoTypes type, const gchar* uuid);
-gchar*     common_info_get_description(DhInfoTypes type, const gchar* uuid);
-void     common_info_reset_description(DhInfoTypes type, const gchar* uuid, const gchar* description);
-gboolean common_info_reader_trylock(DhInfoTypes type, const gchar* uuid);
-void     common_info_reader_unlock(DhInfoTypes type, const gchar* uuid);
-gboolean common_info_writer_trylock(DhInfoTypes type, const gchar* uuid);
-void     common_info_writer_unlock(DhInfoTypes type, const gchar *uuid);
-gboolean common_info_update_data(DhInfoTypes type, const gchar* uuid, void* data);
-const GList* common_info_list_get_uuid_list(DhInfoTypes type);
-
-void     common_info_list_set_uuid(DhInfoTypes type, const char* uuid);
-const char* common_info_list_get_uuid(DhInfoTypes type);
-void     common_info_list_set_multi_uuid(DhInfoTypes type, const char** arr);
-char** common_info_list_get_multi_uuid(DhInfoTypes type);
-
-void common_info_list_add_update_notifier(DhInfoTypes type, void* main_class, DhUpdateFunc func);
-void common_info_list_remove_update_notifier(DhInfoTypes type, void* main_class);
+DH_GET_TYPE(dh, region)
+DH_GET_TYPE(dh, item_list)
+DH_GET_TYPE(dh, nbt_interface_cpp)
 
 G_END_DECLS
 

@@ -15,8 +15,8 @@ static ItemList* ilr = nullptr;
 ilReaderUI::ilReaderUI(QWidget *parent)
     : QWidget{parent}
 {
-    uuid = common_info_list_get_uuid(DH_TYPE_Item_List);
-    ItemList* il = (ItemList*)common_info_get_data(DH_TYPE_Item_List, uuid);
+    uuid = dh_info_get_uuid(DH_TYPE_ITEM_LIST)->val[0];
+    ItemList* il = (ItemList*)dh_info_get_data(DH_TYPE_ITEM_LIST, uuid);
     showTable(il);
     ilr = il;
 
@@ -34,7 +34,7 @@ ilReaderUI::~ilReaderUI()
 {
     tableWidget->clearContents();
     delete[] ti;
-    common_info_reader_unlock(DH_TYPE_Item_List, uuid);
+    dh_info_reader_unlock(DH_TYPE_ITEM_LIST, uuid);
 }
 
 void ilReaderUI::saveAction_triggered()

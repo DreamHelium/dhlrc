@@ -33,5 +33,6 @@ private Q_SLOTS:
     void listBtn_clicked();
     void entityBtn_clicked();
     void propertyBtn_clicked();
+    void showBtn_clicked();
 };
 #endif // BLOCKREADERUI_H

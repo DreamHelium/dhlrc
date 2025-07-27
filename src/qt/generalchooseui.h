@@ -19,11 +19,11 @@ class GeneralChooseUI : public QDialog
   Q_OBJECT
 
 public:
-  explicit GeneralChooseUI(DhInfoTypes type, bool needMulti, QWidget *parent = nullptr);
+  explicit GeneralChooseUI(int type, bool needMulti, QWidget *parent = nullptr);
   ~GeneralChooseUI();
 
 private:
-  DhInfoTypes type;
+  int type;
   bool needMulti;
   void initUI();
   QLabel* label;
