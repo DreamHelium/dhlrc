@@ -37,8 +37,8 @@ private Q_SLOTS:
     void generateBtn_clicked();
     void brBtn_clicked();
     void mrBtn_clicked();
+    void mrBtn_2_clicked();
     void nbtReaderBtn_clicked();
-    void nbtReaderBtn_finished(int ret);
     void recipeBtn_clicked();
     void showabout();
     void addBtn_clicked();

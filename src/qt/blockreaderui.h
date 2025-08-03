@@ -1,8 +1,10 @@
 #ifndef BLOCKREADERUI_H
 #define BLOCKREADERUI_H
 
-#include <QWidget>
 #include "../region.h"
+#include <QWidget>
+
+#include "blockshowui.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class BlockReaderUI; }
@@ -24,9 +26,12 @@ private:
     char* large_version = nullptr;
     BlockInfo* info = nullptr;
     bool readerIsUnlocked = false;
+    void closeEvent(QCloseEvent *event) override;
+    BlockShowUI* bsui = nullptr;
 
 Q_SIGNALS:
     void changeVal(int value);
+    void closeWin();;
 
 private Q_SLOTS:
     void textChanged_cb ();

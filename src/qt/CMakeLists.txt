@@ -46,6 +46,9 @@ set(PROJECT_SOURCES
         blockshowui.cpp
         blockshowui.h
         blockshowui.ui
+        regionmodifyui.cpp
+        regionmodifyui.h
+        regionmodifyui.ui
 )
 
 if (${QT_VERSION_MAJOR} GREATER_EQUAL 6)

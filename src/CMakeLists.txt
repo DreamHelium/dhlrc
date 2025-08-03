@@ -1,4 +1,5 @@
 if (NOT UTIL_FOUND)
+    set(DHUTIL_BUILD_CLI ON)
     add_subdirectory(dhutil)
 endif ()
 

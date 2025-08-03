@@ -22,6 +22,9 @@ public:
   explicit GeneralChooseUI(int type, bool needMulti, QWidget *parent = nullptr);
   ~GeneralChooseUI();
 
+Q_SIGNALS:
+  void test();
+
 private:
   int type;
   bool needMulti;

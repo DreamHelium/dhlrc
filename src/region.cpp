@@ -342,7 +342,7 @@ gboolean
 file_is_new_schem (void *instance_ptr)
 {
     DhNbtInstance *instance = (DhNbtInstance *)instance_ptr;
-    if (g_str_equal ("Schematic", instance->get_key ()))
+    if (instance->get_key() &&g_str_equal ("Schematic", instance->get_key ()))
         return true;
     else
         return false;

@@ -204,26 +204,6 @@ void lite_region_free(LiteRegion* lr)
     g_free(lr);
 }
 
-int lite_region_num(NBT* root)
-{
-    NBT* regionParent = NBT_GetChild_Deep(root,"Regions",NULL);
-    if(regionParent && regionParent->child)
-    {
-        NBT* regionName = regionParent -> child;
-
-        int i = 1;
-        for( ; regionName->next; i++)
-        {
-            regionName = regionName->next;
-        }
-        return i;
-    }
-    else
-    {
-        return 0;
-    }
-}
-
 int lite_region_num_instance(void* instance)
 {
     DhNbtInstance instance_copy(*(DhNbtInstance*)instance);
@@ -232,12 +212,15 @@ int lite_region_num_instance(void* instance)
             if (instance_copy.child())
                 {
                     int i = 1;
-                    for (; instance_copy.next(); i++)
-                        ;
+                    while (instance_copy.next())
+                        {
+                           if (instance_copy.is_non_null ())
+                               i++;
+                        }
                     return i;
                 }
         }
-    else return 0;
+    return 0;
 }
 
 char** lite_region_names(NBT* root, int rNum, int* err)
@@ -510,18 +493,6 @@ int lite_region_block_id_xyz(LiteRegion* lr, int x, int y, int z)
 //     black_list_free(bl);
 //     return o_il;
 // }
-
-DhStrArray* lite_region_name_array(NBT* root)
-{
-    NBT* region_nbt = NBT_GetChild(root, "Regions")->child;
-    DhStrArray* str_arr = NULL;
-    while(region_nbt)
-    {
-        dh_str_array_add_str( &str_arr, region_nbt->key);
-        region_nbt = region_nbt->next;
-    }
-    return str_arr;
-}
 
 DhStrArray* lite_region_name_array_instance(void* instance)
 {

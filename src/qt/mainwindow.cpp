@@ -25,6 +25,11 @@
 #include <qnamespace.h>
 #include <qobject.h>
 #include <qpushbutton.h>
+#include <regionmodifyui.h>
+
+#define REGION_LOCKED_MSG                                                     \
+    _ ("Region is locked! It might not be the writer lock! Please try to "    \
+       "close the window that's using the Region.")
 
 static dh::ManageRegion *mr = nullptr;
 static dh::ManageNbtInterface *mni = nullptr;
@@ -86,6 +91,8 @@ MainWindow::initSignalSlots ()
                       &MainWindow::showabout);
     QObject::connect (ui->addBtn, &QPushButton::clicked, this,
                       &MainWindow::addBtn_clicked);
+    QObject::connect (ui->mrBtn_2, &QPushButton::clicked, this,
+                      &MainWindow::mrBtn_2_clicked);
 }
 
 void
@@ -109,7 +116,7 @@ MainWindow::dropEvent (QDropEvent *event)
 void
 MainWindow::configAction_triggered ()
 {
-    ConfigUI *cui = new ConfigUI ();
+    auto cui = new ConfigUI ();
     cui->setAttribute (Qt::WA_DeleteOnClose);
     cui->show ();
 }
@@ -207,14 +214,13 @@ MainWindow::brBtn_clicked ()
             auto uuids = dh_info_get_uuid (DH_TYPE_REGION);
             if (dh_info_reader_trylock (DH_TYPE_REGION, uuids->val[0]))
                 {
-                    BlockReaderUI *brui = new BlockReaderUI ();
+                    auto brui = new BlockReaderUI ();
                     brui->setAttribute (Qt::WA_DeleteOnClose);
                     brui->show ();
                 }
             /* Region locked */
             else
-                QMessageBox::critical (this, _ ("Error!"),
-                                       _ ("Region is locked!"));
+                QMessageBox::critical (this, _ ("Error!"), REGION_LOCKED_MSG);
         }
     /* No option given for the Region selection */
     else
@@ -228,6 +234,29 @@ MainWindow::mrBtn_clicked ()
     if (!mr)
         mr = new dh::ManageRegion ();
     mr->show ();
+}
+
+void
+MainWindow::mrBtn_2_clicked ()
+{
+    GENERALCHOOSEUI_START (DH_TYPE_REGION, false)
+    if (ret == QDialog::Accepted)
+        {
+            auto uuids = dh_info_get_uuid (DH_TYPE_REGION);
+            if (dh_info_writer_trylock (DH_TYPE_REGION, uuids->val[0]))
+                {
+                    auto rmui = new RegionModifyUI ();
+                    rmui->setAttribute (Qt::WA_DeleteOnClose);
+                    rmui->show ();
+                }
+            /* Region locked */
+            else
+                QMessageBox::critical (this, _ ("Error!"), REGION_LOCKED_MSG);
+        }
+    /* No option given for the Region selection */
+    else
+        QMessageBox::critical (this, _ ("Error!"),
+                               _ ("No Region or no Region selected!"));
 }
 
 void
@@ -251,11 +280,6 @@ MainWindow::nbtReaderBtn_clicked ()
         }
     else
         QMessageBox::critical (this, _ ("Error!"), _ ("No NBT is selected!"));
-}
-
-void
-MainWindow::nbtReaderBtn_finished (int ret)
-{
 }
 
 void

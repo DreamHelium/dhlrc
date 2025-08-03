@@ -44,7 +44,8 @@ BlockReaderUI::BlockReaderUI (QWidget *parent)
                       &QProgressBar::setValue);
     QObject::connect (ui->propertyBtn, &QPushButton::clicked, this,
                       &BlockReaderUI::propertyBtn_clicked);
-    QObject::connect (ui->showBtn, &QPushButton::clicked, this, &BlockReaderUI::showBtn_clicked);
+    QObject::connect (ui->showBtn, &QPushButton::clicked, this,
+                      &BlockReaderUI::showBtn_clicked);
     ui->entityBtn->setEnabled (false);
     ui->propertyBtn->setEnabled (false);
     if (dhlrc_mcdata_enabled ())
@@ -61,8 +62,16 @@ BlockReaderUI::BlockReaderUI (QWidget *parent)
 BlockReaderUI::~BlockReaderUI ()
 {
     delete ui;
+    delete bsui;
     dh_info_reader_unlock (DH_TYPE_REGION, uuid.toUtf8 ());
     g_free (large_version);
+}
+
+void
+BlockReaderUI::closeEvent (QCloseEvent *event)
+{
+    emit closeWin ();
+    QWidget::closeEvent (event);
 }
 
 void
@@ -227,8 +236,7 @@ BlockReaderUI::propertyBtn_clicked ()
             else if (ret == QMessageBox::No)
                 {
                     dh_info_writer_unlock (DH_TYPE_REGION, uuid.toUtf8 ());
-                    dh_info_reader_trylock (DH_TYPE_REGION,
-                                                uuid.toUtf8 ());
+                    dh_info_reader_trylock (DH_TYPE_REGION, uuid.toUtf8 ());
                     return;
                 }
             auto pmui = new PropertyModifyUI (region, info, all);
@@ -241,9 +249,14 @@ BlockReaderUI::propertyBtn_clicked ()
         }
 }
 
-void BlockReaderUI::showBtn_clicked ()
+void
+BlockReaderUI::showBtn_clicked ()
 {
-    auto bsui = new BlockShowUI (uuid, large_version);
-    bsui->setAttribute (Qt::WA_DeleteOnClose);
+    if (!bsui)
+        {
+            bsui = new BlockShowUI (uuid, large_version);
+            QObject::connect (this, &BlockReaderUI::closeWin, bsui,
+                              &BlockShowUI::close);
+        }
     bsui->show ();
 }

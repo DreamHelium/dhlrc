@@ -53,19 +53,37 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>370</width>
-          <height>296</height>
+          <width>364</width>
+          <height>292</height>
          </rect>
         </property>
        </widget>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="pushButton">
-       <property name="text">
-        <string>Modify Palette</string>
-       </property>
-      </widget>
+      <layout class="QVBoxLayout" name="verticalLayout_2">
+       <item>
+        <widget class="QPushButton" name="mpBtn">
+         <property name="text">
+          <string>&amp;Modify Palette</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="lpBtn">
+         <property name="text">
+          <string>&amp;List Palette</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="mbBtn">
+         <property name="text">
+          <string>Modify &amp;Block</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
      </item>
     </layout>
    </item>
