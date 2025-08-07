@@ -8,44 +8,49 @@
 #include "../region.h"
 
 #include <QButtonGroup>
-#include <QWidget>
 #include <QGridLayout>
 #include <QProgressDialog>
 #include <QPushButton>
+#include <QWidget>
 
 QT_BEGIN_NAMESPACE
-namespace Ui { class BlockShowUI; }
+namespace Ui
+{
+class BlockShowUI;
+}
 QT_END_NAMESPACE
 
-class BlockShowUI : public QWidget {
-Q_OBJECT
+class BlockShowUI : public QWidget
+{
+    Q_OBJECT
 
-public:
-    explicit BlockShowUI(QString uuid, const char* large_version, QWidget *parent = nullptr);
-    ~BlockShowUI() override;
+  public:
+    explicit BlockShowUI (QString &uuid, char *&large_version,
+                          QWidget *parent = nullptr);
+    ~BlockShowUI () override;
 
-Q_SIGNALS:
-    void changeVal(int val);
+  Q_SIGNALS:
+    void changeVal (int val);
 
-private:
-    QString uuid;
+  private:
+    QString& uuid;
     bool modeSwitch = false;
-    void initUI();
+    bool firstInited = false;
+    void initUI ();
     QProgressDialog *progressDialog = nullptr;
 
-public:
+  public:
     QWidget *widget;
     Ui::BlockShowUI *ui;
     QList<QPushButton *> btns;
     QButtonGroup *group;
     QGridLayout *layout;
     Region *region;
-    QString large_version;
+    char *&large_version;
     bool inited = false;
 
-private Q_SLOTS:
-    void updateUI();
+  private Q_SLOTS:
+    void updateUI ();
 };
 
-
-#endif //BLOCKSHOWUI_H
+#endif // BLOCKSHOWUI_H

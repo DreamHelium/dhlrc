@@ -49,6 +49,9 @@ set(PROJECT_SOURCES
         regionmodifyui.cpp
         regionmodifyui.h
         regionmodifyui.ui
+        palettelistui.cpp
+        palettelistui.h
+        palettelistui.ui
 )
 
 if (${QT_VERSION_MAJOR} GREATER_EQUAL 6)

@@ -13,19 +13,48 @@
 #include <QProgressDialog>
 #include <future>
 #include <gio/gio.h>
+#include <palettelistui.h>
 
-BlockShowUI::BlockShowUI (QString uuid, const char *large_version,
-                          QWidget *parent)
-    : QWidget (parent), ui (new Ui::BlockShowUI)
+BlockShowUI::BlockShowUI (QString &uuid, char *&large_version, QWidget *parent)
+    : QWidget (parent), ui (new Ui::BlockShowUI),
+      large_version (large_version), uuid (uuid)
 {
     ui->setupUi (this);
     this->uuid = uuid;
     this->region = static_cast<Region *> (
         dh_info_get_data (DH_TYPE_REGION, uuid.toUtf8 ()));
-    this->large_version = large_version;
+    ui->modeBtn->setText ("x/z");
     initUI ();
     QObject::connect (ui->spinBox, &QSpinBox::valueChanged, this,
                       &BlockShowUI::updateUI);
+    QObject::connect (ui->modeBtn, &QPushButton::clicked, this, [&] {
+        modeSwitch = !modeSwitch;
+        inited = false;
+        if (modeSwitch)
+            ui->modeBtn->setText ("z/x");
+        else
+            ui->modeBtn->setText ("x/z");
+        for (const auto &i : group->buttons ())
+            group->removeButton (i);
+        auto clearUI = [&] {
+            QLayoutItem *item;
+            while ((item = layout->takeAt (0)) != nullptr)
+                {
+                    layout->removeWidget (item->widget ());
+                    item->widget ()->setParent (nullptr);
+                    delete item->widget ();
+                    delete item;
+                }
+            btns.clear ();
+        };
+        clearUI ();
+        updateUI ();
+    });
+    QObject::connect (ui->lpBtn, &QPushButton::clicked, this, [&] {
+        auto plui = new PaletteListUI (uuid, large_version);
+        plui->setAttribute (Qt::WA_DeleteOnClose);
+        plui->exec ();
+    });
 }
 
 BlockShowUI::~BlockShowUI ()
@@ -49,76 +78,11 @@ BlockShowUI::initUI ()
     updateUI ();
 }
 
-static void
-realUpdateUI (GTask *task, gpointer source_object, gpointer task_data,
-              GCancellable *cancellable)
-{
-    auto bsui = static_cast<BlockShowUI *> (task_data);
-
-    for (auto i : bsui->group->buttons ())
-            bsui->group->removeButton (i);
-    for (int x = 0; x < bsui->region->region_size->x; x++)
-        {
-            for (int z = 0; z < bsui->region->region_size->z; z++)
-                {
-                    int p = x * bsui->region->region_size->z + z;
-                    int index = region_get_index (
-                        bsui->region, x, bsui->ui->spinBox->value (), z);
-                    auto info = static_cast<BlockInfo *> (
-                        bsui->region->block_info_array->pdata[index]);
-                    auto btn = bsui->btns[p];
-                    btn->setText (QString::number (info->palette));
-                    auto palette
-                        = region_get_palette (bsui->region, info->palette);
-                    QString str = _ ("Block name: %1\n"
-                                     "Palette: %2");
-                    if (!bsui->large_version.isEmpty ())
-                        str = str.arg (mctr (palette->id_name,
-                                             bsui->large_version.toUtf8 ()));
-                    else
-                        str = str.arg (palette->id_name);
-
-                    QString line = "%1: %2\n";
-                    QString paletteStr{};
-                    if (palette->property_name)
-                        for (int i = 0; i < palette->property_name->num; i++)
-                            {
-                                paletteStr
-                                    += line
-                                           .arg (gettext (
-                                               palette->property_name->val[i]))
-                                           .arg (
-                                               gettext (palette->property_data
-                                                            ->val[i]));
-                            }
-                    str = str.arg (paletteStr);
-                    btn->setToolTip (str);
-                }
-        }
-
-    bsui->layout->parentWidget ()->setUpdatesEnabled (false);
-    for (int x = 0; !bsui->inited && x < bsui->region->region_size->x; x++)
-        {
-            for (int z = 0; z < bsui->region->region_size->z; z++)
-                {
-                    int p = x * bsui->region->region_size->z + z;
-                    int index = region_get_index (
-                        bsui->region, x, bsui->ui->spinBox->value (), z);
-                    auto btn = bsui->btns[p];
-                    bsui->group->addButton (btn, index);
-                    bsui->layout->addWidget (btn, x, z);
-                    emit bsui->changeVal (p);
-                }
-        }
-    bsui->layout->parentWidget ()->setUpdatesEnabled (true);
-    bsui->inited = true;
-}
-
 void
 BlockShowUI::updateUI ()
 {
     int fullsize = region->region_size->x * region->region_size->z;
-    if (btns.length () == 0)
+    if (btns.empty ())
         {
             for (int i = 0; i < fullsize; i++)
                 {
@@ -133,11 +97,67 @@ BlockShowUI::updateUI ()
                                               fullsize - 1, this);
     if (!inited)
         progressDialog->show ();
+
     QObject::connect (this, &BlockShowUI::changeVal, progressDialog,
                       &QProgressDialog::setValue);
 
-    GTask *task = g_task_new (nullptr, nullptr, nullptr, nullptr);
-    g_task_set_task_data (task, this, nullptr);
-    g_task_run_in_thread (task, realUpdateUI);
-    g_object_unref (task);
+    auto getString = [&] (BlockInfo *info) -> QString {
+        auto palette = region_get_palette (region, info->palette);
+        QString str = _ ("Block name: %1\n"
+                         "Palette: \n%2");
+        if (large_version)
+            str = str.arg (mctr (palette->id_name, large_version));
+        else
+            str = str.arg (palette->id_name);
+
+        QString line = "%1: %2\n";
+        QString paletteStr{};
+        if (palette->property_name)
+            for (int i = 0; i < palette->property_name->num; i++)
+                {
+                    paletteStr
+                        += line.arg (gettext (palette->property_name->val[i]))
+                               .arg (gettext (palette->property_data->val[i]));
+                }
+        str = str.arg (paletteStr);
+        return str;
+    };
+
+    auto realUpdateUI = [&] () {
+        for (auto i : group->buttons ())
+            group->removeButton (i);
+        for (int x = 0; x < region->region_size->x; x++)
+            {
+                for (int z = 0; z < region->region_size->z; z++)
+                    {
+                        int p = 0;
+                        if (!modeSwitch)
+                            p = x * region->region_size->z + z;
+                        else
+                            p = z * region->region_size->x + x;
+                        int index = region_get_index (
+                            region, x, ui->spinBox->value (), z);
+                        auto info = static_cast<BlockInfo *> (
+                            region->block_info_array->pdata[index]);
+                        auto btn = btns[p];
+                        btn->setText (QString::number (info->palette));
+
+                        btn->setToolTip (getString (info));
+                        if (!inited)
+                            {
+                                group->addButton (btn, index);
+                                if (!modeSwitch)
+                                    layout->addWidget (btn, x, z);
+                                else
+                                    layout->addWidget (btn, z, x);
+                                emit changeVal (p);
+                            }
+                    }
+            }
+
+        inited = true;
+        firstInited = true;
+    };
+
+    realUpdateUI ();
 }

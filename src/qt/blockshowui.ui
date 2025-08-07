@@ -27,6 +27,20 @@
       <widget class="QSpinBox" name="spinBox"/>
      </item>
      <item>
+      <widget class="QLabel" name="label_2">
+       <property name="text">
+        <string>Mode</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="modeBtn">
+       <property name="text">
+        <string notr="true">PushButton</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <spacer name="horizontalSpacer">
        <property name="orientation">
         <enum>Qt::Orientation::Horizontal</enum>
@@ -53,8 +67,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>364</width>
-          <height>292</height>
+          <width>338</width>
+          <height>290</height>
          </rect>
         </property>
        </widget>
@@ -63,16 +77,9 @@
      <item>
       <layout class="QVBoxLayout" name="verticalLayout_2">
        <item>
-        <widget class="QPushButton" name="mpBtn">
-         <property name="text">
-          <string>&amp;Modify Palette</string>
-         </property>
-        </widget>
-       </item>
-       <item>
         <widget class="QPushButton" name="lpBtn">
          <property name="text">
-          <string>&amp;List Palette</string>
+          <string>&amp;List/Modify Palette</string>
          </property>
         </widget>
        </item>

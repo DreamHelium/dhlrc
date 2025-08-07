@@ -35,6 +35,7 @@ BlockListUI::BlockListUI (Region *region, const char *large_version,
 BlockListUI::~BlockListUI ()
 {
     model->clear ();
+    delete model;
     delete ui;
 }
 

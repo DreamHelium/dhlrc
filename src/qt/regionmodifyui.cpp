@@ -31,6 +31,8 @@ RegionModifyUI::RegionModifyUI (QWidget *parent)
         dh_info_get_data (DH_TYPE_REGION, uuid.toUtf8 ()));
     QObject::connect (ui->lineEdit_3, &QLineEdit::textChanged, this,
                       &RegionModifyUI::versionUpdate);
+    QObject::connect (ui->pushButton_2, &QPushButton::clicked, this,
+                      &RegionModifyUI::close);
     initData ();
 }
 

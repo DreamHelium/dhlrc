@@ -79,19 +79,6 @@ monitor_task (GTask *task, gpointer source_object, gpointer task_data,
 }
 
 void
-dhlrc_mkconfig_gsettings ()
-{
-    gchar *config_dir
-        = g_build_filename (g_get_user_config_dir (), "dhlrc", "/", NULL);
-    gchar *config_file
-        = g_build_filename (config_dir, "cn.dh.dhlrc.gschema.xml", NULL);
-    dh_file_create (config_file, TRUE);
-    g_message ("Config directory: %s", config_file);
-    GSettings *settings = g_settings_new_with_path ("cn.dh.dhlrc", config_dir);
-    g_settings_set_boolean (settings, "debug", FALSE);
-}
-
-void
 dhlrc_make_config ()
 {
     if (!config_file)
@@ -126,7 +113,6 @@ dhlrc_make_config ()
             cJSON_AddStringToObject (config, "overrideVersion", "1.18.2");
             cJSON_AddStringToObject (config, "gameDir", minecraft_dir);
             char *config_text = cJSON_Print (config);
-            printf ("%s\n", config_file);
             g_free (minecraft_dir);
             g_free (cache_dir);
             g_free (recipe_dir);
