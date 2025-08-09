@@ -47,11 +47,9 @@ static format
 get_format ()
 {
     dh::Arg arg;
-    arg.add_arg ('n', "NBT", _ ("Choose NBT"));
-    std::vector<std::string> litematic{ "litematic", "lite", "lr" };
-    arg.add_arg ('l', litematic, _ ("Choose litematic"));
-    std::vector<std::string> scheme{ "schematic", "schem" };
-    arg.add_arg ('s', scheme, _ ("Choose schematic"));
+    arg.add_arg ('n', _ ("Choose NBT"), "NBT");
+    arg.add_arg ('l', _ ("Choose litematic"), "litematic", "lite", "lr");
+    arg.add_arg ('s', _ ("Choose schematic"), "schematic", "schem");
     printf (_ ("Please choose an option:\n"));
     printf ("[0] NBT\n");
     printf ("[1] litematic\n");
@@ -290,14 +288,10 @@ interactive ()
     std::vector<Converter> regions;
     std::string dir;
     dh::Arg arg;
-    std::vector<std::string> add_args = { "add", _ ("add_") };
-    arg.add_arg ('a', add_args, _ ("Add NBT File."));
-    std::vector<std::string> set_args = { "set", _ ("set_") };
-    arg.add_arg ('s', set_args, _ ("Set the output directory."));
-    std::vector<std::string> conv_args = { "conv", _ ("convert") };
-    arg.add_arg ('c', conv_args, _ ("Convert the files."));
-    std::vector<std::string> exit_args = { "exit", _ ("exit_") };
-    arg.add_arg ('e', exit_args, _ ("Exit the program."));
+    arg.add_arg ('a', _ ("Add NBT File."), "add", _ ("add_"));
+    arg.add_arg ('s', _ ("Set the output directory."), "set", _ ("set_"));
+    arg.add_arg ('c', _ ("Convert the files."), "conv", _ ("convert"));
+    arg.add_arg ('e', _ ("Exit the program."), "exit", _ ("exit_"));
     bool jump_out = false;
     while (!jump_out)
         {

@@ -26,7 +26,9 @@
 #include "litematica_region.h"
 #include "nbt_interface_cpp/nbt_interface.hpp"
 #include "process_state.h"
-#include <time.h>
+
+#include <iostream>
+#include <ostream>
 
 /* TODO and maybe never do, since property can be too much */
 const char *property[] = { N_ ("waterlogged"), N_ ("facing") };
@@ -36,7 +38,6 @@ const char *data[] = { N_ ("true"), N_ ("false"), N_ ("south"),
 static void palette_free (gpointer mem);
 static void block_info_free (gpointer mem);
 static void base_data_free (gpointer mem);
-static gboolean find_palette (gconstpointer a, gconstpointer b);
 static int compare_block_info (gconstpointer a, gconstpointer b);
 
 void
@@ -342,7 +343,8 @@ gboolean
 file_is_new_schem (void *instance_ptr)
 {
     DhNbtInstance *instance = (DhNbtInstance *)instance_ptr;
-    if (instance->get_key() &&g_str_equal ("Schematic", instance->get_key ()))
+    if (instance->get_key ()
+        && g_str_equal ("Schematic", instance->get_key ()))
         return true;
     else
         return false;
@@ -669,8 +671,11 @@ item_list_new_from_multi_region (const char **region_uuid_arr)
 }
 
 gboolean
-palette_is_same (Palette *a, Palette *b)
+palette_is_same (gconstpointer a_data_p, gconstpointer b_data_p)
 {
+    auto a = static_cast<const Palette *> (a_data_p);
+    auto b = static_cast<const Palette *> (b_data_p);
+
     DhStrArray *a_name = a->property_name;
     DhStrArray *b_name = b->property_name;
 
@@ -685,14 +690,16 @@ palette_is_same (Palette *a, Palette *b)
                 return FALSE;
             if (a_name->num != b_name->num) /* ?? */
                 return FALSE;
-            for (int i = 0; i < a_name->num; i++)
-                {
-                    for (int j = 0; j < b_name->num; j++)
-                        if (g_str_equal (a_name->val[i], b_name->val[j]))
-                            if (!g_str_equal (a_data->val[i], b_data->val[j]))
-                                return FALSE;
-                }
-            return TRUE;
+            DhStrArray *a_palette
+                = dh_str_array_cat_str_array (a_name, a_data, "=");
+            DhStrArray *b_palette
+                = dh_str_array_cat_str_array (b_name, b_data, "=");
+            gboolean ret = FALSE;
+            if (dh_str_array_equal (a_palette, b_palette, TRUE))
+                ret = TRUE;
+            dh_str_array_free (a_palette);
+            dh_str_array_free (b_palette);
+            return ret;
         }
     return FALSE;
 }
@@ -771,12 +778,6 @@ region_modify_property (Region *region, BlockInfo *info, gboolean all_modify,
             info->palette = region->palette_array->len - 1;
         }
 }
-void
-region_modify_block (Region *region, BlockInfo *info, gboolean all_modify,
-                     gboolean safe_mode, DhStrArray *property_name,
-                     DhStrArray *property_data)
-{
-}
 
 int
 region_get_index (Region *region, int x, int y, int z)
@@ -786,4 +787,30 @@ region_get_index (Region *region, int x, int y, int z)
         return -1;
     return region->region_size->x * region->region_size->z * y
            + region->region_size->x * z + x;
+}
+
+gboolean
+region_add_palette (Region *region, const char *id_name,
+                    DhStrArray *palette_name, DhStrArray *palette_data)
+{
+    Palette tmp_palette{ (char *)id_name, palette_name, palette_data };
+    if (g_ptr_array_find_with_equal_func (region->palette_array, &tmp_palette,
+                                          palette_is_same, nullptr))
+        return FALSE;
+    auto palette = g_new0 (Palette, 1);
+    palette->id_name = g_strdup (palette->id_name);
+    palette->property_name = dh_str_array_dup (palette->property_name);
+    palette->property_data = dh_str_array_dup (palette->property_data);
+    g_ptr_array_add (region->palette_array, palette);
+    return TRUE;
+}
+
+gboolean
+region_add_palette_using_palette (Region *region, Palette *palette)
+{
+    if (g_ptr_array_find_with_equal_func (region->palette_array, palette,
+                                          palette_is_same, nullptr))
+        return FALSE;
+    g_ptr_array_add (region->palette_array, palette);
+    return TRUE;
 }

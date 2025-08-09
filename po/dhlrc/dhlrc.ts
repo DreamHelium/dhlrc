@@ -111,7 +111,40 @@
     </message>
     <message>
         <location filename="../../src/qt/blockreaderui.ui" line="161"/>
+        <source>&amp;Show blocks</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qt/blockreaderui.ui" line="168"/>
         <source>&amp;Close</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>BlockShowUI</name>
+    <message>
+        <location filename="../../src/qt/blockshowui.ui" line="14"/>
+        <source>BlockShowUI</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qt/blockshowui.ui" line="22"/>
+        <source>y</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qt/blockshowui.ui" line="32"/>
+        <source>Mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qt/blockshowui.ui" line="82"/>
+        <source>&amp;List/Modify Palette</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qt/blockshowui.ui" line="89"/>
+        <source>Modify &amp;Block</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -238,42 +271,42 @@
     </message>
     <message>
         <location filename="../../src/qt/mainwindow.ui" line="107"/>
+        <source>M&amp;odify Region</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qt/mainwindow.ui" line="114"/>
         <source>&amp;Block reader</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qt/mainwindow.ui" line="117"/>
+        <location filename="../../src/qt/mainwindow.ui" line="124"/>
         <source>&amp;Item List</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qt/mainwindow.ui" line="125"/>
+        <location filename="../../src/qt/mainwindow.ui" line="132"/>
         <source>I&amp;tem list reader and modifier</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qt/mainwindow.ui" line="132"/>
+        <location filename="../../src/qt/mainwindow.ui" line="139"/>
         <source>R&amp;ecipe combiner</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qt/mainwindow.ui" line="142"/>
+        <location filename="../../src/qt/mainwindow.ui" line="149"/>
         <source>Utility</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qt/mainwindow.ui" line="150"/>
+        <location filename="../../src/qt/mainwindow.ui" line="157"/>
         <source>&amp;Config Setting</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qt/mainwindow.ui" line="157"/>
-        <source>Show Recipe</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../../src/qt/mainwindow.ui" line="164"/>
-        <source>Test OpenGL</source>
+        <source>Show Recipe</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -287,8 +320,13 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qt/mainwindow.ui" line="201"/>
-        <location filename="../../src/qt/mainwindow.ui" line="210"/>
+        <location filename="../../src/qt/mainwindow.ui" line="185"/>
+        <source>&amp;Load Jar File for Resources</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qt/mainwindow.ui" line="208"/>
+        <location filename="../../src/qt/mainwindow.ui" line="217"/>
         <source>&amp;About</source>
         <translation type="unfinished"></translation>
     </message>
@@ -370,6 +408,62 @@
     </message>
 </context>
 <context>
+    <name>PaletteAddUI</name>
+    <message>
+        <location filename="../../src/qt/paletteaddui.ui" line="14"/>
+        <source>PaletteAddUI</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qt/paletteaddui.ui" line="35"/>
+        <source>&amp;Add</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qt/paletteaddui.ui" line="45"/>
+        <source>&amp;Remove</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qt/paletteaddui.ui" line="75"/>
+        <source>&amp;OK</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>PaletteListUI</name>
+    <message>
+        <location filename="../../src/qt/palettelistui.ui" line="14"/>
+        <source>PaletteListUI</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qt/palettelistui.ui" line="35"/>
+        <source>&amp;Add</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qt/palettelistui.ui" line="45"/>
+        <source>&amp;Remove</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qt/palettelistui.ui" line="55"/>
+        <source>Re&amp;place</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qt/palettelistui.ui" line="62"/>
+        <source>&amp;Show blocks</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qt/palettelistui.ui" line="69"/>
+        <source>R&amp;efresh</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>PropertyModifyUI</name>
     <message>
         <location filename="../../src/qt/propertymodifyui.ui" line="14"/>
@@ -402,6 +496,64 @@
     <message>
         <location filename="../../src/qt/recipeselectui.ui" line="20"/>
         <source>Please select a recipe file:</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>RegionModifyUI</name>
+    <message>
+        <location filename="../../src/qt/regionmodifyui.ui" line="14"/>
+        <source>RegionModifyUI</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qt/regionmodifyui.ui" line="20"/>
+        <source>Modify the infomation of the Region.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qt/regionmodifyui.ui" line="29"/>
+        <source>Create Time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qt/regionmodifyui.ui" line="43"/>
+        <source>Modify Time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qt/regionmodifyui.ui" line="57"/>
+        <source>Description</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qt/regionmodifyui.ui" line="71"/>
+        <source>Author</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qt/regionmodifyui.ui" line="85"/>
+        <source>Name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qt/regionmodifyui.ui" line="99"/>
+        <source>Data Version</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qt/regionmodifyui.ui" line="109"/>
+        <source>Version</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qt/regionmodifyui.ui" line="133"/>
+        <source>&amp;OK</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qt/regionmodifyui.ui" line="140"/>
+        <source>&amp;Cancel</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

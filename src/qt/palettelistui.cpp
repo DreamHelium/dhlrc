@@ -5,6 +5,8 @@
 #include "dh_type.h"
 #include "ui_palettelistui.h"
 
+#include <paletteaddui.h>
+
 PaletteListUI::PaletteListUI (QString &uuid, char *&large_version,
                               QWidget *parent)
     : QDialog (parent), ui (new Ui::PaletteListUI),
@@ -19,6 +21,14 @@ PaletteListUI::PaletteListUI (QString &uuid, char *&large_version,
     initUI ();
     QObject::connect (ui->buttonBox, &QDialogButtonBox::rejected, this,
                       &PaletteListUI::close);
+    QObject::connect (ui->addBtn, &QPushButton::clicked, this, [&]
+    {
+       auto paui = new PaletteAddUI ();
+        paui->setAttribute (Qt::WA_DeleteOnClose);
+        auto palette = paui->exec_r ();
+        qDebug() << region_add_palette_using_palette(region, palette);
+        drawList ();
+    });
 }
 
 PaletteListUI::~PaletteListUI ()

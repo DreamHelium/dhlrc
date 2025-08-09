@@ -107,7 +107,37 @@ msgstr ""
 
 #: ../../src/qt/blockreaderui.ui:161
 msgctxt "BlockReaderUI|"
+msgid "&Show blocks"
+msgstr ""
+
+#: ../../src/qt/blockreaderui.ui:168
+msgctxt "BlockReaderUI|"
 msgid "&Close"
+msgstr ""
+
+#: ../../src/qt/blockshowui.ui:14
+msgctxt "BlockShowUI|"
+msgid "BlockShowUI"
+msgstr ""
+
+#: ../../src/qt/blockshowui.ui:22
+msgctxt "BlockShowUI|"
+msgid "y"
+msgstr ""
+
+#: ../../src/qt/blockshowui.ui:32
+msgctxt "BlockShowUI|"
+msgid "Mode"
+msgstr ""
+
+#: ../../src/qt/blockshowui.ui:82
+msgctxt "BlockShowUI|"
+msgid "&List/Modify Palette"
+msgstr ""
+
+#: ../../src/qt/blockshowui.ui:89
+msgctxt "BlockShowUI|"
+msgid "Modify &Block"
 msgstr ""
 
 #: ../../src/qt/configui.ui:14
@@ -225,42 +255,42 @@ msgstr ""
 
 #: ../../src/qt/mainwindow.ui:107
 msgctxt "MainWindow|"
+msgid "M&odify Region"
+msgstr ""
+
+#: ../../src/qt/mainwindow.ui:114
+msgctxt "MainWindow|"
 msgid "&Block reader"
 msgstr ""
 
-#: ../../src/qt/mainwindow.ui:117
+#: ../../src/qt/mainwindow.ui:124
 msgctxt "MainWindow|"
 msgid "&Item List"
 msgstr ""
 
-#: ../../src/qt/mainwindow.ui:125
+#: ../../src/qt/mainwindow.ui:132
 msgctxt "MainWindow|"
 msgid "I&tem list reader and modifier"
 msgstr ""
 
-#: ../../src/qt/mainwindow.ui:132
+#: ../../src/qt/mainwindow.ui:139
 msgctxt "MainWindow|"
 msgid "R&ecipe combiner"
 msgstr ""
 
-#: ../../src/qt/mainwindow.ui:142
+#: ../../src/qt/mainwindow.ui:149
 msgctxt "MainWindow|"
 msgid "Utility"
 msgstr ""
 
-#: ../../src/qt/mainwindow.ui:150
+#: ../../src/qt/mainwindow.ui:157
 msgctxt "MainWindow|"
 msgid "&Config Setting"
 msgstr ""
 
-#: ../../src/qt/mainwindow.ui:157
-msgctxt "MainWindow|"
-msgid "Show Recipe"
-msgstr ""
-
 #: ../../src/qt/mainwindow.ui:164
 msgctxt "MainWindow|"
-msgid "Test OpenGL"
+msgid "Show Recipe"
 msgstr ""
 
 #: ../../src/qt/mainwindow.ui:171
@@ -273,7 +303,12 @@ msgctxt "MainWindow|"
 msgid "Add Translation"
 msgstr ""
 
-#: ../../src/qt/mainwindow.ui:201 ../../src/qt/mainwindow.ui:210
+#: ../../src/qt/mainwindow.ui:185
+msgctxt "MainWindow|"
+msgid "&Load Jar File for Resources"
+msgstr ""
+
+#: ../../src/qt/mainwindow.ui:208 ../../src/qt/mainwindow.ui:217
 msgctxt "MainWindow|"
 msgid "&About"
 msgstr ""
@@ -348,6 +383,56 @@ msgctxt "NbtReaderUI|"
 msgid "Close"
 msgstr ""
 
+#: ../../src/qt/paletteaddui.ui:14
+msgctxt "PaletteAddUI|"
+msgid "PaletteAddUI"
+msgstr ""
+
+#: ../../src/qt/paletteaddui.ui:35
+msgctxt "PaletteAddUI|"
+msgid "&Add"
+msgstr ""
+
+#: ../../src/qt/paletteaddui.ui:45
+msgctxt "PaletteAddUI|"
+msgid "&Remove"
+msgstr ""
+
+#: ../../src/qt/paletteaddui.ui:75
+msgctxt "PaletteAddUI|"
+msgid "&OK"
+msgstr ""
+
+#: ../../src/qt/palettelistui.ui:14
+msgctxt "PaletteListUI|"
+msgid "PaletteListUI"
+msgstr ""
+
+#: ../../src/qt/palettelistui.ui:35
+msgctxt "PaletteListUI|"
+msgid "&Add"
+msgstr ""
+
+#: ../../src/qt/palettelistui.ui:45
+msgctxt "PaletteListUI|"
+msgid "&Remove"
+msgstr ""
+
+#: ../../src/qt/palettelistui.ui:55
+msgctxt "PaletteListUI|"
+msgid "Re&place"
+msgstr ""
+
+#: ../../src/qt/palettelistui.ui:62
+msgctxt "PaletteListUI|"
+msgid "&Show blocks"
+msgstr ""
+
+#: ../../src/qt/palettelistui.ui:69
+msgctxt "PaletteListUI|"
+msgid "R&efresh"
+msgstr ""
+
 #: ../../src/qt/propertymodifyui.ui:14
 msgctxt "PropertyModifyUI|"
 msgid "Modify Property of Block(s)"
@@ -376,4 +461,59 @@ msgstr ""
 #: ../../src/qt/recipeselectui.ui:20
 msgctxt "RecipeSelectUI|"
 msgid "Please select a recipe file:"
+msgstr ""
+
+#: ../../src/qt/regionmodifyui.ui:14
+msgctxt "RegionModifyUI|"
+msgid "RegionModifyUI"
+msgstr ""
+
+#: ../../src/qt/regionmodifyui.ui:20
+msgctxt "RegionModifyUI|"
+msgid "Modify the infomation of the Region."
+msgstr ""
+
+#: ../../src/qt/regionmodifyui.ui:29
+msgctxt "RegionModifyUI|"
+msgid "Create Time"
+msgstr ""
+
+#: ../../src/qt/regionmodifyui.ui:43
+msgctxt "RegionModifyUI|"
+msgid "Modify Time"
+msgstr ""
+
+#: ../../src/qt/regionmodifyui.ui:57
+msgctxt "RegionModifyUI|"
+msgid "Description"
+msgstr ""
+
+#: ../../src/qt/regionmodifyui.ui:71
+msgctxt "RegionModifyUI|"
+msgid "Author"
+msgstr ""
+
+#: ../../src/qt/regionmodifyui.ui:85
+msgctxt "RegionModifyUI|"
+msgid "Name"
+msgstr ""
+
+#: ../../src/qt/regionmodifyui.ui:99
+msgctxt "RegionModifyUI|"
+msgid "Data Version"
+msgstr ""
+
+#: ../../src/qt/regionmodifyui.ui:109
+msgctxt "RegionModifyUI|"
+msgid "Version"
+msgstr ""
+
+#: ../../src/qt/regionmodifyui.ui:133
+msgctxt "RegionModifyUI|"
+msgid "&OK"
+msgstr ""
+
+#: ../../src/qt/regionmodifyui.ui:140
+msgctxt "RegionModifyUI|"
+msgid "&Cancel"
 msgstr ""

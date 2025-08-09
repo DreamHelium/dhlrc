@@ -52,6 +52,9 @@ set(PROJECT_SOURCES
         palettelistui.cpp
         palettelistui.h
         palettelistui.ui
+        paletteaddui.cpp
+        paletteaddui.h
+        paletteaddui.ui
 )
 
 if (${QT_VERSION_MAJOR} GREATER_EQUAL 6)

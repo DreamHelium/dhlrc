@@ -85,21 +85,20 @@ extern "C"
         int air_palette;
     } Region;
 
-    int region_get_index(Region* region, int x, int y, int z);
+    int region_get_index (Region *region, int x, int y, int z);
     gboolean file_is_new_schem (void *instance_ptr);
     Region *region_new_from_new_schem (void *instance_ptr);
     Region *region_new_from_lite_region (LiteRegion *lr);
     Region *region_new_from_nbt_file (const char *filepos);
     Region *region_new_from_nbt_instance_ptr (void *instance_ptr);
-    gboolean palette_is_same (Palette *a, Palette *b);
+    gboolean palette_is_same (gconstpointer a, gconstpointer b);
     char *block_info_get_id_name (Region *region, BlockInfo *info);
     void region_modify_property (Region *region, BlockInfo *info,
                                  gboolean all_modify, DhStrArray *new_data);
-    /* Modify a block need new properties, otherwise it might be unsafe */
-    void region_modify_block (Region *region, BlockInfo *info,
-                              gboolean all_modify, gboolean safe_mode,
-                              DhStrArray *property_name,
-                              DhStrArray *property_data);
+    gboolean region_add_palette (Region *region, const char *id_name,
+                                 DhStrArray *palette_name,
+                                 DhStrArray *palette_data);
+    gboolean region_add_palette_using_palette(Region* region, Palette* palette);
     Palette *region_get_palette (Region *region, int val);
     ItemList *item_list_new_from_multi_region (const char **region_uuid_arr);
     void region_free (void *region);
