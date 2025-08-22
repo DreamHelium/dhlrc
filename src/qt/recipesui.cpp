@@ -257,9 +257,9 @@ RecipesUI::recipesProcess (const char *item, const char *filepos, quint32 num)
         {
             QMessageBox::StandardButton result = QMessageBox::question (
                 this, _ ("Mod decide"),
-                QString::asprintf (
-                    _ ("There's a remainder with %d and %d, continue?"), num,
-                    r->num));
+                QString (_ ("There's a remainder with %1 and %2, continue?"))
+                    .arg (num)
+                    .arg (r->num));
             switch (result)
                 {
                 case QMessageBox::Yes:

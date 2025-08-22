@@ -36,7 +36,7 @@ set(PROJECT_SOURCES
         saveregionselectui.h saveregionselectui.cpp
         dhtreefilter.h dhtreefilter.cpp
         recipeselectui.h recipeselectui.cpp recipeselectui.ui
-        generalchooseui.cpp generalchooseui.h
+        generalchooseui.h
         propertymodifyui.cpp
         propertymodifyui.h
         propertymodifyui.ui
@@ -55,6 +55,8 @@ set(PROJECT_SOURCES
         paletteaddui.cpp
         paletteaddui.h
         paletteaddui.ui
+        generalchoosedialog.cpp
+        generalchoosedialog.h
 )
 
 if (${QT_VERSION_MAJOR} GREATER_EQUAL 6)

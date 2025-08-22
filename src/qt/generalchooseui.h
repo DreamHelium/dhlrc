@@ -2,42 +2,16 @@
 #define GENERALCHOOSEUI_H
 
 #include "../common_info.h"
-#include <QDialog>
-#include <QPushButton>
+#include "utility.h"
 #include <QButtonGroup>
-#include <QLabel>
-#include <QVBoxLayout>
+#include <QDialog>
 #include <QHBoxLayout>
+#include <QLabel>
+#include <QPushButton>
+#include <QVBoxLayout>
 
-#define GENERALCHOOSEUI_START(type, needMulti) \
-  GeneralChooseUI* gcui = new GeneralChooseUI(type, needMulti); \
-  gcui->setAttribute(Qt::WA_DeleteOnClose); \
-  int ret = gcui->exec();
+#define GENERALCHOOSEUI_START(type, needMulti)                                \
+    int ret = dh::setTypeUuid (type, needMulti, _ ("Select Option(s)"),       \
+                               _ ("Please select option(s)"));
 
-class GeneralChooseUI : public QDialog
-{
-  Q_OBJECT
-
-public:
-  explicit GeneralChooseUI(int type, bool needMulti, QWidget *parent = nullptr);
-  ~GeneralChooseUI();
-
-Q_SIGNALS:
-  void test();
-
-private:
-  int type;
-  bool needMulti;
-  void initUI();
-  QLabel* label;
-  QVBoxLayout* layout;
-  QButtonGroup* group;
-  QPushButton* okBtn;
-  QPushButton* closeBtn;
-  QHBoxLayout* hLayout;
-
-  private Q_SLOTS:
-  void okBtn_clicked();
-};
-
-#endif //GENERALCHOOSEUI_H
+#endif // GENERALCHOOSEUI_H

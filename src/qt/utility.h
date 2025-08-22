@@ -18,6 +18,9 @@ QPixmap *loadSvgResourceFile (const char *pos);
 QString findIcon (QString obj);
 QIcon getIcon (QString dir);
 QString getVersion (int data_version);
+QList<QString> getTypeDescriptions (int type);
+bool setTypeUuid (int type, bool needMulti, const QString &title,
+                  const QString &label);
 }
 
 #endif /* UTILITY_H */

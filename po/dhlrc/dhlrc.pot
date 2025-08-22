@@ -15,7 +15,7 @@ msgstr ""
 "#-#-#-#-#  dhlrc.pot (dhlrc)  #-#-#-#-#\n"
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-08-10 01:31+0800\n"
+"POT-Creation-Date: 2025-08-22 22:24+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -668,7 +668,7 @@ msgstr ""
 msgid "Loading"
 msgstr ""
 
-#: src/qt/blockshowui.cpp:96
+#: src/qt/blockshowui.cpp:96 src/qt/generalchoosedialog.cpp:62
 msgid "Cancel"
 msgstr ""
 
@@ -679,46 +679,12 @@ msgid ""
 "%2"
 msgstr ""
 
-#: src/qt/generalchooseui.cpp:23
-msgid "Please select object(s):"
+#: src/qt/generalchoosedialog.cpp:22
+msgid "All"
 msgstr ""
 
-#: src/qt/generalchooseui.cpp:63 src/qt/generalchooseui.cpp:65
-#: src/qt/manage.cpp:62 src/qt/manage.cpp:63 src/qt/manage.cpp:64
-msgid "locked"
-msgstr ""
-
-#: src/qt/generalchooseui.cpp:73 src/qt/generalchooseui.cpp:94
-#: src/qt/lrchooseui.cpp:61 src/qt/recipesui.cpp:142
-#: src/qt/saveregionselectui.cpp:50 src/gtk/manage_window.c:118
-msgid "&OK"
-msgstr ""
-
-#: src/qt/generalchooseui.cpp:74 src/qt/lrchooseui.cpp:62
-#: src/qt/recipesui.cpp:143 src/qt/saveregionselectui.cpp:51
-#: src/gtk/manage_window.c:121
-msgid "&Close"
-msgstr ""
-
-#: src/qt/generalchooseui.cpp:91
-msgid "No object available!"
-msgstr ""
-
-#: src/qt/generalchooseui.cpp:134 src/qt/ilreaderui.cpp:111
-#: src/qt/mainwindow.cpp:147 src/qt/mainwindow.cpp:167
-#: src/qt/mainwindow.cpp:198 src/qt/mainwindow.cpp:203
-#: src/qt/mainwindow.cpp:223 src/qt/mainwindow.cpp:227
-#: src/qt/mainwindow.cpp:254 src/qt/mainwindow.cpp:258
-#: src/qt/mainwindow.cpp:282 src/qt/manage.cpp:28 src/qt/manage.cpp:256
-#: src/qt/manage.cpp:271 src/qt/manage.cpp:414
-#: src/qt/saveregionselectui.cpp:130 src/qt/utility.cpp:36
-#: src/qt/utility.cpp:68 src/qt/utility.cpp:89 src/qt/utility.cpp:99
-#: src/qt/utility.cpp:104 src/qt/utility.cpp:113 src/qt/utility.cpp:184
-msgid "Error!"
-msgstr ""
-
-#: src/qt/generalchooseui.cpp:135
-msgid "No item list selected!"
+#: src/qt/generalchoosedialog.cpp:61
+msgid "OK"
 msgstr ""
 
 #: src/qt/ilreaderui.cpp:24
@@ -757,8 +723,20 @@ msgstr ""
 msgid "Show history"
 msgstr ""
 
-#: src/qt/ilreaderui.cpp:111 src/qt/mainwindow.cpp:148
-#: src/qt/mainwindow.cpp:168
+#: src/qt/ilreaderui.cpp:111 src/qt/mainwindow.cpp:155
+#: src/qt/mainwindow.cpp:175 src/qt/mainwindow.cpp:206
+#: src/qt/mainwindow.cpp:211 src/qt/mainwindow.cpp:231
+#: src/qt/mainwindow.cpp:235 src/qt/mainwindow.cpp:262
+#: src/qt/mainwindow.cpp:266 src/qt/mainwindow.cpp:290 src/qt/manage.cpp:28
+#: src/qt/manage.cpp:256 src/qt/manage.cpp:271 src/qt/manage.cpp:414
+#: src/qt/saveregionselectui.cpp:130 src/qt/utility.cpp:35
+#: src/qt/utility.cpp:67 src/qt/utility.cpp:89 src/qt/utility.cpp:100
+#: src/qt/utility.cpp:105 src/qt/utility.cpp:114 src/qt/utility.cpp:186
+msgid "Error!"
+msgstr ""
+
+#: src/qt/ilreaderui.cpp:111 src/qt/mainwindow.cpp:156
+#: src/qt/mainwindow.cpp:176
 msgid "The item list is locked!"
 msgstr ""
 
@@ -770,14 +748,25 @@ msgstr ""
 msgid "&All"
 msgstr ""
 
-#: src/qt/lrchooseui.cpp:51
+#: src/qt/lrchooseui.cpp:49
 msgid ""
 "Please enter the new Region(s)' name(s): (%1 represents the NBT description "
-"and %2 represents the original region's name):"
+"and %2 represents the original region's name), you can see results below the "
+"edit line:"
 msgstr ""
 
 #: src/qt/lrchooseui.cpp:54
 msgid "Enter description here."
+msgstr ""
+
+#: src/qt/lrchooseui.cpp:66 src/qt/recipesui.cpp:142
+#: src/qt/saveregionselectui.cpp:50 src/gtk/manage_window.c:118
+msgid "&OK"
+msgstr ""
+
+#: src/qt/lrchooseui.cpp:67 src/qt/recipesui.cpp:143
+#: src/qt/saveregionselectui.cpp:51 src/gtk/manage_window.c:121
+msgid "&Close"
 msgstr ""
 
 #: src/qt/mainwindow.cpp:31
@@ -786,37 +775,53 @@ msgid ""
 "window that's using the Region."
 msgstr ""
 
-#: src/qt/mainwindow.cpp:186 src/qt/saveregionselectui.cpp:119
+#: src/qt/mainwindow.cpp:34
+msgid ""
+"Welcome! Before using, we will tell you that some functions need components "
+"of the game, luckily we can download them, and these functions will popup a "
+"window showing that we need to download.\n"
+"If you don't want to download them, you can cancel or close the application."
+msgstr ""
+
+#: src/qt/mainwindow.cpp:48
+msgid "Welcome!"
+msgstr ""
+
+#: src/qt/mainwindow.cpp:194 src/qt/saveregionselectui.cpp:119
 msgid "Enter Name for Item List"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:187 src/qt/saveregionselectui.cpp:120
+#: src/qt/mainwindow.cpp:195 src/qt/saveregionselectui.cpp:120
 msgid "Enter the name for item list"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:199 src/qt/saveregionselectui.cpp:131
+#: src/qt/mainwindow.cpp:207 src/qt/saveregionselectui.cpp:131
 msgid "Description is empty!"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:204 src/qt/mainwindow.cpp:228
-#: src/qt/mainwindow.cpp:259
+#: src/qt/mainwindow.cpp:212 src/qt/mainwindow.cpp:236
+#: src/qt/mainwindow.cpp:267
 msgid "No Region or no Region selected!"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:282
+#: src/qt/mainwindow.cpp:290
 msgid "No NBT is selected!"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:296
+#: src/qt/mainwindow.cpp:304
 msgid "Version: "
 msgstr ""
 
-#: src/qt/mainwindow.cpp:298
+#: src/qt/mainwindow.cpp:306
 msgid "About Litematica Reader"
 msgstr ""
 
 #: src/qt/manage.cpp:28
 msgid "No row is selected!"
+msgstr ""
+
+#: src/qt/manage.cpp:62 src/qt/manage.cpp:63 src/qt/manage.cpp:64
+msgid "locked"
 msgstr ""
 
 #: src/qt/manage.cpp:73
@@ -960,9 +965,8 @@ msgstr ""
 msgid "Mod decide"
 msgstr ""
 
-#: src/qt/recipesui.cpp:261
-#, c-format
-msgid "There's a remainder with %d and %d, continue?"
+#: src/qt/recipesui.cpp:260
+msgid "There's a remainder with %1 and %2, continue?"
 msgstr ""
 
 #: src/qt/recipesui.cpp:290
@@ -1022,59 +1026,59 @@ msgstr ""
 msgid "The track information is:\n"
 msgstr ""
 
-#: src/qt/utility.cpp:37
+#: src/qt/utility.cpp:36
 msgid "No NBT or no NBT selected!"
 msgstr ""
 
-#: src/qt/utility.cpp:61 src/qt/utility.cpp:82
+#: src/qt/utility.cpp:60 src/qt/utility.cpp:82
 msgid "Enter Region Name"
 msgstr ""
 
-#: src/qt/utility.cpp:62 src/qt/utility.cpp:83
+#: src/qt/utility.cpp:61 src/qt/utility.cpp:83
 msgid "Enter name for the new Region."
 msgstr ""
 
-#: src/qt/utility.cpp:69 src/qt/utility.cpp:90
+#: src/qt/utility.cpp:68 src/qt/utility.cpp:90
 msgid "No description for the Region!"
 msgstr ""
 
-#: src/qt/utility.cpp:100
+#: src/qt/utility.cpp:101
 msgid "Unknown error!"
 msgstr ""
 
-#: src/qt/utility.cpp:105
+#: src/qt/utility.cpp:106
 msgid "The NBT Struct is unsupported!"
 msgstr ""
 
-#: src/qt/utility.cpp:114
+#: src/qt/utility.cpp:115
 msgid "This NBT is locked!"
 msgstr ""
 
-#: src/qt/utility.cpp:128 src/gtk/manage_nbt.c:131
+#: src/qt/utility.cpp:129 src/gtk/manage_nbt.c:131
 msgid "Enter Desciption"
 msgstr ""
 
-#: src/qt/utility.cpp:129
+#: src/qt/utility.cpp:130
 msgid "Enter desciption for the NBT file."
 msgstr ""
 
-#: src/qt/utility.cpp:133
+#: src/qt/utility.cpp:134
 msgid "No Description Entered!"
 msgstr ""
 
-#: src/qt/utility.cpp:134
+#: src/qt/utility.cpp:135
 msgid "No desciption entered! Will not add the NBT file!"
 msgstr ""
 
-#: src/qt/utility.cpp:151
+#: src/qt/utility.cpp:153
 msgid "Not Valid File!"
 msgstr ""
 
-#: src/qt/utility.cpp:152
+#: src/qt/utility.cpp:154
 msgid "Not a valid NBT file!"
 msgstr ""
 
-#: src/qt/utility.cpp:178
+#: src/qt/utility.cpp:180
 msgid "The following files couldn't be added:\n"
 msgstr ""
 

@@ -23,9 +23,9 @@ LrChooseUI::initUI ()
     vLayout->addWidget (label);
     vLayout->addStretch ();
 
-    auto uuid = dh_info_get_uuid (DH_TYPE_NBT_INTERFACE_CPP);
-    auto instance = (DhNbtInstance *)dh_info_get_data (
-        DH_TYPE_NBT_INTERFACE_CPP, uuid->val[0]);
+    uuid = (*dh_info_get_uuid (DH_TYPE_NBT_INTERFACE_CPP))[0];
+    auto instance
+        = (DhNbtInstance *)dh_info_get_data (DH_TYPE_NBT_INTERFACE_CPP, uuid);
 
     arr = lite_region_name_array_instance (instance);
     group = new QButtonGroup ();
@@ -36,24 +36,29 @@ LrChooseUI::initUI ()
             QCheckBox *box = new QCheckBox (arr->val[i]);
             group->addButton (box, i);
             vLayout->addWidget (box);
-            QObject::connect (box, &QCheckBox::checkStateChanged, this,
+            QObject::connect (box, &QCheckBox::clicked, this,
                               &LrChooseUI::box_clicked);
         }
     allSelectBtn = new QCheckBox (_ ("&All"));
     vLayout->addWidget (allSelectBtn);
-    QObject::connect (allSelectBtn, &QCheckBox::checkStateChanged, this,
+    QObject::connect (allSelectBtn, &QCheckBox::clicked, this,
                       &LrChooseUI::select_clicked);
     vLayout->addStretch ();
 
-    allSelectBtn->setChecked (true);
-
     descriptionLabel = new QLabel (
         _ ("Please enter the new Region(s)' name(s): (%1 represents the NBT "
-           "description and %2 represents the original region's name):"));
+           "description and %2 represents the original region's name), you "
+           "can see results below the edit line:"));
+    descriptionLabel->setWordWrap (true);
     lineEdit = new QLineEdit (("%1 - %2"));
     lineEdit->setPlaceholderText (_ ("Enter description here."));
+    QObject::connect (lineEdit, &QLineEdit::textChanged, this,
+                      &LrChooseUI::text_cb);
+
     vLayout->addWidget (descriptionLabel);
     vLayout->addWidget (lineEdit);
+    viewLabel = new QLabel ();
+    vLayout->addWidget (viewLabel);
     vLayout->addStretch ();
 
     hLayout = new QHBoxLayout ();
@@ -89,6 +94,7 @@ LrChooseUI::box_clicked ()
         allSelectBtn->setChecked (true);
     else
         allSelectBtn->setChecked (false);
+    text_cb ();
 }
 
 void
@@ -97,6 +103,7 @@ LrChooseUI::select_clicked (bool c)
     auto buttons = group->buttons ();
     for (int i = 0; i < buttons.length (); i++)
         buttons[i]->setChecked (c);
+    text_cb ();
 }
 
 void
@@ -105,24 +112,51 @@ LrChooseUI::okBtn_clicked ()
     auto buttons = group->buttons ();
     for (int i = 0; i < buttons.length (); i++)
         {
-            auto uuid = dh_info_get_uuid (DH_TYPE_NBT_INTERFACE_CPP)->val[0];
             auto instance = (DhNbtInstance *)dh_info_get_data (
                 DH_TYPE_NBT_INTERFACE_CPP, uuid);
             if (buttons[i]->isChecked ())
                 {
-                    QString des = lineEdit->text ()
-                                      .arg (dh_info_get_description (
-                                          DH_TYPE_NBT_INTERFACE_CPP, uuid))
-                                      .arg (arr->val[i]);
+                    auto des = dh_string_new_with_string (
+                        lineEdit->text ().toUtf8 ());
+                    dh_string_add_arg (des,
+                                       dh_info_get_description (
+                                           DH_TYPE_NBT_INTERFACE_CPP, uuid));
+                    dh_string_add_arg (des, arr->val[i]);
+                    dh_string_replace_with_args (des);
                     LiteRegion *lr
                         = lite_region_create_from_root_instance_cpp (*instance,
                                                                      i);
                     Region *region = region_new_from_lite_region (lr);
                     dh_info_new (DH_TYPE_REGION, region,
-                                     g_date_time_new_now_local (),
-                                     des.toUtf8 (), nullptr, nullptr);
+                                 g_date_time_new_now_local (),
+                                 dh_string_get_string (des), nullptr, nullptr);
+                    dh_string_free (des);
                     lite_region_free (lr);
                 }
         }
     accept ();
+}
+
+void
+LrChooseUI::text_cb ()
+{
+    auto buttons = group->buttons ();
+    QString viewStr{};
+    for (int i = 0; i < buttons.length (); i++)
+        {
+            if (buttons[i]->isChecked ())
+                {
+                    auto des = dh_string_new_with_string (
+                        lineEdit->text ().toUtf8 ());
+                    dh_string_add_arg (des,
+                                       dh_info_get_description (
+                                           DH_TYPE_NBT_INTERFACE_CPP, uuid));
+                    dh_string_add_arg (des, arr->val[i]);
+                    dh_string_replace_with_args (des);
+                    viewStr += dh_string_get_string (des);
+                    viewStr += "\n";
+                    dh_string_free (des);
+                }
+        }
+    viewLabel->setText (viewStr);
 }

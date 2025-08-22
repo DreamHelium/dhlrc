@@ -4,13 +4,14 @@
 #include "../nbt_interface_cpp/nbt_interface.hpp"
 #include "../region.h"
 #include "../translation.h"
-#include <glib.h>
-#include <gio/gio.h>
 #include "lrchooseui.h"
 #include <QMessageBox>
 #include <QPainter>
 #include <QPixmap>
 #include <QSvgRenderer>
+#include <generalchoosedialog.h>
+#include <gio/gio.h>
+#include <glib.h>
 #include <qcontainerfwd.h>
 #include <qinputdialog.h>
 #include <string>
@@ -22,11 +23,9 @@ dh::loadRegion (QWidget *parent)
 {
     /* The lock for Region info should begin in main func */
     /* Lock for NBT info start */
-    auto *gcui = new GeneralChooseUI (DH_TYPE_NBT_INTERFACE_CPP, false);
-    gcui->setAttribute (Qt::WA_DeleteOnClose);
-    auto res = gcui->exec ();
+    GENERALCHOOSEUI_START (DH_TYPE_NBT_INTERFACE_CPP, false)
     /* Lock for NBT info end */
-    if (res == QDialog::Accepted)
+    if (ret == QDialog::Accepted)
         {
             dh::loadRegion (
                 parent, dh_info_get_uuid (DH_TYPE_NBT_INTERFACE_CPP)->val[0]);
@@ -40,8 +39,8 @@ dh::loadRegion (QWidget *parent)
 void
 dh::loadRegion (QWidget *parent, const char *uuid)
 {
-    auto instance = (DhNbtInstance *)dh_info_get_data (
-        DH_TYPE_NBT_INTERFACE_CPP, uuid);
+    auto instance
+        = (DhNbtInstance *)dh_info_get_data (DH_TYPE_NBT_INTERFACE_CPP, uuid);
     if (dh_info_reader_trylock (DH_TYPE_NBT_INTERFACE_CPP, uuid))
         {
             /* Lock NBT start */
@@ -69,8 +68,9 @@ dh::loadRegion (QWidget *parent, const char *uuid)
                                     _ ("No description for the Region!"));
                             else
                                 dh_info_new (DH_TYPE_REGION, region,
-                                                 g_date_time_new_now_local (),
-                                                 str.toLocal8Bit (), nullptr, nullptr);
+                                             g_date_time_new_now_local (),
+                                             str.toLocal8Bit (), nullptr,
+                                             nullptr);
                         }
                     else if (file_is_new_schem (instance))
                         {
@@ -93,7 +93,8 @@ dh::loadRegion (QWidget *parent, const char *uuid)
                                         dh_info_new (
                                             DH_TYPE_REGION, region,
                                             g_date_time_new_now_local (),
-                                            str.toLocal8Bit (), nullptr, nullptr);
+                                            str.toLocal8Bit (), nullptr,
+                                            nullptr);
                                 }
                             else
                                 QMessageBox::critical (parent, _ ("Error!"),
@@ -144,7 +145,8 @@ dh::loadNbtInstance (QWidget *parent, QString filedir, bool askForDes,
             if (instance->get_original_nbt ())
                 {
                     dh_info_new (DH_TYPE_NBT_INTERFACE_CPP, instance,
-                                     g_date_time_new_now_local (), des, nullptr, nullptr);
+                                 g_date_time_new_now_local (), des, nullptr,
+                                 nullptr);
                     ret = true;
                 }
             else if (tipForFail)
@@ -265,4 +267,55 @@ dh::getVersion (int data_version)
     if (it != map->end ())
         return it->second.data ();
     return {};
+}
+
+QList<QString>
+dh::getTypeDescriptions (int type)
+{
+    QList<QString> list;
+    auto uuidList = dh_info_get_all_uuid (type);
+    for (int i = 0; uuidList && i < **uuidList; i++)
+        {
+            auto uuid = (*uuidList)[i];
+            gchar *time_literal
+                = g_date_time_format (dh_info_get_time (type, uuid), "%T");
+            QString str = QString ("%1 (%2)")
+                              .arg (dh_info_get_description (type, uuid))
+                              .arg (time_literal);
+            list.append (str);
+        }
+    return list;
+}
+
+bool
+dh::setTypeUuid (int type, bool needMulti, const QString &title,
+                 const QString &label)
+{
+    auto list = getTypeDescriptions (type);
+    auto uuidArr = dh_info_get_all_uuid (type);
+    if (needMulti)
+        {
+            auto ret = GeneralChooseDialog::getIndexes (title, label, list);
+            DhStrArray *arr = nullptr;
+            for (auto i : ret)
+                {
+                    dh_str_array_add_str (&arr, (*uuidArr)[i]);
+                }
+
+            if (ret.isEmpty ())
+                return false;
+            dh_info_set_uuid (type, arr);
+            dh_str_array_free (arr);
+            return true;
+        }
+    else
+        {
+            auto ret = GeneralChooseDialog::getIndex (title, label, list);
+            if (ret != -1)
+                {
+                    dh_info_set_single_uuid (type, (*uuidArr)[ret]);
+                    return true;
+                }
+            return false;
+        }
 }

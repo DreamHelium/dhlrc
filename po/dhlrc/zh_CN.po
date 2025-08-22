@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-08-10 01:31+0800\n"
+"POT-Creation-Date: 2025-08-22 21:22+0800\n"
 "PO-Revision-Date: 2024-11-30 07:00+0800\n"
 "Last-Translator: dream_he <48383878+DreamHelium@users.noreply.github.com>\n"
 "Language-Team: Chinese <kde-i18n-doc@kde.org>\n"
@@ -677,7 +677,7 @@ msgstr ""
 msgid "Loading"
 msgstr ""
 
-#: src/qt/blockshowui.cpp:96
+#: src/qt/blockshowui.cpp:96 src/qt/generalchoosedialog.cpp:62
 msgid "Cancel"
 msgstr ""
 
@@ -688,47 +688,13 @@ msgid ""
 "%2"
 msgstr ""
 
-#: src/qt/generalchooseui.cpp:23
-msgid "Please select object(s):"
-msgstr "请选择项目："
+#: src/qt/generalchoosedialog.cpp:22
+msgid "All"
+msgstr ""
 
-#: src/qt/generalchooseui.cpp:63 src/qt/generalchooseui.cpp:65
-#: src/qt/manage.cpp:62 src/qt/manage.cpp:63 src/qt/manage.cpp:64
-msgid "locked"
-msgstr "已锁定"
-
-#: src/qt/generalchooseui.cpp:73 src/qt/generalchooseui.cpp:94
-#: src/qt/lrchooseui.cpp:61 src/qt/recipesui.cpp:142
-#: src/qt/saveregionselectui.cpp:50 src/gtk/manage_window.c:118
-msgid "&OK"
-msgstr "确定(&O)"
-
-#: src/qt/generalchooseui.cpp:74 src/qt/lrchooseui.cpp:62
-#: src/qt/recipesui.cpp:143 src/qt/saveregionselectui.cpp:51
-#: src/gtk/manage_window.c:121
-msgid "&Close"
-msgstr "关闭(&C)"
-
-#: src/qt/generalchooseui.cpp:91
-msgid "No object available!"
-msgstr "没有项目可用！"
-
-#: src/qt/generalchooseui.cpp:134 src/qt/ilreaderui.cpp:111
-#: src/qt/mainwindow.cpp:147 src/qt/mainwindow.cpp:167
-#: src/qt/mainwindow.cpp:198 src/qt/mainwindow.cpp:203
-#: src/qt/mainwindow.cpp:223 src/qt/mainwindow.cpp:227
-#: src/qt/mainwindow.cpp:254 src/qt/mainwindow.cpp:258
-#: src/qt/mainwindow.cpp:282 src/qt/manage.cpp:28 src/qt/manage.cpp:256
-#: src/qt/manage.cpp:271 src/qt/manage.cpp:414
-#: src/qt/saveregionselectui.cpp:130 src/qt/utility.cpp:36
-#: src/qt/utility.cpp:68 src/qt/utility.cpp:89 src/qt/utility.cpp:99
-#: src/qt/utility.cpp:104 src/qt/utility.cpp:113 src/qt/utility.cpp:184
-msgid "Error!"
-msgstr "错误！"
-
-#: src/qt/generalchooseui.cpp:135
-msgid "No item list selected!"
-msgstr "无选择的材料列表！"
+#: src/qt/generalchoosedialog.cpp:61
+msgid "OK"
+msgstr ""
 
 #: src/qt/ilreaderui.cpp:24
 msgid "&File"
@@ -766,8 +732,20 @@ msgstr "追踪"
 msgid "Show history"
 msgstr "展示历史"
 
-#: src/qt/ilreaderui.cpp:111 src/qt/mainwindow.cpp:148
-#: src/qt/mainwindow.cpp:168
+#: src/qt/ilreaderui.cpp:111 src/qt/mainwindow.cpp:155
+#: src/qt/mainwindow.cpp:175 src/qt/mainwindow.cpp:206
+#: src/qt/mainwindow.cpp:211 src/qt/mainwindow.cpp:231
+#: src/qt/mainwindow.cpp:235 src/qt/mainwindow.cpp:262
+#: src/qt/mainwindow.cpp:266 src/qt/mainwindow.cpp:290 src/qt/manage.cpp:28
+#: src/qt/manage.cpp:256 src/qt/manage.cpp:271 src/qt/manage.cpp:414
+#: src/qt/saveregionselectui.cpp:130 src/qt/utility.cpp:35
+#: src/qt/utility.cpp:67 src/qt/utility.cpp:89 src/qt/utility.cpp:100
+#: src/qt/utility.cpp:105 src/qt/utility.cpp:114 src/qt/utility.cpp:186
+msgid "Error!"
+msgstr "错误！"
+
+#: src/qt/ilreaderui.cpp:111 src/qt/mainwindow.cpp:156
+#: src/qt/mainwindow.cpp:176
 msgid "The item list is locked!"
 msgstr "此材料列表被锁定！"
 
@@ -779,55 +757,84 @@ msgstr ""
 msgid "&All"
 msgstr "全选 (&A)"
 
-#: src/qt/lrchooseui.cpp:51
+#: src/qt/lrchooseui.cpp:49
 msgid ""
 "Please enter the new Region(s)' name(s): (%1 represents the NBT description "
-"and %2 represents the original region's name):"
-msgstr "请输入新Region的名字：（%1代表NBT描述，%2代表原本的区域的名字）："
+"and %2 represents the original region's name), you can see results below the "
+"edit line:"
+msgstr ""
 
 #: src/qt/lrchooseui.cpp:54
 msgid "Enter description here."
 msgstr "在此输入描述。"
 
+#: src/qt/lrchooseui.cpp:66 src/qt/recipesui.cpp:142
+#: src/qt/saveregionselectui.cpp:50 src/gtk/manage_window.c:118
+msgid "&OK"
+msgstr "确定(&O)"
+
+#: src/qt/lrchooseui.cpp:67 src/qt/recipesui.cpp:143
+#: src/qt/saveregionselectui.cpp:51 src/gtk/manage_window.c:121
+msgid "&Close"
+msgstr "关闭(&C)"
+
 #: src/qt/mainwindow.cpp:31
-#, fuzzy
 msgid ""
 "Region is locked! It might not be the writer lock! Please try to close the "
 "window that's using the Region."
 msgstr "Region被锁定！可能不是写锁！请尝试关闭正在使用此Region的窗口。"
 
-#: src/qt/mainwindow.cpp:186 src/qt/saveregionselectui.cpp:119
+#: src/qt/mainwindow.cpp:34
+msgid ""
+"Welcome! Before using, we will tell you that some functions need components "
+"of the game, luckily we can download them, and these functions will popup a "
+"window showing that we need to download.\n"
+"If you don't want to download them, you can cancel or close the application."
+msgstr ""
+"欢迎！在使用前，我们得告诉您有些功能需要游戏的组件，幸运的是我们可以下载它"
+"们，并且这些功能将会弹出一个窗口，表示我们需要下载。\n"
+"如果你不想要下载它们，你可以取消或关闭应用。"
+
+#: src/qt/mainwindow.cpp:48
+msgid "Welcome!"
+msgstr "欢迎！"
+
+#: src/qt/mainwindow.cpp:194 src/qt/saveregionselectui.cpp:119
 msgid "Enter Name for Item List"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:187 src/qt/saveregionselectui.cpp:120
+#: src/qt/mainwindow.cpp:195 src/qt/saveregionselectui.cpp:120
 msgid "Enter the name for item list"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:199 src/qt/saveregionselectui.cpp:131
+#: src/qt/mainwindow.cpp:207 src/qt/saveregionselectui.cpp:131
 msgid "Description is empty!"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:204 src/qt/mainwindow.cpp:228
-#: src/qt/mainwindow.cpp:259
+#: src/qt/mainwindow.cpp:212 src/qt/mainwindow.cpp:236
+#: src/qt/mainwindow.cpp:267
 msgid "No Region or no Region selected!"
 msgstr "没有Region或没有Region选中！"
 
-#: src/qt/mainwindow.cpp:282
+#: src/qt/mainwindow.cpp:290
 msgid "No NBT is selected!"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:296
+#: src/qt/mainwindow.cpp:304
 msgid "Version: "
 msgstr "版本： "
 
-#: src/qt/mainwindow.cpp:298
+#: src/qt/mainwindow.cpp:306
 msgid "About Litematica Reader"
 msgstr "关于投影文件阅读器"
 
 #: src/qt/manage.cpp:28
 msgid "No row is selected!"
 msgstr "没有选择行！"
+
+#: src/qt/manage.cpp:62 src/qt/manage.cpp:63 src/qt/manage.cpp:64
+msgid "locked"
+msgstr "已锁定"
 
 #: src/qt/manage.cpp:73
 msgid "Description"
@@ -1032,59 +1039,59 @@ msgstr "保存为新式&Schematic NBT结构。"
 msgid "The track information is:\n"
 msgstr "追踪信息如下：\n"
 
-#: src/qt/utility.cpp:37
+#: src/qt/utility.cpp:36
 msgid "No NBT or no NBT selected!"
 msgstr "无NBT或没有NBT被选中！"
 
-#: src/qt/utility.cpp:61 src/qt/utility.cpp:82
+#: src/qt/utility.cpp:60 src/qt/utility.cpp:82
 msgid "Enter Region Name"
 msgstr "输入Region名称"
 
-#: src/qt/utility.cpp:62 src/qt/utility.cpp:83
+#: src/qt/utility.cpp:61 src/qt/utility.cpp:83
 msgid "Enter name for the new Region."
 msgstr "输入新Region的名称。"
 
-#: src/qt/utility.cpp:69 src/qt/utility.cpp:90
+#: src/qt/utility.cpp:68 src/qt/utility.cpp:90
 msgid "No description for the Region!"
 msgstr "没有Region的描述！"
 
-#: src/qt/utility.cpp:100
+#: src/qt/utility.cpp:101
 msgid "Unknown error!"
 msgstr ""
 
-#: src/qt/utility.cpp:105
+#: src/qt/utility.cpp:106
 msgid "The NBT Struct is unsupported!"
 msgstr "此NBT结构不受支持！"
 
-#: src/qt/utility.cpp:114
+#: src/qt/utility.cpp:115
 msgid "This NBT is locked!"
 msgstr "此NBT被锁定！"
 
-#: src/qt/utility.cpp:128 src/gtk/manage_nbt.c:131
+#: src/qt/utility.cpp:129 src/gtk/manage_nbt.c:131
 msgid "Enter Desciption"
 msgstr "输入描述"
 
-#: src/qt/utility.cpp:129
+#: src/qt/utility.cpp:130
 msgid "Enter desciption for the NBT file."
 msgstr "输入NBT文件的描述。"
 
-#: src/qt/utility.cpp:133
+#: src/qt/utility.cpp:134
 msgid "No Description Entered!"
 msgstr "没有输入的描述！"
 
-#: src/qt/utility.cpp:134
+#: src/qt/utility.cpp:135
 msgid "No desciption entered! Will not add the NBT file!"
 msgstr "没有描述输入！将不会添加NBT文件！"
 
-#: src/qt/utility.cpp:151
+#: src/qt/utility.cpp:153
 msgid "Not Valid File!"
 msgstr "不是有效的文件！"
 
-#: src/qt/utility.cpp:152
+#: src/qt/utility.cpp:154
 msgid "Not a valid NBT file!"
 msgstr "不是一个有效的NBT文件！"
 
-#: src/qt/utility.cpp:178
+#: src/qt/utility.cpp:180
 msgid "The following files couldn't be added:\n"
 msgstr "以下文件不能被添加：\n"
 
@@ -1280,6 +1287,20 @@ msgstr "北"
 #: src/region.cpp:36
 msgid "west"
 msgstr "西"
+
+#~ msgid ""
+#~ "Please enter the new Region(s)' name(s): (%1 represents the NBT "
+#~ "description and %2 represents the original region's name):"
+#~ msgstr "请输入新Region的名字：（%1代表NBT描述，%2代表原本的区域的名字）："
+
+#~ msgid "Please select object(s):"
+#~ msgstr "请选择项目："
+
+#~ msgid "No object available!"
+#~ msgstr "没有项目可用！"
+
+#~ msgid "No item list selected!"
+#~ msgstr "无选择的材料列表！"
 
 #~ msgctxt "MainWindow|"
 #~ msgid "Test OpenGL"

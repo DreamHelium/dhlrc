@@ -30,6 +30,12 @@
 #define REGION_LOCKED_MSG                                                     \
     _ ("Region is locked! It might not be the writer lock! Please try to "    \
        "close the window that's using the Region.")
+#define DHLRC_INIT_MSG                                                        \
+    _ ("Welcome! Before using, we will tell you that some functions need "    \
+       "components of the game, luckily we can download them, and these "     \
+       "functions will popup a window showing that we need to download."      \
+       "\nIf you don't want to download them, you can cancel or close "       \
+       "the application.")
 
 static dh::ManageRegion *mr = nullptr;
 static dh::ManageNbtInterface *mni = nullptr;
@@ -39,6 +45,8 @@ static MainWindow *mw;
 MainWindow::MainWindow (QWidget *parent)
     : QMainWindow (parent), ui (new Ui::MainWindow)
 {
+    QMessageBox::information (this, _ ("Welcome!"), DHLRC_INIT_MSG);
+
     ui->setupUi (this);
     auto pixmap0 = dh::loadSvgResourceFile ("/cn/dh/dhlrc/nbt_tree.svg");
     ui->tabWidget->setTabIcon (0, *pixmap0);
