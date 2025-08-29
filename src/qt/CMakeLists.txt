@@ -17,6 +17,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets Svg)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets Svg)
 
+add_definitions(-DQT_NO_SIGNALS_SLOTS_KEYWORDS)
+
 set(PROJECT_SOURCES
         module.h module.cpp
         mainwindow.ui mainwindow.cpp mainwindow.h

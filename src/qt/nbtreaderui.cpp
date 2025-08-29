@@ -1,19 +1,16 @@
+#include "../translation.h"
 #include "nbtreaderui.h"
 #include "dhtreefilter.h"
 #include "ui_nbtreaderui.h"
 #include <qitemselectionmodel.h>
-#include <qnamespace.h>
 #include <qpushbutton.h>
 #include <qsortfilterproxymodel.h>
 #include <qstandarditemmodel.h>
 #include <qtreeview.h>
-#include <qvariant.h>
 #include "../nbt_interface_cpp/nbt_interface.hpp"
-#include <cstdlib>
-#include <QDebug>
 #include <QLineEdit>
 #include <QInputDialog>
-#include "../translation.h"
+
 
 static QString uuid;
 

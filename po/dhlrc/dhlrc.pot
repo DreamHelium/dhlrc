@@ -15,7 +15,7 @@ msgstr ""
 "#-#-#-#-#  dhlrc.pot (dhlrc)  #-#-#-#-#\n"
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-08-22 22:24+0800\n"
+"POT-Creation-Date: 2025-08-30 01:26+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -727,11 +727,11 @@ msgstr ""
 #: src/qt/mainwindow.cpp:175 src/qt/mainwindow.cpp:206
 #: src/qt/mainwindow.cpp:211 src/qt/mainwindow.cpp:231
 #: src/qt/mainwindow.cpp:235 src/qt/mainwindow.cpp:262
-#: src/qt/mainwindow.cpp:266 src/qt/mainwindow.cpp:290 src/qt/manage.cpp:28
-#: src/qt/manage.cpp:256 src/qt/manage.cpp:271 src/qt/manage.cpp:414
-#: src/qt/saveregionselectui.cpp:130 src/qt/utility.cpp:35
-#: src/qt/utility.cpp:67 src/qt/utility.cpp:89 src/qt/utility.cpp:100
-#: src/qt/utility.cpp:105 src/qt/utility.cpp:114 src/qt/utility.cpp:186
+#: src/qt/mainwindow.cpp:266 src/qt/mainwindow.cpp:290 src/qt/manage.cpp:29
+#: src/qt/manage.cpp:257 src/qt/manage.cpp:272 src/qt/manage.cpp:437
+#: src/qt/saveregionselectui.cpp:130 src/qt/utility.cpp:38
+#: src/qt/utility.cpp:70 src/qt/utility.cpp:92 src/qt/utility.cpp:103
+#: src/qt/utility.cpp:108 src/qt/utility.cpp:117 src/qt/utility.cpp:284
 msgid "Error!"
 msgstr ""
 
@@ -759,12 +759,12 @@ msgstr ""
 msgid "Enter description here."
 msgstr ""
 
-#: src/qt/lrchooseui.cpp:66 src/qt/recipesui.cpp:142
+#: src/qt/lrchooseui.cpp:66 src/qt/recipesui.cpp:134
 #: src/qt/saveregionselectui.cpp:50 src/gtk/manage_window.c:118
 msgid "&OK"
 msgstr ""
 
-#: src/qt/lrchooseui.cpp:67 src/qt/recipesui.cpp:143
+#: src/qt/lrchooseui.cpp:67 src/qt/recipesui.cpp:135
 #: src/qt/saveregionselectui.cpp:51 src/gtk/manage_window.c:121
 msgid "&Close"
 msgstr ""
@@ -816,75 +816,79 @@ msgstr ""
 msgid "About Litematica Reader"
 msgstr ""
 
-#: src/qt/manage.cpp:28
+#: src/qt/manage.cpp:29
 msgid "No row is selected!"
 msgstr ""
 
-#: src/qt/manage.cpp:62 src/qt/manage.cpp:63 src/qt/manage.cpp:64
+#: src/qt/manage.cpp:63 src/qt/manage.cpp:64 src/qt/manage.cpp:65
 msgid "locked"
 msgstr ""
 
-#: src/qt/manage.cpp:73
+#: src/qt/manage.cpp:74
 msgid "Description"
 msgstr ""
 
-#: src/qt/manage.cpp:73
+#: src/qt/manage.cpp:74
 msgid "UUID"
 msgstr ""
 
-#: src/qt/manage.cpp:73
+#: src/qt/manage.cpp:74
 msgid "Time"
 msgstr ""
 
-#: src/qt/manage.cpp:168 src/cli/main_cli.c:39 src/cli/main_cli.c:49
+#: src/qt/manage.cpp:169 src/cli/main_cli.c:39 src/cli/main_cli.c:49
 msgid "Manage Region"
 msgstr ""
 
-#: src/qt/manage.cpp:212
+#: src/qt/manage.cpp:213
 msgid "No item selected!"
 msgstr ""
 
-#: src/qt/manage.cpp:256
+#: src/qt/manage.cpp:257
 msgid "Not a valid NBT List!"
 msgstr ""
 
-#: src/qt/manage.cpp:272
+#: src/qt/manage.cpp:273
 msgid "Not a valid NBT UUID!"
 msgstr ""
 
-#: src/qt/manage.cpp:288
+#: src/qt/manage.cpp:289
 msgid "Manage NBT Interface"
 msgstr ""
 
-#: src/qt/manage.cpp:305
+#: src/qt/manage.cpp:319
+msgid "Loading..."
+msgstr ""
+
+#: src/qt/manage.cpp:327
 msgid "Select a file"
 msgstr ""
 
-#: src/qt/manage.cpp:306
+#: src/qt/manage.cpp:328
 msgid "Litematic file (*.litematic);;NBT File (*.nbt)"
 msgstr ""
 
-#: src/qt/manage.cpp:349
+#: src/qt/manage.cpp:372
 msgid "Save File"
 msgstr ""
 
-#: src/qt/manage.cpp:367
+#: src/qt/manage.cpp:390
 msgid "Info Locked!"
 msgstr ""
 
-#: src/qt/manage.cpp:368
+#: src/qt/manage.cpp:391
 msgid "The NBT info is locked!"
 msgstr ""
 
-#: src/qt/manage.cpp:374
+#: src/qt/manage.cpp:397
 msgid "Save Files"
 msgstr ""
 
-#: src/qt/manage.cpp:408
+#: src/qt/manage.cpp:431
 msgid "The following infos are locked:\n"
 msgstr ""
 
-#: src/qt/nbtreaderui.cpp:208
+#: src/qt/nbtreaderui.cpp:205
 msgid " "
 msgstr ""
 
@@ -932,73 +936,73 @@ msgstr ""
 msgid "The item is:"
 msgstr ""
 
-#: src/qt/recipesui.cpp:107
+#: src/qt/recipesui.cpp:99
 msgid "No items? Get recipe files from file."
 msgstr ""
 
-#: src/qt/recipesui.cpp:108
+#: src/qt/recipesui.cpp:100
 msgid "Please select items:"
 msgstr ""
 
-#: src/qt/recipesui.cpp:110
+#: src/qt/recipesui.cpp:102
 msgid "Search block name"
 msgstr ""
 
-#: src/qt/recipesui.cpp:132
+#: src/qt/recipesui.cpp:124
 msgid "Combine items to this item list."
 msgstr ""
 
-#: src/qt/recipesui.cpp:134
+#: src/qt/recipesui.cpp:126
 msgid "New item list name:"
 msgstr ""
 
-#: src/qt/recipesui.cpp:135
+#: src/qt/recipesui.cpp:127
 msgid "Generated from material list combiner."
 msgstr ""
 
-#: src/qt/recipesui.cpp:224
+#: src/qt/recipesui.cpp:216
 #, c-format
 msgid "\"Delete\" %d items from material list combiner."
 msgstr ""
 
-#: src/qt/recipesui.cpp:259
+#: src/qt/recipesui.cpp:251
 msgid "Mod decide"
 msgstr ""
 
-#: src/qt/recipesui.cpp:260
+#: src/qt/recipesui.cpp:252
 msgid "There's a remainder with %1 and %2, continue?"
 msgstr ""
 
-#: src/qt/recipesui.cpp:290
+#: src/qt/recipesui.cpp:282
 #, c-format
 msgid "Add %d items from material list combiner."
 msgstr ""
 
-#: src/qt/recipesui.cpp:363
+#: src/qt/recipesui.cpp:355
 msgid "Please select a game jar"
 msgstr ""
 
-#: src/qt/recipesui.cpp:364
+#: src/qt/recipesui.cpp:356
 msgid "Jar File (*.jar)"
 msgstr ""
 
-#: src/qt/recipesui.cpp:407
+#: src/qt/recipesui.cpp:399
 msgid "Show recipe"
 msgstr ""
 
-#: src/qt/recipesui.cpp:475
+#: src/qt/recipesui.cpp:467
 msgid "Unzip failed!"
 msgstr ""
 
-#: src/qt/recipesui.cpp:485
+#: src/qt/recipesui.cpp:477
 msgid "Please select a destination."
 msgstr ""
 
-#: src/qt/recipesui.cpp:523
+#: src/qt/recipesui.cpp:515
 msgid "No Unzip Found!"
 msgstr ""
 
-#: src/qt/recipesui.cpp:524
+#: src/qt/recipesui.cpp:516
 msgid "No unzip program found!"
 msgstr ""
 
@@ -1026,59 +1030,75 @@ msgstr ""
 msgid "The track information is:\n"
 msgstr ""
 
-#: src/qt/utility.cpp:36
+#: src/qt/utility.cpp:39
 msgid "No NBT or no NBT selected!"
 msgstr ""
 
-#: src/qt/utility.cpp:60 src/qt/utility.cpp:82
+#: src/qt/utility.cpp:63 src/qt/utility.cpp:85
 msgid "Enter Region Name"
 msgstr ""
 
-#: src/qt/utility.cpp:61 src/qt/utility.cpp:83
+#: src/qt/utility.cpp:64 src/qt/utility.cpp:86
 msgid "Enter name for the new Region."
 msgstr ""
 
-#: src/qt/utility.cpp:68 src/qt/utility.cpp:90
+#: src/qt/utility.cpp:71 src/qt/utility.cpp:93
 msgid "No description for the Region!"
 msgstr ""
 
-#: src/qt/utility.cpp:101
+#: src/qt/utility.cpp:104
 msgid "Unknown error!"
 msgstr ""
 
-#: src/qt/utility.cpp:106
+#: src/qt/utility.cpp:109
 msgid "The NBT Struct is unsupported!"
 msgstr ""
 
-#: src/qt/utility.cpp:115
+#: src/qt/utility.cpp:118
 msgid "This NBT is locked!"
 msgstr ""
 
-#: src/qt/utility.cpp:129 src/gtk/manage_nbt.c:131
-msgid "Enter Desciption"
+#: src/qt/utility.cpp:165
+msgid "Enter Description"
 msgstr ""
 
-#: src/qt/utility.cpp:130
-msgid "Enter desciption for the NBT file."
+#: src/qt/utility.cpp:166
+msgid "Enter description for the NBT file."
 msgstr ""
 
-#: src/qt/utility.cpp:134
+#: src/qt/utility.cpp:169 src/qt/utility.cpp:219
 msgid "No Description Entered!"
 msgstr ""
 
-#: src/qt/utility.cpp:135
+#: src/qt/utility.cpp:170
+msgid "No description entered! Will not add the NBT file!"
+msgstr ""
+
+#: src/qt/utility.cpp:195
+msgid "Loading file: %1."
+msgstr ""
+
+#: src/qt/utility.cpp:214 src/gtk/manage_nbt.c:131
+msgid "Enter Desciption"
+msgstr ""
+
+#: src/qt/utility.cpp:215
+msgid "Enter desciption for the NBT file."
+msgstr ""
+
+#: src/qt/utility.cpp:220
 msgid "No desciption entered! Will not add the NBT file!"
 msgstr ""
 
-#: src/qt/utility.cpp:153
+#: src/qt/utility.cpp:238
 msgid "Not Valid File!"
 msgstr ""
 
-#: src/qt/utility.cpp:154
+#: src/qt/utility.cpp:239
 msgid "Not a valid NBT file!"
 msgstr ""
 
-#: src/qt/utility.cpp:180
+#: src/qt/utility.cpp:278
 msgid "The following files couldn't be added:\n"
 msgstr ""
 

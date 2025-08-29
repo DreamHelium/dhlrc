@@ -6,22 +6,14 @@
 #include "../translation.h"
 #include "dh_file_util.h"
 #include "dh_string_util.h"
-#include "glib.h"
-#include "glibconfig.h"
 #include "recipesshowui.h"
 #include "utility.h"
 #include <QAbstractItemView>
-#include <QDebug>
 #include <QFileDialog>
+#include <QLabel>
 #include <QList>
+#include <QMessageBox>
 #include <QValidator>
-#include <qboxlayout.h>
-#include <qcheckbox.h>
-#include <qcombobox.h>
-#include <qfontmetrics.h>
-#include <qlabel.h>
-#include <qlineedit.h>
-#include <qmessagebox.h>
 
 typedef struct RecipesInternal
 {

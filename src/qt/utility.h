@@ -1,18 +1,28 @@
 #ifndef UTILITY_H
 #define UTILITY_H
 
+#include "../nbt_interface_cpp/nbt_interface.hpp"
+
+#include <QProgressDialog>
 #include <QWidget>
+#include <gio/gio.h>
 
 namespace dh
 {
 void loadRegion (QWidget *parent);
 void loadRegion (QWidget *parent, const char *uuid);
-void loadNbtFiles (QWidget *parent, QStringList filelist);
-bool loadNbtFile (QWidget *parent, QString filedir, bool askForDes,
-                  bool tipForFail);
+void loadNbtFileAsync (QWidget *parent, QString filedir, bool askForDes,
+                       DhProgressSet setFunc, void *main_klass,
+                       GCancellable *cancellable, int min, int max,
+                       QProgressDialog *progressDialog);
 bool loadNbtInstance (QWidget *parent, QString filedir, bool askForDes,
                       bool tipForFail);
-void loadNbtInstances (QWidget *parent, QStringList filelist);
+void loadNbtInstances (QWidget *parent, const QStringList &filelist,
+                       DhProgressSet setFunc, void *main_klass,
+                       GCancellable *cancellable);
+void loadNbtInstances (QWidget *parent, const QStringList &filelist,
+                       DhProgressSet setFunc, void *main_klass,
+                       GCancellable *cancellable, QProgressDialog *dialog);
 QPixmap *loadSvgFile (const char *contents);
 QPixmap *loadSvgResourceFile (const char *pos);
 QString findIcon (QString obj);

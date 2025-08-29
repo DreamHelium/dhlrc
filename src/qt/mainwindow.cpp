@@ -118,7 +118,7 @@ MainWindow::dropEvent (QDropEvent *event)
         {
             filelist << urls[i].toLocalFile ();
         }
-    dh::loadNbtInstances (this, filelist);
+    dh::loadNbtInstances (this, filelist, nullptr, nullptr, nullptr);
 }
 
 void

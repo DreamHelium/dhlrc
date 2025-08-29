@@ -12,6 +12,7 @@
 #include <QFileDialog>
 #include <QInputDialog>
 #include <QMessageBox>
+#include <QProgressDialog>
 #include <qabstractitemmodel.h>
 #include <qcontainerfwd.h>
 #include <qevent.h>
@@ -290,21 +291,43 @@ ManageNbtInterface::ManageNbtInterface ()
                       &ManageNbtInterface::dnd_triggered);
     dh_info_add_notifier (DH_TYPE_NBT_INTERFACE_CPP, update_interface_model,
                           this);
+    cancellable = g_cancellable_new ();
 }
 
 ManageNbtInterface::~ManageNbtInterface ()
 {
     dh_info_remove_notifier (DH_TYPE_NBT_INTERFACE_CPP, this);
     delete model;
+    g_object_unref (cancellable);
 }
 
 void
 ManageNbtInterface::add_triggered ()
 {
+    auto progressDialog = new QProgressDialog (mui);
+
+    auto set_func = [] (void *main_klass, int value) {
+        auto klass = (ManageNbtInterface *)main_klass;
+        emit klass->pChanged (value);
+    };
+
+    auto cancel_func = [&] () {
+        g_cancellable_cancel (cancellable);
+        g_cancellable_reset (cancellable);
+    };
+
+    progressDialog->setWindowTitle (_ ("Loading..."));
+    progressDialog->reset ();
+
+    connect (this, &ManageNbtInterface::pChanged, progressDialog,
+             &QProgressDialog::setValue);
+    connect (progressDialog, &QProgressDialog::canceled, this, cancel_func);
+
     auto dirs = QFileDialog::getOpenFileNames (
         mui, _ ("Select a file"), nullptr,
         _ ("Litematic file (*.litematic);;NBT File (*.nbt)"));
-    dh::loadNbtInstances (mui, dirs);
+    dh::loadNbtInstances (mui, dirs, set_func, this, cancellable,
+                          progressDialog);
 }
 
 void
@@ -435,5 +458,5 @@ ManageNbtInterface::dnd_triggered (const QMimeData *data)
         {
             filelist << urls[i].toLocalFile ();
         }
-    dh::loadNbtInstances (mui, filelist);
+    dh::loadNbtInstances (mui, filelist, nullptr, nullptr, nullptr);
 }
