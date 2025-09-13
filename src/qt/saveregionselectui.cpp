@@ -21,6 +21,80 @@ SaveRegionSelectUI::SaveRegionSelectUI (QWidget *parent) : QDialog (parent)
 SaveRegionSelectUI::~SaveRegionSelectUI () {}
 
 void
+SaveRegionSelectUI::processRegion (QWidget *parent, int option)
+{
+    auto arr = dh_info_get_uuid (DH_TYPE_REGION);
+    QString singleDes;
+    if (**arr == 1)
+        singleDes = QInputDialog::getText (
+            parent, _ ("Input Description"),
+            _ ("Please input the description of the NBT file."));
+    if (singleDes.isEmpty ())
+        {
+            QMessageBox::critical (parent, _ ("Error!"),
+                                   _ ("No description!"));
+            return;
+        }
+    if (option == 0)
+        {
+            for (int i = 0; i < arr->num; i++)
+                {
+                    auto uuid = arr->val[i];
+                    QString des;
+                    if (**arr != 1)
+                        des = dh_info_get_description (DH_TYPE_REGION, uuid);
+                    else
+                        des = singleDes;
+                    auto region
+                        = (Region *)dh_info_get_data (DH_TYPE_REGION, uuid);
+                    auto nbt = dhlrc_conv_region_to_nbt (region, false);
+                    auto instance = (DhNbtInstance *)nbt;
+                    dh_info_new (DH_TYPE_NBT_INTERFACE_CPP, instance,
+                                 g_date_time_new_now_local (), des.toUtf8 (),
+                                 nullptr, nullptr);
+                }
+        }
+    else if (option == 1)
+        {
+            for (int i = 0; i < arr->num; i++)
+                {
+                    auto uuid = arr->val[i];
+                    QString des;
+                    if (**arr != 1)
+                        des = dh_info_get_description (DH_TYPE_REGION, uuid);
+                    else
+                        des = singleDes;
+                    auto region
+                        = (Region *)dh_info_get_data (DH_TYPE_REGION, uuid);
+                    auto nbt = dhlrc_conv_region_to_lite_nbt (region, false);
+                    DhNbtInstance *instance = (DhNbtInstance *)nbt;
+                    dh_info_new (DH_TYPE_NBT_INTERFACE_CPP, instance,
+                                 g_date_time_new_now_local (), des.toUtf8 (),
+                                 nullptr, nullptr);
+                }
+        }
+    else if (option == 2)
+        {
+            for (int i = 0; i < arr->num; i++)
+                {
+                    auto uuid = arr->val[i];
+                    QString des;
+                    if (**arr != 1)
+                        des = dh_info_get_description (DH_TYPE_REGION, uuid);
+                    else
+                        des = singleDes;
+                    auto region
+                        = (Region *)dh_info_get_data (DH_TYPE_REGION, uuid);
+                    auto nbt = dhlrc_conv_region_to_schema_nbt (region, false);
+                    DhNbtInstance *instance = (DhNbtInstance *)nbt;
+                    dh_info_new (DH_TYPE_NBT_INTERFACE_CPP, instance,
+                                 g_date_time_new_now_local (), des.toUtf8 (),
+                                 nullptr, nullptr);
+                }
+        }
+}
+
+void
 SaveRegionSelectUI::initUI ()
 {
     layout = new QVBoxLayout ();
@@ -70,47 +144,47 @@ SaveRegionSelectUI::okBtn_clicked ()
     auto arr = dh_info_get_uuid (DH_TYPE_REGION);
     if (saveAsNbtBtn->isChecked ())
         {
-            for (int i = 0 ; i < arr->num ; i++)
+            for (int i = 0; i < arr->num; i++)
                 {
                     auto uuid = arr->val[i];
-                    auto des
-                        = dh_info_get_description (DH_TYPE_REGION, uuid);
-                    auto region = (Region *)dh_info_get_data (
-                        DH_TYPE_REGION, uuid);
+                    auto des = dh_info_get_description (DH_TYPE_REGION, uuid);
+                    auto region
+                        = (Region *)dh_info_get_data (DH_TYPE_REGION, uuid);
                     auto nbt = dhlrc_conv_region_to_nbt (region, false);
                     DhNbtInstance *instance = (DhNbtInstance *)nbt;
                     dh_info_new (DH_TYPE_NBT_INTERFACE_CPP, instance,
-                                     g_date_time_new_now_local (), des, nullptr, nullptr);
+                                 g_date_time_new_now_local (), des, nullptr,
+                                 nullptr);
                 }
         }
     else if (saveAsLiteNbtBtn->isChecked ())
         {
-            for (int i = 0 ; i < arr->num ; i++)
+            for (int i = 0; i < arr->num; i++)
                 {
                     auto uuid = arr->val[i];
-                    auto des
-                        = dh_info_get_description (DH_TYPE_REGION, uuid);
-                    auto region = (Region *)dh_info_get_data (
-                        DH_TYPE_REGION, uuid);
+                    auto des = dh_info_get_description (DH_TYPE_REGION, uuid);
+                    auto region
+                        = (Region *)dh_info_get_data (DH_TYPE_REGION, uuid);
                     auto nbt = dhlrc_conv_region_to_lite_nbt (region, false);
                     DhNbtInstance *instance = (DhNbtInstance *)nbt;
                     dh_info_new (DH_TYPE_NBT_INTERFACE_CPP, instance,
-                                     g_date_time_new_now_local (), des, nullptr, nullptr);
+                                 g_date_time_new_now_local (), des, nullptr,
+                                 nullptr);
                 }
         }
     else if (saveAsSchemaNbtBtn->isChecked ())
         {
-            for (int i = 0 ; i < arr->num ; i++)
+            for (int i = 0; i < arr->num; i++)
                 {
                     auto uuid = arr->val[i];
-                    auto des
-                        = dh_info_get_description (DH_TYPE_REGION, uuid);
-                    auto region = (Region *)dh_info_get_data (
-                        DH_TYPE_REGION, uuid);
+                    auto des = dh_info_get_description (DH_TYPE_REGION, uuid);
+                    auto region
+                        = (Region *)dh_info_get_data (DH_TYPE_REGION, uuid);
                     auto nbt = dhlrc_conv_region_to_schema_nbt (region, false);
                     DhNbtInstance *instance = (DhNbtInstance *)nbt;
                     dh_info_new (DH_TYPE_NBT_INTERFACE_CPP, instance,
-                                     g_date_time_new_now_local (), des, nullptr, nullptr);
+                                 g_date_time_new_now_local (), des, nullptr,
+                                 nullptr);
                 }
         }
     else if (saveAsIlBtn->isChecked ())
@@ -120,11 +194,11 @@ SaveRegionSelectUI::okBtn_clicked ()
                                          _ ("Enter the name for item list"));
             if (!str.isEmpty ())
                 {
-                    ItemList *newIl
-                        = item_list_new_from_multi_region ((const char **)arr->val);
+                    ItemList *newIl = item_list_new_from_multi_region (
+                        (const char **)arr->val);
                     dh_info_new (DH_TYPE_ITEM_LIST, newIl,
-                                     g_date_time_new_now_local (),
-                                     str.toUtf8 (), nullptr, nullptr);
+                                 g_date_time_new_now_local (), str.toUtf8 (),
+                                 nullptr, nullptr);
                 }
             else
                 QMessageBox::critical (this, _ ("Error!"),

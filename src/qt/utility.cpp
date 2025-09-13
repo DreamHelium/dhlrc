@@ -9,6 +9,7 @@
 #include <QPainter>
 #include <QPixmap>
 #include <QSvgRenderer>
+#include <dhloadobject.h>
 #include <generalchoosedialog.h>
 #include <gio/gio.h>
 #include <glib.h>
@@ -125,16 +126,24 @@ typedef struct LoadAsyncStruct
     QString des;
     DhProgressSet setFunc;
     void *main_klass;
-    GCancellable *cancellable;
-    int min;
-    int max;
 } LoadAsyncStruct;
 
+typedef struct ErrorWithParent
+{
+    QWidget *parent;
+    GError *error;
+} ErrorWithParent;
+
+static void
+errorWithParentFree (gpointer data)
+{
+    auto ewp = static_cast<ErrorWithParent *> (data);
+    g_error_free (ewp->error);
+    g_free (ewp);
+}
+
 void
-dh::loadNbtFileAsync (QWidget *parent, QString filedir, bool askForDes,
-                      DhProgressSet setFunc, void *main_klass,
-                      GCancellable *cancellable, int min, int max,
-                      QProgressDialog *progressDialog)
+dh::loadNbtFileAsync (QWidget *parent, QString filedir, bool askForDes)
 {
     auto func = [] (GTask *task, gpointer source_object, gpointer task_data,
                     GCancellable *task_cancellable) -> void {
@@ -143,21 +152,49 @@ dh::loadNbtFileAsync (QWidget *parent, QString filedir, bool askForDes,
             {
                 auto instance = new DhNbtInstance (
                     data->filedir.toUtf8 (), data->setFunc, data->main_klass,
-                    data->cancellable, data->min, data->max);
+                    task_cancellable, 0, 100);
                 if (instance->get_original_nbt ())
                     {
                         dh_info_new (DH_TYPE_NBT_INTERFACE_CPP, instance,
                                      g_date_time_new_now_local (),
                                      data->des.toUtf8 (), nullptr, nullptr);
+                        g_task_return_pointer (task, nullptr, nullptr);
                     }
                 else
-                    std::cerr << "Error!" << std::endl;
+                    {
+                        ErrorWithParent *ewp = g_new0 (ErrorWithParent, 1);
+                        ewp->parent = data->parent;
+                        if (g_cancellable_is_cancelled (task_cancellable))
+                            ewp->error = g_error_new (
+                                g_quark_from_static_string ("NBT_LOAD_FAIL"),
+                                -1, _ ("The task is cancelled."));
+                        else
+                            ewp->error = g_error_new (
+                                g_quark_from_static_string ("NBT_LOAD_FAIL"),
+                                -2, _ ("Invalid file: %s."),
+                                    data->filedir.toUtf8 ().constData ());
+                        g_task_return_pointer (task, ewp, errorWithParentFree);
+                    }
             }
     };
 
+    auto readyCallback
+        = [] (GObject *object, GAsyncResult *res, gpointer data) -> void {
+        GTask *task = G_TASK (res);
+        gpointer error = g_task_propagate_pointer (task, nullptr);
+        if (error)
+            {
+                auto ewp = static_cast<ErrorWithParent *> (error);
+                QMessageBox::critical (ewp->parent, _ ("Error!"),
+                                       ewp->error->message);
+            }
+        delete static_cast<DhLoadObject *> (data);
+    };
+
+    QString basename = _("Loading %1");
     GFile *file = g_file_new_for_path (filedir.toUtf8 ());
     char *defaultDes = g_file_get_basename (file); /* Should be freed */
-    QString filename = defaultDes;
+    basename = basename.arg (defaultDes);
     char *des = nullptr;
     if (askForDes)
         {
@@ -177,113 +214,32 @@ dh::loadNbtFileAsync (QWidget *parent, QString filedir, bool askForDes,
         des = defaultDes;
     g_object_unref (file);
 
-    GTask *task = g_task_new (nullptr, nullptr, nullptr, nullptr);
     auto asyncStruct = g_new0 (LoadAsyncStruct, 1);
+    auto loadObject
+        = new DhLoadObject (func, readyCallback, asyncStruct, g_free);
+
     asyncStruct->parent = parent;
     asyncStruct->filedir = std::move (filedir);
     asyncStruct->des = des;
-    asyncStruct->setFunc = setFunc;
-    asyncStruct->main_klass = main_klass;
-    asyncStruct->cancellable = cancellable;
-    asyncStruct->min = min;
-    asyncStruct->max = max;
+    asyncStruct->setFunc = DhLoadObject::getSetFunc;
+    asyncStruct->main_klass = loadObject;
     g_free (des);
-    g_task_set_task_data (task, asyncStruct, g_free);
-    g_task_run_in_thread (task, func);
-    if (progressDialog)
-        {
-            QString str = _("Loading file: %1.");
-            str = str.arg(filename);
-            progressDialog->setLabelText (str);
-            progressDialog->exec ();
-        }
-    g_object_unref (task);
-}
 
-bool
-dh::loadNbtInstance (QWidget *parent, QString filedir, bool askForDes,
-                     bool tipForFail)
-{
-    GFile *file = g_file_new_for_path (filedir.toUtf8 ());
-    char *defaultDes = g_file_get_basename (file); /* Should be freed */
-    char *des = NULL;
-    bool ret = false;
-    if (askForDes)
-        {
-            QString qdes = QInputDialog::getText (
-                parent, _ ("Enter Desciption"),
-                _ ("Enter desciption for the NBT file."), QLineEdit::Normal,
-                defaultDes);
-            if (qdes.isEmpty ())
-                QMessageBox::critical (
-                    parent, _ ("No Description Entered!"),
-                    _ ("No desciption entered! Will not add the NBT file!"));
-            else
-                des = g_strdup (qdes.toUtf8 ());
-            g_free (defaultDes);
-        }
-    else
-        des = defaultDes;
-    if (des)
-        {
-            auto instance = new DhNbtInstance (filedir.toUtf8 ());
-            if (instance->get_original_nbt ())
-                {
-                    dh_info_new (DH_TYPE_NBT_INTERFACE_CPP, instance,
-                                 g_date_time_new_now_local (), des, nullptr,
-                                 nullptr);
-                    ret = true;
-                }
-            else if (tipForFail)
-                QMessageBox::critical (parent, _ ("Not Valid File!"),
-                                       _ ("Not a valid NBT file!"));
-            g_free (des);
-        }
-    g_object_unref (file);
-    return ret;
+    loadObject->load (basename);
 }
 
 void
-dh::loadNbtInstances (QWidget *parent, const QStringList &filelist,
-                      DhProgressSet setFunc, void *main_klass,
-                      GCancellable *cancellable)
-{
-    dh::loadNbtInstances (parent, filelist, setFunc, main_klass, cancellable,
-                          nullptr);
-}
-
-void
-dh::loadNbtInstances (QWidget *parent, const QStringList &filelist,
-                      DhProgressSet setFunc, void *main_klass,
-                      GCancellable *cancellable, QProgressDialog *dialog)
+dh::loadNbtInstances (QWidget *parent, const QStringList &filelist)
 {
     using namespace dh;
-    QStringList failedDir;
     if (filelist.length () == 1)
-        {
-            loadNbtFileAsync (parent, filelist[0], true, setFunc, main_klass,
-                              cancellable, 0, 100, dialog);
-        }
+        loadNbtFileAsync (parent, filelist[0], true);
     else
         {
-            int len = filelist.length ();
+            auto len = filelist.length ();
             for (int i = 0; i < len; i++)
-                {
-                    loadNbtFileAsync (parent, filelist[i], false, setFunc,
-                                      main_klass, cancellable, 0, 100, dialog);
-                }
+                loadNbtFileAsync (parent, filelist[i], false);
         }
-    if (filelist.length () > 1 && failedDir.length ())
-        {
-            QString tip = _ ("The following files couldn't be added:\n");
-            for (int i = 0; i < failedDir.length (); i++)
-                {
-                    tip += failedDir[i];
-                    tip += '\n';
-                }
-            QMessageBox::critical (parent, _ ("Error!"), tip);
-        }
-    delete dialog;
 }
 
 QPixmap *
@@ -368,10 +324,10 @@ dh::getVersion (int data_version)
     return {};
 }
 
-QList<QString>
+QStringList
 dh::getTypeDescriptions (int type)
 {
-    QList<QString> list;
+    QStringList stringList;
     auto uuidList = dh_info_get_all_uuid (type);
     for (int i = 0; uuidList && i < **uuidList; i++)
         {
@@ -381,9 +337,9 @@ dh::getTypeDescriptions (int type)
             QString str = QString ("%1 (%2)")
                               .arg (dh_info_get_description (type, uuid))
                               .arg (time_literal);
-            list.append (str);
+            stringList.append (str);
         }
-    return list;
+    return stringList;
 }
 
 bool

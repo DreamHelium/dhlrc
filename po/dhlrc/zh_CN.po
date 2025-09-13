@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-08-30 01:26+0800\n"
+"POT-Creation-Date: 2025-09-14 03:21+0800\n"
 "PO-Revision-Date: 2024-11-30 07:00+0800\n"
 "Last-Translator: dream_he <48383878+DreamHelium@users.noreply.github.com>\n"
 "Language-Team: Chinese <kde-i18n-doc@kde.org>\n"
@@ -267,65 +267,70 @@ msgstr "管理Region（&M）"
 
 #: ../../src/qt/mainwindow.ui:100
 msgctxt "MainWindow|"
+msgid "&Save Region to NBT"
+msgstr ""
+
+#: ../../src/qt/mainwindow.ui:107
+msgctxt "MainWindow|"
 msgid "&Generate item list"
 msgstr "生成物品列表（&G）"
 
-#: ../../src/qt/mainwindow.ui:107
+#: ../../src/qt/mainwindow.ui:114
 msgctxt "MainWindow|"
 msgid "M&odify Region"
 msgstr ""
 
-#: ../../src/qt/mainwindow.ui:114
+#: ../../src/qt/mainwindow.ui:121
 msgctxt "MainWindow|"
 msgid "&Block reader"
 msgstr "方块阅读器（&B）"
 
-#: ../../src/qt/mainwindow.ui:124
+#: ../../src/qt/mainwindow.ui:131
 msgctxt "MainWindow|"
 msgid "&Item List"
 msgstr "物品列表(&I)"
 
-#: ../../src/qt/mainwindow.ui:132
+#: ../../src/qt/mainwindow.ui:139
 msgctxt "MainWindow|"
 msgid "I&tem list reader and modifier"
 msgstr "物品列表阅读器和修改器（&T）"
 
-#: ../../src/qt/mainwindow.ui:139
+#: ../../src/qt/mainwindow.ui:146
 msgctxt "MainWindow|"
 msgid "R&ecipe combiner"
 msgstr "配方合成器（&E）"
 
-#: ../../src/qt/mainwindow.ui:149
+#: ../../src/qt/mainwindow.ui:156
 msgctxt "MainWindow|"
 msgid "Utility"
 msgstr "工具"
 
-#: ../../src/qt/mainwindow.ui:157
+#: ../../src/qt/mainwindow.ui:164
 msgctxt "MainWindow|"
 msgid "&Config Setting"
 msgstr "配置设置（&C）"
 
-#: ../../src/qt/mainwindow.ui:164
+#: ../../src/qt/mainwindow.ui:171
 msgctxt "MainWindow|"
 msgid "Show Recipe"
 msgstr "展示材料"
 
-#: ../../src/qt/mainwindow.ui:171
+#: ../../src/qt/mainwindow.ui:178
 msgctxt "MainWindow|"
 msgid "Block and Translation"
 msgstr ""
 
-#: ../../src/qt/mainwindow.ui:178
+#: ../../src/qt/mainwindow.ui:185
 msgctxt "MainWindow|"
 msgid "Add Translation"
 msgstr ""
 
-#: ../../src/qt/mainwindow.ui:185
+#: ../../src/qt/mainwindow.ui:192
 msgctxt "MainWindow|"
 msgid "&Load Jar File for Resources"
 msgstr ""
 
-#: ../../src/qt/mainwindow.ui:208 ../../src/qt/mainwindow.ui:217
+#: ../../src/qt/mainwindow.ui:215 ../../src/qt/mainwindow.ui:224
 msgctxt "MainWindow|"
 msgid "&About"
 msgstr "关于(&A)"
@@ -677,7 +682,7 @@ msgstr ""
 msgid "Loading"
 msgstr ""
 
-#: src/qt/blockshowui.cpp:96 src/qt/generalchoosedialog.cpp:62
+#: src/qt/blockshowui.cpp:96 src/qt/generalchoosedialog.cpp:63
 msgid "Cancel"
 msgstr ""
 
@@ -688,11 +693,15 @@ msgid ""
 "%2"
 msgstr ""
 
+#: src/qt/dhloadobject.cpp:12
+msgid "Loading..."
+msgstr ""
+
 #: src/qt/generalchoosedialog.cpp:22
 msgid "All"
 msgstr ""
 
-#: src/qt/generalchoosedialog.cpp:61
+#: src/qt/generalchoosedialog.cpp:62
 msgid "OK"
 msgstr ""
 
@@ -732,20 +741,21 @@ msgstr "追踪"
 msgid "Show history"
 msgstr "展示历史"
 
-#: src/qt/ilreaderui.cpp:111 src/qt/mainwindow.cpp:155
-#: src/qt/mainwindow.cpp:175 src/qt/mainwindow.cpp:206
-#: src/qt/mainwindow.cpp:211 src/qt/mainwindow.cpp:231
-#: src/qt/mainwindow.cpp:235 src/qt/mainwindow.cpp:262
-#: src/qt/mainwindow.cpp:266 src/qt/mainwindow.cpp:290 src/qt/manage.cpp:29
-#: src/qt/manage.cpp:257 src/qt/manage.cpp:272 src/qt/manage.cpp:437
-#: src/qt/saveregionselectui.cpp:130 src/qt/utility.cpp:38
-#: src/qt/utility.cpp:70 src/qt/utility.cpp:92 src/qt/utility.cpp:103
-#: src/qt/utility.cpp:108 src/qt/utility.cpp:117 src/qt/utility.cpp:284
+#: src/qt/ilreaderui.cpp:111 src/qt/mainwindow.cpp:164
+#: src/qt/mainwindow.cpp:184 src/qt/mainwindow.cpp:215
+#: src/qt/mainwindow.cpp:220 src/qt/mainwindow.cpp:240
+#: src/qt/mainwindow.cpp:244 src/qt/mainwindow.cpp:273
+#: src/qt/mainwindow.cpp:277 src/qt/mainwindow.cpp:301
+#: src/qt/mainwindow.cpp:342 src/qt/manage.cpp:29 src/qt/manage.cpp:215
+#: src/qt/manage.cpp:230 src/qt/manage.cpp:374 src/qt/saveregionselectui.cpp:34
+#: src/qt/saveregionselectui.cpp:204 src/qt/utility.cpp:39
+#: src/qt/utility.cpp:71 src/qt/utility.cpp:93 src/qt/utility.cpp:104
+#: src/qt/utility.cpp:109 src/qt/utility.cpp:118 src/qt/utility.cpp:188
 msgid "Error!"
 msgstr "错误！"
 
-#: src/qt/ilreaderui.cpp:111 src/qt/mainwindow.cpp:156
-#: src/qt/mainwindow.cpp:176
+#: src/qt/ilreaderui.cpp:111 src/qt/mainwindow.cpp:165
+#: src/qt/mainwindow.cpp:185
 msgid "The item list is locked!"
 msgstr "此材料列表被锁定！"
 
@@ -769,22 +779,22 @@ msgid "Enter description here."
 msgstr "在此输入描述。"
 
 #: src/qt/lrchooseui.cpp:66 src/qt/recipesui.cpp:134
-#: src/qt/saveregionselectui.cpp:50 src/gtk/manage_window.c:118
+#: src/qt/saveregionselectui.cpp:124 src/gtk/manage_window.c:118
 msgid "&OK"
 msgstr "确定(&O)"
 
 #: src/qt/lrchooseui.cpp:67 src/qt/recipesui.cpp:135
-#: src/qt/saveregionselectui.cpp:51 src/gtk/manage_window.c:121
+#: src/qt/saveregionselectui.cpp:125 src/gtk/manage_window.c:121
 msgid "&Close"
 msgstr "关闭(&C)"
 
-#: src/qt/mainwindow.cpp:31
+#: src/qt/mainwindow.cpp:34
 msgid ""
 "Region is locked! It might not be the writer lock! Please try to close the "
 "window that's using the Region."
 msgstr "Region被锁定！可能不是写锁！请尝试关闭正在使用此Region的窗口。"
 
-#: src/qt/mainwindow.cpp:34
+#: src/qt/mainwindow.cpp:37
 msgid ""
 "Welcome! Before using, we will tell you that some functions need components "
 "of the game, luckily we can download them, and these functions will popup a "
@@ -795,38 +805,62 @@ msgstr ""
 "们，并且这些功能将会弹出一个窗口，表示我们需要下载。\n"
 "如果你不想要下载它们，你可以取消或关闭应用。"
 
-#: src/qt/mainwindow.cpp:48
+#: src/qt/mainwindow.cpp:51
 msgid "Welcome!"
 msgstr "欢迎！"
 
-#: src/qt/mainwindow.cpp:194 src/qt/saveregionselectui.cpp:119
+#: src/qt/mainwindow.cpp:203 src/qt/saveregionselectui.cpp:193
 msgid "Enter Name for Item List"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:195 src/qt/saveregionselectui.cpp:120
+#: src/qt/mainwindow.cpp:204 src/qt/saveregionselectui.cpp:194
 msgid "Enter the name for item list"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:207 src/qt/saveregionselectui.cpp:131
+#: src/qt/mainwindow.cpp:216 src/qt/saveregionselectui.cpp:205
 msgid "Description is empty!"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:212 src/qt/mainwindow.cpp:236
-#: src/qt/mainwindow.cpp:267
+#: src/qt/mainwindow.cpp:221 src/qt/mainwindow.cpp:245
+#: src/qt/mainwindow.cpp:278
 msgid "No Region or no Region selected!"
 msgstr "没有Region或没有Region选中！"
 
-#: src/qt/mainwindow.cpp:290
+#: src/qt/mainwindow.cpp:301
 msgid "No NBT is selected!"
 msgstr ""
 
-#: src/qt/mainwindow.cpp:304
+#: src/qt/mainwindow.cpp:315
 msgid "Version: "
 msgstr "版本： "
 
-#: src/qt/mainwindow.cpp:306
+#: src/qt/mainwindow.cpp:317
 msgid "About Litematica Reader"
 msgstr "关于投影文件阅读器"
+
+#: src/qt/mainwindow.cpp:335
+msgid "Select Save Option"
+msgstr ""
+
+#: src/qt/mainwindow.cpp:335
+msgid "Please select a save option"
+msgstr ""
+
+#: src/qt/mainwindow.cpp:336 src/qt/saveregionselectui.cpp:109
+msgid "Save as &NBT struct."
+msgstr "保存为&NBT结构。"
+
+#: src/qt/mainwindow.cpp:337 src/qt/saveregionselectui.cpp:112
+msgid "Save as &Litematic NBT struct."
+msgstr "保存为投影NBT结构(&L)。"
+
+#: src/qt/mainwindow.cpp:338 src/qt/saveregionselectui.cpp:114
+msgid "Save as new &Schematic NBT struct."
+msgstr "保存为新式&Schematic NBT结构。"
+
+#: src/qt/mainwindow.cpp:342
+msgid "No region choosed!"
+msgstr ""
 
 #: src/qt/manage.cpp:29
 msgid "No row is selected!"
@@ -848,55 +882,51 @@ msgstr "唯一码"
 msgid "Time"
 msgstr "时间"
 
-#: src/qt/manage.cpp:169 src/cli/main_cli.c:39 src/cli/main_cli.c:49
+#: src/qt/manage.cpp:146 src/cli/main_cli.c:39 src/cli/main_cli.c:49
 msgid "Manage Region"
 msgstr ""
 
-#: src/qt/manage.cpp:213
+#: src/qt/manage.cpp:190
 msgid "No item selected!"
 msgstr ""
 
-#: src/qt/manage.cpp:257
+#: src/qt/manage.cpp:215
 msgid "Not a valid NBT List!"
 msgstr ""
 
-#: src/qt/manage.cpp:273
+#: src/qt/manage.cpp:231
 msgid "Not a valid NBT UUID!"
 msgstr ""
 
-#: src/qt/manage.cpp:289
+#: src/qt/manage.cpp:248
 msgid "Manage NBT Interface"
 msgstr ""
 
-#: src/qt/manage.cpp:319
-msgid "Loading..."
-msgstr ""
-
-#: src/qt/manage.cpp:327
+#: src/qt/manage.cpp:265
 msgid "Select a file"
 msgstr "选择一个文件"
 
-#: src/qt/manage.cpp:328
+#: src/qt/manage.cpp:266
 msgid "Litematic file (*.litematic);;NBT File (*.nbt)"
 msgstr "投影文件 (*.litematic);;NBT文件 (*.nbt)"
 
-#: src/qt/manage.cpp:372
+#: src/qt/manage.cpp:309
 msgid "Save File"
 msgstr "保存文件"
 
-#: src/qt/manage.cpp:390
+#: src/qt/manage.cpp:327
 msgid "Info Locked!"
 msgstr "信息被锁定！"
 
-#: src/qt/manage.cpp:391
+#: src/qt/manage.cpp:328
 msgid "The NBT info is locked!"
 msgstr "NBT信息被锁定！"
 
-#: src/qt/manage.cpp:397
+#: src/qt/manage.cpp:334
 msgid "Save Files"
 msgstr ""
 
-#: src/qt/manage.cpp:431
+#: src/qt/manage.cpp:368
 msgid "The following infos are locked:\n"
 msgstr ""
 
@@ -1018,101 +1048,86 @@ msgstr ""
 msgid "No unzip program found!"
 msgstr ""
 
-#: src/qt/saveregionselectui.cpp:27
+#: src/qt/saveregionselectui.cpp:30
+msgid "Input Description"
+msgstr ""
+
+#: src/qt/saveregionselectui.cpp:31
+msgid "Please input the description of the NBT file."
+msgstr ""
+
+#: src/qt/saveregionselectui.cpp:35
+msgid "No description!"
+msgstr ""
+
+#: src/qt/saveregionselectui.cpp:101
 msgid "Please select a save option:"
 msgstr "请选择一个保存选项："
 
-#: src/qt/saveregionselectui.cpp:30
+#: src/qt/saveregionselectui.cpp:104
 msgid "Save as &item list."
 msgstr "保存为物品列表(&I)。"
-
-#: src/qt/saveregionselectui.cpp:35
-msgid "Save as &NBT struct."
-msgstr "保存为&NBT结构。"
-
-#: src/qt/saveregionselectui.cpp:38
-msgid "Save as &Litematic NBT struct."
-msgstr "保存为投影NBT结构(&L)。"
-
-#: src/qt/saveregionselectui.cpp:40
-msgid "Save as new &Schematic NBT struct."
-msgstr "保存为新式&Schematic NBT结构。"
 
 #: src/qt/showtrackui.cpp:18
 msgid "The track information is:\n"
 msgstr "追踪信息如下：\n"
 
-#: src/qt/utility.cpp:39
+#: src/qt/utility.cpp:40
 msgid "No NBT or no NBT selected!"
 msgstr "无NBT或没有NBT被选中！"
 
-#: src/qt/utility.cpp:63 src/qt/utility.cpp:85
+#: src/qt/utility.cpp:64 src/qt/utility.cpp:86
 msgid "Enter Region Name"
 msgstr "输入Region名称"
 
-#: src/qt/utility.cpp:64 src/qt/utility.cpp:86
+#: src/qt/utility.cpp:65 src/qt/utility.cpp:87
 msgid "Enter name for the new Region."
 msgstr "输入新Region的名称。"
 
-#: src/qt/utility.cpp:71 src/qt/utility.cpp:93
+#: src/qt/utility.cpp:72 src/qt/utility.cpp:94
 msgid "No description for the Region!"
 msgstr "没有Region的描述！"
 
-#: src/qt/utility.cpp:104
+#: src/qt/utility.cpp:105
 msgid "Unknown error!"
 msgstr ""
 
-#: src/qt/utility.cpp:109
+#: src/qt/utility.cpp:110
 msgid "The NBT Struct is unsupported!"
 msgstr "此NBT结构不受支持！"
 
-#: src/qt/utility.cpp:118
+#: src/qt/utility.cpp:119
 msgid "This NBT is locked!"
 msgstr "此NBT被锁定！"
 
-#: src/qt/utility.cpp:165
+#: src/qt/utility.cpp:170
+msgid "The task is cancelled."
+msgstr ""
+
+#: src/qt/utility.cpp:174
+#, c-format
+msgid "Invalid file: %s."
+msgstr ""
+
+#: src/qt/utility.cpp:194
+msgid "Loading %1"
+msgstr ""
+
+#: src/qt/utility.cpp:202
 msgid "Enter Description"
 msgstr ""
 
-#: src/qt/utility.cpp:166
+#: src/qt/utility.cpp:203
 msgid "Enter description for the NBT file."
 msgstr ""
 
-#: src/qt/utility.cpp:169 src/qt/utility.cpp:219
+#: src/qt/utility.cpp:206
 msgid "No Description Entered!"
 msgstr "没有输入的描述！"
 
-#: src/qt/utility.cpp:170
+#: src/qt/utility.cpp:207
 msgid "No description entered! Will not add the NBT file!"
 msgstr ""
-
-#: src/qt/utility.cpp:195
-msgid "Loading file: %1."
-msgstr ""
-
-#: src/qt/utility.cpp:214 src/gtk/manage_nbt.c:131
-msgid "Enter Desciption"
-msgstr "输入描述"
-
-#: src/qt/utility.cpp:215
-msgid "Enter desciption for the NBT file."
-msgstr "输入NBT文件的描述。"
-
-#: src/qt/utility.cpp:220
-msgid "No desciption entered! Will not add the NBT file!"
-msgstr "没有描述输入！将不会添加NBT文件！"
-
-#: src/qt/utility.cpp:238
-msgid "Not Valid File!"
-msgstr "不是有效的文件！"
-
-#: src/qt/utility.cpp:239
-msgid "Not a valid NBT file!"
-msgstr "不是一个有效的NBT文件！"
-
-#: src/qt/utility.cpp:278
-msgid "The following files couldn't be added:\n"
-msgstr "以下文件不能被添加：\n"
 
 #: src/gtk/main_gtk.c:70
 msgid "Litematica reader"
@@ -1189,6 +1204,10 @@ msgstr "Schema投影"
 #: src/gtk/manage_nbt.c:21
 msgid "Others"
 msgstr "其它"
+
+#: src/gtk/manage_nbt.c:131
+msgid "Enter Desciption"
+msgstr "输入描述"
 
 #: src/gtk/manage_nbt.c:131
 msgid "Please enter description for the NBT."
@@ -1306,6 +1325,21 @@ msgstr "北"
 #: src/region.cpp:36
 msgid "west"
 msgstr "西"
+
+#~ msgid "Enter desciption for the NBT file."
+#~ msgstr "输入NBT文件的描述。"
+
+#~ msgid "No desciption entered! Will not add the NBT file!"
+#~ msgstr "没有描述输入！将不会添加NBT文件！"
+
+#~ msgid "Not Valid File!"
+#~ msgstr "不是有效的文件！"
+
+#~ msgid "Not a valid NBT file!"
+#~ msgstr "不是一个有效的NBT文件！"
+
+#~ msgid "The following files couldn't be added:\n"
+#~ msgstr "以下文件不能被添加：\n"
 
 #, c-format
 #~ msgid "There's a remainder with %d and %d, continue?"

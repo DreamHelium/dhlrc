@@ -36,21 +36,22 @@ GeneralChooseDialog::GeneralChooseDialog (const QString &title,
             if (needMulti)
                 {
                     btn = new QCheckBox (i);
-                    QObject::connect (btn, &QAbstractButton::clicked, this,
-                                      [&] (bool checked) {
-                                          bool same = true;
-                                          auto btns = group->buttons ();
-                                          for (int j = 1 ; j < btns.size (); j++)
-                                              {
-                                                  auto button = btns[j];
-                                                  if (button->isChecked ()
-                                                      != checked)
-                                                      same = false;
-                                              }
-                                          if (same)
-                                              btns[0]->setChecked (checked);
-                                          else btns[0]->setChecked(false);
-                                      });
+                    QObject::connect (
+                        btn, &QAbstractButton::clicked, this,
+                        [&] (bool checked) {
+                            bool same = true;
+                            auto btns = group->buttons ();
+                            for (int j = 1; j < btns.size (); j++)
+                                {
+                                    auto button = btns[j];
+                                    if (button->isChecked () != checked)
+                                        same = false;
+                                }
+                            if (same)
+                                btns[0]->setChecked (checked);
+                            else
+                                btns[0]->setChecked (false);
+                        });
                 }
             else
                 btn = new QRadioButton (i);
@@ -77,7 +78,7 @@ GeneralChooseDialog::~GeneralChooseDialog () {}
 
 int
 GeneralChooseDialog::getIndex (const QString &title, const QString &label,
-                               const QList<QString> &list, QWidget *parent)
+                               const QStringList &list, QWidget *parent)
 {
     auto gcd = new GeneralChooseDialog (title, label, list, false, parent);
     int ret = gcd->exec ();
@@ -96,7 +97,7 @@ GeneralChooseDialog::getIndex (const QString &title, const QString &label,
 
 QList<int>
 GeneralChooseDialog::getIndexes (const QString &title, const QString &label,
-                                 const QList<QString> &list, QWidget *parent)
+                                 const QStringList &list, QWidget *parent)
 {
     auto gcd = new GeneralChooseDialog (title, label, list, true, parent);
     int ret = gcd->exec ();

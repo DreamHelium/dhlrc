@@ -16,11 +16,26 @@ class GeneralChooseDialog : public QDialog
     ~GeneralChooseDialog ();
 
     static int getIndex (const QString &title, const QString &label,
-                         const QList<QString> &list,
-                         QWidget *parent = nullptr);
+                         const QStringList &list, QWidget *parent = nullptr);
     static QList<int> getIndexes (const QString &title, const QString &label,
-                                  const QList<QString> &list,
+                                  const QStringList &list,
                                   QWidget *parent = nullptr);
+    template <typename... Args>
+    static int
+    getIndex (const QString &title, const QString &label,
+              QWidget *parent = nullptr, Args... args)
+    {
+        QStringList names = { args... };
+        return getIndex (title, label, names, parent);
+    }
+    template <typename... Args>
+    static QList<int>
+    getIndexes (const QString &title, const QString &label,
+                QWidget *parent = nullptr, Args... args)
+    {
+        QStringList names = { args... };
+        return getIndexes (title, label, names, parent);
+    }
 
   private:
     QButtonGroup *group;

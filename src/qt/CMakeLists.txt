@@ -59,6 +59,8 @@ set(PROJECT_SOURCES
         paletteaddui.ui
         generalchoosedialog.cpp
         generalchoosedialog.h
+        dhloadobject.cpp
+        dhloadobject.h
 )
 
 if (${QT_VERSION_MAJOR} GREATER_EQUAL 6)

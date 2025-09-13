@@ -95,6 +95,13 @@
            </widget>
           </item>
           <item>
+           <widget class="QPushButton" name="saveBtn">
+            <property name="text">
+             <string>&amp;Save Region to NBT</string>
+            </property>
+           </widget>
+          </item>
+          <item>
            <widget class="QPushButton" name="generateBtn">
             <property name="text">
              <string>&amp;Generate item list</string>

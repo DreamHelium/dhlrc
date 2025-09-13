@@ -111,7 +111,7 @@ remove_items (int type, QList<int> rows, ManageBase *base)
 //     }
 // }
 
-ManageBase::ManageBase () : QObject (), mui (new ManageUI ())
+ManageBase::ManageBase (QWidget *parent) : ManageUI (parent), mui (this)
 {
     QObject::connect (mui, &ManageUI::add, this, &ManageBase::add_triggered);
     QObject::connect (mui, &ManageUI::remove, this,
@@ -128,31 +128,7 @@ ManageBase::ManageBase () : QObject (), mui (new ManageUI ())
                       &ManageBase::tablednd_triggered);
 }
 
-ManageBase::~ManageBase () { delete mui; }
-
-void
-ManageBase::show ()
-{
-    mui->show ();
-}
-
-// void ManageNBT::ok_triggered()
-// {
-//     /* Update model first */
-//     for(int i = 0 ; i < model->rowCount() ; i++)
-//     {
-//         NbtInfo* info = nbt_info_list_get_nbt_info(model->index(i,
-//         1).data().toString().toUtf8());
-//         if(g_rw_lock_writer_trylock(&info->info_lock))
-//         {
-//             const char* str = model->index(i,0).data().toString().toUtf8();
-//             g_free(info->description);
-//             info->description = g_strdup(str);
-//             g_rw_lock_writer_unlock(&info->info_lock);
-//         }
-//     }
-//     mui->close();
-// }
+ManageBase::~ManageBase () {}
 
 static void
 update_region_model (void *main_class)
@@ -163,6 +139,7 @@ update_region_model (void *main_class)
 
 ManageRegion::ManageRegion ()
 {
+    type = DH_TYPE_REGION;
     mui->setDND (true);
     QObject::connect (mui, &ManageUI::dnd, this, &ManageRegion::dnd_triggered);
     model = new QStandardItemModel ();
@@ -198,9 +175,9 @@ void
 ManageRegion::save_triggered (QList<int> rows)
 {
     DhStrArray *arr = nullptr;
-    auto uuidlist = dh_info_get_uuid (DH_TYPE_REGION);
+    auto uuidlist = dh_info_get_all_uuid (DH_TYPE_REGION);
     for (auto row : rows)
-        dh_str_array_add_str (&arr, uuidlist->val[row]);
+        dh_str_array_add_str (&arr, (*uuidlist)[row]);
     if (arr)
         {
             dh_info_set_uuid (DH_TYPE_REGION, arr);
@@ -229,25 +206,6 @@ ManageRegion::showSig_triggered ()
 void
 ManageRegion::closeSig_triggered ()
 {
-}
-
-void
-ManageRegion::ok_triggered ()
-{
-    // /* Update model first */
-    // for(int i = 0 ; i < model->rowCount() ; i++)
-    // {
-    //     RegionInfo* info = region_info_list_get_region_info(model->index(i,
-    //     1).data().toString().toUtf8());
-    //     if(g_rw_lock_writer_trylock(&info->info_lock))
-    //     {
-    //         const char* str = model->index(i,0).data().toString().toUtf8();
-    //         g_free(info->description);
-    //         info->description = g_strdup(str);
-    //         g_rw_lock_writer_unlock(&info->info_lock);
-    //     }
-    // }
-    // mui->close();
 }
 
 void
@@ -284,6 +242,7 @@ update_interface_model (void *main_class)
 
 ManageNbtInterface::ManageNbtInterface ()
 {
+    type = DH_TYPE_NBT_INTERFACE_CPP;
     mui->setDND (true);
     model = new QStandardItemModel ();
     mui->setWindowTitle (_ ("Manage NBT Interface"));
@@ -291,43 +250,21 @@ ManageNbtInterface::ManageNbtInterface ()
                       &ManageNbtInterface::dnd_triggered);
     dh_info_add_notifier (DH_TYPE_NBT_INTERFACE_CPP, update_interface_model,
                           this);
-    cancellable = g_cancellable_new ();
 }
 
 ManageNbtInterface::~ManageNbtInterface ()
 {
     dh_info_remove_notifier (DH_TYPE_NBT_INTERFACE_CPP, this);
     delete model;
-    g_object_unref (cancellable);
 }
 
 void
 ManageNbtInterface::add_triggered ()
 {
-    auto progressDialog = new QProgressDialog (mui);
-
-    auto set_func = [] (void *main_klass, int value) {
-        auto klass = (ManageNbtInterface *)main_klass;
-        emit klass->pChanged (value);
-    };
-
-    auto cancel_func = [&] () {
-        g_cancellable_cancel (cancellable);
-        g_cancellable_reset (cancellable);
-    };
-
-    progressDialog->setWindowTitle (_ ("Loading..."));
-    progressDialog->reset ();
-
-    connect (this, &ManageNbtInterface::pChanged, progressDialog,
-             &QProgressDialog::setValue);
-    connect (progressDialog, &QProgressDialog::canceled, this, cancel_func);
-
     auto dirs = QFileDialog::getOpenFileNames (
         mui, _ ("Select a file"), nullptr,
         _ ("Litematic file (*.litematic);;NBT File (*.nbt)"));
-    dh::loadNbtInstances (mui, dirs, set_func, this, cancellable,
-                          progressDialog);
+    dh::loadNbtInstances (mui, dirs);
 }
 
 void
@@ -445,11 +382,6 @@ ManageNbtInterface::save_triggered (QList<int> rows)
 }
 
 void
-ManageNbtInterface::ok_triggered ()
-{
-}
-
-void
 ManageNbtInterface::dnd_triggered (const QMimeData *data)
 {
     auto urls = data->urls ();
@@ -458,5 +390,5 @@ ManageNbtInterface::dnd_triggered (const QMimeData *data)
         {
             filelist << urls[i].toLocalFile ();
         }
-    dh::loadNbtInstances (mui, filelist, nullptr, nullptr, nullptr);
+    dh::loadNbtInstances (mui, filelist);
 }

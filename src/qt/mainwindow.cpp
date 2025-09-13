@@ -1,11 +1,13 @@
 #include "mainwindow.h"
 #include "../common_info.h"
+#include "../feature/conv_feature.h"
 #include "../region.h"
 #include "../translation.h"
 #include "blockreaderui.h"
 #include "configui.h"
 #include "dh_file_util.h"
 #include "dh_type.h"
+#include "generalchoosedialog.h"
 #include "glib.h"
 #include "ilreaderui.h"
 #include "manage.h"
@@ -26,16 +28,11 @@
 #include <qobject.h>
 #include <qpushbutton.h>
 #include <regionmodifyui.h>
+#include <saveregionselectui.h>
 
 #define REGION_LOCKED_MSG                                                     \
     _ ("Region is locked! It might not be the writer lock! Please try to "    \
        "close the window that's using the Region.")
-#define DHLRC_INIT_MSG                                                        \
-    _ ("Welcome! Before using, we will tell you that some functions need "    \
-       "components of the game, luckily we can download them, and these "     \
-       "functions will popup a window showing that we need to download."      \
-       "\nIf you don't want to download them, you can cancel or close "       \
-       "the application.")
 
 static dh::ManageRegion *mr = nullptr;
 static dh::ManageNbtInterface *mni = nullptr;
@@ -45,8 +42,6 @@ static MainWindow *mw;
 MainWindow::MainWindow (QWidget *parent)
     : QMainWindow (parent), ui (new Ui::MainWindow)
 {
-    QMessageBox::information (this, _ ("Welcome!"), DHLRC_INIT_MSG);
-
     ui->setupUi (this);
     auto pixmap0 = dh::loadSvgResourceFile ("/cn/dh/dhlrc/nbt_tree.svg");
     ui->tabWidget->setTabIcon (0, *pixmap0);
@@ -62,6 +57,8 @@ MainWindow::MainWindow (QWidget *parent)
 
     mw = this;
     // pd.hide();
+    if (!dhlrc_conv_enabled ())
+        ui->saveBtn->hide ();
     initSignalSlots ();
 }
 
@@ -101,6 +98,8 @@ MainWindow::initSignalSlots ()
                       &MainWindow::addBtn_clicked);
     QObject::connect (ui->mrBtn_2, &QPushButton::clicked, this,
                       &MainWindow::mrBtn_2_clicked);
+    QObject::connect (ui->saveBtn, &QPushButton::clicked, this,
+                      &MainWindow::saveBtn_clicked);
 }
 
 void
@@ -118,7 +117,7 @@ MainWindow::dropEvent (QDropEvent *event)
         {
             filelist << urls[i].toLocalFile ();
         }
-    dh::loadNbtInstances (this, filelist, nullptr, nullptr, nullptr);
+    dh::loadNbtInstances (this, filelist);
 }
 
 void
@@ -135,6 +134,8 @@ MainWindow::manageBtn_2_clicked ()
     if (!mni)
         mni = new dh::ManageNbtInterface ();
     mni->show ();
+    mni->activateWindow ();
+    mni->raise ();
 }
 
 void
@@ -242,6 +243,8 @@ MainWindow::mrBtn_clicked ()
     if (!mr)
         mr = new dh::ManageRegion ();
     mr->show ();
+    mr->activateWindow ();
+    mr->raise ();
 }
 
 void
@@ -312,4 +315,21 @@ MainWindow::addBtn_clicked ()
     auto atui = new AddTranslationUI (0);
     atui->setAttribute (Qt::WA_DeleteOnClose);
     atui->exec ();
+}
+
+void
+MainWindow::saveBtn_clicked ()
+{
+    GENERALCHOOSEUI_START (true, DH_TYPE_REGION)
+    if (ret == QDialog::Accepted)
+        {
+            int transRet = GeneralChooseDialog::getIndex (
+                _ ("Select Save Option"), _ ("Please select a save option"),
+                nullptr, _ ("Save as &NBT struct."),
+                _ ("Save as &Litematic NBT struct."),
+                _ ("Save as new &Schematic NBT struct."));
+            SaveRegionSelectUI::processRegion (this, transRet);
+        }
+    else
+        QMessageBox::critical (this, _ ("Error!"), _ ("No region choosed!"));
 }

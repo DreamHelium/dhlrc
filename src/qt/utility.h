@@ -11,24 +11,14 @@ namespace dh
 {
 void loadRegion (QWidget *parent);
 void loadRegion (QWidget *parent, const char *uuid);
-void loadNbtFileAsync (QWidget *parent, QString filedir, bool askForDes,
-                       DhProgressSet setFunc, void *main_klass,
-                       GCancellable *cancellable, int min, int max,
-                       QProgressDialog *progressDialog);
-bool loadNbtInstance (QWidget *parent, QString filedir, bool askForDes,
-                      bool tipForFail);
-void loadNbtInstances (QWidget *parent, const QStringList &filelist,
-                       DhProgressSet setFunc, void *main_klass,
-                       GCancellable *cancellable);
-void loadNbtInstances (QWidget *parent, const QStringList &filelist,
-                       DhProgressSet setFunc, void *main_klass,
-                       GCancellable *cancellable, QProgressDialog *dialog);
+void loadNbtFileAsync (QWidget *parent, QString filedir, bool askForDes);
+void loadNbtInstances (QWidget *parent, const QStringList &filelist);
 QPixmap *loadSvgFile (const char *contents);
 QPixmap *loadSvgResourceFile (const char *pos);
 QString findIcon (QString obj);
 QIcon getIcon (QString dir);
 QString getVersion (int data_version);
-QList<QString> getTypeDescriptions (int type);
+QStringList getTypeDescriptions (int type);
 bool setTypeUuid (int type, bool needMulti, const QString &title,
                   const QString &label);
 }

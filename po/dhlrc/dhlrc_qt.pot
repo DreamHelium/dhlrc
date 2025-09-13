@@ -250,65 +250,70 @@ msgstr ""
 
 #: ../../src/qt/mainwindow.ui:100
 msgctxt "MainWindow|"
-msgid "&Generate item list"
+msgid "&Save Region to NBT"
 msgstr ""
 
 #: ../../src/qt/mainwindow.ui:107
 msgctxt "MainWindow|"
-msgid "M&odify Region"
+msgid "&Generate item list"
 msgstr ""
 
 #: ../../src/qt/mainwindow.ui:114
 msgctxt "MainWindow|"
+msgid "M&odify Region"
+msgstr ""
+
+#: ../../src/qt/mainwindow.ui:121
+msgctxt "MainWindow|"
 msgid "&Block reader"
 msgstr ""
 
-#: ../../src/qt/mainwindow.ui:124
+#: ../../src/qt/mainwindow.ui:131
 msgctxt "MainWindow|"
 msgid "&Item List"
 msgstr ""
 
-#: ../../src/qt/mainwindow.ui:132
+#: ../../src/qt/mainwindow.ui:139
 msgctxt "MainWindow|"
 msgid "I&tem list reader and modifier"
 msgstr ""
 
-#: ../../src/qt/mainwindow.ui:139
+#: ../../src/qt/mainwindow.ui:146
 msgctxt "MainWindow|"
 msgid "R&ecipe combiner"
 msgstr ""
 
-#: ../../src/qt/mainwindow.ui:149
+#: ../../src/qt/mainwindow.ui:156
 msgctxt "MainWindow|"
 msgid "Utility"
 msgstr ""
 
-#: ../../src/qt/mainwindow.ui:157
+#: ../../src/qt/mainwindow.ui:164
 msgctxt "MainWindow|"
 msgid "&Config Setting"
 msgstr ""
 
-#: ../../src/qt/mainwindow.ui:164
+#: ../../src/qt/mainwindow.ui:171
 msgctxt "MainWindow|"
 msgid "Show Recipe"
 msgstr ""
 
-#: ../../src/qt/mainwindow.ui:171
+#: ../../src/qt/mainwindow.ui:178
 msgctxt "MainWindow|"
 msgid "Block and Translation"
 msgstr ""
 
-#: ../../src/qt/mainwindow.ui:178
+#: ../../src/qt/mainwindow.ui:185
 msgctxt "MainWindow|"
 msgid "Add Translation"
 msgstr ""
 
-#: ../../src/qt/mainwindow.ui:185
+#: ../../src/qt/mainwindow.ui:192
 msgctxt "MainWindow|"
 msgid "&Load Jar File for Resources"
 msgstr ""
 
-#: ../../src/qt/mainwindow.ui:208 ../../src/qt/mainwindow.ui:217
+#: ../../src/qt/mainwindow.ui:215 ../../src/qt/mainwindow.ui:224
 msgctxt "MainWindow|"
 msgid "&About"
 msgstr ""

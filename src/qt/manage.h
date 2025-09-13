@@ -2,7 +2,10 @@
 #define MANAGE_H
 
 #include "manageui.h"
+
+#include <QProgressDialog>
 #include <QWidget>
+#include <dh_type.h>
 #include <gio/gio.h>
 #include <qcoreevent.h>
 #include <qevent.h>
@@ -11,15 +14,15 @@
 
 namespace dh
 {
-class ManageBase : public QObject
+class ManageBase : public ManageUI
 {
     Q_OBJECT
   public:
-    ManageBase ();
+    ManageBase (QWidget *parent = nullptr);
     ~ManageBase ();
-    void show ();
     ManageUI *mui;
     QStandardItemModel *model;
+    int type;
 
   public:
     virtual void updateModel () {};
@@ -52,6 +55,17 @@ class ManageBase : public QObject
     virtual void
     ok_triggered ()
     {
+        auto uuidlist = dh_info_get_all_uuid (type);
+        for (int i = 0; i < model->rowCount (); i++)
+            {
+                auto str = model->index (i, 0).data ().toString ().toUtf8 ();
+                if (dh_info_writer_trylock (type, (*uuidlist)[i]))
+                    {
+                        dh_info_reset_description (type, (*uuidlist)[i], str);
+                        dh_info_writer_unlock (type, (*uuidlist)[i]);
+                    }
+            }
+        mui->close ();
     }
     virtual void tablednd_triggered (QDropEvent *event) {};
     virtual void dnd_triggered (const QMimeData *data) {};
@@ -76,7 +90,6 @@ class ManageRegion : public ManageBase
     void save_triggered (QList<int> rows);
     void showSig_triggered ();
     void closeSig_triggered ();
-    void ok_triggered ();
     void dnd_triggered (const QMimeData *data);
 };
 
@@ -93,7 +106,6 @@ class ManageNbtInterface : public ManageBase
 
   private:
     void updateModel ();
-    GCancellable *cancellable = nullptr;
 
   public Q_SLOTS:
     void refresh_triggered ();
@@ -104,7 +116,6 @@ class ManageNbtInterface : public ManageBase
     void save_triggered (QList<int> rows);
     void showSig_triggered ();
     void closeSig_triggered ();
-    void ok_triggered ();
     void dnd_triggered (const QMimeData *data);
 };
 }

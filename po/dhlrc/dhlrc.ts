@@ -266,67 +266,72 @@
     </message>
     <message>
         <location filename="../../src/qt/mainwindow.ui" line="100"/>
-        <source>&amp;Generate item list</source>
+        <source>&amp;Save Region to NBT</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../src/qt/mainwindow.ui" line="107"/>
-        <source>M&amp;odify Region</source>
+        <source>&amp;Generate item list</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../src/qt/mainwindow.ui" line="114"/>
+        <source>M&amp;odify Region</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qt/mainwindow.ui" line="121"/>
         <source>&amp;Block reader</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qt/mainwindow.ui" line="124"/>
+        <location filename="../../src/qt/mainwindow.ui" line="131"/>
         <source>&amp;Item List</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qt/mainwindow.ui" line="132"/>
+        <location filename="../../src/qt/mainwindow.ui" line="139"/>
         <source>I&amp;tem list reader and modifier</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qt/mainwindow.ui" line="139"/>
+        <location filename="../../src/qt/mainwindow.ui" line="146"/>
         <source>R&amp;ecipe combiner</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qt/mainwindow.ui" line="149"/>
+        <location filename="../../src/qt/mainwindow.ui" line="156"/>
         <source>Utility</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qt/mainwindow.ui" line="157"/>
+        <location filename="../../src/qt/mainwindow.ui" line="164"/>
         <source>&amp;Config Setting</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qt/mainwindow.ui" line="164"/>
+        <location filename="../../src/qt/mainwindow.ui" line="171"/>
         <source>Show Recipe</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qt/mainwindow.ui" line="171"/>
+        <location filename="../../src/qt/mainwindow.ui" line="178"/>
         <source>Block and Translation</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qt/mainwindow.ui" line="178"/>
+        <location filename="../../src/qt/mainwindow.ui" line="185"/>
         <source>Add Translation</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qt/mainwindow.ui" line="185"/>
+        <location filename="../../src/qt/mainwindow.ui" line="192"/>
         <source>&amp;Load Jar File for Resources</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qt/mainwindow.ui" line="208"/>
-        <location filename="../../src/qt/mainwindow.ui" line="217"/>
+        <location filename="../../src/qt/mainwindow.ui" line="215"/>
+        <location filename="../../src/qt/mainwindow.ui" line="224"/>
         <source>&amp;About</source>
         <translation type="unfinished"></translation>
     </message>
