@@ -18,6 +18,8 @@
 #ifndef MCDATA_FEATURE_H
 #define MCDATA_FEATURE_H
 
+#include "dh_module.h"
+
 #include <cjson/cJSON.h>
 #include <glib.h>
 #include <gmodule.h>
@@ -26,7 +28,7 @@ G_BEGIN_DECLS
 
 typedef void (*SetFunc) (void *, int);
 
-void dhlrc_mcdata_enable (GModule *module);
+void dhlrc_mcdata_enable ();
 gboolean dhlrc_mcdata_enabled ();
 int dhlrc_init_translation_from_file (const char *filename,
                                       const char *large_version);
@@ -44,9 +46,9 @@ char *dhlrc_get_translation_file (const char *filename,
                                   const char *large_version, const char *lang);
 void dhlrc_cleanup_manifest ();
 void dhlrc_load_jar (const char *filename, int data_version);
-void dhlrc_load_version_map();
-gboolean dhlrc_version_map_inited();
-void* dhlrc_get_version_map();
+void dhlrc_load_version_map ();
+gboolean dhlrc_version_map_inited ();
+void *dhlrc_get_version_map ();
 
 G_END_DECLS
 

@@ -28,7 +28,6 @@ set(PROJECT_SOURCES
         configui.h configui.cpp configui.ui
         blocklistui.cpp blocklistui.h blocklistui.ui
         blockreaderui.cpp blockreaderui.h blockreaderui.ui
-        nbtreaderui.cpp nbtreaderui.h nbtreaderui.ui
         manageui.h manageui.cpp manageui.ui
         ilreaderui.h ilreaderui.cpp
         dhtableview.h dhtableview.cpp
@@ -115,4 +114,4 @@ if (QT_VERSION_MAJOR EQUAL 6)
     qt_finalize_executable(dhlrc_qt)
 endif ()
 
-
+add_subdirectory(nbt-reader)

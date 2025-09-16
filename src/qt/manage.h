@@ -3,6 +3,8 @@
 
 #include "manageui.h"
 
+#include "../translation.h"
+#include <QMessageBox>
 #include <QProgressDialog>
 #include <QWidget>
 #include <dh_type.h>
@@ -24,8 +26,14 @@ class ManageBase : public ManageUI
     QStandardItemModel *model;
     int type;
 
-  public:
-    virtual void updateModel () {};
+    void updateModel ();
+  public Q_SLOTS:
+    virtual void
+    refresh_triggered ()
+    {
+        updateModel ();
+        ManageUI::updateModel (model);
+    }
 
   private Q_SLOTS:
     virtual void
@@ -40,13 +48,11 @@ class ManageBase : public ManageUI
     save_triggered (QList<int> rows)
     {
     }
-    virtual void
-    refresh_triggered ()
-    {
-    }
+
     virtual void
     showSig_triggered ()
     {
+        refresh_triggered ();
     }
     virtual void
     closeSig_triggered ()
@@ -76,47 +82,59 @@ class ManageRegion : public ManageBase
     Q_OBJECT
   public:
     ManageRegion ();
-    ~ManageRegion ();
-
-  private:
-    void updateModel ();
-
-  public Q_SLOTS:
-    void refresh_triggered ();
 
   private Q_SLOTS:
     void add_triggered ();
     void remove_triggered (QList<int> rows);
     void save_triggered (QList<int> rows);
-    void showSig_triggered ();
-    void closeSig_triggered ();
     void dnd_triggered (const QMimeData *data);
 };
 
 class ManageNbtInterface : public ManageBase
 {
-    Q_OBJECT;
+    Q_OBJECT
 
   public:
     ManageNbtInterface ();
-    ~ManageNbtInterface ();
-
-  Q_SIGNALS:
-    void pChanged (int value);
-
-  private:
-    void updateModel ();
-
-  public Q_SLOTS:
-    void refresh_triggered ();
 
   private Q_SLOTS:
     void add_triggered ();
     void remove_triggered (QList<int> rows);
     void save_triggered (QList<int> rows);
-    void showSig_triggered ();
-    void closeSig_triggered ();
     void dnd_triggered (const QMimeData *data);
+};
+
+class ManageModule : public ManageBase
+{
+    Q_OBJECT
+
+  public:
+    ManageModule ();
+
+  public Q_SLOTS:
+    void refresh_triggered () override;
+
+  private Q_SLOTS:
+    void
+    add_triggered ()
+    {
+        QMessageBox::critical (this, _ ("Error!"), _ ("Couldn't add now!"));
+    }
+    void
+    remove_triggered (QList<int> rows)
+    {
+        QMessageBox::critical (this, _ ("Error!"), _ ("Couldn't remove now!"));
+    }
+    void
+    save_triggered (QList<int> rows)
+    {
+        QMessageBox::critical (this, _ ("Error!"), _ ("Couldn't save now!"));
+    }
+    void
+    dnd_triggered (const QMimeData *data)
+    {
+        QMessageBox::critical (this, _ ("Error!"), _ ("Couldn't add now!"));
+    }
 };
 }
 

@@ -97,12 +97,11 @@ dhlrc_is_inited ()
 void
 dhlrc_cleanup ()
 {
-    dh_type_free ();
     dhlrc_common_contents_free ();
     dhlrc_recipe_module_clean ();
     dhlrc_cleanup_manifest ();
-    dh_exit ();
     dh_exit1 ();
+    dh_type_free ();
 }
 
 void

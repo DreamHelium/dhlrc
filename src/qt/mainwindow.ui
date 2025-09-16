@@ -41,20 +41,6 @@
             </property>
            </widget>
           </item>
-          <item>
-           <widget class="QLabel" name="label_3">
-            <property name="text">
-             <string>You can do things below for the NBT file.</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="nbtReaderBtn_2">
-            <property name="text">
-             <string>N&amp;BT Reader</string>
-            </property>
-           </widget>
-          </item>
          </layout>
         </item>
        </layout>
@@ -151,6 +137,16 @@
         </item>
        </layout>
       </widget>
+      <widget class="QWidget" name="tab_5">
+       <attribute name="title">
+        <string>Shortcuts</string>
+       </attribute>
+       <layout class="QVBoxLayout" name="verticalLayout_11">
+        <item>
+         <layout class="QVBoxLayout" name="verticalLayout_7"/>
+        </item>
+       </layout>
+      </widget>
       <widget class="QWidget" name="tab_4">
        <attribute name="title">
         <string>Utility</string>
@@ -162,6 +158,13 @@
            <widget class="QPushButton" name="configBtn">
             <property name="text">
              <string>&amp;Config Setting</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="mmBtn">
+            <property name="text">
+             <string>&amp;Manage Modules</string>
             </property>
            </widget>
           </item>

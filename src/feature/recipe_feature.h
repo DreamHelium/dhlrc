@@ -30,7 +30,7 @@ typedef struct DhRecipes{
 typedef void (*RecipeInitFn)(const char*);
 
 gboolean dhlrc_recipe_module_enabled();
-void dhlrc_recipe_module_init(GModule* module);
+void dhlrc_recipe_module_init();
 void dhlrc_recipe_init(const char* libpath);
 void dhlrc_recipe_module_clean();
 gboolean dhlrc_recipe_is_supported(const char* filename);

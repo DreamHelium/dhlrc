@@ -33,7 +33,6 @@ extern "C"
     gboolean dhlrc_found_transfile ();
     void dhlrc_update_transfile (const char *version, SetFunc set_func,
                                  void *klass, char **large_version);
-    int dh_exit ();
 
 #ifdef __cplusplus
 }

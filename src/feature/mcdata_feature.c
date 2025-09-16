@@ -36,8 +36,6 @@ static InitTr init_tr = NULL;
 static InitTr init_tr_from_content = NULL;
 static GetTr get_tr = NULL;
 static Downloaded downloaded = NULL;
-static Downloaded code = NULL;
-static CleanupTr reset_code = NULL;
 static GetJSON getJSON = NULL;
 static GetString get_string = NULL;
 static GetTrFile get_tr_file = NULL;
@@ -48,33 +46,25 @@ static Inited inited = NULL;
 static GetMap get_map = NULL;
 
 void
-dhlrc_mcdata_enable (GModule *module)
+dhlrc_mcdata_enable ()
 {
-    if (module
-        && g_module_symbol (module, "init_translation_from_file",
-                            (gpointer *)&init_tr)
-        && g_module_symbol (module, "init_translation_from_content",
-                            (gpointer *)&init_tr_from_content)
-        && g_module_symbol (module, "get_translation", (gpointer *)&get_tr)
-        && g_module_symbol (module, "manifest_downloaded",
-                            (gpointer *)&downloaded)
-        && g_module_symbol (module, "get_manifest", (gpointer *)&getJSON)
-        && g_module_symbol (module, "manifest_download_code",
-                            (gpointer *)&code)
-        && g_module_symbol (module, "manifest_reset_code",
-                            (gpointer *)&reset_code)
-        && g_module_symbol (module, "get_version_json_string",
-                            (gpointer *)&get_string)
-        && g_module_symbol (module, "get_translation_file",
-                            (gpointer *)&get_tr_file)
-        && g_module_symbol (module, "cleanup_manifest",
-                            (gpointer *)&cleanup_manifest)
-        && g_module_symbol (module, "load_jar", (gpointer *)&load_jar)
-        && g_module_symbol (module, "load_version_map",
-                            (gpointer *)&load_version_map)
-        && g_module_symbol (module, "version_map_inited", (gpointer *)&inited)
-        && g_module_symbol (module, "get_version_map", (gpointer *)&get_map))
-        enabled = TRUE;
+    DhModule *module = dh_search_inited_module ("mcdata");
+    if (module)
+        {
+            init_tr = module->module_functions->pdata[0];
+            init_tr_from_content = module->module_functions->pdata[1];
+            get_tr = module->module_functions->pdata[2];
+            downloaded = module->module_functions->pdata[4];
+            getJSON = module->module_functions->pdata[5];
+            get_string = module->module_functions->pdata[6];
+            get_tr_file = module->module_functions->pdata[9];
+            cleanup_manifest = module->module_functions->pdata[10];
+            load_jar = module->module_functions->pdata[11];
+            load_version_map = module->module_functions->pdata[12];
+            inited = module->module_functions->pdata[13];
+            get_map = module->module_functions->pdata[14];
+            enabled = TRUE;
+        }
 }
 
 gboolean
@@ -123,21 +113,6 @@ dhlrc_get_manifest ()
     if (getJSON)
         return getJSON ();
     return NULL;
-}
-
-int
-dhlrc_manifest_download_code ()
-{
-    if (code)
-        return code ();
-    return FALSE;
-}
-
-void
-dhlrc_manifest_reset_code ()
-{
-    if (reset_code)
-        reset_code ();
 }
 
 char *

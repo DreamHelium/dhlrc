@@ -20,7 +20,8 @@ add_subdirectory(recipe_handler)
 add_library(dhlrc SHARED
         dh_bit.c dh_bit.h
         litematica_region.cpp litematica_region.h
-        region.cpp region.h)
+        region.cpp region.h
+)
 
 add_library(dhlrc_ext SHARED
         common_info.c common_info.h
@@ -32,7 +33,8 @@ add_library(dhlrc_ext SHARED
         csv_parser.c csv_parser.h
         json_util.c json_util.h
         translation.h translation.c
-        download_file.h download_file.c)
+        download_file.h download_file.c
+)
 
 add_subdirectory(feature)
 
@@ -42,12 +44,12 @@ target_link_libraries(dhlrc PUBLIC
 
 target_include_directories(dhlrc PUBLIC "${GIO_INCLUDE_DIRS}" dhutil)
 
-target_link_libraries(dhlrc_ext PUBLIC dhutil_file dhutil_type cjson)
+target_link_libraries(dhlrc_ext PUBLIC dhutil_file dhutil_type cjson dhlrc_feature)
 target_include_directories(dhlrc_ext PUBLIC ${GIO_INCLUDE_DIRS} dhutil)
 
 add_executable(dhlrc.bin main.c)
 
-target_link_libraries(dhlrc.bin PUBLIC dhlrc dhlrc_feature dhlrc_ext)
+target_link_libraries(dhlrc.bin PUBLIC dhlrc dhlrc_ext)
 
 install(TARGETS dhlrc.bin
         BUNDLE DESTINATION .

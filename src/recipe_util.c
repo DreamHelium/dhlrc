@@ -135,12 +135,6 @@ find_transfile (const char *version, SetFunc set_func, void *klass,
     return ret;
 }
 
-int
-dh_exit ()
-{
-    return 0;
-}
-
 gboolean
 dhlrc_found_transfile ()
 {

@@ -1,8 +1,8 @@
 #include "mcdata.h"
 #include "../config.h"
+#include "../csv_parser.h"
 #include "../download_file.h"
 #include "../json_util.h"
-#include "../csv_parser.h"
 #include <dh_file_util.h>
 #include <dh_string_util.h>
 #include <future>
@@ -12,6 +12,46 @@
 
 extern "C"
 {
+
+    void
+    init (DhModule *module)
+    {
+        module->module_name = g_strdup ("mcdata");
+        module->module_description = g_strdup ("Minecraft Data Management");
+        module->module_type = g_strdup ("custom");
+        module->module_functions = g_ptr_array_new ();
+        g_ptr_array_add (module->module_functions,
+                         (gpointer)init_translation_from_file); /* 0 */
+        g_ptr_array_add (module->module_functions,
+                         (gpointer)init_translation_from_content); /* 1 */
+        g_ptr_array_add (module->module_functions,
+                         (gpointer)get_translation); /* 2 */
+        g_ptr_array_add (module->module_functions,
+                         (gpointer)download_manifest_sync); /* 3 */
+        g_ptr_array_add (module->module_functions,
+                         (gpointer)manifest_downloaded); /* 4 */
+        g_ptr_array_add (module->module_functions,
+                         (gpointer)get_manifest); /* 5 */
+        g_ptr_array_add (module->module_functions,
+                         (gpointer)get_version_json_string); /* 6 */
+        g_ptr_array_add (module->module_functions,
+                         (gpointer)get_object_hash); /* 7 */
+        g_ptr_array_add (module->module_functions,
+                         (gpointer)get_object_dir); /* 8 */
+        g_ptr_array_add (module->module_functions,
+                         (gpointer)get_translation_file); /* 9 */
+        g_ptr_array_add (module->module_functions,
+                         (gpointer)cleanup_manifest); /* 10 */
+        g_ptr_array_add (module->module_functions,
+                         (gpointer)load_jar); /* 11 */
+        g_ptr_array_add (module->module_functions,
+                         (gpointer)load_version_map); /* 12 */
+        g_ptr_array_add (module->module_functions,
+                         (gpointer)version_map_inited); /* 13 */
+        g_ptr_array_add (module->module_functions,
+                         (gpointer)get_version_map); /* 14 */
+    }
+
     typedef struct TranslationGroup
     {
         std::string large_version;
@@ -206,18 +246,6 @@ extern "C"
                     }
             }
         return name;
-    }
-
-    int
-    manifest_download_code ()
-    {
-        return ret_code;
-    }
-
-    void
-    manifest_reset_code ()
-    {
-        ret_code = -1;
     }
 
     int
@@ -516,7 +544,8 @@ extern "C"
         return map_inited;
     }
 
-    void* get_version_map()
+    void *
+    get_version_map ()
     {
         return &version_map;
     }

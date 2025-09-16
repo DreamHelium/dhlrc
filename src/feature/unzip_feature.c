@@ -1,5 +1,7 @@
 #include "unzip_feature.h"
 
+#include "dh_module.h"
+
 typedef void *(*OpenFile) (const char *);
 typedef void (*CloseFile) (void *);
 typedef char *(*GetFileContent) (void *, const char *, gsize *);
@@ -13,16 +15,17 @@ static GetAllFilesInZip get_all_files_in_zip = NULL;
 static gboolean enabled = FALSE;
 
 void
-dhlrc_unzip_enable (GModule *module)
+dhlrc_unzip_enable ()
 {
-    if (module
-        && g_module_symbol (module, "open_zip_file", (gpointer *)&open_file)
-        && g_module_symbol (module, "get_file_content_in_zip",
-                            (gpointer *)&get_file_content)
-        && g_module_symbol (module, "get_all_files_in_zip",
-                            (gpointer *)&get_all_files_in_zip)
-        && g_module_symbol (module, "close_zip_file", (gpointer *)&close_file))
-        enabled = TRUE;
+    DhModule* module = dh_search_inited_module ("unzip");
+    if (module)
+        {
+            open_file = module->module_functions->pdata[0];
+            get_file_content = module->module_functions->pdata[1];
+            get_all_files_in_zip = module->module_functions->pdata[2];
+            close_file = module->module_functions->pdata[3];
+            enabled = TRUE;
+        }
 }
 
 gboolean

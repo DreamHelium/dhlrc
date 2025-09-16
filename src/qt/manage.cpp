@@ -1,5 +1,6 @@
 #include "manage.h"
 #include "../common_info.h"
+#include "../feature/dh_module.h"
 #include "../nbt_interface_cpp/nbt_interface.hpp"
 #include "../translation.h"
 #include "dh_string_util.h"
@@ -8,6 +9,7 @@
 #include "manageui.h"
 #include "saveregionselectui.h"
 #include "utility.h"
+
 #include <QDebug>
 #include <QFileDialog>
 #include <QInputDialog>
@@ -113,6 +115,7 @@ remove_items (int type, QList<int> rows, ManageBase *base)
 
 ManageBase::ManageBase (QWidget *parent) : ManageUI (parent), mui (this)
 {
+    model = new QStandardItemModel ();
     QObject::connect (mui, &ManageUI::add, this, &ManageBase::add_triggered);
     QObject::connect (mui, &ManageUI::remove, this,
                       &ManageBase::remove_triggered);
@@ -128,35 +131,32 @@ ManageBase::ManageBase (QWidget *parent) : ManageUI (parent), mui (this)
                       &ManageBase::tablednd_triggered);
 }
 
-ManageBase::~ManageBase () {}
+ManageBase::~ManageBase ()
+{
+    dh_info_remove_notifier (type, this);
+    delete model;
+}
+
+void
+ManageBase::updateModel ()
+{
+    update_model (type, model);
+}
 
 static void
 update_region_model (void *main_class)
 {
-    auto c = (ManageRegion *)main_class;
+    auto c = static_cast<ManageRegion *> (main_class);
     c->refresh_triggered ();
 }
 
 ManageRegion::ManageRegion ()
 {
     type = DH_TYPE_REGION;
-    mui->setDND (true);
+    setDND (true);
     QObject::connect (mui, &ManageUI::dnd, this, &ManageRegion::dnd_triggered);
-    model = new QStandardItemModel ();
-    mui->setWindowTitle (_ ("Manage Region"));
+    setWindowTitle (_ ("Manage Region"));
     dh_info_add_notifier (DH_TYPE_REGION, update_region_model, this);
-}
-
-ManageRegion::~ManageRegion ()
-{
-    dh_info_remove_notifier (DH_TYPE_REGION, this);
-    delete model;
-}
-
-void
-ManageRegion::updateModel ()
-{
-    update_model (DH_TYPE_REGION, model);
 }
 
 void
@@ -182,30 +182,12 @@ ManageRegion::save_triggered (QList<int> rows)
         {
             dh_info_set_uuid (DH_TYPE_REGION, arr);
             dh_str_array_free (arr);
-            SaveRegionSelectUI *srsui = new SaveRegionSelectUI ();
+            auto srsui = new SaveRegionSelectUI ();
             srsui->setAttribute (Qt::WA_DeleteOnClose);
             srsui->exec ();
         }
     else
         QMessageBox::critical (mui, ERROR_TITLE, _ ("No item selected!"));
-}
-
-void
-ManageRegion::refresh_triggered ()
-{
-    updateModel ();
-    mui->updateModel (model);
-}
-
-void
-ManageRegion::showSig_triggered ()
-{
-    refresh_triggered ();
-}
-
-void
-ManageRegion::closeSig_triggered ()
-{
 }
 
 void
@@ -243,19 +225,12 @@ update_interface_model (void *main_class)
 ManageNbtInterface::ManageNbtInterface ()
 {
     type = DH_TYPE_NBT_INTERFACE_CPP;
-    mui->setDND (true);
-    model = new QStandardItemModel ();
-    mui->setWindowTitle (_ ("Manage NBT Interface"));
+    setDND (true);
+    setWindowTitle (_ ("Manage NBT Interface"));
     QObject::connect (mui, &ManageUI::dnd, this,
                       &ManageNbtInterface::dnd_triggered);
     dh_info_add_notifier (DH_TYPE_NBT_INTERFACE_CPP, update_interface_model,
                           this);
-}
-
-ManageNbtInterface::~ManageNbtInterface ()
-{
-    dh_info_remove_notifier (DH_TYPE_NBT_INTERFACE_CPP, this);
-    delete model;
 }
 
 void
@@ -268,30 +243,6 @@ ManageNbtInterface::add_triggered ()
 }
 
 void
-ManageNbtInterface::updateModel ()
-{
-    update_model (DH_TYPE_NBT_INTERFACE_CPP, model);
-}
-
-void
-ManageNbtInterface::refresh_triggered ()
-{
-    updateModel ();
-    mui->updateModel (model);
-}
-
-void
-ManageNbtInterface::showSig_triggered ()
-{
-    refresh_triggered ();
-}
-
-void
-ManageNbtInterface::closeSig_triggered ()
-{
-}
-
-void
 ManageNbtInterface::remove_triggered (QList<int> rows)
 {
     remove_items (DH_TYPE_NBT_INTERFACE_CPP, rows, this);
@@ -300,7 +251,7 @@ ManageNbtInterface::remove_triggered (QList<int> rows)
 void
 ManageNbtInterface::save_triggered (QList<int> rows)
 {
-    if (rows.length ())
+    if (!rows.empty ())
         {
             if (rows.length () == 1)
                 {
@@ -362,11 +313,11 @@ ManageNbtInterface::save_triggered (QList<int> rows)
                                     else
                                         lockedInfo << description;
                                 }
-                            if (lockedInfo.length ())
+                            if (!lockedInfo.empty ())
                                 {
                                     QString lockedInfoStr = _ (
                                         "The following infos are locked:\n");
-                                    for (auto str : lockedInfo)
+                                    for (const auto &str : lockedInfo)
                                         {
                                             lockedInfoStr += str;
                                             lockedInfoStr += '\n';
@@ -391,4 +342,24 @@ ManageNbtInterface::dnd_triggered (const QMimeData *data)
             filelist << urls[i].toLocalFile ();
         }
     dh::loadNbtInstances (mui, filelist);
+}
+
+ManageModule::ManageModule () { type = DH_TYPE_MODULE; }
+
+void
+ManageModule::refresh_triggered ()
+{
+    ManageBase::refresh_triggered ();
+    QList<QStandardItem *> items;
+    auto list = dh_info_get_all_uuid (type);
+    for (int i = 0; list && i < **list; i++)
+        {
+            auto module = static_cast<DhModule *> (
+                dh_info_get_data (type, (*list)[i]));
+            items.append (new QStandardItem (module->module_description));
+        }
+
+    model->appendColumn (items);
+    model->setHorizontalHeaderItem (3,
+                                    new QStandardItem ("Module Description"));
 }

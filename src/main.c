@@ -20,8 +20,10 @@
 #include <stdlib.h>
 /*#include "dhlrc_config.h"*/
 #include "common.h"
+#include "common_info.h"
 #include "dh_file_util.h"
 #include "feature/conv_feature.h"
+#include "feature/dh_module.h"
 #include "feature/mcdata_feature.h"
 #include "feature/recipe_feature.h"
 #include "feature/unzip_feature.h"
@@ -29,99 +31,23 @@
 #include "gmodule.h"
 #include "translation.h"
 
+#include <dh_type.h>
+
 #ifdef G_OS_WIN32
 #define LINK_PATH "PATH"
 #define MIDD_SEP ";"
-#define QT_MODULE_NAME "dhlrc_qt.dll"
-#define CONV_MODULE_NAME "libdhlrc_conv.dll"
-#define MCDATA_MODULE_NAME "libdhlrc_mcdata.dll"
-#define UNZIP_MODULE_NAME "libdhlrc_unzip.dll"
-#define RECIPE_MODULE_NAME "libdhlrc_recipe.dll"
 #else
 #define LINK_PATH "LD_LIBRARY_PATH"
 #define MIDD_SEP ":"
-#define QT_MODULE_NAME "libdhlrc_qt.so"
-#define CONV_MODULE_NAME "libdhlrc_conv.so"
-#define MCDATA_MODULE_NAME "libdhlrc_mcdata.so"
-#define UNZIP_MODULE_NAME "libdhlrc_unzip.so"
-#define RECIPE_MODULE_NAME "libdhlrc_recipe.so"
 #endif
 
 gchar *log_filename = NULL;
 
 typedef int (*DhlrcMainFunc) (int argc, char **argv, const char *);
 
-static GModule *qt_module = NULL;
-static GModule *conv_module = NULL;
-static GModule *mcdata_module = NULL;
-static GModule *unzip_module = NULL;
-static GModule *recipe_module = NULL;
-static DhlrcMainFunc qt_main = NULL;
-static DhlrcMainFunc conv_main = NULL;
-
 static void
 debug (int argc, char **argv)
 {
-}
-
-static gboolean
-get_module (const char *arg_zero, const char *module_name)
-{
-    char *module_path = NULL;
-    char *prpath = dh_file_get_current_program_dir (arg_zero);
-    /* All platforms the module will be in module directory, sorry */
-#ifdef MODULEDIR
-    module_path = g_strdup (MODULEDIR);
-#else
-    module_path = g_strconcat (prpath, G_DIR_SEPARATOR_S, "module", NULL);
-#endif
-
-    g_free (prpath);
-    char *dir
-        = g_build_path (G_DIR_SEPARATOR_S, module_path, module_name, NULL);
-    g_free (module_path);
-    GError *err = NULL;
-    GModule *new_module = g_module_open_full (dir, 0, &err);
-    if (module_name == QT_MODULE_NAME)
-        qt_module = new_module;
-    else if (module_name == CONV_MODULE_NAME)
-        conv_module = new_module;
-    else if (module_name == MCDATA_MODULE_NAME)
-        mcdata_module = new_module;
-    else if (module_name == UNZIP_MODULE_NAME)
-        unzip_module = new_module;
-    else if (module_name == RECIPE_MODULE_NAME)
-        recipe_module = new_module;
-    g_free (dir);
-
-    if (err)
-        {
-            g_critical ("%s", err->message);
-            g_error_free (err);
-            return FALSE;
-        }
-
-    if (module_name == QT_MODULE_NAME)
-        {
-            if (!g_module_symbol (new_module, "start_qt",
-                                  (gpointer *)&qt_main))
-                {
-                    g_critical ("Load Qt module failed!");
-                    return FALSE;
-                }
-        }
-    else if (module_name == CONV_MODULE_NAME)
-        {
-            conv_main = dhlrc_conv_enable (conv_module);
-            if (!conv_main)
-                return FALSE;
-        }
-    else if (module_name == MCDATA_MODULE_NAME)
-        dhlrc_mcdata_enable (mcdata_module);
-    else if (module_name == UNZIP_MODULE_NAME)
-        dhlrc_unzip_enable (unzip_module);
-
-    return TRUE;
 }
 
 // static int load_module(DhlrcModule* modules, int len, const char*
@@ -154,14 +80,15 @@ dhlrc_run (int argc, char **argv)
 {
     if (!g_module_supported ())
         g_error ("The program is not supported!\n");
+    char *prpath = dh_file_get_current_program_dir (argv[0]);
+    dh_search_module (prpath);
+    g_free (prpath);
 
-    // debug(argc, argv);
-    get_module (argv[0], QT_MODULE_NAME);
-    get_module (argv[0], CONV_MODULE_NAME);
-    get_module (argv[0], MCDATA_MODULE_NAME);
-    get_module (argv[0], UNZIP_MODULE_NAME);
-    get_module (argv[0], RECIPE_MODULE_NAME);
     int ret = 0;
+
+    DhlrcMainFunc qt_func = NULL;
+    DhlrcMainFunc real_main_func = NULL;
+    DhlrcMainFunc conv_main_func = NULL;
 
     if (argc >= 2 && g_str_equal (argv[1], "--help"))
         {
@@ -171,11 +98,18 @@ dhlrc_run (int argc, char **argv)
                                "struct of Minecraft.\n"));
                     printf ("\n");
                     printf (_ ("Modules:\n"));
-                    if (qt_module)
-                        printf (_ ("qt: The Graphical Interface.\n"));
-                    if (conv_module)
-                        printf (_ ("conv: The Simple Converter.\n"));
 
+                    const DhStrArray *uuid_arr
+                        = dh_info_get_all_uuid (DH_TYPE_MODULE);
+                    for (int i = 0; uuid_arr && i < uuid_arr->num; i++)
+                        {
+                            const char *uuid = uuid_arr->val[i];
+                            DhModule *module
+                                = dh_info_get_data (DH_TYPE_MODULE, uuid);
+                            printf ("%s(%s) -- %s\n", module->module_name,
+                                    module->module_type,
+                                    module->module_description);
+                        }
                     printf ("\n");
                 }
             else
@@ -188,21 +122,61 @@ dhlrc_run (int argc, char **argv)
         }
     else if (argc == 1)
         {
+            const DhStrArray *uuid_arr = dh_info_get_all_uuid (DH_TYPE_MODULE);
+            for (int i = 0; uuid_arr && i < uuid_arr->num; i++)
+                {
+                    const char *uuid = uuid_arr->val[i];
+                    DhModule *module = dh_info_get_data (DH_TYPE_MODULE, uuid);
+                    if (g_str_equal (module->module_name, "qt"))
+                        qt_func = module->module_functions->pdata[0];
+                    if (!g_str_equal (module->module_name, "qt")
+                        && g_str_equal (module->module_type, "gui"))
+                        real_main_func = module->module_functions->pdata[0];
+                }
 #if defined G_OS_WIN32 || defined __APPLE__
-            ret = qt_main (argc, argv, argv[0]);
+            if (qt_func)
+                ret = qt_func (argc, argv, argv[0]);
+            else if (real_main_func)
+                ret = real_main_func (argc, argv, argv[0]);
+            else
+                g_error (_ ("No GUI Module!"));
 #else
             if (g_getenv ("XDG_SESSION_DESKTOP"))
-                ret = qt_main (argc, argv, argv[0]);
+                {
+                    if (qt_func)
+                        ret = qt_func (argc, argv, argv[0]);
+                    else if (real_main_func)
+                        ret = real_main_func (argc, argv, argv[0]);
+                    else
+                        g_error (_ ("No GUI Module!"));
+                }
             else
                 g_error (_ ("CLI interface is not supported yet!"));
 #endif
         }
     else if (argc >= 2)
         {
+            const DhStrArray *uuid_arr = dh_info_get_all_uuid (DH_TYPE_MODULE);
+            for (int i = 0; uuid_arr && i < uuid_arr->num; i++)
+                {
+                    const char *uuid = uuid_arr->val[i];
+                    DhModule *module = dh_info_get_data (DH_TYPE_MODULE, uuid);
+                    if (g_str_equal (module->module_name, "qt"))
+                        qt_func = module->module_functions->pdata[0];
+                    if (g_str_equal (module->module_name, argv[1])
+                        && g_str_equal (module->module_type, "gui"))
+                        real_main_func = module->module_functions->pdata[0];
+                    if (g_str_equal (module->module_name, "conv"))
+                        conv_main_func = module->module_functions->pdata[0];
+                }
             if (g_str_equal (argv[1], "qt"))
-                ret = qt_main (argc - 1, argv + 1, argv[0]);
+                ret = qt_func (argc - 1, argv + 1, argv[0]);
             else if (g_str_equal (argv[1], "conv"))
-                ret = conv_main (argc - 1, argv + 1, argv[0]);
+                ret = conv_main_func (argc - 1, argv + 1, argv[0]);
+            else if (real_main_func)
+                ret = real_main_func (argc - 1, argv + 1, argv[0]);
+            else
+                printf ("Not supported!\n");
         }
     else
         printf ("Not supported!\n");
@@ -216,16 +190,6 @@ main (int argc, char **argb)
     int ret = dhlrc_run (argc, argb);
     if (dhlrc_is_inited ())
         dhlrc_cleanup ();
-    if (qt_module)
-        g_module_close (qt_module);
-    if (conv_module)
-        g_module_close (conv_module);
-    if (mcdata_module)
-        g_module_close (mcdata_module);
-    if (unzip_module)
-        g_module_close (unzip_module);
-    if (recipe_module)
-        g_module_close (recipe_module);
 
     return ret;
 }

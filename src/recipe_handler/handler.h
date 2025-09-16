@@ -20,38 +20,43 @@
 
 #include "../dhutil/dh_string_util.h"
 #include <cjson/cJSON.h>
+#include "../feature/dh_module.h"
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
-typedef struct PatternTransformer{
-    char pattern;
-    DhStrArray* item_string;
-} PatternTransformer;
+    typedef struct PatternTransformer
+    {
+        char pattern;
+        DhStrArray *item_string;
+    } PatternTransformer;
 
-typedef struct DhRecipes{
-    guint x;
-    guint y;
-    DhStrArray* pattern;
+    typedef struct DhRecipes
+    {
+        guint x;
+        guint y;
+        DhStrArray *pattern;
 
-    guint num;
-    /* This is rare, it's always be 1 and be ignored. */
-    double rate;
+        guint num;
+        /* This is rare, it's always be 1 and be ignored. */
+        double rate;
 
-    /* Pattern Translator */
-    PatternTransformer* pt;
-    guint pt_num;
-}DhRecipes;
+        /* Pattern Translator */
+        PatternTransformer *pt;
+        guint pt_num;
+    } DhRecipes;
 
-void recipe_handler_init(const char* recipelib_path);
-void recipe_handler_free();
-gboolean recipes_is_supported(const char* filename);
-gboolean recipes_is_supported_type(const char* type);
-DhRecipes* recipes_get_recipes(const char* filename);
-void pattern_translator_writer(PatternTransformer* pt, cJSON* json);
-void pattern_translator_free(PatternTransformer* pt);
-void recipes_free(DhRecipes* r);
+    void recipe_handler_init (const char *recipelib_path);
+    void recipe_handler_free ();
+    gboolean recipes_is_supported (const char *filename);
+    gboolean recipes_is_supported_type (const char *type);
+    DhRecipes *recipes_get_recipes (const char *filename);
+    void pattern_translator_writer (PatternTransformer *pt, cJSON *json);
+    void pattern_translator_free (PatternTransformer *pt);
+    void recipes_free (DhRecipes *r);
+    void init (DhModule *module);
 
 #ifdef __cplusplus
 }

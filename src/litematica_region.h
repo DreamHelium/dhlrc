@@ -85,7 +85,7 @@ extern "C"
 #include "nbt_interface_cpp/nbt_interface.hpp"
 
 DhNbtInstance lite_region_get_instance (LiteRegion *lr);
-LiteRegion *lite_region_create_from_root_instance_cpp (DhNbtInstance root,
+LiteRegion *lite_region_create_from_root_instance_cpp (DhNbtInstance& root,
                                                        int r_num);
 
 #endif

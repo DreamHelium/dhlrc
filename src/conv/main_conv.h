@@ -4,6 +4,7 @@
 #ifndef MAIN_CONV_H
 #define MAIN_CONV_H
 
+#include "../feature/dh_module.h"
 #include "../region.h"
 #include "dh_string_util.h"
 
@@ -19,6 +20,7 @@ extern "C"
                                                     gboolean temp_root);
     extern void *new_schema_instance_ptr_new_from_region (Region *region,
                                                           gboolean temp_root);
+    extern void init (DhModule *module);
 
 #ifdef __cplusplus
 }

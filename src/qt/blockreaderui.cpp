@@ -3,7 +3,6 @@
 #include "../feature/mcdata_feature.h"
 #include "../translation.h"
 #include "blocklistui.h"
-#include "nbtreaderui.h"
 #include "ui_blockreaderui.h"
 #include "utility.h"
 #include <QMessageBox>
@@ -206,9 +205,9 @@ BlockReaderUI::listBtn_clicked ()
 void
 BlockReaderUI::entityBtn_clicked ()
 {
-    auto nrui = new NbtReaderUI (*(DhNbtInstance *)(this->info->nbt_instance));
-    nrui->setAttribute (Qt::WA_DeleteOnClose);
-    nrui->show ();
+    // auto nrui = new NbtReaderUI (*(DhNbtInstance *)(this->info->nbt_instance));
+    // nrui->setAttribute (Qt::WA_DeleteOnClose);
+    // nrui->show ();
 }
 
 void

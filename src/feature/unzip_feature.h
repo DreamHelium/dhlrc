@@ -7,7 +7,7 @@
 
 G_BEGIN_DECLS
 
-void dhlrc_unzip_enable(GModule* module);
+void dhlrc_unzip_enable();
 gboolean dhlrc_unzip_enabled();
 void* dhlrc_open_zip_file (const char *filename);
 void dhlrc_close_zip_file (void *zip);

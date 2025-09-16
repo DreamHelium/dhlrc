@@ -17,26 +17,27 @@ Copyright (C) 2025 Dream Helium
 
 #include "conv_feature.h"
 
+#include "dh_module.h"
+
 static gboolean enabled = FALSE;
 typedef void *(*ConvFunc) (Region *, gboolean);
+static DhlrcMainFunc main_func = NULL;
 static ConvFunc conv_to_nbt = NULL;
 static ConvFunc conv_to_lite = NULL;
 static ConvFunc conv_to_schema = NULL;
 
-DhlrcMainFunc
-dhlrc_conv_enable (GModule *module)
+void
+dhlrc_conv_enable ()
 {
-    DhlrcMainFunc func = NULL;
-    if (!g_module_symbol (module, "start_point", (gpointer *)&func)
-        || !g_module_symbol (module, "nbt_instance_ptr_new_from_region",
-                             (gpointer *)&conv_to_nbt)
-        || !g_module_symbol (module, "lite_instance_ptr_new_from_region",
-                             (gpointer *)&conv_to_lite)
-        || !g_module_symbol (module, "new_schema_instance_ptr_new_from_region",
-                             (gpointer *)&conv_to_schema))
-        return NULL;
-    enabled = TRUE;
-    return func;
+    DhModule* module = dh_search_inited_module ("conv");
+    if (module)
+        {
+            main_func = module->module_functions->pdata[0];
+            conv_to_nbt = module->module_functions->pdata[1];
+            conv_to_lite = module->module_functions->pdata[2];
+            conv_to_schema = module->module_functions->pdata[3];
+            enabled = TRUE;
+        }
 }
 
 gboolean
@@ -44,6 +45,7 @@ dhlrc_conv_enabled ()
 {
     return enabled;
 }
+
 void *
 dhlrc_conv_region_to_nbt (Region *region, gboolean temp_root)
 {

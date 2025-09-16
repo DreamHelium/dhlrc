@@ -1,5 +1,19 @@
 #include "unzip.h"
 
+void
+init (DhModule *module)
+{
+    module->module_name = g_strdup ("unzip");
+    module->module_type = g_strdup ("custom");
+    module->module_description = g_strdup ("Unzip Module");
+    module->module_functions = g_ptr_array_new ();
+    g_ptr_array_add (module->module_functions, (gpointer)open_zip_file);
+    g_ptr_array_add (module->module_functions,
+                     (gpointer)get_file_content_in_zip);
+    g_ptr_array_add (module->module_functions, (gpointer)get_all_files_in_zip);
+    g_ptr_array_add (module->module_functions, (gpointer)close_zip_file);
+}
+
 zip_t *
 open_zip_file (const char *filename)
 {
@@ -20,14 +34,14 @@ char *
 get_file_content_in_zip (zip_t *zip, const char *filename, gsize *size)
 {
     zip_stat_t st;
-    zip_stat(zip, filename, 0, &st);
+    zip_stat (zip, filename, 0, &st);
     *size = st.size;
-    zip_file_t *file = zip_fopen(zip, filename, 0);
+    zip_file_t *file = zip_fopen (zip, filename, 0);
     if (file)
         {
             char *ret = g_new0 (char, *size);
             zip_fread (file, ret, *size);
-            g_message("%s", ret);
+            g_message ("%s", ret);
             zip_fclose (file);
             return ret;
         }

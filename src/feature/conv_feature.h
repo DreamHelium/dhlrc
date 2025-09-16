@@ -26,8 +26,9 @@ G_BEGIN_DECLS
 
 typedef int (*DhlrcMainFunc) (int argc, char **argv, const char *);
 
-DhlrcMainFunc dhlrc_conv_enable (GModule *module);
+void dhlrc_conv_enable();
 gboolean dhlrc_conv_enabled ();
+int dhlrc_conv_start(int argc, char **argv, const char *);
 void *dhlrc_conv_region_to_nbt (Region *region, gboolean temp_root);
 void *dhlrc_conv_region_to_lite_nbt (Region *region, gboolean temp_root);
 void *dhlrc_conv_region_to_schema_nbt (Region *region, gboolean temp_root);

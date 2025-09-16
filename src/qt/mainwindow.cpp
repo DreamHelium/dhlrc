@@ -11,7 +11,6 @@
 #include "glib.h"
 #include "ilreaderui.h"
 #include "manage.h"
-#include "nbtreaderui.h"
 #include "recipeselectui.h"
 #include "recipesui.h"
 #include "ui_mainwindow.h"
@@ -19,13 +18,11 @@
 #include <QFileDialog>
 #include <addtranslationui.h>
 #include <generalchooseui.h>
-#include <qcontainerfwd.h>
 #include <qdialog.h>
 #include <qevent.h>
 #include <qinputdialog.h>
 #include <qmessagebox.h>
 #include <qnamespace.h>
-#include <qobject.h>
 #include <qpushbutton.h>
 #include <regionmodifyui.h>
 #include <saveregionselectui.h>
@@ -36,6 +33,7 @@
 
 static dh::ManageRegion *mr = nullptr;
 static dh::ManageNbtInterface *mni = nullptr;
+static dh::ManageModule *mm = nullptr;
 
 static MainWindow *mw;
 
@@ -60,12 +58,14 @@ MainWindow::MainWindow (QWidget *parent)
     if (!dhlrc_conv_enabled ())
         ui->saveBtn->hide ();
     initSignalSlots ();
+    initShortcuts ();
 }
 
 MainWindow::~MainWindow ()
 {
     delete mr;
     delete mni;
+    delete mm;
     delete ui;
 }
 
@@ -86,8 +86,8 @@ MainWindow::initSignalSlots ()
                       &MainWindow::brBtn_clicked);
     QObject::connect (ui->mrBtn, &QPushButton::clicked, this,
                       &MainWindow::mrBtn_clicked);
-    QObject::connect (ui->nbtReaderBtn_2, &QPushButton::clicked, this,
-                      &MainWindow::nbtReaderBtn_clicked);
+    // QObject::connect (ui->nbtReaderBtn_2, &QPushButton::clicked, this,
+    //                   &MainWindow::nbtReaderBtn_clicked);
     QObject::connect (ui->configBtn, &QPushButton::clicked, this,
                       &MainWindow::configAction_triggered);
     QObject::connect (ui->recipeBtn, &QPushButton::clicked, this,
@@ -100,6 +100,50 @@ MainWindow::initSignalSlots ()
                       &MainWindow::mrBtn_2_clicked);
     QObject::connect (ui->saveBtn, &QPushButton::clicked, this,
                       &MainWindow::saveBtn_clicked);
+    QObject::connect (ui->mmBtn, &QPushButton::clicked, this, [&] {
+        if (!mm)
+            mm = new dh::ManageModule ();
+        mm->show ();
+        mm->activateWindow ();
+        mm->raise ();
+    });
+}
+
+void
+MainWindow::initShortcuts ()
+{
+    typedef void *(*newFunc) ();
+    group = new QButtonGroup ();
+    auto list = dh_info_get_all_uuid (DH_TYPE_MODULE);
+    int num = 0;
+    for (int i = 0; list && i < **list; i++)
+        {
+            auto uuid = (*list)[i];
+            auto module = static_cast<DhModule *> (
+                dh_info_get_data (DH_TYPE_MODULE, uuid));
+            if (g_str_equal (module->module_type, "qt-shortcut"))
+                {
+                    g_message ("test");
+                    modules.append (module);
+                    QPushButton *btn
+                        = new QPushButton (module->module_description);
+                    ui->verticalLayout_7->addWidget (btn);
+                    group->addButton (btn, num);
+                    num++;
+                    connect (btn, &QPushButton::clicked, this, [&] {
+                        auto btns = group->buttons ();
+                        int btnNum = 0;
+                        for (int j = 0; j < btns.length (); j++)
+                            if (btns[j]->isChecked ())
+                                btnNum = j;
+                        std::function func = reinterpret_cast<newFunc> (
+                            modules[btnNum]->module_functions->pdata[0]);
+                        void *newWin = func ();
+                        if (newWin)
+                            static_cast<QWidget *> (newWin)->show ();
+                    });
+                }
+        }
 }
 
 void
@@ -273,24 +317,25 @@ MainWindow::mrBtn_2_clicked ()
 void
 MainWindow::nbtReaderBtn_clicked ()
 {
-    GENERALCHOOSEUI_START (DH_TYPE_NBT_INTERFACE_CPP, false)
-
-    if (ret == QDialog::Accepted)
-        {
-            auto uuid = dh_info_get_uuid (DH_TYPE_NBT_INTERFACE_CPP);
-            DhNbtInstance *instance = nullptr;
-            if (uuid)
-                instance = (DhNbtInstance *)dh_info_get_data (
-                    DH_TYPE_NBT_INTERFACE_CPP, uuid->val[0]);
-            if (instance)
-                {
-                    auto nrui = new NbtReaderUI (*instance);
-                    nrui->setAttribute (Qt::WA_DeleteOnClose);
-                    nrui->show ();
-                }
-        }
-    else
-        QMessageBox::critical (this, _ ("Error!"), _ ("No NBT is selected!"));
+    // GENERALCHOOSEUI_START (DH_TYPE_NBT_INTERFACE_CPP, false)
+    //
+    // if (ret == QDialog::Accepted)
+    //     {
+    //         auto uuid = dh_info_get_uuid (DH_TYPE_NBT_INTERFACE_CPP);
+    //         DhNbtInstance *instance = nullptr;
+    //         if (uuid)
+    //             instance = (DhNbtInstance *)dh_info_get_data (
+    //                 DH_TYPE_NBT_INTERFACE_CPP, uuid->val[0]);
+    //         if (instance)
+    //             {
+    //                 auto nrui = new NbtReaderUI (*instance);
+    //                 nrui->setAttribute (Qt::WA_DeleteOnClose);
+    //                 nrui->show ();
+    //             }
+    //     }
+    // else
+    //     QMessageBox::critical (this, _ ("Error!"), _ ("No NBT is
+    //     selected!"));
 }
 
 void

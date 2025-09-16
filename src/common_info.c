@@ -16,7 +16,13 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>. */
 
 #include "common_info.h"
+#include "dhlrc_list.h"
+#include "feature/dh_module.h"
+#include "nbt_interface_cpp/nbt_interface.hpp"
+#include "region.h"
 
-DH_TYPE_REGISTER_GET_FUNC(DhRegion, dh, region, region_free)
-DH_TYPE_REGISTER_GET_FUNC(DhItemList, dh, item_list, item_list_free)
-DH_TYPE_REGISTER_GET_FUNC(DhNbtInterfaceCpp, dh, nbt_interface_cpp, dh_nbt_instance_cpp_free)
+DH_TYPE_REGISTER_GET_FUNC (DhRegion, dh, region, region_free)
+DH_TYPE_REGISTER_GET_FUNC (DhItemList, dh, item_list, item_list_free)
+DH_TYPE_REGISTER_GET_FUNC (DhNbtInterfaceCpp, dh, nbt_interface_cpp,
+                           dh_nbt_instance_cpp_free)
+DH_TYPE_REGISTER_GET_FUNC (DhModule, dh, module, dh_module_free)
