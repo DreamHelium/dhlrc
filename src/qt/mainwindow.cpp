@@ -4,7 +4,6 @@
 #include "../region.h"
 #include "../translation.h"
 #include "blockreaderui.h"
-#include "configui.h"
 #include "dh_file_util.h"
 #include "dh_type.h"
 #include "generalchoosedialog.h"
@@ -86,10 +85,6 @@ MainWindow::initSignalSlots ()
                       &MainWindow::brBtn_clicked);
     QObject::connect (ui->mrBtn, &QPushButton::clicked, this,
                       &MainWindow::mrBtn_clicked);
-    // QObject::connect (ui->nbtReaderBtn_2, &QPushButton::clicked, this,
-    //                   &MainWindow::nbtReaderBtn_clicked);
-    QObject::connect (ui->configBtn, &QPushButton::clicked, this,
-                      &MainWindow::configAction_triggered);
     QObject::connect (ui->recipeBtn, &QPushButton::clicked, this,
                       &MainWindow::recipeBtn_clicked);
     QObject::connect (ui->action_about, &QAction::triggered, this,
@@ -106,13 +101,13 @@ MainWindow::initSignalSlots ()
         mm->show ();
         mm->activateWindow ();
         mm->raise ();
+        connect (this, &MainWindow::winClose, mm, &dh::ManageModule::close);
     });
 }
 
 void
 MainWindow::initShortcuts ()
 {
-    typedef void *(*newFunc) ();
     group = new QButtonGroup ();
     auto list = dh_info_get_all_uuid (DH_TYPE_MODULE);
     int num = 0;
@@ -123,27 +118,23 @@ MainWindow::initShortcuts ()
                 dh_info_get_data (DH_TYPE_MODULE, uuid));
             if (g_str_equal (module->module_type, "qt-shortcut"))
                 {
-                    g_message ("test");
                     modules.append (module);
                     QPushButton *btn
                         = new QPushButton (module->module_description);
                     ui->verticalLayout_7->addWidget (btn);
                     group->addButton (btn, num);
                     num++;
-                    connect (btn, &QPushButton::clicked, this, [&] {
-                        auto btns = group->buttons ();
-                        int btnNum = 0;
-                        for (int j = 0; j < btns.length (); j++)
-                            if (btns[j]->isChecked ())
-                                btnNum = j;
-                        std::function func = reinterpret_cast<newFunc> (
-                            modules[btnNum]->module_functions->pdata[0]);
-                        void *newWin = func ();
-                        if (newWin)
-                            static_cast<QWidget *> (newWin)->show ();
-                    });
                 }
         }
+    connect (group, &QButtonGroup::idClicked, this,
+             &MainWindow::groupBtn_clicked);
+}
+
+void
+MainWindow::closeEvent (QCloseEvent *event)
+{
+    Q_EMIT winClose ();
+    QMainWindow::closeEvent (event);
 }
 
 void
@@ -162,14 +153,6 @@ MainWindow::dropEvent (QDropEvent *event)
             filelist << urls[i].toLocalFile ();
         }
     dh::loadNbtInstances (this, filelist);
-}
-
-void
-MainWindow::configAction_triggered ()
-{
-    auto cui = new ConfigUI ();
-    cui->setAttribute (Qt::WA_DeleteOnClose);
-    cui->show ();
 }
 
 void
@@ -315,30 +298,6 @@ MainWindow::mrBtn_2_clicked ()
 }
 
 void
-MainWindow::nbtReaderBtn_clicked ()
-{
-    // GENERALCHOOSEUI_START (DH_TYPE_NBT_INTERFACE_CPP, false)
-    //
-    // if (ret == QDialog::Accepted)
-    //     {
-    //         auto uuid = dh_info_get_uuid (DH_TYPE_NBT_INTERFACE_CPP);
-    //         DhNbtInstance *instance = nullptr;
-    //         if (uuid)
-    //             instance = (DhNbtInstance *)dh_info_get_data (
-    //                 DH_TYPE_NBT_INTERFACE_CPP, uuid->val[0]);
-    //         if (instance)
-    //             {
-    //                 auto nrui = new NbtReaderUI (*instance);
-    //                 nrui->setAttribute (Qt::WA_DeleteOnClose);
-    //                 nrui->show ();
-    //             }
-    //     }
-    // else
-    //     QMessageBox::critical (this, _ ("Error!"), _ ("No NBT is
-    //     selected!"));
-}
-
-void
 MainWindow::recipeBtn_clicked ()
 {
     auto rsui = new RecipeSelectUI ();
@@ -365,7 +324,7 @@ MainWindow::addBtn_clicked ()
 void
 MainWindow::saveBtn_clicked ()
 {
-    GENERALCHOOSEUI_START (true, DH_TYPE_REGION)
+    GENERALCHOOSEUI_START (DH_TYPE_REGION, false)
     if (ret == QDialog::Accepted)
         {
             int transRet = GeneralChooseDialog::getIndex (
@@ -377,4 +336,19 @@ MainWindow::saveBtn_clicked ()
         }
     else
         QMessageBox::critical (this, _ ("Error!"), _ ("No region choosed!"));
+}
+
+void
+MainWindow::groupBtn_clicked (int id)
+{
+    typedef void *(*newFunc) ();
+    std::function func
+        = reinterpret_cast<newFunc> (modules[id]->module_functions->pdata[0]);
+    void *newWin = func ();
+    if (newWin)
+        {
+            auto win = static_cast<QWidget *> (newWin);
+            win->show ();
+            connect (this, &MainWindow::winClose, win, &QWidget::close);
+        }
 }

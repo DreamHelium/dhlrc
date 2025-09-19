@@ -64,7 +64,7 @@ PropertyModifyUI::okBtn_clicked ()
             auto widget = dynamic_cast<QLineEdit *> (item->widget ());
             dh_str_array_add_str (&arr, widget->text ().toUtf8 ());
         }
-    region_modify_property(region, info, allModify, arr);
+    // region_modify_property(region, info, allModify, arr);
     dh_str_array_free(arr);
     accept ();
 }

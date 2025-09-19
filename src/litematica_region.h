@@ -18,8 +18,8 @@
 #ifndef LITEMATICA_REGION_H
 #define LITEMATICA_REGION_H
 
-#include "dh_string_util.h"
 #include "dhlrc_list.h"
+#include "dhutil/dh_string_util.h"
 #include "nbt_interface_cpp/libnbt/nbt.h"
 
 #ifdef __cplusplus
@@ -72,6 +72,7 @@ extern "C"
     /**  Make ItemList but not init item numbers (support extend) */
     ItemList *lite_region_item_list_without_num (LiteRegion *lr,
                                                  ItemList *o_il);
+    const gint64 *lite_region_state (LiteRegion *lr, int *len);
     // ItemList* lite_region_item_list_extend(NBT* root, int r_num, ItemList
     // *oBlock, int print_process); gboolean
     // lite_region_block_properties_equal(LiteRegion* lr, int id, char* key,
@@ -84,8 +85,8 @@ extern "C"
 #ifdef __cplusplus
 #include "nbt_interface_cpp/nbt_interface.hpp"
 
-DhNbtInstance lite_region_get_instance (LiteRegion *lr);
-LiteRegion *lite_region_create_from_root_instance_cpp (DhNbtInstance& root,
+const DhNbtInstance &lite_region_get_instance (LiteRegion *lr);
+LiteRegion *lite_region_create_from_root_instance_cpp (DhNbtInstance &root,
                                                        int r_num);
 
 #endif

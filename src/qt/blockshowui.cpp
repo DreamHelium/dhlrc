@@ -101,8 +101,7 @@ BlockShowUI::updateUI ()
     QObject::connect (this, &BlockShowUI::changeVal, progressDialog,
                       &QProgressDialog::setValue);
 
-    auto getString = [&] (BlockInfo *info) -> QString {
-        auto palette = region_get_palette (region, info->palette);
+    auto getString = [&] (Palette *palette) -> QString {
         QString str = _ ("Block name: %1\n"
                          "Palette: \n%2");
         if (large_version)
@@ -137,12 +136,12 @@ BlockShowUI::updateUI ()
                             p = z * region->region_size->x + x;
                         int index = region_get_index (
                             region, x, ui->spinBox->value (), z);
-                        auto info = static_cast<BlockInfo *> (
-                            region->block_info_array->pdata[index]);
+                        auto palette_num = region_get_block_palette (region, index);
+                        auto palette = region_get_palette (region, palette_num);
                         auto btn = btns[p];
-                        btn->setText (QString::number (info->palette));
+                        btn->setText (QString::number (palette_num));
 
-                        btn->setToolTip (getString (info));
+                        btn->setToolTip (getString (palette));
                         if (!inited)
                             {
                                 group->addButton (btn, index);

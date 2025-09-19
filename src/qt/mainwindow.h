@@ -23,21 +23,23 @@ class MainWindow : public QMainWindow
   public:
     MainWindow (QWidget *parent = nullptr);
     ~MainWindow ();
-    // QProgressDialog pd = QProgressDialog(this, Qt::Dialog);
+    static QList<DhModule *> modules;
+
+  Q_SIGNALS:
+    void winClose ();
 
   private:
     Ui::MainWindow *ui;
-    QList<DhModule *> modules;
     void initSignalSlots ();
     void initShortcuts ();
     QButtonGroup *group;
+    void closeEvent (QCloseEvent *event) override;
 
   protected:
     void virtual dragEnterEvent (QDragEnterEvent *event);
     void virtual dropEvent (QDropEvent *event);
 
   private Q_SLOTS:
-    void configAction_triggered ();
     void manageBtn_2_clicked ();
     void ilReaderBtn_clicked ();
     void recipeCombineBtn_clicked ();
@@ -46,10 +48,13 @@ class MainWindow : public QMainWindow
     void brBtn_clicked ();
     void mrBtn_clicked ();
     void mrBtn_2_clicked ();
-    void nbtReaderBtn_clicked ();
     void recipeBtn_clicked ();
     void showabout ();
     void addBtn_clicked ();
     void saveBtn_clicked ();
+    void groupBtn_clicked (int id);
 };
+
+inline QList<DhModule *> MainWindow::modules = {};
+
 #endif // MAINWINDOW_H

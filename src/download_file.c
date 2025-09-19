@@ -17,17 +17,6 @@
 
 #include "download_file.h"
 
-// gboolean dh_download_version_manifest(const char *dir, DhProgressCallback
-// callback)
-// {
-//     gboolean ret =
-//     dh_file_download_full_arg("https://launchermeta.mojang.com/mc/game/version_manifest.json",
-//     dir, G_FILE_COPY_OVERWRITE
-//                                      , NULL, callback, "Version Manifest",
-//                                      NULL);
-//     return ret;
-// }
-
 int
 dh_file_progress_callback (void *data, curl_off_t total, curl_off_t current,
                            curl_off_t unused0, curl_off_t unused1)

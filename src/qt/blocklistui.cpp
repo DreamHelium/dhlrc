@@ -50,28 +50,32 @@ BlockListUI::drawList ()
         stringList << _ ("id") << _ ("id Name") << _ ("x") << _ ("y")
                    << _ ("z") << _ ("Palette");
     model->setHorizontalHeaderLabels (stringList);
-    for (int i = 0; i < region->block_info_array->len; i++)
+    int size = region->region_size->x * region->region_size->y
+               * region->region_size->z;
+    int x = 0;
+    int y = 0;
+    int z = 0;
+    for (int i = 0; i < size; i++)
         {
-            BlockInfo *info = (BlockInfo *)region->block_info_array->pdata[i];
-            auto id_name = block_info_get_id_name (region, info);
+            auto id_name = region_get_id_name (region, i);
+            auto palette_num = region_get_block_palette (region, i);
             if (!strcmp (id_name, "minecraft:air") && ignoreAir)
                 continue;
             QStandardItem *item2 = nullptr;
-            QStandardItem *item0
-                = new QStandardItem (QString::number (info->index));
+            QStandardItem *item0 = new QStandardItem (QString::number (i));
             QStandardItem *item1 = new QStandardItem (id_name);
             if (dhlrc_mcdata_enabled () && large_version)
                 item2 = new QStandardItem (mctr (id_name, large_version));
             QStandardItem *item3
-                = new QStandardItem (QString::number (info->pos->x));
+                = new QStandardItem (QString::number (x));
             QStandardItem *item4
-                = new QStandardItem (QString::number (info->pos->y));
+                = new QStandardItem (QString::number (y));
             QStandardItem *item5
-                = new QStandardItem (QString::number (info->pos->z));
+                = new QStandardItem (QString::number (z));
             QStandardItem *item6
-                = new QStandardItem (QString::number (info->palette));
+                = new QStandardItem (QString::number (palette_num));
             Palette *palette
-                = (Palette *)region->palette_array->pdata[info->palette];
+                = (Palette *)region->palette_array->pdata[palette_num];
             QString str = QString ();
             if (palette->property_data)
                 {
@@ -94,6 +98,19 @@ BlockListUI::drawList ()
             else
                 itemList = { item0, item1, item3, item4, item5, item6 };
             model->appendRow (itemList);
+            if (x < region->region_size->x - 1)
+                x++;
+            else if (z < region->region_size->z - 1)
+                {
+                    x = 0;
+                    z++;
+                }
+            else if (y < region->region_size->y - 1)
+                {
+                    x = 0;
+                    z = 0;
+                    y++;
+                }
         }
     proxyModel->setSourceModel (model);
     ui->tableView->setModel (proxyModel);

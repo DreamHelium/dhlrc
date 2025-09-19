@@ -96,10 +96,11 @@ item_list_new_from_region (Region *region)
     TmpItemList *til = NULL;
     BlackList *bl = black_list_init ();
     ReplaceList *rl = replace_list_init ();
-    for (int i = 0; i < region->block_info_array->len; i++)
+    int size = region->region_size->x * region->region_size->y
+               * region->region_size->z;
+    for (int i = 0; i < size; i++)
         {
-            BlockInfo *bi = (BlockInfo *)(region->block_info_array->pdata[i]);
-            char *id_name = block_info_get_id_name (region, bi);
+            char *id_name = region_get_id_name (region, i);
             if (black_list_scan (bl, id_name))
                 continue;
             DhStrArray *arr = NULL;
@@ -109,7 +110,7 @@ item_list_new_from_region (Region *region)
                         tmp_item_list_add_num (&til, arr->val[i], 1);
                     continue;
                 }
-            int palette_num = bi->palette;
+            int palette_num = region_get_block_palette (region, i);
             Palette *palette = region->palette_array->pdata[palette_num];
             for (int i = 0;
                  palette->property_name && i < palette->property_name->num;

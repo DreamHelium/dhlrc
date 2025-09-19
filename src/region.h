@@ -35,6 +35,12 @@ extern "C"
         int z;
     } Pos;
 
+    typedef struct BlockEntity
+    {
+        Pos *pos;
+        void *nbt_instance;
+    } BlockEntity;
+
     typedef Pos RegionSize;
 
     typedef struct Palette
@@ -44,18 +50,10 @@ extern "C"
         DhStrArray *property_data;
     } Palette;
 
-    typedef struct BlockInfo
-    {
-        int index;
-        Pos *pos;
-        int palette;
-        void *nbt_instance;
-    } BlockInfo;
-
-    /** Just like `GPtrArray<BlockInfo>` */
-    typedef GPtrArray BlockInfoArray;
     /** Just like `GPtrArray<Palette>` */
     typedef GPtrArray PaletteArray;
+    /** Just like `GPtrArray<BlockEntity>` */
+    typedef GPtrArray BlockEntityArray;
 
     typedef struct BaseData
     {
@@ -79,7 +77,10 @@ extern "C"
         /** The size of region */
         RegionSize *region_size;
         /** The block info array */
-        BlockInfoArray *block_info_array;
+        gint64* block_array;
+        int block_array_len;
+        /** Block Entity Array */
+        BlockEntityArray* block_entity_array;
         /** The Palette info array*/
         PaletteArray *palette_array;
         int air_palette;
@@ -92,16 +93,19 @@ extern "C"
     Region *region_new_from_nbt_file (const char *filepos);
     Region *region_new_from_nbt_instance_ptr (void *instance_ptr);
     gboolean palette_is_same (gconstpointer a, gconstpointer b);
-    char *block_info_get_id_name (Region *region, BlockInfo *info);
-    void region_modify_property (Region *region, BlockInfo *info,
-                                 gboolean all_modify, DhStrArray *new_data);
+    char *region_get_id_name (Region *region, int index);
+    // void region_modify_property (Region *region, BlockInfo *info,
+    //                              gboolean all_modify, DhStrArray *new_data);
     gboolean region_add_palette (Region *region, const char *id_name,
                                  DhStrArray *palette_name,
                                  DhStrArray *palette_data);
-    gboolean region_add_palette_using_palette(Region* region, Palette* palette);
+    gboolean region_add_palette_using_palette (Region *region,
+                                               Palette *palette);
     Palette *region_get_palette (Region *region, int val);
     ItemList *item_list_new_from_multi_region (const char **region_uuid_arr);
     void region_free (void *region);
+    int region_get_block_palette (Region *region, int index);
+    BlockEntity* region_get_block_entity(Region* region, int x, int y, int z);
 
 #ifdef __cplusplus
 }

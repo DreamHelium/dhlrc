@@ -25,7 +25,6 @@ set(PROJECT_SOURCES
         recipesui.cpp recipesui.h
         recipesshowui.cpp recipesshowui.h
         showtrackui.cpp showtrackui.h
-        configui.h configui.cpp configui.ui
         blocklistui.cpp blocklistui.h blocklistui.ui
         blockreaderui.cpp blockreaderui.h blockreaderui.ui
         manageui.h manageui.cpp manageui.ui
@@ -38,9 +37,9 @@ set(PROJECT_SOURCES
         dhtreefilter.h dhtreefilter.cpp
         recipeselectui.h recipeselectui.cpp recipeselectui.ui
         generalchooseui.h
-        propertymodifyui.cpp
-        propertymodifyui.h
-        propertymodifyui.ui
+#        propertymodifyui.cpp
+#        propertymodifyui.h
+#        propertymodifyui.ui
         addtranslationui.cpp
         addtranslationui.h
         addtranslationui.ui
@@ -115,3 +114,5 @@ if (QT_VERSION_MAJOR EQUAL 6)
 endif ()
 
 add_subdirectory(nbt-reader)
+add_subdirectory(itemlist-manage)
+add_subdirectory(configui)

@@ -83,7 +83,7 @@ update_model (int type, QStandardItemModel *model)
 }
 
 static void
-remove_items (int type, QList<int> rows, ManageBase *base)
+remove_items (int type, const QList<int>& rows, ManageBase *base)
 {
     if (rows.length ())
         {
@@ -113,6 +113,7 @@ remove_items (int type, QList<int> rows, ManageBase *base)
 //     }
 // }
 
+
 ManageBase::ManageBase (QWidget *parent) : ManageUI (parent), mui (this)
 {
     model = new QStandardItemModel ();
@@ -138,17 +139,17 @@ ManageBase::~ManageBase ()
 }
 
 void
+ManageBase::deleteItems (const QList<int>& rows)
+{
+    remove_items(type, rows, this);
+}
+
+void
 ManageBase::updateModel ()
 {
     update_model (type, model);
 }
 
-static void
-update_region_model (void *main_class)
-{
-    auto c = static_cast<ManageRegion *> (main_class);
-    c->refresh_triggered ();
-}
 
 ManageRegion::ManageRegion ()
 {
@@ -156,19 +157,12 @@ ManageRegion::ManageRegion ()
     setDND (true);
     QObject::connect (mui, &ManageUI::dnd, this, &ManageRegion::dnd_triggered);
     setWindowTitle (_ ("Manage Region"));
-    dh_info_add_notifier (DH_TYPE_REGION, update_region_model, this);
 }
 
 void
 ManageRegion::add_triggered ()
 {
     loadRegion (mui);
-}
-
-void
-ManageRegion::remove_triggered (QList<int> rows)
-{
-    remove_items (DH_TYPE_REGION, rows, this);
 }
 
 void
@@ -215,13 +209,6 @@ ManageRegion::dnd_triggered (const QMimeData *data)
         }
 }
 
-static void
-update_interface_model (void *main_class)
-{
-    auto c = (ManageNbtInterface *)main_class;
-    c->refresh_triggered ();
-}
-
 ManageNbtInterface::ManageNbtInterface ()
 {
     type = DH_TYPE_NBT_INTERFACE_CPP;
@@ -229,8 +216,6 @@ ManageNbtInterface::ManageNbtInterface ()
     setWindowTitle (_ ("Manage NBT Interface"));
     QObject::connect (mui, &ManageUI::dnd, this,
                       &ManageNbtInterface::dnd_triggered);
-    dh_info_add_notifier (DH_TYPE_NBT_INTERFACE_CPP, update_interface_model,
-                          this);
 }
 
 void
@@ -240,12 +225,6 @@ ManageNbtInterface::add_triggered ()
         mui, _ ("Select a file"), nullptr,
         _ ("Litematic file (*.litematic);;NBT File (*.nbt)"));
     dh::loadNbtInstances (mui, dirs);
-}
-
-void
-ManageNbtInterface::remove_triggered (QList<int> rows)
-{
-    remove_items (DH_TYPE_NBT_INTERFACE_CPP, rows, this);
 }
 
 void
@@ -350,13 +329,22 @@ void
 ManageModule::refresh_triggered ()
 {
     ManageBase::refresh_triggered ();
+    auto columns = model->takeColumn (0);
+    for (auto item : columns)
+        {
+            item->setEditable (false);
+        }
+    model->insertColumn (0, columns);
+    model->setHorizontalHeaderItem (0, new QStandardItem (_ ("Description")));
     QList<QStandardItem *> items;
     auto list = dh_info_get_all_uuid (type);
     for (int i = 0; list && i < **list; i++)
         {
             auto module = static_cast<DhModule *> (
                 dh_info_get_data (type, (*list)[i]));
-            items.append (new QStandardItem (module->module_description));
+            auto item = new QStandardItem (module->module_description);
+            item->setEditable (false);
+            items.append (item);
         }
 
     model->appendColumn (items);

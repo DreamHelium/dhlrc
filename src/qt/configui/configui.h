@@ -1,9 +1,9 @@
 #ifndef CONFIGUI_H
 #define CONFIGUI_H
 
+#include "../../translation.h"
 #include <QDialog>
 #include <QTranslator>
-#include "../translation.h"
 
 namespace Ui {
 class ConfigUI;
@@ -33,5 +33,10 @@ private Q_SLOTS:
     void reset6Btn_clicked();
     void okBtn_clicked();
 };
+
+extern "C"
+{
+    void init (DhModule *module);
+}
 
 #endif // CONFIGUI_H

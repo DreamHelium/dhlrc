@@ -18,7 +18,7 @@
 #ifndef DOWNLOAD_FILE_H
 #define DOWNLOAD_FILE_H
 
-#include "dhutil/dh_file_util.h"
+#include "dhutil/dh_dl.h"
 
 G_BEGIN_DECLS
 

@@ -5,6 +5,7 @@
 #include "ui_nbtreaderui.h"
 #include <QInputDialog>
 #include <QLineEdit>
+#include <QMessageBox>
 #include <generalchooseui.h>
 #include <qitemselectionmodel.h>
 #include <qpushbutton.h>
@@ -23,6 +24,14 @@ newWin ()
     return nullptr;
 }
 
+static void *
+newWinWithInstance (void *instance)
+{
+    auto real_instance = static_cast<DhNbtInstance *> (instance);
+    auto nrui = new NbtReaderUI (real_instance);
+    return nrui;
+}
+
 void
 init (DhModule *module)
 {
@@ -32,6 +41,8 @@ init (DhModule *module)
     module->module_functions = g_ptr_array_new ();
     g_ptr_array_add (module->module_functions,
                      reinterpret_cast<gpointer> (newWin));
+    g_ptr_array_add (module->module_functions,
+                     reinterpret_cast<gpointer> (newWinWithInstance));
 }
 
 static QString uuid;
@@ -161,7 +172,29 @@ NbtReaderUI::NbtReaderUI (QWidget *parent)
                               &NbtReaderUI::modifyBtn_clicked);
         }
     else
-        failed = true;
+        {
+            failed = true;
+            QMessageBox::critical (this, _ ("Error!"), _ ("No NBT selected!"));
+        }
+}
+
+NbtReaderUI::NbtReaderUI (DhNbtInstance *instance, QWidget *parent)
+    : QWidget (parent), ui (new Ui::NbtReaderUI)
+{
+    model = new QStandardItemModel (this);
+    this->instance = *instance;
+    ui->setupUi (this);
+    proxyModel = new DhTreeFilter (this);
+    initModel ();
+    proxyModel->setSourceModel (model);
+    ui->treeView->setModel (proxyModel);
+    auto selectionModel = ui->treeView->selectionModel ();
+    QObject::connect (selectionModel, &QItemSelectionModel::selectionChanged,
+                      this, &NbtReaderUI::treeview_clicked);
+    QObject::connect (ui->lineEdit, &QLineEdit::textChanged, this,
+                      &NbtReaderUI::textChanged_cb);
+    QObject::connect (ui->modifyButton, &QPushButton::clicked, this,
+                      &NbtReaderUI::modifyBtn_clicked);
 }
 
 NbtReaderUI::~NbtReaderUI ()

@@ -25,7 +25,7 @@ class ManageBase : public ManageUI
     ManageUI *mui;
     QStandardItemModel *model;
     int type;
-
+    void deleteItems (const QList<int> &rows);
     void updateModel ();
   public Q_SLOTS:
     virtual void
@@ -33,6 +33,15 @@ class ManageBase : public ManageUI
     {
         updateModel ();
         ManageUI::updateModel (model);
+    }
+
+  private:
+    bool inited = false;
+    static auto
+    update_base_model (void *main_class)
+    {
+        auto c = static_cast<ManageBase *> (main_class);
+        c->refresh_triggered ();
     }
 
   private Q_SLOTS:
@@ -43,6 +52,7 @@ class ManageBase : public ManageUI
     virtual void
     remove_triggered (QList<int> rows)
     {
+        deleteItems (rows);
     }
     virtual void
     save_triggered (QList<int> rows)
@@ -53,6 +63,11 @@ class ManageBase : public ManageUI
     showSig_triggered ()
     {
         refresh_triggered ();
+        if (!inited)
+            {
+                dh_info_add_notifier (type, update_base_model, this);
+                inited = true;
+            }
     }
     virtual void
     closeSig_triggered ()
@@ -85,7 +100,6 @@ class ManageRegion : public ManageBase
 
   private Q_SLOTS:
     void add_triggered ();
-    void remove_triggered (QList<int> rows);
     void save_triggered (QList<int> rows);
     void dnd_triggered (const QMimeData *data);
 };
@@ -99,7 +113,6 @@ class ManageNbtInterface : public ManageBase
 
   private Q_SLOTS:
     void add_triggered ();
-    void remove_triggered (QList<int> rows);
     void save_triggered (QList<int> rows);
     void dnd_triggered (const QMimeData *data);
 };

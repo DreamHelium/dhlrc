@@ -18,6 +18,7 @@ class NbtReaderUI : public QWidget
 
   public:
     explicit NbtReaderUI (QWidget *parent = nullptr);
+    NbtReaderUI (DhNbtInstance *instance, QWidget *parent = nullptr);
     ~NbtReaderUI ();
     bool failed = false;
 

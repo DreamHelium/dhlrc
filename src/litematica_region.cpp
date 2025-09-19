@@ -175,8 +175,7 @@ lite_region_create_from_root_instance_cpp (DhNbtInstance &root, int r_num)
 
     out->name = g_strdup (region.get_key ());
     out->region_num = r_num;
-    const DhNbtInstance &r = root;
-    out->region_nbt_instance_cpp = r;
+    out->region_nbt_instance_cpp = region;
     auto region_dup (region);
 
     out->blocks = get_blocks (region_dup);
@@ -338,7 +337,7 @@ lite_region_author (LiteRegion *lr)
     return lr->author;
 }
 
-DhNbtInstance
+const DhNbtInstance &
 lite_region_get_instance (LiteRegion *lr)
 {
     return lr->region_nbt_instance_cpp;
@@ -572,3 +571,9 @@ lite_region_name_array_instance (void *instance)
 //     dh_nbt_instance_free(current_copy);
 //     return ret;
 // }
+const gint64 *
+lite_region_state (LiteRegion *lr, int *len)
+{
+    *len = lr->states_num;
+    return lr->states;
+}

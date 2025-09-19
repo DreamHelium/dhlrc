@@ -7,12 +7,11 @@
 #include "utility.h"
 #include <QMessageBox>
 #include <blockshowui.h>
-#include <propertymodifyui.h>
+#include <mainwindow.h>
 #include <qlineedit.h>
 #include <qnamespace.h>
 #include <qpushbutton.h>
 #include <qvalidator.h>
-#include <ui_blockshowui.h>
 
 static void
 set_func (void *klass, int value)
@@ -91,72 +90,59 @@ BlockReaderUI::textChanged_cb ()
                 && ui->zEdit->validator ()->validate (zText, pos)
                        == QValidator::Acceptable)
                 {
-                    auto info = region->block_info_array;
-                    for (int i = 0; i < info->len; i++)
+                    int index
+                        = region_get_index (region, xText.toInt (),
+                                            yText.toInt (), zText.toInt ());
+
+                    const char *transName = nullptr;
+                    auto name = region_get_id_name (region, index);
+                    if (large_version && ui->progressBar->value () == 100)
+                        transName = mctr (name, large_version);
+                    auto palette = region_get_block_palette (region, index);
+                    auto paletteInfo
+                        = (Palette *)(region->palette_array->pdata[palette]);
+                    auto paletteNames = paletteInfo->property_name;
+                    auto paletteDatas = paletteInfo->property_data;
+                    if (transName)
+                        infos = QString (_ ("Name: %1\n"
+                                            "Translation name: %2\n"
+                                            "Index: %3\n"
+                                            "Palette: %4\n"
+                                            "Properties:\n"))
+                                    .arg (name)
+                                    .arg (transName)
+                                    .arg (index)
+                                    .arg (palette);
+                    else
+                        infos = QString (_ ("Name: %1\n"
+                                            "Index: %2\n"
+                                            "Palette: %3\n"
+                                            "Properties:\n"))
+                                    .arg (name)
+                                    .arg (index)
+                                    .arg (palette);
+                    if (paletteNames)
                         {
-                            auto blockInfo = (BlockInfo *)(info->pdata[i]);
-                            this->info = blockInfo;
-                            if (blockInfo->pos->x == xText.toInt ()
-                                && blockInfo->pos->y == yText.toInt ()
-                                && blockInfo->pos->z == zText.toInt ())
+                            for (int i = 0; i < paletteNames->num; i++)
                                 {
-                                    const char *transName = nullptr;
-                                    auto name = block_info_get_id_name (
-                                        region, blockInfo);
-                                    if (large_version
-                                        && ui->progressBar->value () == 100)
-                                        transName = mctr (name, large_version);
-                                    auto index = blockInfo->index;
-                                    auto palette = blockInfo->palette;
-                                    auto paletteInfo
-                                        = (Palette *)(region->palette_array
-                                                          ->pdata[palette]);
-                                    auto paletteNames
-                                        = paletteInfo->property_name;
-                                    auto paletteDatas
-                                        = paletteInfo->property_data;
-                                    if (transName)
-                                        infos = QString (
-                                                    _ ("Name: %1\n"
-                                                       "Translation name: %2\n"
-                                                       "Index: %3\n"
-                                                       "Palette: %4\n"
-                                                       "Properties:\n"))
-                                                    .arg (name)
-                                                    .arg (transName)
-                                                    .arg (index)
-                                                    .arg (palette);
-                                    else
-                                        infos = QString (_ ("Name: %1\n"
-                                                            "Index: %2\n"
-                                                            "Palette: %3\n"
-                                                            "Properties:\n"))
-                                                    .arg (name)
-                                                    .arg (index)
-                                                    .arg (palette);
-                                    if (paletteNames)
-                                        {
-                                            for (int i = 0;
-                                                 i < paletteNames->num; i++)
-                                                {
-                                                    infos += gettext (
-                                                        paletteNames->val[i]);
-                                                    infos += ": ";
-                                                    infos += gettext (
-                                                        paletteDatas->val[i]);
-                                                    infos += "\n";
-                                                }
-                                            ui->propertyBtn->setEnabled (true);
-                                        }
-                                    else
-                                        ui->propertyBtn->setEnabled (false);
-                                    if (this->info->nbt_instance)
-                                        ui->entityBtn->setEnabled (true);
-                                    else
-                                        ui->entityBtn->setEnabled (false);
-                                    break;
+                                    infos += gettext (paletteNames->val[i]);
+                                    infos += ": ";
+                                    infos += gettext (paletteDatas->val[i]);
+                                    infos += "\n";
                                 }
+                            ui->propertyBtn->setEnabled (true);
                         }
+                    else
+                        ui->propertyBtn->setEnabled (false);
+                    auto be = region_get_block_entity (region, xText.toInt (),
+                                            yText.toInt (), zText.toInt ());
+                    if (be)
+                        {
+                            ui->entityBtn->setEnabled (true);
+                            instance = be->nbt_instance;
+                        }
+                    else
+                        ui->entityBtn->setEnabled (false);
                 }
             else
                 infos = _ ("Not valid!");
@@ -202,50 +188,65 @@ BlockReaderUI::listBtn_clicked ()
     blui->show ();
 }
 
+typedef void *(*NewFunc) (void *);
+
 void
 BlockReaderUI::entityBtn_clicked ()
 {
-    // auto nrui = new NbtReaderUI (*(DhNbtInstance *)(this->info->nbt_instance));
-    // nrui->setAttribute (Qt::WA_DeleteOnClose);
-    // nrui->show ();
+    for (auto i : MainWindow::modules)
+        {
+            if (g_str_equal (i->module_name, "nbt-reader-qt"))
+                {
+                    NewFunc f = reinterpret_cast<NewFunc> (
+                        i->module_functions->pdata[1]);
+                    auto newObj = f (instance);
+                    auto newWin = static_cast<QWidget *> (newObj);
+                    newWin->show ();
+                    connect (this, &BlockReaderUI::closeWin, newWin,
+                             &QWidget::close);
+                }
+        }
+    // auto nrui = new NbtReaderUI (*(DhNbtInstance
+    // *)(this->info->nbt_instance)); nrui->setAttribute
+    // (Qt::WA_DeleteOnClose); nrui->show ();
 }
 
 void
 BlockReaderUI::propertyBtn_clicked ()
 {
     /* It seems that I can't write when it's locked with reader lock */
-    dh_info_reader_unlock (DH_TYPE_REGION, uuid.toUtf8 ());
+    // dh_info_reader_unlock (DH_TYPE_REGION, uuid.toUtf8 ());
     /* It seems that it will lock multiple times,
      * And doing so will break the infomation of the reader,
      * so this **must** be blocked way.
      */
-    if (dh_info_writer_trylock (DH_TYPE_REGION, uuid.toUtf8 ()))
-        {
-            auto ret = QMessageBox::question (
-                this, _ ("Select an option."),
-                _ ("Do you want to modify the property of this block or "
-                   "blocks that has the same property?"
-                   "\nWarning: if a wrong key is input, we don't take any "
-                   "warranty."),
-                QMessageBox::Yes | QMessageBox::YesAll | QMessageBox::No,
-                QMessageBox::Yes);
-            bool all = false;
-            if (ret == QMessageBox::YesAll)
-                all = true;
-            else if (ret == QMessageBox::No)
-                {
-                    dh_info_writer_unlock (DH_TYPE_REGION, uuid.toUtf8 ());
-                    dh_info_reader_trylock (DH_TYPE_REGION, uuid.toUtf8 ());
-                    return;
-                }
-            auto pmui = new PropertyModifyUI (region, info, all);
-            pmui->setAttribute (Qt::WA_DeleteOnClose);
-            pmui->exec ();
-
-            dh_info_writer_unlock (DH_TYPE_REGION, uuid.toUtf8 ());
-            dh_info_reader_trylock (DH_TYPE_REGION, uuid.toUtf8 ());
-            textChanged_cb ();
-        }
+    // if (dh_info_writer_trylock (DH_TYPE_REGION, uuid.toUtf8 ()))
+    //     {
+    //         auto ret = QMessageBox::question (
+    //             this, _ ("Select an option."),
+    //             _ ("Do you want to modify the property of this block or "
+    //                "blocks that has the same property?"
+    //                "\nWarning: if a wrong key is input, we don't take any "
+    //                "warranty."),
+    //             QMessageBox::Yes | QMessageBox::YesAll | QMessageBox::No,
+    //             QMessageBox::Yes);
+    //         bool all = false;
+    //         if (ret == QMessageBox::YesAll)
+    //             all = true;
+    //         else if (ret == QMessageBox::No)
+    //             {
+    //                 dh_info_writer_unlock (DH_TYPE_REGION, uuid.toUtf8 ());
+    //                 dh_info_reader_trylock (DH_TYPE_REGION, uuid.toUtf8 ());
+    //                 return;
+    //             }
+    //         auto pmui = new PropertyModifyUI (region, info, all);
+    //         pmui->setAttribute (Qt::WA_DeleteOnClose);
+    //         pmui->exec ();
+    //
+    //         dh_info_writer_unlock (DH_TYPE_REGION, uuid.toUtf8 ());
+    //         dh_info_reader_trylock (DH_TYPE_REGION, uuid.toUtf8 ());
+    //         textChanged_cb ();
+    //     }
 }
 
 void

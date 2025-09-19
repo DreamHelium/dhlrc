@@ -24,8 +24,8 @@ private:
     QString uuid = {};
     void setText();
     char* large_version = nullptr;
-    BlockInfo* info = nullptr;
     bool readerIsUnlocked = false;
+    void* instance = nullptr;
     void closeEvent(QCloseEvent *event) override;
     BlockShowUI* bsui = nullptr;
 

@@ -28,6 +28,19 @@
         <item>
          <layout class="QVBoxLayout" name="verticalLayout_3">
           <item>
+           <spacer name="verticalSpacer">
+            <property name="orientation">
+             <enum>Qt::Orientation::Vertical</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>40</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
            <widget class="QLabel" name="label_2">
             <property name="text">
              <string>Let's load a NBT file here!</string>
@@ -40,6 +53,19 @@
              <string>&amp;Manage NBT Interface (Test)</string>
             </property>
            </widget>
+          </item>
+          <item>
+           <spacer name="verticalSpacer_2">
+            <property name="orientation">
+             <enum>Qt::Orientation::Vertical</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>40</height>
+             </size>
+            </property>
+           </spacer>
           </item>
          </layout>
         </item>
@@ -154,13 +180,6 @@
        <layout class="QVBoxLayout" name="verticalLayout_5">
         <item>
          <layout class="QVBoxLayout" name="verticalLayout">
-          <item>
-           <widget class="QPushButton" name="configBtn">
-            <property name="text">
-             <string>&amp;Config Setting</string>
-            </property>
-           </widget>
-          </item>
           <item>
            <widget class="QPushButton" name="mmBtn">
             <property name="text">

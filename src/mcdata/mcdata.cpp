@@ -3,8 +3,8 @@
 #include "../csv_parser.h"
 #include "../download_file.h"
 #include "../json_util.h"
-#include <dh_file_util.h>
 #include <dh_string_util.h>
+#include <dh_dl.h>
 #include <future>
 #include <iostream>
 #include <map>

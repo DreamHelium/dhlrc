@@ -1,5 +1,5 @@
 #include "configui.h"
-#include "../json_util.h"
+#include "../../json_util.h"
 #include "dh_file_util.h"
 #include "glibconfig.h"
 #include "ui_configui.h"
@@ -10,8 +10,27 @@
 #include <qpushbutton.h>
 
 static cJSON *configFile = nullptr;
-
+static ConfigUI *configUI = nullptr;
 static QString configFilePath;
+
+static void *
+newWin ()
+{
+    if (!configUI)
+        configUI = new ConfigUI ();
+    return configUI;
+}
+
+void
+init (DhModule *module)
+{
+    module->module_name = g_strdup ("configui-qt");
+    module->module_type = g_strdup ("qt-shortcut");
+    module->module_description = g_strdup ("Configure");
+    module->module_functions = g_ptr_array_new ();
+    g_ptr_array_add (module->module_functions,
+                     reinterpret_cast<gpointer> (newWin));
+}
 
 ConfigUI::ConfigUI (QWidget *parent) : QDialog (parent), ui (new Ui::ConfigUI)
 {

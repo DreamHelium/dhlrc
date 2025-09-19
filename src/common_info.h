@@ -18,7 +18,7 @@
 #ifndef COMMON_INFO_H
 #define COMMON_INFO_H
 
-#include "dh_type.h"
+#include "dhutil/dh_type.h"
 #include <glib.h>
 
 G_BEGIN_DECLS

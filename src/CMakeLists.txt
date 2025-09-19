@@ -66,6 +66,6 @@ add_subdirectory(conv)
 add_subdirectory(mcdata)
 add_subdirectory(unzip)
 
-install(TARGETS dhlrc_conv dhlrc_mcdata dhlrc_qt dhlrc_recipe
-        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}/dhlrc/modules)
+#install(TARGETS dhlrc_conv dhlrc_mcdata dhlrc_qt dhlrc_recipe
+#        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}/dhlrc/modules)
 install(FILES ${CMAKE_BINARY_DIR}/dhlrc_resources DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/dhlrc)
