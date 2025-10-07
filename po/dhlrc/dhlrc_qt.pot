@@ -140,59 +140,6 @@ msgctxt "BlockShowUI|"
 msgid "Modify &Block"
 msgstr ""
 
-#: ../../src/qt/configui.ui:14
-msgctxt "ConfigUI|"
-msgid "Config settings"
-msgstr ""
-
-#: ../../src/qt/configui.ui:29
-msgctxt "ConfigUI|"
-msgid "Cache Directory"
-msgstr ""
-
-#: ../../src/qt/configui.ui:39 ../../src/qt/configui.ui:60
-#: ../../src/qt/configui.ui:81 ../../src/qt/configui.ui:109
-#: ../../src/qt/configui.ui:130 ../../src/qt/configui.ui:151
-#: ../../src/qt/configui.ui:172
-msgctxt "ConfigUI|"
-msgid "Reset"
-msgstr ""
-
-#: ../../src/qt/configui.ui:50
-msgctxt "ConfigUI|"
-msgid "Override Language"
-msgstr ""
-
-#: ../../src/qt/configui.ui:71
-msgctxt "ConfigUI|"
-msgid "Recipe Directory"
-msgstr ""
-
-#: ../../src/qt/configui.ui:92
-msgctxt "ConfigUI|"
-msgid "Translation File"
-msgstr ""
-
-#: ../../src/qt/configui.ui:102
-msgctxt "ConfigUI|"
-msgid "The file used for translating block/item."
-msgstr ""
-
-#: ../../src/qt/configui.ui:120
-msgctxt "ConfigUI|"
-msgid "Game Directory"
-msgstr ""
-
-#: ../../src/qt/configui.ui:141
-msgctxt "ConfigUI|"
-msgid "Override Version"
-msgstr ""
-
-#: ../../src/qt/configui.ui:162
-msgctxt "ConfigUI|"
-msgid "Assets Directory"
-msgstr ""
-
 #: ../../src/qt/mainwindow.ui:14
 msgctxt "MainWindow|"
 msgid "Litematica reader"
@@ -203,117 +150,117 @@ msgctxt "MainWindow|"
 msgid "&NBT"
 msgstr ""
 
-#: ../../src/qt/mainwindow.ui:33
+#: ../../src/qt/mainwindow.ui:46
 msgctxt "MainWindow|"
 msgid "Let's load a NBT file here!"
 msgstr ""
 
-#: ../../src/qt/mainwindow.ui:40
+#: ../../src/qt/mainwindow.ui:53
 msgctxt "MainWindow|"
 msgid "&Manage NBT Interface (Test)"
 msgstr ""
 
-#: ../../src/qt/mainwindow.ui:47
-msgctxt "MainWindow|"
-msgid "You can do things below for the NBT file."
-msgstr ""
-
-#: ../../src/qt/mainwindow.ui:54
-msgctxt "MainWindow|"
-msgid "N&BT Reader"
-msgstr ""
-
-#: ../../src/qt/mainwindow.ui:64
+#: ../../src/qt/mainwindow.ui:76
 msgctxt "MainWindow|"
 msgid "&Region"
 msgstr ""
 
-#: ../../src/qt/mainwindow.ui:72
+#: ../../src/qt/mainwindow.ui:84
 msgctxt "MainWindow|"
 msgid "First, you need to create a Region struct."
 msgstr ""
 
-#: ../../src/qt/mainwindow.ui:79
+#: ../../src/qt/mainwindow.ui:91
 msgctxt "MainWindow|"
 msgid "&Create Region from NBT"
 msgstr ""
 
-#: ../../src/qt/mainwindow.ui:86
+#: ../../src/qt/mainwindow.ui:98
 msgctxt "MainWindow|"
 msgid "Second, you can do lots of things with the Region."
 msgstr ""
 
-#: ../../src/qt/mainwindow.ui:93
+#: ../../src/qt/mainwindow.ui:105
 msgctxt "MainWindow|"
 msgid "&Manage Region"
 msgstr ""
 
-#: ../../src/qt/mainwindow.ui:100
+#: ../../src/qt/mainwindow.ui:112
 msgctxt "MainWindow|"
 msgid "&Save Region to NBT"
 msgstr ""
 
-#: ../../src/qt/mainwindow.ui:107
+#: ../../src/qt/mainwindow.ui:119
 msgctxt "MainWindow|"
 msgid "&Generate item list"
 msgstr ""
 
-#: ../../src/qt/mainwindow.ui:114
+#: ../../src/qt/mainwindow.ui:126
 msgctxt "MainWindow|"
 msgid "M&odify Region"
 msgstr ""
 
-#: ../../src/qt/mainwindow.ui:121
+#: ../../src/qt/mainwindow.ui:133
 msgctxt "MainWindow|"
 msgid "&Block reader"
 msgstr ""
 
-#: ../../src/qt/mainwindow.ui:131
+#: ../../src/qt/mainwindow.ui:143
 msgctxt "MainWindow|"
 msgid "&Item List"
 msgstr ""
 
-#: ../../src/qt/mainwindow.ui:139
+#: ../../src/qt/mainwindow.ui:151
 msgctxt "MainWindow|"
 msgid "I&tem list reader and modifier"
 msgstr ""
 
-#: ../../src/qt/mainwindow.ui:146
+#: ../../src/qt/mainwindow.ui:158
 msgctxt "MainWindow|"
 msgid "R&ecipe combiner"
 msgstr ""
 
-#: ../../src/qt/mainwindow.ui:156
+#: ../../src/qt/mainwindow.ui:168
 msgctxt "MainWindow|"
-msgid "Utility"
-msgstr ""
-
-#: ../../src/qt/mainwindow.ui:164
-msgctxt "MainWindow|"
-msgid "&Config Setting"
-msgstr ""
-
-#: ../../src/qt/mainwindow.ui:171
-msgctxt "MainWindow|"
-msgid "Show Recipe"
+msgid "Shortcuts"
 msgstr ""
 
 #: ../../src/qt/mainwindow.ui:178
 msgctxt "MainWindow|"
+msgid "Utility"
+msgstr ""
+
+#: ../../src/qt/mainwindow.ui:186
+msgctxt "MainWindow|"
+msgid "&Manage Modules"
+msgstr ""
+
+#: ../../src/qt/mainwindow.ui:193
+msgctxt "MainWindow|"
+msgid "&Run Script"
+msgstr ""
+
+#: ../../src/qt/mainwindow.ui:200
+msgctxt "MainWindow|"
+msgid "Show Recipe"
+msgstr ""
+
+#: ../../src/qt/mainwindow.ui:207
+msgctxt "MainWindow|"
 msgid "Block and Translation"
 msgstr ""
 
-#: ../../src/qt/mainwindow.ui:185
+#: ../../src/qt/mainwindow.ui:214
 msgctxt "MainWindow|"
 msgid "Add Translation"
 msgstr ""
 
-#: ../../src/qt/mainwindow.ui:192
+#: ../../src/qt/mainwindow.ui:221
 msgctxt "MainWindow|"
 msgid "&Load Jar File for Resources"
 msgstr ""
 
-#: ../../src/qt/mainwindow.ui:215 ../../src/qt/mainwindow.ui:224
+#: ../../src/qt/mainwindow.ui:244 ../../src/qt/mainwindow.ui:253
 msgctxt "MainWindow|"
 msgid "&About"
 msgstr ""
@@ -351,41 +298,6 @@ msgstr ""
 #: ../../src/qt/manageui.ui:123
 msgctxt "ManageUI|"
 msgid "&Close"
-msgstr ""
-
-#: ../../src/qt/nbtreaderui.ui:14
-msgctxt "NbtReaderUI|"
-msgid "NBT Reader"
-msgstr ""
-
-#: ../../src/qt/nbtreaderui.ui:22
-msgctxt "NbtReaderUI|"
-msgid "Search NBT label"
-msgstr ""
-
-#: ../../src/qt/nbtreaderui.ui:40
-msgctxt "NbtReaderUI|"
-msgid "Type:"
-msgstr ""
-
-#: ../../src/qt/nbtreaderui.ui:58
-msgctxt "NbtReaderUI|"
-msgid "Key:"
-msgstr ""
-
-#: ../../src/qt/nbtreaderui.ui:101
-msgctxt "NbtReaderUI|"
-msgid "Value:"
-msgstr ""
-
-#: ../../src/qt/nbtreaderui.ui:123
-msgctxt "NbtReaderUI|"
-msgid "Modify"
-msgstr ""
-
-#: ../../src/qt/nbtreaderui.ui:130
-msgctxt "NbtReaderUI|"
-msgid "Close"
 msgstr ""
 
 #: ../../src/qt/paletteaddui.ui:14

@@ -586,5 +586,9 @@ extern "C"
                          (gpointer)lite_instance_ptr_new_from_region);
         g_ptr_array_add (module->module_functions,
                          (gpointer)new_schema_instance_ptr_new_from_region);
+        g_ptr_array_add (module->module_functions,
+                         (gpointer)lite_instance_ptr_new_from_region_full);
+        g_ptr_array_add (module->module_functions,
+                         (gpointer)nbt_instance_ptr_new_from_region_full);
     }
 }

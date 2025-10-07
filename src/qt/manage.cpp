@@ -2,6 +2,7 @@
 #include "../common_info.h"
 #include "../feature/dh_module.h"
 #include "../nbt_interface_cpp/nbt_interface.hpp"
+#include "../region.h"
 #include "../translation.h"
 #include "dh_string_util.h"
 #include "dhtableview.h"
@@ -9,12 +10,9 @@
 #include "manageui.h"
 #include "saveregionselectui.h"
 #include "utility.h"
-
 #include <QDebug>
 #include <QFileDialog>
-#include <QInputDialog>
-#include <QMessageBox>
-#include <QProgressDialog>
+#include <generalchoosedialog.h>
 #include <qabstractitemmodel.h>
 #include <qcontainerfwd.h>
 #include <qevent.h>
@@ -77,13 +75,11 @@ update_model (int type, QStandardItemModel *model)
     model->setHorizontalHeaderLabels (list);
 
     for (int i = 0; i < itemList.length (); i++)
-        {
-            model->appendRow (itemList[i]);
-        }
+        model->appendRow (itemList[i]);
 }
 
 static void
-remove_items (int type, const QList<int>& rows, ManageBase *base)
+remove_items (int type, const QList<int> &rows, ManageBase *base)
 {
     if (rows.length ())
         {
@@ -113,7 +109,6 @@ remove_items (int type, const QList<int>& rows, ManageBase *base)
 //     }
 // }
 
-
 ManageBase::ManageBase (QWidget *parent) : ManageUI (parent), mui (this)
 {
     model = new QStandardItemModel ();
@@ -130,18 +125,20 @@ ManageBase::ManageBase (QWidget *parent) : ManageUI (parent), mui (this)
     QObject::connect (mui, &ManageUI::ok, this, &ManageBase::ok_triggered);
     QObject::connect (mui->view, &DhTableView::tableDND, this,
                       &ManageBase::tablednd_triggered);
+    g_mutex_init (&lock);
 }
 
 ManageBase::~ManageBase ()
 {
     dh_info_remove_notifier (type, this);
     delete model;
+    g_mutex_clear (&lock);
 }
 
 void
-ManageBase::deleteItems (const QList<int>& rows)
+ManageBase::deleteItems (const QList<int> &rows)
 {
-    remove_items(type, rows, this);
+    remove_items (type, rows, this);
 }
 
 void
@@ -149,7 +146,6 @@ ManageBase::updateModel ()
 {
     update_model (type, model);
 }
-
 
 ManageRegion::ManageRegion ()
 {
@@ -230,32 +226,178 @@ ManageNbtInterface::add_triggered ()
 void
 ManageNbtInterface::save_triggered (QList<int> rows)
 {
+    auto save_option = [] (int ret, const char *uuid, const QString &filepos) {
+        if (dh_info_reader_trylock (DH_TYPE_NBT_INTERFACE_CPP, uuid))
+            {
+                auto instance = static_cast<DhNbtInstance *> (
+                    dh_info_get_data (DH_TYPE_NBT_INTERFACE_CPP, uuid));
+                DhModule *conv_module = dh_search_inited_module ("conv");
+                QList<Region *> regions;
+                if (lite_region_num_instance (instance))
+                    {
+                        for (int i = 0;
+                             i < lite_region_num_instance (instance); i++)
+                            {
+                                auto lr
+                                    = lite_region_create_from_root_instance_cpp (
+                                        *instance, i);
+                                regions << region_new_from_lite_region (lr);
+                            }
+                    }
+                else
+                    regions << region_new_from_nbt_instance_ptr (instance);
+                typedef void *(*trFunc) (Region *, gboolean);
+                switch (ret)
+                    {
+                    case 0:
+                        instance->save_to_file (filepos.toUtf8 ());
+                        break;
+                    case 1:
+                        if (conv_module)
+                            {
+                                trFunc func = reinterpret_cast<trFunc> (
+                                    conv_module->module_functions->pdata[1]);
+                                for (auto region : regions)
+                                    {
+                                        auto temp
+                                            = static_cast<DhNbtInstance *> (
+                                                func (region, false));
+                                        QString realFile;
+                                        if (regions.length () == 1)
+                                            realFile = filepos + ".nbt";
+                                        else
+                                            realFile
+                                                = filepos + "_"
+                                                  + region->data->description
+                                                  + ".nbt";
+                                        temp->save_to_file (
+                                            realFile.toUtf8 ());
+                                        delete temp;
+                                    }
+                            }
+                        break;
+                    case 2:
+                        if (conv_module)
+                            {
+                                typedef void *(*s_trFunc) (Region *, gboolean,
+                                                           gboolean);
+                                s_trFunc func = reinterpret_cast<s_trFunc> (
+                                    conv_module->module_functions->pdata[5]);
+
+                                for (auto region : regions)
+                                    {
+                                        auto temp
+                                            = static_cast<DhNbtInstance *> (
+                                                func (region, false, true));
+                                        QString realFile;
+                                        if (regions.length () == 1)
+                                            realFile = filepos + ".nbt";
+                                        else
+                                            realFile
+                                                = filepos + "_"
+                                                  + region->data->description
+                                                  + ".nbt";
+                                        temp->save_to_file (
+                                            realFile.toUtf8 ());
+                                        delete temp;
+                                    }
+                            }
+                        break;
+                    case 3:
+                        if (conv_module)
+                            {
+                                typedef void *(*ss_trFunc) (Region *, gboolean,
+                                                            int);
+                                ss_trFunc func = reinterpret_cast<ss_trFunc> (
+                                    conv_module->module_functions->pdata[4]);
+
+                                for (auto region : regions)
+                                    {
+                                        auto temp
+                                            = static_cast<DhNbtInstance *> (
+                                                func (region, false, 5));
+                                        QString realFile;
+                                        if (regions.length () == 1)
+                                            realFile = filepos + ".litematic";
+                                        else
+                                            realFile
+                                                = filepos + "_"
+                                                  + region->data->description
+                                                  + ".litematic";
+                                        temp->save_to_file (
+                                            realFile.toUtf8 ());
+                                        delete temp;
+                                    }
+                            }
+                        break;
+                    case 4:
+                        if (conv_module)
+                            {
+                                trFunc func = reinterpret_cast<trFunc> (
+                                    conv_module->module_functions->pdata[3]);
+                                for (auto region : regions)
+                                    {
+                                        auto temp
+                                            = static_cast<DhNbtInstance *> (
+                                                func (region, false));
+                                        QString realFile;
+                                        if (regions.length () == 1)
+                                            realFile = filepos + ".schem";
+                                        else
+                                            realFile
+                                                = filepos + "_"
+                                                  + region->data->description
+                                                  + ".schem";
+                                        temp->save_to_file (
+                                            realFile.toUtf8 ());
+                                        delete temp;
+                                    }
+                            }
+                        break;
+                    default:
+                        break;
+                    }
+            }
+    };
+
     if (!rows.empty ())
         {
-            if (rows.length () == 1)
+            auto ret = GeneralChooseDialog::getIndex (
+                _ ("Select an option"), _ ("Please select an option."), this,
+                _ ("Save as original NBT."), _ ("Convert to NBT struct."),
+                _ ("Convert to NBT struct (ignore air)."),
+                _ ("Convert to litematic."), _ ("Convert to new schematics."));
+
+            QList<int> lockedRows;
+            for (auto row : rows)
+                {
+                    auto uuidlist
+                        = dh_info_get_all_uuid (DH_TYPE_NBT_INTERFACE_CPP);
+                    auto uuid = uuidlist->val[row];
+                    if (dh_info_reader_trylock (DH_TYPE_NBT_INTERFACE_CPP,
+                                                uuid))
+                        dh_info_reader_unlock (DH_TYPE_NBT_INTERFACE_CPP,
+                                               uuid);
+                    else
+                        lockedRows << row;
+                }
+
+            if (!lockedRows.isEmpty ())
+                QMessageBox::warning (
+                    this, _ ("Warning!"),
+                    _ ("Some items are locked, which will be ignored."));
+
+            if (rows.length () == 1 && lockedRows.isEmpty ())
                 {
                     auto row = rows[0];
                     QString filepos
                         = QFileDialog::getSaveFileName (mui, _ ("Save File"));
                     if (!filepos.isEmpty ())
                         {
-                            auto uuidlist
-                                = dh_info_get_uuid (DH_TYPE_NBT_INTERFACE_CPP);
+                            auto uuidlist = dh_info_get_all_uuid (
+                                DH_TYPE_NBT_INTERFACE_CPP);
                             auto uuid = uuidlist->val[row];
-                            if (dh_info_reader_trylock (
-                                    DH_TYPE_NBT_INTERFACE_CPP, uuid))
-                                {
-                                    auto instance
-                                        = (DhNbtInstance *)dh_info_get_data (
-                                            DH_TYPE_NBT_INTERFACE_CPP, uuid);
-                                    instance->save_to_file (filepos.toUtf8 ());
-                                    dh_info_reader_unlock (
-                                        DH_TYPE_NBT_INTERFACE_CPP, uuid);
-                                }
-                            else
-                                QMessageBox::critical (
-                                    mui, _ ("Info Locked!"),
-                                    _ ("The NBT info is locked!"));
+                            save_option (ret, uuid, filepos);
                         }
                 }
             else
@@ -263,48 +405,27 @@ ManageNbtInterface::save_triggered (QList<int> rows)
                     auto dir = QFileDialog::getExistingDirectory (
                         mui, _ ("Save Files"));
                     if (!dir.isEmpty ())
-                        {
-                            QStringList lockedInfo;
-                            for (auto row : rows)
-                                {
-                                    auto uuidlist = dh_info_get_uuid (
-                                        DH_TYPE_NBT_INTERFACE_CPP);
-                                    auto uuid = uuidlist->val[row];
-                                    auto description
-                                        = dh_info_get_description (
-                                            DH_TYPE_NBT_INTERFACE_CPP, uuid);
-                                    QString filepos = (dir + G_DIR_SEPARATOR
-                                                       + description);
-                                    if (dh_info_reader_trylock (
-                                            DH_TYPE_NBT_INTERFACE_CPP, uuid))
-                                        {
-                                            auto instance = (DhNbtInstance *)
-                                                dh_info_get_data (
-                                                    DH_TYPE_NBT_INTERFACE_CPP,
-                                                    uuid);
-                                            qDebug ()
-                                                << instance->save_to_file (
-                                                       filepos.toUtf8 ());
-                                            dh_info_reader_unlock (
+                        for (auto row : rows)
+                            {
+                                bool repeated = false;
+                                for (auto lockedRow : lockedRows)
+                                    if (row == lockedRow)
+                                        repeated = true;
+                                if (!repeated)
+                                    {
+                                        auto uuidlist = dh_info_get_all_uuid (
+                                            DH_TYPE_NBT_INTERFACE_CPP);
+                                        auto uuid = uuidlist->val[row];
+                                        auto description
+                                            = dh_info_get_description (
                                                 DH_TYPE_NBT_INTERFACE_CPP,
                                                 uuid);
-                                        }
-                                    else
-                                        lockedInfo << description;
-                                }
-                            if (!lockedInfo.empty ())
-                                {
-                                    QString lockedInfoStr = _ (
-                                        "The following infos are locked:\n");
-                                    for (const auto &str : lockedInfo)
-                                        {
-                                            lockedInfoStr += str;
-                                            lockedInfoStr += '\n';
-                                        }
-                                    QMessageBox::critical (mui, _ ("Error!"),
-                                                           lockedInfoStr);
-                                }
-                        }
+                                        QString filepos
+                                            = (dir + G_DIR_SEPARATOR
+                                               + description);
+                                        save_option (ret, uuid, filepos);
+                                    }
+                            }
                 }
         }
     else

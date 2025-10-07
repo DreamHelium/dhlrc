@@ -27,11 +27,13 @@ G_BEGIN_DECLS
 #define DH_TYPE_ITEM_LIST dh_item_list_get_type ()
 #define DH_TYPE_NBT_INTERFACE_CPP dh_nbt_interface_cpp_get_type ()
 #define DH_TYPE_MODULE dh_module_get_type ()
+#define DH_TYPE_FUNC dh_func_get_type ()
 
 DH_GET_TYPE (dh, region)
 DH_GET_TYPE (dh, item_list)
 DH_GET_TYPE (dh, nbt_interface_cpp)
 DH_GET_TYPE (dh, module)
+DH_GET_TYPE (dh, func)
 
 G_END_DECLS
 

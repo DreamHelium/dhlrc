@@ -30,7 +30,7 @@
 #include "glibconfig.h"
 #include "gmodule.h"
 #include "translation.h"
-
+#include "script.h"
 #include <dh_type.h>
 
 #ifdef G_OS_WIN32
@@ -80,6 +80,8 @@ dhlrc_run (int argc, char **argv)
 {
     if (!g_module_supported ())
         g_error ("The program is not supported!\n");
+    dhlrc_script_register_functions ();
+
     char *prpath = dh_file_get_current_program_dir (argv[0]);
     dh_search_module (prpath);
     g_free (prpath);

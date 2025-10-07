@@ -30,10 +30,7 @@
 #include <iostream>
 #include <ostream>
 
-/* TODO and maybe never do, since property can be too much */
-const char *property[] = { N_ ("waterlogged"), N_ ("facing") };
-const char *data[] = { N_ ("true"), N_ ("false"), N_ ("south"),
-                       N_ ("east"), N_ ("north"), N_ ("west") };
+/* TODO: Region convertion progress */
 
 static void palette_free (gpointer mem);
 static void base_data_free (gpointer mem);
@@ -671,7 +668,10 @@ Region *
 region_new_from_nbt_instance_ptr (void *instance_ptr)
 {
     auto instance = *(DhNbtInstance *)instance_ptr;
-    return region_new_from_nbt_instance (instance);
+    if (file_is_new_schem (instance_ptr))
+        return region_new_from_new_schem (instance_ptr);
+    else
+        return region_new_from_nbt_instance (instance);
 }
 
 ItemList *
@@ -854,7 +854,8 @@ region_get_block_entity (Region *region, int x, int y, int z)
 {
     for (int i = 0; i < region->block_entity_array->len; i++)
         {
-            BlockEntity* be = (BlockEntity*)region->block_entity_array->pdata[i];
+            BlockEntity *be
+                = (BlockEntity *)region->block_entity_array->pdata[i];
             if (be->pos->x == x && be->pos->y == y && be->pos->z == z)
                 return be;
         }

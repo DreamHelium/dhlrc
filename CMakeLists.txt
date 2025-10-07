@@ -17,6 +17,7 @@ pkg_search_module(GIO REQUIRED gio-2.0)
 pkg_search_module(gm REQUIRED gmodule-2.0)
 pkg_search_module(UTIL dhutil)
 pkg_search_module(INTERFACE dhnbt_interface_cpp)
+pkg_search_module(LUA REQUIRED lua)
 
 set(DH_ENABLE_TRANSLATION true)
 

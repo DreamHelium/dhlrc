@@ -1,7 +1,9 @@
 #include "mainwindow.h"
 #include "../common_info.h"
 #include "../feature/conv_feature.h"
+#include "../global_variant.h"
 #include "../region.h"
+#include "../script.h"
 #include "../translation.h"
 #include "blockreaderui.h"
 #include "dh_file_util.h"
@@ -17,6 +19,11 @@
 #include <QFileDialog>
 #include <addtranslationui.h>
 #include <generalchooseui.h>
+G_BEGIN_DECLS
+#include <lauxlib.h>
+#include <lua.h>
+#include <lualib.h>
+G_END_DECLS
 #include <qdialog.h>
 #include <qevent.h>
 #include <qinputdialog.h>
@@ -102,6 +109,21 @@ MainWindow::initSignalSlots ()
         mm->activateWindow ();
         mm->raise ();
         connect (this, &MainWindow::winClose, mm, &dh::ManageModule::close);
+    });
+    QObject::connect (ui->scriptBtn, &QPushButton::clicked, this, [&] {
+        auto filename = QFileDialog::getOpenFileName (
+            this, _ ("Load File"), nullptr, _ ("Lua Script File (*.lua)"));
+        if (filename.isEmpty ())
+            {
+                QMessageBox::warning (this, _ ("Error!"),
+                                      _ ("No file selected."));
+                return;
+            }
+        lua_State *L = luaL_newstate ();
+        luaL_openlibs (L);
+        dhlrc_script_load_functions (L);
+        luaL_dofile (L, filename.toUtf8 ());
+        lua_close (L);
     });
 }
 
@@ -308,8 +330,7 @@ MainWindow::recipeBtn_clicked ()
 void
 MainWindow::showabout ()
 {
-    QString str = _ ("Version: ") + QString (DHLRC_VERSION) + '-'
-                  + QString::number (DHLRC_COMPILE_DATE);
+    QString str = _ ("Version: ") + QString::number (DHLRC_COMPILE_DATE);
     QMessageBox::about (this, _ ("About Litematica Reader"), str);
 }
 

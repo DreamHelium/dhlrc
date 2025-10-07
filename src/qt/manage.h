@@ -31,12 +31,17 @@ class ManageBase : public ManageUI
     virtual void
     refresh_triggered ()
     {
-        updateModel ();
-        ManageUI::updateModel (model);
+        if (g_mutex_trylock (&lock))
+            {
+                updateModel ();
+                ManageUI::updateModel (model);
+                g_mutex_unlock (&lock);
+            }
     }
 
   private:
     bool inited = false;
+    GMutex lock;
     static auto
     update_base_model (void *main_class)
     {

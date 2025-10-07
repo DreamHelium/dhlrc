@@ -20,6 +20,7 @@
 #include "config.h"
 #include "dh_file_util.h"
 #include "feature/recipe_feature.h"
+#include "global_variant.h"
 #include "recipe_util.h"
 #include "translation.h"
 
@@ -85,6 +86,7 @@ dhlrc_init (const char *prname)
 #endif
     dhlrc_recipe_init (recipes_module_path);
     g_free (recipes_module_path);
+    dhlrc_global_variant_init ();
     inited = TRUE;
 }
 
@@ -102,6 +104,7 @@ dhlrc_cleanup ()
     dhlrc_cleanup_manifest ();
     dh_exit1 ();
     dh_type_free ();
+    dhlrc_global_variant_clear ();
 }
 
 void

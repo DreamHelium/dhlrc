@@ -21,6 +21,7 @@ add_library(dhlrc SHARED
         dh_bit.c dh_bit.h
         litematica_region.cpp litematica_region.h
         region.cpp region.h
+        process_state.c process_state.h
 )
 
 add_library(dhlrc_ext SHARED
@@ -29,27 +30,29 @@ add_library(dhlrc_ext SHARED
         dhlrc_list.h dhlrc_list.c
         recipe_util.h recipe_util.c
         config.c config.h
-        process_state.c process_state.h
         csv_parser.c csv_parser.h
         json_util.c json_util.h
         translation.h translation.c
         download_file.h download_file.c
+        feature/dh_module.c feature/dh_module.h
+        script.cpp
+        script.h
+        global_variant.c
+        global_variant.h
 )
 
 add_subdirectory(feature)
 
-target_link_libraries(dhlrc PUBLIC
-        dhutil_string
-        dhnbt_interface_cpp)
+target_link_libraries(dhlrc PUBLIC dhutil_string dhnbt_interface_cpp)
 
 target_include_directories(dhlrc PUBLIC "${GIO_INCLUDE_DIRS}" dhutil)
 
-target_link_libraries(dhlrc_ext PUBLIC dhutil_file dhutil_type cjson dhlrc_feature)
-target_include_directories(dhlrc_ext PUBLIC ${GIO_INCLUDE_DIRS} dhutil)
+target_link_libraries(dhlrc_ext PUBLIC dhutil_file dhutil_type cjson gmodule-2.0 ${LUA_LIBRARIES})
+target_include_directories(dhlrc_ext PUBLIC ${GIO_INCLUDE_DIRS} dhutil ${LUA_INCLUDE_DIRS})
 
 add_executable(dhlrc.bin main.c)
 
-target_link_libraries(dhlrc.bin PUBLIC dhlrc dhlrc_ext)
+target_link_libraries(dhlrc.bin PUBLIC dhlrc dhlrc_ext dhlrc_feature)
 
 install(TARGETS dhlrc.bin
         BUNDLE DESTINATION .

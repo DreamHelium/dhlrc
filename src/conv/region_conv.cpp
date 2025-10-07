@@ -1,6 +1,11 @@
 #include "../dh_bit.h"
+#include "../global_variant.h"
 #include "../nbt_interface_cpp/nbt_interface.hpp"
 #include "../region.h"
+
+/* TODO: Better support for Litematica Region convertion.
+ *
+ * */
 
 static DhNbtInstance
 size_nbt_instance_new (Pos *pos, const char *key)
@@ -17,9 +22,36 @@ size_nbt_instance_new (Pos *pos, const char *key)
     return ret;
 }
 
-static DhNbtInstance
-blocks_nbt_instance_new (Region *region)
+static gboolean
+find_same_block (const GPtrArray *arr, const char *name)
 {
+    for (int i = 0; i < arr->len; i++)
+        {
+            if (g_str_equal (name, arr->pdata[i]))
+                return TRUE;
+        }
+    return FALSE;
+}
+
+static DhNbtInstance
+blocks_nbt_instance_new (Region *region, gboolean ignore_air)
+{
+    auto size_change = [region] (int &x, int &y, int &z) {
+        if (x < region->region_size->x - 1)
+            x++;
+        else if (z < region->region_size->z - 1)
+            {
+                x = 0;
+                z++;
+            }
+        else if (y < region->region_size->y - 1)
+            {
+                x = 0;
+                z = 0;
+                y++;
+            }
+    };
+
     int len = region->region_size->x * region->region_size->y
               * region->region_size->z;
     DhNbtInstance ret (DH_TYPE_List, "blocks", true);
@@ -28,16 +60,24 @@ blocks_nbt_instance_new (Region *region)
     int z = 0;
     for (int i = 0; i < len; i++)
         {
+            const char *name = region_get_id_name (region, i);
+            if (ignore_air
+                && find_same_block (dhlrc_get_ignore_air_list (), name))
+                {
+                    size_change (x, y, z);
+                    continue;
+                }
+
             Pos *pos_pos = new Pos{ x, y, z };
             DhNbtInstance cur (DH_TYPE_Compound, nullptr, true);
             DhNbtInstance nbt{};
 
             for (int j = 0; j < region->block_entity_array->len; j++)
                 {
-                    BlockEntity *be
-                        = (BlockEntity *)region->block_entity_array->pdata[j];
+                    auto be = static_cast<BlockEntity *> (
+                        region->block_entity_array->pdata[j]);
                     if (be->pos->x == x && be->pos->y == y && be->pos->z == z)
-                        nbt = ((DhNbtInstance *)(be->nbt_instance))
+                        nbt = static_cast<DhNbtInstance *> (be->nbt_instance)
                                   ->dup_current_as_original (true);
                 }
 
@@ -54,19 +94,7 @@ blocks_nbt_instance_new (Region *region)
 
             /* before is too slow */
             ret.insert_after ({}, cur);
-            if (x < region->region_size->x - 1)
-                x++;
-            else if (z < region->region_size->z - 1)
-                {
-                    x = 0;
-                    z++;
-                }
-            else if (y < region->region_size->y - 1)
-                {
-                    x = 0;
-                    z = 0;
-                    y++;
-                }
+            size_change (x, y, z);
         }
     return ret;
 }
@@ -335,9 +363,9 @@ new_schema_fill_non_compound (DhNbtInstance &instance, Region *region)
 
 extern "C"
 {
-
     void *
-    nbt_instance_ptr_new_from_region (Region *region, gboolean temp_root)
+    nbt_instance_ptr_new_from_region_full (Region *region, gboolean temp_root,
+                                           gboolean ignore_air)
     {
         DhNbtInstance ret (DH_TYPE_Compound, NULL, temp_root);
         /* First is size */
@@ -349,7 +377,7 @@ extern "C"
         ret.insert_before ({}, entities_nbt);
         /* Third is blocks */
         DhNbtInstance blocks_nbt
-            = blocks_nbt_instance_new (region);
+            = blocks_nbt_instance_new (region, ignore_air);
         ret.insert_before ({}, blocks_nbt);
         /* Fourth is palette */
         DhNbtInstance palette_nbt
@@ -363,15 +391,23 @@ extern "C"
     }
 
     void *
-    lite_instance_ptr_new_from_region (Region *region, gboolean temp_root)
+    nbt_instance_ptr_new_from_region (Region *region, gboolean temp_root)
+    {
+        return nbt_instance_ptr_new_from_region_full (region, temp_root,
+                                                      FALSE);
+    }
+
+    void *
+    lite_instance_ptr_new_from_region_full (Region *region, gboolean temp_root,
+                                            int lite_version)
     {
         DhNbtInstance ret (DH_TYPE_Compound, nullptr, temp_root);
         /* First is DataVersion */
         DhNbtInstance data_version_nbt (region->data_version,
                                         "MinecraftDataVersion", true);
         ret.insert_before ({}, data_version_nbt);
-        /* Second is Version, default to 5 */
-        DhNbtInstance version_nbt ((gint32)5, "Version", true);
+        /* Second is Version */
+        DhNbtInstance version_nbt ((gint32)lite_version, "Version", true);
         ret.insert_before ({}, version_nbt);
         /* Third is metadata */
         DhNbtInstance metadata_nbt = lite_metadata_new (region);
@@ -380,6 +416,12 @@ extern "C"
         DhNbtInstance regions = lite_regions_new (region);
         ret.insert_before ({}, regions);
         return new DhNbtInstance (ret);
+    }
+
+    void *
+    lite_instance_ptr_new_from_region (Region *region, gboolean temp_root)
+    {
+        return lite_instance_ptr_new_from_region_full (region, temp_root, 5);
     }
 
     void *

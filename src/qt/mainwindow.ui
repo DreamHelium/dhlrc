@@ -188,6 +188,13 @@
            </widget>
           </item>
           <item>
+           <widget class="QPushButton" name="scriptBtn">
+            <property name="text">
+             <string>&amp;Run Script</string>
+            </property>
+           </widget>
+          </item>
+          <item>
            <widget class="QPushButton" name="recipeBtn">
             <property name="text">
              <string>Show Recipe</string>

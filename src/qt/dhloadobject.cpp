@@ -8,7 +8,6 @@ DhLoadObject::DhLoadObject (GTaskThreadFunc threadFunc,
       progressDialog (new QProgressDialog), threadFunc (threadFunc),
       readyCallback (readyCallback), data (taskData), freeFunc (freeFunc)
 {
-    progressDialog->reset ();
     progressDialog->setWindowTitle (_("Loading..."));
     auto cancelFunc = [&] { g_cancellable_cancel (cancellable); };
     connect (progressDialog, &QProgressDialog::canceled, this, cancelFunc);
@@ -30,7 +29,6 @@ DhLoadObject::load (const QString &label)
     g_task_set_check_cancellable (task, false);
     g_task_set_task_data (task, data, freeFunc);
     g_task_run_in_thread (task, threadFunc);
-    progressDialog->show ();
     g_object_unref (task);
 }
 

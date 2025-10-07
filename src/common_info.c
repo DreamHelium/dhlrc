@@ -26,3 +26,4 @@ DH_TYPE_REGISTER_GET_FUNC (DhItemList, dh, item_list, item_list_free)
 DH_TYPE_REGISTER_GET_FUNC (DhNbtInterfaceCpp, dh, nbt_interface_cpp,
                            dh_nbt_instance_cpp_free)
 DH_TYPE_REGISTER_GET_FUNC (DhModule, dh, module, dh_module_free)
+DH_TYPE_REGISTER_GET_FUNC (DhFunc, dh, func, NULL)
