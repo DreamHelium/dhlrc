@@ -75,6 +75,18 @@ debug (int argc, char **argv)
 //     return ret;
 // }
 
+static GList *
+dh_module_file_list_create (const char *path)
+{
+    GList *list = NULL;
+    GDir *dir = g_dir_open (path, 0, NULL);
+    const char *filename = NULL;
+    while ((filename = g_dir_read_name (dir)) != NULL)
+        list = g_list_append (list, g_strdup (filename));
+    g_dir_close (dir);
+    return list;
+}
+
 static gint
 dhlrc_run (int argc, char **argv)
 {
@@ -83,6 +95,34 @@ dhlrc_run (int argc, char **argv)
     dhlrc_script_register_functions ();
 
     char *prpath = dh_file_get_current_program_dir (argv[0]);
+
+    const char *original_path = g_getenv (LINK_PATH);
+    /* Add lib dirs to LINK_PATH */
+    char *lib_dir = g_strconcat (prpath, G_DIR_SEPARATOR_S, "lib", NULL);
+    GList *list = dh_module_file_list_create (lib_dir);
+    GList *list_p = list;
+
+    char *path = g_strdup (original_path);
+    for ( ; list ; list = list->next )
+        {
+            char *real_path = g_strconcat (lib_dir, G_DIR_SEPARATOR_S, list->data, NULL);
+            char *new_path = g_strconcat(path, MIDD_SEP, real_path, NULL);
+            g_free(path);
+            g_free(real_path);
+            path = new_path;
+        }
+    g_list_free_full (list_p, g_free);
+    g_free (lib_dir);
+    /* Add module dir to LINK_PATH */
+    char *module_dir = g_strconcat (prpath, G_DIR_SEPARATOR_S, "module", NULL);
+    char *new_path = g_strconcat (path, MIDD_SEP, module_dir, NULL);
+    g_free (module_dir);
+    g_free (path);
+    path = new_path;
+
+    g_setenv (LINK_PATH, path, TRUE);
+    g_free (path);
+
     dh_search_module (prpath);
     g_free (prpath);
 
@@ -189,9 +229,15 @@ dhlrc_run (int argc, char **argv)
 int
 main (int argc, char **argb)
 {
+#ifdef G_OS_WIN32
+    argb = g_win32_get_command_line ();
+#else
+    argb = g_strdupv (argb);
+#endif
     int ret = dhlrc_run (argc, argb);
     if (dhlrc_is_inited ())
         dhlrc_cleanup ();
+    g_strfreev (argb);
 
     return ret;
 }

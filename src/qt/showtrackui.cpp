@@ -2,6 +2,7 @@
 #include "../translation.h"
 #include <qboxlayout.h>
 #include <qlabel.h>
+#undef asprintf
 
 ShowTrackUI::ShowTrackUI(IListData* data, QWidget* parent):
     QWidget(parent)

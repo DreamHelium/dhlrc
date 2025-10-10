@@ -86,7 +86,7 @@ endif ()
 
 target_link_libraries(dhlrc_qt PRIVATE Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::Svg)
 
-target_link_libraries(dhlrc_qt PUBLIC dhlrc dhlrc_ext)
+target_link_libraries(dhlrc_qt PUBLIC dhlrc)
 
 target_include_directories(dhlrc_qt PUBLIC
         "${PROJECT_BINARY_DIR}" "${GIO_INCLUDE_DIRS}" "${dhutil_INCLUDE_DIRS}"

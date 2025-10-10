@@ -22,9 +22,6 @@ add_library(dhlrc SHARED
         litematica_region.cpp litematica_region.h
         region.cpp region.h
         process_state.c process_state.h
-)
-
-add_library(dhlrc_ext SHARED
         common_info.c common_info.h
         common.c common.h
         dhlrc_list.h dhlrc_list.c
@@ -35,30 +32,29 @@ add_library(dhlrc_ext SHARED
         translation.h translation.c
         download_file.h download_file.c
         feature/dh_module.c feature/dh_module.h
+        feature/conv_feature.c feature/conv_feature.h
+        feature/mcdata_feature.c feature/mcdata_feature.h
+        feature/recipe_feature.c feature/recipe_feature.h
+        feature/unzip_feature.c feature/unzip_feature.h
         script.cpp
         script.h
         global_variant.c
         global_variant.h
 )
 
-add_subdirectory(feature)
-
-target_link_libraries(dhlrc PUBLIC dhutil_string dhnbt_interface_cpp)
+target_link_libraries(dhlrc PUBLIC dhutil_string dhnbt_interface_cpp ${gm_LIBRARIES} dhutil_type dhutil_file cjson ${LUA_LIBRARIES})
 
 target_include_directories(dhlrc PUBLIC "${GIO_INCLUDE_DIRS}" dhutil)
 
-target_link_libraries(dhlrc_ext PUBLIC dhutil_file dhutil_type cjson gmodule-2.0 ${LUA_LIBRARIES})
-target_include_directories(dhlrc_ext PUBLIC ${GIO_INCLUDE_DIRS} dhutil ${LUA_INCLUDE_DIRS})
-
 add_executable(dhlrc.bin main.c)
 
-target_link_libraries(dhlrc.bin PUBLIC dhlrc dhlrc_ext dhlrc_feature)
+target_link_libraries(dhlrc.bin PUBLIC dhlrc)
 
 install(TARGETS dhlrc.bin
         BUNDLE DESTINATION .
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
 
-install(TARGETS dhlrc dhlrc_ext dhlrc_feature
+install(TARGETS dhlrc
         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
 )
 

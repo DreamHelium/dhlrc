@@ -9,4 +9,4 @@ set(SOURCES main_conv.cpp
 set(HEADERS main_conv.h)
 
 add_library(dhlrc_conv SHARED ${SOURCES} ${HEADERS})
-target_link_libraries(dhlrc_conv PUBLIC dhlrc dhutil_cli dhlrc_ext)
+target_link_libraries(dhlrc_conv PUBLIC dhlrc dhutil_cli)
