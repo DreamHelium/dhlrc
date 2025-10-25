@@ -28,7 +28,7 @@
 #include "process_state.h"
 
 #include <iostream>
-#include <ostream>
+#include <list>
 
 /* TODO: Region convertion progress */
 
@@ -323,8 +323,11 @@ new_schem_get_palette (Region *region, DhNbtInstance instance)
 }
 
 static void
-new_schem_get_block_array (Region *region, const DhNbtInstance &instance)
+new_schem_get_block_array (Region *region, const DhNbtInstance &instance,
+                           DhProgressFullSet func, void *main_klass,
+                           GCancellable *cancellable)
 {
+    clock_t start = clock ();
     /* Get array first */
     int len = 0;
     DhNbtInstance instance_dup (instance);
@@ -337,6 +340,20 @@ new_schem_get_block_array (Region *region, const DhNbtInstance &instance)
     DhBit *bits = dh_bit_new ();
     for (int i = 0; i < len; i++)
         {
+            if (g_cancellable_is_cancelled (cancellable))
+                {
+                    dh_bit_free (bits);
+                    return;
+                }
+            if (func && main_klass)
+                {
+                    int passed_ms
+                        = 1000.0f * (clock () - start) / CLOCKS_PER_SEC;
+                    if (passed_ms % 500 == 0 || (i + 1) == len)
+                        func (main_klass, (i + 1) * 100 / len,
+                              _ ("Parsing blocks."));
+                }
+
             int palette = arr[i];
             if (palette == 0)
                 palette = region->air_palette;
@@ -386,8 +403,10 @@ new_schem_get_block_entity_array (Region *region,
         }
 }
 
-Region *
-region_new_from_new_schem (void *instance_ptr)
+static Region *
+region_new_from_new_schem_internal (void *instance_ptr, DhProgressFullSet func,
+                                    void *main_klass,
+                                    GCancellable *cancellable)
 {
     if (!file_is_new_schem (instance_ptr))
         return nullptr;
@@ -408,11 +427,24 @@ region_new_from_new_schem (void *instance_ptr)
             /* Fill Palette */
             new_schem_get_palette (region, instance_dup);
             /* Fill BlockArray */
-            new_schem_get_block_array (region, instance_dup);
+            new_schem_get_block_array (region, instance_dup, func, main_klass,
+                                       cancellable);
             /* Fill BlockEntityArray */
             new_schem_get_block_entity_array (region, instance_dup);
+            if (g_cancellable_is_cancelled (cancellable))
+                {
+                    region_free (region);
+                    return nullptr;
+                }
             return region;
         }
+}
+
+Region *
+region_new_from_new_schem (void *instance_ptr)
+{
+    return region_new_from_new_schem_internal (instance_ptr, nullptr, nullptr,
+                                               nullptr);
 }
 
 static BlockEntityArray *
@@ -520,8 +552,22 @@ base_data_free (gpointer mem)
 
 static gint64 *
 get_block_array_from_nbt_instance (const DhNbtInstance &instance,
-                                   Region *region, int *len)
+                                   Region *region, int *len,
+                                   DhProgressFullSet func, void *main_klass,
+                                   GCancellable *cancellable)
 {
+    typedef struct tempStruct
+    {
+        int index;
+        int palette;
+    } tempStruct;
+
+    auto cmp = [] (const tempStruct &a, const tempStruct &b) {
+        /* a's index is less than b. */
+        if (a.index < b.index)
+            return true;
+        return false;
+    };
     DhNbtInstance nbt_instance (instance);
     nbt_instance.child ("blocks");
     nbt_instance.child ();
@@ -530,41 +576,68 @@ get_block_array_from_nbt_instance (const DhNbtInstance &instance,
     int region_size = region->region_size->x * region->region_size->y
                       * region->region_size->z;
     DhBit *bits = dh_bit_new ();
+    clock_t start_time = clock ();
+    std::list<tempStruct> blocks;
+    DhNbtInstance block (nbt_instance);
+    /* Push back the struct into list */
+    for (; block (); block.next ())
+        {
+            tempStruct st;
+            auto pos_instance (block);
+            pos_instance.child ("pos");
+            pos_instance.child ();
+            int x = pos_instance.get_int ();
+            pos_instance.next ();
+            int y = pos_instance.get_int ();
+            pos_instance.next ();
+            int z = pos_instance.get_int ();
+            int index = region_get_index (region, x, y, z);
+            st.index = index;
+
+            auto palette (block);
+            palette.child ("state");
+            int palette_num = palette.get_int ();
+            /* Switch the air palette with the air-palette */
+            if (palette_num == region->air_palette)
+                palette_num = 0;
+            else if (palette_num == 0)
+                palette_num = region->air_palette;
+            st.palette = palette_num;
+            blocks.emplace_back (st);
+        }
+    if (func && main_klass)
+        func (main_klass, 0, _ ("Sorting"));
+    blocks.sort (cmp);
+
     for (int i = 0; i < region_size; i++)
         {
-            DhNbtInstance block (nbt_instance);
-            bool added = false;
-            for (; block (); block.next ())
+            if (g_cancellable_is_cancelled (cancellable))
                 {
-                    auto pos_instance (block);
-                    pos_instance.child ("pos");
-                    pos_instance.child ();
-                    int x = pos_instance.get_int ();
-                    pos_instance.next ();
-                    int y = pos_instance.get_int ();
-                    pos_instance.next ();
-                    int z = pos_instance.get_int ();
-                    int index = region_get_index (region, x, y, z);
-                    if (i == index)
+                    dh_bit_free (bits);
+                    return nullptr;
+                }
+            if (func && main_klass)
+                {
+                    int passed_ms
+                        = 1000.0f * (clock () - start_time) / CLOCKS_PER_SEC;
+                    if (passed_ms % 500 == 0 || (i + 1) == region_size)
                         {
-                            added = true;
-                            auto palette (block);
-                            palette.child ("state");
-                            int palette_num = palette.get_int ();
-                            /* Switch the air palette with the air-palette */
-                            if (palette_num == region->air_palette)
-                                palette_num = 0;
-                            else if (palette_num == 0)
-                                palette_num = region->air_palette;
-                            dh_bit_push_back_val (bits, move_bits,
-                                                  palette_num);
-                            break;
+                            char *str = g_strdup_printf (
+                                "[%d/%d] %s", i + 1, region_size,
+                                _ ("Parsing blocks."));
+                            func (main_klass, (i + 1) * 100 / region_size,
+                                  str);
+                            g_free (str);
                         }
                 }
-            if (!added)
+
+            if (!blocks.empty () && blocks.front ().index == i)
                 {
-                    dh_bit_push_back_val (bits, move_bits, 0);
+                    dh_bit_push_back_val (bits, move_bits, blocks.front ().palette);
+                    blocks.erase (blocks.begin ());
                 }
+            else
+                dh_bit_push_back_val (bits, move_bits, 0);
         }
     gint64 *ret = dh_bit_dup_array (bits, len);
     dh_bit_free (bits);
@@ -607,7 +680,10 @@ get_block_entity_array_from_nbt_instance (const DhNbtInstance &instance,
 }
 
 static Region *
-region_new_from_nbt_instance (const DhNbtInstance &instance)
+region_new_from_nbt_instance_internal (const DhNbtInstance &instance,
+                                       DhProgressFullSet func,
+                                       void *main_klass,
+                                       GCancellable *cancellable)
 {
     Region *region = g_new0 (Region, 1);
 
@@ -631,7 +707,8 @@ region_new_from_nbt_instance (const DhNbtInstance &instance)
 
             /* Fill BlockArray */
             gint64 *ba = get_block_array_from_nbt_instance (
-                instance, region, &region->block_array_len);
+                instance, region, &region->block_array_len, func, main_klass,
+                cancellable);
             region->block_array = ba;
 
             /* Fill BlockEntityArray */
@@ -645,14 +722,27 @@ region_new_from_nbt_instance (const DhNbtInstance &instance)
             region->data_version = version_instance.get_int ();
             region->data = base_data_new_null ();
 
+            if (g_cancellable_is_cancelled (cancellable))
+                {
+                    region_free (region);
+                    return nullptr;
+                }
+
             return region;
         }
     else
         {
             g_free (region);
             g_free (rs);
-            return NULL;
+            return nullptr;
         }
+}
+
+static Region *
+region_new_from_nbt_instance (const DhNbtInstance &instance)
+{
+    return region_new_from_nbt_instance_internal (instance, nullptr, nullptr,
+                                                  nullptr);
 }
 
 Region *
@@ -667,11 +757,8 @@ region_new_from_nbt_file (const char *filepos)
 Region *
 region_new_from_nbt_instance_ptr (void *instance_ptr)
 {
-    auto instance = *(DhNbtInstance *)instance_ptr;
-    if (file_is_new_schem (instance_ptr))
-        return region_new_from_new_schem (instance_ptr);
-    else
-        return region_new_from_nbt_instance (instance);
+    return region_new_from_nbt_instance_ptr_full (instance_ptr, nullptr,
+                                                  nullptr, nullptr);
 }
 
 ItemList *
@@ -860,4 +947,19 @@ region_get_block_entity (Region *region, int x, int y, int z)
                 return be;
         }
     return NULL;
+}
+
+Region *
+region_new_from_nbt_instance_ptr_full (void *instance_ptr,
+                                       DhProgressFullSet func,
+                                       void *main_klass,
+                                       GCancellable *cancellable)
+{
+    auto instance = *(DhNbtInstance *)instance_ptr;
+    if (file_is_new_schem (instance_ptr))
+        return region_new_from_new_schem_internal (instance_ptr, func,
+                                                   main_klass, cancellable);
+    else
+        return region_new_from_nbt_instance_internal (instance, func,
+                                                      main_klass, cancellable);
 }

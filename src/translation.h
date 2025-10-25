@@ -22,7 +22,6 @@
 
 #undef signals
 #include "feature/mcdata_feature.h"
-#include "recipe_util.h"
 #include <libintl.h>
 #include <locale.h>
 
@@ -40,6 +39,7 @@ extern "C"
 
     void translation_init (const char *prog_name);
     char *replace_at_with_slash (char *str);
+    char *get_translation_filedir (const char *prog_name);
 
 #ifdef __cplusplus
 }

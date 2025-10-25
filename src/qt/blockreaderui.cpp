@@ -46,15 +46,9 @@ BlockReaderUI::BlockReaderUI (QWidget *parent)
                       &BlockReaderUI::showBtn_clicked);
     ui->entityBtn->setEnabled (false);
     ui->propertyBtn->setEnabled (false);
-    if (dhlrc_mcdata_enabled ())
-        dhlrc_update_transfile (version.toUtf8 (), set_func, this,
-                                &large_version);
-    else
-        {
-            ui->label_7->setText (_ ("Lack the translation module, will not "
+    ui->label_7->setText (_ ("Lack the translation module, will not "
                                      "try to get translation!"));
-            ui->progressBar->hide ();
-        }
+    ui->progressBar->hide ();
 }
 
 BlockReaderUI::~BlockReaderUI ()

@@ -1,29 +1,17 @@
 #include "module.h"
 #include "../common.h"
 #include "../feature/dh_module.h"
+#include "../translation.h"
 #include "mainwindow.h"
+#include "settings.h"
 #include "utility.h"
-
+#include <KLocalizedString>
+#include <KLocalizedTranslator>
 #include <QApplication>
-#include <QPainter>
 #include <QSvgRenderer>
 #include <QTranslator>
 #include <qcoreapplication.h>
-#include <qnamespace.h>
 #include <qpixmap.h>
-
-class SelfTranslator : public QTranslator
-{
-    Q_OBJECT
-  public:
-    QString
-    translate (const char *context, const char *sourceText,
-               const char *disambiguation, int n = -1) const
-    {
-        QString trStr = QString ("%1%2").arg (context).arg ("|");
-        return g_dpgettext2 ("dhlrc", trStr.toUtf8 (), sourceText);
-    }
-};
 
 extern "C"
 {
@@ -31,11 +19,15 @@ extern "C"
     extern int
     start_qt (int argc, char *argv[], const char *prname)
     {
-
         QApplication a (argc, argv);
-        SelfTranslator st;
-        QCoreApplication::installTranslator (&st);
         dhlrc_init (prname);
+        QApplication::setApplicationName ("dhlrc");
+        QApplication::setApplicationDisplayName (_ ("Litematica Reader"));
+
+        KLocalizedString::setApplicationDomain ("dhlrc");
+        char *trdir = get_translation_filedir (prname);
+        KLocalizedString::addDomainLocaleDir ("dhlrc", trdir);
+        g_free (trdir);
 
         auto pixmap = dh::loadSvgResourceFile ("/cn/dh/dhlrc/dhlrc.svg");
         QApplication::setWindowIcon (QIcon (*pixmap));
@@ -58,5 +50,3 @@ extern "C"
         g_ptr_array_add (module->module_functions, (gpointer)start_qt);
     }
 }
-
-#include "module.moc"

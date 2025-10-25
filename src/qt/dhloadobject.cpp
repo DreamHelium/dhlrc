@@ -8,11 +8,13 @@ DhLoadObject::DhLoadObject (GTaskThreadFunc threadFunc,
       progressDialog (new QProgressDialog), threadFunc (threadFunc),
       readyCallback (readyCallback), data (taskData), freeFunc (freeFunc)
 {
-    progressDialog->setWindowTitle (_("Loading..."));
+    progressDialog->setWindowTitle (_ ("Loading..."));
     auto cancelFunc = [&] { g_cancellable_cancel (cancellable); };
     connect (progressDialog, &QProgressDialog::canceled, this, cancelFunc);
     connect (this, &DhLoadObject::progress, progressDialog,
              &QProgressDialog::setValue);
+    connect (this, &DhLoadObject::resetLabelText, progressDialog,
+             &QProgressDialog::setLabelText);
 }
 
 DhLoadObject::~DhLoadObject ()
@@ -33,7 +35,15 @@ DhLoadObject::load (const QString &label)
 }
 
 void
-DhLoadObject::getSetFunc (void* main_klass, int value)
+DhLoadObject::getSetFunc (void *main_klass, int value)
 {
-    emit static_cast<DhLoadObject*>(main_klass)->progress (value);
+    Q_EMIT static_cast<DhLoadObject *> (main_klass)->progress (value);
+}
+
+void
+DhLoadObject::getSetFuncFull (void *main_klass, int value, const char *label)
+{
+    auto obj = static_cast<DhLoadObject *> (main_klass);
+    Q_EMIT obj->progress (value);
+    Q_EMIT obj->resetLabelText (label);
 }

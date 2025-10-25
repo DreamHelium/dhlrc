@@ -1,6 +1,6 @@
-cmake_minimum_required(VERSION 3.12)
+cmake_minimum_required(VERSION 3.16)
 
-project(dhlrc_nbtreader_qt VERSION 0.3.6 LANGUAGES CXX)
+project(dhlrc_nbtreader_qt LANGUAGES CXX)
 
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)

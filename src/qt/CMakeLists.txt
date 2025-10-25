@@ -1,66 +1,74 @@
-cmake_minimum_required(VERSION 3.12)
+cmake_minimum_required(VERSION 3.17)
 
-project(dhlrc_qt VERSION 0.3.6 LANGUAGES CXX)
+project(dhlrc_qt LANGUAGES CXX)
 
 add_definitions(-DDHLRC_VERSION="${dhlrc_qt_VERSION}")
 string(TIMESTAMP CURRENT_DAY %Y%m%d)
 add_definitions(-DDHLRC_COMPILE_DATE=${CURRENT_DAY})
 
-set(CMAKE_AUTOUIC ON)
+#set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
-set(CMAKE_AUTORCC ON)
+#set(CMAKE_AUTORCC ON)
 set(LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR}/module)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+find_package(ECM REQUIRED NO_MODULE)
+set(CMAKE_MODULE_PATH ${ECM_MODULE_PATH})
+#include(KDEInstallDirs)
+#include(KDECompilerSettings)
+#include(KDECMakeSettings)
+find_package(KF6 REQUIRED COMPONENTS ColorScheme ConfigWidgets I18n)
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets Svg)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets Svg)
 
 add_definitions(-DQT_NO_SIGNALS_SLOTS_KEYWORDS)
 
+set(ui_files mainwindow.ui blocklistui.ui blockreaderui.ui manageui.ui
+        blockshowui.ui regionmodifyui.ui palettelistui.ui paletteaddui.ui
+        loadobjectui.ui)
+
 set(PROJECT_SOURCES
         module.h module.cpp
-        mainwindow.ui mainwindow.cpp mainwindow.h
-        recipesui.cpp recipesui.h
-        recipesshowui.cpp recipesshowui.h
-        showtrackui.cpp showtrackui.h
-        blocklistui.cpp blocklistui.h blocklistui.ui
-        blockreaderui.cpp blockreaderui.h blockreaderui.ui
-        manageui.h manageui.cpp manageui.ui
-        ilreaderui.h ilreaderui.cpp
+         mainwindow.cpp mainwindow.h
+        blocklistui.cpp blocklistui.h
+        blockreaderui.cpp blockreaderui.h
+        manageui.h manageui.cpp
         dhtableview.h dhtableview.cpp
         lrchooseui.h lrchooseui.cpp
         manage.h manage.cpp
         utility.h utility.cpp
-        saveregionselectui.h saveregionselectui.cpp
         dhtreefilter.h dhtreefilter.cpp
-        recipeselectui.h recipeselectui.cpp recipeselectui.ui
         generalchooseui.h
 #        propertymodifyui.cpp
 #        propertymodifyui.h
 #        propertymodifyui.ui
-        addtranslationui.cpp
-        addtranslationui.h
-        addtranslationui.ui
         blockshowui.cpp
         blockshowui.h
-        blockshowui.ui
         regionmodifyui.cpp
         regionmodifyui.h
-        regionmodifyui.ui
         palettelistui.cpp
         palettelistui.h
-        palettelistui.ui
         paletteaddui.cpp
         paletteaddui.h
-        paletteaddui.ui
         generalchoosedialog.cpp
         generalchoosedialog.h
         dhloadobject.cpp
         dhloadobject.h
+        loadregionui.cpp
+        loadregionui.h
+        dhlinklikebutton.cpp
+        dhlinklikebutton.h
+        loadobjectui.cpp
+        loadobjectui.h
+        saveregionui.cpp
+        saveregionui.h
+        dhgameconfigui.h
+        dhcheckboxgroup.cpp
+        dhcheckboxgroup.h
 )
-
+ki18n_wrap_ui(PROJECT_SOURCES ${ui_files})
 if (${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_add_library(dhlrc_qt SHARED
             MANUAL_FINALIZATION
@@ -84,14 +92,15 @@ else ()
     endif ()
 endif ()
 
-target_link_libraries(dhlrc_qt PRIVATE Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::Svg)
+target_link_libraries(dhlrc_qt PRIVATE Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::Svg KF6::ColorScheme
+        KF6::ConfigWidgets KF6::I18n KF6::I18nLocaleData)
 
 target_link_libraries(dhlrc_qt PUBLIC dhlrc)
 
 target_include_directories(dhlrc_qt PUBLIC
         "${PROJECT_BINARY_DIR}" "${GIO_INCLUDE_DIRS}" "${dhutil_INCLUDE_DIRS}"
 )
-
+kconfig_add_kcfg_files(dhlrc_qt config/settings.kcfgc)
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
 # If you are developing for iOS or macOS you should consider setting an
@@ -101,8 +110,6 @@ if (${QT_VERSION} VERSION_LESS 6.1.0)
 endif ()
 set_target_properties(dhlrc_qt PROPERTIES
         ${BUNDLE_ID_OPTION}
-        MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION}
-        MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
         MACOSX_BUNDLE TRUE
         WIN32_EXECUTABLE TRUE
 )
@@ -113,6 +120,5 @@ if (QT_VERSION_MAJOR EQUAL 6)
     qt_finalize_executable(dhlrc_qt)
 endif ()
 
+
 add_subdirectory(nbt-reader)
-add_subdirectory(itemlist-manage)
-add_subdirectory(configui)

@@ -7,5 +7,7 @@
     <file>item_list.svg</file>
     <file>data_version.csv</file>
     <file>handle_block.json</file>
+    <file>show.svg</file>
+    <file>hide.svg</file>
   </gresource>
 </gresources>

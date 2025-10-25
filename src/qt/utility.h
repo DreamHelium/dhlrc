@@ -15,7 +15,6 @@ void loadNbtFileAsync (QWidget *parent, QString filedir, bool askForDes);
 void loadNbtInstances (QWidget *parent, const QStringList &filelist);
 QPixmap *loadSvgFile (const char *contents);
 QPixmap *loadSvgResourceFile (const char *pos);
-QString findIcon (QString obj);
 QIcon getIcon (QString dir);
 QString getVersion (int data_version);
 QStringList getTypeDescriptions (int type);

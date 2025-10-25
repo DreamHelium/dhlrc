@@ -22,7 +22,6 @@
 #include "feature/recipe_feature.h"
 #include "glib.h"
 #include "json_util.h"
-#include "recipe_util.h"
 #include "translation.h"
 #include <cjson/cJSON.h>
 #include <stdio.h>
@@ -504,7 +503,7 @@ int item_list_to_csv(const char* pos,ItemList* il)
     while(ild)
     {
         IListData* ildata = ild->data;
-        const char* trans = name_block_translate(ildata->name);
+        const char* trans = ildata->name;
         if(trans)
             fprintf(f,"\"%s\",%d,%d,%d\n",trans,ildata->total,ildata->total-ildata->placed,ildata->available);
         else

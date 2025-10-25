@@ -77,10 +77,10 @@ extern "C"
         /** The size of region */
         RegionSize *region_size;
         /** The block info array */
-        gint64* block_array;
+        gint64 *block_array;
         int block_array_len;
         /** Block Entity Array */
-        BlockEntityArray* block_entity_array;
+        BlockEntityArray *block_entity_array;
         /** The Palette info array*/
         PaletteArray *palette_array;
         int air_palette;
@@ -92,6 +92,10 @@ extern "C"
     Region *region_new_from_lite_region (LiteRegion *lr);
     Region *region_new_from_nbt_file (const char *filepos);
     Region *region_new_from_nbt_instance_ptr (void *instance_ptr);
+    Region *region_new_from_nbt_instance_ptr_full (void *instance_ptr,
+                                                   DhProgressFullSet func,
+                                                   void *main_klass,
+                                                   GCancellable *cancellable);
     gboolean palette_is_same (gconstpointer a, gconstpointer b);
     char *region_get_id_name (Region *region, int index);
     // void region_modify_property (Region *region, BlockInfo *info,
@@ -105,7 +109,7 @@ extern "C"
     ItemList *item_list_new_from_multi_region (const char **region_uuid_arr);
     void region_free (void *region);
     int region_get_block_palette (Region *region, int index);
-    BlockEntity* region_get_block_entity(Region* region, int x, int y, int z);
+    BlockEntity *region_get_block_entity (Region *region, int x, int y, int z);
 
 #ifdef __cplusplus
 }

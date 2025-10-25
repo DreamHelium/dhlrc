@@ -2,17 +2,19 @@
 #include "../common_info.h"
 #include "../feature/dh_module.h"
 #include "../nbt_interface_cpp/nbt_interface.hpp"
+#include "../public_text.h"
 #include "../region.h"
 #include "../translation.h"
 #include "dh_string_util.h"
 #include "dhtableview.h"
 #include "glib.h"
 #include "manageui.h"
-#include "saveregionselectui.h"
 #include "utility.h"
 #include <QDebug>
 #include <QFileDialog>
+#include <dhloadobject.h>
 #include <generalchoosedialog.h>
+#include <loadregionui.h>
 #include <qabstractitemmodel.h>
 #include <qcontainerfwd.h>
 #include <qevent.h>
@@ -22,6 +24,7 @@
 #include <qnamespace.h>
 #include <qobject.h>
 #include <qstandarditemmodel.h>
+#include <saveregionui.h>
 
 static void
 messageNoRow (QWidget *parent)
@@ -158,23 +161,74 @@ ManageRegion::ManageRegion ()
 void
 ManageRegion::add_triggered ()
 {
-    loadRegion (mui);
+    auto ret = GeneralChooseDialog::getIndex (
+        DHLRC_CHOOSE_OPTION, DHLRC_CHOOSE_OPTION_LABEL, this,
+        _ ("Add region from file."), _ ("Add region from NBT instance."));
+    if (ret == 1)
+        loadRegion (mui);
+    else if (ret == 0)
+        {
+            QString filter = "%1;;%2;;%3;;%4";
+            filter = filter.arg (DHLRC_LITEMATIC_FILE)
+                         .arg (DHLRC_NBT_FILE)
+                         .arg (DHLRC_SCHEM_FILE)
+                         .arg (DHLRC_ALL_FILE);
+            auto dirs = QFileDialog::getOpenFileNames (
+                this, DHLRC_SELECT_FILE_CAPTION, nullptr, filter);
+            if (dirs.isEmpty ())
+                QMessageBox::critical (this, DHLRC_ERROR_CAPTION,
+                                       DHLRC_NO_FILE_SELECTED);
+            else
+                {
+                    auto lrui = new LoadRegionUI (dirs);
+                    lrui->setAttribute (Qt::WA_DeleteOnClose);
+                    lrui->show ();
+                }
+        }
 }
 
 void
 ManageRegion::save_triggered (QList<int> rows)
 {
-    DhStrArray *arr = nullptr;
     auto uuidlist = dh_info_get_all_uuid (DH_TYPE_REGION);
-    for (auto row : rows)
-        dh_str_array_add_str (&arr, (*uuidlist)[row]);
-    if (arr)
+
+    if (!rows.isEmpty ())
         {
-            dh_info_set_uuid (DH_TYPE_REGION, arr);
-            dh_str_array_free (arr);
-            auto srsui = new SaveRegionSelectUI ();
-            srsui->setAttribute (Qt::WA_DeleteOnClose);
-            srsui->exec ();
+            auto ret = GeneralChooseDialog::getIndex (
+                DHLRC_CHOOSE_OPTION, DHLRC_CHOOSE_OPTION_LABEL, this,
+                _ ("Save as NBT."), _ ("Save as NBT (Ignore air)."),
+                _ ("Save as litematic"), _ ("Save as new schematics"));
+            QString dir;
+            if (ret != -1)
+                {
+                    dir = QFileDialog::getExistingDirectory (
+                        this, _ ("Select A Directory"));
+                    int type = 0;
+                    if (ret == 0)
+                        type = DHLRC_TYPE_NBT;
+                    if (ret == 1)
+                        type = DHLRC_TYPE_NBT_NO_AIR;
+                    if (ret == 2)
+                        type = DHLRC_TYPE_LITEMATIC;
+                    if (ret == 3)
+                        type = DHLRC_TYPE_NEW_SCHEM;
+
+                    TransList regions;
+                    for (auto row : rows)
+                        {
+                            TransStruct st;
+                            st.region = static_cast<Region *> (
+                                dh_info_get_data (DH_TYPE_REGION, (*uuidlist)[row]));
+                            st.description
+                                = dh_info_get_description (DH_TYPE_REGION, (*uuidlist)[row]);
+                            st.type = type;
+                            regions.append (st);
+                        }
+
+                    auto srui = new SaveRegionUI (regions, dir);
+                    srui->setAttribute (Qt::WA_DeleteOnClose);
+                    srui->show ();
+                }
         }
     else
         QMessageBox::critical (mui, ERROR_TITLE, _ ("No item selected!"));
@@ -226,26 +280,78 @@ ManageNbtInterface::add_triggered ()
 void
 ManageNbtInterface::save_triggered (QList<int> rows)
 {
-    auto save_option = [] (int ret, const char *uuid, const QString &filepos) {
+    typedef struct TempStruct
+    {
+        QList<Region *> regions;
+        DhModule *conv_module;
+        DhProgressFullSet setFunc;
+        void *main_klass;
+        bool ignore_air;
+        QString filepos;
+    } TempStruct;
+    auto save_as_nbt = [] (GTask *task, gpointer source_object,
+                           gpointer task_data,
+                           GCancellable *task_cancellable) {
+        auto data = static_cast<TempStruct *> (task_data);
+        auto func = data->conv_module->module_functions->pdata[6];
+        typedef void *(*RealFunc) (Region *, gboolean, gboolean,
+                                   DhProgressFullSet, void *, GCancellable *);
+        auto real_func = reinterpret_cast<RealFunc> (func);
+        for (auto region : data->regions)
+            {
+                auto ret = real_func (region, false, data->ignore_air,
+                                      data->setFunc, data->main_klass,
+                                      task_cancellable);
+                if (ret)
+                    {
+                        QString realFile;
+                        if (data->regions.length () == 1)
+                            realFile = data->filepos + ".nbt";
+                        else
+                            realFile = data->filepos + "_" + region->data->name
+                                       + ".nbt";
+                        static_cast<DhNbtInstance *> (ret)->save_to_file_full (
+                            realFile.toUtf8 (), data->setFunc,
+                            data->main_klass, task_cancellable);
+                        delete static_cast<DhNbtInstance *> (ret);
+                    }
+            }
+        g_task_return_pointer (task, nullptr, nullptr);
+    };
+
+    auto delete_obj = [] (GObject *object, GAsyncResult *res, gpointer data) {
+        delete static_cast<DhLoadObject *> (data);
+    };
+    auto save_option = [save_as_nbt, delete_obj] (int ret, const char *uuid,
+                                                  const QString &filepos) {
         if (dh_info_reader_trylock (DH_TYPE_NBT_INTERFACE_CPP, uuid))
             {
                 auto instance = static_cast<DhNbtInstance *> (
                     dh_info_get_data (DH_TYPE_NBT_INTERFACE_CPP, uuid));
                 DhModule *conv_module = dh_search_inited_module ("conv");
                 QList<Region *> regions;
-                if (lite_region_num_instance (instance))
+                if (ret != 0)
                     {
-                        for (int i = 0;
-                             i < lite_region_num_instance (instance); i++)
+
+                        if (lite_region_num_instance (instance))
                             {
-                                auto lr
-                                    = lite_region_create_from_root_instance_cpp (
-                                        *instance, i);
-                                regions << region_new_from_lite_region (lr);
+                                for (int i = 0;
+                                     i < lite_region_num_instance (instance);
+                                     i++)
+                                    {
+                                        auto lr
+                                            = lite_region_create_from_root_instance_cpp (
+                                                *instance, i);
+                                        regions
+                                            << region_new_from_lite_region (
+                                                   lr);
+                                    }
                             }
+                        else
+                            regions
+                                << region_new_from_nbt_instance_ptr (instance);
                     }
-                else
-                    regions << region_new_from_nbt_instance_ptr (instance);
+
                 typedef void *(*trFunc) (Region *, gboolean);
                 switch (ret)
                     {
@@ -255,52 +361,36 @@ ManageNbtInterface::save_triggered (QList<int> rows)
                     case 1:
                         if (conv_module)
                             {
-                                trFunc func = reinterpret_cast<trFunc> (
-                                    conv_module->module_functions->pdata[1]);
-                                for (auto region : regions)
-                                    {
-                                        auto temp
-                                            = static_cast<DhNbtInstance *> (
-                                                func (region, false));
-                                        QString realFile;
-                                        if (regions.length () == 1)
-                                            realFile = filepos + ".nbt";
-                                        else
-                                            realFile
-                                                = filepos + "_"
-                                                  + region->data->description
-                                                  + ".nbt";
-                                        temp->save_to_file (
-                                            realFile.toUtf8 ());
-                                        delete temp;
-                                    }
+                                auto tempStruct = g_new0 (TempStruct, 1);
+                                auto loadObject = new DhLoadObject (
+                                    save_as_nbt, delete_obj, tempStruct,
+                                    g_free);
+                                tempStruct->conv_module = conv_module;
+                                tempStruct->main_klass = loadObject;
+                                tempStruct->regions = regions;
+                                tempStruct->ignore_air = false;
+                                tempStruct->filepos = filepos;
+                                tempStruct->setFunc
+                                    = DhLoadObject::getSetFuncFull;
+
+                                loadObject->load (nullptr);
                             }
                         break;
                     case 2:
                         if (conv_module)
                             {
-                                typedef void *(*s_trFunc) (Region *, gboolean,
-                                                           gboolean);
-                                s_trFunc func = reinterpret_cast<s_trFunc> (
-                                    conv_module->module_functions->pdata[5]);
+                                auto tempStruct = g_new0 (TempStruct, 1);
+                                auto loadObject = new DhLoadObject (
+                                    save_as_nbt, nullptr, tempStruct, g_free);
+                                tempStruct->conv_module = conv_module;
+                                tempStruct->main_klass = loadObject;
+                                tempStruct->regions = regions;
+                                tempStruct->ignore_air = true;
+                                tempStruct->filepos = filepos;
+                                tempStruct->setFunc
+                                    = DhLoadObject::getSetFuncFull;
 
-                                for (auto region : regions)
-                                    {
-                                        auto temp
-                                            = static_cast<DhNbtInstance *> (
-                                                func (region, false, true));
-                                        QString realFile;
-                                        if (regions.length () == 1)
-                                            realFile = filepos + ".nbt";
-                                        else
-                                            realFile
-                                                = filepos + "_"
-                                                  + region->data->description
-                                                  + ".nbt";
-                                        temp->save_to_file (
-                                            realFile.toUtf8 ());
-                                        delete temp;
-                                    }
+                                loadObject->load (nullptr);
                             }
                         break;
                     case 3:
@@ -320,10 +410,9 @@ ManageNbtInterface::save_triggered (QList<int> rows)
                                         if (regions.length () == 1)
                                             realFile = filepos + ".litematic";
                                         else
-                                            realFile
-                                                = filepos + "_"
-                                                  + region->data->description
-                                                  + ".litematic";
+                                            realFile = filepos + "_"
+                                                       + region->data->name
+                                                       + ".litematic";
                                         temp->save_to_file (
                                             realFile.toUtf8 ());
                                         delete temp;
@@ -344,10 +433,9 @@ ManageNbtInterface::save_triggered (QList<int> rows)
                                         if (regions.length () == 1)
                                             realFile = filepos + ".schem";
                                         else
-                                            realFile
-                                                = filepos + "_"
-                                                  + region->data->description
-                                                  + ".schem";
+                                            realFile = filepos + "_"
+                                                       + region->data->name
+                                                       + ".schem";
                                         temp->save_to_file (
                                             realFile.toUtf8 ());
                                         delete temp;

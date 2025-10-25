@@ -8,6 +8,8 @@
 #include "../region.h"
 #include "dh_string_util.h"
 
+typedef void (*DhProgressFullSet) (void *, int, const char *);
+
 #ifdef __cplusplus
 extern "C"
 {
@@ -27,6 +29,10 @@ extern "C"
     extern void *nbt_instance_ptr_new_from_region_full (Region *region,
                                                         gboolean temp_root,
                                                         gboolean ignore_air);
+    extern void *nbt_instance_ptr_new_from_region_real_full (
+        Region *region, gboolean temp_root, gboolean ignore_air,
+        DhProgressFullSet set_func, void *main_klass,
+        GCancellable *cancellable);
 
 #ifdef __cplusplus
 }

@@ -13,6 +13,13 @@
 
 LrChooseUI::LrChooseUI (QWidget *parent) : QDialog (parent) { initUI (); }
 
+LrChooseUI::LrChooseUI (DhNbtInstance *instance, const char *description,
+                        QWidget *parent)
+    : instance (instance), QDialog (parent), description (description)
+{
+    initUI ();
+}
+
 LrChooseUI::~LrChooseUI () { dh_str_array_free (arr); }
 
 void
@@ -23,9 +30,14 @@ LrChooseUI::initUI ()
     vLayout->addWidget (label);
     vLayout->addStretch ();
 
-    uuid = (*dh_info_get_uuid (DH_TYPE_NBT_INTERFACE_CPP))[0];
-    auto instance
-        = (DhNbtInstance *)dh_info_get_data (DH_TYPE_NBT_INTERFACE_CPP, uuid);
+    if (!instance)
+        {
+            uuid = (*dh_info_get_uuid (DH_TYPE_NBT_INTERFACE_CPP))[0];
+            instance = (DhNbtInstance *)dh_info_get_data (
+                DH_TYPE_NBT_INTERFACE_CPP, uuid);
+            description
+                = dh_info_get_description (DH_TYPE_NBT_INTERFACE_CPP, uuid);
+        }
 
     arr = lite_region_name_array_instance (instance);
     group = new QButtonGroup ();
@@ -112,15 +124,11 @@ LrChooseUI::okBtn_clicked ()
     auto buttons = group->buttons ();
     for (int i = 0; i < buttons.length (); i++)
         {
-            auto instance = (DhNbtInstance *)dh_info_get_data (
-                DH_TYPE_NBT_INTERFACE_CPP, uuid);
             if (buttons[i]->isChecked ())
                 {
                     auto des = dh_string_new_with_string (
                         lineEdit->text ().toUtf8 ());
-                    dh_string_add_arg (des,
-                                       dh_info_get_description (
-                                           DH_TYPE_NBT_INTERFACE_CPP, uuid));
+                    dh_string_add_arg (des, description);
                     dh_string_add_arg (des, arr->val[i]);
                     dh_string_replace_with_args (des);
                     LiteRegion *lr
@@ -148,9 +156,7 @@ LrChooseUI::text_cb ()
                 {
                     auto des = dh_string_new_with_string (
                         lineEdit->text ().toUtf8 ());
-                    dh_string_add_arg (des,
-                                       dh_info_get_description (
-                                           DH_TYPE_NBT_INTERFACE_CPP, uuid));
+                    dh_string_add_arg (des, description);
                     dh_string_add_arg (des, arr->val[i]);
                     dh_string_replace_with_args (des);
                     viewStr += dh_string_get_string (des);

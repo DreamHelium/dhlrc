@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kcfg xmlns="http://www.kde.org/standards/kcfg/1.0"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.kde.org/standards/kcfg/1.0
+                          http://www.kde.org/standards/kcfg/1.0/kcfg.xsd">
+    <group name="General">
+        <!-- The language overriding setting is of no use. -->
+
+    </group>
+    <group name="Game">
+        <entry name="OverrideSetting" type="Bool">
+            <label>Override Settings</label>
+            <tooltip>Whether to override setting or not.</tooltip>
+            <default>false</default>
+        </entry>
+        <entry name="OverrideVersion" type="String">
+            <label>Override Version</label>
+            <tooltip>The version to override in translation stage.</tooltip>
+        </entry>
+    </group>
+</kcfg>

@@ -10,9 +10,6 @@
     <height>409</height>
    </rect>
   </property>
-  <property name="windowTitle">
-   <string>Litematica reader</string>
-  </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout_2">
     <item>
@@ -20,103 +17,17 @@
       <property name="currentIndex">
        <number>0</number>
       </property>
-      <widget class="QWidget" name="tab_3">
-       <attribute name="title">
-        <string>&amp;NBT</string>
-       </attribute>
-       <layout class="QVBoxLayout" name="verticalLayout_4">
-        <item>
-         <layout class="QVBoxLayout" name="verticalLayout_3">
-          <item>
-           <spacer name="verticalSpacer">
-            <property name="orientation">
-             <enum>Qt::Orientation::Vertical</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>20</width>
-              <height>40</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-          <item>
-           <widget class="QLabel" name="label_2">
-            <property name="text">
-             <string>Let's load a NBT file here!</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="manageBtn_2">
-            <property name="text">
-             <string>&amp;Manage NBT Interface (Test)</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <spacer name="verticalSpacer_2">
-            <property name="orientation">
-             <enum>Qt::Orientation::Vertical</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>20</width>
-              <height>40</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-         </layout>
-        </item>
-       </layout>
-      </widget>
       <widget class="QWidget" name="tab">
        <attribute name="title">
-        <string>&amp;Region</string>
+        <string notr="true">&amp;Region</string>
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout_8">
         <item>
          <layout class="QVBoxLayout" name="verticalLayout_6">
           <item>
-           <widget class="QLabel" name="label_4">
-            <property name="text">
-             <string>First, you need to create a Region struct.</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="createBtn">
-            <property name="text">
-             <string>&amp;Create Region from NBT</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLabel" name="label_5">
-            <property name="text">
-             <string>Second, you can do lots of things with the Region.</string>
-            </property>
-           </widget>
-          </item>
-          <item>
            <widget class="QPushButton" name="mrBtn">
             <property name="text">
              <string>&amp;Manage Region</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="saveBtn">
-            <property name="text">
-             <string>&amp;Save Region to NBT</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="generateBtn">
-            <property name="text">
-             <string>&amp;Generate item list</string>
             </property>
            </widget>
           </item>
@@ -131,31 +42,6 @@
            <widget class="QPushButton" name="brBtn">
             <property name="text">
              <string>&amp;Block reader</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </item>
-       </layout>
-      </widget>
-      <widget class="QWidget" name="tab_2">
-       <attribute name="title">
-        <string>&amp;Item List</string>
-       </attribute>
-       <layout class="QVBoxLayout" name="verticalLayout_10">
-        <item>
-         <layout class="QVBoxLayout" name="verticalLayout_9">
-          <item>
-           <widget class="QPushButton" name="ilReaderBtn">
-            <property name="text">
-             <string>I&amp;tem list reader and modifier</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="recipeCombineBtn">
-            <property name="text">
-             <string>R&amp;ecipe combiner</string>
             </property>
            </widget>
           </item>
@@ -181,9 +67,9 @@
         <item>
          <layout class="QVBoxLayout" name="verticalLayout">
           <item>
-           <widget class="QPushButton" name="mmBtn">
+           <widget class="QPushButton" name="configBtn">
             <property name="text">
-             <string>&amp;Manage Modules</string>
+             <string>&amp;Configure</string>
             </property>
            </widget>
           </item>
@@ -191,34 +77,6 @@
            <widget class="QPushButton" name="scriptBtn">
             <property name="text">
              <string>&amp;Run Script</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="recipeBtn">
-            <property name="text">
-             <string>Show Recipe</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="trBtn">
-            <property name="text">
-             <string>Block and Translation</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="addBtn">
-            <property name="text">
-             <string>Add Translation</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="loadBtn">
-            <property name="text">
-             <string>&amp;Load Jar File for Resources</string>
             </property>
            </widget>
           </item>
@@ -245,12 +103,44 @@
     </property>
     <addaction name="action_about"/>
    </widget>
+   <widget class="QMenu" name="menu_Tools">
+    <property name="title">
+     <string>&amp;Tools</string>
+    </property>
+    <widget class="QMenu" name="menuIcons">
+     <property name="title">
+      <string>Icons</string>
+     </property>
+    </widget>
+    <addaction name="menuIcons"/>
+   </widget>
+   <addaction name="menu_Tools"/>
    <addaction name="menu_About"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="action_about">
    <property name="text">
     <string>&amp;About</string>
+   </property>
+  </action>
+  <action name="actiontest">
+   <property name="text">
+    <string>test</string>
+   </property>
+  </action>
+  <action name="actiontest_2">
+   <property name="text">
+    <string>test\</string>
+   </property>
+  </action>
+  <action name="actiontetst">
+   <property name="text">
+    <string>tetst</string>
+   </property>
+  </action>
+  <action name="actiontest_3">
+   <property name="text">
+    <string>test</string>
    </property>
   </action>
  </widget>

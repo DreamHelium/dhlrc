@@ -25,8 +25,8 @@ BlockShowUI::BlockShowUI (QString &uuid, char *&large_version, QWidget *parent)
         dh_info_get_data (DH_TYPE_REGION, uuid.toUtf8 ()));
     ui->modeBtn->setText ("x/z");
     initUI ();
-    QObject::connect (ui->spinBox, &QSpinBox::valueChanged, this,
-                      &BlockShowUI::updateUI);
+    // QObject::connect (ui->spinBox, &QSpinBox::valueChanged, this,
+                      // &BlockShowUI::updateUI);
     QObject::connect (ui->modeBtn, &QPushButton::clicked, this, [&] {
         modeSwitch = !modeSwitch;
         inited = false;
@@ -48,7 +48,7 @@ BlockShowUI::BlockShowUI (QString &uuid, char *&large_version, QWidget *parent)
             btns.clear ();
         };
         clearUI ();
-        updateUI ();
+        // updateUI ();
     });
     QObject::connect (ui->lpBtn, &QPushButton::clicked, this, [&] {
         auto plui = new PaletteListUI (uuid, large_version);
@@ -75,7 +75,7 @@ BlockShowUI::initUI ()
 
     group = new QButtonGroup ();
     group->setExclusive (false);
-    updateUI ();
+    // updateUI ();
 }
 
 void

@@ -29,8 +29,8 @@
 #include "feature/unzip_feature.h"
 #include "glibconfig.h"
 #include "gmodule.h"
-#include "translation.h"
 #include "script.h"
+#include "translation.h"
 #include <dh_type.h>
 
 #ifdef G_OS_WIN32
@@ -80,10 +80,13 @@ dh_module_file_list_create (const char *path)
 {
     GList *list = NULL;
     GDir *dir = g_dir_open (path, 0, NULL);
-    const char *filename = NULL;
-    while ((filename = g_dir_read_name (dir)) != NULL)
-        list = g_list_append (list, g_strdup (filename));
-    g_dir_close (dir);
+    if (dir)
+        {
+            const char *filename = NULL;
+            while ((filename = g_dir_read_name (dir)) != NULL)
+                list = g_list_append (list, g_strdup (filename));
+            g_dir_close (dir);
+        }
     return list;
 }
 
@@ -103,12 +106,13 @@ dhlrc_run (int argc, char **argv)
     GList *list_p = list;
 
     char *path = g_strdup (original_path);
-    for ( ; list ; list = list->next )
+    for (; list; list = list->next)
         {
-            char *real_path = g_strconcat (lib_dir, G_DIR_SEPARATOR_S, list->data, NULL);
-            char *new_path = g_strconcat(path, MIDD_SEP, real_path, NULL);
-            g_free(path);
-            g_free(real_path);
+            char *real_path
+                = g_strconcat (lib_dir, G_DIR_SEPARATOR_S, list->data, NULL);
+            char *new_path = g_strconcat (path, MIDD_SEP, real_path, NULL);
+            g_free (path);
+            g_free (real_path);
             path = new_path;
         }
     g_list_free_full (list_p, g_free);
@@ -120,7 +124,8 @@ dhlrc_run (int argc, char **argv)
     g_free (path);
     path = new_path;
 
-    g_setenv (LINK_PATH, path, TRUE);
+    if (path)
+        g_setenv (LINK_PATH, path, TRUE);
     g_free (path);
 
     dh_search_module (prpath);

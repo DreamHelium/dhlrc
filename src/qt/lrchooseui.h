@@ -1,7 +1,9 @@
 #ifndef LRCHOOSEUI_H
 #define LRCHOOSEUI_H
 
+#include "../nbt_interface_cpp/nbt_interface.hpp"
 #include "dh_string_util.h"
+
 #include <QDialog>
 #include <QWidget>
 #include <qboxlayout.h>
@@ -16,6 +18,8 @@ class LrChooseUI : public QDialog
     Q_OBJECT
   public:
     explicit LrChooseUI (QWidget *parent = nullptr);
+    LrChooseUI (DhNbtInstance *instance, const char *description,
+                QWidget *parent = nullptr);
     ~LrChooseUI ();
 
   private:
@@ -32,6 +36,8 @@ class LrChooseUI : public QDialog
     void initUI ();
     DhStrArray *arr = nullptr;
     const char *uuid = nullptr;
+    DhNbtInstance *instance = nullptr;
+    const char *description = nullptr;
 
   private Q_SLOTS:
     void okBtn_clicked ();

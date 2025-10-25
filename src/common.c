@@ -17,11 +17,9 @@
 
 #include "common.h"
 #include "common_info.h"
-#include "config.h"
 #include "dh_file_util.h"
 #include "feature/recipe_feature.h"
 #include "global_variant.h"
-#include "recipe_util.h"
 #include "translation.h"
 
 static GResource *res = NULL;
@@ -73,7 +71,6 @@ void
 dhlrc_init (const char *prname)
 {
     translation_init (prname);
-    dhlrc_make_config ();
     dhlrc_common_contents_init (prname);
     char *recipes_module_path = NULL;
 #ifdef RECIPESDIR
@@ -102,7 +99,6 @@ dhlrc_cleanup ()
     dhlrc_common_contents_free ();
     dhlrc_recipe_module_clean ();
     dhlrc_cleanup_manifest ();
-    dh_exit1 ();
     dh_type_free ();
     dhlrc_global_variant_clear ();
 }

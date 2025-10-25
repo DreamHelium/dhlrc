@@ -149,131 +149,214 @@
     </message>
 </context>
 <context>
+    <name>ConfigUI</name>
+    <message>
+        <location filename="../../src/qt/configui/configui.ui" line="14"/>
+        <source>Config settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qt/configui/configui.ui" line="29"/>
+        <source>Cache Directory</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qt/configui/configui.ui" line="39"/>
+        <location filename="../../src/qt/configui/configui.ui" line="60"/>
+        <location filename="../../src/qt/configui/configui.ui" line="81"/>
+        <location filename="../../src/qt/configui/configui.ui" line="109"/>
+        <location filename="../../src/qt/configui/configui.ui" line="130"/>
+        <location filename="../../src/qt/configui/configui.ui" line="151"/>
+        <location filename="../../src/qt/configui/configui.ui" line="172"/>
+        <source>Reset</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qt/configui/configui.ui" line="50"/>
+        <source>Override Language</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qt/configui/configui.ui" line="71"/>
+        <source>Recipe Directory</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qt/configui/configui.ui" line="92"/>
+        <source>Translation File</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qt/configui/configui.ui" line="102"/>
+        <source>The file used for translating block/item.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qt/configui/configui.ui" line="120"/>
+        <source>Game Directory</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qt/configui/configui.ui" line="141"/>
+        <source>Override Version</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qt/configui/configui.ui" line="162"/>
+        <source>Assets Directory</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>LoadObjectUI</name>
+    <message>
+        <location filename="../../src/qt/loadobjectui.ui" line="14"/>
+        <source>LoadRegionUI</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qt/loadobjectui.ui" line="47"/>
+        <source>What happened in this step?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qt/loadobjectui.ui" line="74"/>
+        <source>Details</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qt/loadobjectui.ui" line="116"/>
+        <source>&amp;Continue</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qt/loadobjectui.ui" line="123"/>
+        <source>C&amp;ancel</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>MainWindow</name>
     <message>
-        <location filename="../../src/qt/mainwindow.ui" line="14"/>
-        <source>Litematica reader</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../src/qt/mainwindow.ui" line="25"/>
-        <source>&amp;NBT</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../src/qt/mainwindow.ui" line="46"/>
-        <source>Let&apos;s load a NBT file here!</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../src/qt/mainwindow.ui" line="53"/>
-        <source>&amp;Manage NBT Interface (Test)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../src/qt/mainwindow.ui" line="76"/>
+        <location filename="../../src/qt/mainwindow.ui" line="22"/>
         <source>&amp;Region</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qt/mainwindow.ui" line="84"/>
-        <source>First, you need to create a Region struct.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../src/qt/mainwindow.ui" line="91"/>
-        <source>&amp;Create Region from NBT</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../src/qt/mainwindow.ui" line="98"/>
-        <source>Second, you can do lots of things with the Region.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../src/qt/mainwindow.ui" line="105"/>
+        <location filename="../../src/qt/mainwindow.ui" line="30"/>
         <source>&amp;Manage Region</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qt/mainwindow.ui" line="112"/>
+        <location filename="../../src/qt/mainwindow.ui" line="37"/>
         <source>&amp;Save Region to NBT</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qt/mainwindow.ui" line="119"/>
+        <location filename="../../src/qt/mainwindow.ui" line="44"/>
         <source>&amp;Generate item list</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qt/mainwindow.ui" line="126"/>
+        <location filename="../../src/qt/mainwindow.ui" line="51"/>
         <source>M&amp;odify Region</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qt/mainwindow.ui" line="133"/>
+        <location filename="../../src/qt/mainwindow.ui" line="58"/>
         <source>&amp;Block reader</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qt/mainwindow.ui" line="143"/>
+        <location filename="../../src/qt/mainwindow.ui" line="65"/>
+        <source>&amp;Config</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qt/mainwindow.ui" line="75"/>
         <source>&amp;Item List</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qt/mainwindow.ui" line="151"/>
+        <location filename="../../src/qt/mainwindow.ui" line="83"/>
         <source>I&amp;tem list reader and modifier</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qt/mainwindow.ui" line="158"/>
+        <location filename="../../src/qt/mainwindow.ui" line="90"/>
         <source>R&amp;ecipe combiner</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qt/mainwindow.ui" line="168"/>
+        <location filename="../../src/qt/mainwindow.ui" line="100"/>
         <source>Shortcuts</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qt/mainwindow.ui" line="178"/>
+        <location filename="../../src/qt/mainwindow.ui" line="110"/>
         <source>Utility</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qt/mainwindow.ui" line="186"/>
+        <location filename="../../src/qt/mainwindow.ui" line="118"/>
         <source>&amp;Manage Modules</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qt/mainwindow.ui" line="193"/>
+        <location filename="../../src/qt/mainwindow.ui" line="125"/>
         <source>&amp;Run Script</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qt/mainwindow.ui" line="200"/>
+        <location filename="../../src/qt/mainwindow.ui" line="132"/>
         <source>Show Recipe</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qt/mainwindow.ui" line="207"/>
+        <location filename="../../src/qt/mainwindow.ui" line="139"/>
         <source>Block and Translation</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qt/mainwindow.ui" line="214"/>
+        <location filename="../../src/qt/mainwindow.ui" line="146"/>
         <source>Add Translation</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qt/mainwindow.ui" line="221"/>
+        <location filename="../../src/qt/mainwindow.ui" line="153"/>
         <source>&amp;Load Jar File for Resources</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qt/mainwindow.ui" line="244"/>
-        <location filename="../../src/qt/mainwindow.ui" line="253"/>
+        <location filename="../../src/qt/mainwindow.ui" line="176"/>
+        <location filename="../../src/qt/mainwindow.ui" line="197"/>
         <source>&amp;About</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qt/mainwindow.ui" line="182"/>
+        <source>&amp;Tools</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qt/mainwindow.ui" line="202"/>
+        <location filename="../../src/qt/mainwindow.ui" line="217"/>
+        <source>test</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qt/mainwindow.ui" line="207"/>
+        <source>test\</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qt/mainwindow.ui" line="212"/>
+        <source>tetst</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qt/mainwindow.ui" line="186"/>
+        <source>Icons</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -312,6 +395,44 @@
     <message>
         <location filename="../../src/qt/manageui.ui" line="123"/>
         <source>&amp;Close</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>NbtReaderUI</name>
+    <message>
+        <location filename="../../src/qt/nbt-reader/nbtreaderui.ui" line="14"/>
+        <source>NBT Reader</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qt/nbt-reader/nbtreaderui.ui" line="22"/>
+        <source>Search NBT label</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qt/nbt-reader/nbtreaderui.ui" line="40"/>
+        <source>Type:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qt/nbt-reader/nbtreaderui.ui" line="58"/>
+        <source>Key:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qt/nbt-reader/nbtreaderui.ui" line="101"/>
+        <source>Value:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qt/nbt-reader/nbtreaderui.ui" line="123"/>
+        <source>Modify</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qt/nbt-reader/nbtreaderui.ui" line="130"/>
+        <source>Close</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

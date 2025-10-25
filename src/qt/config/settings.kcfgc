@@ -1,0 +1,6 @@
+File=config.kcfg
+ClassName=DhConfig
+Singleton=true
+ItemAccessors=true
+SetUserTexts=true
+TranslationSystem=kde

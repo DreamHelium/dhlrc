@@ -133,7 +133,7 @@ get_blocks (DhNbtInstance region)
 LiteRegion *
 lite_region_create_from_root_instance_cpp (DhNbtInstance &root, int r_num)
 {
-    LiteRegion *out = g_new0 (LiteRegion, 1);
+    LiteRegion *out = new LiteRegion;
 
     auto data_version (root);
     data_version.goto_root ();
@@ -207,7 +207,7 @@ lite_region_free (LiteRegion *lr)
     g_free (lr->author);
     g_free (lr->description);
     dh_str_array_free (lr->blocks);
-    g_free (lr);
+    delete lr;
 }
 
 int

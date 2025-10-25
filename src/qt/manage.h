@@ -91,7 +91,7 @@ class ManageBase : public ManageUI
                         dh_info_writer_unlock (type, (*uuidlist)[i]);
                     }
             }
-        mui->close ();
+        close ();
     }
     virtual void tablednd_triggered (QDropEvent *event) {};
     virtual void dnd_triggered (const QMimeData *data) {};

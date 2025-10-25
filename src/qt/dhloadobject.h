@@ -8,6 +8,8 @@
 #include <QProgressDialog>
 #include <gio/gio.h>
 
+typedef void (*DhProgressFullSet) (void *, int, const char *);
+
 class DhLoadObject : public QObject
 {
     Q_OBJECT
@@ -18,6 +20,7 @@ class DhLoadObject : public QObject
     ~DhLoadObject () override;
     void load (const QString &label);
     static void getSetFunc (void *, int);
+    static void getSetFuncFull (void *, int, const char *);
 
   private:
     GCancellable *cancellable;
@@ -29,6 +32,7 @@ class DhLoadObject : public QObject
 
   Q_SIGNALS:
     void progress (int);
+    void resetLabelText (const QString &);
 };
 
 #endif // DHLRC_DHLOADOBJECT_H

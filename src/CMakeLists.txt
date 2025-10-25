@@ -15,8 +15,6 @@ if (${INSTALL_NOW})
     message("Install Now.")
 endif ()
 
-add_subdirectory(recipe_handler)
-
 add_library(dhlrc SHARED
         dh_bit.c dh_bit.h
         litematica_region.cpp litematica_region.h
@@ -25,8 +23,6 @@ add_library(dhlrc SHARED
         common_info.c common_info.h
         common.c common.h
         dhlrc_list.h dhlrc_list.c
-        recipe_util.h recipe_util.c
-        config.c config.h
         csv_parser.c csv_parser.h
         json_util.c json_util.h
         translation.h translation.c
@@ -40,11 +36,12 @@ add_library(dhlrc SHARED
         script.h
         global_variant.c
         global_variant.h
+        public_text.h
 )
 
 target_link_libraries(dhlrc PUBLIC dhutil_string dhnbt_interface_cpp ${gm_LIBRARIES} dhutil_type dhutil_file cjson ${LUA_LIBRARIES})
 
-target_include_directories(dhlrc PUBLIC "${GIO_INCLUDE_DIRS}" dhutil)
+target_include_directories(dhlrc PUBLIC "${GIO_INCLUDE_DIRS}" dhutil ${LUA_INCLUDE_DIRS})
 
 add_executable(dhlrc.bin main.c)
 
@@ -59,11 +56,7 @@ install(TARGETS dhlrc
 )
 
 add_subdirectory(qt)
-#add_subdirectory(gtk)
-# add_subdirectory(cli)
 add_subdirectory(conv)
-add_subdirectory(mcdata)
-add_subdirectory(unzip)
 
 #install(TARGETS dhlrc_conv dhlrc_mcdata dhlrc_qt dhlrc_recipe
 #        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}/dhlrc/modules)

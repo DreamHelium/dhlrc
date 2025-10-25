@@ -2,6 +2,7 @@
 #include "../global_variant.h"
 #include "../nbt_interface_cpp/nbt_interface.hpp"
 #include "../region.h"
+#include "main_conv.h"
 
 /* TODO: Better support for Litematica Region convertion.
  *
@@ -34,7 +35,9 @@ find_same_block (const GPtrArray *arr, const char *name)
 }
 
 static DhNbtInstance
-blocks_nbt_instance_new (Region *region, gboolean ignore_air)
+blocks_nbt_instance_new (Region *region, gboolean ignore_air,
+                         DhProgressFullSet set_func, void *main_klass,
+                         GCancellable *cancellable)
 {
     auto size_change = [region] (int &x, int &y, int &z) {
         if (x < region->region_size->x - 1)
@@ -58,9 +61,26 @@ blocks_nbt_instance_new (Region *region, gboolean ignore_air)
     int x = 0;
     int y = 0;
     int z = 0;
+    clock_t start = clock ();
     for (int i = 0; i < len; i++)
         {
             const char *name = region_get_id_name (region, i);
+            char *value = g_strdup_printf ("Adding block: %s", name);
+            if (set_func && main_klass)
+                {
+                    clock_t now = clock ();
+                    int passed_ms = 1000.0f * (now - start) / CLOCKS_PER_SEC;
+                    if (passed_ms % 500 == 0 || ((i + 1) == len))
+                        set_func (main_klass, (i + 1) * 100 / len, value);
+                }
+            g_free (value);
+            if (g_cancellable_is_cancelled (cancellable))
+                {
+                    /* Make returned nbt invalid */
+                    ret.make_invalid ();
+                    ret.self_free ();
+                    break;
+                }
             if (ignore_air
                 && find_same_block (dhlrc_get_ignore_air_list (), name))
                 {
@@ -364,8 +384,12 @@ new_schema_fill_non_compound (DhNbtInstance &instance, Region *region)
 extern "C"
 {
     void *
-    nbt_instance_ptr_new_from_region_full (Region *region, gboolean temp_root,
-                                           gboolean ignore_air)
+    nbt_instance_ptr_new_from_region_real_full (Region *region,
+                                                gboolean temp_root,
+                                                gboolean ignore_air,
+                                                DhProgressFullSet set_func,
+                                                void *main_klass,
+                                                GCancellable *cancellable)
     {
         DhNbtInstance ret (DH_TYPE_Compound, NULL, temp_root);
         /* First is size */
@@ -376,8 +400,8 @@ extern "C"
         DhNbtInstance entities_nbt = entities_nbt_instance_new ();
         ret.insert_before ({}, entities_nbt);
         /* Third is blocks */
-        DhNbtInstance blocks_nbt
-            = blocks_nbt_instance_new (region, ignore_air);
+        DhNbtInstance blocks_nbt = blocks_nbt_instance_new (
+            region, ignore_air, set_func, main_klass, cancellable);
         ret.insert_before ({}, blocks_nbt);
         /* Fourth is palette */
         DhNbtInstance palette_nbt
@@ -387,7 +411,21 @@ extern "C"
         DhNbtInstance data_version_nbt (region->data_version, "DataVersion",
                                         true);
         ret.insert_before ({}, data_version_nbt);
+        if (g_cancellable_is_cancelled (cancellable))
+            {
+                if (temp_root)
+                    ret.self_free ();
+                return nullptr;
+            }
         return new DhNbtInstance (ret);
+    }
+
+    void *
+    nbt_instance_ptr_new_from_region_full (Region *region, gboolean temp_root,
+                                           gboolean ignore_air)
+    {
+        return nbt_instance_ptr_new_from_region_real_full (
+            region, temp_root, ignore_air, nullptr, nullptr, nullptr);
     }
 
     void *

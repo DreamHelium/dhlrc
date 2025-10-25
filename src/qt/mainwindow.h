@@ -40,18 +40,10 @@ class MainWindow : public QMainWindow
     void virtual dropEvent (QDropEvent *event);
 
   private Q_SLOTS:
-    void manageBtn_2_clicked ();
-    void ilReaderBtn_clicked ();
-    void recipeCombineBtn_clicked ();
-    void createBtn_clicked ();
-    void generateBtn_clicked ();
     void brBtn_clicked ();
     void mrBtn_clicked ();
     void mrBtn_2_clicked ();
-    void recipeBtn_clicked ();
     void showabout ();
-    void addBtn_clicked ();
-    void saveBtn_clicked ();
     void groupBtn_clicked (int id);
 };
 
