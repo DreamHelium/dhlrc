@@ -19,7 +19,6 @@ class DhLoadObject : public QObject
                            GFreeFunc freeFunc, QObject *parent = nullptr);
     ~DhLoadObject () override;
     void load (const QString &label);
-    static void getSetFunc (void *, int);
     static void getSetFuncFull (void *, int, const char *);
 
   private:

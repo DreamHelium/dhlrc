@@ -15,24 +15,27 @@ extern "C"
 {
 #endif
 
-    extern int start_point (int argc, char **argv, const char *prpath);
-    extern void *nbt_instance_ptr_new_from_region (Region *region,
-                                                   gboolean temp_root);
-    extern void *lite_instance_ptr_new_from_region (Region *region,
-                                                    gboolean temp_root);
-    extern void *new_schema_instance_ptr_new_from_region (Region *region,
-                                                          gboolean temp_root);
-    extern void init (DhModule *module);
-    extern void *lite_instance_ptr_new_from_region_full (Region *region,
-                                                         gboolean temp_root,
-                                                         int lite_version);
-    extern void *nbt_instance_ptr_new_from_region_full (Region *region,
-                                                        gboolean temp_root,
-                                                        gboolean ignore_air);
-    extern void *nbt_instance_ptr_new_from_region_real_full (
-        Region *region, gboolean temp_root, gboolean ignore_air,
-        DhProgressFullSet set_func, void *main_klass,
-        GCancellable *cancellable);
+  extern int start_point (int argc, char **argv, const char *prpath);
+  extern void *nbt_instance_ptr_new_from_region (Region *region,
+                                                 gboolean temp_root);
+  extern void *lite_instance_ptr_new_from_region (Region *region,
+                                                  gboolean temp_root);
+  extern void *new_schema_instance_ptr_new_from_region (Region *region,
+                                                        gboolean temp_root);
+  extern void init (DhModule *module);
+  extern void *lite_instance_ptr_new_from_region_full (Region *region,
+                                                       gboolean temp_root,
+                                                       int lite_version);
+  extern void *nbt_instance_ptr_new_from_region_full (Region *region,
+                                                      gboolean temp_root,
+                                                      gboolean ignore_air);
+  extern void *nbt_instance_ptr_new_from_region_real_full (
+      Region *region, gboolean temp_root, gboolean ignore_air,
+      DhProgressFullSet set_func, void *main_klass, GCancellable *cancellable);
+  extern NbtNode *
+  nbt_node_new_from_region_full (Region *region, gboolean ignore_air,
+                                 DhProgressFullSet set_func, void *main_klass,
+                                 GCancellable *cancellable, GError **err);
 
 #ifdef __cplusplus
 }

@@ -1,6 +1,7 @@
 #include "global_variant.h"
 
 static gboolean ignore_extension_name = FALSE;
+static gboolean ignore_leftover = FALSE;
 static GPtrArray *ignore_air_list = NULL;
 
 void
@@ -28,6 +29,18 @@ gboolean
 dhlrc_get_ignore_extension_name ()
 {
     return ignore_extension_name;
+}
+
+void
+dhlrc_set_ignore_leftover (gboolean ignore)
+{
+    ignore_leftover = ignore;
+}
+
+gboolean
+dhlrc_get_ignore_leftover ()
+{
+    return ignore_leftover;
 }
 
 void

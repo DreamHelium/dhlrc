@@ -19,6 +19,7 @@ class LoadObjectUI : public QWidget
     ~LoadObjectUI ();
     bool finished = false;
     bool stopped = false;
+    void setLabel (const QString &str);
 
   protected:
     void closeEvent (QCloseEvent *event) override;

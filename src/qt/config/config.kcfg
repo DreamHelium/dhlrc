@@ -5,7 +5,11 @@
                           http://www.kde.org/standards/kcfg/1.0/kcfg.xsd">
     <group name="General">
         <!-- The language overriding setting is of no use. -->
-
+        <entry name="IgnoreLeftover" type="Bool">
+            <label>Ignore Leftover Data</label>
+            <tooltip>Whether to ignore leftover data in NBT when parsing.</tooltip>
+            <default>false</default>
+        </entry>
     </group>
     <group name="Game">
         <entry name="OverrideSetting" type="Bool">

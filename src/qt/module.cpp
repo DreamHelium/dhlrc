@@ -15,8 +15,7 @@
 
 extern "C"
 {
-
-    extern int
+    static int
     start_qt (int argc, char *argv[], const char *prname)
     {
         QApplication a (argc, argv);
@@ -40,6 +39,12 @@ extern "C"
         return ret;
     }
 
+    static void
+    config_changed_sig ()
+    {
+        Q_EMIT DhConfig::self ()->configChanged ();
+    }
+
     extern void
     init (DhModule *module)
     {
@@ -48,5 +53,7 @@ extern "C"
         module->module_description = g_strdup ("Qt Module");
         module->module_functions = g_ptr_array_new ();
         g_ptr_array_add (module->module_functions, (gpointer)start_qt);
+        g_ptr_array_add (module->module_functions,
+                         (gpointer)config_changed_sig);
     }
 }

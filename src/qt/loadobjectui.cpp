@@ -61,6 +61,12 @@ LoadObjectUI::LoadObjectUI (QWidget *parent)
 LoadObjectUI::~LoadObjectUI () {}
 
 void
+LoadObjectUI::setLabel (const QString &str)
+{
+    ui->label->setText (str);
+}
+
+void
 LoadObjectUI::closeEvent (QCloseEvent *event)
 {
     Q_EMIT winClose ();

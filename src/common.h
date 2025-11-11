@@ -18,18 +18,19 @@
 #ifndef MAIN_H
 #define MAIN_H
 
-#include <glib.h>
 #include <gio/gio.h>
+#include <glib.h>
 
 G_BEGIN_DECLS
 
-gboolean dhlrc_common_contents_init(const char* prname);
-gboolean dhlrc_common_contents_is_inited();
-void     dhlrc_common_contents_free();
-GResource* dhlrc_get_resource();
-void    dhlrc_init(const char* prname);
-gboolean dhlrc_is_inited();
-void    dhlrc_cleanup();
+gboolean dhlrc_common_contents_init (const char *prname);
+gboolean dhlrc_common_contents_is_inited ();
+gboolean dhlrc_config_is_listened ();
+void dhlrc_common_contents_free ();
+GResource *dhlrc_get_resource ();
+void dhlrc_init (const char *prname);
+gboolean dhlrc_is_inited ();
+void dhlrc_cleanup ();
 
 G_END_DECLS
 

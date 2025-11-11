@@ -4,9 +4,6 @@
 #include "dhcheckboxgroup.h"
 #include "settings.h"
 #include <KCoreConfigSkeleton>
-#include <KCountry>
-#include <KLanguageButton>
-#include <KLocalizedString>
 #include <QFormLayout>
 #include <QLineEdit>
 #include <QWidget>
@@ -23,15 +20,32 @@ class DhGameConfigUI : public QWidget
         textEdit = new QLineEdit (this);
         fLayout->addRow (DhConfig::self ()->overrideVersionItem ()->label (),
                          textEdit);
-        textEdit->setText (DhConfig::self ()->overrideVersion ());
         vLayout->addLayout (fLayout);
 
         checkBox = new QCheckBox (
             DhConfig::self ()->overrideSettingItem ()->label (), this);
-        checkBox->setChecked (DhConfig::self ()->overrideSetting ());
         vLayout->addWidget (checkBox);
+        updateUI ();
+        connect (DhConfig::self (), &DhConfig::configChanged, this,
+                 &DhGameConfigUI::updateConfig);
     }
 
+  private Q_SLOTS:
+    void
+    updateConfig ()
+    {
+        DhConfig::self ()->load ();
+        updateUI ();
+    }
+
+    void
+    updateUI ()
+    {
+        textEdit->setText (DhConfig::overrideVersion ());
+        checkBox->setChecked (DhConfig::overrideSetting ());
+    }
+
+  private:
     QFormLayout *fLayout;
     QLineEdit *textEdit;
     QCheckBox *checkBox;
@@ -55,16 +69,37 @@ class DhGeneralConfigUI : public QWidget
   public:
     explicit DhGeneralConfigUI ()
     {
-
+        checkBox = new QCheckBox (this);
+        checkBox->setText (DhConfig::self ()->ignoreLeftoverItem ()->label ());
+        checkBox->setChecked (DhConfig::ignoreLeftover ());
+        connect (DhConfig::self (), &DhConfig::configChanged, this,
+                 &DhGeneralConfigUI::updateConfig);
     }
 
+  private:
+    QCheckBox *checkBox;
 
+  private Q_SLOTS:
+    void
+    updateConfig ()
+    {
+        DhConfig::self ()->load ();
+        updateUI ();
+    }
+
+    void
+    updateUI ()
+    {
+        checkBox->setChecked (DhConfig::ignoreLeftover ());
+    }
 
   public Q_SLOTS:
     void
     changeSettings ()
     {
-
+        DhConfig::self ()->ignoreLeftoverItem ()->setValue (
+            checkBox->isChecked ());
+        DhConfig::self ()->save ();
     }
 };
 

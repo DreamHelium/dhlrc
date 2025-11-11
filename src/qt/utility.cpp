@@ -123,7 +123,7 @@ typedef struct LoadAsyncStruct
     QWidget *parent;
     QString filedir;
     QString des;
-    DhProgressSet setFunc;
+    DhProgressFullSet setFunc;
     void *main_klass;
 } LoadAsyncStruct;
 
@@ -220,7 +220,7 @@ dh::loadNbtFileAsync (QWidget *parent, QString filedir, bool askForDes)
     asyncStruct->parent = parent;
     asyncStruct->filedir = std::move (filedir);
     asyncStruct->des = des;
-    asyncStruct->setFunc = DhLoadObject::getSetFunc;
+    asyncStruct->setFunc = DhLoadObject::getSetFuncFull;
     asyncStruct->main_klass = loadObject;
     g_free (des);
 

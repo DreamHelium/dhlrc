@@ -230,53 +230,6 @@ lite_region_num_instance (void *instance)
     return 0;
 }
 
-char **
-lite_region_names (NBT *root, int rNum, int *err)
-{
-    NBT *regionParent = NBT_GetChild (root, "Regions");
-    char **region = (char **)malloc (rNum * sizeof (char *));
-    int i = 0;
-    NBT *regionName = regionParent->child;
-    if (regionName)
-        {
-            for (i = 0; i < rNum; i++)
-                {
-                    if (regionName)
-                        {
-                            int len = strlen (regionName->key) + 1;
-                            region[i] = (char *)malloc (len * sizeof (char));
-                            // region[i] = (regionName -> key);
-                            strcpy (region[i], regionName->key);
-                            // printf("%s \n",region[i]);
-                        }
-                    else
-                        {
-                            lite_region_free_names (region, i);
-                            *err = -2;
-                            return NULL;
-                        }
-                    regionName = regionName->next;
-                }
-        }
-    else
-        {
-            free (region);
-            *err = -1;
-            return NULL;
-        }
-    *err = 0;
-    return region;
-}
-
-void
-lite_region_free_names (char **region, int rNum)
-{
-    for (int i = 0; i < rNum; i++)
-        free (region[i]);
-    free (region);
-    region = NULL;
-}
-
 DhStrArray *
 lite_region_block_name_array (LiteRegion *lr)
 {

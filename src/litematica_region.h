@@ -41,10 +41,6 @@ extern "C"
 
     /** Get region numbers in litematica file */
     int lite_region_num_instance (void *instance);
-    G_DEPRECATED_FOR (lite_region_name_array)
-    char **lite_region_names (NBT *root, int rNum, int *err);
-    G_DEPRECATED
-    void lite_region_free_names (char **region, int rNum);
     /** Improved version to get region name */
     DhStrArray *lite_region_name_array_instance (void *instance);
 

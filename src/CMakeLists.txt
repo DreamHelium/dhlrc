@@ -39,7 +39,8 @@ add_library(dhlrc SHARED
         public_text.h
 )
 
-target_link_libraries(dhlrc PUBLIC dhutil_string dhnbt_interface_cpp ${gm_LIBRARIES} dhutil_type dhutil_file cjson ${LUA_LIBRARIES})
+target_link_libraries(dhlrc PUBLIC dhutil_string dhnbt_interface_cpp ${gm_LIBRARIES} dhutil_type dhutil_file cjson
+        ${LUA_LIBRARIES} iniparser-shared)
 
 target_include_directories(dhlrc PUBLIC "${GIO_INCLUDE_DIRS}" dhutil ${LUA_INCLUDE_DIRS})
 

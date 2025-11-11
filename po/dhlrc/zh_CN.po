@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-10-25 23:58+0800\n"
+"POT-Creation-Date: 2025-11-10 23:26+0800\n"
 "PO-Revision-Date: 2024-11-30 07:00+0800\n"
 "Last-Translator: dream_he <48383878+DreamHelium@users.noreply.github.com>\n"
 "Language-Team: Chinese <kde-i18n-doc@kde.org>\n"
@@ -164,23 +164,88 @@ msgstr "确定"
 msgid "Finish!"
 msgstr "结束！"
 
-#: ../../src/qt/loadregionui.cpp:30 ../../src/qt/saveregionui.cpp:14
+#: ../../src/qt/loadregionui.cpp:18
+msgid "Decompressing."
+msgstr "解压缩中。"
+
+#: ../../src/qt/loadregionui.cpp:19
+msgid "Some leftover text detected after parsing."
+msgstr "转换时检测到一些随后文本。"
+
+#: ../../src/qt/loadregionui.cpp:20
+msgid "Some internal error happened, which is not your fault."
+msgstr "内部错误，并不是你的错。"
+
+#: ../../src/qt/loadregionui.cpp:21
+msgid "The parsing progress has been cancelled."
+msgstr "传递过程被取消。"
+
+#: ../../src/qt/loadregionui.cpp:22
+msgid "Couldn't get the type after the End type."
+msgstr "在End类型后获取不到类型。"
+
+#: ../../src/qt/loadregionui.cpp:23
+msgid "The tag is invalid."
+msgstr "标签无效。"
+
+#: ../../src/qt/loadregionui.cpp:24
+msgid "Couldn't get key."
+msgstr "获取不到键。"
+
+#: ../../src/qt/loadregionui.cpp:25
+msgid "The length of the array is not the corresponding length."
+msgstr "数组的长度对不上。"
+
+#: ../../src/qt/loadregionui.cpp:26
+#, c-format
+msgid "Couldn't find the corresponding %s type."
+msgstr "找不到对应的%s类型。"
+
+#: ../../src/qt/loadregionui.cpp:27
+msgid "The length of the array/list couldn't be found"
+msgstr "数组/列表的长度找不到"
+
+#: ../../src/qt/loadregionui.cpp:28
+msgid "Couldn't get type in the list."
+msgstr "获取不到列表类型。"
+
+#: ../../src/qt/loadregionui.cpp:29
+msgid "The tag of the list is invalid."
+msgstr "列表的标签无效。"
+
+#: ../../src/qt/loadregionui.cpp:30
+msgid "Parsing finished!"
+msgstr "传递结束！"
+
+#: ../../src/qt/loadregionui.cpp:31
+msgid "Parsing NBT file to NBT node tree."
+msgstr "将NBT文件传递到NBT节点树上。"
+
+#: ../../src/qt/loadregionui.cpp:44
+msgid "Loading file(s) to Region(s)."
+msgstr "加载文件至Region。"
+
+#: ../../src/qt/loadregionui.cpp:50 ../../src/qt/saveregionui.cpp:14
 msgid "The following files are not added:\n"
 msgstr "以下文件将不会被添加：\n"
 
-#: ../../src/qt/loadregionui.cpp:73
+#: ../../src/qt/loadregionui.cpp:91
 msgid "Parsing NBT"
 msgstr "传递NBT中"
 
-#: ../../src/qt/lrchooseui.cpp:29
+#: ../../src/qt/loadregionui.cpp:113
+msgid "Error encountered with domain %1 and code %2: %3"
+msgstr "在域名为%1处发生错误，代码为%2：%3"
+
+#: ../../src/qt/lrchooseui.cpp:28
 msgid "Please select region(s) of the Litematic"
 msgstr "请选择投影文件的区域"
 
-#: ../../src/qt/lrchooseui.cpp:55
+#: ../../src/qt/lrchooseui.cpp:54
 msgid "&All"
 msgstr "全选 (&A)"
 
-#: ../../src/qt/lrchooseui.cpp:62
+#: ../../src/qt/lrchooseui.cpp:61
 msgid ""
 "Please enter the new Region(s)' name(s): (%1 represents the NBT description "
 "and %2 represents the original region's name), you can see results below the "
@@ -189,15 +254,15 @@ msgstr ""
 "请输入新Region的名字：（%1代表NBT描述，%2代表原本的区域的名字），你可以在输入"
 "栏下看到结果："
 
-#: ../../src/qt/lrchooseui.cpp:67
+#: ../../src/qt/lrchooseui.cpp:66
 msgid "Enter description here."
 msgstr "在此输入描述。"
 
-#: ../../src/qt/lrchooseui.cpp:79 rc.cpp:156 rc.cpp:192 rc.cpp:252
+#: ../../src/qt/lrchooseui.cpp:78 rc.cpp:162 rc.cpp:198 rc.cpp:258
 msgid "&OK"
 msgstr "确定(&O)"
 
-#: ../../src/qt/lrchooseui.cpp:80 rc.cpp:12 rc.cpp:51 rc.cpp:159
+#: ../../src/qt/lrchooseui.cpp:79 rc.cpp:12 rc.cpp:51 rc.cpp:165
 msgid "&Close"
 msgstr "关闭(&C)"
 
@@ -207,17 +272,17 @@ msgid ""
 "window that's using the Region."
 msgstr "Region被锁定！可能不是写锁！请尝试关闭正在使用此Region的窗口。"
 
-#: ../../src/qt/mainwindow.cpp:137
+#: ../../src/qt/mainwindow.cpp:134
 msgid "Load File"
 msgstr ""
 
-#: ../../src/qt/mainwindow.cpp:137
+#: ../../src/qt/mainwindow.cpp:134
 msgid "Lua Script File (*.lua)"
 msgstr "Lua脚本文件(*.lua)"
 
-#: ../../src/qt/mainwindow.cpp:140 ../../src/qt/mainwindow.cpp:236
-#: ../../src/qt/mainwindow.cpp:240 ../../src/qt/mainwindow.cpp:269
-#: ../../src/qt/mainwindow.cpp:273 ../../src/qt/manage.cpp:32
+#: ../../src/qt/mainwindow.cpp:137 ../../src/qt/mainwindow.cpp:252
+#: ../../src/qt/mainwindow.cpp:256 ../../src/qt/mainwindow.cpp:285
+#: ../../src/qt/mainwindow.cpp:289 ../../src/qt/manage.cpp:32
 #: ../../src/qt/manage.cpp:241 ../../src/qt/manage.cpp:256
 #: ../../src/qt/utility.cpp:38 ../../src/qt/utility.cpp:70
 #: ../../src/qt/utility.cpp:92 ../../src/qt/utility.cpp:103
@@ -226,27 +291,27 @@ msgstr "Lua脚本文件(*.lua)"
 msgid "Error!"
 msgstr "错误！"
 
-#: ../../src/qt/mainwindow.cpp:141
+#: ../../src/qt/mainwindow.cpp:137
 msgid "No file selected."
 msgstr ""
 
-#: ../../src/qt/mainwindow.cpp:158
+#: ../../src/qt/mainwindow.cpp:154
 msgid "General"
 msgstr "概况"
 
-#: ../../src/qt/mainwindow.cpp:159
+#: ../../src/qt/mainwindow.cpp:155
 msgid "Game"
 msgstr "游戏"
 
-#: ../../src/qt/mainwindow.cpp:241 ../../src/qt/mainwindow.cpp:274
+#: ../../src/qt/mainwindow.cpp:257 ../../src/qt/mainwindow.cpp:290
 msgid "No Region or no Region selected!"
 msgstr "没有Region或没有Region选中！"
 
-#: ../../src/qt/mainwindow.cpp:280
+#: ../../src/qt/mainwindow.cpp:296
 msgid "Version: "
 msgstr "版本： "
 
-#: ../../src/qt/mainwindow.cpp:281
+#: ../../src/qt/mainwindow.cpp:297
 msgid "About Litematica Reader"
 msgstr "关于投影文件阅读器"
 
@@ -259,7 +324,7 @@ msgstr "没有选择行！"
 msgid "locked"
 msgstr "已锁定"
 
-#: ../../src/qt/manage.cpp:77 ../../src/qt/manage.cpp:547 rc.cpp:237
+#: ../../src/qt/manage.cpp:77 ../../src/qt/manage.cpp:547 rc.cpp:243
 msgid "Description"
 msgstr "描述"
 
@@ -371,9 +436,9 @@ msgstr "保存文件"
 msgid "Save Files"
 msgstr ""
 
-#: ../../src/qt/module.cpp:25
+#: ../../src/qt/module.cpp:24
 msgid "Litematica Reader"
-msgstr ""
+msgstr "投影文件阅读器"
 
 #: ../../src/qt/paletteaddui.cpp:19
 msgid "Please Enter a Block Name"
@@ -399,7 +464,7 @@ msgstr ""
 msgid "Please enter a data."
 msgstr ""
 
-#: ../../src/qt/paletteaddui.cpp:68 rc.cpp:243
+#: ../../src/qt/paletteaddui.cpp:68 rc.cpp:249
 msgid "Name"
 msgstr "名称"
 
@@ -468,11 +533,11 @@ msgstr "没有输入的描述！"
 msgid "No description entered! Will not add the NBT file!"
 msgstr ""
 
-#: ../../src/region.cpp:354 ../../src/region.cpp:627
+#: ../../src/region.cpp:353 ../../src/region.cpp:624
 msgid "Parsing blocks."
 msgstr "传输方块中。"
 
-#: ../../src/region.cpp:609
+#: ../../src/region.cpp:608
 msgid "Sorting"
 msgstr "整理中"
 
@@ -485,18 +550,26 @@ msgid " "
 msgstr ""
 
 #: ../../build/src/qt/settings.cpp:39 rc.cpp:69
+msgid "Ignore Leftover Data"
+msgstr ""
+
+#: ../../build/src/qt/settings.cpp:40 rc.cpp:72
+msgid "Whether to ignore leftover data in NBT when parsing."
+msgstr ""
+
+#: ../../build/src/qt/settings.cpp:46 rc.cpp:75
 msgid "Override Settings"
 msgstr "覆盖设置"
 
-#: ../../build/src/qt/settings.cpp:40 rc.cpp:72
+#: ../../build/src/qt/settings.cpp:47 rc.cpp:78
 msgid "Whether to override setting or not."
 msgstr "是否覆盖设置。"
 
-#: ../../build/src/qt/settings.cpp:43 rc.cpp:75
+#: ../../build/src/qt/settings.cpp:50 rc.cpp:81
 msgid "Override Version"
 msgstr "覆盖版本"
 
-#: ../../build/src/qt/settings.cpp:44 rc.cpp:78
+#: ../../build/src/qt/settings.cpp:51 rc.cpp:84
 msgid "The version to override in translation stage."
 msgstr "在翻译阶段覆盖的版本。"
 
@@ -544,7 +617,7 @@ msgstr "展示实体NBT(&S)"
 msgid "&List blocks"
 msgstr "列出方块(&L)"
 
-#: rc.cpp:48 rc.cpp:207
+#: rc.cpp:48 rc.cpp:213
 msgid "&Show blocks"
 msgstr "展示方块 (&S)"
 
@@ -564,185 +637,191 @@ msgstr ""
 msgid "Modify &Block"
 msgstr ""
 
-#: rc.cpp:81
+#: rc.cpp:87
 msgid "LoadRegionUI"
 msgstr ""
 
-#: rc.cpp:84
+#: rc.cpp:90
 msgid "What happened in this step?"
 msgstr "在此步发生了什么？"
 
-#: rc.cpp:87
+#: rc.cpp:93
 msgid "Details"
 msgstr "细节"
 
-#: rc.cpp:90
+#: rc.cpp:96
 msgid "&Continue"
 msgstr "继续(&C)"
 
-#: rc.cpp:93
+#: rc.cpp:99
 msgid "C&ancel"
 msgstr "取消(&C)"
 
-#: rc.cpp:96
+#: rc.cpp:102
 msgid "&Manage Region"
 msgstr "管理Region(&M)"
 
-#: rc.cpp:99
+#: rc.cpp:105
 msgid "M&odify Region"
 msgstr ""
 
-#: rc.cpp:102
+#: rc.cpp:108
 msgid "&Block reader"
 msgstr "方块阅读器(&B)"
 
-#: rc.cpp:105
+#: rc.cpp:111
 msgid "Shortcuts"
 msgstr ""
 
-#: rc.cpp:108
+#: rc.cpp:114
 msgid "Utility"
 msgstr ""
 
-#: rc.cpp:111
+#: rc.cpp:117
 msgid "&Configure"
 msgstr ""
 
-#: rc.cpp:114
+#: rc.cpp:120
 msgid "&Run Script"
 msgstr ""
 
-#: rc.cpp:117 rc.cpp:126
+#: rc.cpp:123 rc.cpp:132
 msgid "&About"
 msgstr "关于(&A)"
 
-#: rc.cpp:120
+#: rc.cpp:126
 msgid "&Tools"
 msgstr "工具(&T)"
 
-#: rc.cpp:123
+#: rc.cpp:129
 msgid "Icons"
 msgstr "图标"
 
-#: rc.cpp:129 rc.cpp:138
+#: rc.cpp:135 rc.cpp:144
 msgid "test"
 msgstr ""
 
-#: rc.cpp:132
+#: rc.cpp:138
 msgid "test\\"
 msgstr ""
 
-#: rc.cpp:135
+#: rc.cpp:141
 msgid "tetst"
 msgstr ""
 
-#: rc.cpp:141
+#: rc.cpp:147
 msgid "Form"
 msgstr ""
 
-#: rc.cpp:144 rc.cpp:186 rc.cpp:198
+#: rc.cpp:150 rc.cpp:192 rc.cpp:204
 msgid "&Add"
 msgstr "添加(&A)"
 
-#: rc.cpp:147 rc.cpp:189 rc.cpp:201
+#: rc.cpp:153 rc.cpp:195 rc.cpp:207
 msgid "&Remove"
 msgstr "移除(&R)"
 
-#: rc.cpp:150 rc.cpp:210
+#: rc.cpp:156 rc.cpp:216
 msgid "R&efresh"
 msgstr "刷新(&E)"
 
-#: rc.cpp:153
+#: rc.cpp:159
 msgid "&Save"
 msgstr "保存(&S)"
 
-#: rc.cpp:162
+#: rc.cpp:168
 msgid "NBT Reader"
 msgstr ""
 
-#: rc.cpp:165
+#: rc.cpp:171
 msgid "Search NBT label"
 msgstr ""
 
-#: rc.cpp:168
+#: rc.cpp:174
 msgid "Type:"
 msgstr ""
 
-#: rc.cpp:171
+#: rc.cpp:177
 msgid "Key:"
 msgstr ""
 
-#: rc.cpp:174
+#: rc.cpp:180
 msgid "Value:"
 msgstr ""
 
-#: rc.cpp:177
+#: rc.cpp:183
 msgid "Modify"
 msgstr ""
 
-#: rc.cpp:180
+#: rc.cpp:186
 msgid "Close"
 msgstr ""
 
-#: rc.cpp:183
+#: rc.cpp:189
 msgid "PaletteAddUI"
 msgstr ""
 
-#: rc.cpp:195
+#: rc.cpp:201
 msgid "PaletteListUI"
 msgstr ""
 
-#: rc.cpp:204
+#: rc.cpp:210
 msgid "Re&place"
 msgstr ""
 
-#: rc.cpp:213
+#: rc.cpp:219
 msgid "Modify Property of Block(s)"
 msgstr ""
 
-#: rc.cpp:216
+#: rc.cpp:222
 msgid "Modify the property of the block in:"
 msgstr "更改在此的方块属性："
 
-#: rc.cpp:219
+#: rc.cpp:225
 msgid "With the block that is the same property"
 msgstr "以及同属性的方块"
 
-#: rc.cpp:222
+#: rc.cpp:228
 msgid "Properties:"
 msgstr ""
 
-#: rc.cpp:225
+#: rc.cpp:231
 msgid "RegionModifyUI"
 msgstr ""
 
-#: rc.cpp:228
+#: rc.cpp:234
 msgid "Modify the infomation of the Region."
 msgstr ""
 
-#: rc.cpp:231
+#: rc.cpp:237
 msgid "Create Time"
 msgstr ""
 
-#: rc.cpp:234
+#: rc.cpp:240
 msgid "Modify Time"
 msgstr ""
 
-#: rc.cpp:240
+#: rc.cpp:246
 msgid "Author"
 msgstr ""
 
-#: rc.cpp:246
+#: rc.cpp:252
 msgid "Data Version"
 msgstr "数据版本"
 
-#: rc.cpp:249
+#: rc.cpp:255
 msgid "Version"
 msgstr ""
 
-#: rc.cpp:255
+#: rc.cpp:261
 msgid "&Cancel"
 msgstr "取消(&C)"
+
+#~ msgid "Failed to parse to NBT when trying as a Gzip file."
+#~ msgstr "在以Gzip文件尝试传为NBT时发生错误。"
+
+#~ msgid "Failed to parse to NBT when trying as a Zlib file."
+#~ msgstr "在以Zlib文件尝试传为NBT时发生错误。"
 
 #~ msgid "&File"
 #~ msgstr "文件 (&F)"

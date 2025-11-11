@@ -35,12 +35,6 @@ DhLoadObject::load (const QString &label)
 }
 
 void
-DhLoadObject::getSetFunc (void *main_klass, int value)
-{
-    Q_EMIT static_cast<DhLoadObject *> (main_klass)->progress (value);
-}
-
-void
 DhLoadObject::getSetFuncFull (void *main_klass, int value, const char *label)
 {
     auto obj = static_cast<DhLoadObject *> (main_klass);

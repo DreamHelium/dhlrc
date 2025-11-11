@@ -1,5 +1,5 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 3.16)
-PROJECT( dhlrc )
+PROJECT(dhlrc)
 
 option(INSTALL_NOW OFF)
 
@@ -21,23 +21,26 @@ pkg_search_module(LUA REQUIRED lua)
 
 set(DH_ENABLE_TRANSLATION true)
 
-if(NOT GETTEXT_FOUND)
+if (NOT GETTEXT_FOUND)
     set(DH_ENABLE_TRANSLATION false)
-endif()
+endif ()
 
-if(NOT DH_ENABLE_TRANSLATION)
+if (NOT DH_ENABLE_TRANSLATION)
     add_definitions(-DDH_DISABLE_TRANSLATION)
-endif()
+endif ()
 
 add_definitions(-DDH_DEBUG_IN_IDE)
 
 add_compile_options(-Wno-error=incompatible-pointer-types)
 
-add_subdirectory( src )
-add_subdirectory( resources )
-if(DH_ENABLE_TRANSLATION)
-    add_subdirectory( po )
-endif()
+set(BUILD_TESTING OFF)
+set(BUILD_EXAMPLES OFF)
+add_subdirectory(3rdparty/iniparser)
+add_subdirectory(src)
+add_subdirectory(resources)
+if (DH_ENABLE_TRANSLATION)
+    add_subdirectory(po)
+endif ()
 
 install(FILES "${CMAKE_CURRENT_BINARY_DIR}/locale/zh_CN/LC_MESSAGES/dhlrc.mo" DESTINATION
         "${CMAKE_INSTALL_DATAROOTDIR}/locale/zh_CN/LC_MESSAGES/")
