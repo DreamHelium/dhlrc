@@ -37,6 +37,8 @@ add_library(dhlrc SHARED
         global_variant.c
         global_variant.h
         public_text.h
+        region_litematic.c
+        region_litematic.h
 )
 
 target_link_libraries(dhlrc PUBLIC dhutil_string dhnbt_interface_cpp ${gm_LIBRARIES} dhutil_type dhutil_file cjson

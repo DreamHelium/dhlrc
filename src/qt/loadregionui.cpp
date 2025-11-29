@@ -78,8 +78,15 @@ LoadRegionUI::process ()
   auto real_task = [&] {
     int i = 0;
     GCancellable *new_cancellable = g_object_ref (cancellable);
-    for (auto dir : list)
+    for (const auto &dir : list)
       {
+        auto setFunc = [] (void *main_klass, int value, const char *text) {
+          Q_EMIT static_cast<LoadRegionUI *> (main_klass)
+              ->refreshSubProgress (value);
+          Q_EMIT static_cast<LoadRegionUI *> (main_klass)
+              ->refreshSubLabel (text);
+        };
+
         if (g_cancellable_is_cancelled (new_cancellable))
           break;
         Q_EMIT refreshFullProgress (i * 100 / list.size ());
@@ -90,15 +97,8 @@ LoadRegionUI::process ()
         /* Processing stuff */
         Q_EMIT refreshSubLabel (_ ("Parsing NBT"));
         GError *err = nullptr;
-        auto nbt = DhNbtInstance (
-            dir.toUtf8 (),
-            [] (void *main_klass, int value, const char *text) {
-              Q_EMIT static_cast<LoadRegionUI *> (main_klass)
-                  ->refreshSubProgress (value);
-              Q_EMIT static_cast<LoadRegionUI *> (main_klass)
-                  ->refreshSubLabel (text);
-            },
-            this, new_cancellable, 0, 100, &err);
+        auto nbt = DhNbtInstance (dir.toUtf8 (), setFunc, this,
+                                  new_cancellable, 0, 100, &err);
         if (!nbt () || err)
           {
             g_message ("%d", dhlrc_get_ignore_leftover ());
@@ -137,13 +137,7 @@ LoadRegionUI::process ()
               instance = nullptr;
             }
           else if (auto region = region_new_from_nbt_instance_ptr_full (
-                       &nbt,
-                       [] (void *main_klass, int value, const char *string) {
-                         auto lrui = static_cast<LoadRegionUI *> (main_klass);
-                         Q_EMIT lrui->refreshSubProgress (value);
-                         Q_EMIT lrui->refreshSubLabel (string);
-                       },
-                       this, cancellable))
+                       &nbt, setFunc, this, cancellable))
             {
               char *real_name = g_path_get_basename (dir.toUtf8 ());
               char *real_des = dh_get_filename_without_extension (real_name);

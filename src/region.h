@@ -21,100 +21,93 @@
 #include "litematica_region.h"
 #include <glib.h>
 
-#ifdef __cplusplus
-extern "C"
+G_BEGIN_DECLS
+
+typedef struct Pos
 {
-#endif
+  int x;
+  int y;
+  int z;
+} Pos;
 
-  typedef struct _Region Region;
+typedef struct BlockEntity
+{
+  Pos *pos;
+  void *nbt_instance;
+  /* Will use */
+  NbtNode *nbt_node;
+} BlockEntity;
 
-  typedef struct Pos
-  {
-    int x;
-    int y;
-    int z;
-  } Pos;
+typedef Pos RegionSize;
 
-  typedef struct BlockEntity
-  {
-    Pos *pos;
-    void *nbt_instance;
-  } BlockEntity;
+typedef struct Palette
+{
+  char *id_name;
+  DhStrArray *property_name;
+  DhStrArray *property_data;
+} Palette;
 
-  typedef Pos RegionSize;
+/** Just like `GPtrArray<Palette>` */
+typedef GPtrArray PaletteArray;
+/** Just like `GPtrArray<BlockEntity>` */
+typedef GPtrArray BlockEntityArray;
 
-  typedef struct Palette
-  {
-    char *id_name;
-    DhStrArray *property_name;
-    DhStrArray *property_data;
-  } Palette;
+typedef struct BaseData
+{
+  /* Default: time of generated */
+  GDateTime *create_time;
+  /* Default: time of generated */
+  GDateTime *modify_time;
+  /* Default: "" */
+  char *description;
+  /* Default: username */
+  char *author;
+  /* Default: Converted */
+  char *name;
+} BaseData;
 
-  /** Just like `GPtrArray<Palette>` */
-  typedef GPtrArray PaletteArray;
-  /** Just like `GPtrArray<BlockEntity>` */
-  typedef GPtrArray BlockEntityArray;
+typedef struct Region
+{
+  /** The base information */
+  int data_version;
+  BaseData *data;
+  /** The size of region */
+  RegionSize *region_size;
+  /** The block info array */
+  gint64 *block_array;
+  int block_array_len;
+  /** Block Entity Array */
+  BlockEntityArray *block_entity_array;
+  /** The Palette info array*/
+  PaletteArray *palette_array;
+  int air_palette;
+} Region;
 
-  typedef struct BaseData
-  {
-    /* Default: time of generated */
-    GDateTime *create_time;
-    /* Default: time of generated */
-    GDateTime *modify_time;
-    /* Default: "" */
-    char *description;
-    /* Default: username */
-    char *author;
-    /* Default: Converted */
-    char *name;
-  } BaseData;
+int region_get_index (Region *region, int x, int y, int z);
+gboolean file_is_new_schem (void *instance_ptr);
+gboolean region_node_is_new_schem (const NbtNode *root);
+Region *region_new_from_new_schem (void *instance_ptr);
+Region *region_new_from_lite_region (LiteRegion *lr);
+Region *region_new_from_nbt_node (NbtNode *root, DhProgressFullSet func,
+                                  void *main_klass, GCancellable *cancellable);
+Region *region_new_from_nbt_file (const char *filepos);
+Region *region_new_from_nbt_instance_ptr (void *instance_ptr);
+Region *region_new_from_nbt_instance_ptr_full (void *instance_ptr,
+                                               DhProgressFullSet func,
+                                               void *main_klass,
+                                               GCancellable *cancellable);
+gboolean palette_is_same (gconstpointer a, gconstpointer b);
+char *region_get_id_name (Region *region, int index);
+gboolean region_add_palette (Region *region, const char *id_name,
+                             DhStrArray *palette_name,
+                             DhStrArray *palette_data);
+gboolean region_add_palette_using_palette (Region *region, Palette *palette);
+Palette *region_get_palette (Region *region, int val);
+ItemList *item_list_new_from_multi_region (const char **region_uuid_arr);
+void region_free (void *region);
+int region_get_block_palette (Region *region, int index);
+BlockEntity *region_get_block_entity (Region *region, int x, int y, int z);
 
-  typedef struct _Region
-  {
-    /** The base information */
-    int data_version;
-    BaseData *data;
-    /** The size of region */
-    RegionSize *region_size;
-    /** The block info array */
-    gint64 *block_array;
-    int block_array_len;
-    /** Block Entity Array */
-    BlockEntityArray *block_entity_array;
-    /** The Palette info array*/
-    PaletteArray *palette_array;
-    int air_palette;
-  } Region;
-
-  int region_get_index (Region *region, int x, int y, int z);
-  gboolean file_is_new_schem (void *instance_ptr);
-  Region *region_new_from_new_schem (void *instance_ptr);
-  Region *region_new_from_lite_region (LiteRegion *lr);
-  Region *region_new_from_nbt_node (NbtNode *root, DhProgressFullSet func,
-                                    void *main_klass,
-                                    GCancellable *cancellable);
-  Region *region_new_from_nbt_file (const char *filepos);
-  Region *region_new_from_nbt_instance_ptr (void *instance_ptr);
-  Region *region_new_from_nbt_instance_ptr_full (void *instance_ptr,
-                                                 DhProgressFullSet func,
-                                                 void *main_klass,
-                                                 GCancellable *cancellable);
-  gboolean palette_is_same (gconstpointer a, gconstpointer b);
-  char *region_get_id_name (Region *region, int index);
-  // void region_modify_property (Region *region, BlockInfo *info,
-  //                              gboolean all_modify, DhStrArray *new_data);
-  gboolean region_add_palette (Region *region, const char *id_name,
-                               DhStrArray *palette_name,
-                               DhStrArray *palette_data);
-  gboolean region_add_palette_using_palette (Region *region, Palette *palette);
-  Palette *region_get_palette (Region *region, int val);
-  ItemList *item_list_new_from_multi_region (const char **region_uuid_arr);
-  void region_free (void *region);
-  int region_get_block_palette (Region *region, int index);
-  BlockEntity *region_get_block_entity (Region *region, int x, int y, int z);
-
-#ifdef __cplusplus
-}
-#endif
+G_END_DECLS
 
 #endif /* REGION_H */

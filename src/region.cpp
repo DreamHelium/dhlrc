@@ -24,13 +24,12 @@
 #include "glib.h"
 #include "glibconfig.h"
 #include "litematica_region.h"
+#include "nbt_interface_cpp/libnbt/nbt_util.h"
 #include "nbt_interface_cpp/nbt_interface.hpp"
 #include "process_state.h"
 
 #include <iostream>
 #include <list>
-
-/* TODO: Region convertion progress */
 
 static void palette_free (gpointer mem);
 static void base_data_free (gpointer mem);
@@ -983,4 +982,13 @@ region_new_from_nbt_node (NbtNode *root, DhProgressFullSet func,
   DhNbtInstance instance (root, true);
   return region_new_from_nbt_instance_ptr_full (&instance, func, main_klass,
                                            cancellable);
+}
+
+gboolean
+region_node_is_new_schem (const NbtNode *root)
+{
+  const char* key = nbt_node_get_key (root);
+  if (key && g_str_equal (key, "Schematic"))
+    return TRUE;
+  return FALSE;
 }
