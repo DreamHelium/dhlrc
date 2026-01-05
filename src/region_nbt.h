@@ -15,22 +15,23 @@
     You should have received a copy of the GNU Lesser General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>. */
 
-#ifndef DHLRC_REGION_LITEMATIC_H
-#define DHLRC_REGION_LITEMATIC_H
+#ifndef DHLRC_REGION_NBT_H
+#define DHLRC_REGION_NBT_H
 
 #include "region.h"
+#include <glib.h>
 
 G_BEGIN_DECLS
 
 typedef enum
 {
-  DHLRC_REGION_LITEMATIC_ERROR_NO_CHILD,
-  DHLRC_REGION_LITEMATIC_ERROR_WRONG_TYPE
-} DhlrcRegionLitematicError;
+  DHLRC_REGION_NBT_ERROR_NO_CHILD,
+  DHLRC_REGION_NBT_ERROR_WRONG_TYPE
+} DhlrcRegionNbtError;
 
-Region *region_new_from_litematic (NbtNode *root, int i, GError **err,
-                                   DhProgressFullSet func, void *main_klass);
+Region *region_new_from_nbt (NbtNode *root, int i, GError **err,
+                             DhProgressFullSet func, void *main_klass);
 
 G_END_DECLS
 
-#endif // DHLRC_REGION_LITEMATIC_H
+#endif // DHLRC_REGION_NBT_H

@@ -3,6 +3,7 @@
 #include "../nbt_interface_cpp/libnbt/nbt_util.h"
 #include "../region.h"
 #include "../translation.h"
+#include "../nbt_interface_cpp/nbt_interface.hpp"
 
 #define DHLRC_REGION_CONV_ERROR dhlrc_region_conv_error_quark ()
 
@@ -50,17 +51,17 @@ static void
 size_change (Region *region, int *x, int *y, int *z)
 {
   if (*x < region->region_size->x - 1)
-    *x++;
+    (*x)++;
   else if (*z < region->region_size->z - 1)
     {
       *x = 0;
-      *z++;
+      (*z)++;
     }
   else if (*y < region->region_size->y - 1)
     {
       *x = 0;
       *z = 0;
-      *y++;
+      (*y)++;
     }
 }
 
@@ -114,7 +115,8 @@ blocks_nbt_new (Region *region, gboolean ignore_air, GError **err,
         {
           BlockEntity *be
               = (BlockEntity *)(region->block_entity_array->pdata[j]);
-          if (be->pos->x == x && be->pos->y == y && be->pos->z == z)
+          if (be->pos->x == x && be->pos->y == y && be->pos->z == z
+              && be->nbt_instance)
             {
               NbtNode *original_nbt
                   = ((DhNbtInstance *)(be->nbt_instance))->get_original_nbt ();

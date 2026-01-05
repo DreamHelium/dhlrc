@@ -5,6 +5,7 @@
 #define DH_EDITLINE_USED
 #include "../common_info.h"
 #include "../feature/dh_module.h"
+#include "../region_litematic.h"
 #include "dh_validator_cpp.hpp"
 #include "glib.h"
 
@@ -111,8 +112,8 @@ extern "C"
         auto ret_val = std::any_cast<std::vector<int64_t>> (ret);
         for (auto i : ret_val)
           {
-            auto lr = lite_region_create_from_root_instance_cpp (instance, i);
-            auto region = region_new_from_lite_region (lr);
+            auto region = region_new_from_litematic (
+                instance.get_original_nbt (), i, nullptr, nullptr, nullptr);
             regions.insert (
                 std::pair<std::string, Region *> (names->val[i], region));
           }
@@ -211,19 +212,20 @@ extern "C"
                     const std::string &suffix, format output_format,
                     const std::string &dir)
   {
-    auto filesuffix = [] (format format) -> std::string {
-      switch (format)
-        {
-        case DH_NBT:
-          return ".nbt";
-        case DH_LITEMATIC:
-          return ".litematic";
-        case DH_SCHEMATIC:
-          return ".schem";
-        default:
-          return {};
-        }
-    };
+    auto filesuffix = [] (format format) -> std::string
+      {
+        switch (format)
+          {
+          case DH_NBT:
+            return ".nbt";
+          case DH_LITEMATIC:
+            return ".litematic";
+          case DH_SCHEMATIC:
+            return ".schem";
+          default:
+            return {};
+          }
+      };
 
     std::string real_filename = dir;
     real_filename += G_DIR_SEPARATOR_S;
@@ -365,10 +367,9 @@ extern "C"
             /* Make regions */
             for (int i = 0; i < litematic_len; i++)
               {
-                LiteRegion *lr
-                    = lite_region_create_from_root_instance_cpp (instance, i);
-                Region *region = region_new_from_lite_region (lr);
-                lite_region_free (lr);
+                Region *region
+                    = region_new_from_litematic (instance.get_original_nbt (),
+                                                 i, nullptr, nullptr, nullptr);
                 g_ptr_array_add (region_array, region);
               }
           }

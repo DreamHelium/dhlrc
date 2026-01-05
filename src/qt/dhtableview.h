@@ -8,19 +8,24 @@
 
 class DhTableView : public QTableView
 {
-    Q_OBJECT
+  Q_OBJECT
 
 public:
-    DhTableView(QWidget* parent =  nullptr);
+  DhTableView (QWidget *parent = nullptr);
 
 Q_SIGNALS:
-    void tableDND(QDropEvent* event);
+  void tableDND (QDropEvent *event);
+  void viewResized ();
+
+public:
+  void setDND (bool value);
 
 protected:
-    void dropEvent(QDropEvent* event);
+  void dropEvent (QDropEvent *event);
+  void resizeEvent (QResizeEvent *event);
 
 private:
-    QLabel* indicateLabel;
+  QLabel *indicateLabel;
 };
 
 #endif /* DHTABLEVIEW_H */

@@ -1,106 +1,94 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
-    <class>BlockListUI</class>
-    <widget class="QWidget" name="BlockListUI">
-        <property name="geometry">
-            <rect>
-                <x>0</x>
-                <y>0</y>
-                <width>702</width>
-                <height>639</height>
-            </rect>
-        </property>
-        <property name="windowTitle">
-            <string>Show Block Lists</string>
-        </property>
-        <layout class="QHBoxLayout" name="horizontalLayout_5">
-            <item>
-                <layout class="QVBoxLayout" name="verticalLayout_2">
-                    <item>
-                        <layout class="QVBoxLayout" name="verticalLayout">
-                            <item>
-                                <widget class="QLabel" name="label">
-                                    <property name="text">
-                                        <string>The blocks are listed below:</string>
-                                    </property>
-                                </widget>
-                            </item>
-                            <item>
-                                <widget class="QLineEdit" name="lineEdit">
-                                    <property name="placeholderText">
-                                        <string>Search block name</string>
-                                    </property>
-                                </widget>
-                            </item>
-                            <item>
-                                <widget class="QScrollArea" name="scrollArea">
-                                    <property name="widgetResizable">
-                                        <bool>true</bool>
-                                    </property>
-                                    <widget class="QWidget" name="scrollAreaWidgetContents">
-                                        <property name="geometry">
-                                            <rect>
-                                                <x>0</x>
-                                                <y>0</y>
-                                                <width>682</width>
-                                                <height>515</height>
-                                            </rect>
-                                        </property>
-                                        <layout class="QHBoxLayout" name="horizontalLayout">
-                                            <item>
-                                                <widget class="QTableView" name="tableView"/>
-                                            </item>
-                                        </layout>
-                                    </widget>
-                                </widget>
-                            </item>
-                        </layout>
-                    </item>
-                    <item>
-                        <layout class="QHBoxLayout" name="horizontalLayout_4">
-                            <item>
-                                <spacer name="horizontalSpacer">
-                                    <property name="orientation">
-                                        <enum>Qt::Orientation::Horizontal</enum>
-                                    </property>
-                                    <property name="sizeHint" stdset="0">
-                                        <size>
-                                            <width>40</width>
-                                            <height>20</height>
-                                        </size>
-                                    </property>
-                                </spacer>
-                            </item>
-                            <item>
-                                <widget class="QPushButton" name="pushButton">
-                                    <property name="text">
-                                        <string>&amp;Close</string>
-                                    </property>
-                                </widget>
-                            </item>
-                        </layout>
-                    </item>
-                </layout>
-            </item>
-        </layout>
-    </widget>
-    <resources/>
-    <connections>
-        <connection>
-            <sender>pushButton</sender>
-            <signal>clicked()</signal>
-            <receiver>BlockListUI</receiver>
-            <slot>close()</slot>
-            <hints>
-                <hint type="sourcelabel">
-                    <x>433</x>
-                    <y>406</y>
-                </hint>
-                <hint type="destinationlabel">
-                    <x>271</x>
-                    <y>219</y>
-                </hint>
-            </hints>
-        </connection>
-    </connections>
+ <class>BlockListUI</class>
+ <widget class="QWidget" name="BlockListUI">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>702</width>
+    <height>639</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Show Block Lists</string>
+  </property>
+  <layout class="QHBoxLayout" name="horizontalLayout_5">
+   <item>
+    <layout class="QVBoxLayout" name="verticalLayout_2">
+     <item>
+      <layout class="QVBoxLayout" name="verticalLayout">
+       <item>
+        <widget class="QLabel" name="label">
+         <property name="text">
+          <string>The blocks are listed below:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="lineEdit">
+         <property name="placeholderText">
+          <string>Search block name</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="DhTableView" name="tableView"/>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_4">
+       <item>
+        <spacer name="horizontalSpacer">
+         <property name="orientation">
+          <enum>Qt::Orientation::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QPushButton" name="pushButton">
+         <property name="text">
+          <string>&amp;Close</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>DhTableView</class>
+   <extends>QTableView</extends>
+   <header>dhtableview.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>pushButton</sender>
+   <signal>clicked()</signal>
+   <receiver>BlockListUI</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>433</x>
+     <y>406</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>271</x>
+     <y>219</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

@@ -9,22 +9,24 @@
 
 class LoadRegionUI : public LoadObjectUI
 {
-    Q_OBJECT
+  Q_OBJECT
 
-  public:
-    explicit LoadRegionUI (QStringList list, QWidget *parent = nullptr);
-    ~LoadRegionUI () override;
-    GMainLoop *main_loop = g_main_loop_new (nullptr, false);
-    DhNbtInstance *instance;
-    char *description = nullptr;
+public:
+  explicit LoadRegionUI (QStringList list, QWidget *parent = nullptr);
+  ~LoadRegionUI () override;
+  GMainLoop *main_loop = g_main_loop_new (nullptr, false);
+  DhNbtInstance *instance;
+  char *description = nullptr;
 
-  private:
-    QStringList list;
-    QStringList failedList;
-    GCancellable *cancellable = g_cancellable_new ();
+private:
+  QStringList list;
+  QStringList failedList;
+  /* Original class never provide this. */
+  QStringList failedReason;
+  GCancellable *cancellable = g_cancellable_new ();
 
-  public Q_SLOTS:
-    void process ();
+public Q_SLOTS:
+  void process ();
 };
 
 #endif // DHLRC_LOADREGIONUI_H

@@ -18,7 +18,9 @@
 #ifndef REGION_H
 #define REGION_H
 
-#include "litematica_region.h"
+#include "dh_string_util.h"
+#include "dhlrc_list.h"
+#include "nbt_interface_cpp/libnbt/nbt_parse.h"
 #include <glib.h>
 
 G_BEGIN_DECLS
@@ -87,7 +89,6 @@ int region_get_index (Region *region, int x, int y, int z);
 gboolean file_is_new_schem (void *instance_ptr);
 gboolean region_node_is_new_schem (const NbtNode *root);
 Region *region_new_from_new_schem (void *instance_ptr);
-Region *region_new_from_lite_region (LiteRegion *lr);
 Region *region_new_from_nbt_node (NbtNode *root, DhProgressFullSet func,
                                   void *main_klass, GCancellable *cancellable);
 Region *region_new_from_nbt_file (const char *filepos);

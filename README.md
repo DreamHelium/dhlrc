@@ -1,9 +1,13 @@
 # Litematica Reader in C language
 
 [中文文档](README_zh.md)
-[pic](funcshow_en.png)
 
 **Note: The most part of the code will be transformed to C++, so the project might be dhlrcpp in the future.**
+
+## Announcement
+
+I will port the project to `Rust` language, so the `main` branch will not update until I finish porting. At this time, 
+you can see the `rust-dev` branch for more information.
 
 ## Introduction
 

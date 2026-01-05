@@ -40,8 +40,6 @@ G_END_DECLS
      "close the window that's using the Region.")
 
 static dh::ManageRegion *mr = nullptr;
-static dh::ManageNbtInterface *mni = nullptr;
-static dh::ManageModule *mm = nullptr;
 static KPageDialog *dialog = nullptr;
 static MainWindow *mw;
 
@@ -112,8 +110,6 @@ MainWindow::MainWindow (QWidget *parent)
 MainWindow::~MainWindow ()
 {
   delete mr;
-  delete mni;
-  delete mm;
   delete dialog;
   delete ui;
 }

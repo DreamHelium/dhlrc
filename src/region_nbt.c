@@ -1,5 +1,5 @@
 /*  region_litematic - Region Structure converted from Litematic
-    Copyright (C) 2025 Dream Helium
+    Copyright (C) 2026 Dream Helium
     This file is part of litematica_reader_c.
 
     This program is free software: you can redistribute it and/or modify
@@ -15,22 +15,6 @@
     You should have received a copy of the GNU Lesser General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>. */
 
-#ifndef DHLRC_REGION_LITEMATIC_H
-#define DHLRC_REGION_LITEMATIC_H
+#include "region_nbt.h"
 
-#include "region.h"
 
-G_BEGIN_DECLS
-
-typedef enum
-{
-  DHLRC_REGION_LITEMATIC_ERROR_NO_CHILD,
-  DHLRC_REGION_LITEMATIC_ERROR_WRONG_TYPE
-} DhlrcRegionLitematicError;
-
-Region *region_new_from_litematic (NbtNode *root, int i, GError **err,
-                                   DhProgressFullSet func, void *main_klass);
-
-G_END_DECLS
-
-#endif // DHLRC_REGION_LITEMATIC_H

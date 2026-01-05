@@ -15,6 +15,8 @@
     You should have received a copy of the GNU Lesser General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>. */
 
+/* note: We try to check whether the information has error. */
+
 #include "region_litematic.h"
 #include "nbt_interface_cpp/libnbt/nbt_util.h"
 #include "public_text.h"
@@ -196,9 +198,9 @@ litematic_fill_entity_array (NbtNode *root, Region *region, GError **err)
   NbtNode *entities = nbt_node_child_to_key (root, "TileEntities");
   if (!entities)
     goto no_child;
+  /* We need to goto child then we can see entities */
   entities = entities->children;
-  // if (!entities)
-  //   goto no_child;
+
   while (entities)
     {
       NbtNode *x_node = nbt_node_child_to_key (entities, "x");

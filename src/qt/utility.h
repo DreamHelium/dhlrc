@@ -9,8 +9,6 @@
 
 namespace dh
 {
-void loadRegion (QWidget *parent);
-void loadRegion (QWidget *parent, const char *uuid);
 void loadNbtFileAsync (QWidget *parent, QString filedir, bool askForDes);
 void loadNbtInstances (QWidget *parent, const QStringList &filelist);
 QPixmap *loadSvgFile (const char *contents);

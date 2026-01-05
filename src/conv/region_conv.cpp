@@ -341,16 +341,19 @@ new_schema_fill_block_entities (BlockEntityArray *array)
   for (int i = 0; i < array->len; i++)
     {
       BlockEntity *info = (BlockEntity *)array->pdata[i];
-      DhNbtInstance entity = ((DhNbtInstance *)(info->nbt_instance))
-                                 ->dup_current_as_original (true);
-      entity.set_key (nullptr);
-      DhNbtInstance id (entity);
-      id.child ("id");
-      id.set_key ("Id");
-      int pos[3] = { info->pos->x, info->pos->y, info->pos->z };
-      DhNbtInstance pos_nbt (pos, 3, "Pos", true);
-      entity.insert_before ({}, pos_nbt);
-      ret.insert_before ({}, entity);
+      if (info->nbt_instance)
+        {
+          DhNbtInstance entity = ((DhNbtInstance *)(info->nbt_instance))
+                                     ->dup_current_as_original (true);
+          entity.set_key (nullptr);
+          DhNbtInstance id (entity);
+          id.child ("id");
+          id.set_key ("Id");
+          int pos[3] = { info->pos->x, info->pos->y, info->pos->z };
+          DhNbtInstance pos_nbt (pos, 3, "Pos", true);
+          entity.insert_before ({}, pos_nbt);
+          ret.insert_before ({}, entity);
+        }
     }
   return ret;
 }

@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-11-10 23:26+0800\n"
+"POT-Creation-Date: 2025-12-20 17:26+0800\n"
 "PO-Revision-Date: 2024-11-30 07:00+0800\n"
 "Last-Translator: dream_he <48383878+DreamHelium@users.noreply.github.com>\n"
 "Language-Team: Chinese <kde-i18n-doc@kde.org>\n"
@@ -50,40 +50,52 @@ msgstr "没有GUI模块！"
 msgid "CLI interface is not supported yet!"
 msgstr ""
 
-#: ../../src/qt/blocklistui.cpp:25
+#: ../../src/region_litematic.c:346
+msgid "Starting to parse litematic NBT node to Region."
+msgstr ""
+
+#: ../../src/region_litematic.c:402
+msgid "Finish parsing litematic NBT node to Region."
+msgstr ""
+
+#: ../../src/region_litematic.c:416
+msgid "Failed when parsing litematic NBT node to Region."
+msgstr ""
+
+#: ../../src/qt/blocklistui.cpp:23
 msgid "Ignore Air?"
 msgstr "忽略空气？"
 
-#: ../../src/qt/blocklistui.cpp:26
+#: ../../src/qt/blocklistui.cpp:24
 msgid "Do you want to ignore air?"
 msgstr "您想要忽略空气吗？"
 
-#: ../../src/qt/blocklistui.cpp:47 ../../src/qt/blocklistui.cpp:50
+#: ../../src/qt/blocklistui.cpp:46 ../../src/qt/blocklistui.cpp:49
 msgid "id"
 msgstr "索引"
 
-#: ../../src/qt/blocklistui.cpp:47 ../../src/qt/blocklistui.cpp:50
+#: ../../src/qt/blocklistui.cpp:46 ../../src/qt/blocklistui.cpp:49
 msgid "id Name"
 msgstr "id名称"
 
-#: ../../src/qt/blocklistui.cpp:47
+#: ../../src/qt/blocklistui.cpp:46
 msgid "Block Name"
 msgstr "方块名称"
 
-#: ../../src/qt/blocklistui.cpp:47 ../../src/qt/blocklistui.cpp:50 rc.cpp:27
+#: ../../src/qt/blocklistui.cpp:46 ../../src/qt/blocklistui.cpp:49 rc.cpp:27
 msgid "x"
 msgstr "x"
 
-#: ../../src/qt/blocklistui.cpp:48 ../../src/qt/blocklistui.cpp:50 rc.cpp:30
+#: ../../src/qt/blocklistui.cpp:47 ../../src/qt/blocklistui.cpp:49 rc.cpp:30
 #: rc.cpp:57
 msgid "y"
 msgstr "y"
 
-#: ../../src/qt/blocklistui.cpp:48 ../../src/qt/blocklistui.cpp:51 rc.cpp:33
+#: ../../src/qt/blocklistui.cpp:47 ../../src/qt/blocklistui.cpp:49 rc.cpp:33
 msgid "z"
 msgstr "z"
 
-#: ../../src/qt/blocklistui.cpp:48 ../../src/qt/blocklistui.cpp:51
+#: ../../src/qt/blocklistui.cpp:47 ../../src/qt/blocklistui.cpp:50
 msgid "Palette"
 msgstr "偏移码"
 
@@ -91,7 +103,7 @@ msgstr "偏移码"
 msgid "Lack the translation module, will not try to get translation!"
 msgstr "缺少翻译模块，将不会尝试获取翻译！"
 
-#: ../../src/qt/blockreaderui.cpp:101
+#: ../../src/qt/blockreaderui.cpp:100
 msgid ""
 "Name: %1\n"
 "Translation name: %2\n"
@@ -105,7 +117,7 @@ msgstr ""
 "偏移量：%4\n"
 "属性：\n"
 
-#: ../../src/qt/blockreaderui.cpp:111
+#: ../../src/qt/blockreaderui.cpp:110
 msgid ""
 "Name: %1\n"
 "Index: %2\n"
@@ -117,19 +129,19 @@ msgstr ""
 "偏移量：%3\n"
 "属性：\n"
 
-#: ../../src/qt/blockreaderui.cpp:142
+#: ../../src/qt/blockreaderui.cpp:141
 msgid "Not valid!"
 msgstr "无效！"
 
-#: ../../src/qt/blockreaderui.cpp:152
+#: ../../src/qt/blockreaderui.cpp:151
 msgid "With DataVersion %4, version %5."
 msgstr "数据版本%4，版本%5。"
 
-#: ../../src/qt/blockreaderui.cpp:154
+#: ../../src/qt/blockreaderui.cpp:153
 msgid "Created time: %6, Modified time: %7, Author: %8, Name: %9"
 msgstr "创建时间：%6，修改时间：%7，作者：%8，名字：%9"
 
-#: ../../src/qt/blockreaderui.cpp:156
+#: ../../src/qt/blockreaderui.cpp:155
 msgid "Description: %10"
 msgstr "描述：%10"
 
@@ -160,7 +172,7 @@ msgstr "全选"
 msgid "OK"
 msgstr "确定"
 
-#: ../../src/qt/loadobjectui.cpp:55
+#: ../../src/qt/loadobjectui.cpp:63
 msgid "Finish!"
 msgstr "结束！"
 
@@ -225,27 +237,35 @@ msgstr "将NBT文件传递到NBT节点树上。"
 msgid "Loading file(s) to Region(s)."
 msgstr "加载文件至Region。"
 
-#: ../../src/qt/loadregionui.cpp:50 ../../src/qt/saveregionui.cpp:14
+#: ../../src/qt/loadregionui.cpp:53 ../../src/qt/saveregionui.cpp:14
 msgid "The following files are not added:\n"
 msgstr "以下文件将不会被添加：\n"
 
-#: ../../src/qt/loadregionui.cpp:91
+#: ../../src/qt/loadregionui.cpp:109
 msgid "Parsing NBT"
 msgstr "传递NBT中"
 
-#: ../../src/qt/loadregionui.cpp:113
+#: ../../src/qt/loadregionui.cpp:125
 msgid "Error encountered with domain %1 and code %2: %3"
 msgstr "在域名为%1处发生错误，代码为%2：%3"
 
-#: ../../src/qt/lrchooseui.cpp:28
+#: ../../src/qt/loadregionui.cpp:141
+msgid "Please click `Continue` to choose region(s)."
+msgstr ""
+
+#: ../../src/qt/loadregionui.cpp:170
+msgid "No reason provided."
+msgstr ""
+
+#: ../../src/qt/lrchooseui.cpp:30
 msgid "Please select region(s) of the Litematic"
 msgstr "请选择投影文件的区域"
 
-#: ../../src/qt/lrchooseui.cpp:54
+#: ../../src/qt/lrchooseui.cpp:55
 msgid "&All"
 msgstr "全选 (&A)"
 
-#: ../../src/qt/lrchooseui.cpp:61
+#: ../../src/qt/lrchooseui.cpp:62
 msgid ""
 "Please enter the new Region(s)' name(s): (%1 represents the NBT description "
 "and %2 represents the original region's name), you can see results below the "
@@ -254,15 +274,15 @@ msgstr ""
 "请输入新Region的名字：（%1代表NBT描述，%2代表原本的区域的名字），你可以在输入"
 "栏下看到结果："
 
-#: ../../src/qt/lrchooseui.cpp:66
+#: ../../src/qt/lrchooseui.cpp:67
 msgid "Enter description here."
 msgstr "在此输入描述。"
 
-#: ../../src/qt/lrchooseui.cpp:78 rc.cpp:162 rc.cpp:198 rc.cpp:258
+#: ../../src/qt/lrchooseui.cpp:79 rc.cpp:162 rc.cpp:198 rc.cpp:258
 msgid "&OK"
 msgstr "确定(&O)"
 
-#: ../../src/qt/lrchooseui.cpp:79 rc.cpp:12 rc.cpp:51 rc.cpp:165
+#: ../../src/qt/lrchooseui.cpp:80 rc.cpp:12 rc.cpp:51 rc.cpp:165
 msgid "&Close"
 msgstr "关闭(&C)"
 
@@ -272,168 +292,104 @@ msgid ""
 "window that's using the Region."
 msgstr "Region被锁定！可能不是写锁！请尝试关闭正在使用此Region的窗口。"
 
-#: ../../src/qt/mainwindow.cpp:134
+#: ../../src/qt/mainwindow.cpp:130
 msgid "Load File"
 msgstr ""
 
-#: ../../src/qt/mainwindow.cpp:134
+#: ../../src/qt/mainwindow.cpp:130
 msgid "Lua Script File (*.lua)"
 msgstr "Lua脚本文件(*.lua)"
 
-#: ../../src/qt/mainwindow.cpp:137 ../../src/qt/mainwindow.cpp:252
-#: ../../src/qt/mainwindow.cpp:256 ../../src/qt/mainwindow.cpp:285
-#: ../../src/qt/mainwindow.cpp:289 ../../src/qt/manage.cpp:32
-#: ../../src/qt/manage.cpp:241 ../../src/qt/manage.cpp:256
-#: ../../src/qt/utility.cpp:38 ../../src/qt/utility.cpp:70
-#: ../../src/qt/utility.cpp:92 ../../src/qt/utility.cpp:103
-#: ../../src/qt/utility.cpp:108 ../../src/qt/utility.cpp:117
-#: ../../src/qt/utility.cpp:187 ../../src/qt/nbt-reader/nbtreaderui.cpp:177
+#: ../../src/qt/mainwindow.cpp:133 ../../src/qt/mainwindow.cpp:248
+#: ../../src/qt/mainwindow.cpp:252 ../../src/qt/mainwindow.cpp:281
+#: ../../src/qt/mainwindow.cpp:285 ../../src/qt/manage.cpp:33
+#: ../../src/qt/utility.cpp:90 ../../src/qt/nbt-reader/nbtreaderui.cpp:177
 msgid "Error!"
 msgstr "错误！"
 
-#: ../../src/qt/mainwindow.cpp:137
+#: ../../src/qt/mainwindow.cpp:133
 msgid "No file selected."
 msgstr ""
 
-#: ../../src/qt/mainwindow.cpp:154
+#: ../../src/qt/mainwindow.cpp:150
 msgid "General"
 msgstr "概况"
 
-#: ../../src/qt/mainwindow.cpp:155
+#: ../../src/qt/mainwindow.cpp:151
 msgid "Game"
 msgstr "游戏"
 
-#: ../../src/qt/mainwindow.cpp:257 ../../src/qt/mainwindow.cpp:290
+#: ../../src/qt/mainwindow.cpp:253 ../../src/qt/mainwindow.cpp:286
 msgid "No Region or no Region selected!"
 msgstr "没有Region或没有Region选中！"
 
-#: ../../src/qt/mainwindow.cpp:296
+#: ../../src/qt/mainwindow.cpp:292
 msgid "Version: "
 msgstr "版本： "
 
-#: ../../src/qt/mainwindow.cpp:297
+#: ../../src/qt/mainwindow.cpp:293
 msgid "About Litematica Reader"
 msgstr "关于投影文件阅读器"
 
-#: ../../src/qt/manage.cpp:32
+#: ../../src/qt/manage.cpp:33
 msgid "No row is selected!"
 msgstr "没有选择行！"
 
-#: ../../src/qt/manage.cpp:66 ../../src/qt/manage.cpp:67
-#: ../../src/qt/manage.cpp:68
+#: ../../src/qt/manage.cpp:67 ../../src/qt/manage.cpp:68
+#: ../../src/qt/manage.cpp:69
 msgid "locked"
 msgstr "已锁定"
 
-#: ../../src/qt/manage.cpp:77 ../../src/qt/manage.cpp:547 rc.cpp:243
+#: ../../src/qt/manage.cpp:78 rc.cpp:243
 msgid "Description"
 msgstr "描述"
 
-#: ../../src/qt/manage.cpp:77
+#: ../../src/qt/manage.cpp:78
 msgid "UUID"
 msgstr "唯一码"
 
-#: ../../src/qt/manage.cpp:77
+#: ../../src/qt/manage.cpp:78
 msgid "Time"
 msgstr "时间"
 
-#: ../../src/qt/manage.cpp:158
+#: ../../src/qt/manage.cpp:147
 msgid "Manage Region"
 msgstr "管理Region"
 
-#: ../../src/qt/manage.cpp:166
+#: ../../src/qt/manage.cpp:155
 msgid "Add region from file."
 msgstr "从文件添加Region。"
 
-#: ../../src/qt/manage.cpp:166
+#: ../../src/qt/manage.cpp:155
 msgid "Add region from NBT instance."
 msgstr "从NBT实例添加Region。"
 
-#: ../../src/qt/manage.cpp:199
+#: ../../src/qt/manage.cpp:177
+msgid "Function not implemented yet."
+msgstr ""
+
+#: ../../src/qt/manage.cpp:189
 msgid "Save as NBT."
 msgstr "保存为NBT结构。"
 
-#: ../../src/qt/manage.cpp:199
+#: ../../src/qt/manage.cpp:189
 msgid "Save as NBT (Ignore air)."
 msgstr "保存为NBT结构（忽略空气）。"
 
-#: ../../src/qt/manage.cpp:200
+#: ../../src/qt/manage.cpp:190
 msgid "Save as litematic"
 msgstr "保存为投影格式"
 
-#: ../../src/qt/manage.cpp:200
+#: ../../src/qt/manage.cpp:190
 msgid "Save as new schematics"
 msgstr "保存为新式schematics"
 
-#: ../../src/qt/manage.cpp:205
+#: ../../src/qt/manage.cpp:195
 msgid "Select A Directory"
 msgstr "选择一个目录"
 
-#: ../../src/qt/manage.cpp:234
+#: ../../src/qt/manage.cpp:224
 msgid "No item selected!"
-msgstr ""
-
-#: ../../src/qt/manage.cpp:241
-msgid "Not a valid NBT List!"
-msgstr ""
-
-#: ../../src/qt/manage.cpp:257
-msgid "Not a valid NBT UUID!"
-msgstr ""
-
-#: ../../src/qt/manage.cpp:266
-msgid "Manage NBT Interface"
-msgstr ""
-
-#: ../../src/qt/manage.cpp:275
-msgid "Select a file"
-msgstr "选择一个文件"
-
-#: ../../src/qt/manage.cpp:276
-msgid "Litematic file (*.litematic);;NBT File (*.nbt)"
-msgstr "投影文件 (*.litematic);;NBT文件 (*.nbt)"
-
-#: ../../src/qt/manage.cpp:454
-msgid "Select an option"
-msgstr "选择一个选项"
-
-#: ../../src/qt/manage.cpp:454
-msgid "Please select an option."
-msgstr "请选择一个选项。"
-
-#: ../../src/qt/manage.cpp:455
-msgid "Save as original NBT."
-msgstr "保存为原本的NBT。"
-
-#: ../../src/qt/manage.cpp:455
-msgid "Convert to NBT struct."
-msgstr "转换为NBT结构。"
-
-#: ../../src/qt/manage.cpp:456
-msgid "Convert to NBT struct (ignore air)."
-msgstr "转换为NBT结构（忽略空气）。"
-
-#: ../../src/qt/manage.cpp:457
-msgid "Convert to litematic."
-msgstr "转换为投影。"
-
-#: ../../src/qt/manage.cpp:457
-msgid "Convert to new schematics."
-msgstr "转换为新式Schematics。"
-
-#: ../../src/qt/manage.cpp:475
-msgid "Warning!"
-msgstr "警告！"
-
-#: ../../src/qt/manage.cpp:476
-msgid "Some items are locked, which will be ignored."
-msgstr "有些项目被锁定，将被忽略。"
-
-#: ../../src/qt/manage.cpp:482
-msgid "Save File"
-msgstr "保存文件"
-
-#: ../../src/qt/manage.cpp:494
-msgid "Save Files"
 msgstr ""
 
 #: ../../src/qt/module.cpp:24
@@ -476,68 +432,40 @@ msgstr ""
 msgid "Invalid!"
 msgstr ""
 
-#: ../../src/qt/utility.cpp:39
-msgid "No NBT or no NBT selected!"
-msgstr "无NBT或没有NBT被选中！"
-
-#: ../../src/qt/utility.cpp:63 ../../src/qt/utility.cpp:85
-msgid "Enter Region Name"
-msgstr "输入Region名称"
-
-#: ../../src/qt/utility.cpp:64 ../../src/qt/utility.cpp:86
-msgid "Enter name for the new Region."
-msgstr "输入新Region的名称。"
-
-#: ../../src/qt/utility.cpp:71 ../../src/qt/utility.cpp:93
-msgid "No description for the Region!"
-msgstr "没有Region的描述！"
-
-#: ../../src/qt/utility.cpp:104
-msgid "Unknown error!"
-msgstr ""
-
-#: ../../src/qt/utility.cpp:109
-msgid "The NBT Struct is unsupported!"
-msgstr "此NBT结构不受支持！"
-
-#: ../../src/qt/utility.cpp:118
-msgid "This NBT is locked!"
-msgstr "此NBT被锁定！"
-
-#: ../../src/qt/utility.cpp:169
+#: ../../src/qt/utility.cpp:72
 msgid "The task is cancelled."
 msgstr "任务被取消。"
 
-#: ../../src/qt/utility.cpp:173
+#: ../../src/qt/utility.cpp:76
 #, c-format
 msgid "Invalid file: %s."
 msgstr ""
 
-#: ../../src/qt/utility.cpp:193
+#: ../../src/qt/utility.cpp:95
 msgid "Loading %1"
 msgstr ""
 
-#: ../../src/qt/utility.cpp:201
+#: ../../src/qt/utility.cpp:103
 msgid "Enter Description"
 msgstr ""
 
-#: ../../src/qt/utility.cpp:202
+#: ../../src/qt/utility.cpp:104
 msgid "Enter description for the NBT file."
 msgstr ""
 
-#: ../../src/qt/utility.cpp:205
+#: ../../src/qt/utility.cpp:107
 msgid "No Description Entered!"
 msgstr "没有输入的描述！"
 
-#: ../../src/qt/utility.cpp:206
+#: ../../src/qt/utility.cpp:108
 msgid "No description entered! Will not add the NBT file!"
 msgstr ""
 
-#: ../../src/region.cpp:353 ../../src/region.cpp:624
+#: ../../src/region.cpp:352 ../../src/region.cpp:623
 msgid "Parsing blocks."
 msgstr "传输方块中。"
 
-#: ../../src/region.cpp:608
+#: ../../src/region.cpp:607
 msgid "Sorting"
 msgstr "整理中"
 
@@ -816,6 +744,60 @@ msgstr ""
 #: rc.cpp:261
 msgid "&Cancel"
 msgstr "取消(&C)"
+
+#~ msgid "No NBT or no NBT selected!"
+#~ msgstr "无NBT或没有NBT被选中！"
+
+#~ msgid "Enter Region Name"
+#~ msgstr "输入Region名称"
+
+#~ msgid "Enter name for the new Region."
+#~ msgstr "输入新Region的名称。"
+
+#~ msgid "No description for the Region!"
+#~ msgstr "没有Region的描述！"
+
+#~ msgid "The NBT Struct is unsupported!"
+#~ msgstr "此NBT结构不受支持！"
+
+#~ msgid "This NBT is locked!"
+#~ msgstr "此NBT被锁定！"
+
+#~ msgid "Select a file"
+#~ msgstr "选择一个文件"
+
+#~ msgid "Litematic file (*.litematic);;NBT File (*.nbt)"
+#~ msgstr "投影文件 (*.litematic);;NBT文件 (*.nbt)"
+
+#~ msgid "Select an option"
+#~ msgstr "选择一个选项"
+
+#~ msgid "Please select an option."
+#~ msgstr "请选择一个选项。"
+
+#~ msgid "Save as original NBT."
+#~ msgstr "保存为原本的NBT。"
+
+#~ msgid "Convert to NBT struct."
+#~ msgstr "转换为NBT结构。"
+
+#~ msgid "Convert to NBT struct (ignore air)."
+#~ msgstr "转换为NBT结构（忽略空气）。"
+
+#~ msgid "Convert to litematic."
+#~ msgstr "转换为投影。"
+
+#~ msgid "Convert to new schematics."
+#~ msgstr "转换为新式Schematics。"
+
+#~ msgid "Warning!"
+#~ msgstr "警告！"
+
+#~ msgid "Some items are locked, which will be ignored."
+#~ msgstr "有些项目被锁定，将被忽略。"
+
+#~ msgid "Save File"
+#~ msgstr "保存文件"
 
 #~ msgid "Failed to parse to NBT when trying as a Gzip file."
 #~ msgstr "在以Gzip文件尝试传为NBT时发生错误。"
