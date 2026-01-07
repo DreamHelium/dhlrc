@@ -14,6 +14,21 @@ struct BaseData {
     name: String,
 }
 
+impl BaseData {
+    fn set_time(&mut self, create_time: i64, modify_time: i64) -> Result<bool, Box<dyn Error>> {
+        self.create_time = UtcDateTime::from_unix_timestamp(create_time)?;
+        self.modify_time = UtcDateTime::from_unix_timestamp(modify_time)?;
+        Ok(true)
+    }
+    fn get_create_timestamp(&self) -> i64 {
+        self.create_time.unix_timestamp()
+    }
+
+    fn get_modify_timestamp(&self) -> i64 {
+        self.modify_time.unix_timestamp()
+    }
+}
+
 impl Default for BaseData {
     fn default() -> Self {
         BaseData {
@@ -53,6 +68,16 @@ pub struct Region {
     air_palette: u8,
 }
 
+impl Region {
+    fn set_data_time(
+        &mut self,
+        create_time: i64,
+        modify_time: i64,
+    ) -> Result<bool, Box<dyn Error>> {
+        self.base_data.set_time(create_time, modify_time)
+    }
+}
+
 #[unsafe(no_mangle)]
 pub extern "C" fn region_new() -> *mut Region {
     let region = Box::new(Region::default());
@@ -65,27 +90,26 @@ pub extern "C" fn region_free(region: *mut Region) {
     drop(r);
 }
 
-fn region_set_time_internal(
-    base_data: &mut BaseData,
-    create_time: i64,
-    modify_time: i64,
-) -> Result<bool, Box<dyn Error>> {
-    base_data.create_time = UtcDateTime::from_unix_timestamp(create_time)?;
-    base_data.modify_time = UtcDateTime::from_unix_timestamp(modify_time)?;
-    Ok(true)
-}
-
 #[unsafe(no_mangle)]
 pub extern "C" fn region_set_time(
     region: *mut Region,
     create_time: i64,
     modify_time: i64,
 ) -> *const c_char {
-    let r = unsafe { Box::from_raw(region) };
-    let mut base_data = r.base_data;
-    let set_time_true = region_set_time_internal(&mut base_data, create_time, modify_time);
-    match set_time_true {
-        Ok(ret) => CString::new("").unwrap().into_raw(),
-        Err(err) => CString::new("").unwrap().into_raw(),
+    let r = unsafe { &mut *region };
+    let set_time_real = r.set_data_time(create_time, modify_time);
+    match set_time_real {
+        Ok(_ret) => CString::new("Success").unwrap().into_raw(),
+        Err(err) => CString::new(err.to_string()).unwrap().into_raw(),
     }
+}
+
+#[unsafe(no_mangle)]
+pub extern "C" fn string_free(string: *mut c_char) {
+    drop(unsafe { CString::from_raw(string) });
+}
+
+#[unsafe(no_mangle)]
+pub extern "C" fn region_get_create_timestamp(region: *mut Region) -> i64 {
+    unsafe { (*region).base_data.get_create_timestamp() }
 }

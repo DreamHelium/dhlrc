@@ -3,9 +3,8 @@ cmake_minimum_required(VERSION 3.17)
 project(dhlrc_qt LANGUAGES CXX)
 
 add_definitions(-DDHLRC_VERSION="${dhlrc_qt_VERSION}")
-#string(TIMESTAMP CURRENT_DAY %Y%m%d)
-#add_definitions(-DDHLRC_COMPILE_DATE=${CURRENT_DAY})
-add_definitions(-DDHLRC_COMPILE_DATE=20260105)
+string(TIMESTAMP CURRENT_DAY %Y%m%d)
+add_definitions(-DDHLRC_COMPILE_DATE=${CURRENT_DAY})
 
 #set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
@@ -31,8 +30,8 @@ set(ui_files mainwindow.ui blocklistui.ui blockreaderui.ui manageui.ui
         loadobjectui.ui)
 
 set(PROJECT_SOURCES
-        module.h module.cpp
-         mainwindow.cpp mainwindow.h
+        main.cpp
+        mainwindow.cpp mainwindow.h
         blocklistui.cpp blocklistui.h
         blockreaderui.cpp blockreaderui.h
         manageui.h manageui.cpp
@@ -42,9 +41,9 @@ set(PROJECT_SOURCES
         utility.h utility.cpp
         dhtreefilter.h dhtreefilter.cpp
         generalchooseui.h
-#        propertymodifyui.cpp
-#        propertymodifyui.h
-#        propertymodifyui.ui
+        #        propertymodifyui.cpp
+        #        propertymodifyui.h
+        #        propertymodifyui.ui
         blockshowui.cpp
         blockshowui.h
         regionmodifyui.cpp
@@ -69,11 +68,16 @@ set(PROJECT_SOURCES
         dhcheckboxgroup.cpp
         dhcheckboxgroup.h
 )
+
+set(TEMP_PROJECT_SOURCES
+        main.cpp
+)
+
 ki18n_wrap_ui(PROJECT_SOURCES ${ui_files})
 if (${QT_VERSION_MAJOR} GREATER_EQUAL 6)
-    qt_add_library(dhlrc_qt SHARED
+    qt_add_executable(dhlrc_qt
             MANUAL_FINALIZATION
-            ${PROJECT_SOURCES}
+            ${TEMP_PROJECT_SOURCES}
     )
     # Define target properties for Android with Qt 6 as:
     #    set_property(TARGET dhlrc_qt APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR
@@ -87,20 +91,16 @@ else ()
         # Define properties for Android with Qt 5 after find_package() calls as:
         #    set(ANDROID_PACKAGE_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/android")
     else ()
-        add_library(dhlrc_qt
+        add_executable(dhlrc_qt
                 ${PROJECT_SOURCES}
         )
     endif ()
 endif ()
 
 target_link_libraries(dhlrc_qt PRIVATE Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::Svg KF6::ColorScheme
-        KF6::ConfigWidgets KF6::I18n KF6::I18nLocaleData)
+        KF6::ConfigWidgets KF6::I18n KF6::I18nLocaleData region_rs)
+target_link_directories(dhlrc_qt PRIVATE ${CMAKE_BINARY_DIR})
 
-target_link_libraries(dhlrc_qt PUBLIC dhlrc)
-
-target_include_directories(dhlrc_qt PUBLIC
-        "${PROJECT_BINARY_DIR}" "${GIO_INCLUDE_DIRS}" "${dhutil_INCLUDE_DIRS}"
-)
 kconfig_add_kcfg_files(dhlrc_qt config/settings.kcfgc)
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
@@ -120,6 +120,3 @@ include(GNUInstallDirs)
 if (QT_VERSION_MAJOR EQUAL 6)
     qt_finalize_executable(dhlrc_qt)
 endif ()
-
-
-add_subdirectory(nbt-reader)
