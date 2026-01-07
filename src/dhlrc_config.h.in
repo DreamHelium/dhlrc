@@ -1,3 +1,0 @@
-#define dhlrc_VERSION_MAJOR @dhlrc_VERSION_MAJOR@
-#define dhlrc_VERSION_MINOR @dhlrc_VERSION_MINOR@
-#define dhlrc_VERSION_PATCH @dhlrc_VERSION_PATCH@

@@ -1,9 +1,0 @@
-[submodule "src/dhutil"]
-	path = src/dhutil
-	url = https://github.com/DreamHelium/dhutil
-[submodule "src/nbt_interface_cpp"]
-	path = src/nbt_interface_cpp
-	url = https://github.com/DreamHelium/nbtlib_interface_cpp.git
-[submodule "3rdparty/iniparser"]
-	path = 3rdparty/iniparser
-	url = https://gitlab.com/iniparser/iniparser
