@@ -3,6 +3,15 @@ PROJECT(dhlrc)
 
 option(INSTALL_NOW OFF)
 
+find_program(CARGO_EXECUTABLE cargo)
+add_custom_target(dhlrc_cargo_region ALL
+        COMMAND cd ../region-rs && ${CARGO_EXECUTABLE} build
+)
+
+add_custom_target(dhlrc_cargo_nbt ALL
+        COMMAND cd ../region-nbt-rs && ${CARGO_EXECUTABLE} build
+)
+
 include(GNUInstallDirs)
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR})
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)

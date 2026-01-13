@@ -9,6 +9,10 @@
 I will port the project to `Rust` language, so the `main` branch will not update until I finish porting. At this time, 
 you can see the `rust-dev` branch for more information.
 
+## License Problem
+
+Since `crabnbt` is licensed under GPL, I had to use GPL license. Sorry for the inconvenience.
+
 ## Introduction
 
 Although it was named as `litematica_reader_c`, **it's not only intended to read litematica file**, but process the

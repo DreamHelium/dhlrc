@@ -1,6 +1,7 @@
 #ifndef DHLRC_REGION_H
 #define DHLRC_REGION_H
 #include <cstdint>
+#include <cstdlib>
 
 #ifdef __cplusplus
 extern "C"
@@ -14,6 +15,40 @@ extern "C"
                                int64_t modify_time);
   void string_free (const char *string);
   int64_t region_get_create_timestamp (void *region);
+  int64_t region_get_modify_timestamp (void *region);
+  void region_get_size (void *region);
+  /* Note: The getter should not return nullptr unless error occurred */
+  const char *region_get_name (void *region);
+  const char *region_set_name (void *region, const char *name);
+  const char *region_get_description (void *region);
+  const char *region_set_description (void *region, const char *description);
+  const char *region_get_author (void *region);
+  const char *region_set_author (void *region, const char *author);
+
+  uint32_t region_get_data_version (void *region);
+  void region_set_data_version (void *region, uint32_t version);
+  void region_set_size (void *region, int32_t x, int32_t y, int32_t z);
+  int32_t region_get_x (void *region);
+  int32_t region_get_y (void *region);
+  int32_t region_get_z (void *region);
+  uint32_t region_get_block_id_by_index (void *region, size_t index);
+  const char *region_get_palette_id_name (void *region, size_t id);
+  size_t region_get_palette_property_len (void *region, size_t id);
+  const char *region_get_palette_property_name (void *region, size_t id,
+                                                size_t index);
+  const char *region_get_palette_property_data (void *region, size_t id,
+                                                size_t index);
+  const char *region_set_palette_property_name_and_data (void *region,
+                                                         size_t id,
+                                                         size_t index,
+                                                         const char *name,
+                                                         const char *data);
+
+  typedef void (*ProgressFunc) (void *, int, const char *, const char *);
+  void *file_try_uncompress (const char *filename, ProgressFunc progress_func,
+                             void *main_klass, int *failed);
+  void vec_free (void *vec);
+  char *vec_to_cstr (void *vec);
 
 #ifdef __cplusplus
 }

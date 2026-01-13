@@ -1,0 +1,12 @@
+[package]
+name = "region-nbt-rs"
+version = "0.1.0"
+edition = "2024"
+#links = "region_rs"
+
+[dependencies]
+crab_nbt = "0.2.11"
+flate2 = "1.1.5"
+
+[lib]
+crate-type = ["cdylib"]
