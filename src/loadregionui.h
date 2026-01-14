@@ -3,8 +3,8 @@
 
 #include "loadobjectui.h"
 #include <QWidget>
-#include <gio/gio.h>
-#include <lrchooseui.h>
+// #include <lrchooseui.h>
+#include <manage.h>
 #include <qeventloop.h>
 
 class LoadRegionUI : public LoadObjectUI
@@ -12,18 +12,17 @@ class LoadRegionUI : public LoadObjectUI
   Q_OBJECT
 
 public:
-  explicit LoadRegionUI (QStringList list, QWidget *parent = nullptr);
+  explicit LoadRegionUI (QStringList list, dh::ManageRegion *mr,
+                         QWidget *parent = nullptr);
   ~LoadRegionUI () override;
-  GMainLoop *main_loop = g_main_loop_new (nullptr, false);
-  DhNbtInstance *instance;
   char *description = nullptr;
+  dh::ManageRegion *mr = nullptr;
 
 private:
   QStringList list;
   QStringList failedList;
   /* Original class never provide this. */
   QStringList failedReason;
-  GCancellable *cancellable = g_cancellable_new ();
 
 public Q_SLOTS:
   void process ();

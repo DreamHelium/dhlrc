@@ -1,19 +1,18 @@
 #include "loadobjectui.h"
-#include "../translation.h"
 #include "ui_loadobjectui.h"
-#include "utility.h"
+#define _(str) gettext (str)
 
 LoadObjectUI::LoadObjectUI (QWidget *parent)
     : QWidget (parent), ui (new Ui::LoadObjectUI)
 {
   ui->setupUi (this);
   ui->widget->hide ();
-  auto showPixmap = dh::loadSvgResourceFile ("/cn/dh/dhlrc/show.svg");
-  showIcon = QIcon (*showPixmap);
-  delete showPixmap;
-  auto hidePixmap = dh::loadSvgResourceFile ("/cn/dh/dhlrc/hide.svg");
-  hideIcon = QIcon (*hidePixmap);
-  delete hidePixmap;
+  // auto showPixmap = dh::loadSvgResourceFile ("/cn/dh/dhlrc/show.svg");
+  // showIcon = QIcon (*showPixmap);
+  // delete showPixmap;
+  // auto hidePixmap = dh::loadSvgResourceFile ("/cn/dh/dhlrc/hide.svg");
+  // hideIcon = QIcon (*hidePixmap);
+  // delete hidePixmap;
   ui->detailBtn->setIcon (hideIcon);
   ui->continueBtn->setEnabled (false);
   connect (ui->detailBtn, &QPushButton::clicked, this,

@@ -1,18 +1,15 @@
 mod i18n;
 
 use crate::i18n::i18n;
-use flate2::write::{GzDecoder, ZlibDecoder};
 use flate2::{Decompress, FlushDecompress, Status};
-use std::cell::RefCell;
 use std::collections::HashMap;
 use std::error::Error;
 use std::ffi::{CStr, CString, c_char, c_int, c_void};
 use std::fmt::{Display, Formatter};
 use std::fs::File;
-use std::io::{Cursor, Read, Seek, SeekFrom, Write};
+use std::io::{Read, Seek, SeekFrom};
 use std::ops::IndexMut;
 use std::ptr::{null, null_mut};
-use std::rc::Rc;
 use std::string::String;
 use std::time::Instant;
 use time::UtcDateTime;
@@ -192,6 +189,12 @@ fn string_to_ptr_fail_to_null(string: &str) -> *mut c_char {
         Ok(real_str) => real_str.into_raw(),
         Err(_err) => null_mut(),
     }
+}
+
+#[unsafe(no_mangle)]
+pub extern "C" fn region_get_index(region: *mut Region, x: i32, y: i32, z: i32) -> i32 {
+    let size = unsafe { (*region).region_size };
+    size.0 * size.2 * y + size.0 * z + x
 }
 
 #[derive(Debug)]
@@ -563,10 +566,8 @@ fn file_try_uncompress_real(
 
         let decompress_result =
             decoder.decompress_vec(&file_data[pos..], &mut ret, FlushDecompress::None)?;
-        println!("{}", ret.capacity());
         match decompress_result {
-            Status::Ok => {
-            }
+            Status::Ok => {}
             Status::BufError => {
                 ret.reserve(100);
             }

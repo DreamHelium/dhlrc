@@ -1,7 +1,7 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include "../feature/dh_module.h"
+// #include "../feature/dh_module.h"
 #include <QDateTime>
 #include <QEvent>
 #include <QLabel>
@@ -23,7 +23,7 @@ class MainWindow : public QMainWindow
   public:
     MainWindow (QWidget *parent = nullptr);
     ~MainWindow ();
-    static QList<DhModule *> modules;
+    // static QList<DhModule *> modules;
 
   Q_SIGNALS:
     void winClose ();
@@ -47,6 +47,6 @@ class MainWindow : public QMainWindow
     void groupBtn_clicked (int id);
 };
 
-inline QList<DhModule *> MainWindow::modules = {};
+// inline QList<DhModule *> MainWindow::modules = {};
 
 #endif // MAINWINDOW_H

@@ -41,8 +41,8 @@ ManageUI::updateModel (QStandardItemModel *model)
 {
   ui->tableView->setModel (model);
   /* The default policy */
-  ui->tableView->horizontalHeader ()->setSectionResizeMode (
-      0, QHeaderView::Stretch);
+  // ui->tableView->horizontalHeader ()->setSectionResizeMode (
+  //     0, QHeaderView::Stretch);
 }
 
 void

@@ -25,8 +25,14 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets Svg)
 
 add_definitions(-DQT_NO_SIGNALS_SLOTS_KEYWORDS)
 
-set(ui_files mainwindow.ui blocklistui.ui blockreaderui.ui manageui.ui
-        blockshowui.ui regionmodifyui.ui palettelistui.ui paletteaddui.ui
+set(ui_files mainwindow.ui
+        #        blocklistui.ui
+        #        blockreaderui.ui
+        manageui.ui
+        #        blockshowui.ui
+        #        regionmodifyui.ui
+        #        palettelistui.ui
+        #        paletteaddui.ui
         loadobjectui.ui)
 
 set(PROJECT_SOURCES
@@ -71,9 +77,17 @@ set(PROJECT_SOURCES
 
 set(TEMP_PROJECT_SOURCES
         main.cpp
+        mainwindow.cpp mainwindow.h
+        loadobjectui.cpp loadobjectui.h
+        manage.cpp manage.h
+        manageui.cpp manageui.h
+        dhtableview.cpp dhtableview.h
+        dhlinklikebutton.cpp dhlinklikebutton.h
+        loadregionui.cpp loadregionui.h
 )
 
-ki18n_wrap_ui(PROJECT_SOURCES ${ui_files})
+ki18n_wrap_ui(TEMP_PROJECT_SOURCES ${ui_files})
+
 if (${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_add_executable(dhlrc_qt
             MANUAL_FINALIZATION
@@ -86,13 +100,13 @@ if (${QT_VERSION_MAJOR} GREATER_EQUAL 6)
 else ()
     if (ANDROID)
         add_library(dhlrc_qt SHARED
-                ${PROJECT_SOURCES}
+                ${TEMP_PROJECT_SOURCES}
         )
         # Define properties for Android with Qt 5 after find_package() calls as:
         #    set(ANDROID_PACKAGE_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/android")
     else ()
         add_executable(dhlrc_qt
-                ${PROJECT_SOURCES}
+                ${TEMP_PROJECT_SOURCES}
         )
     endif ()
 endif ()
@@ -100,6 +114,9 @@ endif ()
 target_link_libraries(dhlrc_qt PRIVATE Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::Svg KF6::ColorScheme
         KF6::ConfigWidgets KF6::I18n KF6::I18nLocaleData region_rs)
 target_link_directories(dhlrc_qt PRIVATE ${CMAKE_BINARY_DIR})
+target_include_directories(dhlrc_qt PUBLIC
+        "${PROJECT_BINARY_DIR}" "${PROJECT_SOURCE_DIR}"
+)
 
 kconfig_add_kcfg_files(dhlrc_qt config/settings.kcfgc)
 
