@@ -7,12 +7,9 @@ LoadObjectUI::LoadObjectUI (QWidget *parent)
 {
   ui->setupUi (this);
   ui->widget->hide ();
-  // auto showPixmap = dh::loadSvgResourceFile ("/cn/dh/dhlrc/show.svg");
-  // showIcon = QIcon (*showPixmap);
-  // delete showPixmap;
-  // auto hidePixmap = dh::loadSvgResourceFile ("/cn/dh/dhlrc/hide.svg");
-  // hideIcon = QIcon (*hidePixmap);
-  // delete hidePixmap;
+  showIcon = QIcon (":/cn/dh/dhlrc/show.svg");
+  hideIcon = QIcon (":/cn/dh/dhlrc/hide.svg");
+
   ui->detailBtn->setIcon (hideIcon);
   ui->continueBtn->setEnabled (false);
   connect (ui->detailBtn, &QPushButton::clicked, this,

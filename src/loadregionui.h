@@ -18,7 +18,11 @@ public:
   char *description = nullptr;
   dh::ManageRegion *mr = nullptr;
 
+Q_SIGNALS:
+  void finishLoadOne ();
+
 private:
+  const void *cancel_flag;
   QStringList list;
   QStringList failedList;
   /* Original class never provide this. */

@@ -22,15 +22,16 @@ enum
 
 LoadRegionUI::LoadRegionUI (QStringList list, dh::ManageRegion *mr,
                             QWidget *parent)
-    : LoadObjectUI (parent), mr (mr), list (list)
+    : LoadObjectUI (parent), mr (mr), list (list),
+      cancel_flag (cancel_flag_new ())
 {
   setLabel (_ ("Loading file(s) to Region(s)."));
   connect (this, &LoadRegionUI::winClose, this,
            [&]
              {
-               // if (!finished)
-               //   g_cancellable_cancel (cancellable);
-               if (!failedList.isEmpty ())
+               cancel_flag_cancel (cancel_flag);
+
+               if (!failedList.isEmpty () || !finished)
                  {
                    QString errorMsg
                        = _ ("The following files are not added:\n");
@@ -40,6 +41,9 @@ LoadRegionUI::LoadRegionUI (QStringList list, dh::ManageRegion *mr,
                        const QString &reason = failedReason.at (i);
                        errorMsg += dir + ": " + reason + "\n";
                      }
+                   if (!finished)
+                     errorMsg
+                         += _ ("The loading of current file is cancelled.");
                    QMessageBox::critical (this, _ ("Error!"), errorMsg);
                  }
              });
@@ -55,6 +59,8 @@ LoadRegionUI::LoadRegionUI (QStringList list, dh::ManageRegion *mr,
                //     stopped = false;
                //   }
              });
+  connect (this, &LoadRegionUI::finishLoadOne, mr,
+           &dh::ManageRegion::refresh_triggered);
   process ();
 }
 
@@ -62,6 +68,7 @@ LoadRegionUI::~LoadRegionUI ()
 {
   // g_object_unref (cancellable);
   // g_main_loop_unref (main_loop);
+  cancel_flag_destroy (cancel_flag);
 }
 
 void
@@ -70,7 +77,8 @@ LoadRegionUI::process ()
   auto real_task = [&]
     {
       int i = 0;
-      // GCancellable *new_cancellable = g_object_ref (cancellable);
+      auto new_cancel_flag = cancel_flag;
+      cancel_flag_clone (cancel_flag);
       for (const auto &dir : list)
         {
           auto setFunc = [] (void *main_klass, int value, const char *text,
@@ -80,17 +88,17 @@ LoadRegionUI::process ()
                   ->refreshSubProgress (value);
               if (!arg)
                 Q_EMIT static_cast<LoadRegionUI *> (main_klass)
-                    ->refreshSubLabel (text);
+                    ->refreshSubLabel (gettext (text));
               else
                 {
-                  auto msg = QString::asprintf (text, arg);
+                  auto msg = QString::asprintf (gettext (text), arg);
                   Q_EMIT static_cast<LoadRegionUI *> (main_klass)
                       ->refreshSubLabel (msg);
                 }
             };
 
-          // if (g_cancellable_is_cancelled (new_cancellable))
-          //   break;
+          if (cancel_flag_is_cancelled (new_cancel_flag))
+            break;
           Q_EMIT refreshFullProgress (i * 100 / list.size ());
           QString realLabel = "[%1/%2] %3";
           realLabel = realLabel.arg (i + 1).arg (list.size ()).arg (dir);
@@ -99,8 +107,8 @@ LoadRegionUI::process ()
           /* Processing stuff */
           Q_EMIT refreshSubLabel (_ ("Parsing NBT"));
           int failed = 0;
-          void *data
-              = file_try_uncompress (dir.toUtf8 (), setFunc, this, &failed);
+          void *data = file_try_uncompress (dir.toUtf8 (), setFunc, this,
+                                            &failed, new_cancel_flag);
 
           // GError *err = nullptr;
           // auto nbt = DhNbtInstance (dir.toUtf8 (), setFunc, this,
@@ -115,20 +123,15 @@ LoadRegionUI::process ()
               //     g_error_free (err);
               //     goto continue_situation;
               //   }
-              failedList.append (dir);
-              auto err_msg = vec_to_cstr (data);
-              failedReason.append (err_msg);
-              string_free (err_msg);
-              QString str = _ ("Error encountered with domain %1 "
-                               "and code %2: %3");
-              // str = str.arg (g_quark_to_string (err->domain))
-              //           .arg (err->code)
-              //           .arg (err->message);
-              // if (!g_cancellable_is_cancelled (new_cancellable))
-              Q_EMIT refreshSubLabel (str);
-              // else
-              //   g_message ("%s", str.toUtf8 ().constData ());
-              // g_error_free (err);
+
+              if (!cancel_flag_is_cancelled (new_cancel_flag))
+                {
+                  failedList.append (dir);
+                  auto err_msg = vec_to_cstr (data);
+                  failedReason.append (err_msg);
+                  Q_EMIT refreshSubLabel (err_msg);
+                  string_free (err_msg);
+                }
             }
           // else
           // continue_situation:
@@ -154,38 +157,39 @@ LoadRegionUI::process ()
           //   }
           else
             {
-              auto moduleDir = QApplication::applicationDirPath ();
-              moduleDir += QDir::toNativeSeparators ("/");
-              moduleDir += "region_module";
-
-              auto moduleList = QDir (moduleDir).entryList (QDir::Files);
-              for (auto module : moduleList)
+              auto moduleNum = mr->moduleNum ();
+              for (int j = 0; j < moduleNum; j++)
                 {
                   typedef const char *(*LoadFunc) (void *, ProgressFunc,
                                                    void **, void *);
-                  QString realModuleDir
-                      = moduleDir + QDir::toNativeSeparators ("/") + module;
-                  QLibrary lib (realModuleDir);
-                  lib.load ();
+                  auto lib = mr->getModule (j);
                   auto func = reinterpret_cast<LoadFunc> (
-                      lib.resolve ("region_create_from_file"));
+                      lib->resolve ("region_create_from_file"));
                   void *region = nullptr;
                   auto msg = func (data, setFunc, &region, this);
                   if (msg)
                     {
                       failedList.append (dir);
                       failedReason.append (msg);
+                      Q_EMIT refreshSubLabel (msg);
                       string_free (msg);
                     }
                   else
                     {
+                      auto realName = QFileInfo (dir).fileName ();
+                      auto lastDot = realName.lastIndexOf ('.');
+                      if (lastDot != -1)
+                        {
+                          realName = realName.left (lastDot);
+                        }
                       Region regionStruct = {
                         region,
-                        QFileInfo (dir).baseName (),
+                        realName,
                         QUuid::createUuid ().toString (),
                         QDateTime::currentDateTime (),
                       };
                       mr->appendRegion (regionStruct);
+                      break;
                     }
                 }
             }
@@ -201,13 +205,13 @@ LoadRegionUI::process ()
 
           // }
           // }
-          // if (!g_cancellable_is_cancelled (new_cancellable))
-          // {
-          Q_EMIT refreshFullProgress (100);
-
-          // }
-          // g_object_unref (new_cancellable);
+          if (!cancel_flag_is_cancelled (cancel_flag))
+            {
+              Q_EMIT refreshFullProgress (100);
+              Q_EMIT finishLoadOne ();
+            }
         }
+      cancel_flag_destroy (new_cancel_flag);
       finish ();
     };
 

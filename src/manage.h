@@ -4,6 +4,7 @@
 #include "manageui.h"
 
 #include <QDateTime>
+#include <QLibrary>
 #include <QMessageBox>
 #include <QProgressDialog>
 #include <QWidget>
@@ -12,7 +13,7 @@
 #include <qmimedata.h>
 #include <qstandarditemmodel.h>
 
-using Region = struct
+using Region = struct Region
 {
   void *region;
   QString name;
@@ -73,17 +74,40 @@ public:
   ManageRegion ();
   ~ManageRegion () override;
   void updateModel () override;
-  void appendRegion(const Region& region)
+  void
+  appendRegion (const Region &region)
   {
     regions.append (region);
   }
-  qsizetype regionNum()
+  qsizetype
+  regionNum ()
   {
-    return regions.count();
+    return regions.count ();
   }
-  QList<Region>& getRegions()
+  QList<Region> &
+  getRegions ()
   {
     return regions;
+  }
+  qsizetype
+  moduleNum ()
+  {
+    return modules.count ();
+  }
+  QLibrary *
+  getModule (qsizetype i)
+  {
+    if (i < modules.count ())
+      return modules.at (i);
+    else
+      return nullptr;
+  }
+  QStringList regionNames ()
+  {
+    QStringList list;
+    for (const auto &r : regions)
+      list.append (r.name);
+    return list;
   }
 
 private Q_SLOTS:
@@ -93,6 +117,7 @@ private Q_SLOTS:
 
 private:
   QList<Region> regions = {};
+  QList<QLibrary *> modules = {};
 };
 
 /* There might be a `ManageNbtNode`, but since ManageRegion is better, we might

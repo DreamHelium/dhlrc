@@ -37,7 +37,7 @@ endif ()
 add_definitions(-DDH_DEBUG_IN_IDE)
 
 add_subdirectory(src)
-add_subdirectory(resources)
+#add_subdirectory(resources)
 if (DH_ENABLE_TRANSLATION)
     add_subdirectory(po)
 endif ()

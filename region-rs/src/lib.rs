@@ -11,6 +11,8 @@ use std::io::{Read, Seek, SeekFrom};
 use std::ops::IndexMut;
 use std::ptr::{null, null_mut};
 use std::string::String;
+use std::sync::Arc;
+use std::sync::atomic::{AtomicBool, Ordering};
 use std::time::Instant;
 use time::UtcDateTime;
 
@@ -91,8 +93,7 @@ impl Default for BaseData {
             modify_time: UtcDateTime::now(),
             description: "".to_string(),
             author: real_username,
-            /* NOTE: can be translated */
-            name: i18n("Converted").to_string(),
+            name: "Converted".to_string(),
         }
     }
 }
@@ -509,6 +510,7 @@ fn file_try_uncompress_real(
     filename: *const c_char,
     progress_fn: ProgressFn,
     main_klass: *mut c_void,
+    cancel_flag: *const AtomicBool,
 ) -> Result<Vec<u8>, Box<dyn Error>> {
     let str = cstr_to_str(filename)?;
     let mut file = File::open(str)?;
@@ -527,6 +529,12 @@ fn file_try_uncompress_real(
                 &String::new(),
             );
             start = Instant::now();
+        }
+
+        if cancel_flag_is_cancelled(cancel_flag) == 1 {
+            return Err(Box::new(MyError {
+                msg: i18n("The loading operation is cancelled.").to_string(),
+            }));
         }
 
         let len = file.read(&mut temp_data)?;
@@ -564,6 +572,12 @@ fn file_try_uncompress_real(
             start = Instant::now();
         }
 
+        if cancel_flag_is_cancelled(cancel_flag) == 1 {
+            return Err(Box::new(MyError {
+                msg: i18n("The uncompressing operation is cancelled.").to_string(),
+            }));
+        }
+
         let decompress_result =
             decoder.decompress_vec(&file_data[pos..], &mut ret, FlushDecompress::None)?;
         match decompress_result {
@@ -592,8 +606,9 @@ pub extern "C" fn file_try_uncompress(
     progress_fn: ProgressFn,
     main_klass: *mut c_void,
     failed: *mut c_int,
+    cancel_flag: *const AtomicBool,
 ) -> *mut Vec<u8> {
-    match file_try_uncompress_real(filename, progress_fn, main_klass) {
+    match file_try_uncompress_real(filename, progress_fn, main_klass, cancel_flag) {
         Ok(r) => Box::into_raw(Box::new(r)),
         Err(err) => {
             unsafe {
@@ -620,4 +635,50 @@ pub extern "C" fn vec_to_cstr(vec: *mut Vec<u8>) -> *mut c_char {
         Ok(ret_str) => string_to_ptr_fail_to_null(&ret_str),
         Err(err) => string_to_ptr_fail_to_null(&err.to_string()),
     }
+}
+
+#[unsafe(no_mangle)]
+pub extern "C" fn cancel_flag_new() -> *const AtomicBool {
+    Arc::into_raw(Arc::new(AtomicBool::new(false)))
+}
+
+#[unsafe(no_mangle)]
+pub extern "C" fn cancel_flag_is_cancelled(ptr: *const AtomicBool) -> c_int {
+    if ptr.is_null() {
+        return 0;
+    }
+    let arc = unsafe { Arc::from_raw(ptr) };
+    let ret = arc.load(Ordering::SeqCst);
+    let _ = Arc::into_raw(arc);
+    ret as c_int
+}
+
+#[unsafe(no_mangle)]
+pub extern "C" fn cancel_flag_cancel(ptr: *const AtomicBool) {
+    if ptr.is_null() {
+        return;
+    }
+    let arc = unsafe { Arc::from_raw(ptr) };
+    arc.store(true, Ordering::SeqCst);
+    let _ = Arc::into_raw(arc);
+}
+
+#[unsafe(no_mangle)]
+pub extern "C" fn cancel_flag_destroy(ptr: *const AtomicBool) {
+    if !ptr.is_null() {
+        unsafe {
+            Arc::from_raw(ptr);
+        }
+    }
+}
+
+#[unsafe(no_mangle)]
+pub extern "C" fn cancel_flag_clone(ptr: *const AtomicBool) -> *const AtomicBool {
+    if ptr.is_null() {
+        return null();
+    }
+    let arc = unsafe { Arc::from_raw(ptr) };
+    let cloned_arc = arc.clone();
+    let _ = Arc::into_raw(arc);
+    Arc::into_raw(cloned_arc)
 }

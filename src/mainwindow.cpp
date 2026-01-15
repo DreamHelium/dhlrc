@@ -1,6 +1,6 @@
-#include "ui_mainwindow.h"
 #include "mainwindow.h"
 #include "manage.h"
+#include "ui_mainwindow.h"
 #include <KPageDialog>
 // #include "../common_info.h"
 // #include "../feature/conv_feature.h"
@@ -35,6 +35,8 @@
 // #include <qmessagebox.h>
 // #include <qnamespace.h>
 #include <QPushButton>
+#include <blockreaderui.h>
+#include <generalchoosedialog.h>
 #define _(str) gettext (str)
 
 #define REGION_LOCKED_MSG                                                     \
@@ -56,13 +58,9 @@ MainWindow::MainWindow (QWidget *parent)
   ui->menu_Tools->addAction (menu);
   ui->menu_Tools->addAction (KStyleManager::createConfigureAction (this));
 
-  // auto pixmap1 = dh::loadSvgResourceFile ("/cn/dh/dhlrc/region.svg");
-  // ui->tabWidget->setTabIcon (0, *pixmap1);
-  // delete pixmap1;
-  //
-  // auto pixmap2 = dh::loadSvgResourceFile ("/cn/dh/dhlrc/item_list.svg");
-  // ui->tabWidget->setTabIcon (1, *pixmap2);
-  // delete pixmap2;
+  ui->tabWidget->setTabIcon (0, QIcon (":/cn/dh/dhlrc/region.svg"));
+
+  // ui->tabWidget->setTabIcon (1, QIcon(":/cn/dh/dhlrc/item_list.svg"));
 
   initSignalSlots ();
   initShortcuts ();
@@ -137,7 +135,8 @@ MainWindow::initSignalSlots ()
   //              if (region_1->block_array_len == region_2->block_array_len)
   //                for (; i < region_1->block_array_len; i++)
   //                  {
-  //                    if (region_1->block_array[i] != region_2->block_array[i])
+  //                    if (region_1->block_array[i] !=
+  //                    region_2->block_array[i])
   //                      {
   //                        g_message ("%64lb", region_1->block_array[i]);
   //                        g_message ("%64lb", region_2->block_array[i]);
@@ -161,7 +160,8 @@ MainWindow::initShortcuts ()
   //   {
   //     auto uuid = (*list)[i];
   //     auto module
-  //         = static_cast<DhModule *> (dh_info_get_data (DH_TYPE_MODULE, uuid));
+  //         = static_cast<DhModule *> (dh_info_get_data (DH_TYPE_MODULE,
+  //         uuid));
   //     if (g_str_equal (module->module_type, "qt-shortcut"))
   //       {
   //         modules.append (module);
@@ -203,25 +203,26 @@ MainWindow::dropEvent (QDropEvent *event)
 void
 MainWindow::brBtn_clicked ()
 {
-  // GENERALCHOOSEUI_START (DH_TYPE_REGION, false)
-  //
-  // if (ret == QDialog::Accepted)
-  //   {
-  //     auto uuids = dh_info_get_uuid (DH_TYPE_REGION);
-  //     if (dh_info_reader_trylock (DH_TYPE_REGION, uuids->val[0]))
-  //       {
-  //         auto brui = new BlockReaderUI ();
-  //         brui->setAttribute (Qt::WA_DeleteOnClose);
-  //         brui->show ();
-  //       }
-  //     /* Region locked */
-  //     else
-  //       QMessageBox::critical (this, _ ("Error!"), REGION_LOCKED_MSG);
-  //   }
-  // /* No option given for the Region selection */
-  // else
-  //   QMessageBox::critical (this, _ ("Error!"),
-  //                          _ ("No Region or no Region selected!"));
+  int ret = GeneralChooseDialog::getIndex (
+      _ ("Select Region"), _ ("Please select a region."), mr->regionNames ());
+
+  if (ret != -1)
+    {
+      auto region = mr->getRegions ()[ret].region;
+      // if (dh_info_reader_trylock (DH_TYPE_REGION, uuids->val[0]))
+        // {
+          auto brui = new BlockReaderUI (region);
+          brui->setAttribute (Qt::WA_DeleteOnClose);
+          brui->show ();
+        // }
+      /* Region locked */
+      // else
+      //   QMessageBox::critical (this, _ ("Error!"), REGION_LOCKED_MSG);
+    }
+  /* No option given for the Region selection */
+  else
+    QMessageBox::critical (this, _ ("Error!"),
+                           _ ("No Region or no Region selected!"));
 }
 
 void

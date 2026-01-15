@@ -30,16 +30,10 @@ main (int argc, char *argv[])
   textdomain ("dhlrc");
 
   KLocalizedString::setApplicationDomain ("dhlrc");
-  // char *trdir = get_translation_filedir (prname);
   KLocalizedString::addDomainLocaleDir ("dhlrc", dir);
-  // g_free (trdir);
-  //
-  // auto pixmap = dh::loadSvgResourceFile ("/cn/dh/dhlrc/dhlrc.svg");
-  // QApplication::setWindowIcon (QIcon (*pixmap));
-  // delete pixmap;
 
-  // QWidget widget;
-  // widget.show ();
+  QApplication::setWindowIcon (QIcon (":/cn/dh/dhlrc/dhlrc.svg"));
+
   MainWindow w;
   w.show ();
 

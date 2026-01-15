@@ -8,7 +8,7 @@ add_definitions(-DDHLRC_COMPILE_DATE=${CURRENT_DAY})
 
 #set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
-#set(CMAKE_AUTORCC ON)
+set(CMAKE_AUTORCC ON)
 set(LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR}/module)
 
 set(CMAKE_CXX_STANDARD 20)
@@ -27,7 +27,7 @@ add_definitions(-DQT_NO_SIGNALS_SLOTS_KEYWORDS)
 
 set(ui_files mainwindow.ui
         #        blocklistui.ui
-        #        blockreaderui.ui
+        blockreaderui.ui
         manageui.ui
         #        blockshowui.ui
         #        regionmodifyui.ui
@@ -84,6 +84,9 @@ set(TEMP_PROJECT_SOURCES
         dhtableview.cpp dhtableview.h
         dhlinklikebutton.cpp dhlinklikebutton.h
         loadregionui.cpp loadregionui.h
+        ../resources/dhlrc.qrc
+        generalchoosedialog.cpp generalchoosedialog.h
+        blockreaderui.cpp blockreaderui.h
 )
 
 ki18n_wrap_ui(TEMP_PROJECT_SOURCES ${ui_files})

@@ -125,12 +125,28 @@ ManageRegion::ManageRegion ()
   setDND (true);
   QObject::connect (mui, &ManageUI::dnd, this, &ManageRegion::dnd_triggered);
   setWindowTitle (_ ("Manage Region"));
+  auto moduleDir = QApplication::applicationDirPath ();
+  moduleDir += QDir::toNativeSeparators ("/");
+  moduleDir += "region_module";
+
+  auto moduleList = QDir (moduleDir).entryList (QDir::Files);
+  for (const auto &module : moduleList)
+    {
+      QString realDir = moduleDir + QDir::toNativeSeparators ("/") + module;
+      auto library = new QLibrary (realDir);
+      if (library->load ())
+        modules.append (library);
+      else
+        delete library;
+    }
 }
 
 ManageRegion::~ManageRegion ()
 {
   for (const auto &i : regions)
     region_free (i.region);
+  for (const auto library : modules)
+    delete library;
 }
 
 void
@@ -164,7 +180,7 @@ ManageRegion::updateModel ()
 {
   QList<QList<QStandardItem *>> itemList;
 
-  for (const auto& i : getRegions ())
+  for (const auto &i : getRegions ())
     {
       QStandardItem *description = new QStandardItem;
       QStandardItem *uuid = new QStandardItem;

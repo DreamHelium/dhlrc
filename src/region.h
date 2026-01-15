@@ -25,6 +25,8 @@ extern "C"
   const char *region_get_author (void *region);
   const char *region_set_author (void *region, const char *author);
 
+  int32_t region_get_index (void *region, int32_t x, int32_t y, int32_t z);
+
   uint32_t region_get_data_version (void *region);
   void region_set_data_version (void *region, uint32_t version);
   void region_set_size (void *region, int32_t x, int32_t y, int32_t z);
@@ -46,9 +48,15 @@ extern "C"
 
   typedef void (*ProgressFunc) (void *, int, const char *, const char *);
   void *file_try_uncompress (const char *filename, ProgressFunc progress_func,
-                             void *main_klass, int *failed);
+                             void *main_klass, int *failed,
+                             const void *cancel_flag);
   void vec_free (void *vec);
   char *vec_to_cstr (void *vec);
+  const void *cancel_flag_new ();
+  int cancel_flag_is_cancelled (const void *cancel_flag);
+  void cancel_flag_cancel (const void *cancel_flag);
+  void cancel_flag_destroy (const void *cancel_flag);
+  const void *cancel_flag_clone (const void *cancel_flag);
 
 #ifdef __cplusplus
 }
