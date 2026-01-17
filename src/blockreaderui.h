@@ -2,6 +2,7 @@
 #define BLOCKREADERUI_H
 
 #include <QWidget>
+#include <manage.h>
 
 // #include "blockshowui.h"
 
@@ -17,13 +18,14 @@ class BlockReaderUI : public QWidget
   Q_OBJECT
 
 public:
-  BlockReaderUI (void *region, QWidget *parent = nullptr);
+  BlockReaderUI (int index, dh::ManageRegion *mr, QWidget *parent = nullptr);
   ~BlockReaderUI ();
 
 private:
   Ui::BlockReaderUI *ui;
   void *region;
-//   QString uuid = {};
+  QReadLocker lock;
+  //   QString uuid = {};
   void setText ();
   char *large_version = nullptr;
   bool readerIsUnlocked = false;

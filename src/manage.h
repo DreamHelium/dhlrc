@@ -2,11 +2,12 @@
 #define MANAGE_H
 
 #include "manageui.h"
-
+#define _(str) gettext (str)
 #include <QDateTime>
 #include <QLibrary>
 #include <QMessageBox>
 #include <QProgressDialog>
+#include <QReadWriteLock>
 #include <QWidget>
 #include <qcoreevent.h>
 #include <qevent.h>
@@ -19,6 +20,13 @@ using Region = struct Region
   QString name;
   QString uuid;
   QDateTime dateTime;
+  QReadWriteLock *lock;
+};
+
+using NameAndLocked = struct NameAndLocked
+{
+  QString name;
+  bool unlocked;
 };
 
 namespace dh
@@ -102,11 +110,29 @@ public:
     else
       return nullptr;
   }
-  QStringList regionNames ()
+
+  QList<NameAndLocked>
+  regionNames (bool write)
   {
-    QStringList list;
+    QList<NameAndLocked> list;
     for (const auto &r : regions)
-      list.append (r.name);
+      {
+        bool add = false;
+        if (write && r.lock->tryLockForWrite ())
+          {
+            add = true;
+            r.lock->unlock ();
+          }
+        else if (!write && r.lock->tryLockForRead ())
+          {
+            add = true;
+            r.lock->unlock ();
+          }
+        if (add)
+          list.append ({ r.name, add });
+        else
+          list.append ({ _ ("Locked!"), add });
+      }
     return list;
   }
 

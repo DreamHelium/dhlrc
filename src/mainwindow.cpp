@@ -37,6 +37,8 @@
 #include <QPushButton>
 #include <blockreaderui.h>
 #include <generalchoosedialog.h>
+#include <regionmodifyui.h>
+#include <utility.h>
 #define _(str) gettext (str)
 
 #define REGION_LOCKED_MSG                                                     \
@@ -203,26 +205,13 @@ MainWindow::dropEvent (QDropEvent *event)
 void
 MainWindow::brBtn_clicked ()
 {
-  int ret = GeneralChooseDialog::getIndex (
-      _ ("Select Region"), _ ("Please select a region."), mr->regionNames ());
-
-  if (ret != -1)
+  auto region = dh::getRegion (this, mr, false);
+  if (region != -1)
     {
-      auto region = mr->getRegions ()[ret].region;
-      // if (dh_info_reader_trylock (DH_TYPE_REGION, uuids->val[0]))
-        // {
-          auto brui = new BlockReaderUI (region);
-          brui->setAttribute (Qt::WA_DeleteOnClose);
-          brui->show ();
-        // }
-      /* Region locked */
-      // else
-      //   QMessageBox::critical (this, _ ("Error!"), REGION_LOCKED_MSG);
+      auto brui = new BlockReaderUI (region, mr);
+      brui->setAttribute (Qt::WA_DeleteOnClose);
+      brui->show ();
     }
-  /* No option given for the Region selection */
-  else
-    QMessageBox::critical (this, _ ("Error!"),
-                           _ ("No Region or no Region selected!"));
 }
 
 void
@@ -238,24 +227,13 @@ MainWindow::mrBtn_clicked ()
 void
 MainWindow::mrBtn_2_clicked ()
 {
-  // GENERALCHOOSEUI_START (DH_TYPE_REGION, false)
-  // if (ret == QDialog::Accepted)
-  //   {
-  //     auto uuids = dh_info_get_uuid (DH_TYPE_REGION);
-  //     if (dh_info_writer_trylock (DH_TYPE_REGION, uuids->val[0]))
-  //       {
-  //         auto rmui = new RegionModifyUI ();
-  //         rmui->setAttribute (Qt::WA_DeleteOnClose);
-  //         rmui->show ();
-  //       }
-  //     /* Region locked */
-  //     else
-  //       QMessageBox::critical (this, _ ("Error!"), REGION_LOCKED_MSG);
-  //   }
-  // /* No option given for the Region selection */
-  // else
-  //   QMessageBox::critical (this, _ ("Error!"),
-  //                          _ ("No Region or no Region selected!"));
+  auto region = dh::getRegion (this, mr, true);
+  if (region != -1)
+    {
+      auto rmui = new RegionModifyUI (region, mr);
+      rmui->setAttribute (Qt::WA_DeleteOnClose);
+      rmui->show ();
+    }
 }
 
 void

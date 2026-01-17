@@ -7,18 +7,12 @@
 #include <QTimer>
 #include <future>
 // #include <lrchooseui.h>
+#include <QThread>
 #include <QUuid>
 #include <manage.h>
 #include <region.h>
+#include <utility.h>
 #define _(str) gettext (str)
-
-enum
-{
-  DHLRC_LOAD_IS_LITEMATIC,
-  DHLRC_LOAD_SUCCESS,
-  DHLRC_LOAD_CANCELED,
-  DHLRC_LOAD_FAILED
-};
 
 LoadRegionUI::LoadRegionUI (QStringList list, dh::ManageRegion *mr,
                             QWidget *parent)
@@ -30,6 +24,7 @@ LoadRegionUI::LoadRegionUI (QStringList list, dh::ManageRegion *mr,
            [&]
              {
                cancel_flag_cancel (cancel_flag);
+               QThread::msleep (10);
 
                if (!failedList.isEmpty () || !finished)
                  {
@@ -41,9 +36,16 @@ LoadRegionUI::LoadRegionUI (QStringList list, dh::ManageRegion *mr,
                        const QString &reason = failedReason.at (i);
                        errorMsg += dir + ": " + reason + "\n";
                      }
-                   if (!finished)
-                     errorMsg
-                         += _ ("The loading of current file is cancelled.");
+                   // if (!finished)
+                   //   {
+                   //     errorMsg
+                   //         += _ ("The loading of current file is
+                   //         cancelled.\n");
+                   //     errorMsg
+                   //         += _ ("See the console output for more
+                   //         information.");
+                   //   }
+
                    QMessageBox::critical (this, _ ("Error!"), errorMsg);
                  }
              });
@@ -124,14 +126,11 @@ LoadRegionUI::process ()
               //     goto continue_situation;
               //   }
 
-              if (!cancel_flag_is_cancelled (new_cancel_flag))
-                {
-                  failedList.append (dir);
-                  auto err_msg = vec_to_cstr (data);
-                  failedReason.append (err_msg);
-                  Q_EMIT refreshSubLabel (err_msg);
-                  string_free (err_msg);
-                }
+              failedList.append (dir);
+              auto err_msg = vec_to_cstr (data);
+              failedReason.append (gettext (err_msg));
+              Q_EMIT refreshSubLabel (gettext (err_msg));
+              string_free (err_msg);
             }
           // else
           // continue_situation:
@@ -160,13 +159,23 @@ LoadRegionUI::process ()
               auto moduleNum = mr->moduleNum ();
               for (int j = 0; j < moduleNum; j++)
                 {
-                  typedef const char *(*LoadFunc) (void *, ProgressFunc,
-                                                   void **, void *);
+                  typedef const char *(*LoadFunc) (
+                      void *, ProgressFunc, void **, void *, const void *);
+                  typedef const char *(*LoadTranslation) (const char *);
                   auto lib = mr->getModule (j);
+                  auto transFunc = reinterpret_cast<LoadTranslation> (
+                      lib->resolve ("init_translation"));
                   auto func = reinterpret_cast<LoadFunc> (
                       lib->resolve ("region_create_from_file"));
+                  const char *msg = nullptr;
+                  if (transFunc)
+                    {
+                      msg = transFunc (dh::getTranslationDir ().toUtf8 ());
+                    }
                   void *region = nullptr;
-                  auto msg = func (data, setFunc, &region, this);
+                  if (func && !msg)
+                    msg = func (data, setFunc, &region, this, new_cancel_flag);
+                  // else msg = _("No matching function found");
                   if (msg)
                     {
                       failedList.append (dir);
@@ -187,6 +196,7 @@ LoadRegionUI::process ()
                         realName,
                         QUuid::createUuid ().toString (),
                         QDateTime::currentDateTime (),
+                        new QReadWriteLock (),
                       };
                       mr->appendRegion (regionStruct);
                       break;

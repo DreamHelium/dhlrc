@@ -1,58 +1,41 @@
-//
-// Created by dream_he on 25-8-1.
-//
-
-// You may need to build the project (run Qt uic code generator) to get
-// "ui_RegionModifyUI.h" resolved
-
 #include "regionmodifyui.h"
-#include "../common_info.h"
-#include "../translation.h"
-#include "dh_type.h"
 #include "ui_regionmodifyui.h"
 #include "utility.h"
 #include <QLineEdit>
+#define _(str) gettext (str)
 
-static QDateTime
-GDateTimeToQDateTime (GDateTime *time)
+RegionModifyUI::RegionModifyUI (int index, dh::ManageRegion *mr,
+                                QWidget *parent)
+    : QWidget (parent), region (mr->getRegions ()[index].region),
+      ui (new Ui::RegionModifyUI), lock (mr->getRegions ()[index].lock)
 {
-    QDate date (g_date_time_get_year (time), g_date_time_get_month (time),
-                g_date_time_get_day_of_month (time));
-    QTime qtime (g_date_time_get_hour (time), g_date_time_get_minute (time));
-    return { date, qtime };
+  ui->setupUi (this);
+  QObject::connect (ui->lineEdit_3, &QLineEdit::textChanged, this,
+                    &RegionModifyUI::versionUpdate);
+  QObject::connect (ui->pushButton_2, &QPushButton::clicked, this,
+                    &RegionModifyUI::close);
+  initData ();
 }
 
-RegionModifyUI::RegionModifyUI (QWidget *parent)
-    : QWidget (parent), ui (new Ui::RegionModifyUI)
-{
-    ui->setupUi (this);
-    uuid = dh_info_get_uuid (DH_TYPE_REGION)->val[0];
-    region = static_cast<Region *> (
-        dh_info_get_data (DH_TYPE_REGION, uuid.toUtf8 ()));
-    QObject::connect (ui->lineEdit_3, &QLineEdit::textChanged, this,
-                      &RegionModifyUI::versionUpdate);
-    QObject::connect (ui->pushButton_2, &QPushButton::clicked, this,
-                      &RegionModifyUI::close);
-    initData ();
-}
-
-RegionModifyUI::~RegionModifyUI ()
-{
-    delete ui;
-    dh_info_writer_unlock (DH_TYPE_REGION, uuid.toUtf8 ());
-}
+RegionModifyUI::~RegionModifyUI () { delete ui; }
 
 void
 RegionModifyUI::initData ()
 {
-    ui->dateTimeEdit->setDateTime (
-        GDateTimeToQDateTime (region->data->create_time));
-    ui->dateTimeEdit_2->setDateTime (
-        GDateTimeToQDateTime (region->data->modify_time));
-    ui->textEdit->setText (region->data->description);
-    ui->lineEdit->setText (region->data->author);
-    ui->lineEdit_2->setText (region->data->name);
-    ui->lineEdit_3->setText (QString::number (region->data_version));
+  ui->dateTimeEdit->setDateTime (
+      dh::getDateTimeFromTimeStamp (region_get_create_timestamp (region)));
+  ui->dateTimeEdit_2->setDateTime (
+      dh::getDateTimeFromTimeStamp (region_get_modify_timestamp (region)));
+  auto name = region_get_name (region);
+  auto author = region_get_author (region);
+  auto description = region_get_description (region);
+  ui->textEdit->setText (description);
+  ui->lineEdit->setText (author);
+  ui->lineEdit_2->setText (name);
+  string_free (name);
+  string_free (author);
+  string_free (description);
+  ui->lineEdit_3->setText (QString::number (region_get_data_version (region)));
 }
 
 void
@@ -63,9 +46,9 @@ RegionModifyUI::okBtn_clicked ()
 void
 RegionModifyUI::versionUpdate ()
 {
-    QString str = dh::getVersion (ui->lineEdit_3->text ().toInt ());
-    if (!str.isEmpty ())
-        ui->versionLabel->setText (str);
-    else
-        ui->versionLabel->setText (_ ("Invalid!"));
+  // QString str = dh::getVersion (ui->lineEdit_3->text ().toInt ());
+  // if (!str.isEmpty ())
+  //   ui->versionLabel->setText (str);
+  // else
+  ui->versionLabel->setText (_ ("Unknown!"));
 }

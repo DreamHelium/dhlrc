@@ -144,7 +144,11 @@ ManageRegion::ManageRegion ()
 ManageRegion::~ManageRegion ()
 {
   for (const auto &i : regions)
-    region_free (i.region);
+    {
+      region_free (i.region);
+      delete i.lock;
+    }
+
   for (const auto library : modules)
     delete library;
 }

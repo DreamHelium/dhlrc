@@ -6,7 +6,7 @@ xgettext -k_ -kN_ \
 -kki18n:1 -kki18nc:1c,2 -kki18np:1,2 -kki18ncp:1c,2,3 \
 -kkli18n:1 -kkli18nc:1c,2 -kkli18np:1,2 -kkli18ncp:1c,2,3 \
 --default-domain=dhlrc --package-name=dhlrc \
---output=dhlrc.pot ../../src/*.cpp ../../build/src/settings.cpp rc.cpp ../../region-rs/src/lib.rs
+--output=dhlrc.pot ../../src/*.cpp ../../build/src/settings.cpp rc.cpp ../../region-rs/src/lib.rs ../../crab-nbt-ext/src/lib.rs
 echo "Extract the po source file"
 
 #lupdate6 ../../src/qt/*.ui ../../src/qt/*/*.ui -ts dhlrc.ts

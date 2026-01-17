@@ -14,7 +14,7 @@ use std::string::String;
 use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::time::Instant;
-use time::UtcDateTime;
+use time::{Duration, UtcDateTime};
 
 #[derive(Clone)]
 pub enum TreeValue {
@@ -47,16 +47,18 @@ struct BaseData {
 
 impl BaseData {
     fn set_time(&mut self, create_time: i64, modify_time: i64) -> Result<bool, Box<dyn Error>> {
-        self.create_time = UtcDateTime::from_unix_timestamp(create_time)?;
-        self.modify_time = UtcDateTime::from_unix_timestamp(modify_time)?;
+        self.create_time = UtcDateTime::from_unix_timestamp(create_time / 1000)?;
+        self.create_time += Duration::milliseconds(create_time % 1000);
+        self.modify_time = UtcDateTime::from_unix_timestamp(modify_time / 1000)?;
+        self.create_time += Duration::milliseconds(create_time % 1000);
         Ok(true)
     }
     fn get_create_timestamp(&self) -> i64 {
-        self.create_time.unix_timestamp()
+        self.create_time.unix_timestamp() * 1000 + self.create_time.millisecond() as i64
     }
 
     fn get_modify_timestamp(&self) -> i64 {
-        self.modify_time.unix_timestamp()
+        self.modify_time.unix_timestamp() * 1000 + self.modify_time.millisecond() as i64
     }
 
     fn get_description(&self) -> &str {
@@ -520,7 +522,7 @@ fn file_try_uncompress_real(
     loop {
         let mut temp_data = vec![0; 100];
         let file_pos = file.try_clone()?.seek(SeekFrom::Current(0))?;
-        if start.elapsed().as_secs() >= 5 {
+        if start.elapsed().as_secs() >= 1 {
             show_progress(
                 progress_fn,
                 main_klass,
@@ -561,7 +563,7 @@ fn file_try_uncompress_real(
 
     let data_size = file_data.len();
     loop {
-        if start.elapsed().as_secs() >= 5 {
+        if start.elapsed().as_secs() >= 1 {
             show_progress(
                 progress_fn,
                 main_klass,

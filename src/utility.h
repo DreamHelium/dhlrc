@@ -1,23 +1,13 @@
 #ifndef UTILITY_H
 #define UTILITY_H
-
-#include "../nbt_interface_cpp/nbt_interface.hpp"
-
-#include <QProgressDialog>
-#include <QWidget>
-#include <gio/gio.h>
+#include "manage.h"
+#include <QString>
 
 namespace dh
 {
-void loadNbtFileAsync (QWidget *parent, QString filedir, bool askForDes);
-void loadNbtInstances (QWidget *parent, const QStringList &filelist);
-QPixmap *loadSvgFile (const char *contents);
-QPixmap *loadSvgResourceFile (const char *pos);
-QIcon getIcon (QString dir);
-QString getVersion (int data_version);
-QStringList getTypeDescriptions (int type);
-bool setTypeUuid (int type, bool needMulti, const QString &title,
-                  const QString &label);
+QString getTranslationDir ();
+int getRegion (QWidget *widget, ManageRegion *mr, bool write);
+QDateTime getDateTimeFromTimeStamp (qint64 timeStamp);
 }
 
 #endif /* UTILITY_H */

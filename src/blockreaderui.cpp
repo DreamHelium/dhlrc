@@ -3,12 +3,14 @@
 #include "ui_blockreaderui.h"
 #include <QMessageBox>
 // #include <blockshowui.h>
+#include <blocklistui.h>
 #include <mainwindow.h>
 #include <qlineedit.h>
 #include <qnamespace.h>
 #include <qpushbutton.h>
 #include <qvalidator.h>
 #include <region.h>
+#include <utility.h>
 #define _(str) gettext (str)
 
 static void
@@ -18,8 +20,10 @@ set_func (void *klass, int value)
   emit brui->changeVal (value);
 }
 
-BlockReaderUI::BlockReaderUI (void *region, QWidget *parent)
-    : QWidget (parent), ui (new Ui::BlockReaderUI), region (region)
+BlockReaderUI::BlockReaderUI (int index, dh::ManageRegion *mr, QWidget *parent)
+    : QWidget (parent), ui (new Ui::BlockReaderUI),
+      region (mr->getRegions ()[index].region),
+      lock (mr->getRegions ()[index].lock)
 {
   ui->setupUi (this);
   // auto version = dh::getVersion (region->data_version);
@@ -108,13 +112,20 @@ BlockReaderUI::textChanged_cb ()
                         .arg (name)
                         .arg (index)
                         .arg (id);
+          string_free (name);
           if (palette_len)
             {
               for (int i = 0; i < palette_len; i++)
                 {
-                  infos += region_get_palette_property_name (region, id, i);
+                  auto propertyName
+                      = region_get_palette_property_name (region, id, i);
+                  infos += propertyName;
+                  string_free (propertyName);
                   infos += ": ";
-                  infos += region_get_palette_property_data (region, id, i);
+                  auto propertyData
+                      = region_get_palette_property_data (region, id, i);
+                  infos += propertyData;
+                  string_free (propertyData);
                   infos += "\n";
                 }
               ui->propertyBtn->setEnabled (true);
@@ -158,30 +169,34 @@ BlockReaderUI::setText ()
   str += '\n';
   str += _ ("Description: %10");
 
-  QString sizeStr
-      = str.arg (x)
-            .arg (y)
-            .arg (z)
-            .arg (data_version)
-            .arg ("Unknown")
-            .arg (QDateTime::fromSecsSinceEpoch (create_timestamp).toString ())
-            .arg (QDateTime::fromSecsSinceEpoch (modify_timestamp).toString ())
-            .arg (author)
-            .arg (name)
-            .arg (description);
+  QString sizeStr = str.arg (x)
+                        .arg (y)
+                        .arg (z)
+                        .arg (data_version)
+                        .arg ("Unknown")
+                        .arg (dh::getDateTimeFromTimeStamp (create_timestamp)
+                                  .toString ("yyyy/MM/dd HH:mm:ss.zzz"))
+                        .arg (dh::getDateTimeFromTimeStamp (modify_timestamp)
+                                  .toString ("yyyy/MM/dd HH:mm:ss.zzz"))
+                        .arg (author)
+                        .arg (name)
+                        .arg (description);
   ui->sizeLabel->setText (sizeStr);
 
   ui->xEdit->setValidator (new QIntValidator (0, x - 1));
   ui->yEdit->setValidator (new QIntValidator (0, y - 1));
   ui->zEdit->setValidator (new QIntValidator (0, z - 1));
+  string_free (author);
+  string_free (name);
+  string_free (description);
 }
 
 void
 BlockReaderUI::listBtn_clicked ()
 {
-  // BlockListUI *blui = new BlockListUI (region, large_version);
-  // blui->setAttribute (Qt::WA_DeleteOnClose);
-  // blui->show ();
+  BlockListUI *blui = new BlockListUI (region, large_version);
+  blui->setAttribute (Qt::WA_DeleteOnClose);
+  blui->show ();
 }
 
 typedef void *(*NewFunc) (void *);

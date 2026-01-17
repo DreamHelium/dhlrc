@@ -1,35 +1,15 @@
-use crab_nbt::{Nbt, NbtCompound, NbtTag};
+use crab_nbt::NbtTag;
+use crab_nbt_ext::{
+    GetWithError, MyError, ProgressFn, TreeValue, convert_nbt_to_hashmap, i18n,
+    init_translation_internal, nbt_create_real, string_to_ptr_fail_to_null,
+};
 use std::collections::HashMap;
 use std::error::Error;
-use std::ffi::{CStr, CString, c_char, c_int, c_void};
-use std::fmt::{Display, Formatter};
-use std::io::Cursor;
+use std::ffi::{c_char, c_int, c_void};
 use std::ops::IndexMut;
 use std::ptr::{null, null_mut};
 use std::string::String;
-
-type ProgressFn = extern "C" fn(
-    main_klass: *mut c_void,
-    progress: c_int,
-    format: *const c_char,
-    text: *const c_char,
-);
-
-#[derive(Clone)]
-pub enum TreeValue {
-    Byte(i8),
-    Short(i16),
-    Int(i32),
-    Long(i64),
-    Float(f32),
-    Double(f64),
-    String(String),
-    ByteArray(Vec<i8>),
-    IntArray(Vec<i32>),
-    LongArray(Vec<i64>),
-    List(Vec<TreeValue>),
-    Compound(HashMap<String, TreeValue>),
-}
+use std::sync::atomic::AtomicBool;
 
 #[link(name = "region_rs")]
 unsafe extern "C" {
@@ -98,43 +78,7 @@ unsafe extern "C" {
     fn vec_free(vec: *mut Vec<u8>);
     fn vec_to_cstr(vec: *mut Vec<u8>) -> *mut c_char;
     fn region_get_index(region: *mut c_void, x: i32, y: i32, z: i32) -> i32;
-}
-
-fn string_to_ptr_fail_to_null(string: &str) -> *mut c_char {
-    let str = CString::new(string);
-    match str {
-        Ok(real_str) => real_str.into_raw(),
-        Err(_err) => null_mut(),
-    }
-}
-
-#[derive(Debug)]
-struct MyError {
-    msg: String,
-}
-
-impl Display for MyError {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.msg)
-    }
-}
-
-impl Error for MyError {}
-
-fn cstr_to_str(string: *const c_char) -> Result<String, Box<dyn Error>> {
-    if string.is_null() {
-        return Err(Box::from(MyError {
-            /* NOTE: can be translated */
-            msg: "Null pointer detected".to_string(),
-        }));
-    }
-    let str = unsafe { CStr::from_ptr(string) };
-    let ref_str = str.to_str()?;
-    Ok(ref_str.to_string())
-}
-
-fn i18n(string: &str) -> &str {
-    string
+    fn cancel_flag_is_cancelled(ptr: *const AtomicBool) -> c_int;
 }
 
 #[unsafe(no_mangle)]
@@ -153,53 +97,6 @@ pub extern "C" fn region_is_multi() -> i32 {
  * region_crate_from_file_index
  */
 
-fn show_progress(
-    progress_fn: ProgressFn,
-    main_klass: *mut c_void,
-    progress: c_int,
-    message: &str,
-    text: &str,
-) {
-    let msg = string_to_ptr_fail_to_null(message);
-    let mut real_text: *mut c_char = null_mut();
-    if !text.is_empty() {
-        real_text = string_to_ptr_fail_to_null(text);
-    }
-    unsafe {
-        if progress_fn as usize != 0 {
-            progress_fn(main_klass, progress, msg, real_text);
-        }
-        string_free(msg);
-        string_free(real_text);
-    }
-}
-
-fn nbt_create_real(
-    bytes: *mut Vec<u8>,
-    progress_fn: ProgressFn,
-    main_klass: *mut c_void,
-) -> Result<Nbt, Box<dyn Error>> {
-    let uncompressed_bytes = unsafe { Box::from_raw(bytes) };
-
-    let mut bytes = Cursor::new(*uncompressed_bytes);
-    show_progress(
-        progress_fn,
-        main_klass,
-        0,
-        i18n("Reading NBT."),
-        &String::new(),
-    );
-    let nbt = Nbt::read(&mut bytes)?;
-    show_progress(
-        progress_fn,
-        main_klass,
-        100,
-        i18n("Reading NBT finish."),
-        &String::new(),
-    );
-    Ok(nbt)
-}
-
 struct Palette {
     id_name: String,
     property: Vec<(String, String)>,
@@ -209,94 +106,6 @@ struct Palette {
 struct Block {
     id: u32,
     block_entity: Option<HashMap<String, TreeValue>>,
-}
-
-trait GetWithError {
-    fn get_compound_with_err(&self, name: &str) -> Result<&NbtCompound, MyError>;
-    fn get_int_with_err(&self, name: &str) -> Result<i32, MyError>;
-    fn get_list_with_err(&self, name: &str) -> Result<&Vec<NbtTag>, MyError>;
-    fn get_string_with_err(&self, name: &str) -> Result<&String, MyError>;
-}
-
-impl GetWithError for NbtCompound {
-    fn get_compound_with_err(&self, name: &str) -> Result<&NbtCompound, MyError> {
-        match self.get_compound(name) {
-            Some(ret) => Ok(ret),
-            None => Err(MyError {
-                msg: i18n("Couldn't get compound.").to_string(),
-            }),
-        }
-    }
-
-    fn get_int_with_err(&self, name: &str) -> Result<i32, MyError> {
-        match self.get_int(name) {
-            Some(ret) => Ok(ret),
-            None => Err(MyError {
-                msg: i18n("Couldn't get int.").to_string(),
-            }),
-        }
-    }
-
-    fn get_list_with_err(&self, name: &str) -> Result<&Vec<NbtTag>, MyError> {
-        match self.get_list(name) {
-            Some(ret) => Ok(ret),
-            None => Err(MyError {
-                msg: i18n("Couldn't get list.").to_string(),
-            }),
-        }
-    }
-
-    fn get_string_with_err(&self, name: &str) -> Result<&String, MyError> {
-        match self.get_string(name) {
-            Some(ret) => Ok(ret),
-            None => Err(MyError {
-                msg: i18n("Couldn't get string.").to_string(),
-            }),
-        }
-    }
-}
-
-fn vec_u8_to_i8_safest(vec: Vec<u8>) -> Vec<i8> {
-    let mut result = Vec::with_capacity(vec.len());
-    for byte in vec {
-        result.push(byte as i8);
-    }
-    result
-}
-
-fn convert_nbt_tag_to_tree_value(nbt_tag: NbtTag) -> TreeValue {
-    match nbt_tag {
-        NbtTag::End => TreeValue::String("error".to_string()),
-        NbtTag::Byte(b) => TreeValue::Byte(b),
-        NbtTag::Int(i) => TreeValue::Int(i),
-        NbtTag::Short(s) => TreeValue::Short(s),
-        NbtTag::Long(l) => TreeValue::Long(l),
-        NbtTag::ByteArray(ba) => TreeValue::ByteArray(vec_u8_to_i8_safest(ba.to_vec())),
-        NbtTag::LongArray(la) => TreeValue::LongArray(la),
-        NbtTag::String(str) => TreeValue::String(str),
-        NbtTag::Float(f) => TreeValue::Float(f),
-        NbtTag::Double(d) => TreeValue::Double(d),
-        NbtTag::IntArray(ia) => TreeValue::IntArray(ia),
-        NbtTag::List(l) => {
-            let mut list: Vec<TreeValue> = vec![];
-            for tag in l {
-                let new_tag = convert_nbt_tag_to_tree_value(tag);
-                list.push(new_tag);
-            }
-            TreeValue::List(list)
-        }
-        NbtTag::Compound(c) => TreeValue::Compound(convert_nbt_to_hashmap(&c)),
-    }
-}
-
-fn convert_nbt_to_hashmap(nbt: &NbtCompound) -> HashMap<String, TreeValue> {
-    let child = &nbt.child_tags;
-    let mut hashmap = HashMap::new();
-    for child_node in child {
-        let tree_value = convert_nbt_tag_to_tree_value(child_node.1.clone());
-        hashmap.insert(child_node.0.clone(), tree_value);
-    }
-    hashmap
 }
 
 fn get_int_from_nbt_tag(nbt: &NbtTag) -> Result<i32, MyError> {
@@ -324,6 +133,7 @@ fn region_create_from_bytes_internal(
     bytes: *mut Vec<u8>,
     progress_fn: ProgressFn,
     main_klass: *mut c_void,
+    cancel_flag: *const AtomicBool,
 ) -> Result<*mut c_void, Box<dyn Error>> {
     let nbt = nbt_create_real(bytes, progress_fn, main_klass)?;
     let data_version = nbt.get_int_with_err("DataVersion")?;
@@ -341,6 +151,11 @@ fn region_create_from_bytes_internal(
     let palette_list = nbt.get_list_with_err("palette")?;
     let mut palette_vec: Vec<Palette> = vec![];
     for palette in palette_list {
+        if unsafe { cancel_flag_is_cancelled(cancel_flag) } == 1 {
+            return Err(Box::from(MyError {
+                msg: String::from(i18n("Reading palette is cancelled!")),
+            }));
+        }
         let internal_compound = match palette {
             NbtTag::Compound(c) => c,
             _ => {
@@ -393,6 +208,11 @@ fn region_create_from_bytes_internal(
 
     i = 0;
     for block in block_compound {
+        if unsafe { cancel_flag_is_cancelled(cancel_flag) } == 1 {
+            return Err(Box::from(MyError {
+                msg: String::from(i18n("Reading blocks is cancelled!")),
+            }));
+        }
         let internal_block = match block {
             NbtTag::Compound(c) => c,
             _ => {
@@ -416,6 +236,11 @@ fn region_create_from_bytes_internal(
     }
 
     for block in block_compound {
+        if unsafe { cancel_flag_is_cancelled(cancel_flag) } == 1 {
+            return Err(Box::from(MyError {
+                msg: String::from(i18n("Reading blocks is cancelled!")),
+            }));
+        }
         let internal_block = match block {
             NbtTag::Compound(c) => c,
             _ => {
@@ -453,12 +278,22 @@ fn region_create_from_bytes_internal(
         region_set_data_version(region, data_version as u32);
         region_set_size(region, x, y, z);
         for palette in palette_vec {
+            if { cancel_flag_is_cancelled(cancel_flag) } == 1 {
+                return Err(Box::from(MyError {
+                    msg: String::from(i18n("Adding palette is cancelled!")),
+                }));
+            }
             let string = string_to_ptr_fail_to_null(&palette.id_name);
             region_append_palette(region, string, Box::into_raw(Box::new(palette.property)));
             string_free(string);
         }
         i = 0;
         for block in blocks {
+            if { cancel_flag_is_cancelled(cancel_flag) } == 1 {
+                return Err(Box::from(MyError {
+                    msg: String::from(i18n("Adding block is cancelled!")),
+                }));
+            }
             let entities = match block.block_entity {
                 Some(e) => Box::into_raw(Box::new(e)),
                 None => null_mut(),
@@ -471,22 +306,33 @@ fn region_create_from_bytes_internal(
 }
 
 #[unsafe(no_mangle)]
+pub extern "C" fn init_translation(path: *const c_char) -> *const c_char {
+    match init_translation_internal(path) {
+        Ok(_) => null(),
+        Err(e) => string_to_ptr_fail_to_null(&e.to_string()),
+    }
+}
+
+#[unsafe(no_mangle)]
 pub extern "C" fn region_create_from_file(
     bytes: *mut Vec<u8>,
     progress_fn: ProgressFn,
     region: *mut *mut c_void,
     main_klass: *mut c_void,
+    cancel_flag: *const AtomicBool,
 ) -> *const c_char {
     let mut err_string: String = String::new();
     if !region.is_null() {
         unsafe {
-            *region = match region_create_from_bytes_internal(bytes, progress_fn, main_klass) {
-                Ok(ret) => ret,
-                Err(err) => {
-                    err_string = err.to_string();
-                    null_mut()
+            *region =
+                match region_create_from_bytes_internal(bytes, progress_fn, main_klass, cancel_flag)
+                {
+                    Ok(ret) => ret,
+                    Err(err) => {
+                        err_string = err.to_string();
+                        null_mut()
+                    }
                 }
-            }
         }
     } else {
         err_string = String::from(i18n("Region value not provided"));

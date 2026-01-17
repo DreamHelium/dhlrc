@@ -26,11 +26,11 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets Svg)
 add_definitions(-DQT_NO_SIGNALS_SLOTS_KEYWORDS)
 
 set(ui_files mainwindow.ui
-        #        blocklistui.ui
+        blocklistui.ui
         blockreaderui.ui
         manageui.ui
         #        blockshowui.ui
-        #        regionmodifyui.ui
+        regionmodifyui.ui
         #        palettelistui.ui
         #        paletteaddui.ui
         loadobjectui.ui)
@@ -87,6 +87,9 @@ set(TEMP_PROJECT_SOURCES
         ../resources/dhlrc.qrc
         generalchoosedialog.cpp generalchoosedialog.h
         blockreaderui.cpp blockreaderui.h
+        utility.cpp utility.h
+        regionmodifyui.cpp regionmodifyui.h
+        blocklistui.cpp blocklistui.h
 )
 
 ki18n_wrap_ui(TEMP_PROJECT_SOURCES ${ui_files})
