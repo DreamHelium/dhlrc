@@ -1,11 +1,14 @@
 use crab_nbt::{Nbt, NbtCompound, NbtTag};
 use formatx::formatx;
+use gettextrs::gettext;
 use std::collections::HashMap;
 use std::error::Error;
 use std::ffi::{CStr, CString, c_char, c_int, c_void};
 use std::fmt::{Display, Formatter};
 use std::io::Cursor;
 use std::ptr::null_mut;
+use std::sync::Arc;
+use std::sync::atomic::{AtomicBool, Ordering};
 
 pub type ProgressFn = extern "C" fn(
     main_klass: *mut c_void,
@@ -78,6 +81,8 @@ pub trait GetWithError {
     fn get_int_with_err(&self, name: &str) -> Result<i32, Box<dyn Error>>;
     fn get_list_with_err(&self, name: &str) -> Result<&Vec<NbtTag>, Box<dyn Error>>;
     fn get_string_with_err(&self, name: &str) -> Result<&String, Box<dyn Error>>;
+    fn get_long_with_err(&self, name: &str) -> Result<i64, Box<dyn Error>>;
+    fn get_long_array_with_err(&self, name: &str) -> Result<&Vec<i64>, Box<dyn Error>>;
 }
 
 impl GetWithError for NbtCompound {
@@ -85,7 +90,7 @@ impl GetWithError for NbtCompound {
         match self.get_compound(name) {
             Some(ret) => Ok(ret),
             None => {
-                let str = gettextrs::gettext(i18n("Couldn't get compound of {}."));
+                let str = gettext(i18n("Couldn't get compound of {}."));
                 let formatted_str = formatx!(str, name)?;
                 Err(Box::new(MyError { msg: formatted_str }))
             }
@@ -96,7 +101,7 @@ impl GetWithError for NbtCompound {
         match self.get_int(name) {
             Some(ret) => Ok(ret),
             None => {
-                let str = gettextrs::dgettext("dhlrc", i18n("Couldn't get int of {}."));
+                let str = gettext(i18n("Couldn't get int of {}."));
                 let formatted_str = formatx!(str, name)?;
                 Err(Box::new(MyError { msg: formatted_str }))
             }
@@ -107,7 +112,7 @@ impl GetWithError for NbtCompound {
         match self.get_list(name) {
             Some(ret) => Ok(ret),
             None => {
-                let str = gettextrs::gettext(i18n("Couldn't get list of {}."));
+                let str = gettext(i18n("Couldn't get list of {}."));
                 let formatted_str = formatx!(str, name)?;
                 Err(Box::new(MyError { msg: formatted_str }))
             }
@@ -118,7 +123,29 @@ impl GetWithError for NbtCompound {
         match self.get_string(name) {
             Some(ret) => Ok(ret),
             None => {
-                let str = gettextrs::gettext(i18n("Couldn't get string of {}."));
+                let str = gettext(i18n("Couldn't get string of {}."));
+                let formatted_str = formatx!(str, name)?;
+                Err(Box::new(MyError { msg: formatted_str }))
+            }
+        }
+    }
+
+    fn get_long_with_err(&self, name: &str) -> Result<i64, Box<dyn Error>> {
+        match self.get_long(name) {
+            Some(ret) => Ok(ret),
+            None => {
+                let str = gettext(i18n("Couldn't get long of {}."));
+                let formatted_str = formatx!(str, name)?;
+                Err(Box::new(MyError { msg: formatted_str }))
+            }
+        }
+    }
+
+    fn get_long_array_with_err(&self, name: &str) -> Result<&Vec<i64>, Box<dyn Error>> {
+        match self.get_long_array(name) {
+            Some(ret) => Ok(ret),
+            None => {
+                let str = gettext(i18n("Couldn't get long array of {}."));
                 let formatted_str = formatx!(str, name)?;
                 Err(Box::new(MyError { msg: formatted_str }))
             }
@@ -149,10 +176,21 @@ pub fn show_progress(
     }
 }
 
+fn cancel_flag_is_cancelled(cancel_flag: *const AtomicBool) -> bool {
+    if cancel_flag.is_null() {
+        return false;
+    }
+    let arc = unsafe { Arc::from_raw(cancel_flag) };
+    let ret = arc.load(Ordering::SeqCst);
+    let _ = Arc::into_raw(arc);
+    ret
+}
+
 pub fn nbt_create_real(
     bytes: *mut Vec<u8>,
     progress_fn: ProgressFn,
     main_klass: *mut c_void,
+    cancel_flag: *const AtomicBool,
 ) -> Result<Nbt, Box<dyn Error>> {
     let uncompressed_bytes = unsafe { Box::from_raw(bytes) };
 
@@ -164,7 +202,17 @@ pub fn nbt_create_real(
         i18n("Reading NBT."),
         &String::new(),
     );
+    if cancel_flag_is_cancelled(cancel_flag) {
+        return Err(Box::new(MyError {
+            msg: gettext(i18n("The parsing operation is cancelled.")),
+        }));
+    }
     let nbt = Nbt::read(&mut bytes)?;
+    if cancel_flag_is_cancelled(cancel_flag) {
+        return Err(Box::new(MyError {
+            msg: gettext(i18n("The parsing operation is cancelled.")),
+        }));
+    }
     show_progress(
         progress_fn,
         main_klass,
@@ -216,4 +264,55 @@ pub fn convert_nbt_to_hashmap(nbt: &NbtCompound) -> HashMap<String, TreeValue> {
         hashmap.insert(child_node.0.clone(), tree_value);
     }
     hashmap
+}
+pub struct Palette {
+    pub id_name: String,
+    pub property: Vec<(String, String)>,
+}
+pub fn get_palette_from_nbt_tag(
+    palette_list: &Vec<NbtTag>,
+    cancel_flag: *const AtomicBool,
+) -> Result<Vec<Palette>, Box<dyn Error>> {
+    let mut palette_vec = vec![];
+    for palette in palette_list {
+        if cancel_flag_is_cancelled(cancel_flag) {
+            return Err(Box::from(MyError {
+                msg: String::from(i18n("Reading palette is cancelled!")),
+            }));
+        }
+        let internal_compound = match palette {
+            NbtTag::Compound(c) => c,
+            _ => {
+                return Err(Box::from(MyError {
+                    msg: String::from(i18n("Wrong type of palette!")),
+                }));
+            }
+        };
+        let internal_string = internal_compound.get_string_with_err("Name")?;
+        let internal_properties: Vec<(String, String)> =
+            match internal_compound.get_compound("Properties") {
+                Some(properties) => {
+                    let child = &properties.child_tags;
+                    let mut ret = vec![];
+                    for (name, data) in child {
+                        let real_data = match data {
+                            NbtTag::String(x) => x,
+                            _ => {
+                                return Err(Box::from(MyError {
+                                    msg: String::from(i18n("Wrong type of property!")),
+                                }));
+                            }
+                        };
+                        ret.push((name.clone(), real_data.clone()));
+                    }
+                    ret
+                }
+                None => vec![],
+            };
+        palette_vec.push(Palette {
+            id_name: internal_string.clone(),
+            property: internal_properties,
+        });
+    }
+    Ok((palette_vec))
 }

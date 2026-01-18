@@ -1,13 +1,11 @@
 [package]
-name = "region-nbt-rs"
+name = "region-litematic-rs"
 version = "0.1.0"
 edition = "2024"
-#links = "region_rs"
 
 [dependencies]
-crab_nbt = "0.2.11"
 crab-nbt-ext = { path = "../crab-nbt-ext" }
-gettext-rs = "0.7.7"
+crab_nbt = "0.2.11"
 formatx = "0.2.4"
 
 [lib]

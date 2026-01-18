@@ -117,6 +117,8 @@ pub struct Region {
     base_data: BaseData,
     /** The size of the region */
     region_size: (i32, i32, i32),
+    /** The offset */
+    region_offset : (i32, i32, i32),
     /** The block info array */
     block_array: Vec<Block>,
     /** The Palette info array*/
@@ -307,6 +309,26 @@ pub extern "C" fn region_get_y(region: *mut Region) -> i32 {
 #[unsafe(no_mangle)]
 pub extern "C" fn region_get_z(region: *mut Region) -> i32 {
     unsafe { (*region).region_size.2 }
+}
+
+#[unsafe(no_mangle)]
+pub extern "C" fn region_set_offset(region: *mut Region, x: i32, y: i32, z: i32) {
+    unsafe { (*region).region_offset = (x, y, z) };
+}
+
+#[unsafe(no_mangle)]
+pub extern "C" fn region_get_offset_x(region: *mut Region) -> i32 {
+    unsafe { (*region).region_offset.0 }
+}
+
+#[unsafe(no_mangle)]
+pub extern "C" fn region_get_offset_y(region: *mut Region) -> i32 {
+    unsafe { (*region).region_offset.1 }
+}
+
+#[unsafe(no_mangle)]
+pub extern "C" fn region_get_offset_z(region: *mut Region) -> i32 {
+    unsafe { (*region).region_offset.2 }
 }
 
 /* The two functions are used for Rust only */

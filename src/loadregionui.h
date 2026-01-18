@@ -4,6 +4,8 @@
 #include "loadobjectui.h"
 #include <QWidget>
 // #include <lrchooseui.h>
+#include <QEventLoop>
+#include <condition_variable>
 #include <manage.h>
 #include <qeventloop.h>
 
@@ -20,9 +22,18 @@ public:
 
 Q_SIGNALS:
   void finishLoadOne ();
+  void quitLoop();
 
 private:
+  QThread *thread = nullptr;
+  std::mutex mutex;
+  std::condition_variable cv;
+  QString currentDir;
   const void *cancel_flag;
+  void *object = nullptr;
+  QStringList regionList;
+  QLibrary *library = nullptr;
+  void *region = nullptr;
   QStringList list;
   QStringList failedList;
   /* Original class never provide this. */
