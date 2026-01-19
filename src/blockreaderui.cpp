@@ -4,6 +4,7 @@
 #include <QMessageBox>
 // #include <blockshowui.h>
 #include <blocklistui.h>
+#include <blockshowui.h>
 #include <mainwindow.h>
 #include <qlineedit.h>
 #include <qnamespace.h>
@@ -262,11 +263,10 @@ BlockReaderUI::propertyBtn_clicked ()
 void
 BlockReaderUI::showBtn_clicked ()
 {
-  // if (!bsui)
-  //   {
-  //     bsui = new BlockShowUI (uuid, large_version);
-  //     QObject::connect (this, &BlockReaderUI::closeWin, bsui,
-  //                       &BlockShowUI::close);
-  //   }
-  // bsui->show ();
+  if (!bsui)
+    {
+      bsui = new BlockShowUI (region, large_version);
+      connect (this, &BlockReaderUI::closeWin, bsui, &BlockShowUI::close);
+    }
+  bsui->show ();
 }

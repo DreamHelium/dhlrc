@@ -2,6 +2,7 @@
 #define BLOCKREADERUI_H
 
 #include <QWidget>
+#include "blockshowui.h"
 #include <manage.h>
 
 // #include "blockshowui.h"
@@ -31,7 +32,7 @@ private:
   bool readerIsUnlocked = false;
   void *instance = nullptr;
   void closeEvent (QCloseEvent *event) override;
-  // BlockShowUI *bsui = nullptr;
+  BlockShowUI *bsui = nullptr;
 
 Q_SIGNALS:
   void changeVal (int value);

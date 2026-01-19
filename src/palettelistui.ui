@@ -30,46 +30,9 @@
       </spacer>
      </item>
      <item>
-      <widget class="QPushButton" name="addBtn">
-       <property name="text">
-        <string>&amp;Add</string>
-       </property>
-       <property name="icon">
-        <iconset theme="list-add"/>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="pushButton_2">
-       <property name="text">
-        <string>&amp;Remove</string>
-       </property>
-       <property name="icon">
-        <iconset theme="list-remove"/>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="pushButton_4">
-       <property name="text">
-        <string>Re&amp;place</string>
-       </property>
-      </widget>
-     </item>
-     <item>
       <widget class="QPushButton" name="pushButton_5">
        <property name="text">
         <string>&amp;Show blocks</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="pushButton_3">
-       <property name="text">
-        <string>R&amp;efresh</string>
-       </property>
-       <property name="icon">
-        <iconset theme="view-refresh"/>
        </property>
       </widget>
      </item>

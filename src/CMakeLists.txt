@@ -29,9 +29,9 @@ set(ui_files mainwindow.ui
         blocklistui.ui
         blockreaderui.ui
         manageui.ui
-        #        blockshowui.ui
+        blockshowui.ui
         regionmodifyui.ui
-        #        palettelistui.ui
+        palettelistui.ui
         #        paletteaddui.ui
         loadobjectui.ui)
 
@@ -90,6 +90,8 @@ set(TEMP_PROJECT_SOURCES
         utility.cpp utility.h
         regionmodifyui.cpp regionmodifyui.h
         blocklistui.cpp blocklistui.h
+        blockshowui.cpp blockshowui.h
+        palettelistui.cpp palettelistui.h
 )
 
 ki18n_wrap_ui(TEMP_PROJECT_SOURCES ${ui_files})

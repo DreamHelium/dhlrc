@@ -28,6 +28,7 @@ private:
   QThread *thread = nullptr;
   std::mutex mutex;
   std::condition_variable cv;
+  QList<int> regionIndexes;
   QString currentDir;
   const void *cancel_flag;
   void *object = nullptr;

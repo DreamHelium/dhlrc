@@ -50,7 +50,7 @@ impl BaseData {
         self.create_time = UtcDateTime::from_unix_timestamp(create_time / 1000)?;
         self.create_time += Duration::milliseconds(create_time % 1000);
         self.modify_time = UtcDateTime::from_unix_timestamp(modify_time / 1000)?;
-        self.create_time += Duration::milliseconds(create_time % 1000);
+        self.modify_time += Duration::milliseconds(modify_time % 1000);
         Ok(true)
     }
     fn get_create_timestamp(&self) -> i64 {
@@ -118,7 +118,7 @@ pub struct Region {
     /** The size of the region */
     region_size: (i32, i32, i32),
     /** The offset */
-    region_offset : (i32, i32, i32),
+    region_offset: (i32, i32, i32),
     /** The block info array */
     block_array: Vec<Block>,
     /** The Palette info array*/
@@ -136,6 +136,9 @@ impl Region {
 
     fn get_size(&self) {
         println!("{}", size_of::<Region>());
+    }
+    fn get_palette_len(&self) -> usize {
+        self.palette_array.len()
     }
 }
 
@@ -279,6 +282,11 @@ pub extern "C" fn region_set_author(region: *mut Region, string: *const c_char) 
         },
         Err(err) => string_to_ptr_fail_to_null(&err.to_string()),
     }
+}
+
+#[unsafe(no_mangle)]
+pub extern "C" fn region_set_blocks_from_vec(region: *mut Region, blocks: *mut Vec<Block>) {
+    unsafe { (*region).block_array = *Box::from_raw(blocks) };
 }
 
 #[unsafe(no_mangle)]
@@ -705,4 +713,10 @@ pub extern "C" fn cancel_flag_clone(ptr: *const AtomicBool) -> *const AtomicBool
     let cloned_arc = arc.clone();
     let _ = Arc::into_raw(arc);
     Arc::into_raw(cloned_arc)
+}
+
+#[unsafe(no_mangle)]
+pub extern "C" fn region_get_palette_len(region: *mut Region) -> usize {
+    let array = unsafe { &(*region).palette_array };
+    array.len()
 }

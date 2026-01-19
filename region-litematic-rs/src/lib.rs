@@ -10,6 +10,7 @@ use std::ffi::{CStr, c_char, c_int, c_void};
 use std::ops::{IndexMut, Shl, Shr};
 use std::ptr::{null, null_mut};
 use std::sync::atomic::AtomicBool;
+use std::time::Instant;
 
 #[link(name = "region_rs")]
 unsafe extern "C" {
@@ -83,6 +84,7 @@ unsafe extern "C" {
     fn vec_to_cstr(vec: *mut Vec<u8>) -> *mut c_char;
     fn region_get_index(region: *mut c_void, x: i32, y: i32, z: i32) -> i32;
     fn cancel_flag_is_cancelled(ptr: *const AtomicBool) -> c_int;
+    fn region_set_blocks_from_vec(region: *mut c_void, blocks: *mut Vec<Block>);
 }
 
 #[unsafe(no_mangle)]
@@ -164,19 +166,24 @@ fn get_block_id(
     progress_fn: ProgressFn,
     main_klass: *mut c_void,
     cancel_flag: *const AtomicBool,
-) -> Result<Vec<u32>, Box<dyn Error>> {
-    let mut ret: Vec<u32> = vec![];
+) -> Result<Vec<Block>, Box<dyn Error>> {
+    let mut ret: Vec<Block> = vec![Block::default(); block_num as usize];
+    let mut time = Instant::now();
     let mut i = 0;
     loop {
-        let str = i18n("Reading block id: {} / {}.");
-        let real_str = formatx!(str, i, block_num)?;
-        show_progress(
-            progress_fn,
-            main_klass,
-            i * 100 / block_num,
-            &real_str,
-            &String::new(),
-        );
+        if time.elapsed().as_secs() >= 1 {
+            let str = i18n("Reading block id: {} / {}.");
+            let real_str = formatx!(str, i, block_num)?;
+            show_progress(
+                progress_fn,
+                main_klass,
+                (i as u64 * 100 / block_num as u64) as c_int,
+                &real_str,
+                &String::new(),
+            );
+            time = Instant::now();
+        }
+
         let start_bit = i as u32 * move_bit;
         let start_state = start_bit / 64;
         let and_num = (1 << move_bit) - 1;
@@ -203,9 +210,16 @@ fn get_block_id(
                 | ((states[(start_state + 1) as usize] as u64).shl(move_num_2 as u64)))
                 & and_num;
         }
-        ret.push(id as u32);
+        ret.index_mut(i).id = id as u32;
         i += 1;
-        if i == block_num {
+        if i == block_num as usize {
+            show_progress(
+                progress_fn,
+                main_klass,
+                100,
+                i18n("Reading block finished!"),
+                &String::new(),
+            );
             break;
         }
     }
@@ -227,7 +241,9 @@ fn region_create_from_bytes_internal(
     cancel_flag: *const AtomicBool,
     index: i32,
 ) -> Result<*mut c_void, Box<dyn Error>> {
-    let nbt = unsafe { Box::from_raw(o_nbt) };
+    let o_nbt_box = unsafe { Box::from_raw(o_nbt) };
+    let nbt = o_nbt_box.clone();
+    let _ = Box::into_raw(o_nbt_box);
     let data_version = nbt.get_int_with_err("MinecraftDataVersion")?;
     let metadata = nbt.get_compound_with_err("Metadata")?;
     let create_time = metadata.get_long_with_err("TimeCreated")?;
@@ -275,12 +291,7 @@ fn region_create_from_bytes_internal(
         main_klass,
         cancel_flag,
     )?;
-    let mut blocks = vec![Block::default(); block_num as usize];
-    let mut i = 0;
-    for block in block_ids {
-        blocks.index_mut(i).id = block;
-        i += 1;
-    }
+    let blocks = block_ids;
 
     let entities_list = real_region_nbt.get_list_with_err("TileEntities")?;
     { /* TODO */ }
@@ -301,30 +312,7 @@ fn region_create_from_bytes_internal(
             region_append_palette(region, string, Box::into_raw(Box::new(palette.property)));
             string_free(string);
         }
-        i = 0;
-        for block in blocks {
-            if { cancel_flag_is_cancelled(cancel_flag) } == 1 {
-                region_free(region);
-                return Err(Box::from(MyError {
-                    msg: String::from(i18n("Adding block is cancelled!")),
-                }));
-            }
-            let str = i18n("Adding blocks: {} / {}.");
-            let real_str = formatx!(str, i, block_num)?;
-            show_progress(
-                progress_fn,
-                main_klass,
-                (i * 100 / block_num as usize) as c_int,
-                &real_str,
-                &String::new(),
-            );
-            let entities = match block.block_entity {
-                Some(e) => Box::into_raw(Box::new(e)),
-                None => null_mut(),
-            };
-            block_new_to_region(region, i, block.id, entities);
-            i += 1;
-        }
+        region_set_blocks_from_vec(region, Box::into_raw(Box::new(blocks)));
         let real_name = string_to_ptr_fail_to_null(name);
         let real_description = string_to_ptr_fail_to_null(description);
         let real_author = string_to_ptr_fail_to_null(author);

@@ -192,9 +192,9 @@ pub fn nbt_create_real(
     main_klass: *mut c_void,
     cancel_flag: *const AtomicBool,
 ) -> Result<Nbt, Box<dyn Error>> {
-    let uncompressed_bytes = unsafe { Box::from_raw(bytes) };
+    let uncompressed_bytes = unsafe { (*bytes).clone() };
 
-    let mut bytes = Cursor::new(*uncompressed_bytes);
+    let mut bytes = Cursor::new(uncompressed_bytes);
     show_progress(
         progress_fn,
         main_klass,

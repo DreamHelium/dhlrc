@@ -26,7 +26,12 @@ LoadRegionUI::LoadRegionUI (QStringList list, dh::ManageRegion *mr,
              {
                cancel_flag_cancel (cancel_flag);
                QThread::msleep (10);
-
+               if (stopped)
+                 {
+                   cv.notify_one ();
+                   failedList.append (currentDir);
+                   failedReason.append (_ ("Cancelled."));
+                 }
                if (!failedList.isEmpty () || !finished)
                  {
                    QString errorMsg
@@ -40,53 +45,22 @@ LoadRegionUI::LoadRegionUI (QStringList list, dh::ManageRegion *mr,
                    QMessageBox::critical (this, _ ("Error!"), errorMsg);
                  }
              });
-  connect (
-      this, &LoadRegionUI::continued, this,
-      [&]
-        {
-          if (!finished)
-            {
-              auto index = GeneralChooseDialog::getIndex (
-                  _ ("Select a Region"), _ ("Please select a region."),
-                  regionList);
-              if (index != -1)
-                {
-                  auto setFunc = [] (void *main_klass, int value,
-                                     const char *text, const char *arg)
-                    {
-                      Q_EMIT static_cast<LoadRegionUI *> (main_klass)
-                          ->refreshSubProgress (value);
-                      if (!arg)
-                        Q_EMIT static_cast<LoadRegionUI *> (main_klass)
-                            ->refreshSubLabel (gettext (text));
-                      else
-                        {
-                          auto msg = QString::asprintf (gettext (text), arg);
-                          Q_EMIT static_cast<LoadRegionUI *> (main_klass)
-                              ->refreshSubLabel (msg);
-                        }
-                    };
-                  typedef const char *(*LoadFunc) (void *, ProgressFunc,
-                                                   void **, void *,
-                                                   const void *, int32_t);
-                  auto func = reinterpret_cast<LoadFunc> (
-                      library->resolve ("region_create_from_file_as_index"));
-                  const char *msg = nullptr;
-                  if (func)
-                    msg = func (object, setFunc, &region, this, cancel_flag,
-                                index);
-                  if (msg)
-                    {
-                      failedList.append (currentDir);
-                      failedReason.append (msg);
-                      Q_EMIT refreshSubLabel (msg);
-                      string_free (msg);
-                    }
-                }
-              cv.notify_one ();
-              stopped = false;
-            }
-        });
+  connect (this, &LoadRegionUI::continued, this,
+           [&]
+             {
+               if (!finished)
+                 {
+                   auto indexes = GeneralChooseDialog::getIndexes (
+                       _ ("Select a Region"), _ ("Please select a region."),
+                       regionList);
+                   if (!indexes.isEmpty ())
+                     {
+                       regionIndexes = indexes;
+                     }
+                   cv.notify_one ();
+                   stopped = false;
+                 }
+             });
   connect (this, &LoadRegionUI::finishLoadOne, mr,
            &dh::ManageRegion::refresh_triggered);
   process ();
@@ -104,56 +78,47 @@ LoadRegionUI::process ()
 {
   auto real_task = [&]
     {
-      thread = QThread::currentThread ();
-      int i = 0;
-      auto new_cancel_flag = cancel_flag;
-      cancel_flag_clone (cancel_flag);
-      for (const auto &dir : list)
+      auto setFunc
+          = [] (void *main_klass, int value, const char *text, const char *arg)
         {
-          auto setFunc = [] (void *main_klass, int value, const char *text,
-                             const char *arg)
+          Q_EMIT static_cast<LoadRegionUI *> (main_klass)
+              ->refreshSubProgress (value);
+          if (!arg)
+            Q_EMIT static_cast<LoadRegionUI *> (main_klass)
+                ->refreshSubLabel (gettext (text));
+          else
             {
+              auto msg = QString::asprintf (gettext (text), arg);
               Q_EMIT static_cast<LoadRegionUI *> (main_klass)
-                  ->refreshSubProgress (value);
-              if (!arg)
-                Q_EMIT static_cast<LoadRegionUI *> (main_klass)
-                    ->refreshSubLabel (gettext (text));
-              else
-                {
-                  auto msg = QString::asprintf (gettext (text), arg);
-                  Q_EMIT static_cast<LoadRegionUI *> (main_klass)
-                      ->refreshSubLabel (msg);
-                }
-            };
+                  ->refreshSubLabel (msg);
+            }
+        };
+      auto pushMsgFunc = [&] (const QString &curDir, const char *msg)
+        {
+          failedList.append (curDir);
+          failedReason.append (msg);
+          Q_EMIT refreshSubLabel (msg);
+          string_free (msg);
+        };
+      auto realProcessFunc = [&] (const QString &dir, int i)
+        {
+          if (cancel_flag_is_cancelled (cancel_flag))
+            return;
 
-          if (cancel_flag_is_cancelled (new_cancel_flag))
-            break;
           Q_EMIT refreshFullProgress (i * 100 / list.size ());
           QString realLabel = "[%1/%2] %3";
           realLabel = realLabel.arg (i + 1).arg (list.size ()).arg (dir);
           Q_EMIT refreshFullLabel (realLabel);
-          i++;
+
           /* Processing stuff */
           Q_EMIT refreshSubLabel (_ ("Parsing NBT"));
           int failed = 0;
           void *data = file_try_uncompress (dir.toUtf8 (), setFunc, this,
-                                            &failed, new_cancel_flag);
+                                            &failed, cancel_flag);
           if (failed)
             {
-              // g_message ("%d", dhlrc_get_ignore_leftover ());
-              // if (err->code == NBT_GLIB_PARSE_ERROR_LEFTOVER_DATA
-              //     && dhlrc_get_ignore_leftover ())
-              //   {
-              //     /* Ignore Leftover data */
-              //     g_error_free (err);
-              //     goto continue_situation;
-              //   }
-
-              failedList.append (dir);
               auto err_msg = vec_to_cstr (data);
-              failedReason.append (gettext (err_msg));
-              Q_EMIT refreshSubLabel (gettext (err_msg));
-              string_free (err_msg);
+              pushMsgFunc (dir, err_msg);
             }
           else
             {
@@ -162,7 +127,7 @@ LoadRegionUI::process ()
               for (int j = 0; j < moduleNum; j++)
                 {
                   typedef int32_t *(*multiFunc) ();
-
+                  object = nullptr;
                   typedef const char *(*LoadTranslation) (const char *);
                   auto lib = mr->getModule (j);
                   auto multiFn = reinterpret_cast<multiFunc> (
@@ -177,21 +142,21 @@ LoadRegionUI::process ()
                       lib->resolve ("init_translation"));
 
                   if (transFn)
-                    {
-                      msg = transFn (dh::getTranslationDir ().toUtf8 ());
-                    }
+                    msg = transFn (dh::getTranslationDir ().toUtf8 ());
                   if (multiFn)
                     {
                       if (multiFn ())
                         {
-                          object = nullptr;
                           if (loadObjectFn && !msg)
                             {
                               msg = loadObjectFn (data, setFunc, this,
-                                                  new_cancel_flag, &object);
+                                                  cancel_flag, &object);
                               if (msg)
-
-                                vec_free (data);
+                                {
+                                  if (!cancel_flag_is_cancelled (cancel_flag))
+                                    vec_free (data);
+                                  pushMsgFunc (dir, msg);
+                                }
                             }
                           typedef int32_t (*numFunc) (void *);
                           auto numFn = reinterpret_cast<numFunc> (
@@ -218,11 +183,55 @@ LoadRegionUI::process ()
                               /* Emit the stop signal to stop, and use loop to
                                * stop the process. */
                               Q_EMIT stopProgress ();
-                              std::unique_lock<std::mutex> lock (mutex);
+                              std::unique_lock lock (mutex);
                               cv.wait (lock);
                               /* Continue */
+                              Q_EMIT refreshFullLabel (realLabel);
+                              typedef const char *(*LoadFunc) (
+                                  void *, ProgressFunc, void **, void *,
+                                  const void *, int32_t);
+                              auto func = reinterpret_cast<LoadFunc> (
+                                  library->resolve (
+                                      "region_create_from_file_as_index"));
+                              for (auto index : regionIndexes)
+                                {
+                                  void *singleRegion = nullptr;
+                                  if (func)
+                                    msg = func (object, setFunc, &singleRegion,
+                                                this, cancel_flag, index);
+                                  if (msg)
+                                    pushMsgFunc (dir, msg);
+                                  else
+                                    {
+                                      auto realName
+                                          = QFileInfo (dir).fileName ();
+                                      auto lastDot
+                                          = realName.lastIndexOf ('.');
+                                      if (lastDot != -1)
+                                        {
+                                          realName = realName.left (lastDot);
+                                        }
+                                      auto name
+                                          = region_get_name (singleRegion);
+                                      realName += " - ";
+                                      realName += name;
+                                      string_free (name);
+                                      Region regionStruct = {
+                                        singleRegion,
+                                        realName,
+                                        QUuid::createUuid ().toString (),
+                                        QDateTime::currentDateTime (),
+                                        new QReadWriteLock (),
+                                      };
+                                      mr->appendRegion (regionStruct);
+                                    }
+                                }
+                              objFree (object);
+                              regionIndexes.clear ();
+                              vec_free (data);
                               object = nullptr;
                               library = nullptr;
+                              break;
                             }
                           else
                             objFree (object);
@@ -238,54 +247,62 @@ LoadRegionUI::process ()
                           if (loadObjectFn && !msg)
                             {
                               msg = loadObjectFn (data, setFunc, this,
-                                                  new_cancel_flag, &object);
-                              if (msg)
+                                                  cancel_flag, &object);
+                              vec_free (data);
+                              if (msg
+                                  && !cancel_flag_is_cancelled (cancel_flag))
                                 vec_free (data);
                             }
                           if (func && !msg)
                             msg = func (object, setFunc, &region, this,
-                                        new_cancel_flag);
+                                        cancel_flag);
                           if (msg)
                             if (j != moduleNum - 1)
                               string_free (msg);
                           object = nullptr;
+                          if (msg)
+                            pushMsgFunc (dir, msg);
+                          if (region)
+                            {
+                              auto realName = QFileInfo (dir).fileName ();
+                              auto lastDot = realName.lastIndexOf ('.');
+                              if (lastDot != -1)
+                                {
+                                  realName = realName.left (lastDot);
+                                }
+                              Region regionStruct = {
+                                region,
+                                realName,
+                                QUuid::createUuid ().toString (),
+                                QDateTime::currentDateTime (),
+                                new QReadWriteLock (),
+                              };
+                              mr->appendRegion (regionStruct);
+                              region = nullptr;
+                              break;
+                            }
                         }
                     }
-                  if (msg)
-                    {
-                      failedList.append (dir);
-                      failedReason.append (msg);
-                      Q_EMIT refreshSubLabel (msg);
-                      string_free (msg);
-                    }
-                  if (region)
-                    {
-                      auto realName = QFileInfo (dir).fileName ();
-                      auto lastDot = realName.lastIndexOf ('.');
-                      if (lastDot != -1)
-                        {
-                          realName = realName.left (lastDot);
-                        }
-                      Region regionStruct = {
-                        region,
-                        realName,
-                        QUuid::createUuid ().toString (),
-                        QDateTime::currentDateTime (),
-                        new QReadWriteLock (),
-                      };
-                      mr->appendRegion (regionStruct);
-                      region = nullptr;
-                      break;
-                    }
+                  else
+                    pushMsgFunc (dir, msg);
+                }
+
+              if (!cancel_flag_is_cancelled (cancel_flag))
+                {
+                  Q_EMIT refreshFullProgress (100);
+                  Q_EMIT finishLoadOne ();
                 }
             }
-          if (!cancel_flag_is_cancelled (cancel_flag))
-            {
-              Q_EMIT refreshFullProgress (100);
-              Q_EMIT finishLoadOne ();
-            }
+          cancel_flag_destroy (cancel_flag);
+        };
+      int i = 0;
+      cancel_flag_clone (cancel_flag);
+      for (const auto &dir : list)
+        {
+          realProcessFunc (dir, i);
+          i++;
         }
-      cancel_flag_destroy (new_cancel_flag);
+
       finish ();
     };
 

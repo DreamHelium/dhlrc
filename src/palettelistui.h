@@ -5,7 +5,6 @@
 #ifndef DHLRC_PALETTELISTUI_H
 #define DHLRC_PALETTELISTUI_H
 
-#include <../region.h>
 #include <QDialog>
 #include <QSortFilterProxyModel>
 #include <QStandardItemModel>
@@ -19,22 +18,21 @@ QT_END_NAMESPACE
 
 class PaletteListUI : public QDialog
 {
-    Q_OBJECT
+  Q_OBJECT
 
-  public:
-    explicit PaletteListUI (QString &uuid, char *&large_version,
-                            QWidget *parent = nullptr);
-    ~PaletteListUI () override;
+public:
+  explicit PaletteListUI (void *region, char *&large_version,
+                          QWidget *parent = nullptr);
+  ~PaletteListUI () override;
 
-  private:
-    Ui::PaletteListUI *ui;
-    char *&large_version;
-    QString &uuid;
-    Region *region;
-    QStandardItemModel *model;
-    QSortFilterProxyModel *proxyModel;
-    void drawList ();
-    void initUI ();
+private:
+  Ui::PaletteListUI *ui;
+  char *&large_version;
+  void *region;
+  QStandardItemModel *model;
+  QSortFilterProxyModel *proxyModel;
+  void drawList ();
+  void initUI ();
 };
 
 #endif // DHLRC_PALETTELISTUI_H

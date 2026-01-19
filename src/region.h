@@ -36,6 +36,7 @@ extern "C"
   uint32_t region_get_block_id_by_index (void *region, size_t index);
   const char *region_get_palette_id_name (void *region, size_t id);
   size_t region_get_palette_property_len (void *region, size_t id);
+  size_t region_get_palette_len (void *region);
   const char *region_get_palette_property_name (void *region, size_t id,
                                                 size_t index);
   const char *region_get_palette_property_data (void *region, size_t id,

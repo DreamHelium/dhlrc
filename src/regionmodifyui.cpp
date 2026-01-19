@@ -22,7 +22,6 @@ RegionModifyUI::~RegionModifyUI () { delete ui; }
 void
 RegionModifyUI::initData ()
 {
-  printf ("%ld", region_get_create_timestamp (region));
   ui->dateTimeEdit->setDateTime (
       dh::getDateTimeFromTimeStamp (region_get_create_timestamp (region)));
   ui->dateTimeEdit_2->setDateTime (
