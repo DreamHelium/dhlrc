@@ -11,6 +11,10 @@ use std::ops::{IndexMut, Shl, Shr};
 use std::ptr::{null, null_mut};
 use std::sync::atomic::AtomicBool;
 use std::time::Instant;
+use sysinfo::System;
+use tiny_varint::{VarInt, VarIntEncoder, varint_size};
+
+static mut FREE_MEMORY: usize = 500 * 1024 * 1024;
 
 #[link(name = "region_rs")]
 unsafe extern "C" {
@@ -84,7 +88,7 @@ unsafe extern "C" {
     fn vec_to_cstr(vec: *mut Vec<u8>) -> *mut c_char;
     fn region_get_index(region: *mut c_void, x: i32, y: i32, z: i32) -> i32;
     fn cancel_flag_is_cancelled(ptr: *const AtomicBool) -> c_int;
-    fn region_set_blocks_from_vec(region: *mut c_void, blocks: *mut Vec<Block>);
+    fn region_set_blocks_from_vec(region: *mut c_void, blocks: *mut Vec<u8>);
 }
 
 #[unsafe(no_mangle)]
@@ -140,12 +144,6 @@ pub extern "C" fn region_name_index(region: *mut crab_nbt::Nbt, index: i32) -> *
     string_to_ptr_fail_to_null(&region_nbt.child_tags[index as usize].0)
 }
 
-#[derive(Default, Clone)]
-struct Block {
-    id: u32,
-    block_entity: Option<HashMap<String, TreeValue>>,
-}
-
 fn get_bits(num: usize) -> u32 {
     let mut ret: u32 = 0;
     let mut number = num;
@@ -159,6 +157,16 @@ fn get_bits(num: usize) -> u32 {
     ret
 }
 
+fn finish_oom(system: &mut System) -> Result<(), MyError> {
+    system.refresh_all();
+    if unsafe { system.free_memory() < FREE_MEMORY as u64 } {
+        return Err(MyError {
+            msg: i18n("Out of memory!").to_string(),
+        });
+    }
+    Ok(())
+}
+
 fn get_block_id(
     states: &Vec<i64>,
     block_num: i32,
@@ -166,12 +174,15 @@ fn get_block_id(
     progress_fn: ProgressFn,
     main_klass: *mut c_void,
     cancel_flag: *const AtomicBool,
-) -> Result<Vec<Block>, Box<dyn Error>> {
-    let mut ret: Vec<Block> = vec![Block::default(); block_num as usize];
+    sys: &mut System,
+) -> Result<Vec<u8>, Box<dyn Error>> {
     let mut time = Instant::now();
     let mut i = 0;
+    let mut buf = vec![];
+    let mut ret_size = 0;
     loop {
         if time.elapsed().as_secs() >= 1 {
+            finish_oom(sys)?;
             let str = i18n("Reading block id: {} / {}.");
             let real_str = formatx!(str, i, block_num)?;
             show_progress(
@@ -210,7 +221,8 @@ fn get_block_id(
                 | ((states[(start_state + 1) as usize] as u64).shl(move_num_2 as u64)))
                 & and_num;
         }
-        ret.index_mut(i).id = id as u32;
+        buf.push(id as u32);
+        ret_size += varint_size(id);
         i += 1;
         if i == block_num as usize {
             show_progress(
@@ -223,6 +235,35 @@ fn get_block_id(
             break;
         }
     }
+    println!("{ret_size} {block_num}");
+    let mut ret = vec![0u8; ret_size];
+    let mut encoder = VarIntEncoder::<u32>::new(&mut ret);
+    i = 0;
+    for value in buf {
+        if time.elapsed().as_secs() >= 1 {
+            finish_oom(sys)?;
+            let str = i18n("Encoding block id: {} / {}.");
+            let real_str = formatx!(str, i, block_num)?;
+            show_progress(
+                progress_fn,
+                main_klass,
+                (i as u64 * 100 / block_num as u64) as c_int,
+                &real_str,
+                &String::new(),
+            );
+            time = Instant::now();
+        }
+        match encoder.write(value) {
+            Ok(a) => a,
+            Err(_) => {
+                return Err(Box::new(MyError {
+                    msg: i18n("Write error!").to_string(),
+                }));
+            }
+        };
+        i += 1;
+    }
+    println!("{i}");
     Ok(ret)
 }
 
@@ -283,6 +324,8 @@ fn region_create_from_bytes_internal(
     let move_bit = get_bits(palette_num - 1);
     let real_move_bit = if move_bit <= 2 { 2 } else { move_bit };
 
+    let mut sys = System::new_all();
+
     let block_ids = get_block_id(
         block_states,
         block_num,
@@ -290,6 +333,7 @@ fn region_create_from_bytes_internal(
         progress_fn,
         main_klass,
         cancel_flag,
+        &mut sys,
     )?;
     let blocks = block_ids;
 

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-19 22:02+0800\n"
+"POT-Creation-Date: 2026-01-22 21:12+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -137,11 +137,11 @@ msgstr ""
 msgid "Please select a region."
 msgstr ""
 
-#: ../../src/loadregionui.cpp:116
+#: ../../src/loadregionui.cpp:114
 msgid "Parsing NBT"
 msgstr ""
 
-#: ../../src/loadregionui.cpp:183
+#: ../../src/loadregionui.cpp:181
 msgid "Please click `Continue` to choose region(s)."
 msgstr ""
 
@@ -510,31 +510,35 @@ msgstr ""
 msgid "&Cancel"
 msgstr ""
 
-#: ../../region-rs/src/lib.rs:225
+#: ../../region-rs/src/lib.rs:222
 msgid "Null pointer detected"
 msgstr ""
 
-#: ../../region-rs/src/lib.rs:504 ../../region-rs/src/lib.rs:508
+#: ../../region-rs/src/lib.rs:461 ../../region-rs/src/lib.rs:465
 msgid "The index is out of range."
 msgstr ""
 
-#: ../../region-rs/src/lib.rs:560
+#: ../../region-rs/src/lib.rs:502
+msgid "Out of memory!"
+msgstr ""
+
+#: ../../region-rs/src/lib.rs:529
 msgid "Loading file."
 msgstr ""
 
-#: ../../region-rs/src/lib.rs:568
+#: ../../region-rs/src/lib.rs:537
 msgid "The loading operation is cancelled."
 msgstr ""
 
-#: ../../region-rs/src/lib.rs:601
+#: ../../region-rs/src/lib.rs:571
 msgid "Uncompressing data."
 msgstr ""
 
-#: ../../region-rs/src/lib.rs:609
+#: ../../region-rs/src/lib.rs:579
 msgid "The uncompressing operation is cancelled."
 msgstr ""
 
-#: ../../region-rs/src/lib.rs:625
+#: ../../region-rs/src/lib.rs:595
 msgid "Uncompress finish!"
 msgstr ""
 

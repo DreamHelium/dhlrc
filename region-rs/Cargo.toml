@@ -6,7 +6,9 @@ edition = "2024"
 [dependencies]
 time = "0.3.44"
 whoami = "2.0.1"
-flate2 = { version = "1.1.8", features = ["zlib"] }
+flate2 = { version = "1.1.8", features = ["zlib-rs"] }
+sysinfo = "0.37.2"
+tiny-varint = "0.2.0"
 
 [lib]
 crate-type = ["cdylib"]

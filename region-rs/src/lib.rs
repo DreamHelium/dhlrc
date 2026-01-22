@@ -14,7 +14,11 @@ use std::string::String;
 use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::time::Instant;
+use sysinfo::System;
 use time::{Duration, UtcDateTime};
+use tiny_varint::VarIntValuesIter;
+
+static mut FREE_MEMORY: usize = 500 * 1024 * 1024;
 
 #[derive(Clone)]
 pub enum TreeValue {
@@ -105,11 +109,6 @@ struct Palette {
     property: Vec<(String, String)>,
 }
 
-struct Block {
-    id: u32,
-    block_entity: Option<HashMap<String, TreeValue>>,
-}
-
 #[derive(Default)]
 pub struct Region {
     /* Base information */
@@ -120,7 +119,7 @@ pub struct Region {
     /** The offset */
     region_offset: (i32, i32, i32),
     /** The block info array */
-    block_array: Vec<Block>,
+    block_array: Vec<u8>,
     /** The Palette info array*/
     palette_array: Vec<Palette>,
 }
@@ -134,9 +133,7 @@ impl Region {
         self.base_data.set_time(create_time, modify_time)
     }
 
-    fn get_size(&self) {
-        println!("{}", size_of::<Region>());
-    }
+    fn get_size(&self) {}
     fn get_palette_len(&self) -> usize {
         self.palette_array.len()
     }
@@ -285,11 +282,6 @@ pub extern "C" fn region_set_author(region: *mut Region, string: *const c_char) 
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn region_set_blocks_from_vec(region: *mut Region, blocks: *mut Vec<Block>) {
-    unsafe { (*region).block_array = *Box::from_raw(blocks) };
-}
-
-#[unsafe(no_mangle)]
 pub extern "C" fn region_get_data_version(region: *mut Region) -> u32 {
     unsafe { (*region).data_version }
 }
@@ -339,56 +331,14 @@ pub extern "C" fn region_get_offset_z(region: *mut Region) -> i32 {
     unsafe { (*region).region_offset.2 }
 }
 
-/* The two functions are used for Rust only */
-/* WARNING: This function will take ownership of the hashmap */
-#[unsafe(no_mangle)]
-pub extern "C" fn block_new_to_region(
-    region: *mut Region,
-    index: usize,
-    id: u32,
-    tree: *mut HashMap<String, TreeValue>,
-) {
-    let opt: Option<HashMap<String, TreeValue>>;
-    if tree.is_null() {
-        opt = None;
-    } else {
-        let real_tree = unsafe { Box::from_raw(tree) };
-        opt = Option::from(*real_tree);
-    }
-    let block = Block {
-        id,
-        block_entity: opt,
-    };
-    let r = unsafe { &mut *region };
-    match r.block_array.get_mut(index) {
-        Some(b) => *b = block,
-        None => r.block_array.insert(index, block),
-    }
-}
-
-/* This will create a new HashMap */
-#[unsafe(no_mangle)]
-pub extern "C" fn region_get_block_entity_tree_by_index(
-    region: *mut Region,
-    index: usize,
-) -> *mut HashMap<String, TreeValue> {
-    let block_array = unsafe { &(*region).block_array };
-    if block_array.len() < index {
-        return null_mut();
-    }
-    let opt = block_array[index].block_entity.clone();
-    match opt {
-        None => null_mut(),
-        Some(tree) => {
-            let ret = Box::new(tree);
-            Box::into_raw(ret)
-        }
-    }
-}
-
 #[unsafe(no_mangle)]
 pub extern "C" fn region_get_block_id_by_index(region: *mut Region, index: usize) -> u32 {
-    unsafe { (&*region).block_array[index].id }
+    let r = unsafe { &*region };
+    let mut iter = VarIntValuesIter::<u32>::new(r.block_array.as_slice());
+    match iter.nth(index) {
+        Some(s) => s.unwrap_or_else(|_| 0),
+        None => 0,
+    }
 }
 
 /* WARNING: This will take the ownership of the property */
@@ -410,6 +360,13 @@ pub extern "C" fn region_append_palette(
         property: real_property,
     });
     null()
+}
+
+#[unsafe(no_mangle)]
+pub extern "C" fn region_set_blocks_from_vec(region: *mut Region, blocks: *mut Vec<u8>) {
+    let r = unsafe { &mut *region };
+    let real_blocks = unsafe { Box::from_raw(blocks) };
+    r.block_array = *real_blocks;
 }
 
 #[unsafe(no_mangle)]
@@ -538,6 +495,16 @@ fn show_progress(
     string_free(real_text);
 }
 
+fn finish_oom(system: &mut System) -> Result<(), MyError> {
+    system.refresh_all();
+    if unsafe { system.free_memory() < FREE_MEMORY as u64 } {
+        return Err(MyError {
+            msg: i18n("Out of memory!").to_string(),
+        });
+    }
+    Ok(())
+}
+
 fn file_try_uncompress_real(
     filename: *const c_char,
     progress_fn: ProgressFn,
@@ -549,10 +516,12 @@ fn file_try_uncompress_real(
     let file_size = file.metadata()?.len();
     let mut start = Instant::now();
     let mut file_data = vec![];
+    let mut sys = System::new_all();
     loop {
         let mut temp_data = vec![0; 100];
         let file_pos = file.try_clone()?.seek(SeekFrom::Current(0))?;
         if start.elapsed().as_secs() >= 1 {
+            finish_oom(&mut sys)?;
             show_progress(
                 progress_fn,
                 main_klass,
@@ -594,6 +563,7 @@ fn file_try_uncompress_real(
     let data_size = file_data.len();
     loop {
         if start.elapsed().as_secs() >= 1 {
+            finish_oom(&mut sys)?;
             show_progress(
                 progress_fn,
                 main_klass,
@@ -717,6 +687,5 @@ pub extern "C" fn cancel_flag_clone(ptr: *const AtomicBool) -> *const AtomicBool
 
 #[unsafe(no_mangle)]
 pub extern "C" fn region_get_palette_len(region: *mut Region) -> usize {
-    let array = unsafe { &(*region).palette_array };
-    array.len()
+    unsafe { (*region).get_palette_len() }
 }
