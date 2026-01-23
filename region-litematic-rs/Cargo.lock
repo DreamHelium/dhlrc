@@ -271,7 +271,6 @@ dependencies = [
  "crab_nbt",
  "formatx",
  "sysinfo",
- "tiny-varint",
 ]
 
 [[package]]
@@ -344,15 +343,6 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn",
-]
-
-[[package]]
-name = "tiny-varint"
-version = "0.2.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "208916571688a0d90ad99136e5b8ba24df5a201310eee3c6a2e8363a3747d45c"
-dependencies = [
- "zigzag-rs",
 ]
 
 [[package]]
@@ -493,9 +483,3 @@ checksum = "b66463ad2e0ea3bbf808b7f1d371311c80e115c0b71d60efc142cafbcfb057a6"
 dependencies = [
  "windows-link",
 ]
-
-[[package]]
-name = "zigzag-rs"
-version = "0.2.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4be13092fdf7a0e970ca30ab3dd64d35e0f78bfd5b47c922648bd8945d6f43bb"

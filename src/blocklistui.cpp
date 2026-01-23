@@ -1,12 +1,14 @@
 #include "blocklistui.h"
 #define _(str) gettext (str)
 #include "ui_blocklistui.h"
+#include <QFuture>
+#include <QFutureWatcher>
 #include <QList>
-#include <QScrollBar>
+#include <QTimer>
+#include <QtConcurrentRun>
+#include <future>
 #include <qlineedit.h>
 #include <qmessagebox.h>
-#include <qnamespace.h>
-#include <qobject.h>
 #include <qsortfilterproxymodel.h>
 #include <qstandarditemmodel.h>
 #include <region.h>
@@ -28,7 +30,16 @@ BlockListUI::BlockListUI (void *region, const char *large_version,
   ui->setupUi (this);
   QObject::connect (ui->lineEdit, &QLineEdit::textChanged, this,
                     &BlockListUI::textChanged_cb);
-  drawList ();
+  connect (this, &BlockListUI::setModel, this,
+           [&]
+             {
+               proxyModel->setSourceModel (model);
+               ui->tableView->setModel (proxyModel);
+               proxyModel->setFilterKeyColumn (-1);
+
+               ui->tableView->horizontalHeader ()->setSectionResizeMode (
+                   1, QHeaderView::Stretch);
+             });
   ui->tableView->setDND (false);
 }
 
@@ -40,7 +51,7 @@ BlockListUI::~BlockListUI ()
 }
 
 void
-BlockListUI::drawList ()
+BlockListUI::updateBlockList ()
 {
   QStringList stringList;
   if (large_version)
@@ -50,81 +61,108 @@ BlockListUI::drawList ()
     stringList << _ ("id") << _ ("id Name") << _ ("x") << _ ("y") << _ ("z")
                << _ ("Palette");
   model->setHorizontalHeaderLabels (stringList);
-  int regionX = region_get_x (region);
-  int regionY = region_get_y (region);
-  int regionZ = region_get_z (region);
-  int size = regionX * regionY * regionZ;
-  int x = 0;
-  int y = 0;
-  int z = 0;
-  for (int i = 0; i < size; i++)
+
+  connect (this, &BlockListUI::addItems,
+           [&] (const QList<QStandardItem *> &items)
+             { model->appendRow (items); });
+  connect (this, &BlockListUI::setValue, ui->progressBar,
+           &QProgressBar::setValue);
+  auto addBlockFunc = [&]
     {
-      auto id = region_get_block_id_by_index (region, i);
-      auto id_name = region_get_palette_id_name (region, id);
-      if (!strcmp (id_name, "minecraft:air") && ignoreAir)
+      int regionX = region_get_x (region);
+      int regionY = region_get_y (region);
+      int regionZ = region_get_z (region);
+      int size = regionX * regionY * regionZ;
+      int x = 0;
+      int y = 0;
+      int z = 0;
+      auto addIndexFunc = [&x, &y, &z, regionX, regionY, regionZ]
         {
-          string_free (id_name);
-          continue;
-        }
-      QStandardItem *item2 = nullptr;
-      QStandardItem *item0 = new QStandardItem (QString::number (i));
-      QStandardItem *item1 = new QStandardItem (id_name);
-
-      // if ( large_version)
-        // item2 = new QStandardItem (mctr (id_name, large_version));
-      QStandardItem *item3 = new QStandardItem (QString::number (x));
-      QStandardItem *item4 = new QStandardItem (QString::number (y));
-      QStandardItem *item5 = new QStandardItem (QString::number (z));
-      QStandardItem *item6 = new QStandardItem (QString::number (id));
-      auto palette_index = region_get_palette_property_len (region, id);
-      QString str = QString ();
-      if (palette_index)
-        {
-          for (int j = 0; j < palette_index; j++)
+          if (x < regionX - 1)
+            x++;
+          else if (z < regionZ - 1)
             {
-              auto name = region_get_palette_property_name (region, id, j);
-              str += name;
-              string_free (name);
-              str += ": ";
-              auto data = region_get_palette_property_data (region, id, j);
-              str += data;
-              string_free (data);
-              if (j != palette_index - 1)
-                str += "\n";
+              x = 0;
+              z++;
             }
-        }
-
-      item6->setToolTip (str);
-      QList<QStandardItem *> itemList;
-      if (item2)
-        itemList = { item0, item1, item2, item3, item4, item5, item6 };
-      else
-        itemList = { item0, item1, item3, item4, item5, item6 };
-
-      for (auto item : itemList)
-        item->setEditable (false);
-      model->appendRow (itemList);
-      if (x < regionX - 1)
-        x++;
-      else if (z < regionZ - 1)
+          else if (y < regionY - 1)
+            {
+              x = 0;
+              z = 0;
+              y++;
+            }
+        };
+      void *system_info = get_system_info_object ();
+      clock_t start = clock ();
+      for (int i = 0; i < size; i++)
         {
-          x = 0;
-          z++;
-        }
-      else if (y < regionY - 1)
-        {
-          x = 0;
-          z = 0;
-          y++;
-        }
-      string_free (id_name);
-    }
-  proxyModel->setSourceModel (model);
-  ui->tableView->setModel (proxyModel);
-  proxyModel->setFilterKeyColumn (-1);
+          clock_t end = clock ();
+          if ((end - start) % 1000 == 0)
+            {
+              Q_EMIT setValue ((i + 1) * 100 / size);
+              if (get_free_memory (system_info) < 500 * 1024 * 1024)
+                {
+                  system_info_object_free (system_info);
+                  Q_EMIT stopProcess ();
+                  return;
+                }
+            }
 
-  ui->tableView->horizontalHeader ()->setSectionResizeMode (
-      1, QHeaderView::Stretch);
+          auto id = region_get_block_id_by_index (region, i);
+          auto id_name = region_get_palette_id_name (region, id);
+          if (!strcmp (id_name, "minecraft:air") && ignoreAir)
+            {
+              string_free (id_name);
+              addIndexFunc();
+              continue;
+            }
+          QStandardItem *item2 = nullptr;
+          QStandardItem *item0 = new QStandardItem (QString::number (i));
+          QStandardItem *item1 = new QStandardItem (id_name);
+
+          // if ( large_version)
+          // item2 = new QStandardItem (mctr (id_name, large_version));
+          QStandardItem *item3 = new QStandardItem (QString::number (x));
+          QStandardItem *item4 = new QStandardItem (QString::number (y));
+          QStandardItem *item5 = new QStandardItem (QString::number (z));
+          QStandardItem *item6 = new QStandardItem (QString::number (id));
+          auto palette_index = region_get_palette_property_len (region, id);
+          QString str = QString ();
+          if (palette_index)
+            {
+              for (int j = 0; j < palette_index; j++)
+                {
+                  auto name = region_get_palette_property_name (region, id, j);
+                  str += name;
+                  string_free (name);
+                  str += ": ";
+                  auto data = region_get_palette_property_data (region, id, j);
+                  str += data;
+                  string_free (data);
+                  if (j != palette_index - 1)
+                    str += "\n";
+                }
+            }
+
+          item6->setToolTip (str);
+          QList<QStandardItem *> itemList;
+          if (item2)
+            itemList = { item0, item1, item2, item3, item4, item5, item6 };
+          else
+            itemList = { item0, item1, item3, item4, item5, item6 };
+
+          for (auto item : itemList)
+            item->setEditable (false);
+          Q_EMIT addItems (itemList);
+          addIndexFunc ();
+          string_free (id_name);
+        }
+      Q_EMIT setValue (100);
+      Q_EMIT setModel ();
+    };
+
+  std::thread trd (addBlockFunc);
+  trd.detach ();
 }
 
 void

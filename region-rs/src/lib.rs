@@ -2,13 +2,13 @@ mod i18n;
 
 use crate::i18n::i18n;
 use flate2::{Decompress, FlushDecompress, Status};
-use std::collections::HashMap;
 use std::error::Error;
 use std::ffi::{CStr, CString, c_char, c_int, c_void};
 use std::fmt::{Display, Formatter};
 use std::fs::File;
 use std::io::{Read, Seek, SeekFrom};
 use std::ops::IndexMut;
+use std::ptr;
 use std::ptr::{null, null_mut};
 use std::string::String;
 use std::sync::Arc;
@@ -16,24 +16,24 @@ use std::sync::atomic::{AtomicBool, Ordering};
 use std::time::Instant;
 use sysinfo::System;
 use time::{Duration, UtcDateTime};
-use tiny_varint::VarIntValuesIter;
 
 static mut FREE_MEMORY: usize = 500 * 1024 * 1024;
 
 #[derive(Clone)]
+#[repr(i32)]
 pub enum TreeValue {
-    Byte(i8),
-    Short(i16),
-    Int(i32),
-    Long(i64),
-    Float(f32),
-    Double(f64),
-    String(String),
-    ByteArray(Vec<i8>),
-    IntArray(Vec<i32>),
-    LongArray(Vec<i64>),
-    List(Vec<TreeValue>),
-    Compound(HashMap<String, TreeValue>),
+    Byte(i8) = 1,
+    Short(i16) = 2,
+    Int(i32) = 3,
+    Long(i64) = 4,
+    Float(f32) = 5,
+    Double(f64) = 6,
+    String(String) = 7,
+    ByteArray(Vec<i8>) = 8,
+    IntArray(Vec<i32>) = 9,
+    LongArray(Vec<i64>) = 10,
+    List(Vec<TreeValue>) = 11,
+    Compound(Vec<(String, TreeValue)>) = 12,
 }
 
 struct BaseData {
@@ -109,6 +109,11 @@ struct Palette {
     property: Vec<(String, String)>,
 }
 
+pub struct BlockEntity {
+    pos: (i32, i32, i32),
+    entity: Vec<(String, TreeValue)>,
+}
+
 #[derive(Default)]
 pub struct Region {
     /* Base information */
@@ -119,7 +124,11 @@ pub struct Region {
     /** The offset */
     region_offset: (i32, i32, i32),
     /** The block info array */
-    block_array: Vec<u8>,
+    block_array: Vec<u32>,
+    /** The block entity array */
+    block_entity_array: Vec<BlockEntity>,
+    /** Entity array */
+    entity_array: Vec<(String, TreeValue)>,
     /** The Palette info array*/
     palette_array: Vec<Palette>,
 }
@@ -334,11 +343,7 @@ pub extern "C" fn region_get_offset_z(region: *mut Region) -> i32 {
 #[unsafe(no_mangle)]
 pub extern "C" fn region_get_block_id_by_index(region: *mut Region, index: usize) -> u32 {
     let r = unsafe { &*region };
-    let mut iter = VarIntValuesIter::<u32>::new(r.block_array.as_slice());
-    match iter.nth(index) {
-        Some(s) => s.unwrap_or_else(|_| 0),
-        None => 0,
-    }
+    r.block_array[index]
 }
 
 /* WARNING: This will take the ownership of the property */
@@ -363,10 +368,20 @@ pub extern "C" fn region_append_palette(
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn region_set_blocks_from_vec(region: *mut Region, blocks: *mut Vec<u8>) {
+pub extern "C" fn region_set_blocks_from_vec(region: *mut Region, blocks: *mut Vec<u32>) {
     let r = unsafe { &mut *region };
     let real_blocks = unsafe { Box::from_raw(blocks) };
     r.block_array = *real_blocks;
+}
+
+#[unsafe(no_mangle)]
+pub extern "C" fn region_set_block_entities_from_vec(
+    region: *mut Region,
+    block_entities: *mut Vec<BlockEntity>,
+) {
+    let r = unsafe { &mut *region };
+    let real_blocks = unsafe { Box::from_raw(block_entities) };
+    r.block_entity_array = *real_blocks;
 }
 
 #[unsafe(no_mangle)]
@@ -688,4 +703,165 @@ pub extern "C" fn cancel_flag_clone(ptr: *const AtomicBool) -> *const AtomicBool
 #[unsafe(no_mangle)]
 pub extern "C" fn region_get_palette_len(region: *mut Region) -> usize {
     unsafe { (*region).get_palette_len() }
+}
+
+#[unsafe(no_mangle)]
+pub extern "C" fn get_system_info_object() -> *mut System {
+    Box::into_raw(Box::new(System::new_all()))
+}
+
+#[unsafe(no_mangle)]
+pub extern "C" fn get_free_memory(system: *mut System) -> u64 {
+    let sys = unsafe { &mut *system };
+    sys.refresh_memory();
+    sys.free_memory()
+}
+
+#[unsafe(no_mangle)]
+pub extern "C" fn system_info_object_free(system: *mut System) {
+    drop(unsafe { Box::from_raw(system) })
+}
+
+#[unsafe(no_mangle)]
+pub extern "C" fn region_get_block_entity(
+    region: *mut Region,
+    index: u32,
+) -> *const Vec<(String, TreeValue)> {
+    let r = unsafe { &*region };
+    for entity in &r.block_entity_array {
+        let entity_index = region_get_index(region, entity.pos.0, entity.pos.1, entity.pos.2);
+        if entity_index == index as i32 {
+            return ptr::from_ref(&entity.entity);
+        }
+    }
+    null()
+}
+
+#[unsafe(no_mangle)]
+pub extern "C" fn nbt_vec_get_len(nbt: *const Vec<(String, TreeValue)>) -> usize {
+    if !nbt.is_null() {
+        unsafe { nbt.as_ref().unwrap().len() }
+    } else {
+        0
+    }
+}
+
+impl TreeValue {
+    fn type_to_str(&self) -> &str {
+        match self {
+            TreeValue::Byte(_) => i18n("Byte"),
+            TreeValue::Int(_) => i18n("Int"),
+            TreeValue::Short(_) => i18n("Short"),
+            TreeValue::Long(_) => i18n("Long"),
+            TreeValue::ByteArray(_) => i18n("Byte Array"),
+            TreeValue::LongArray(_) => i18n("Long Array"),
+            TreeValue::String(_) => i18n("String"),
+            TreeValue::Float(_) => i18n("Float"),
+            TreeValue::Double(_) => i18n("Double"),
+            TreeValue::IntArray(_) => i18n("Int Array"),
+            TreeValue::List(_) => i18n("List"),
+            TreeValue::Compound(_) => i18n("Compound"),
+        }
+    }
+
+    fn to_string(&self) -> String {
+        match self {
+            TreeValue::Byte(b) => b.to_string(),
+            TreeValue::Int(i) => i.to_string(),
+            TreeValue::Short(s) => s.to_string(),
+            TreeValue::Long(l) => l.to_string(),
+            TreeValue::ByteArray(ba) => format!("{:?}", ba),
+            TreeValue::LongArray(la) => format!("{:?}", la),
+            TreeValue::String(s) => s.clone(),
+            TreeValue::Float(f) => f.to_string(),
+            TreeValue::Double(d) => d.to_string(),
+            TreeValue::IntArray(ia) => format!("{:?}", ia),
+            TreeValue::List(_) => String::new(),
+            TreeValue::Compound(_) => String::new(),
+        }
+    }
+
+    fn to_int(&self) -> i32 {
+        unsafe { *(self as *const TreeValue as *const i32) }
+    }
+}
+
+#[unsafe(no_mangle)]
+pub extern "C" fn nbt_vec_get_key(
+    nbt: *const Vec<(String, TreeValue)>,
+    index: usize,
+) -> *const c_char {
+    if !nbt.is_null() {
+        unsafe { string_to_ptr_fail_to_null(&nbt.as_ref().unwrap()[index].0) }
+    } else {
+        null()
+    }
+}
+
+#[unsafe(no_mangle)]
+pub extern "C" fn nbt_vec_get_value_type(
+    nbt: *const Vec<(String, TreeValue)>,
+    index: usize,
+) -> *const c_char {
+    if !nbt.is_null() {
+        unsafe { string_to_ptr_fail_to_null(&nbt.as_ref().unwrap()[index].1.type_to_str()) }
+    } else {
+        null()
+    }
+}
+
+#[unsafe(no_mangle)]
+pub extern "C" fn nbt_vec_get_value_string(
+    nbt: *const Vec<(String, TreeValue)>,
+    index: usize,
+) -> *const c_char {
+    if !nbt.is_null() {
+        unsafe { string_to_ptr_fail_to_null(&nbt.as_ref().unwrap()[index].1.to_string()) }
+    } else {
+        null()
+    }
+}
+
+#[unsafe(no_mangle)]
+pub extern "C" fn nbt_vec_get_value_type_int(
+    nbt: *const Vec<(String, TreeValue)>,
+    index: usize,
+) -> i32 {
+    if !nbt.is_null() {
+        unsafe { nbt.as_ref().unwrap()[index].1.to_int() }
+    } else {
+        0
+    }
+}
+
+#[unsafe(no_mangle)]
+pub extern "C" fn nbt_vec_get_value_to_child(
+    nbt: *const Vec<(String, TreeValue)>,
+    index: usize,
+) -> *const Vec<(String, TreeValue)> {
+    if !nbt.is_null() {
+        let value = unsafe { &nbt.as_ref().unwrap()[index].1 };
+        match value {
+            TreeValue::Compound(c) => ptr::from_ref(c),
+            _ => null(),
+        }
+    } else {
+        null()
+    }
+}
+
+#[unsafe(no_mangle)]
+pub extern "C" fn nbt_vec_get_value_list_to_child(
+    nbt: *const Vec<(String, TreeValue)>,
+    index: usize,
+) -> *const Vec<TreeValue> {
+    if !nbt.is_null() {
+        let value = unsafe { &nbt.as_ref().unwrap()[index].1 };
+        match value {
+            TreeValue::List(l) => ptr::from_ref(l),
+            _ => null(),
+        }
+    } else {
+        null()
+    }
 }

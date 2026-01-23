@@ -6,6 +6,7 @@
 #include <blocklistui.h>
 #include <blockshowui.h>
 #include <mainwindow.h>
+#include <nbtreaderui.h>
 #include <qlineedit.h>
 #include <qnamespace.h>
 #include <qpushbutton.h>
@@ -133,14 +134,11 @@ BlockReaderUI::textChanged_cb ()
             }
           else
             ui->propertyBtn->setEnabled (false);
-          // auto be = region_get_block_entity (region, xText.toInt (),
-          //                                    yText.toInt (), zText.toInt
-          //                                    ());
-          auto be = nullptr;
+          auto be = region_get_block_entity (region, index);
           if (be)
             {
               ui->entityBtn->setEnabled (true);
-              // instance = be->nbt_instance;
+              nbt = be;
             }
           else
             ui->entityBtn->setEnabled (false);
@@ -195,9 +193,17 @@ BlockReaderUI::setText ()
 void
 BlockReaderUI::listBtn_clicked ()
 {
-  BlockListUI *blui = new BlockListUI (region, large_version);
+  auto blui = new BlockListUI (region, large_version);
+  blui->updateBlockList ();
   blui->setAttribute (Qt::WA_DeleteOnClose);
   blui->show ();
+  connect (blui, &BlockListUI::stopProcess, this,
+           [&, blui]
+             {
+               QMessageBox::critical (this, _ ("Error!"),
+                                      _ ("Out of memory!"));
+               blui->close ();
+             });
 }
 
 typedef void *(*NewFunc) (void *);
@@ -205,21 +211,9 @@ typedef void *(*NewFunc) (void *);
 void
 BlockReaderUI::entityBtn_clicked ()
 {
-  // for (auto i : MainWindow::modules)
-  //   {
-  //     if (g_str_equal (i->module_name, "nbt-reader-qt"))
-  //       {
-  //         NewFunc f
-  //             = reinterpret_cast<NewFunc> (i->module_functions->pdata[1]);
-  //         auto newObj = f (instance);
-  //         auto newWin = static_cast<QWidget *> (newObj);
-  //         newWin->show ();
-  //         connect (this, &BlockReaderUI::closeWin, newWin, &QWidget::close);
-  //       }
-  //   }
-  // auto nrui = new NbtReaderUI (*(DhNbtInstance
-  // *)(this->info->nbt_instance)); nrui->setAttribute
-  // (Qt::WA_DeleteOnClose); nrui->show ();
+  auto nrui = new NbtReaderUI (nbt);
+  nrui->setAttribute (Qt::WA_DeleteOnClose);
+  nrui->show ();
 }
 
 void

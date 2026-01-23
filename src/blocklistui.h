@@ -2,6 +2,7 @@
 #define BLOCKLISTUI_H
 
 #include <QWidget>
+#include <condition_variable>
 #include <qsortfilterproxymodel.h>
 #include <qstandarditemmodel.h>
 
@@ -20,6 +21,13 @@ public:
   BlockListUI (void *region, const char *large_version,
                QWidget *parent = nullptr);
   ~BlockListUI ();
+  void updateBlockList ();
+
+Q_SIGNALS:
+  void setModel ();
+  void stopProcess ();
+  void addItems (const QList<QStandardItem *> &);
+  void setValue (int value);
 
 private:
   const char *large_version;

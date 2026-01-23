@@ -19,6 +19,13 @@
      <item>
       <layout class="QVBoxLayout" name="verticalLayout">
        <item>
+        <widget class="QProgressBar" name="progressBar">
+         <property name="value">
+          <number>0</number>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QLabel" name="label">
          <property name="text">
           <string>The blocks are listed below:</string>

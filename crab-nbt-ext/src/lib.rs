@@ -26,19 +26,20 @@ pub fn string_to_ptr_fail_to_null(string: &str) -> *mut c_char {
 }
 
 #[derive(Clone)]
+#[repr(i32)]
 pub enum TreeValue {
-    Byte(i8),
-    Short(i16),
-    Int(i32),
-    Long(i64),
-    Float(f32),
-    Double(f64),
-    String(String),
-    ByteArray(Vec<i8>),
-    IntArray(Vec<i32>),
-    LongArray(Vec<i64>),
-    List(Vec<TreeValue>),
-    Compound(HashMap<String, TreeValue>),
+    Byte(i8) = 1,
+    Short(i16) = 2,
+    Int(i32) = 3,
+    Long(i64) = 4,
+    Float(f32) = 5,
+    Double(f64) = 6,
+    String(String) = 7,
+    ByteArray(Vec<i8>) = 8,
+    IntArray(Vec<i32>) = 9,
+    LongArray(Vec<i64>) = 10,
+    List(Vec<TreeValue>) = 11,
+    Compound(Vec<(String, TreeValue)>) = 12,
 }
 
 #[derive(Debug)]
@@ -252,18 +253,18 @@ fn convert_nbt_tag_to_tree_value(nbt_tag: NbtTag) -> TreeValue {
             }
             TreeValue::List(list)
         }
-        NbtTag::Compound(c) => TreeValue::Compound(convert_nbt_to_hashmap(&c)),
+        NbtTag::Compound(c) => TreeValue::Compound(convert_nbt_to_vec(&c)),
     }
 }
 
-pub fn convert_nbt_to_hashmap(nbt: &NbtCompound) -> HashMap<String, TreeValue> {
+pub fn convert_nbt_to_vec(nbt: &NbtCompound) -> Vec<(String, TreeValue)> {
     let child = &nbt.child_tags;
-    let mut hashmap = HashMap::new();
+    let mut ret: Vec<(String, TreeValue)> = vec![];
     for child_node in child {
         let tree_value = convert_nbt_tag_to_tree_value(child_node.1.clone());
-        hashmap.insert(child_node.0.clone(), tree_value);
+        ret.push((child_node.0.clone(), tree_value));
     }
-    hashmap
+    ret
 }
 pub struct Palette {
     pub id_name: String,
@@ -314,5 +315,5 @@ pub fn get_palette_from_nbt_tag(
             property: internal_properties,
         });
     }
-    Ok((palette_vec))
+    Ok(palette_vec)
 }

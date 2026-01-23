@@ -12,7 +12,6 @@ use std::ptr::{null, null_mut};
 use std::sync::atomic::AtomicBool;
 use std::time::Instant;
 use sysinfo::System;
-use tiny_varint::{VarInt, VarIntEncoder, varint_size};
 
 static mut FREE_MEMORY: usize = 500 * 1024 * 1024;
 
@@ -88,7 +87,7 @@ unsafe extern "C" {
     fn vec_to_cstr(vec: *mut Vec<u8>) -> *mut c_char;
     fn region_get_index(region: *mut c_void, x: i32, y: i32, z: i32) -> i32;
     fn cancel_flag_is_cancelled(ptr: *const AtomicBool) -> c_int;
-    fn region_set_blocks_from_vec(region: *mut c_void, blocks: *mut Vec<u8>);
+    fn region_set_blocks_from_vec(region: *mut c_void, blocks: *mut Vec<u32>);
 }
 
 #[unsafe(no_mangle)]
@@ -175,11 +174,10 @@ fn get_block_id(
     main_klass: *mut c_void,
     cancel_flag: *const AtomicBool,
     sys: &mut System,
-) -> Result<Vec<u8>, Box<dyn Error>> {
+) -> Result<Vec<u32>, Box<dyn Error>> {
     let mut time = Instant::now();
     let mut i = 0;
     let mut buf = vec![];
-    let mut ret_size = 0;
     loop {
         if time.elapsed().as_secs() >= 1 {
             finish_oom(sys)?;
@@ -212,7 +210,7 @@ fn get_block_id(
             id = states[start_state as usize] as u64 >> move_num & and_num;
         } else {
             let move_num_2 = 64 - move_num;
-            if (start_state + 1 >= block_num as u32) {
+            if start_state + 1 >= block_num as u32 {
                 return Err(Box::new(MyError {
                     msg: i18n("Out of range!").to_string(),
                 }));
@@ -222,7 +220,6 @@ fn get_block_id(
                 & and_num;
         }
         buf.push(id as u32);
-        ret_size += varint_size(id);
         i += 1;
         if i == block_num as usize {
             show_progress(
@@ -235,36 +232,7 @@ fn get_block_id(
             break;
         }
     }
-    println!("{ret_size} {block_num}");
-    let mut ret = vec![0u8; ret_size];
-    let mut encoder = VarIntEncoder::<u32>::new(&mut ret);
-    i = 0;
-    for value in buf {
-        if time.elapsed().as_secs() >= 1 {
-            finish_oom(sys)?;
-            let str = i18n("Encoding block id: {} / {}.");
-            let real_str = formatx!(str, i, block_num)?;
-            show_progress(
-                progress_fn,
-                main_klass,
-                (i as u64 * 100 / block_num as u64) as c_int,
-                &real_str,
-                &String::new(),
-            );
-            time = Instant::now();
-        }
-        match encoder.write(value) {
-            Ok(a) => a,
-            Err(_) => {
-                return Err(Box::new(MyError {
-                    msg: i18n("Write error!").to_string(),
-                }));
-            }
-        };
-        i += 1;
-    }
-    println!("{i}");
-    Ok(ret)
+    Ok(buf)
 }
 
 #[unsafe(no_mangle)]

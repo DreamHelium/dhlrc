@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-22 21:12+0800\n"
+"POT-Creation-Date: 2026-01-23 22:36+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,48 +17,48 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: ../../src/blocklistui.cpp:24
+#: ../../src/blocklistui.cpp:26
 msgid "Ignore Air?"
 msgstr ""
 
-#: ../../src/blocklistui.cpp:25
+#: ../../src/blocklistui.cpp:27
 msgid "Do you want to ignore air?"
 msgstr ""
 
-#: ../../src/blocklistui.cpp:47 ../../src/blocklistui.cpp:50
+#: ../../src/blocklistui.cpp:58 ../../src/blocklistui.cpp:61
 msgid "id"
 msgstr ""
 
-#: ../../src/blocklistui.cpp:47 ../../src/blocklistui.cpp:50
+#: ../../src/blocklistui.cpp:58 ../../src/blocklistui.cpp:61
 msgid "id Name"
 msgstr ""
 
-#: ../../src/blocklistui.cpp:47
+#: ../../src/blocklistui.cpp:58
 msgid "Block Name"
 msgstr ""
 
-#: ../../src/blocklistui.cpp:47 ../../src/blocklistui.cpp:50 rc.cpp:27
+#: ../../src/blocklistui.cpp:58 ../../src/blocklistui.cpp:61 rc.cpp:27
 msgid "x"
 msgstr ""
 
-#: ../../src/blocklistui.cpp:48 ../../src/blocklistui.cpp:50 rc.cpp:30
+#: ../../src/blocklistui.cpp:59 ../../src/blocklistui.cpp:61 rc.cpp:30
 #: rc.cpp:57
 msgid "y"
 msgstr ""
 
-#: ../../src/blocklistui.cpp:48 ../../src/blocklistui.cpp:50 rc.cpp:33
+#: ../../src/blocklistui.cpp:59 ../../src/blocklistui.cpp:61 rc.cpp:33
 msgid "z"
 msgstr ""
 
-#: ../../src/blocklistui.cpp:48 ../../src/blocklistui.cpp:51
+#: ../../src/blocklistui.cpp:59 ../../src/blocklistui.cpp:62
 msgid "Palette"
 msgstr ""
 
-#: ../../src/blockreaderui.cpp:50
+#: ../../src/blockreaderui.cpp:51
 msgid "Lack the translation module, will not try to get translation!"
 msgstr ""
 
-#: ../../src/blockreaderui.cpp:99
+#: ../../src/blockreaderui.cpp:100
 msgid ""
 "Name: %1\n"
 "Translation name: %2\n"
@@ -67,7 +67,7 @@ msgid ""
 "Properties:\n"
 msgstr ""
 
-#: ../../src/blockreaderui.cpp:109
+#: ../../src/blockreaderui.cpp:110
 msgid ""
 "Name: %1\n"
 "Index: %2\n"
@@ -75,20 +75,30 @@ msgid ""
 "Properties:\n"
 msgstr ""
 
-#: ../../src/blockreaderui.cpp:149
+#: ../../src/blockreaderui.cpp:147
 msgid "Not valid!"
 msgstr ""
 
-#: ../../src/blockreaderui.cpp:167
+#: ../../src/blockreaderui.cpp:165
 msgid "With DataVersion %4, version %5."
 msgstr ""
 
-#: ../../src/blockreaderui.cpp:169
+#: ../../src/blockreaderui.cpp:167
 msgid "Created time: %6, Modified time: %7, Author: %8, Name: %9"
 msgstr ""
 
-#: ../../src/blockreaderui.cpp:171
+#: ../../src/blockreaderui.cpp:169
 msgid "Description: %10"
+msgstr ""
+
+#: ../../src/blockreaderui.cpp:203 ../../src/loadregionui.cpp:45
+#: ../../src/manage.cpp:13 ../../src/manage.cpp:162 ../../src/utility.cpp:21
+#: ../../src/utility.cpp:38 ../../src/utility.cpp:46
+msgid "Error!"
+msgstr ""
+
+#: ../../src/blockreaderui.cpp:204 ../../region-rs/src/lib.rs:517
+msgid "Out of memory!"
 msgstr ""
 
 #: ../../src/dhloadobject.cpp:11
@@ -121,12 +131,6 @@ msgstr ""
 
 #: ../../src/loadregionui.cpp:38 ../../src/saveregionui.cpp:14
 msgid "The following files are not added:\n"
-msgstr ""
-
-#: ../../src/loadregionui.cpp:45 ../../src/manage.cpp:13
-#: ../../src/manage.cpp:162 ../../src/utility.cpp:21 ../../src/utility.cpp:38
-#: ../../src/utility.cpp:46
-msgid "Error!"
 msgstr ""
 
 #: ../../src/loadregionui.cpp:54
@@ -164,7 +168,7 @@ msgstr ""
 msgid "Enter description here."
 msgstr ""
 
-#: ../../src/lrchooseui.cpp:79 rc.cpp:162 rc.cpp:177 rc.cpp:231
+#: ../../src/lrchooseui.cpp:79 rc.cpp:162 rc.cpp:198 rc.cpp:252
 msgid "&OK"
 msgstr ""
 
@@ -206,7 +210,7 @@ msgstr ""
 msgid "No file selected!"
 msgstr ""
 
-#: ../../src/manage.cpp:216 rc.cpp:216
+#: ../../src/manage.cpp:216 rc.cpp:237
 msgid "Description"
 msgstr ""
 
@@ -242,7 +246,7 @@ msgstr ""
 msgid "Please enter a data."
 msgstr ""
 
-#: ../../src/paletteaddui.cpp:68 rc.cpp:222
+#: ../../src/paletteaddui.cpp:68 rc.cpp:243
 msgid "Name"
 msgstr ""
 
@@ -338,7 +342,7 @@ msgstr ""
 msgid "&List blocks"
 msgstr ""
 
-#: rc.cpp:48 rc.cpp:183
+#: rc.cpp:48 rc.cpp:204
 msgid "&Show blocks"
 msgstr ""
 
@@ -430,15 +434,15 @@ msgstr ""
 msgid "tetst"
 msgstr ""
 
-#: rc.cpp:147
+#: rc.cpp:147 rc.cpp:168
 msgid "Form"
 msgstr ""
 
-#: rc.cpp:150 rc.cpp:171
+#: rc.cpp:150 rc.cpp:192
 msgid "&Add"
 msgstr ""
 
-#: rc.cpp:153 rc.cpp:174
+#: rc.cpp:153 rc.cpp:195
 msgid "&Remove"
 msgstr ""
 
@@ -450,148 +454,208 @@ msgstr ""
 msgid "&Save"
 msgstr ""
 
-#: rc.cpp:168
-msgid "PaletteAddUI"
+#: rc.cpp:171
+msgid "Type:"
 msgstr ""
 
-#: rc.cpp:180
-msgid "PaletteListUI"
+#: rc.cpp:174
+msgid "Key:"
 msgstr ""
 
-#: rc.cpp:186
-msgid "Modify Property of Block(s)"
+#: rc.cpp:177
+msgid "Value:"
+msgstr ""
+
+#: rc.cpp:180 rc.cpp:183 rc.cpp:186
+msgid "PushButton"
 msgstr ""
 
 #: rc.cpp:189
-msgid "Modify the property of the block in:"
-msgstr ""
-
-#: rc.cpp:192
-msgid "With the block that is the same property"
-msgstr ""
-
-#: rc.cpp:195
-msgid "Properties:"
-msgstr ""
-
-#: rc.cpp:198
-msgid "RegionModifyUI"
+msgid "PaletteAddUI"
 msgstr ""
 
 #: rc.cpp:201
-msgid "Modify the infomation of the Region."
+msgid "PaletteListUI"
 msgstr ""
 
-#: rc.cpp:204
-msgid "Create Time"
-msgstr ""
-
-#: rc.cpp:207 rc.cpp:213
-msgid "yyyy/MM/dd HH:mm:ss.zzz"
+#: rc.cpp:207
+msgid "Modify Property of Block(s)"
 msgstr ""
 
 #: rc.cpp:210
-msgid "Modify Time"
+msgid "Modify the property of the block in:"
+msgstr ""
+
+#: rc.cpp:213
+msgid "With the block that is the same property"
+msgstr ""
+
+#: rc.cpp:216
+msgid "Properties:"
 msgstr ""
 
 #: rc.cpp:219
-msgid "Author"
+msgid "RegionModifyUI"
+msgstr ""
+
+#: rc.cpp:222
+msgid "Modify the infomation of the Region."
 msgstr ""
 
 #: rc.cpp:225
+msgid "Create Time"
+msgstr ""
+
+#: rc.cpp:228 rc.cpp:234
+msgid "yyyy/MM/dd HH:mm:ss.zzz"
+msgstr ""
+
+#: rc.cpp:231
+msgid "Modify Time"
+msgstr ""
+
+#: rc.cpp:240
+msgid "Author"
+msgstr ""
+
+#: rc.cpp:246
 msgid "Data Version"
 msgstr ""
 
-#: rc.cpp:228
+#: rc.cpp:249
 msgid "Version"
 msgstr ""
 
-#: rc.cpp:234
+#: rc.cpp:255
 msgid "&Cancel"
 msgstr ""
 
-#: ../../region-rs/src/lib.rs:222
+#: ../../region-rs/src/lib.rs:231
 msgid "Null pointer detected"
 msgstr ""
 
-#: ../../region-rs/src/lib.rs:461 ../../region-rs/src/lib.rs:465
+#: ../../region-rs/src/lib.rs:476 ../../region-rs/src/lib.rs:480
 msgid "The index is out of range."
 msgstr ""
 
-#: ../../region-rs/src/lib.rs:502
-msgid "Out of memory!"
-msgstr ""
-
-#: ../../region-rs/src/lib.rs:529
+#: ../../region-rs/src/lib.rs:544
 msgid "Loading file."
 msgstr ""
 
-#: ../../region-rs/src/lib.rs:537
+#: ../../region-rs/src/lib.rs:552
 msgid "The loading operation is cancelled."
 msgstr ""
 
-#: ../../region-rs/src/lib.rs:571
+#: ../../region-rs/src/lib.rs:586
 msgid "Uncompressing data."
 msgstr ""
 
-#: ../../region-rs/src/lib.rs:579
+#: ../../region-rs/src/lib.rs:594
 msgid "The uncompressing operation is cancelled."
 msgstr ""
 
-#: ../../region-rs/src/lib.rs:595
+#: ../../region-rs/src/lib.rs:610
 msgid "Uncompress finish!"
 msgstr ""
 
-#: ../../crab-nbt-ext/src/lib.rs:93
+#: ../../region-rs/src/lib.rs:752
+msgid "Byte"
+msgstr ""
+
+#: ../../region-rs/src/lib.rs:753
+msgid "Int"
+msgstr ""
+
+#: ../../region-rs/src/lib.rs:754
+msgid "Short"
+msgstr ""
+
+#: ../../region-rs/src/lib.rs:755
+msgid "Long"
+msgstr ""
+
+#: ../../region-rs/src/lib.rs:756
+msgid "Byte Array"
+msgstr ""
+
+#: ../../region-rs/src/lib.rs:757
+msgid "Long Array"
+msgstr ""
+
+#: ../../region-rs/src/lib.rs:758
+msgid "String"
+msgstr ""
+
+#: ../../region-rs/src/lib.rs:759
+msgid "Float"
+msgstr ""
+
+#: ../../region-rs/src/lib.rs:760
+msgid "Double"
+msgstr ""
+
+#: ../../region-rs/src/lib.rs:761
+msgid "Int Array"
+msgstr ""
+
+#: ../../region-rs/src/lib.rs:762
+msgid "List"
+msgstr ""
+
+#: ../../region-rs/src/lib.rs:763
+msgid "Compound"
+msgstr ""
+
+#: ../../crab-nbt-ext/src/lib.rs:94
 #, rust-format
 msgid "Couldn't get compound of {}."
 msgstr ""
 
-#: ../../crab-nbt-ext/src/lib.rs:104
+#: ../../crab-nbt-ext/src/lib.rs:105
 #, rust-format
 msgid "Couldn't get int of {}."
 msgstr ""
 
-#: ../../crab-nbt-ext/src/lib.rs:115
+#: ../../crab-nbt-ext/src/lib.rs:116
 #, rust-format
 msgid "Couldn't get list of {}."
 msgstr ""
 
-#: ../../crab-nbt-ext/src/lib.rs:126
+#: ../../crab-nbt-ext/src/lib.rs:127
 #, rust-format
 msgid "Couldn't get string of {}."
 msgstr ""
 
-#: ../../crab-nbt-ext/src/lib.rs:137
+#: ../../crab-nbt-ext/src/lib.rs:138
 #, rust-format
 msgid "Couldn't get long of {}."
 msgstr ""
 
-#: ../../crab-nbt-ext/src/lib.rs:148
+#: ../../crab-nbt-ext/src/lib.rs:149
 #, rust-format
 msgid "Couldn't get long array of {}."
 msgstr ""
 
-#: ../../crab-nbt-ext/src/lib.rs:202
+#: ../../crab-nbt-ext/src/lib.rs:203
 msgid "Reading NBT."
 msgstr ""
 
-#: ../../crab-nbt-ext/src/lib.rs:207 ../../crab-nbt-ext/src/lib.rs:213
+#: ../../crab-nbt-ext/src/lib.rs:208 ../../crab-nbt-ext/src/lib.rs:214
 msgid "The parsing operation is cancelled."
 msgstr ""
 
-#: ../../crab-nbt-ext/src/lib.rs:220
+#: ../../crab-nbt-ext/src/lib.rs:221
 msgid "Reading NBT finish."
 msgstr ""
 
-#: ../../crab-nbt-ext/src/lib.rs:280
+#: ../../crab-nbt-ext/src/lib.rs:281
 msgid "Reading palette is cancelled!"
 msgstr ""
 
-#: ../../crab-nbt-ext/src/lib.rs:287
+#: ../../crab-nbt-ext/src/lib.rs:288
 msgid "Wrong type of palette!"
 msgstr ""
 
-#: ../../crab-nbt-ext/src/lib.rs:302
+#: ../../crab-nbt-ext/src/lib.rs:303
 msgid "Wrong type of property!"
 msgstr ""

@@ -1,8 +1,8 @@
 #ifndef BLOCKREADERUI_H
 #define BLOCKREADERUI_H
 
-#include <QWidget>
 #include "blockshowui.h"
+#include <QWidget>
 #include <manage.h>
 
 // #include "blockshowui.h"
@@ -33,6 +33,7 @@ private:
   void *instance = nullptr;
   void closeEvent (QCloseEvent *event) override;
   BlockShowUI *bsui = nullptr;
+  const void *nbt = nullptr;
 
 Q_SIGNALS:
   void changeVal (int value);

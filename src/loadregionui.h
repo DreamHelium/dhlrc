@@ -25,7 +25,6 @@ Q_SIGNALS:
   void quitLoop();
 
 private:
-  QThread *thread = nullptr;
   std::mutex mutex;
   std::condition_variable cv;
   QList<int> regionIndexes;

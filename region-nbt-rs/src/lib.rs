@@ -1,6 +1,6 @@
 use crab_nbt::NbtTag;
 use crab_nbt_ext::{
-    GetWithError, MyError, Palette, ProgressFn, TreeValue, convert_nbt_to_hashmap,
+    GetWithError, MyError, Palette, ProgressFn, TreeValue, convert_nbt_to_vec,
     get_palette_from_nbt_tag, i18n, init_translation_internal, nbt_create_real, show_progress,
     string_to_ptr_fail_to_null,
 };
@@ -81,6 +81,11 @@ unsafe extern "C" {
     fn vec_to_cstr(vec: *mut Vec<u8>) -> *mut c_char;
     fn region_get_index(region: *mut c_void, x: i32, y: i32, z: i32) -> i32;
     fn cancel_flag_is_cancelled(ptr: *const AtomicBool) -> c_int;
+    fn region_set_block_entities_from_vec(
+        region: *mut c_void,
+        block_entities: *mut Vec<BlockEntity>,
+    );
+    fn region_set_blocks_from_vec(region: *mut c_void, blocks: *mut Vec<u32>);
 }
 
 #[unsafe(no_mangle)]
@@ -99,10 +104,9 @@ pub extern "C" fn region_is_multi() -> i32 {
  * region_create_from_file_index
  */
 
-#[derive(Default, Clone)]
-struct Block {
-    id: u32,
-    block_entity: Option<HashMap<String, TreeValue>>,
+pub struct BlockEntity {
+    pos: (i32, i32, i32),
+    entity: Vec<(String, TreeValue)>,
 }
 
 fn get_int_from_nbt_tag(nbt: &NbtTag) -> Result<i32, MyError> {
@@ -179,7 +183,8 @@ fn region_create_from_bytes_internal(
     }
     palette_vec.swap(0, air_palette);
     let block_compound = nbt.get_list_with_err("blocks")?;
-    let mut blocks = vec![Block::default(); (x * y * z) as usize];
+    let mut blocks: Vec<u32> = vec![0; (x * y * z) as usize];
+    let mut block_entities: Vec<BlockEntity> = vec![];
 
     let mut min_x = 0;
     let mut min_y = 0;
@@ -250,17 +255,20 @@ fn region_create_from_bytes_internal(
         } else if state == 0 {
             state = air_palette as i32;
         }
-        let tree_nbt = match internal_block.get_compound("nbt") {
-            None => None,
-            Some(c) => Some(convert_nbt_to_hashmap(c)),
+        match internal_block.get_compound("nbt") {
+            None => (),
+            Some(c) => {
+                let block_entity = convert_nbt_to_vec(c);
+                let pos = (block_x, block_y, block_z);
+                let real_entity = BlockEntity {
+                    pos,
+                    entity: block_entity,
+                };
+                block_entities.push(real_entity);
+            }
         };
-        if index > blocks.len() as i32 {
-            return Err(Box::from(MyError {
-                msg: String::from(i18n("Block out of range!")),
-            }));
-        }
-        blocks.index_mut(index as usize).id = state as u32;
-        blocks.index_mut(index as usize).block_entity = tree_nbt;
+        blocks[index as usize] = state as u32;
+
         j += 1;
     }
     unsafe {
@@ -278,30 +286,8 @@ fn region_create_from_bytes_internal(
             region_append_palette(region, string, Box::into_raw(Box::new(palette.property)));
             string_free(string);
         }
-        i = 0;
-        for block in blocks {
-            if { cancel_flag_is_cancelled(cancel_flag) } == 1 {
-                region_free(region);
-                return Err(Box::from(MyError {
-                    msg: String::from(i18n("Adding block is cancelled!")),
-                }));
-            }
-            let str = i18n("Adding blocks: {} / {}.");
-            let real_str = formatx!(str, i, block_num)?;
-            show_progress(
-                progress_fn,
-                main_klass,
-                (i * 100 / block_num) as c_int,
-                &real_str,
-                &String::new(),
-            );
-            let entities = match block.block_entity {
-                Some(e) => Box::into_raw(Box::new(e)),
-                None => null_mut(),
-            };
-            block_new_to_region(region, i, block.id, entities);
-            i += 1;
-        }
+        region_set_block_entities_from_vec(region, Box::into_raw(Box::new(block_entities)));
+        region_set_blocks_from_vec(region, Box::into_raw(Box::new(blocks)));
         Ok(region)
     }
 }

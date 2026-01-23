@@ -58,6 +58,17 @@ extern "C"
   void cancel_flag_cancel (const void *cancel_flag);
   void cancel_flag_destroy (const void *cancel_flag);
   const void *cancel_flag_clone (const void *cancel_flag);
+  void *get_system_info_object ();
+  uint64_t get_free_memory (void *system);
+  void system_info_object_free (void *system);
+  const void *region_get_block_entity (void *region, uint32_t index);
+  size_t nbt_vec_get_len (const void *nbt);
+  const char *nbt_vec_get_key (const void *nbt, size_t index);
+  const char *nbt_vec_get_value_type (const void *nbt, size_t index);
+  const char *nbt_vec_get_value_string (const void *nbt, size_t index);
+  int32_t nbt_vec_get_value_type_int (const void *nbt, size_t index);
+  const void *nbt_vec_get_value_to_child (const void *nbt, size_t index);
+  const void *nbt_vec_get_value_list_to_child (const void *nbt, size_t index);
 
 #ifdef __cplusplus
 }
