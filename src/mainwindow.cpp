@@ -39,6 +39,7 @@
 #include <generalchoosedialog.h>
 #include <regionmodifyui.h>
 #include <utility.h>
+#include <libintl.h>
 #define _(str) gettext (str)
 
 #define REGION_LOCKED_MSG                                                     \

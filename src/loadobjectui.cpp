@@ -1,5 +1,6 @@
 #include "loadobjectui.h"
 #include "ui_loadobjectui.h"
+#include <libintl.h>
 #define _(str) gettext (str)
 
 LoadObjectUI::LoadObjectUI (QWidget *parent)

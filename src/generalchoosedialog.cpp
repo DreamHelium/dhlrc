@@ -3,6 +3,7 @@
 #include <QLabel>
 #include <QPushButton>
 #include <QRadioButton>
+#include <libintl.h>
 #define _(str) gettext (str)
 
 GeneralChooseDialog::GeneralChooseDialog (const QString &title,

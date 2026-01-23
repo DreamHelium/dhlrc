@@ -2,6 +2,7 @@
 #define MANAGE_H
 
 #include "manageui.h"
+#include <libintl.h>
 #define _(str) gettext (str)
 #include <QDateTime>
 #include <QLibrary>

@@ -14,6 +14,7 @@
 #include <region.h>
 #include <utility.h>
 #define _(str) gettext (str)
+#undef asprintf
 
 LoadRegionUI::LoadRegionUI (QStringList list, dh::ManageRegion *mr,
                             QWidget *parent)
