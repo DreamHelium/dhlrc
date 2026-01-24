@@ -16,6 +16,9 @@ add_custom_target(dhlrc_cargo_litematic ALL
         COMMAND cd ../region-litematic-rs && ${CARGO_EXECUTABLE} build
 )
 
+add_custom_target(dhlrc_cargo_yo_vec ALL
+        COMMAND cd ../nbt-to-vec && ${CARGO_EXECUTABLE} build)
+
 include(GNUInstallDirs)
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR})
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)

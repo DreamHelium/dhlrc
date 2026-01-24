@@ -69,6 +69,14 @@ extern "C"
   int32_t nbt_vec_get_value_type_int (const void *nbt, size_t index);
   const void *nbt_vec_get_value_to_child (const void *nbt, size_t index);
   const void *nbt_vec_get_value_list_to_child (const void *nbt, size_t index);
+  const char *nbt_tree_value_get_value_string (const void *tree_value);
+  const char *nbt_tree_value_get_type_string (const void *tree_value);
+  int32_t nbt_tree_value_get_type_int (const void *tree_value);
+  const void *nbt_vec_tree_value_get_tree_value (const void *vec,
+                                                 size_t index);
+  size_t nbt_vec_tree_value_get_len (const void *vec);
+  const void *nbt_tree_value_get_value_to_child (const void *tree_value);
+  const void *nbt_tree_value_get_value_list_to_child (const void *tree_value);
 
 #ifdef __cplusplus
 }

@@ -36,10 +36,11 @@
 // #include <qnamespace.h>
 #include <QPushButton>
 #include <blockreaderui.h>
+#include <externalnbtreaderui.h>
 #include <generalchoosedialog.h>
+#include <libintl.h>
 #include <regionmodifyui.h>
 #include <utility.h>
-#include <libintl.h>
 #define _(str) gettext (str)
 
 #define REGION_LOCKED_MSG                                                     \
@@ -87,6 +88,8 @@ MainWindow::initSignalSlots ()
                     &MainWindow::showabout);
   QObject::connect (ui->mrBtn_2, &QPushButton::clicked, this,
                     &MainWindow::mrBtn_2_clicked);
+  QObject::connect (ui->nbtBtn, &QPushButton::clicked, this,
+                    &MainWindow::nbtBtn_clicked);
   // QObject::connect (ui->scriptBtn, &QPushButton::clicked, this,
   //                   [&]
   //                     {
@@ -257,4 +260,12 @@ MainWindow::groupBtn_clicked (int id)
   //     win->show ();
   //     connect (this, &MainWindow::winClose, win, &QWidget::close);
   //   }
+}
+
+void
+MainWindow::nbtBtn_clicked ()
+{
+  auto enrui = new ExternalNbtReaderUI ();
+  enrui->setAttribute (Qt::WA_DeleteOnClose);
+  enrui->show ();
 }

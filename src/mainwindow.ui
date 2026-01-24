@@ -25,6 +25,13 @@
         <item>
          <layout class="QVBoxLayout" name="verticalLayout_6">
           <item>
+           <widget class="QPushButton" name="nbtBtn">
+            <property name="text">
+             <string>&amp;NBT File Reader</string>
+            </property>
+           </widget>
+          </item>
+          <item>
            <widget class="QPushButton" name="mrBtn">
             <property name="text">
              <string>&amp;Manage Region</string>

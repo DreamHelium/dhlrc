@@ -10,12 +10,14 @@ use std::ptr::null_mut;
 use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering};
 
-pub type ProgressFn = extern "C" fn(
-    main_klass: *mut c_void,
-    progress: c_int,
-    format: *const c_char,
-    text: *const c_char,
-);
+pub type ProgressFn = Option<
+    extern "C" fn(
+        main_klass: *mut c_void,
+        progress: c_int,
+        format: *const c_char,
+        text: *const c_char,
+    ),
+>;
 
 pub fn string_to_ptr_fail_to_null(string: &str) -> *mut c_char {
     let str = CString::new(string);
@@ -167,8 +169,10 @@ pub fn show_progress(
         real_text = string_to_ptr_fail_to_null(text);
     }
     unsafe {
-        if progress_fn as usize != 0 {
-            progress_fn(main_klass, progress, msg, real_text);
+        if !progress_fn.is_none(){
+            if progress_fn.unwrap() as usize != 0 {
+                progress_fn.unwrap()(main_klass, progress, msg, real_text);
+            }
         }
         drop(Box::from_raw(msg));
         if !real_text.is_null() {

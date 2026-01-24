@@ -18,6 +18,7 @@ class NbtReaderUI : public QWidget
 public:
   explicit NbtReaderUI (const void *nbt, QWidget *parent = nullptr);
   ~NbtReaderUI () override;
+  void disableClose ();
 
 private:
   Ui::NbtReaderUI *ui;
@@ -26,6 +27,7 @@ private:
   DhTreeFilter *proxyModel;
   void initModel ();
   void addModelTree (const void *currentNbt, QStandardItem *iroot);
+  void addModelTreeFromList (const void *list, QStandardItem *iroot);
 
 private Q_SLOTS:
 };

@@ -18,33 +18,34 @@ QT_END_NAMESPACE
 
 class MainWindow : public QMainWindow
 {
-    Q_OBJECT
+  Q_OBJECT
 
-  public:
-    MainWindow (QWidget *parent = nullptr);
-    ~MainWindow ();
-    // static QList<DhModule *> modules;
+public:
+  MainWindow (QWidget *parent = nullptr);
+  ~MainWindow ();
+  // static QList<DhModule *> modules;
 
-  Q_SIGNALS:
-    void winClose ();
+Q_SIGNALS:
+  void winClose ();
 
-  private:
-    Ui::MainWindow *ui;
-    void initSignalSlots ();
-    void initShortcuts ();
-    QButtonGroup *group;
-    void closeEvent (QCloseEvent *event) override;
+private:
+  Ui::MainWindow *ui;
+  void initSignalSlots ();
+  void initShortcuts ();
+  QButtonGroup *group;
+  void closeEvent (QCloseEvent *event) override;
 
-  protected:
-    void virtual dragEnterEvent (QDragEnterEvent *event);
-    void virtual dropEvent (QDropEvent *event);
+protected:
+  void virtual dragEnterEvent (QDragEnterEvent *event);
+  void virtual dropEvent (QDropEvent *event);
 
-  private Q_SLOTS:
-    void brBtn_clicked ();
-    void mrBtn_clicked ();
-    void mrBtn_2_clicked ();
-    void showabout ();
-    void groupBtn_clicked (int id);
+private Q_SLOTS:
+  void brBtn_clicked ();
+  void mrBtn_clicked ();
+  void mrBtn_2_clicked ();
+  void showabout ();
+  void groupBtn_clicked (int id);
+  void nbtBtn_clicked ();
 };
 
 // inline QList<DhModule *> MainWindow::modules = {};

@@ -484,12 +484,14 @@ pub extern "C" fn region_set_palette_property_name_and_data(
     null()
 }
 
-type ProgressFn = extern "C" fn(
-    main_klass: *mut c_void,
-    progress: c_int,
-    format: *const c_char,
-    text: *const c_char,
-);
+type ProgressFn = Option<
+    extern "C" fn(
+        main_klass: *mut c_void,
+        progress: c_int,
+        format: *const c_char,
+        text: *const c_char,
+    ),
+>;
 
 fn show_progress(
     progress_fn: ProgressFn,
@@ -503,9 +505,12 @@ fn show_progress(
     if !text.is_empty() {
         real_text = string_to_ptr_fail_to_null(text);
     }
-    if progress_fn as usize != 0 {
-        progress_fn(main_klass, progress, msg, real_text);
+    if !progress_fn.is_none() {
+        if progress_fn.unwrap() as usize != 0 {
+            progress_fn.unwrap()(main_klass, progress, msg, real_text);
+        }
     }
+
     string_free(msg);
     string_free(real_text);
 }
@@ -857,6 +862,64 @@ pub extern "C" fn nbt_vec_get_value_list_to_child(
 ) -> *const Vec<TreeValue> {
     if !nbt.is_null() {
         let value = unsafe { &nbt.as_ref().unwrap()[index].1 };
+        match value {
+            TreeValue::List(l) => ptr::from_ref(l),
+            _ => null(),
+        }
+    } else {
+        null()
+    }
+}
+
+#[unsafe(no_mangle)]
+pub extern "C" fn nbt_vec_tree_value_get_len(tree_value: *const Vec<TreeValue>) -> usize {
+    unsafe { (*tree_value).len() }
+}
+
+#[unsafe(no_mangle)]
+pub extern "C" fn nbt_vec_tree_value_get_tree_value(
+    tree_value: *const Vec<TreeValue>,
+    index: usize,
+) -> *const TreeValue {
+    unsafe { ptr::from_ref(&tree_value.as_ref().unwrap()[index]) }
+}
+
+#[unsafe(no_mangle)]
+pub extern "C" fn nbt_tree_value_get_value_string(tree_value: *const TreeValue) -> *const c_char {
+    unsafe { string_to_ptr_fail_to_null(&(*tree_value).to_string()) }
+}
+
+#[unsafe(no_mangle)]
+pub extern "C" fn nbt_tree_value_get_type_string(tree_value: *const TreeValue) -> *const c_char {
+    unsafe { string_to_ptr_fail_to_null(&(*tree_value).type_to_str()) }
+}
+
+#[unsafe(no_mangle)]
+pub extern "C" fn nbt_tree_value_get_type_int(tree_value: *const TreeValue) -> i32 {
+    unsafe { (*tree_value).to_int() }
+}
+
+#[unsafe(no_mangle)]
+pub extern "C" fn nbt_tree_value_get_value_to_child(
+    tree_value: *const TreeValue,
+) -> *const Vec<(String, TreeValue)> {
+    if !tree_value.is_null() {
+        let value = unsafe { &*tree_value };
+        match value {
+            TreeValue::Compound(c) => ptr::from_ref(&c),
+            _ => null(),
+        }
+    } else {
+        null()
+    }
+}
+
+#[unsafe(no_mangle)]
+pub extern "C" fn nbt_tree_value_get_value_list_to_child(
+    tree_value: *const TreeValue,
+) -> *const Vec<TreeValue> {
+    if !tree_value.is_null() {
+        let value = unsafe { &*tree_value };
         match value {
             TreeValue::List(l) => ptr::from_ref(l),
             _ => null(),

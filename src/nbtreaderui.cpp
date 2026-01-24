@@ -24,14 +24,17 @@ NbtReaderUI::NbtReaderUI (const void *nbt, QWidget *parent)
           if (!selection.isEmpty ())
             {
               auto index = selection.indexes ()[0];
-              auto typeItem = model->data (index, Qt::UserRole + 2).toString ();
+              auto typeItem
+                  = model->data (index, Qt::UserRole + 2).toString ();
               ui->typeLabel->setText (typeItem);
               auto keyItem = model->data (index, Qt::DisplayRole).toString ();
               ui->keyLabel->setText (keyItem);
-              auto valueItem = model->data (index, Qt::UserRole + 3).toString ();
+              auto valueItem
+                  = model->data (index, Qt::UserRole + 3).toString ();
               ui->valueLabel->setText (valueItem);
             }
         });
+  connect (ui->closeBtn, &QPushButton::clicked, this, &NbtReaderUI::close);
 }
 
 NbtReaderUI::~NbtReaderUI ()
@@ -39,6 +42,12 @@ NbtReaderUI::~NbtReaderUI ()
   model->clear ();
   delete model;
   delete ui;
+}
+
+void
+NbtReaderUI::disableClose ()
+{
+  ui->closeBtn->hide ();
 }
 
 void
@@ -74,6 +83,46 @@ NbtReaderUI::addModelTree (const void *currentNbt, QStandardItem *iroot)
           auto new_nbt = nbt_vec_get_value_to_child (currentNbt, i);
           addModelTree (new_nbt, item);
         }
+      if (type == 11)
+        {
+          auto list = nbt_vec_get_value_list_to_child (currentNbt, i);
+          addModelTreeFromList (list, item);
+        }
       iroot->appendRow (item);
+    }
+}
+
+void
+NbtReaderUI::addModelTreeFromList (const void *list, QStandardItem *iroot)
+{
+  auto len = nbt_vec_tree_value_get_len (list);
+  for (int i = 0; i < len; i++)
+    {
+      auto item = nbt_vec_tree_value_get_tree_value (list, i);
+      /* No key */
+      auto key = "";
+      auto type = nbt_tree_value_get_type_int (item);
+      auto typeStr = nbt_tree_value_get_type_string (item);
+      auto valueStr = nbt_tree_value_get_value_string (item);
+
+      auto standardItem = new QStandardItem ();
+      standardItem->setData (key, Qt::DisplayRole);
+      standardItem->setData (typeStr, Qt::UserRole + 2);
+      standardItem->setData (valueStr, Qt::UserRole + 3);
+
+      string_free (valueStr);
+      string_free (typeStr);
+
+      if (type == 12)
+        {
+          auto new_nbt = nbt_tree_value_get_value_to_child (item);
+          addModelTree (new_nbt, standardItem);
+        }
+      if (type == 11)
+        {
+          auto new_list = nbt_tree_value_get_value_list_to_child (item);
+          addModelTreeFromList (new_list, standardItem);
+        }
+      iroot->appendRow (standardItem);
     }
 }
