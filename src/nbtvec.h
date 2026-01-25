@@ -7,8 +7,11 @@ extern "C"
 #endif
 
   /* This file is the output symbol of libnbt_to_vec.so */
-  void* file_to_nbt_vec(const char* filename);
-  void nbt_vec_free (void* vec);
+  typedef void (*ProgressFunc) (void *, int, const char *, const char *);
+
+  void *file_to_nbt_vec (const char *filename, ProgressFunc progress_func,
+                         void *main_klass);
+  void nbt_vec_free (void *vec);
 
 #ifdef __cplusplus
 }

@@ -124,13 +124,17 @@ pub extern "C" fn region_get_object(
 
 #[unsafe(no_mangle)]
 pub extern "C" fn region_num(region: *mut crab_nbt::Nbt) -> i32 {
-    let real_nbt = unsafe { Box::from_raw(region) };
-    let clone_nbt = real_nbt.clone();
-    let _ = Box::into_raw(real_nbt);
-    let region_nbt = clone_nbt.get_compound_with_err("Regions");
-    match region_nbt {
-        Ok(r) => r.child_tags.len() as i32,
-        Err(e) => 0,
+    if !region.is_null() {
+        let real_nbt = unsafe { Box::from_raw(region) };
+        let clone_nbt = real_nbt.clone();
+        let _ = Box::into_raw(real_nbt);
+        let region_nbt = clone_nbt.get_compound_with_err("Regions");
+        match region_nbt {
+            Ok(r) => r.child_tags.len() as i32,
+            Err(e) => 0,
+        }
+    } else {
+        0
     }
 }
 

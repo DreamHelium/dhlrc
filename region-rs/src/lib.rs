@@ -517,7 +517,8 @@ fn show_progress(
 
 fn finish_oom(system: &mut System) -> Result<(), MyError> {
     system.refresh_all();
-    if unsafe { system.free_memory() < FREE_MEMORY as u64 } {
+    if unsafe { system.available_memory() < FREE_MEMORY as u64 } {
+        println!("{}", system.free_memory());
         return Err(MyError {
             msg: i18n("Out of memory!").to_string(),
         });

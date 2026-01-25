@@ -30,10 +30,7 @@ private:
   QList<int> regionIndexes;
   QString currentDir;
   const void *cancel_flag;
-  void *object = nullptr;
   QStringList regionList;
-  QLibrary *library = nullptr;
-  void *region = nullptr;
   QStringList list;
   QStringList failedList;
   /* Original class never provide this. */

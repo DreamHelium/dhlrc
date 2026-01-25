@@ -79,6 +79,9 @@ LoadRegionUI::process ()
 {
   auto real_task = [&]
     {
+      using LoadObjectFunc = const char *(*)(void *, ProgressFunc, void *,
+                                             const void *, void **);
+      using ObjFreeFunc = void (*) (void *);
       auto setFunc
           = [] (void *main_klass, int value, const char *text, const char *arg)
         {
@@ -101,8 +104,159 @@ LoadRegionUI::process ()
           Q_EMIT refreshSubLabel (msg);
           string_free (msg);
         };
+      auto singleFuncProcessFunc =
+          [&] (const QString &dir, QLibrary *lib, LoadObjectFunc loadObjectFn,
+               ObjFreeFunc objFree, const char *&msg, void *&data)
+        {
+          void *object = nullptr;
+          void *region = nullptr;
+          typedef const char *(*LoadFunc) (void *, ProgressFunc, void **,
+                                           void *, const void *);
+          auto func = reinterpret_cast<LoadFunc> (
+              lib->resolve ("region_create_from_file"));
+
+          if (loadObjectFn && !msg)
+            {
+              msg = loadObjectFn (data, setFunc, this, cancel_flag, &object);
+              if (msg)
+                {
+                  /* If cancelled, we need to free the data */
+                  if (cancel_flag_is_cancelled (cancel_flag))
+                    vec_free (data);
+                  pushMsgFunc (dir, msg);
+                  return false;
+                }
+            }
+          if (func && !msg)
+            msg = func (object, setFunc, &region, this, cancel_flag);
+
+          if (msg)
+            {
+              /* If cancelled, we need to free the data */
+              if (cancel_flag_is_cancelled (cancel_flag))
+                vec_free (data);
+              objFree (object);
+              pushMsgFunc (dir, msg);
+              return false;
+            }
+
+          if (region)
+            {
+              auto realName = QFileInfo (dir).fileName ();
+              auto lastDot = realName.lastIndexOf ('.');
+              if (lastDot != -1)
+                {
+                  realName = realName.left (lastDot);
+                }
+              Region regionStruct = {
+                region,
+                realName,
+                QUuid::createUuid ().toString (),
+                QDateTime::currentDateTime (),
+                new QReadWriteLock (),
+              };
+              mr->appendRegion (regionStruct);
+              region = nullptr;
+              return true;
+            }
+          return false;
+        };
+      auto multiFuncProcessFunc
+          = [&] (const QString &dir, QLibrary *lib,
+                 LoadObjectFunc loadObjectFn, ObjFreeFunc objFree,
+                 const char *&msg, void *data, const QString &realLabel)
+        {
+          void *object = nullptr;
+          /* First we load object */
+          if (loadObjectFn && !msg)
+            {
+              msg = loadObjectFn (data, setFunc, this, cancel_flag, &object);
+              if (msg)
+                {
+                  /* If cancelled, we need to free the data */
+                  if (cancel_flag_is_cancelled (cancel_flag))
+                    vec_free (data);
+                  pushMsgFunc (dir, msg);
+                  return false;
+                }
+            }
+          typedef int32_t (*numFunc) (void *);
+          auto numFn = reinterpret_cast<numFunc> (lib->resolve ("region_num"));
+          int32_t nums = 0;
+          /* We need the region_num function to check whether it's nullptr */
+          if ((nums = numFn (object)))
+            {
+              auto indexFn
+                  = reinterpret_cast<const char *(*)(void *, qint32)> (
+                      lib->resolve ("region_name_index"));
+              regionList.clear ();
+              for (int k = 0; k < nums; k++)
+                {
+                  auto name = indexFn (object, k);
+                  regionList.append (name);
+                  string_free (name);
+                }
+              Q_EMIT refreshFullLabel (_ ("Please click `Continue` to choose "
+                                          "region(s)."));
+              /* Emit the stop signal to stop, and use loop to
+               * stop the process. */
+              Q_EMIT stopProgress ();
+              std::unique_lock lock (mutex);
+              cv.wait (lock);
+              /* Continue */
+              Q_EMIT refreshFullLabel (realLabel);
+              typedef const char *(*LoadFunc) (void *, ProgressFunc, void **,
+                                               void *, const void *, int32_t);
+              auto func = reinterpret_cast<LoadFunc> (
+                  lib->resolve ("region_create_from_file_as_index"));
+              for (auto index : regionIndexes)
+                {
+                  void *singleRegion = nullptr;
+                  if (func)
+                    msg = func (object, setFunc, &singleRegion, this,
+                                cancel_flag, index);
+                  if (msg)
+                    {
+                      objFree (object);
+                      /* If cancelled, we need to free the data */
+                      if (cancel_flag_is_cancelled (cancel_flag))
+                        vec_free (data);
+                      pushMsgFunc (dir, msg);
+                      return false;
+                    }
+
+                  auto realName = QFileInfo (dir).fileName ();
+                  auto lastDot = realName.lastIndexOf ('.');
+                  if (lastDot != -1)
+                    {
+                      realName = realName.left (lastDot);
+                    }
+                  auto name = indexFn (object, index);
+                  realName += " - ";
+                  realName += name;
+                  string_free (name);
+                  Region regionStruct = {
+                    singleRegion,
+                    realName,
+                    QUuid::createUuid ().toString (),
+                    QDateTime::currentDateTime (),
+                    new QReadWriteLock (),
+                  };
+                  mr->appendRegion (regionStruct);
+                }
+              objFree (object);
+              regionIndexes.clear ();
+              vec_free (data);
+              return true;
+            }
+          /* It's not a valid object */
+          if (object)
+            objFree (object);
+          return false;
+        };
       auto realProcessFunc = [&] (const QString &dir, int i)
         {
+          currentDir = dir;
           if (cancel_flag_is_cancelled (cancel_flag))
             return;
 
@@ -120,180 +274,47 @@ LoadRegionUI::process ()
             {
               auto err_msg = vec_to_cstr (data);
               pushMsgFunc (dir, err_msg);
+              return;
             }
-          else
+          auto moduleNum = mr->moduleNum ();
+          const char *msg = nullptr;
+          int j = 0;
+          failed = false;
+          for (; j < moduleNum; j++)
             {
-              auto moduleNum = mr->moduleNum ();
-              const char *msg = nullptr;
-              for (int j = 0; j < moduleNum; j++)
+              auto lib = mr->getModule (j);
+              auto multiFn = reinterpret_cast<qint32 (*) ()> (
+                  lib->resolve ("region_is_multi"));
+              auto objFree = reinterpret_cast<ObjFreeFunc> (
+                  lib->resolve ("object_free"));
+              auto loadObjectFn = reinterpret_cast<LoadObjectFunc> (
+                  lib->resolve ("region_get_object"));
+              auto transFn = reinterpret_cast<const char *(*)(const char *)> (
+                  lib->resolve ("init_translation"));
+
+              if (transFn)
+                msg = transFn (dh::getTranslationDir ().toUtf8 ());
+              if (multiFn)
                 {
-                  typedef int32_t *(*multiFunc) ();
-                  object = nullptr;
-                  typedef const char *(*LoadTranslation) (const char *);
-                  auto lib = mr->getModule (j);
-                  auto multiFn = reinterpret_cast<multiFunc> (
-                      lib->resolve ("region_is_multi"));
-                  auto objFree = reinterpret_cast<void (*) (void *)> (
-                      lib->resolve ("object_free"));
-                  typedef const char *(*LoadObjectFunc) (
-                      void *, ProgressFunc, void *, const void *, void **);
-                  auto loadObjectFn = reinterpret_cast<LoadObjectFunc> (
-                      lib->resolve ("region_get_object"));
-                  auto transFn = reinterpret_cast<LoadTranslation> (
-                      lib->resolve ("init_translation"));
-
-                  if (transFn)
-                    msg = transFn (dh::getTranslationDir ().toUtf8 ());
-                  if (multiFn)
+                  if (multiFn ())
                     {
-                      if (multiFn ())
-                        {
-                          if (loadObjectFn && !msg)
-                            {
-                              msg = loadObjectFn (data, setFunc, this,
-                                                  cancel_flag, &object);
-                              if (msg)
-                                {
-                                  if (!cancel_flag_is_cancelled (cancel_flag))
-                                    vec_free (data);
-                                  pushMsgFunc (dir, msg);
-                                }
-                            }
-                          typedef int32_t (*numFunc) (void *);
-                          auto numFn = reinterpret_cast<numFunc> (
-                              lib->resolve ("region_num"));
-                          int32_t nums = 0;
-                          if ((nums = numFn (object)))
-                            {
-                              library = lib;
-                              currentDir = dir;
-                              auto indexFn
-                                  = reinterpret_cast<const char *(*)(void *,
-                                                                     qint32)> (
-                                      lib->resolve ("region_name_index"));
-                              regionList.clear ();
-                              for (int k = 0; k < nums; k++)
-                                {
-                                  auto name = indexFn (object, k);
-                                  regionList.append (name);
-                                  string_free (name);
-                                }
-                              Q_EMIT refreshFullLabel (
-                                  _ ("Please click `Continue` to choose "
-                                     "region(s)."));
-                              /* Emit the stop signal to stop, and use loop to
-                               * stop the process. */
-                              Q_EMIT stopProgress ();
-                              std::unique_lock lock (mutex);
-                              cv.wait (lock);
-                              /* Continue */
-                              Q_EMIT refreshFullLabel (realLabel);
-                              typedef const char *(*LoadFunc) (
-                                  void *, ProgressFunc, void **, void *,
-                                  const void *, int32_t);
-                              auto func = reinterpret_cast<LoadFunc> (
-                                  library->resolve (
-                                      "region_create_from_file_as_index"));
-                              for (auto index : regionIndexes)
-                                {
-                                  void *singleRegion = nullptr;
-                                  if (func)
-                                    msg = func (object, setFunc, &singleRegion,
-                                                this, cancel_flag, index);
-                                  if (msg)
-                                    pushMsgFunc (dir, msg);
-                                  else
-                                    {
-                                      auto realName
-                                          = QFileInfo (dir).fileName ();
-                                      auto lastDot
-                                          = realName.lastIndexOf ('.');
-                                      if (lastDot != -1)
-                                        {
-                                          realName = realName.left (lastDot);
-                                        }
-                                      auto name
-                                          = region_get_name (singleRegion);
-                                      realName += " - ";
-                                      realName += name;
-                                      string_free (name);
-                                      Region regionStruct = {
-                                        singleRegion,
-                                        realName,
-                                        QUuid::createUuid ().toString (),
-                                        QDateTime::currentDateTime (),
-                                        new QReadWriteLock (),
-                                      };
-                                      mr->appendRegion (regionStruct);
-                                    }
-                                }
-                              objFree (object);
-                              regionIndexes.clear ();
-                              vec_free (data);
-                              object = nullptr;
-                              library = nullptr;
-                              break;
-                            }
-                          else
-                            objFree (object);
-                        }
-                      else
-                        {
-                          typedef const char *(*LoadFunc) (
-                              void *, ProgressFunc, void **, void *,
-                              const void *);
-                          auto func = reinterpret_cast<LoadFunc> (
-                              lib->resolve ("region_create_from_file"));
-
-                          if (loadObjectFn && !msg)
-                            {
-                              msg = loadObjectFn (data, setFunc, this,
-                                                  cancel_flag, &object);
-                              vec_free (data);
-                              if (msg
-                                  && !cancel_flag_is_cancelled (cancel_flag))
-                                vec_free (data);
-                            }
-                          if (func && !msg)
-                            msg = func (object, setFunc, &region, this,
-                                        cancel_flag);
-                          if (msg)
-                            if (j != moduleNum - 1)
-                              string_free (msg);
-                          object = nullptr;
-                          if (msg)
-                            pushMsgFunc (dir, msg);
-                          if (region)
-                            {
-                              auto realName = QFileInfo (dir).fileName ();
-                              auto lastDot = realName.lastIndexOf ('.');
-                              if (lastDot != -1)
-                                {
-                                  realName = realName.left (lastDot);
-                                }
-                              Region regionStruct = {
-                                region,
-                                realName,
-                                QUuid::createUuid ().toString (),
-                                QDateTime::currentDateTime (),
-                                new QReadWriteLock (),
-                              };
-                              mr->appendRegion (regionStruct);
-                              region = nullptr;
-                              break;
-                            }
-                        }
+                      if (multiFuncProcessFunc (dir, lib, loadObjectFn,
+                                                objFree, msg, data, realLabel))
+                        break;
                     }
                   else
-                    pushMsgFunc (dir, msg);
+                    {
+                      if (singleFuncProcessFunc (dir, lib, loadObjectFn,
+                                                 objFree, msg, data))
+                        break;
+                    }
                 }
-
-              if (!cancel_flag_is_cancelled (cancel_flag))
-                {
-                  Q_EMIT refreshFullProgress (100);
-                  Q_EMIT finishLoadOne ();
-                }
+              else if (msg)
+                pushMsgFunc (dir, msg);
+              failed = true;
             }
+          if (!failed && !cancel_flag_is_cancelled (cancel_flag))
+            Q_EMIT finishLoadOne ();
           cancel_flag_destroy (cancel_flag);
         };
       int i = 0;
@@ -303,7 +324,7 @@ LoadRegionUI::process ()
           realProcessFunc (dir, i);
           i++;
         }
-
+      Q_EMIT refreshFullProgress (100);
       finish ();
     };
 
