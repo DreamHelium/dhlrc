@@ -254,9 +254,7 @@ fn region_create_from_bytes_internal(
     cancel_flag: *const AtomicBool,
     index: i32,
 ) -> Result<*mut c_void, Box<dyn Error>> {
-    let o_nbt_box = unsafe { Box::from_raw(o_nbt) };
-    let nbt = o_nbt_box.clone();
-    let _ = Box::into_raw(o_nbt_box);
+    let nbt = unsafe { (*o_nbt).clone() };
     let data_version = nbt.get_int_with_err("MinecraftDataVersion")?;
     let metadata = nbt.get_compound_with_err("Metadata")?;
     let create_time = metadata.get_long_with_err("TimeCreated")?;

@@ -158,7 +158,7 @@ fn region_create_from_bytes_internal(
     main_klass: *mut c_void,
     cancel_flag: *const AtomicBool,
 ) -> Result<*mut c_void, Box<dyn Error>> {
-    let nbt = unsafe { Box::from_raw(o_nbt) };
+    let nbt = unsafe { (*o_nbt).clone() };
     let data_version = nbt.get_int_with_err("DataVersion")?;
     let size_compound = nbt.get_list_with_err("size")?;
     let size_compound_size = size_compound.len();

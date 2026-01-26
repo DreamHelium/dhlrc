@@ -123,7 +123,6 @@ LoadRegionUI::process ()
                   /* If cancelled, we need to free the data */
                   if (cancel_flag_is_cancelled (cancel_flag))
                     vec_free (data);
-                  pushMsgFunc (dir, msg);
                   return false;
                 }
             }
@@ -136,7 +135,6 @@ LoadRegionUI::process ()
               if (cancel_flag_is_cancelled (cancel_flag))
                 vec_free (data);
               objFree (object);
-              pushMsgFunc (dir, msg);
               return false;
             }
 
@@ -164,7 +162,7 @@ LoadRegionUI::process ()
       auto multiFuncProcessFunc
           = [&] (const QString &dir, QLibrary *lib,
                  LoadObjectFunc loadObjectFn, ObjFreeFunc objFree,
-                 const char *&msg, void *data, const QString &realLabel)
+                 const char *&msg, void *&data, const QString &realLabel)
         {
           void *object = nullptr;
           /* First we load object */
@@ -176,7 +174,6 @@ LoadRegionUI::process ()
                   /* If cancelled, we need to free the data */
                   if (cancel_flag_is_cancelled (cancel_flag))
                     vec_free (data);
-                  pushMsgFunc (dir, msg);
                   return false;
                 }
             }
@@ -221,16 +218,13 @@ LoadRegionUI::process ()
                       /* If cancelled, we need to free the data */
                       if (cancel_flag_is_cancelled (cancel_flag))
                         vec_free (data);
-                      pushMsgFunc (dir, msg);
                       return false;
                     }
 
                   auto realName = QFileInfo (dir).fileName ();
                   auto lastDot = realName.lastIndexOf ('.');
                   if (lastDot != -1)
-                    {
-                      realName = realName.left (lastDot);
-                    }
+                    realName = realName.left (lastDot);
                   auto name = indexFn (object, index);
                   realName += " - ";
                   realName += name;
@@ -253,6 +247,13 @@ LoadRegionUI::process ()
           if (object)
             objFree (object);
           return false;
+        };
+      auto tryErrorFunc = [&] (int j, const char *msg, QString &realStr)
+        {
+          QString ret = _ ("%1 try's fail message: %2\n");
+          ret = ret.arg (j).arg (msg);
+          realStr += ret;
+          string_free (msg);
         };
       auto realProcessFunc = [&] (const QString &dir, int i)
         {
@@ -280,6 +281,7 @@ LoadRegionUI::process ()
           const char *msg = nullptr;
           int j = 0;
           failed = false;
+          QString realStr;
           for (; j < moduleNum; j++)
             {
               auto lib = mr->getModule (j);
@@ -301,18 +303,33 @@ LoadRegionUI::process ()
                       if (multiFuncProcessFunc (dir, lib, loadObjectFn,
                                                 objFree, msg, data, realLabel))
                         break;
+                      tryErrorFunc (j, msg, realStr);
                     }
                   else
                     {
                       if (singleFuncProcessFunc (dir, lib, loadObjectFn,
                                                  objFree, msg, data))
                         break;
+                      tryErrorFunc (j, msg, realStr);
                     }
                 }
-              else if (msg)
-                pushMsgFunc (dir, msg);
-              failed = true;
+              if (msg && j != moduleNum - 1)
+                string_free (msg);
+              if (j == moduleNum - 1)
+                failed = true;
             }
+          if (failed)
+            {
+              if (realStr.isEmpty ())
+                pushMsgFunc (dir, msg);
+              else
+                {
+                  failedList.append (dir);
+                  failedReason.append (realStr);
+                  Q_EMIT refreshSubLabel (realStr);
+                }
+            }
+
           if (!failed && !cancel_flag_is_cancelled (cancel_flag))
             Q_EMIT finishLoadOne ();
           cancel_flag_destroy (cancel_flag);
