@@ -9,19 +9,24 @@
 #include <QMessageBox>
 #include <QProgressDialog>
 #include <QReadWriteLock>
+#include <QUuid>
 #include <QWidget>
 #include <qcoreevent.h>
 #include <qevent.h>
 #include <qmimedata.h>
 #include <qstandarditemmodel.h>
+#include <region.h>
 
 using Region = struct Region
 {
-  void *region;
+  // Region (Region &other) noexcept
+  //     : region (std::move (other.region)), name (std::move (other.name)),
+  //       uuid (std::move (other.uuid)), lock (std::move (other.lock)) {};
+  std::unique_ptr<void, void (*) (void *)> region;
   QString name;
   QString uuid;
   QDateTime dateTime;
-  QReadWriteLock *lock;
+  std::unique_ptr<QReadWriteLock> lock;
 };
 
 using NameAndLocked = struct NameAndLocked
@@ -84,16 +89,21 @@ public:
   ~ManageRegion () override;
   void updateModel () override;
   void
-  appendRegion (const Region &region)
+  appendRegion (void *region, const QString &name)
   {
-    regions.append (region);
+    regions.emplace_back (std::make_unique<Region> (
+        Region{ { region, region_free },
+                name,
+                QUuid::createUuid ().toString (QUuid::WithoutBraces),
+                QDateTime::currentDateTime (),
+                std::make_unique<QReadWriteLock> () }));
   }
   qsizetype
   regionNum ()
   {
-    return regions.count ();
+    return regions.size ();
   }
-  QList<Region> &
+  auto &
   getRegions ()
   {
     return regions;
@@ -118,19 +128,16 @@ public:
     QList<NameAndLocked> list;
     for (const auto &r : regions)
       {
+        auto r_ptr = r.get ();
         bool add = false;
-        if (write && r.lock->tryLockForWrite ())
+        if ((write && r_ptr->lock->tryLockForWrite ())
+            || (!write && r_ptr->lock->tryLockForRead ()))
           {
             add = true;
-            r.lock->unlock ();
-          }
-        else if (!write && r.lock->tryLockForRead ())
-          {
-            add = true;
-            r.lock->unlock ();
+            r_ptr->lock->unlock ();
           }
         if (add)
-          list.append ({ r.name, add });
+          list.append ({ r_ptr->name, add });
         else
           list.append ({ _ ("Locked!"), add });
       }
@@ -143,7 +150,7 @@ private Q_SLOTS:
   void dnd_triggered (const QMimeData *data);
 
 private:
-  QList<Region> regions = {};
+  std::vector<std::unique_ptr<Region>> regions = {};
   QList<QLibrary *> modules = {};
 };
 

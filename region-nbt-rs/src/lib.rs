@@ -12,6 +12,7 @@ use std::ops::IndexMut;
 use std::ptr::{null, null_mut};
 use std::string::String;
 use std::sync::atomic::AtomicBool;
+use std::time::Instant;
 
 #[link(name = "region_rs")]
 unsafe extern "C" {
@@ -220,6 +221,7 @@ fn region_create_from_bytes_internal(
     }
     let block_num = i;
     let mut j = 0;
+    let mut start = Instant::now();
     for block in block_compound {
         if unsafe { cancel_flag_is_cancelled(cancel_flag) } == 1 {
             return Err(Box::from(MyError {
@@ -236,13 +238,17 @@ fn region_create_from_bytes_internal(
         };
         let string = i18n("Processing blocks: {} / {}.");
         let real_string = formatx!(string, j, block_num)?;
-        show_progress(
-            progress_fn,
-            main_klass,
-            (j * 100 / block_num) as c_int,
-            &real_string,
-            &String::new(),
-        );
+        if start.elapsed().as_millis() >= 500 || j == block_num - 1 {
+            show_progress(
+                progress_fn,
+                main_klass,
+                (j * 100 / block_num) as c_int,
+                &real_string,
+                &String::new(),
+            );
+            start = Instant::now();
+        }
+
         let pos = internal_block.get_list_with_err("pos")?;
         let block_pos = get_size(pos)?;
         let block_x = block_pos.0 - min_x;

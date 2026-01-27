@@ -6,8 +6,9 @@
 
 RegionModifyUI::RegionModifyUI (int index, dh::ManageRegion *mr,
                                 QWidget *parent)
-    : QWidget (parent), region (mr->getRegions ()[index].region),
-      ui (new Ui::RegionModifyUI), lock (mr->getRegions ()[index].lock)
+    : QWidget (parent), ui (new Ui::RegionModifyUI),
+      region (mr->getRegions ()[index].get ()->region.get ()),
+      lock (mr->getRegions ()[index].get ()->lock.get ())
 {
   ui->setupUi (this);
   QObject::connect (ui->lineEdit_3, &QLineEdit::textChanged, this,

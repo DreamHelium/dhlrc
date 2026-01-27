@@ -35,6 +35,7 @@ private:
   QStringList failedList;
   /* Original class never provide this. */
   QStringList failedReason;
+  bool cancelled = false;
 
 public Q_SLOTS:
   void process ();

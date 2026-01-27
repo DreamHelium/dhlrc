@@ -143,12 +143,6 @@ ManageRegion::ManageRegion ()
 
 ManageRegion::~ManageRegion ()
 {
-  for (const auto &i : regions)
-    {
-      region_free (i.region);
-      delete i.lock;
-    }
-
   for (const auto library : modules)
     delete library;
 }
@@ -176,7 +170,13 @@ ManageRegion::save_triggered (QList<int> rows)
 void
 ManageRegion::dnd_triggered (const QMimeData *data)
 {
-  /* TODO */
+  auto dir = data->urls ();
+  QStringList filelist;
+  for (const auto &file : dir)
+    filelist << file.toLocalFile ();
+  auto lrui = new LoadRegionUI (filelist, this);
+  lrui->setAttribute (Qt::WA_DeleteOnClose);
+  lrui->show ();
 }
 
 void
@@ -189,27 +189,20 @@ ManageRegion::updateModel ()
       QStandardItem *description = new QStandardItem;
       QStandardItem *uuid = new QStandardItem;
       QStandardItem *time = new QStandardItem;
-      // QStandardItem* type = new QStandardItem;
       uuid->setEditable (false);
       time->setEditable (false);
-      // type->setEditable(false);
-      // if (dh_info_reader_trylock (type, uuid_s))
-      //   {
-      description->setData (i.name, 2);
-      uuid->setData (i.uuid, 0);
-      time->setData (i.dateTime, 0);
-      // type->setData(getTypeOfNbt(info->type), 0);
-      // dh_info_reader_unlock (type, uuid_s);
+      if (i->lock->tryLockForRead ())
+        {
+          description->setData (i->name, 2);
+          i->lock->unlock ();
+        }
+      else
+        description->setData (QString (_ ("Locked!")), 2);
+      uuid->setData (i->uuid, 0);
+      time->setData (i->dateTime, 0);
       QList list = { description, uuid, time };
       itemList.append (list);
     }
-  // else
-  //   {
-  //     description->setData (QString (_ ("locked")), 0);
-  //     uuid->setData (QString (_ ("locked")), 0);
-  //     time->setData (QString (_ ("locked")), 0);
-  // type->setData(QString(_("locked")), 0);
-  // }
 
   model->clear ();
   QStringList list;
