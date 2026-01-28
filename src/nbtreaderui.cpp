@@ -1,6 +1,9 @@
 #include "nbtreaderui.h"
 #include "ui_nbtreaderui.h"
 
+#include <QFileDialog>
+#include <manage.h>
+#include <nbtvec.h>
 #include <region.h>
 
 NbtReaderUI::NbtReaderUI (const void *nbt, QWidget *parent)
@@ -35,6 +38,14 @@ NbtReaderUI::NbtReaderUI (const void *nbt, QWidget *parent)
             }
         });
   connect (ui->closeBtn, &QPushButton::clicked, this, &NbtReaderUI::close);
+  connect (ui->exportBtn, &QPushButton::clicked, this,
+           [&]
+             {
+               auto dir = QFileDialog::getSaveFileName (
+                   this, _ ("Export NBT To ..."));
+               if (!dir.isEmpty ())
+                 nbt_vec_to_file (this->nbt, dir.toUtf8 ().constData ());
+             });
 }
 
 NbtReaderUI::~NbtReaderUI ()

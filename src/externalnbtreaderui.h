@@ -24,6 +24,7 @@ Q_SIGNALS:
   void setLabel (const QString &text);
 
 private:
+  bool first = true;
   void *nbt = nullptr;
   QString filename;
   NbtReaderUI *nrui = nullptr;

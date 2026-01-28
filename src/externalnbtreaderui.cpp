@@ -91,11 +91,12 @@ ExternalNbtReaderUI::dropEvent (QDropEvent *event)
   nbt = file_to_nbt_vec (filename.toUtf8 ().constData (), progressFn, this);
   if (nbt)
     {
-      if (wLayout->itemAt (0)->widget () == label)
+      if (first)
         {
           wLayout->removeWidget (label);
           delete label;
           label = nullptr;
+          first = false;
         }
       nrui = new NbtReaderUI (nbt);
       nrui->disableClose ();

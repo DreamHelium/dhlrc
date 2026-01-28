@@ -1,5 +1,7 @@
-use crab_nbt_ext::{TreeValue, convert_nbt_to_vec, nbt_create_real};
-use std::ffi::{c_char, c_int, c_void};
+use crab_nbt_ext::{TreeValue, convert_nbt_to_vec, convert_vec_to_nbt, nbt_create_real};
+use std::ffi::{CStr, c_char, c_int, c_void};
+use std::fs::File;
+use std::io::Write;
 use std::ptr::{null, null_mut};
 use std::sync::atomic::AtomicBool;
 
@@ -25,10 +27,19 @@ unsafe extern "C" {
 }
 
 #[unsafe(no_mangle)]
+pub extern "C" fn nbt_vec_to_file(vec: *const Vec<(String, TreeValue)>, filename: *const c_char) {
+    let tree_vec = unsafe { (*vec).clone() };
+    let nbt = convert_vec_to_nbt(tree_vec, "");
+    let mut file = File::create(unsafe { CStr::from_ptr(filename) }.to_str().unwrap()).unwrap();
+    let bytes = nbt.write();
+    file.write_all(&*bytes).unwrap();
+}
+
+#[unsafe(no_mangle)]
 pub extern "C" fn file_to_nbt_vec(
     filename: *const c_char,
     progress_fn: ProgressFn,
-    main_klass : *mut c_void
+    main_klass: *mut c_void,
 ) -> *mut Vec<(String, TreeValue)> {
     let failed = 0;
     unsafe {

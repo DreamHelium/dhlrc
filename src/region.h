@@ -77,6 +77,8 @@ extern "C"
   size_t nbt_vec_tree_value_get_len (const void *vec);
   const void *nbt_tree_value_get_value_to_child (const void *tree_value);
   const void *nbt_tree_value_get_value_list_to_child (const void *tree_value);
+  size_t region_get_entity_len (void *region);
+  const void *region_get_entity (void *region, size_t index);
 
 #ifdef __cplusplus
 }

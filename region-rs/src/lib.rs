@@ -127,8 +127,8 @@ pub struct Region {
     block_array: Vec<u32>,
     /** The block entity array */
     block_entity_array: Vec<BlockEntity>,
-    /** Entity array */
-    entity_array: Vec<(String, TreeValue)>,
+    /** Entity array, use TreeValue::Compound */
+    entity_array: Vec<Vec<(String, TreeValue)>>,
     /** The Palette info array*/
     palette_array: Vec<Palette>,
 }
@@ -366,12 +366,21 @@ pub extern "C" fn region_append_palette(
     });
     null()
 }
-
 #[unsafe(no_mangle)]
 pub extern "C" fn region_set_blocks_from_vec(region: *mut Region, blocks: *mut Vec<u32>) {
     let r = unsafe { &mut *region };
     let real_blocks = unsafe { Box::from_raw(blocks) };
     r.block_array = *real_blocks;
+}
+
+#[unsafe(no_mangle)]
+pub extern "C" fn region_set_entity_from_vec(
+    region: *mut Region,
+    entities: *mut Vec<Vec<(String, TreeValue)>>,
+) {
+    let r = unsafe { &mut *region };
+    let real_entities = unsafe { Box::from_raw(entities) };
+    r.entity_array = *real_entities;
 }
 
 #[unsafe(no_mangle)]
@@ -741,6 +750,20 @@ pub extern "C" fn region_get_block_entity(
         }
     }
     null()
+}
+
+#[unsafe(no_mangle)]
+pub extern "C" fn region_get_entity_len(region: *mut Region) -> usize {
+    unsafe { (*region).entity_array.len() }
+}
+
+#[unsafe(no_mangle)]
+pub extern "C" fn region_get_entity(
+    region: *mut Region,
+    index: usize,
+) -> *const Vec<(String, TreeValue)> {
+    let r = unsafe { &*region };
+    ptr::from_ref(&r.entity_array[index])
 }
 
 #[unsafe(no_mangle)]

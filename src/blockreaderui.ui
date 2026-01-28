@@ -135,6 +135,13 @@
         </spacer>
        </item>
        <item>
+        <widget class="QPushButton" name="tileBtn">
+         <property name="text">
+          <string>Show &amp;Tile Entity</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QPushButton" name="propertyBtn">
          <property name="text">
           <string>&amp;Modify Property</string>

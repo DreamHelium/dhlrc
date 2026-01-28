@@ -111,9 +111,9 @@
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_2">
          <item>
-          <widget class="QPushButton" name="pushButton">
+          <widget class="QPushButton" name="exportBtn">
            <property name="text">
-            <string>PushButton</string>
+            <string>&amp;Export</string>
            </property>
           </widget>
          </item>

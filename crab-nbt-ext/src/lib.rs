@@ -5,7 +5,7 @@ use std::collections::HashMap;
 use std::error::Error;
 use std::ffi::{CStr, CString, c_char, c_int, c_void};
 use std::fmt::{Display, Formatter};
-use std::io::Cursor;
+use std::io::{Bytes, Cursor};
 use std::ptr::null_mut;
 use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering};
@@ -169,7 +169,7 @@ pub fn show_progress(
         real_text = string_to_ptr_fail_to_null(text);
     }
     unsafe {
-        if !progress_fn.is_none(){
+        if !progress_fn.is_none() {
             if progress_fn.unwrap() as usize != 0 {
                 progress_fn.unwrap()(main_klass, progress, msg, real_text);
             }
@@ -236,19 +236,27 @@ fn vec_u8_to_i8_safest(vec: Vec<u8>) -> Vec<i8> {
     result
 }
 
-fn convert_nbt_tag_to_tree_value(nbt_tag: NbtTag) -> TreeValue {
+fn vec_i8_to_u8_safest(vec: Vec<i8>) -> Vec<u8> {
+    let mut result = Vec::with_capacity(vec.len());
+    for byte in vec {
+        result.push(byte as u8);
+    }
+    result
+}
+
+fn convert_nbt_tag_to_tree_value(nbt_tag: &NbtTag) -> TreeValue {
     match nbt_tag {
         NbtTag::End => TreeValue::String("error".to_string()),
-        NbtTag::Byte(b) => TreeValue::Byte(b),
-        NbtTag::Int(i) => TreeValue::Int(i),
-        NbtTag::Short(s) => TreeValue::Short(s),
-        NbtTag::Long(l) => TreeValue::Long(l),
+        NbtTag::Byte(b) => TreeValue::Byte(*b),
+        NbtTag::Int(i) => TreeValue::Int(*i),
+        NbtTag::Short(s) => TreeValue::Short(*s),
+        NbtTag::Long(l) => TreeValue::Long(*l),
         NbtTag::ByteArray(ba) => TreeValue::ByteArray(vec_u8_to_i8_safest(ba.to_vec())),
-        NbtTag::LongArray(la) => TreeValue::LongArray(la),
-        NbtTag::String(str) => TreeValue::String(str),
-        NbtTag::Float(f) => TreeValue::Float(f),
-        NbtTag::Double(d) => TreeValue::Double(d),
-        NbtTag::IntArray(ia) => TreeValue::IntArray(ia),
+        NbtTag::LongArray(la) => TreeValue::LongArray(la.clone()),
+        NbtTag::String(str) => TreeValue::String(str.clone()),
+        NbtTag::Float(f) => TreeValue::Float(*f),
+        NbtTag::Double(d) => TreeValue::Double(*d),
+        NbtTag::IntArray(ia) => TreeValue::IntArray(ia.clone()),
         NbtTag::List(l) => {
             let mut list: Vec<TreeValue> = vec![];
             for tag in l {
@@ -265,11 +273,78 @@ pub fn convert_nbt_to_vec(nbt: &NbtCompound) -> Vec<(String, TreeValue)> {
     let child = &nbt.child_tags;
     let mut ret: Vec<(String, TreeValue)> = vec![];
     for child_node in child {
-        let tree_value = convert_nbt_tag_to_tree_value(child_node.1.clone());
+        let tree_value = convert_nbt_tag_to_tree_value(&child_node.1);
         ret.push((child_node.0.clone(), tree_value));
     }
     ret
 }
+
+fn convert_tree_value_to_nbt_tag(tree_value: &TreeValue, str: &str) -> NbtTag {
+    match tree_value {
+        TreeValue::Byte(b) => NbtTag::Byte(*b),
+        TreeValue::Short(s) => NbtTag::Short(*s),
+        TreeValue::Int(i) => NbtTag::Int(*i),
+        TreeValue::Long(l) => NbtTag::Long(*l),
+        TreeValue::Float(f) => NbtTag::Float(*f),
+        TreeValue::Double(d) => NbtTag::Double(*d),
+        TreeValue::ByteArray(ba) => {
+            let vec_u8 = vec_i8_to_u8_safest(ba.clone());
+            let bytes = bytes::Bytes::from(vec_u8);
+            NbtTag::ByteArray(bytes)
+        }
+        TreeValue::IntArray(ia) => NbtTag::IntArray(ia.clone()),
+        TreeValue::LongArray(la) => NbtTag::LongArray(la.clone()),
+        TreeValue::String(s) => NbtTag::String(s.clone()),
+        TreeValue::List(l) => {
+            let mut list: Vec<NbtTag> = vec![];
+            for tag in l {
+                let new_tag = convert_tree_value_to_nbt_tag(tag, "");
+                list.push(new_tag);
+            }
+            NbtTag::List(list)
+        }
+        TreeValue::Compound(c) => {
+            NbtTag::Compound(convert_vec_to_nbt(c.clone(), str).root_tag)
+        }
+    }
+}
+
+pub fn convert_vec_to_nbt(vec: Vec<(String, TreeValue)>, str: &str) -> Nbt {
+    let mut nbt_vec = vec![];
+    let mut real_str = String::new();
+    let mut real_vec = vec![];
+    if vec.len() == 1 {
+        let tree_value = &vec[0].1;
+        let is_compound = match tree_value {
+            TreeValue::Compound(c) => {
+                real_vec = c.clone();
+                true
+            }
+            _ => {
+                real_vec = vec.clone();
+                false
+            }
+        };
+        if is_compound {
+            real_str = vec[0].0.clone();
+        }
+    }
+    if real_str.is_empty() {
+        real_str = str.to_string();
+    }
+    for child_node in real_vec {
+        let nbt_tag = convert_tree_value_to_nbt_tag(&child_node.1, &child_node.0);
+        let real_nbt = (child_node.0, nbt_tag);
+        nbt_vec.push(real_nbt);
+    }
+    Nbt {
+        name: real_str,
+        root_tag: NbtCompound {
+            child_tags: nbt_vec,
+        },
+    }
+}
+
 pub struct Palette {
     pub id_name: String,
     pub property: Vec<(String, String)>,

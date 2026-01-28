@@ -87,6 +87,7 @@ unsafe extern "C" {
         block_entities: *mut Vec<BlockEntity>,
     );
     fn region_set_blocks_from_vec(region: *mut c_void, blocks: *mut Vec<u32>);
+    fn region_set_entity_from_vec(region: *mut c_void, entities: *mut Vec<Vec<(String, TreeValue)>>);
 }
 
 #[unsafe(no_mangle)]
@@ -119,6 +120,15 @@ fn get_int_from_nbt_tag(nbt: &NbtTag) -> Result<i32, MyError> {
     }
 }
 
+fn get_double_from_nbt_tag(nbt: &NbtTag) -> Result<f64, MyError> {
+    match nbt {
+        NbtTag::Double(x) => Ok(*x),
+        _ => Err(MyError {
+            msg: String::from(i18n("Wrong type of size!")),
+        }),
+    }
+}
+
 fn get_size(nbt: &Vec<NbtTag>) -> Result<(i32, i32, i32), MyError> {
     if nbt.len() != 3 {
         return Err(MyError {
@@ -128,6 +138,18 @@ fn get_size(nbt: &Vec<NbtTag>) -> Result<(i32, i32, i32), MyError> {
     let x = get_int_from_nbt_tag(&nbt[0])?;
     let y = get_int_from_nbt_tag(&nbt[1])?;
     let z = get_int_from_nbt_tag(&nbt[2])?;
+    Ok((x, y, z))
+}
+
+fn get_size_double(nbt: &Vec<NbtTag>) -> Result<(f64, f64, f64), MyError> {
+    if nbt.len() != 3 {
+        return Err(MyError {
+            msg: i18n("The length of the size is wrong.").to_string(),
+        });
+    }
+    let x = get_double_from_nbt_tag(&nbt[0])?;
+    let y = get_double_from_nbt_tag(&nbt[1])?;
+    let z = get_double_from_nbt_tag(&nbt[2])?;
     Ok((x, y, z))
 }
 
@@ -151,6 +173,69 @@ pub extern "C" fn region_get_object(
         }
         Err(e) => string_to_ptr_fail_to_null(&e.to_string()),
     }
+}
+
+fn region_get_entity_internal(
+    nbt: &crab_nbt::Nbt,
+    cancel_flag: *const AtomicBool,
+) -> Result<Vec<Vec<(String, TreeValue)>>, Box<dyn Error>> {
+    let entity_nbt = nbt.get_list_with_err("entities")?;
+    let mut ret = vec![];
+    for entity in entity_nbt {
+        if unsafe { cancel_flag_is_cancelled(cancel_flag) } == 1 {
+            return Err(Box::from(MyError {
+                msg: String::from(i18n("Reading entities is cancelled!")),
+            }));
+        }
+
+        let internal_entity = match entity {
+            NbtTag::Compound(c) => c,
+            _ => {
+                return Err(Box::from(MyError {
+                    msg: String::from(i18n("Wrong type of entity!")),
+                }));
+            }
+        };
+        /* Then we need to process the nbt */
+        let real_nbt = internal_entity.get_compound_with_err("nbt")?;
+        let block_pos = internal_entity.get_list_with_err("pos")?;
+        let block_pos_value = get_size_double(block_pos)?;
+
+        let mut value = convert_nbt_to_vec(real_nbt);
+        for (str, val) in &mut value {
+            if str == "Pos" {
+                match val {
+                    TreeValue::List(l) => {
+                        fn modify_tree_value_double(
+                            tree_value: &mut TreeValue,
+                            value: f64,
+                        ) -> Result<(), MyError> {
+                            match tree_value {
+                                TreeValue::Double(d) => *d = value,
+                                _ => {
+                                    return Err(MyError {
+                                        msg: i18n("Not a double value").to_string(),
+                                    });
+                                }
+                            }
+                            Ok(())
+                        }
+                        modify_tree_value_double(&mut l[0], block_pos_value.0)?;
+                        modify_tree_value_double(&mut l[1], block_pos_value.1)?;
+                        modify_tree_value_double(&mut l[2], block_pos_value.2)?;
+                    }
+                    _ => {
+                        return Err(Box::from(MyError {
+                            msg: String::from(i18n("Wrong type of entity's pos!")),
+                        }));
+                    }
+                }
+            }
+        }
+        /* Finally we put the parent into ret */
+        ret.push(value);
+    }
+    Ok(ret)
 }
 
 fn region_create_from_bytes_internal(
@@ -277,6 +362,7 @@ fn region_create_from_bytes_internal(
 
         j += 1;
     }
+    let entities = region_get_entity_internal(&nbt, cancel_flag)?;
     unsafe {
         let region = region_new();
         region_set_data_version(region, data_version as u32);
@@ -294,6 +380,7 @@ fn region_create_from_bytes_internal(
         }
         region_set_block_entities_from_vec(region, Box::into_raw(Box::new(block_entities)));
         region_set_blocks_from_vec(region, Box::into_raw(Box::new(blocks)));
+        region_set_entity_from_vec(region, Box::into_raw(Box::new(entities)));
         Ok(region)
     }
 }

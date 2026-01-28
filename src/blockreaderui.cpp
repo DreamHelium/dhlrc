@@ -5,6 +5,7 @@
 // #include <blockshowui.h>
 #include <blocklistui.h>
 #include <blockshowui.h>
+#include <generalchoosedialog.h>
 #include <mainwindow.h>
 #include <nbtreaderui.h>
 #include <qlineedit.h>
@@ -24,8 +25,8 @@ set_func (void *klass, int value)
 
 BlockReaderUI::BlockReaderUI (int index, dh::ManageRegion *mr, QWidget *parent)
     : QWidget (parent), ui (new Ui::BlockReaderUI),
-      region (mr->getRegions ()[index].get()->region.get ()),
-      lock (mr->getRegions ()[index].get()->lock.get ())
+      region (mr->getRegions ()[index].get ()->region.get ()),
+      lock (mr->getRegions ()[index].get ()->lock.get ())
 {
   ui->setupUi (this);
   // auto version = dh::getVersion (region->data_version);
@@ -46,6 +47,24 @@ BlockReaderUI::BlockReaderUI (int index, dh::ManageRegion *mr, QWidget *parent)
                     &BlockReaderUI::propertyBtn_clicked);
   QObject::connect (ui->showBtn, &QPushButton::clicked, this,
                     &BlockReaderUI::showBtn_clicked);
+  connect (ui->tileBtn, &QPushButton::clicked, this,
+           [&]
+             {
+               auto len = region_get_entity_len (region);
+               QStringList list;
+               for (int i = 0; i < len; i++)
+                 list << QString::number (i);
+               auto entityIndex = GeneralChooseDialog::getIndex (
+                   _ ("Choose an Index"), _ ("Please choose an index."), list,
+                   this);
+               if (entityIndex != -1)
+                 {
+                   auto nrui = new NbtReaderUI (
+                       region_get_entity (region, entityIndex));
+                   nrui->setAttribute (Qt::WA_DeleteOnClose);
+                   nrui->show ();
+                 }
+             });
   ui->entityBtn->setEnabled (false);
   ui->propertyBtn->setEnabled (false);
   ui->label_7->setText (_ ("Lack the translation module, will not "
