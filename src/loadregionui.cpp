@@ -16,6 +16,22 @@
 #define _(str) gettext (str)
 #undef asprintf
 
+#define dh_return_val_if_fail(func, val)                                      \
+  if (!func)                                                                  \
+    return val;
+
+template <typename Func, typename... Args>
+static bool
+errMsgHandleFunc (const char *&msg, Func func, Args... args)
+{
+  if (msg)
+    return false;
+  msg = func (args...);
+  if (msg)
+    return false;
+  return true;
+}
+
 LoadRegionUI::LoadRegionUI (QStringList list, dh::ManageRegion *mr,
                             QWidget *parent)
     : LoadObjectUI (parent), mr (mr), list (list),
@@ -41,16 +57,21 @@ LoadRegionUI::LoadRegionUI (QStringList list, dh::ManageRegion *mr,
                  }
                if (!failedList.isEmpty () || !finished)
                  {
-
                    QString errorMsg
-                       = _ ("The following files are not added:\n");
+                       = _ ("The following files are not added:\n\n");
                    for (int i = 0; i < failedList.size (); i++)
                      {
                        const QString &dir = failedList.at (i);
                        const QString &reason = failedReason.at (i);
-                       errorMsg += dir + ": " + reason + "\n";
+                       errorMsg += "**" + dir + "**" + ":\n\n" + reason + "\n\n";
                      }
-                   QMessageBox::critical (this, _ ("Error!"), errorMsg);
+                   auto messageBox = new QMessageBox (this);
+                   messageBox->setIcon (QMessageBox::Critical);
+                   messageBox->setWindowTitle (_ ("Error!"));
+                   messageBox->setText (errorMsg);
+                   messageBox->setTextFormat (Qt::MarkdownText);
+                   messageBox->exec ();
+                   delete messageBox;
                  }
              });
   connect (this, &LoadRegionUI::continued, this,
@@ -136,25 +157,22 @@ LoadRegionUI::process ()
           auto func = reinterpret_cast<LoadFunc> (
               lib->resolve ("region_create_from_file"));
 
-          if (loadObjectFn && !msg)
+          if (loadObjectFn)
             {
-              msg = loadObjectFn (data, setFunc, this, cancel_flag, &o_object);
+              dh_return_val_if_fail (errMsgHandleFunc (msg, loadObjectFn, data,
+                                                       setFunc, this,
+                                                       cancel_flag, &o_object),
+                                     false);
               object = { o_object, objFree };
-              if (msg)
-                return false;
             }
-          if (func && !msg)
-            msg = func (object.get (), setFunc, &region, this, cancel_flag);
+          if (func)
+            dh_return_val_if_fail (errMsgHandleFunc (msg, func, object.get (),
+                                                     setFunc, &region, this,
+                                                     cancel_flag),
+                                   false);
 
-          if (msg)
-            return false;
-
-          if (region)
-            {
-              pushRegionFunc (dir, {}, region);
-              return true;
-            }
-          return false;
+          pushRegionFunc (dir, {}, region);
+          return true;
         };
 
       auto multiFuncProcessFunc
@@ -162,19 +180,19 @@ LoadRegionUI::process ()
                  LoadObjectFunc loadObjectFn, ObjFreeFunc objFree,
                  const char *&msg, void *data, const QString &realLabel)
         {
-          void *object = nullptr;
+          void *o_object = nullptr;
           /* First we load object */
-          if (loadObjectFn && !msg)
-            {
-              msg = loadObjectFn (data, setFunc, this, cancel_flag, &object);
-              if (msg)
-                return false;
-            }
+          if (loadObjectFn)
+            dh_return_val_if_fail (errMsgHandleFunc (msg, loadObjectFn, data,
+                                                     setFunc, this,
+                                                     cancel_flag, &o_object),
+                                   false);
+          std::unique_ptr<void, void (*) (void *)> object{ o_object, objFree };
           typedef int32_t (*numFunc) (void *);
           auto numFn = reinterpret_cast<numFunc> (lib->resolve ("region_num"));
           int32_t nums = 0;
           /* We need the region_num function to check whether it's nullptr */
-          if ((nums = numFn (object)))
+          if ((nums = numFn (object.get ())))
             {
               auto indexFn
                   = reinterpret_cast<const char *(*)(void *, qint32)> (
@@ -182,7 +200,7 @@ LoadRegionUI::process ()
               regionList.clear ();
               for (int k = 0; k < nums; k++)
                 {
-                  auto name = indexFn (object, k);
+                  auto name = indexFn (object.get (), k);
                   regionList.append (name);
                   string_free (name);
                 }
@@ -203,33 +221,33 @@ LoadRegionUI::process ()
                 {
                   void *singleRegion = nullptr;
                   if (func)
-                    msg = func (object, setFunc, &singleRegion, this,
-                                cancel_flag, index);
-                  if (msg)
-                    {
-                      objFree (object);
-                      return false;
-                    }
+                    dh_return_val_if_fail (
+                        errMsgHandleFunc (msg, func, object.get (), setFunc,
+                                          &singleRegion, this, cancel_flag,
+                                          index),
+                        false);
 
-                  auto name = indexFn (object, index);
+                  auto name = indexFn (object.get (), index);
                   pushRegionFunc (dir, name, singleRegion);
                   string_free (name);
                 }
-              objFree (object);
               regionIndexes.clear ();
               return true;
             }
-          /* It's not a valid object */
-          if (object)
-            objFree (object);
           return false;
         };
-      auto tryErrorFunc = [&] (int j, const char *msg, QString &realStr)
+      auto tryErrorFunc = [&] (const QString &name, const char *msg,
+                               QString &realStr, bool addEnter)
         {
-          QString ret = _ ("%1 try's fail message: %2\n");
-          ret = ret.arg (j).arg (msg);
+          QString realMsg = msg;
+          if (!msg)
+            realMsg = _ ("No region found in this type.");
+          QString ret = _ ("%1 try's fail message: %2");
+          ret = ret.arg (name).arg (realMsg);
           realStr += ret;
           string_free (msg);
+          if (addEnter)
+            realStr += "\n\n";
         };
 
       auto realProcessFunc = [&] (const QString &dir, int i)
@@ -277,9 +295,22 @@ LoadRegionUI::process ()
                   lib->resolve ("region_get_object"));
               auto transFn = reinterpret_cast<const char *(*)(const char *)> (
                   lib->resolve ("init_translation"));
+              auto nameFn = reinterpret_cast<const char *(*)()> (
+                  lib->resolve ("region_type"));
+
+              QString name;
+              if (nameFn)
+                {
+                  auto typeName = nameFn ();
+                  name = typeName;
+                  string_free (typeName);
+                }
+              if (name.isEmpty ())
+                name = _ ("unknown");
 
               if (transFn)
                 msg = transFn (dh::getTranslationDir ().toUtf8 ());
+
               if (multiFn)
                 {
                   if (multiFn ())
@@ -288,14 +319,14 @@ LoadRegionUI::process ()
                                                 objFree, msg, data.get (),
                                                 realLabel))
                         break;
-                      tryErrorFunc (j, msg, realStr);
+                      tryErrorFunc (name, msg, realStr, j != moduleNum - 1);
                     }
                   else
                     {
                       if (singleFuncProcessFunc (dir, lib, loadObjectFn,
                                                  objFree, msg, data.get ()))
                         break;
-                      tryErrorFunc (j, msg, realStr);
+                      tryErrorFunc (name, msg, realStr, j != moduleNum - 1);
                     }
                 }
               if (j == moduleNum - 1)
@@ -315,10 +346,8 @@ LoadRegionUI::process ()
 
           if (!failed && !cancel_flag_is_cancelled (cancel_flag))
             Q_EMIT finishLoadOne ();
-          cancel_flag_destroy (cancel_flag);
         };
       int i = 0;
-      cancel_flag_clone (cancel_flag);
       for (const auto &dir : list)
         {
           realProcessFunc (dir, i);
