@@ -47,20 +47,25 @@ BlockReaderUI::BlockReaderUI (int index, dh::ManageRegion *mr, QWidget *parent)
                     &BlockReaderUI::propertyBtn_clicked);
   QObject::connect (ui->showBtn, &QPushButton::clicked, this,
                     &BlockReaderUI::showBtn_clicked);
-  connect (ui->tileBtn, &QPushButton::clicked, this,
+  connect (ui->entityBtn_2, &QPushButton::clicked, this,
            [&]
              {
                auto len = region_get_entity_len (region);
                QStringList list;
                for (int i = 0; i < len; i++)
-                 list << QString::number (i);
+                 {
+                   auto id = region_get_entity_id (region, i);
+                   list << (id ? id : "(NULL)");
+                   string_free (id);
+                 }
+
                auto entityIndex = GeneralChooseDialog::getIndex (
                    _ ("Choose an Index"), _ ("Please choose an index."), list,
                    this);
                if (entityIndex != -1)
                  {
                    auto nrui = new NbtReaderUI (
-                       region_get_entity (region, entityIndex));
+                       region_get_entity (region, entityIndex), false);
                    nrui->setAttribute (Qt::WA_DeleteOnClose);
                    nrui->show ();
                  }
@@ -230,7 +235,7 @@ typedef void *(*NewFunc) (void *);
 void
 BlockReaderUI::entityBtn_clicked ()
 {
-  auto nrui = new NbtReaderUI (nbt);
+  auto nrui = new NbtReaderUI (nbt, false);
   nrui->setAttribute (Qt::WA_DeleteOnClose);
   nrui->show ();
 }

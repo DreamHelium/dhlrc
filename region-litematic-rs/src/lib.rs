@@ -1,7 +1,8 @@
 use crab_nbt::NbtTag;
 use crab_nbt_ext::{
-    GetWithError, MyError, Palette, ProgressFn, TreeValue, get_palette_from_nbt_tag, i18n,
-    init_translation_internal, nbt_create_real, show_progress, string_to_ptr_fail_to_null,
+    GetWithError, MyError, Palette, ProgressFn, TreeValue, convert_nbt_tag_to_tree_value,
+    convert_nbt_to_vec, get_palette_from_nbt_tag, i18n, init_translation_internal, nbt_create_real,
+    show_progress, string_to_ptr_fail_to_null,
 };
 use formatx::formatx;
 use std::collections::HashMap;
@@ -88,6 +89,19 @@ unsafe extern "C" {
     fn region_get_index(region: *mut c_void, x: i32, y: i32, z: i32) -> i32;
     fn cancel_flag_is_cancelled(ptr: *const AtomicBool) -> c_int;
     fn region_set_blocks_from_vec(region: *mut c_void, blocks: *mut Vec<u32>);
+    fn region_set_entity_from_vec(
+        region: *mut c_void,
+        entities: *mut Vec<Vec<(String, TreeValue)>>,
+    );
+    fn region_set_block_entities_from_vec(
+        region: *mut c_void,
+        block_entities: *mut Vec<BlockEntity>,
+    );
+}
+
+pub struct BlockEntity {
+    pos: (i32, i32, i32),
+    entity: Vec<(String, TreeValue)>,
 }
 
 #[unsafe(no_mangle)]
@@ -131,7 +145,7 @@ pub extern "C" fn region_num(region: *mut crab_nbt::Nbt) -> i32 {
         let region_nbt = clone_nbt.get_compound_with_err("Regions");
         match region_nbt {
             Ok(r) => r.child_tags.len() as i32,
-            Err(e) => 0,
+            Err(_) => 0,
         }
     } else {
         0
@@ -306,10 +320,67 @@ fn region_create_from_bytes_internal(
         &mut sys,
     )?;
     let blocks = block_ids;
-
-    let entities_list = real_region_nbt.get_list_with_err("TileEntities")?;
-    { /* TODO */ }
-
+    let mut tile_entities_vec = vec![];
+    let tile_entities_list = real_region_nbt.get_list_with_err("TileEntities")?;
+    for tile_entity in tile_entities_list {
+        let real_tile_entity = match tile_entity {
+            NbtTag::Compound(c) => c,
+            _ => {
+                return Err(Box::new(MyError {
+                    msg: i18n("Wrong type of tile entity.").to_string(),
+                }));
+            }
+        };
+        let entity_x = real_tile_entity.get_int_with_err("x")?;
+        let entity_y = real_tile_entity.get_int_with_err("y")?;
+        let entity_z = real_tile_entity.get_int_with_err("z")?;
+        let entity_index = region_x * region_z * entity_y + region_x * entity_z + entity_x;
+        let entity_id = blocks[entity_index as usize];
+        let id = real_tile_entity.get_string("id");
+        let mut has_id: bool = true;
+        let real_id = match id {
+            Some(s) => s,
+            None => {
+                has_id = false;
+                &palette_vec[entity_id as usize].id_name
+            }
+        };
+        let mut single_entity_vec = vec![];
+        for (str, val) in &real_tile_entity.child_tags {
+            if str == "x" || str == "y" || str == "z" {
+                continue;
+            }
+            let tree_value = convert_nbt_tag_to_tree_value(val);
+            single_entity_vec.push((str.to_string(), tree_value));
+        }
+        if !has_id {
+            single_entity_vec.push(("id".to_string(), TreeValue::String(real_id.to_string())));
+        }
+        let block_entity = BlockEntity {
+            pos: (entity_x, entity_y, entity_z),
+            entity: single_entity_vec,
+        };
+        tile_entities_vec.push(block_entity);
+    }
+    let mut entities_vec = vec![];
+    let entities_list = real_region_nbt.get_list_with_err("Entities")?;
+    for entity in entities_list {
+        if unsafe { cancel_flag_is_cancelled(cancel_flag) } == 1 {
+            return Err(Box::from(MyError {
+                msg: String::from(i18n("Reading entities is cancelled!")),
+            }));
+        }
+        let internal_entity = match entity {
+            NbtTag::Compound(c) => c,
+            _ => {
+                return Err(Box::from(MyError {
+                    msg: String::from(i18n("Wrong type of entity!")),
+                }));
+            }
+        };
+        let value = convert_nbt_to_vec(internal_entity);
+        entities_vec.push(value);
+    }
     unsafe {
         let region = region_new();
         region_set_data_version(region, data_version as u32);
@@ -330,17 +401,34 @@ fn region_create_from_bytes_internal(
         let real_name = string_to_ptr_fail_to_null(name);
         let real_description = string_to_ptr_fail_to_null(description);
         let real_author = string_to_ptr_fail_to_null(author);
-        region_set_name(region, real_name);
-        region_set_description(region, real_description);
-        region_set_author(region, real_author);
+        let name_err = region_set_name(region, real_name);
+        let description_err = region_set_description(region, real_description);
+        let author_err = region_set_author(region, real_author);
+        if !name_err.is_null() || !description_err.is_null() || !author_err.is_null() {
+            string_free(name_err as *mut c_char);
+            string_free(description_err as *mut c_char);
+            string_free(author_err as *mut c_char);
+            region_free(region);
+            return Err(Box::from(MyError {
+                msg: String::from(i18n("Setting base data error!")),
+            }));
+        }
         string_free(real_name);
         string_free(real_description);
         string_free(real_author);
+        region_set_block_entities_from_vec(region, Box::into_raw(Box::new(tile_entities_vec)));
+        region_set_entity_from_vec(region, Box::into_raw(Box::new(entities_vec)));
         let msg = region_set_time(region, create_time, modify_time);
         if !msg.is_null() {
             region_free(region);
             let err = Box::new(MyError {
-                msg: cstr_to_str(msg)?,
+                msg: match cstr_to_str(msg) {
+                    Ok(str) => str,
+                    Err(e) => {
+                        string_free(msg as *mut c_char);
+                        return Err(e);
+                    }
+                },
             });
             string_free(msg as *mut c_char);
             return Err(err);

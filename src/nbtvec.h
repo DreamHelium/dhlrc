@@ -12,7 +12,7 @@ extern "C"
   void *file_to_nbt_vec (const char *filename, ProgressFunc progress_func,
                          void *main_klass);
   void nbt_vec_free (void *vec);
-  void nbt_vec_to_file (const void *vec, const char *filename);
+  void nbt_vec_to_file (const void *vec, const char *filename, int from_file);
 
 #ifdef __cplusplus
 }

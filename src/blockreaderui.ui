@@ -135,9 +135,9 @@
         </spacer>
        </item>
        <item>
-        <widget class="QPushButton" name="tileBtn">
+        <widget class="QPushButton" name="entityBtn_2">
          <property name="text">
-          <string>Show &amp;Tile Entity</string>
+          <string>Show &amp;All Entities</string>
          </property>
         </widget>
        </item>

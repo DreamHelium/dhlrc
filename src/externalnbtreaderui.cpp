@@ -98,7 +98,7 @@ ExternalNbtReaderUI::dropEvent (QDropEvent *event)
           label = nullptr;
           first = false;
         }
-      nrui = new NbtReaderUI (nbt);
+      nrui = new NbtReaderUI (nbt, true);
       nrui->disableClose ();
       wLayout->addWidget (nrui);
       nrui->show ();

@@ -11,7 +11,7 @@
 // #include "blockreaderui.h"
 // #include "dh_file_util.h"
 // #include "dh_type.h"
-// #include "dhgameconfigui.h"
+#include "dhgameconfigui.h"
 // #include "generalchoosedialog.h"
 // #include "glib.h"
 // #include "manage.h"
@@ -108,26 +108,26 @@ MainWindow::initSignalSlots ()
   //                       luaL_dofile (L, filename.toUtf8 ());
   //                       lua_close (L);
   //                     });
-  // connect (ui->configBtn, &QPushButton::clicked, this,
-  //          [&]
-  //            {
-  //              if (dialog)
-  //                dialog->show ();
-  //              else
-  //                {
-  //                  dialog = new KPageDialog (this);
-  //                  auto general = new DhGeneralConfigUI ();
-  //                  auto game = new DhGameConfigUI ();
-  //                  dialog->addPage (general, i18n ("General"));
-  //                  dialog->addPage (game, i18n ("Game"));
-  //                  auto okBtn = dialog->button (QDialogButtonBox::Ok);
-  //                  connect (okBtn, &QPushButton::clicked, general,
-  //                           &DhGeneralConfigUI::changeSettings);
-  //                  connect (okBtn, &QPushButton::clicked, game,
-  //                           &DhGameConfigUI::changeSettings);
-  //                  dialog->show ();
-  //                }
-  //            });
+  connect (ui->configBtn, &QPushButton::clicked, this,
+           [&]
+             {
+               if (dialog)
+                 dialog->show ();
+               else
+                 {
+                   dialog = new KPageDialog (this);
+                   auto general = new DhGeneralConfigUI ();
+                   auto game = new DhGameConfigUI ();
+                   dialog->addPage (general, i18n ("General"));
+                   dialog->addPage (game, i18n ("Game"));
+                   auto okBtn = dialog->button (QDialogButtonBox::Ok);
+                   connect (okBtn, &QPushButton::clicked, general,
+                            &DhGeneralConfigUI::changeSettings);
+                   connect (okBtn, &QPushButton::clicked, game,
+                            &DhGameConfigUI::changeSettings);
+                   dialog->show ();
+                 }
+             });
   // connect (ui->debugBtn, &QPushButton::clicked,
   //          [&]
   //            {

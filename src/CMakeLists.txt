@@ -100,6 +100,8 @@ set(TEMP_PROJECT_SOURCES
         externalnbtreaderui.cpp
         externalnbtreaderui.h
         nbtvec.h
+        dhgameconfigui.h
+        saveregionui.h saveregionui.cpp
 )
 
 ki18n_wrap_ui(TEMP_PROJECT_SOURCES ${ui_files})

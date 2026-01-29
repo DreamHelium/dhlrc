@@ -244,7 +244,7 @@ fn vec_i8_to_u8_safest(vec: Vec<i8>) -> Vec<u8> {
     result
 }
 
-fn convert_nbt_tag_to_tree_value(nbt_tag: &NbtTag) -> TreeValue {
+pub fn convert_nbt_tag_to_tree_value(nbt_tag: &NbtTag) -> TreeValue {
     match nbt_tag {
         NbtTag::End => TreeValue::String("error".to_string()),
         NbtTag::Byte(b) => TreeValue::Byte(*b),
@@ -304,44 +304,51 @@ fn convert_tree_value_to_nbt_tag(tree_value: &TreeValue, str: &str) -> NbtTag {
             NbtTag::List(list)
         }
         TreeValue::Compound(c) => {
-            NbtTag::Compound(convert_vec_to_nbt(c.clone(), str).root_tag)
+            NbtTag::Compound(convert_vec_to_nbt_compound(&c))
         }
     }
 }
 
-pub fn convert_vec_to_nbt(vec: Vec<(String, TreeValue)>, str: &str) -> Nbt {
+fn convert_vec_to_nbt_compound(vec : &Vec<(String, TreeValue)>) -> NbtCompound{
     let mut nbt_vec = vec![];
-    let mut real_str = String::new();
-    let mut real_vec = vec![];
-    if vec.len() == 1 {
-        let tree_value = &vec[0].1;
-        let is_compound = match tree_value {
-            TreeValue::Compound(c) => {
-                real_vec = c.clone();
-                true
-            }
-            _ => {
-                real_vec = vec.clone();
-                false
-            }
-        };
-        if is_compound {
-            real_str = vec[0].0.clone();
-        }
-    }
-    if real_str.is_empty() {
-        real_str = str.to_string();
-    }
-    for child_node in real_vec {
+    for child_node in vec{
         let nbt_tag = convert_tree_value_to_nbt_tag(&child_node.1, &child_node.0);
-        let real_nbt = (child_node.0, nbt_tag);
+        let real_nbt = (child_node.0.clone(), nbt_tag);
         nbt_vec.push(real_nbt);
     }
-    Nbt {
-        name: real_str,
-        root_tag: NbtCompound {
-            child_tags: nbt_vec,
-        },
+    NbtCompound{
+        child_tags : nbt_vec
+    }
+}
+
+pub fn convert_vec_to_nbt(vec: &Vec<(String, TreeValue)>, str: &str, from_file: bool) -> Nbt {
+    let mut nbt_vec = vec![];
+    for child_node in vec {
+        let nbt_tag = convert_tree_value_to_nbt_tag(&child_node.1, &child_node.0);
+        let real_nbt = (child_node.0.clone(), nbt_tag);
+        nbt_vec.push(real_nbt);
+    }
+    if from_file {
+        Nbt {
+            name: nbt_vec[0].0.clone(),
+            root_tag: NbtCompound {
+                child_tags: match &nbt_vec[0].1 {
+                    NbtTag::Compound(c) => c.child_tags.clone(),
+                    _ => vec![],
+                },
+            },
+        }
+    } else {
+        // let tag = NbtTag::Compound(NbtCompound {
+            // child_tags: nbt_vec,
+        // });
+        // let final_vec = vec![(str.to_string(), tag)];
+        Nbt {
+            name: str.to_string(),
+            root_tag: NbtCompound {
+                child_tags: nbt_vec,
+            },
+        }
     }
 }
 

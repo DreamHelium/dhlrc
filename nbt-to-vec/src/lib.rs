@@ -27,9 +27,9 @@ unsafe extern "C" {
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn nbt_vec_to_file(vec: *const Vec<(String, TreeValue)>, filename: *const c_char) {
-    let tree_vec = unsafe { (*vec).clone() };
-    let nbt = convert_vec_to_nbt(tree_vec, "");
+pub extern "C" fn nbt_vec_to_file(vec: *const Vec<(String, TreeValue)>, filename: *const c_char, from_file : c_int) {
+    let tree_vec = unsafe { &(*vec) };
+    let nbt = convert_vec_to_nbt(tree_vec, "", from_file != 0);
     let mut file = File::create(unsafe { CStr::from_ptr(filename) }.to_str().unwrap()).unwrap();
     let bytes = nbt.write();
     file.write_all(&*bytes).unwrap();
@@ -62,7 +62,7 @@ pub extern "C" fn file_to_nbt_vec(
                     let ret = vec![(nbt_string, tree_value)];
                     Box::into_raw(Box::new(ret))
                 }
-                Err(e) => {
+                Err(_) => {
                     vec_free(vector);
                     null_mut()
                 }

@@ -16,11 +16,13 @@ class NbtReaderUI : public QWidget
   Q_OBJECT
 
 public:
-  explicit NbtReaderUI (const void *nbt, QWidget *parent = nullptr);
+  explicit NbtReaderUI (const void *nbt, bool fromFile,
+                        QWidget *parent = nullptr);
   ~NbtReaderUI () override;
   void disableClose ();
 
 private:
+  bool fromFile;
   Ui::NbtReaderUI *ui;
   const void *nbt;
   QStandardItemModel *model;

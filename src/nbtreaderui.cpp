@@ -6,8 +6,9 @@
 #include <nbtvec.h>
 #include <region.h>
 
-NbtReaderUI::NbtReaderUI (const void *nbt, QWidget *parent)
-    : QWidget (parent), ui (new Ui::NbtReaderUI), nbt (nbt)
+NbtReaderUI::NbtReaderUI (const void *nbt, bool fromFile, QWidget *parent)
+    : QWidget (parent), ui (new Ui::NbtReaderUI), nbt (nbt),
+      fromFile (fromFile)
 {
   ui->setupUi (this);
   model = new QStandardItemModel (this);
@@ -44,7 +45,7 @@ NbtReaderUI::NbtReaderUI (const void *nbt, QWidget *parent)
                auto dir = QFileDialog::getSaveFileName (
                    this, _ ("Export NBT To ..."));
                if (!dir.isEmpty ())
-                 nbt_vec_to_file (this->nbt, dir.toUtf8 ().constData ());
+                 nbt_vec_to_file (this->nbt, dir.toUtf8 ().constData (), this->fromFile);
              });
 }
 

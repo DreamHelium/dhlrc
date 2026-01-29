@@ -2,8 +2,10 @@
 #include "dhtableview.h"
 #include "loadregionui.h"
 #include "manageui.h"
+#include "saveregionui.h"
 #include "ui_manageui.h"
 #include <QFileDialog>
+#include <generalchoosedialog.h>
 #include <region.h>
 #define _(str) gettext (str)
 
@@ -165,6 +167,86 @@ ManageRegion::add_triggered ()
 void
 ManageRegion::save_triggered (QList<int> rows)
 {
+  if (!rows.isEmpty ())
+    {
+      QStringList supportList;
+      QList<multiTransFunc> multiFuncList;
+      QList<singleTransFunc> singleFuncList;
+      for (auto lib : modules)
+        {
+          auto nameFn = reinterpret_cast<const char *(*)()> (
+              lib->resolve ("region_type"));
+          auto name = nameFn ();
+          auto multiFn = reinterpret_cast<int (*) ()> (
+              lib->resolve ("region_is_multi"));
+          if (multiFn && multiFn ())
+            {
+              auto transMultiFn = reinterpret_cast<multiTransFunc> (
+                  lib->resolve ("region_save_into_multi"));
+              auto singleTransFn = reinterpret_cast<singleTransFunc> (
+                  lib->resolve ("region_save"));
+              if (singleTransFn)
+                {
+                  supportList << name;
+                  singleFuncList << singleTransFn;
+                }
+              if (transMultiFn)
+                multiFuncList << transMultiFn;
+              else
+                multiFuncList << nullptr;
+            }
+          else
+            {
+              auto transFn = reinterpret_cast<singleTransFunc> (
+                  lib->resolve ("region_save"));
+              if (transFn)
+                {
+                  supportList << name;
+                  singleFuncList << transFn;
+                  multiFuncList << nullptr;
+                }
+            }
+
+          string_free (name);
+        }
+      auto index = GeneralChooseDialog::getIndex (
+          _ ("Choose Save Option"),
+          _ ("Choose whether format you want to save to."), supportList, this);
+      if (index != -1)
+        {
+          bool useMulti = false;
+          if (multiFuncList[index] != nullptr && rows.size () > 1)
+            {
+              auto btn
+                  = QMessageBox::question (this, _ ("Use MultiFunc?"),
+                                           _ ("This type supports regions to "
+                                              "save as one file, do you want "
+                                              "to use it?"));
+              if (btn == QMessageBox::Ok)
+                useMulti = true;
+            }
+          if (useMulti)
+            { /* TODO */
+            }
+          else
+            {
+              auto dir = QFileDialog::getExistingDirectory (
+                  this, _ ("Select Directory"));
+              if (!dir.isEmpty ())
+                {
+                  QList<Region *> transRegions;
+                  for (auto i : rows)
+                    {
+                      auto region = regions[i].get ();
+                      transRegions << region;
+                    }
+                  auto srui = new SaveRegionUI(transRegions, dir, singleFuncList[index]);
+                  srui->setAttribute (Qt::WA_DeleteOnClose);
+                  srui->show ();
+                }
+            }
+        }
+    }
 }
 
 void

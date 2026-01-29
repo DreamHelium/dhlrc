@@ -19,9 +19,6 @@
 
 using Region = struct Region
 {
-  // Region (Region &other) noexcept
-  //     : region (std::move (other.region)), name (std::move (other.name)),
-  //       uuid (std::move (other.uuid)), lock (std::move (other.lock)) {};
   std::unique_ptr<void, void (*) (void *)> region;
   QString name;
   QString uuid;

@@ -79,7 +79,7 @@ extern "C"
   const void *nbt_tree_value_get_value_list_to_child (const void *tree_value);
   size_t region_get_entity_len (void *region);
   const void *region_get_entity (void *region, size_t index);
-
+  const char *region_get_entity_id (void *region, size_t index);
 #ifdef __cplusplus
 }
 #endif

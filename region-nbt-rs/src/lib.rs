@@ -1,14 +1,17 @@
-use crab_nbt::NbtTag;
+use crab_nbt::{Nbt, NbtCompound, NbtTag};
 use crab_nbt_ext::{
-    GetWithError, MyError, Palette, ProgressFn, TreeValue, convert_nbt_to_vec,
+    GetWithError, MyError, Palette, ProgressFn, TreeValue, convert_nbt_to_vec, convert_vec_to_nbt,
     get_palette_from_nbt_tag, i18n, init_translation_internal, nbt_create_real, show_progress,
     string_to_ptr_fail_to_null,
 };
 use formatx::formatx;
 use std::collections::HashMap;
 use std::error::Error;
-use std::ffi::{c_char, c_int, c_void};
+use std::ffi::{CStr, c_char, c_int, c_void};
+use std::fs::File;
+use std::io::Write;
 use std::ops::IndexMut;
+use std::ptr;
 use std::ptr::{null, null_mut};
 use std::string::String;
 use std::sync::atomic::AtomicBool;
@@ -87,7 +90,218 @@ unsafe extern "C" {
         block_entities: *mut Vec<BlockEntity>,
     );
     fn region_set_blocks_from_vec(region: *mut c_void, blocks: *mut Vec<u32>);
-    fn region_set_entity_from_vec(region: *mut c_void, entities: *mut Vec<Vec<(String, TreeValue)>>);
+    fn region_set_entity_from_vec(
+        region: *mut c_void,
+        entities: *mut Vec<Vec<(String, TreeValue)>>,
+    );
+    fn region_get_entity_len(region: *mut c_void) -> usize;
+    fn region_get_entity_id(region: *mut c_void, index: usize) -> *const c_char;
+    fn region_get_entity(region: *mut c_void, index: usize) -> *const Vec<(String, TreeValue)>;
+    fn region_get_block_entity(region: *mut c_void, index: u32) -> *const Vec<(String, TreeValue)>;
+    fn region_get_palette_len(region: *mut c_void) -> usize;
+}
+
+trait NbtCreate {
+    fn create_size(x: i32, y: i32, z: i32) -> Self;
+    fn create_entities(entities: &Vec<Vec<(String, TreeValue)>>) -> Result<Self, MyError>
+    where
+        Self: Sized;
+    fn create_data_version(data_version: i32) -> Self;
+    fn create_blocks(region: *mut c_void, states: &Vec<u32>, ignore_air: bool) -> Self;
+    fn create_palette(region: *mut c_void) -> Result<Self, Box<dyn Error>>
+    where
+        Self: Sized;
+}
+
+impl NbtCreate for NbtTag {
+    fn create_size(x: i32, y: i32, z: i32) -> Self {
+        let x_pos = NbtTag::Int(x);
+        let y_pos = NbtTag::Int(y);
+        let z_pos = NbtTag::Int(z);
+        let size_vec = vec![x_pos, y_pos, z_pos];
+        NbtTag::List(size_vec)
+    }
+
+    fn create_entities(entities: &Vec<Vec<(String, TreeValue)>>) -> Result<Self, MyError> {
+        let mut vec = vec![];
+        for entity in entities {
+            let nbt = convert_vec_to_nbt(entity, "", false).root_tag;
+            let child_nbt = &nbt.child_tags;
+            let mut pos_x = 0.0;
+            let mut pos_y = 0.0;
+            let mut pos_z = 0.0;
+            for (str, tag) in child_nbt {
+                if str == "Pos" {
+                    let real_tag = match tag {
+                        NbtTag::List(l) => l,
+                        _ => {
+                            return Err(MyError {
+                                msg: i18n("Nullptr detected!").to_string(),
+                            });
+                        }
+                    };
+                    let size = get_size_double(real_tag)?;
+                    pos_x = size.0;
+                    pos_y = size.1;
+                    pos_z = size.2;
+                }
+            }
+            let block_pos_x = NbtTag::Int(pos_x as i32);
+            let block_pos_y = NbtTag::Int(pos_y as i32);
+            let block_pos_z = NbtTag::Int(pos_z as i32);
+            let block_pos = NbtTag::List(vec![block_pos_x, block_pos_y, block_pos_z]);
+            let pos = NbtTag::List(vec![
+                NbtTag::Double(pos_x),
+                NbtTag::Double(pos_y),
+                NbtTag::Double(pos_z),
+            ]);
+            let tag = NbtTag::Compound(nbt);
+            let real_tag = NbtTag::Compound(NbtCompound {
+                child_tags: vec![
+                    ("nbt".to_string(), tag),
+                    ("blockPos".to_string(), block_pos),
+                    ("pos".to_string(), pos),
+                ],
+            });
+            vec.push(real_tag);
+        }
+        Ok(NbtTag::List(vec))
+    }
+
+    fn create_data_version(data_version: i32) -> Self {
+        NbtTag::Int(data_version)
+    }
+
+    fn create_blocks(region: *mut c_void, states: &Vec<u32>, ignore_air: bool) -> Self {
+        let region_x = unsafe { region_get_x(region) };
+        let region_y = unsafe { region_get_y(region) };
+        let region_z = unsafe { region_get_z(region) };
+        let mut x = 0;
+        let mut y = 0;
+        let mut z = 0;
+        fn size_change(
+            mut x: &mut i32,
+            mut y: &mut i32,
+            mut z: &mut i32,
+            region_x: i32,
+            region_y: i32,
+            region_z: i32,
+        ) {
+            if *x < region_x - 1 {
+                *x += 1;
+            } else if *z < region_z - 1 {
+                *x = 0;
+                *z += 1;
+            } else if *y < region_y - 1 {
+                *x = 0;
+                *z = 0;
+                *y += 1;
+            }
+        }
+        let mut i = 0;
+        let mut block_vec = vec![];
+        for state in states {
+            let mut single_block_vec = vec![];
+            if ignore_air && *state == 0 {
+                size_change(&mut x, &mut y, &mut z, region_x, region_y, region_z);
+                i += 1;
+                continue;
+            }
+            let pos = NbtTag::create_size(x, y, z);
+            let state = NbtTag::Int(*state as i32);
+            let nbt = unsafe { region_get_block_entity(region, i) };
+            let mut nbt_nbt: Option<NbtTag> = None;
+
+            if !nbt.is_null() {
+                let real_nbt = convert_vec_to_nbt(unsafe { &*nbt }, "", false).root_tag;
+                nbt_nbt = Some(NbtTag::Compound(real_nbt));
+            }
+            single_block_vec.push(("pos".to_string(), pos));
+            single_block_vec.push(("state".to_string(), state));
+            match nbt_nbt {
+                Some(nbt) => single_block_vec.push(("nbt".to_string(), nbt)),
+                None => {}
+            }
+            let compound = NbtTag::Compound(NbtCompound {
+                child_tags: single_block_vec,
+            });
+            block_vec.push(compound);
+            size_change(&mut x, &mut y, &mut z, region_x, region_y, region_z);
+            i += 1;
+        }
+        NbtTag::List(block_vec)
+    }
+
+    fn create_palette(region: *mut c_void) -> Result<Self, Box<dyn Error>> {
+        let len = unsafe { region_get_palette_len(region) };
+        let mut i = 0;
+        let mut palette_vec = vec![];
+        while i < len {
+            let mut real_palette_vec = vec![];
+            let mut property_vec = vec![];
+            let property_len = unsafe { region_get_palette_property_len(region, i) };
+            let name = unsafe { region_get_palette_id_name(region, i) };
+            let real_name = match unsafe { CStr::from_ptr(name) }.to_str() {
+                Err(e) => {
+                    unsafe {
+                        string_free(name as *mut c_char);
+                    }
+                    return Err(Box::from(e));
+                }
+                Ok(str) => str.to_string(),
+            };
+            let name_tag = NbtTag::String(real_name);
+            unsafe {
+                string_free(name as *mut c_char);
+            }
+
+            let mut j = 0;
+            while j < property_len {
+                let property_name = unsafe { region_get_palette_property_name(region, i, j) };
+                let property_data = unsafe { region_get_palette_property_data(region, i, j) };
+                let real_property_name = match unsafe { CStr::from_ptr(property_name) }.to_str() {
+                    Err(e) => {
+                        unsafe {
+                            string_free(property_name as *mut c_char);
+                        }
+                        return Err(Box::from(e));
+                    }
+                    Ok(str) => str.to_string(),
+                };
+                let real_property_data = match unsafe { CStr::from_ptr(property_data) }.to_str() {
+                    Err(e) => {
+                        unsafe {
+                            string_free(property_data as *mut c_char);
+                        }
+                        return Err(Box::from(e));
+                    }
+                    Ok(str) => str.to_string(),
+                };
+                let tag = NbtTag::String(real_property_data);
+                property_vec.push((real_property_name, tag));
+                unsafe {
+                    string_free(property_name as *mut c_char);
+                    string_free(property_data as *mut c_char);
+                }
+                j += 1;
+            }
+            let mut property_tag: Option<NbtTag> = None;
+            if property_len > 0 {
+                property_tag = Some(NbtTag::Compound(NbtCompound {
+                    child_tags: property_vec,
+                }));
+            }
+            real_palette_vec.push(("Name".to_string(), name_tag));
+            if property_tag.is_some() {
+                real_palette_vec.push(("Properties".to_string(), property_tag.unwrap()));
+            }
+            palette_vec.push(NbtTag::Compound(NbtCompound {
+                child_tags: real_palette_vec,
+            }));
+            i += 1;
+        }
+        Ok(NbtTag::List(palette_vec))
+    }
 }
 
 #[unsafe(no_mangle)]
@@ -99,12 +313,6 @@ pub extern "C" fn region_type() -> *const c_char {
 pub extern "C" fn region_is_multi() -> i32 {
     0
 }
-
-/* If it's litematic, please add:
- * region_num
- * region_name_index
- * region_create_from_file_index
- */
 
 pub struct BlockEntity {
     pos: (i32, i32, i32),
@@ -426,4 +634,64 @@ pub extern "C" fn region_create_from_file(
 #[unsafe(no_mangle)]
 pub extern "C" fn object_free(object: *mut crab_nbt::Nbt) {
     drop(unsafe { Box::from_raw(object) });
+}
+
+fn region_save_internal(
+    region: *mut c_void,
+    filename: *const c_char,
+) -> Result<(), Box<dyn Error>> {
+    if region.is_null() || filename.is_null() {
+        return Err(Box::new(MyError {
+            msg: i18n("Nullptr detected!").to_string(),
+        }));
+    }
+    let mut i = 0;
+    let mut entity_vec = vec![];
+    while i < unsafe { region_get_entity_len(region) } {
+        let entity = unsafe { region_get_entity(region, i) };
+        let real_entity = unsafe { (&*entity).clone() };
+        entity_vec.push(real_entity);
+        i += 1;
+    }
+    let region_x = unsafe { region_get_x(region) };
+    let region_y = unsafe { region_get_y(region) };
+    let region_z = unsafe { region_get_z(region) };
+    let entity_nbt = NbtTag::create_entities(&entity_vec);
+    let size_nbt = NbtTag::create_size(region_x, region_y, region_z);
+    let mut id = vec![];
+    let mut i = 0;
+    while i < region_x * region_y * region_z {
+        unsafe { id.push(region_get_block_id_by_index(region, i as usize)) };
+        i += 1;
+    }
+    let blocks_nbt = NbtTag::create_blocks(region, &id, false);
+    let palette_nbt = NbtTag::create_palette(region);
+    let data_version_nbt =
+        unsafe { NbtTag::create_data_version(region_get_data_version(region) as i32) };
+    let compound_vec = vec![
+        ("size".to_string(), size_nbt),
+        ("entities".to_string(), entity_nbt?),
+        ("blocks".to_string(), blocks_nbt),
+        ("palette".to_string(), palette_nbt?),
+        ("DataVersion".to_string(), data_version_nbt),
+    ];
+    let nbt = Nbt {
+        name: "".to_string(),
+        root_tag: NbtCompound {
+            child_tags: compound_vec,
+        },
+    };
+
+    let bytes = nbt.write();
+    let file = File::create(unsafe { CStr::from_ptr(filename) }.to_str()?);
+    file?.write_all(&bytes.to_vec())?;
+    Ok(())
+}
+
+#[unsafe(no_mangle)]
+pub extern "C" fn region_save(region: *mut c_void, filename: *const c_char) -> *const c_char {
+    match region_save_internal(region, filename) {
+        Ok(()) => null(),
+        Err(e) => string_to_ptr_fail_to_null(&e.to_string()),
+    }
 }

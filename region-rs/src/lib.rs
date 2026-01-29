@@ -758,6 +758,20 @@ pub extern "C" fn region_get_entity_len(region: *mut Region) -> usize {
 }
 
 #[unsafe(no_mangle)]
+pub extern "C" fn region_get_entity_id(region: *mut Region, index: usize) -> *const c_char {
+    let entity = unsafe { &(&*region).entity_array[index] };
+    for (str, val) in entity {
+        if str == "id" {
+            return match val {
+                TreeValue::String(s) => string_to_ptr_fail_to_null(&s),
+                _ => null(),
+            }
+        }
+    }
+    null()
+}
+
+#[unsafe(no_mangle)]
 pub extern "C" fn region_get_entity(
     region: *mut Region,
     index: usize,
