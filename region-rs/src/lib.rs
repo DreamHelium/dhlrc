@@ -1,12 +1,13 @@
 mod i18n;
 
 use crate::i18n::i18n;
-use flate2::{Decompress, FlushDecompress, Status};
+use flate2::write::GzEncoder;
+use flate2::{Compress, Compression, Decompress, FlushCompress, FlushDecompress, Status};
 use std::error::Error;
 use std::ffi::{CStr, CString, c_char, c_int, c_void};
 use std::fmt::{Display, Formatter};
 use std::fs::File;
-use std::io::{Read, Seek, SeekFrom};
+use std::io::{Read, Seek, SeekFrom, Write};
 use std::ops::IndexMut;
 use std::ptr;
 use std::ptr::{null, null_mut};
@@ -578,10 +579,10 @@ fn file_try_uncompress_real(
     let mut decoder: Decompress;
     let mut ret = vec![];
 
-    if file_data.len() > 1 && file_data[0] == 0x1f && file_data[1] == 0x8b {
+    if file_data.len() > 2 && file_data[0] == 0x1f && file_data[1] == 0x8b {
         /* file is gzip */
         decoder = Decompress::new_gzip(15);
-    } else if file_data[0] == 0x78 {
+    } else if file_data.len() > 1 && file_data[0] == 0x78 {
         /* file is zlib */
         decoder = Decompress::new(true);
     } else {
@@ -641,6 +642,93 @@ pub extern "C" fn file_try_uncompress(
     cancel_flag: *const AtomicBool,
 ) -> *mut Vec<u8> {
     match file_try_uncompress_real(filename, progress_fn, main_klass, cancel_flag) {
+        Ok(r) => Box::into_raw(Box::new(r)),
+        Err(err) => {
+            unsafe {
+                *failed = 1;
+            }
+            let err_msg: Vec<u8> = Vec::from(err.to_string());
+            Box::into_raw(Box::new(err_msg))
+        }
+    }
+}
+
+fn vec_try_compress_real(
+    vec: *mut Vec<u8>,
+    progress_fn: ProgressFn,
+    main_klass: *mut c_void,
+    zlib: bool,
+    cancel_flag: *const AtomicBool,
+) -> Result<Vec<u8>, Box<dyn Error>> {
+    let real_vec = unsafe { Box::from_raw(vec) };
+    let mut compressor;
+    if zlib {
+        compressor = Compress::new(Compression::default(), true);
+    } else {
+        compressor = Compress::new_gzip(Compression::default(), 15);
+    }
+    let mut start = Instant::now();
+    let mut pos: usize = 0;
+    let vec_size = real_vec.len();
+    let mut sys = System::new_all();
+    let mut ret = vec![];
+    loop {
+        if start.elapsed().as_secs() >= 1 {
+            finish_oom(&mut sys)?;
+            show_progress(
+                progress_fn,
+                main_klass,
+                (pos * 100 / vec_size) as c_int,
+                i18n("Uncompressing data."),
+                &String::new(),
+            );
+            start = Instant::now();
+        }
+
+        if cancel_flag_is_cancelled(cancel_flag) == 1 {
+            return Err(Box::new(MyError {
+                msg: i18n("The compressing operation is cancelled.").to_string(),
+            }));
+        }
+        let result;
+        if pos != vec_size {
+            result = compressor.compress_vec(&real_vec[pos..], &mut ret, FlushCompress::None)?;
+        } else {
+            result = compressor.compress_vec(&real_vec[pos..], &mut ret, FlushCompress::Finish)?;
+        }
+        match result {
+            Status::Ok => {}
+            Status::BufError => {
+                ret.reserve(100);
+            }
+            Status::StreamEnd => {
+                show_progress(
+                    progress_fn,
+                    main_klass,
+                    100,
+                    i18n("Uncompress finish!"),
+                    &String::new(),
+                );
+                return Ok(ret);
+            }
+        }
+        pos = compressor.total_in() as usize;
+    }
+    // compressor = GzEncoder::new(Vec::new(), Compression::default());
+    // compressor.write_all(&real_vec)?;
+    // Ok(compressor.finish()?)
+}
+
+#[unsafe(no_mangle)]
+pub extern "C" fn vec_try_compress(
+    vec: *mut Vec<u8>,
+    progress_fn: ProgressFn,
+    main_klass: *mut c_void,
+    failed: *mut c_int,
+    zlib: bool,
+    cancel_flag: *const AtomicBool,
+) -> *mut Vec<u8> {
+    match vec_try_compress_real(vec, progress_fn, main_klass, zlib, cancel_flag) {
         Ok(r) => Box::into_raw(Box::new(r)),
         Err(err) => {
             unsafe {
@@ -765,7 +853,7 @@ pub extern "C" fn region_get_entity_id(region: *mut Region, index: usize) -> *co
             return match val {
                 TreeValue::String(s) => string_to_ptr_fail_to_null(&s),
                 _ => null(),
-            }
+            };
         }
     }
     null()

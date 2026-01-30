@@ -99,6 +99,14 @@ unsafe extern "C" {
     fn region_get_entity(region: *mut c_void, index: usize) -> *const Vec<(String, TreeValue)>;
     fn region_get_block_entity(region: *mut c_void, index: u32) -> *const Vec<(String, TreeValue)>;
     fn region_get_palette_len(region: *mut c_void) -> usize;
+    fn vec_try_compress(
+        vec: *mut Vec<u8>,
+        progress_fn: ProgressFn,
+        main_klass: *mut c_void,
+        failed: *mut c_int,
+        zlib: bool,
+        cancel_flag: *const AtomicBool,
+    ) -> *mut Vec<u8>;
 }
 
 trait NbtCreate {
@@ -447,7 +455,7 @@ fn region_get_entity_internal(
 }
 
 fn region_create_from_bytes_internal(
-    o_nbt: *mut crab_nbt::Nbt,
+    o_nbt: *mut Nbt,
     progress_fn: ProgressFn,
     main_klass: *mut c_void,
     cancel_flag: *const AtomicBool,
@@ -682,9 +690,29 @@ fn region_save_internal(
         },
     };
 
-    let bytes = nbt.write();
+    let bytes = nbt.write().to_vec();
+    let mut failed: c_int = 0;
+    let ret = unsafe {
+        vec_try_compress(
+            Box::into_raw(Box::new(bytes)),
+            None,
+            null_mut(),
+            &mut failed as *mut c_int,
+            false,
+            null(),
+        )
+    };
+    let real_ret;
+    if failed == 1 {
+        return Err(Box::new(MyError {
+            msg: unsafe { String::from_utf8(*Box::from_raw(ret))? },
+        }));
+    } else {
+        real_ret = unsafe { Box::from_raw(ret) };
+    }
+
     let file = File::create(unsafe { CStr::from_ptr(filename) }.to_str()?);
-    file?.write_all(&bytes.to_vec())?;
+    file?.write_all(&real_ret)?;
     Ok(())
 }
 

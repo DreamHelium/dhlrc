@@ -16,21 +16,12 @@
 #define _(str) gettext (str)
 #undef asprintf
 
-#define dh_return_val_if_fail(func, val)                                      \
-  if (!func)                                                                  \
-    return val;
-
-template <typename Func, typename... Args>
-static bool
-errMsgHandleFunc (const char *&msg, Func func, Args... args)
-{
-  if (msg)
+#define err_msg_handle_func(msg, func, ...)                                   \
+  if (msg)                                                                    \
+    return false;                                                             \
+  msg = func (__VA_ARGS__);                                                   \
+  if (msg)                                                                    \
     return false;
-  msg = func (args...);
-  if (msg)
-    return false;
-  return true;
-}
 
 LoadRegionUI::LoadRegionUI (QStringList list, dh::ManageRegion *mr,
                             QWidget *parent)
@@ -63,7 +54,8 @@ LoadRegionUI::LoadRegionUI (QStringList list, dh::ManageRegion *mr,
                      {
                        const QString &dir = failedList.at (i);
                        const QString &reason = failedReason.at (i);
-                       errorMsg += "**" + dir + "**" + ":\n\n" + reason + "\n\n";
+                       errorMsg
+                           += "**" + dir + "**" + ":\n\n" + reason + "\n\n";
                      }
                    auto messageBox = new QMessageBox (this);
                    messageBox->setIcon (QMessageBox::Critical);
@@ -159,17 +151,13 @@ LoadRegionUI::process ()
 
           if (loadObjectFn)
             {
-              dh_return_val_if_fail (errMsgHandleFunc (msg, loadObjectFn, data,
-                                                       setFunc, this,
-                                                       cancel_flag, &o_object),
-                                     false);
+              err_msg_handle_func (msg, loadObjectFn, data, setFunc, this,
+                                   cancel_flag, &o_object);
               object = { o_object, objFree };
             }
           if (func)
-            dh_return_val_if_fail (errMsgHandleFunc (msg, func, object.get (),
-                                                     setFunc, &region, this,
-                                                     cancel_flag),
-                                   false);
+            err_msg_handle_func (msg, func, object.get (), setFunc, &region,
+                                 this, cancel_flag);
 
           pushRegionFunc (dir, {}, region);
           return true;
@@ -183,10 +171,8 @@ LoadRegionUI::process ()
           void *o_object = nullptr;
           /* First we load object */
           if (loadObjectFn)
-            dh_return_val_if_fail (errMsgHandleFunc (msg, loadObjectFn, data,
-                                                     setFunc, this,
-                                                     cancel_flag, &o_object),
-                                   false);
+            err_msg_handle_func (msg, loadObjectFn, data, setFunc, this,
+                                 cancel_flag, &o_object);
           std::unique_ptr<void, void (*) (void *)> object{ o_object, objFree };
           typedef int32_t (*numFunc) (void *);
           auto numFn = reinterpret_cast<numFunc> (lib->resolve ("region_num"));
@@ -221,11 +207,9 @@ LoadRegionUI::process ()
                 {
                   void *singleRegion = nullptr;
                   if (func)
-                    dh_return_val_if_fail (
-                        errMsgHandleFunc (msg, func, object.get (), setFunc,
-                                          &singleRegion, this, cancel_flag,
-                                          index),
-                        false);
+                    err_msg_handle_func (msg, func, object.get (), setFunc,
+                                         &singleRegion, this, cancel_flag,
+                                         index);
 
                   auto name = indexFn (object.get (), index);
                   pushRegionFunc (dir, name, singleRegion);

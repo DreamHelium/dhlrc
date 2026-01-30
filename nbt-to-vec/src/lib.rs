@@ -41,13 +41,13 @@ pub extern "C" fn file_to_nbt_vec(
     progress_fn: ProgressFn,
     main_klass: *mut c_void,
 ) -> *mut Vec<(String, TreeValue)> {
-    let failed = 0;
+    let mut failed = 0;
     unsafe {
         let vector = file_try_uncompress(
             filename,
             progress_fn,
             main_klass,
-            failed as *mut c_int,
+            &mut failed as *mut c_int,
             null(),
         );
         if failed == 1 {
