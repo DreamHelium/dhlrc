@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-05 19:41+0800\n"
+"POT-Creation-Date: 2026-02-02 23:50+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,88 +17,56 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: ../../src/dhlrc_list.c:323
-#, c-format
-msgid "Combined %d items to the new item list."
-msgstr ""
-
-#: ../../src/main.c:144
-#, c-format
-msgid "dhlrc - Program to handle litematic or other struct of Minecraft.\n"
-msgstr ""
-
-#: ../../src/main.c:147
-#, c-format
-msgid "Modules:\n"
-msgstr ""
-
-#: ../../src/main.c:164
-#, c-format
-msgid "Unrecognized options "
-msgstr ""
-
-#: ../../src/main.c:189 ../../src/main.c:198
-msgid "No GUI Module!"
-msgstr ""
-
-#: ../../src/main.c:201
-msgid "CLI interface is not supported yet!"
-msgstr ""
-
-#: ../../src/region_litematic.c:346
-msgid "Starting to parse litematic NBT node to Region."
-msgstr ""
-
-#: ../../src/region_litematic.c:402
-msgid "Finish parsing litematic NBT node to Region."
-msgstr ""
-
-#: ../../src/region_litematic.c:416
-msgid "Failed when parsing litematic NBT node to Region."
-msgstr ""
-
-#: ../../src/qt/blocklistui.cpp:23
+#: ../../src/blocklistui.cpp:26
 msgid "Ignore Air?"
 msgstr ""
 
-#: ../../src/qt/blocklistui.cpp:24
+#: ../../src/blocklistui.cpp:27
 msgid "Do you want to ignore air?"
 msgstr ""
 
-#: ../../src/qt/blocklistui.cpp:46 ../../src/qt/blocklistui.cpp:49
+#: ../../src/blocklistui.cpp:58 ../../src/blocklistui.cpp:61
 msgid "id"
 msgstr ""
 
-#: ../../src/qt/blocklistui.cpp:46 ../../src/qt/blocklistui.cpp:49
+#: ../../src/blocklistui.cpp:58 ../../src/blocklistui.cpp:61
 msgid "id Name"
 msgstr ""
 
-#: ../../src/qt/blocklistui.cpp:46
+#: ../../src/blocklistui.cpp:58
 msgid "Block Name"
 msgstr ""
 
-#: ../../src/qt/blocklistui.cpp:46 ../../src/qt/blocklistui.cpp:49 rc.cpp:27
+#: ../../src/blocklistui.cpp:58 ../../src/blocklistui.cpp:61 rc.cpp:27
 msgid "x"
 msgstr ""
 
-#: ../../src/qt/blocklistui.cpp:47 ../../src/qt/blocklistui.cpp:49 rc.cpp:30
-#: rc.cpp:57
+#: ../../src/blocklistui.cpp:59 ../../src/blocklistui.cpp:61 rc.cpp:30
+#: rc.cpp:60
 msgid "y"
 msgstr ""
 
-#: ../../src/qt/blocklistui.cpp:47 ../../src/qt/blocklistui.cpp:49 rc.cpp:33
+#: ../../src/blocklistui.cpp:59 ../../src/blocklistui.cpp:61 rc.cpp:33
 msgid "z"
 msgstr ""
 
-#: ../../src/qt/blocklistui.cpp:47 ../../src/qt/blocklistui.cpp:50
+#: ../../src/blocklistui.cpp:59 ../../src/blocklistui.cpp:62
 msgid "Palette"
 msgstr ""
 
-#: ../../src/qt/blockreaderui.cpp:49
+#: ../../src/blockreaderui.cpp:63
+msgid "Choose an Index"
+msgstr ""
+
+#: ../../src/blockreaderui.cpp:63
+msgid "Please choose an index."
+msgstr ""
+
+#: ../../src/blockreaderui.cpp:75
 msgid "Lack the translation module, will not try to get translation!"
 msgstr ""
 
-#: ../../src/qt/blockreaderui.cpp:100
+#: ../../src/blockreaderui.cpp:124
 msgid ""
 "Name: %1\n"
 "Translation name: %2\n"
@@ -107,7 +75,7 @@ msgid ""
 "Properties:\n"
 msgstr ""
 
-#: ../../src/qt/blockreaderui.cpp:110
+#: ../../src/blockreaderui.cpp:134
 msgid ""
 "Name: %1\n"
 "Index: %2\n"
@@ -115,373 +83,302 @@ msgid ""
 "Properties:\n"
 msgstr ""
 
-#: ../../src/qt/blockreaderui.cpp:141
+#: ../../src/blockreaderui.cpp:171
 msgid "Not valid!"
 msgstr ""
 
-#: ../../src/qt/blockreaderui.cpp:151
+#: ../../src/blockreaderui.cpp:189
 msgid "With DataVersion %4, version %5."
 msgstr ""
 
-#: ../../src/qt/blockreaderui.cpp:153
+#: ../../src/blockreaderui.cpp:191
 msgid "Created time: %6, Modified time: %7, Author: %8, Name: %9"
 msgstr ""
 
-#: ../../src/qt/blockreaderui.cpp:155
+#: ../../src/blockreaderui.cpp:193
 msgid "Description: %10"
 msgstr ""
 
-#: ../../src/qt/blockshowui.cpp:96
-msgid "Loading"
+#: ../../src/blockreaderui.cpp:227 ../../src/loadregionui.cpp:62
+#: ../../src/manage.cpp:15 ../../src/manage.cpp:158
+#: ../../src/saveregionui.cpp:44 ../../src/utility.cpp:21
+#: ../../src/utility.cpp:38 ../../src/utility.cpp:46
+msgid "Error!"
 msgstr ""
 
-#: ../../src/qt/blockshowui.cpp:96 ../../src/qt/generalchoosedialog.cpp:63
-msgid "Cancel"
+#: ../../src/blockreaderui.cpp:228 ../../region-rs/src/lib.rs:533
+msgid "Out of memory!"
 msgstr ""
 
-#: ../../src/qt/blockshowui.cpp:105
-msgid ""
-"Block name: %1\n"
-"Palette: \n"
-"%2"
-msgstr ""
-
-#: ../../src/qt/dhloadobject.cpp:11
+#: ../../src/dhloadobject.cpp:11
 msgid "Loading..."
 msgstr ""
 
-#: ../../src/qt/generalchoosedialog.cpp:22
+#: ../../src/externalnbtreaderui.cpp:12
+msgid "NBT Reader"
+msgstr ""
+
+#: ../../src/externalnbtreaderui.cpp:29 ../../src/lrchooseui.cpp:80 rc.cpp:12
+#: rc.cpp:54 rc.cpp:168 rc.cpp:189
+msgid "&Close"
+msgstr ""
+
+#: ../../src/externalnbtreaderui.cpp:33
+msgid "Drag file to read NBT."
+msgstr ""
+
+#: ../../src/externalnbtreaderui.cpp:78 ../../src/externalnbtreaderui.cpp:107
+msgid "Error"
+msgstr ""
+
+#: ../../src/externalnbtreaderui.cpp:78
+msgid "Multiple files dropped!"
+msgstr ""
+
+#: ../../src/externalnbtreaderui.cpp:107
+msgid "Not a valid NBT!"
+msgstr ""
+
+#: ../../src/generalchoosedialog.cpp:23
 msgid "All"
 msgstr ""
 
-#: ../../src/qt/generalchoosedialog.cpp:62
+#: ../../src/generalchoosedialog.cpp:64
 msgid "OK"
 msgstr ""
 
-#: ../../src/qt/loadobjectui.cpp:63
+#: ../../src/generalchoosedialog.cpp:65
+msgid "Cancel"
+msgstr ""
+
+#: ../../src/loadobjectui.cpp:60
 msgid "Finish!"
 msgstr ""
 
-#: ../../src/qt/loadregionui.cpp:18
-msgid "Decompressing."
-msgstr ""
-
-#: ../../src/qt/loadregionui.cpp:19
-msgid "Some leftover text detected after parsing."
-msgstr ""
-
-#: ../../src/qt/loadregionui.cpp:20
-msgid "Some internal error happened, which is not your fault."
-msgstr ""
-
-#: ../../src/qt/loadregionui.cpp:21
-msgid "The parsing progress has been cancelled."
-msgstr ""
-
-#: ../../src/qt/loadregionui.cpp:22
-msgid "Couldn't get the type after the End type."
-msgstr ""
-
-#: ../../src/qt/loadregionui.cpp:23
-msgid "The tag is invalid."
-msgstr ""
-
-#: ../../src/qt/loadregionui.cpp:24
-msgid "Couldn't get key."
-msgstr ""
-
-#: ../../src/qt/loadregionui.cpp:25
-msgid "The length of the array is not the corresponding length."
-msgstr ""
-
-#: ../../src/qt/loadregionui.cpp:26
-#, c-format
-msgid "Couldn't find the corresponding %s type."
-msgstr ""
-
-#: ../../src/qt/loadregionui.cpp:27
-msgid "The length of the array/list couldn't be found"
-msgstr ""
-
-#: ../../src/qt/loadregionui.cpp:28
-msgid "Couldn't get type in the list."
-msgstr ""
-
-#: ../../src/qt/loadregionui.cpp:29
-msgid "The tag of the list is invalid."
-msgstr ""
-
-#: ../../src/qt/loadregionui.cpp:30
-msgid "Parsing finished!"
-msgstr ""
-
-#: ../../src/qt/loadregionui.cpp:31
-msgid "Parsing NBT file to NBT node tree."
-msgstr ""
-
-#: ../../src/qt/loadregionui.cpp:44
+#: ../../src/loadregionui.cpp:31
 msgid "Loading file(s) to Region(s)."
 msgstr ""
 
-#: ../../src/qt/loadregionui.cpp:53 ../../src/qt/saveregionui.cpp:14
-msgid "The following files are not added:\n"
+#: ../../src/loadregionui.cpp:47 ../../src/saveregionui.cpp:29
+msgid "Cancelled."
 msgstr ""
 
-#: ../../src/qt/loadregionui.cpp:109
-msgid "Parsing NBT"
+#: ../../src/loadregionui.cpp:52 ../../src/saveregionui.cpp:34
+msgid ""
+"The following files are not added:\n"
+"\n"
 msgstr ""
 
-#: ../../src/qt/loadregionui.cpp:125
-msgid "Error encountered with domain %1 and code %2: %3"
+#: ../../src/loadregionui.cpp:75
+msgid "Select a Region"
 msgstr ""
 
-#: ../../src/qt/loadregionui.cpp:141
+#: ../../src/loadregionui.cpp:75 ../../src/utility.cpp:30
+msgid "Please select a region."
+msgstr ""
+
+#: ../../src/loadregionui.cpp:193
 msgid "Please click `Continue` to choose region(s)."
 msgstr ""
 
-#: ../../src/qt/loadregionui.cpp:170
-msgid "No reason provided."
+#: ../../src/loadregionui.cpp:228
+msgid "No region found in this type."
 msgstr ""
 
-#: ../../src/qt/lrchooseui.cpp:30
+#: ../../src/loadregionui.cpp:229
+msgid "%1 try's fail message: %2"
+msgstr ""
+
+#: ../../src/loadregionui.cpp:249
+msgid "Parsing NBT"
+msgstr ""
+
+#: ../../src/loadregionui.cpp:293
+msgid "unknown"
+msgstr ""
+
+#: ../../src/lrchooseui.cpp:30
 msgid "Please select region(s) of the Litematic"
 msgstr ""
 
-#: ../../src/qt/lrchooseui.cpp:55
+#: ../../src/lrchooseui.cpp:55
 msgid "&All"
 msgstr ""
 
-#: ../../src/qt/lrchooseui.cpp:62
+#: ../../src/lrchooseui.cpp:62
 msgid ""
 "Please enter the new Region(s)' name(s): (%1 represents the NBT description "
 "and %2 represents the original region's name), you can see results below the "
 "edit line:"
 msgstr ""
 
-#: ../../src/qt/lrchooseui.cpp:67
+#: ../../src/lrchooseui.cpp:67
 msgid "Enter description here."
 msgstr ""
 
-#: ../../src/qt/lrchooseui.cpp:79 rc.cpp:162 rc.cpp:198 rc.cpp:258
+#: ../../src/lrchooseui.cpp:79 rc.cpp:165 rc.cpp:201 rc.cpp:255
 msgid "&OK"
 msgstr ""
 
-#: ../../src/qt/lrchooseui.cpp:80 rc.cpp:12 rc.cpp:51 rc.cpp:165
-msgid "&Close"
+#: ../../src/main.cpp:31
+msgid "Minecraft Structure Modifier"
 msgstr ""
 
-#: ../../src/qt/mainwindow.cpp:39
+#: ../../src/mainwindow.cpp:47
 msgid ""
 "Region is locked! It might not be the writer lock! Please try to close the "
 "window that's using the Region."
 msgstr ""
 
-#: ../../src/qt/mainwindow.cpp:130
-msgid "Load File"
-msgstr ""
-
-#: ../../src/qt/mainwindow.cpp:130
-msgid "Lua Script File (*.lua)"
-msgstr ""
-
-#: ../../src/qt/mainwindow.cpp:133 ../../src/qt/mainwindow.cpp:248
-#: ../../src/qt/mainwindow.cpp:252 ../../src/qt/mainwindow.cpp:281
-#: ../../src/qt/mainwindow.cpp:285 ../../src/qt/manage.cpp:33
-#: ../../src/qt/utility.cpp:90 ../../src/qt/nbt-reader/nbtreaderui.cpp:177
-msgid "Error!"
-msgstr ""
-
-#: ../../src/qt/mainwindow.cpp:133
-msgid "No file selected."
-msgstr ""
-
-#: ../../src/qt/mainwindow.cpp:150
+#: ../../src/mainwindow.cpp:121
 msgid "General"
 msgstr ""
 
-#: ../../src/qt/mainwindow.cpp:151
+#: ../../src/mainwindow.cpp:122
 msgid "Game"
 msgstr ""
 
-#: ../../src/qt/mainwindow.cpp:253 ../../src/qt/mainwindow.cpp:286
-msgid "No Region or no Region selected!"
-msgstr ""
-
-#: ../../src/qt/mainwindow.cpp:292
+#: ../../src/mainwindow.cpp:246
 msgid "Version: "
 msgstr ""
 
-#: ../../src/qt/mainwindow.cpp:293
+#: ../../src/mainwindow.cpp:248
+msgid "Graphical Backend: Qt"
+msgstr ""
+
+#: ../../src/mainwindow.cpp:249
 msgid "About Litematica Reader"
 msgstr ""
 
-#: ../../src/qt/manage.cpp:33
+#: ../../src/manage.cpp:15
 msgid "No row is selected!"
 msgstr ""
 
-#: ../../src/qt/manage.cpp:67 ../../src/qt/manage.cpp:68
-#: ../../src/qt/manage.cpp:69
-msgid "locked"
-msgstr ""
-
-#: ../../src/qt/manage.cpp:78 rc.cpp:243
-msgid "Description"
-msgstr ""
-
-#: ../../src/qt/manage.cpp:78
-msgid "UUID"
-msgstr ""
-
-#: ../../src/qt/manage.cpp:78
-msgid "Time"
-msgstr ""
-
-#: ../../src/qt/manage.cpp:147
+#: ../../src/manage.cpp:129
 msgid "Manage Region"
 msgstr ""
 
-#: ../../src/qt/manage.cpp:155
-msgid "Add region from file."
+#: ../../src/manage.cpp:155
+msgid "Select Files"
 msgstr ""
 
-#: ../../src/qt/manage.cpp:155
-msgid "Add region from NBT instance."
+#: ../../src/manage.cpp:158
+msgid "No file selected!"
 msgstr ""
 
-#: ../../src/qt/manage.cpp:177
-msgid "Function not implemented yet."
+#: ../../src/manage.cpp:213
+msgid "Choose Save Option"
 msgstr ""
 
-#: ../../src/qt/manage.cpp:189
-msgid "Save as NBT."
+#: ../../src/manage.cpp:214
+msgid "Choose whether format you want to save to."
 msgstr ""
 
-#: ../../src/qt/manage.cpp:189
-msgid "Save as NBT (Ignore air)."
+#: ../../src/manage.cpp:221
+msgid "Use MultiFunc?"
 msgstr ""
 
-#: ../../src/qt/manage.cpp:190
-msgid "Save as litematic"
+#: ../../src/manage.cpp:222
+msgid "This type supports regions to save as one file, do you want to use it?"
 msgstr ""
 
-#: ../../src/qt/manage.cpp:190
-msgid "Save as new schematics"
+#: ../../src/manage.cpp:234
+msgid "Select Directory"
 msgstr ""
 
-#: ../../src/qt/manage.cpp:195
-msgid "Select A Directory"
+#: ../../src/manage.cpp:282
+msgid "Locked!"
 msgstr ""
 
-#: ../../src/qt/manage.cpp:224
-msgid "No item selected!"
+#: ../../src/manage.cpp:291 rc.cpp:240
+msgid "Description"
 msgstr ""
 
-#: ../../src/qt/module.cpp:24
-msgid "Litematica Reader"
+#: ../../src/manage.cpp:291
+msgid "UUID"
 msgstr ""
 
-#: ../../src/qt/paletteaddui.cpp:19
+#: ../../src/manage.cpp:291
+msgid "Time"
+msgstr ""
+
+#: ../../src/nbtreaderui.cpp:46
+msgid "Export NBT To ..."
+msgstr ""
+
+#: ../../src/paletteaddui.cpp:19
 msgid "Please Enter a Block Name"
 msgstr ""
 
-#: ../../src/qt/paletteaddui.cpp:20
+#: ../../src/paletteaddui.cpp:20
 msgid "Please enter a block name. (id name please)"
 msgstr ""
 
-#: ../../src/qt/paletteaddui.cpp:25
+#: ../../src/paletteaddui.cpp:25
 msgid "Enter Name"
 msgstr ""
 
-#: ../../src/qt/paletteaddui.cpp:26
+#: ../../src/paletteaddui.cpp:26
 msgid "Please enter a name."
 msgstr ""
 
-#: ../../src/qt/paletteaddui.cpp:27
+#: ../../src/paletteaddui.cpp:27
 msgid "Enter Data"
 msgstr ""
 
-#: ../../src/qt/paletteaddui.cpp:28
+#: ../../src/paletteaddui.cpp:28
 msgid "Please enter a data."
 msgstr ""
 
-#: ../../src/qt/paletteaddui.cpp:68 rc.cpp:249
+#: ../../src/paletteaddui.cpp:68 rc.cpp:246
 msgid "Name"
 msgstr ""
 
-#: ../../src/qt/paletteaddui.cpp:68
+#: ../../src/paletteaddui.cpp:68
 msgid "Data"
 msgstr ""
 
-#: ../../src/qt/regionmodifyui.cpp:70
-msgid "Invalid!"
+#: ../../src/regionmodifyui.cpp:54
+msgid "Unknown!"
 msgstr ""
 
-#: ../../src/qt/utility.cpp:72
-msgid "The task is cancelled."
+#: ../../src/utility.cpp:22
+msgid "Manage Region window is not initialized"
 msgstr ""
 
-#: ../../src/qt/utility.cpp:76
-#, c-format
-msgid "Invalid file: %s."
+#: ../../src/utility.cpp:30
+msgid "Select Region"
 msgstr ""
 
-#: ../../src/qt/utility.cpp:95
-msgid "Loading %1"
+#: ../../src/utility.cpp:39
+msgid "Region is locked!"
 msgstr ""
 
-#: ../../src/qt/utility.cpp:103
-msgid "Enter Description"
+#: ../../src/utility.cpp:47
+msgid "No Region or no Region selected!"
 msgstr ""
 
-#: ../../src/qt/utility.cpp:104
-msgid "Enter description for the NBT file."
-msgstr ""
-
-#: ../../src/qt/utility.cpp:107
-msgid "No Description Entered!"
-msgstr ""
-
-#: ../../src/qt/utility.cpp:108
-msgid "No description entered! Will not add the NBT file!"
-msgstr ""
-
-#: ../../src/region.cpp:352 ../../src/region.cpp:623
-msgid "Parsing blocks."
-msgstr ""
-
-#: ../../src/region.cpp:607
-msgid "Sorting"
-msgstr ""
-
-#: ../../src/qt/nbt-reader/nbtreaderui.cpp:177
-msgid "No NBT selected!"
-msgstr ""
-
-#: ../../src/qt/nbt-reader/nbtreaderui.cpp:294
-msgid " "
-msgstr ""
-
-#: ../../build/src/qt/settings.cpp:39 rc.cpp:69
+#: ../../build/src/settings.cpp:39 rc.cpp:72
 msgid "Ignore Leftover Data"
 msgstr ""
 
-#: ../../build/src/qt/settings.cpp:40 rc.cpp:72
+#: ../../build/src/settings.cpp:40 rc.cpp:75
 msgid "Whether to ignore leftover data in NBT when parsing."
 msgstr ""
 
-#: ../../build/src/qt/settings.cpp:46 rc.cpp:75
+#: ../../build/src/settings.cpp:46 rc.cpp:78
 msgid "Override Settings"
 msgstr ""
 
-#: ../../build/src/qt/settings.cpp:47 rc.cpp:78
+#: ../../build/src/settings.cpp:47 rc.cpp:81
 msgid "Whether to override setting or not."
 msgstr ""
 
-#: ../../build/src/qt/settings.cpp:50 rc.cpp:81
+#: ../../build/src/settings.cpp:50 rc.cpp:84
 msgid "Override Version"
 msgstr ""
 
-#: ../../build/src/qt/settings.cpp:51 rc.cpp:84
+#: ../../build/src/settings.cpp:51 rc.cpp:87
 msgid "The version to override in translation stage."
 msgstr ""
 
@@ -518,39 +415,39 @@ msgid "The information is:"
 msgstr ""
 
 #: rc.cpp:39
-msgid "&Modify Property"
+msgid "Show &All Entities"
 msgstr ""
 
 #: rc.cpp:42
-msgid "&Show Entity NBT"
+msgid "&Modify Property"
 msgstr ""
 
 #: rc.cpp:45
+msgid "&Show Entity NBT"
+msgstr ""
+
+#: rc.cpp:48
 msgid "&List blocks"
 msgstr ""
 
-#: rc.cpp:48 rc.cpp:213
+#: rc.cpp:51 rc.cpp:207
 msgid "&Show blocks"
 msgstr ""
 
-#: rc.cpp:54
+#: rc.cpp:57
 msgid "BlockShowUI"
 msgstr ""
 
-#: rc.cpp:60
+#: rc.cpp:63
 msgid "Mode"
 msgstr ""
 
-#: rc.cpp:63
+#: rc.cpp:66
 msgid "&List/Modify Palette"
 msgstr ""
 
-#: rc.cpp:66
+#: rc.cpp:69
 msgid "Modify &Block"
-msgstr ""
-
-#: rc.cpp:87
-msgid "LoadRegionUI"
 msgstr ""
 
 #: rc.cpp:90
@@ -570,83 +467,79 @@ msgid "C&ancel"
 msgstr ""
 
 #: rc.cpp:102
-msgid "&Manage Region"
+msgid "&NBT File Reader"
 msgstr ""
 
 #: rc.cpp:105
-msgid "M&odify Region"
+msgid "&Manage Region"
 msgstr ""
 
 #: rc.cpp:108
-msgid "&Block reader"
+msgid "M&odify Region"
 msgstr ""
 
 #: rc.cpp:111
-msgid "Shortcuts"
+msgid "&Block reader"
 msgstr ""
 
 #: rc.cpp:114
-msgid "Utility"
+msgid "Shortcuts"
 msgstr ""
 
 #: rc.cpp:117
-msgid "&Configure"
+msgid "Utility"
 msgstr ""
 
 #: rc.cpp:120
+msgid "&Configure"
+msgstr ""
+
+#: rc.cpp:123
 msgid "&Run Script"
 msgstr ""
 
-#: rc.cpp:123 rc.cpp:132
+#: rc.cpp:126 rc.cpp:135
 msgid "&About"
 msgstr ""
 
-#: rc.cpp:126
+#: rc.cpp:129
 msgid "&Tools"
 msgstr ""
 
-#: rc.cpp:129
+#: rc.cpp:132
 msgid "Icons"
 msgstr ""
 
-#: rc.cpp:135 rc.cpp:144
+#: rc.cpp:138 rc.cpp:147
 msgid "test"
 msgstr ""
 
-#: rc.cpp:138
+#: rc.cpp:141
 msgid "test\\"
 msgstr ""
 
-#: rc.cpp:141
+#: rc.cpp:144
 msgid "tetst"
 msgstr ""
 
-#: rc.cpp:147
+#: rc.cpp:150 rc.cpp:171
 msgid "Form"
 msgstr ""
 
-#: rc.cpp:150 rc.cpp:192 rc.cpp:204
+#: rc.cpp:153 rc.cpp:195
 msgid "&Add"
 msgstr ""
 
-#: rc.cpp:153 rc.cpp:195 rc.cpp:207
+#: rc.cpp:156 rc.cpp:198
 msgid "&Remove"
 msgstr ""
 
-#: rc.cpp:156 rc.cpp:216
+#: rc.cpp:159
 msgid "R&efresh"
 msgstr ""
 
-#: rc.cpp:159
+#: rc.cpp:162
 msgid "&Save"
-msgstr ""
-
-#: rc.cpp:168
-msgid "NBT Reader"
-msgstr ""
-
-#: rc.cpp:171
-msgid "Search NBT label"
 msgstr ""
 
 #: rc.cpp:174
@@ -662,69 +555,203 @@ msgid "Value:"
 msgstr ""
 
 #: rc.cpp:183
-msgid "Modify"
+msgid "&Export"
 msgstr ""
 
 #: rc.cpp:186
-msgid "Close"
+msgid "PushButton"
 msgstr ""
 
-#: rc.cpp:189
+#: rc.cpp:192
 msgid "PaletteAddUI"
 msgstr ""
 
-#: rc.cpp:201
+#: rc.cpp:204
 msgid "PaletteListUI"
 msgstr ""
 
 #: rc.cpp:210
-msgid "Re&place"
-msgstr ""
-
-#: rc.cpp:219
 msgid "Modify Property of Block(s)"
 msgstr ""
 
-#: rc.cpp:222
+#: rc.cpp:213
 msgid "Modify the property of the block in:"
 msgstr ""
 
-#: rc.cpp:225
+#: rc.cpp:216
 msgid "With the block that is the same property"
 msgstr ""
 
-#: rc.cpp:228
+#: rc.cpp:219
 msgid "Properties:"
 msgstr ""
 
-#: rc.cpp:231
+#: rc.cpp:222
 msgid "RegionModifyUI"
 msgstr ""
 
-#: rc.cpp:234
+#: rc.cpp:225
 msgid "Modify the infomation of the Region."
 msgstr ""
 
-#: rc.cpp:237
+#: rc.cpp:228
 msgid "Create Time"
 msgstr ""
 
-#: rc.cpp:240
+#: rc.cpp:231 rc.cpp:237
+msgid "yyyy/MM/dd HH:mm:ss.zzz"
+msgstr ""
+
+#: rc.cpp:234
 msgid "Modify Time"
 msgstr ""
 
-#: rc.cpp:246
+#: rc.cpp:243
 msgid "Author"
 msgstr ""
 
-#: rc.cpp:252
+#: rc.cpp:249
 msgid "Data Version"
 msgstr ""
 
-#: rc.cpp:255
+#: rc.cpp:252
 msgid "Version"
 msgstr ""
 
-#: rc.cpp:261
+#: rc.cpp:258
 msgid "&Cancel"
+msgstr ""
+
+#: ../../region-rs/src/lib.rs:232
+msgid "Null pointer detected"
+msgstr ""
+
+#: ../../region-rs/src/lib.rs:486 ../../region-rs/src/lib.rs:490
+msgid "The index is out of range."
+msgstr ""
+
+#: ../../region-rs/src/lib.rs:560
+msgid "Loading file."
+msgstr ""
+
+#: ../../region-rs/src/lib.rs:568
+msgid "The loading operation is cancelled."
+msgstr ""
+
+#: ../../region-rs/src/lib.rs:602 ../../region-rs/src/lib.rs:682
+msgid "Uncompressing data."
+msgstr ""
+
+#: ../../region-rs/src/lib.rs:610
+msgid "The uncompressing operation is cancelled."
+msgstr ""
+
+#: ../../region-rs/src/lib.rs:626 ../../region-rs/src/lib.rs:709
+msgid "Uncompress finish!"
+msgstr ""
+
+#: ../../region-rs/src/lib.rs:690
+msgid "The compressing operation is cancelled."
+msgstr ""
+
+#: ../../region-rs/src/lib.rs:883
+msgid "Byte"
+msgstr ""
+
+#: ../../region-rs/src/lib.rs:884
+msgid "Int"
+msgstr ""
+
+#: ../../region-rs/src/lib.rs:885
+msgid "Short"
+msgstr ""
+
+#: ../../region-rs/src/lib.rs:886
+msgid "Long"
+msgstr ""
+
+#: ../../region-rs/src/lib.rs:887
+msgid "Byte Array"
+msgstr ""
+
+#: ../../region-rs/src/lib.rs:888
+msgid "Long Array"
+msgstr ""
+
+#: ../../region-rs/src/lib.rs:889
+msgid "String"
+msgstr ""
+
+#: ../../region-rs/src/lib.rs:890
+msgid "Float"
+msgstr ""
+
+#: ../../region-rs/src/lib.rs:891
+msgid "Double"
+msgstr ""
+
+#: ../../region-rs/src/lib.rs:892
+msgid "Int Array"
+msgstr ""
+
+#: ../../region-rs/src/lib.rs:893
+msgid "List"
+msgstr ""
+
+#: ../../region-rs/src/lib.rs:894
+msgid "Compound"
+msgstr ""
+
+#: ../../crab-nbt-ext/src/lib.rs:96
+#, rust-format
+msgid "Couldn't get compound of {}."
+msgstr ""
+
+#: ../../crab-nbt-ext/src/lib.rs:107
+#, rust-format
+msgid "Couldn't get int of {}."
+msgstr ""
+
+#: ../../crab-nbt-ext/src/lib.rs:118
+#, rust-format
+msgid "Couldn't get list of {}."
+msgstr ""
+
+#: ../../crab-nbt-ext/src/lib.rs:129
+#, rust-format
+msgid "Couldn't get string of {}."
+msgstr ""
+
+#: ../../crab-nbt-ext/src/lib.rs:140
+#, rust-format
+msgid "Couldn't get long of {}."
+msgstr ""
+
+#: ../../crab-nbt-ext/src/lib.rs:151
+#, rust-format
+msgid "Couldn't get long array of {}."
+msgstr ""
+
+#: ../../crab-nbt-ext/src/lib.rs:207
+msgid "Reading NBT."
+msgstr ""
+
+#: ../../crab-nbt-ext/src/lib.rs:212 ../../crab-nbt-ext/src/lib.rs:218
+msgid "The parsing operation is cancelled."
+msgstr ""
+
+#: ../../crab-nbt-ext/src/lib.rs:225
+msgid "Reading NBT finish."
+msgstr ""
+
+#: ../../crab-nbt-ext/src/lib.rs:367
+msgid "Reading palette is cancelled!"
+msgstr ""
+
+#: ../../crab-nbt-ext/src/lib.rs:374
+msgid "Wrong type of palette!"
+msgstr ""
+
+#: ../../crab-nbt-ext/src/lib.rs:389
+msgid "Wrong type of property!"
 msgstr ""

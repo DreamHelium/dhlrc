@@ -3,6 +3,22 @@ PROJECT(dhlrc)
 
 option(INSTALL_NOW OFF)
 
+find_program(CARGO_EXECUTABLE cargo)
+add_custom_target(dhlrc_cargo_region ALL
+        COMMAND cd ../region-rs && ${CARGO_EXECUTABLE} build
+)
+
+add_custom_target(dhlrc_cargo_nbt ALL
+        COMMAND cd ../region-nbt-rs && ${CARGO_EXECUTABLE} build
+)
+
+add_custom_target(dhlrc_cargo_litematic ALL
+        COMMAND cd ../region-litematic-rs && ${CARGO_EXECUTABLE} build
+)
+
+add_custom_target(dhlrc_cargo_yo_vec ALL
+        COMMAND cd ../nbt-to-vec && ${CARGO_EXECUTABLE} build)
+
 include(GNUInstallDirs)
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR})
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
@@ -13,11 +29,7 @@ set(LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR})
 find_package(Gettext)
 find_package(PkgConfig)
 
-pkg_search_module(GIO REQUIRED gio-2.0)
-pkg_search_module(gm REQUIRED gmodule-2.0)
-pkg_search_module(UTIL dhutil)
-pkg_search_module(INTERFACE dhnbt_interface_cpp)
-pkg_search_module(LUA REQUIRED lua)
+#pkg_search_module(LUA REQUIRED lua)
 
 set(DH_ENABLE_TRANSLATION true)
 
@@ -31,16 +43,11 @@ endif ()
 
 add_definitions(-DDH_DEBUG_IN_IDE)
 
-add_compile_options(-Wno-error=incompatible-pointer-types)
-
-set(BUILD_TESTING OFF)
-set(BUILD_EXAMPLES OFF)
-add_subdirectory(3rdparty/iniparser)
 add_subdirectory(src)
-add_subdirectory(resources)
+#add_subdirectory(resources)
 if (DH_ENABLE_TRANSLATION)
     add_subdirectory(po)
 endif ()
 
-install(FILES "${CMAKE_CURRENT_BINARY_DIR}/locale/zh_CN/LC_MESSAGES/dhlrc.mo" DESTINATION
-        "${CMAKE_INSTALL_DATAROOTDIR}/locale/zh_CN/LC_MESSAGES/")
+#install(FILES "${CMAKE_CURRENT_BINARY_DIR}/locale/zh_CN/LC_MESSAGES/dhlrc.mo" DESTINATION
+#        "${CMAKE_INSTALL_DATAROOTDIR}/locale/zh_CN/LC_MESSAGES/")

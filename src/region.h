@@ -1,114 +1,87 @@
-/*  region - Region Structure
-    Copyright (C) 2024 Dream Helium
-    This file is part of litematica_reader_c.
+#ifndef DHLRC_REGION_H
+#define DHLRC_REGION_H
+#include <cstdint>
+#include <cstdlib>
 
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Lesser General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU Lesser General Public License for more details.
-
-    You should have received a copy of the GNU Lesser General Public License
-    along with this program.  If not, see <https://www.gnu.org/licenses/>. */
-
-#ifndef REGION_H
-#define REGION_H
-
-#include "dh_string_util.h"
-#include "dhlrc_list.h"
-#include "nbt_interface_cpp/libnbt/nbt_parse.h"
-#include <glib.h>
-
-G_BEGIN_DECLS
-
-typedef struct Pos
+#ifdef __cplusplus
+extern "C"
 {
-  int x;
-  int y;
-  int z;
-} Pos;
+#endif
 
-typedef struct BlockEntity
-{
-  Pos *pos;
-  void *nbt_instance;
-  /* Will use */
-  NbtNode *nbt_node;
-} BlockEntity;
+  /* This file is the output symbol of libregion_rs.so */
+  void *region_new ();
+  void region_free (void *region);
+  const char *region_set_time (void *region, int64_t create_time,
+                               int64_t modify_time);
+  void string_free (const char *string);
+  int64_t region_get_create_timestamp (void *region);
+  int64_t region_get_modify_timestamp (void *region);
+  void region_get_size (void *region);
+  /* Note: The getter should not return nullptr unless error occurred */
+  const char *region_get_name (void *region);
+  const char *region_set_name (void *region, const char *name);
+  const char *region_get_description (void *region);
+  const char *region_set_description (void *region, const char *description);
+  const char *region_get_author (void *region);
+  const char *region_set_author (void *region, const char *author);
 
-typedef Pos RegionSize;
+  int32_t region_get_index (void *region, int32_t x, int32_t y, int32_t z);
 
-typedef struct Palette
-{
-  char *id_name;
-  DhStrArray *property_name;
-  DhStrArray *property_data;
-} Palette;
+  uint32_t region_get_data_version (void *region);
+  void region_set_data_version (void *region, uint32_t version);
+  void region_set_size (void *region, int32_t x, int32_t y, int32_t z);
+  int32_t region_get_x (void *region);
+  int32_t region_get_y (void *region);
+  int32_t region_get_z (void *region);
+  uint32_t region_get_block_id_by_index (void *region, size_t index);
+  const char *region_get_palette_id_name (void *region, size_t id);
+  size_t region_get_palette_property_len (void *region, size_t id);
+  size_t region_get_palette_len (void *region);
+  const char *region_get_palette_property_name (void *region, size_t id,
+                                                size_t index);
+  const char *region_get_palette_property_data (void *region, size_t id,
+                                                size_t index);
+  const char *region_set_palette_property_name_and_data (void *region,
+                                                         size_t id,
+                                                         size_t index,
+                                                         const char *name,
+                                                         const char *data);
 
-/** Just like `GPtrArray<Palette>` */
-typedef GPtrArray PaletteArray;
-/** Just like `GPtrArray<BlockEntity>` */
-typedef GPtrArray BlockEntityArray;
+  typedef void (*ProgressFunc) (void *, int, const char *, const char *);
+  void *file_try_uncompress (const char *filename, ProgressFunc progress_func,
+                             void *main_klass, int *failed,
+                             const void *cancel_flag);
+  void vec_free (void *vec);
+  char *vec_to_cstr (void *vec);
+  const void *cancel_flag_new ();
+  int cancel_flag_is_cancelled (const void *cancel_flag);
+  void cancel_flag_cancel (const void *cancel_flag);
+  void cancel_flag_destroy (const void *cancel_flag);
+  const void *cancel_flag_clone (const void *cancel_flag);
+  void *get_system_info_object ();
+  uint64_t get_free_memory (void *system);
+  void system_info_object_free (void *system);
+  const void *region_get_block_entity (void *region, uint32_t index);
+  size_t nbt_vec_get_len (const void *nbt);
+  const char *nbt_vec_get_key (const void *nbt, size_t index);
+  const char *nbt_vec_get_value_type (const void *nbt, size_t index);
+  const char *nbt_vec_get_value_string (const void *nbt, size_t index);
+  int32_t nbt_vec_get_value_type_int (const void *nbt, size_t index);
+  const void *nbt_vec_get_value_to_child (const void *nbt, size_t index);
+  const void *nbt_vec_get_value_list_to_child (const void *nbt, size_t index);
+  const char *nbt_tree_value_get_value_string (const void *tree_value);
+  const char *nbt_tree_value_get_type_string (const void *tree_value);
+  int32_t nbt_tree_value_get_type_int (const void *tree_value);
+  const void *nbt_vec_tree_value_get_tree_value (const void *vec,
+                                                 size_t index);
+  size_t nbt_vec_tree_value_get_len (const void *vec);
+  const void *nbt_tree_value_get_value_to_child (const void *tree_value);
+  const void *nbt_tree_value_get_value_list_to_child (const void *tree_value);
+  size_t region_get_entity_len (void *region);
+  const void *region_get_entity (void *region, size_t index);
+  const char *region_get_entity_id (void *region, size_t index);
+#ifdef __cplusplus
+}
+#endif
 
-typedef struct BaseData
-{
-  /* Default: time of generated */
-  GDateTime *create_time;
-  /* Default: time of generated */
-  GDateTime *modify_time;
-  /* Default: "" */
-  char *description;
-  /* Default: username */
-  char *author;
-  /* Default: Converted */
-  char *name;
-} BaseData;
-
-typedef struct Region
-{
-  /** The base information */
-  int data_version;
-  BaseData *data;
-  /** The size of region */
-  RegionSize *region_size;
-  /** The block info array */
-  gint64 *block_array;
-  int block_array_len;
-  /** Block Entity Array */
-  BlockEntityArray *block_entity_array;
-  /** The Palette info array*/
-  PaletteArray *palette_array;
-  int air_palette;
-} Region;
-
-int region_get_index (Region *region, int x, int y, int z);
-gboolean file_is_new_schem (void *instance_ptr);
-gboolean region_node_is_new_schem (const NbtNode *root);
-Region *region_new_from_new_schem (void *instance_ptr);
-Region *region_new_from_nbt_node (NbtNode *root, DhProgressFullSet func,
-                                  void *main_klass, GCancellable *cancellable);
-Region *region_new_from_nbt_file (const char *filepos);
-Region *region_new_from_nbt_instance_ptr (void *instance_ptr);
-Region *region_new_from_nbt_instance_ptr_full (void *instance_ptr,
-                                               DhProgressFullSet func,
-                                               void *main_klass,
-                                               GCancellable *cancellable);
-gboolean palette_is_same (gconstpointer a, gconstpointer b);
-char *region_get_id_name (Region *region, int index);
-gboolean region_add_palette (Region *region, const char *id_name,
-                             DhStrArray *palette_name,
-                             DhStrArray *palette_data);
-gboolean region_add_palette_using_palette (Region *region, Palette *palette);
-Palette *region_get_palette (Region *region, int val);
-ItemList *item_list_new_from_multi_region (const char **region_uuid_arr);
-void region_free (void *region);
-int region_get_block_palette (Region *region, int index);
-BlockEntity *region_get_block_entity (Region *region, int x, int y, int z);
-
-G_END_DECLS
-
-#endif /* REGION_H */
+#endif // DHLRC_REGION_H

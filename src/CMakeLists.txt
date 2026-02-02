@@ -1,68 +1,157 @@
-if (NOT UTIL_FOUND)
-    set(DHUTIL_BUILD_CLI ON)
-    add_subdirectory(dhutil)
-endif ()
+cmake_minimum_required(VERSION 3.17)
 
-if (NOT INTERFACE_FOUND)
-    add_subdirectory(nbt_interface_cpp)
-endif ()
+project(dhlrc_qt LANGUAGES CXX)
 
-if (${INSTALL_NOW})
-    add_definitions(-DLOCALEDIR="/usr/share/locale")
-    add_definitions(-DMODULEDIR="/usr/lib64/dhlrc/modules")
-    add_definitions(-DRESOURCEDIR="/usr/share/dhlrc/dhlrc_resources")
-    add_definitions(-DRECIPESDIR="/usr/lib64/dhlrc/recipes_modules")
-    message("Install Now.")
-endif ()
+add_definitions(-DDHLRC_VERSION="${dhlrc_qt_VERSION}")
+string(TIMESTAMP CURRENT_DAY %Y%m%d)
+add_definitions(-DDHLRC_COMPILE_DATE=${CURRENT_DAY})
 
-add_library(dhlrc SHARED
-        dh_bit.c dh_bit.h
-        litematica_region.cpp litematica_region.h
-        region.cpp region.h
-        process_state.c process_state.h
-        common_info.c common_info.h
-        common.c common.h
-        dhlrc_list.h dhlrc_list.c
-        csv_parser.c csv_parser.h
-        json_util.c json_util.h
-        translation.h translation.c
-        download_file.h download_file.c
-        feature/dh_module.c feature/dh_module.h
-        feature/conv_feature.c feature/conv_feature.h
-        feature/mcdata_feature.c feature/mcdata_feature.h
-        feature/recipe_feature.c feature/recipe_feature.h
-        feature/unzip_feature.c feature/unzip_feature.h
-        script.cpp
-        script.h
-        global_variant.c
-        global_variant.h
-        public_text.h
-        region_litematic.c
-        region_litematic.h
-        region_nbt.c
-        region_nbt.h
+#set(CMAKE_AUTOUIC ON)
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTORCC ON)
+set(LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR}/module)
+
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+find_package(ECM REQUIRED NO_MODULE)
+set(CMAKE_MODULE_PATH ${ECM_MODULE_PATH})
+#include(KDEInstallDirs)
+#include(KDECompilerSettings)
+#include(KDECMakeSettings)
+find_package(KF6 REQUIRED COMPONENTS ColorScheme ConfigWidgets I18n)
+find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets Svg Concurrent)
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets Svg Concurrent)
+
+add_definitions(-DQT_NO_SIGNALS_SLOTS_KEYWORDS)
+
+set(ui_files mainwindow.ui
+        blocklistui.ui
+        blockreaderui.ui
+        manageui.ui
+        blockshowui.ui
+        regionmodifyui.ui
+        palettelistui.ui
+        #        paletteaddui.ui
+        loadobjectui.ui
+        nbtreaderui.ui
 )
 
-target_link_libraries(dhlrc PUBLIC dhutil_string dhnbt_interface_cpp ${gm_LIBRARIES} dhutil_type dhutil_file cjson
-        ${LUA_LIBRARIES} iniparser-shared)
-
-target_include_directories(dhlrc PUBLIC "${GIO_INCLUDE_DIRS}" dhutil ${LUA_INCLUDE_DIRS})
-
-add_executable(dhlrc.bin main.c)
-
-target_link_libraries(dhlrc.bin PUBLIC dhlrc)
-
-install(TARGETS dhlrc.bin
-        BUNDLE DESTINATION .
-        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
-
-install(TARGETS dhlrc
-        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+set(PROJECT_SOURCES
+        main.cpp
+        mainwindow.cpp mainwindow.h
+        blocklistui.cpp blocklistui.h
+        blockreaderui.cpp blockreaderui.h
+        manageui.h manageui.cpp
+        dhtableview.h dhtableview.cpp
+        lrchooseui.h lrchooseui.cpp
+        manage.h manage.cpp
+        utility.h utility.cpp
+        dhtreefilter.h dhtreefilter.cpp
+        generalchooseui.h
+        #        propertymodifyui.cpp
+        #        propertymodifyui.h
+        #        propertymodifyui.ui
+        blockshowui.cpp
+        blockshowui.h
+        regionmodifyui.cpp
+        regionmodifyui.h
+        palettelistui.cpp
+        palettelistui.h
+        paletteaddui.cpp
+        paletteaddui.h
+        generalchoosedialog.cpp
+        generalchoosedialog.h
+        dhloadobject.cpp
+        dhloadobject.h
+        loadregionui.cpp
+        loadregionui.h
+        dhlinklikebutton.cpp
+        dhlinklikebutton.h
+        loadobjectui.cpp
+        loadobjectui.h
+        saveregionui.cpp
+        saveregionui.h
+        dhgameconfigui.h
+        dhcheckboxgroup.cpp
+        dhcheckboxgroup.h
 )
 
-add_subdirectory(qt)
-add_subdirectory(conv)
+set(TEMP_PROJECT_SOURCES
+        main.cpp
+        mainwindow.cpp mainwindow.h
+        loadobjectui.cpp loadobjectui.h
+        manage.cpp manage.h
+        manageui.cpp manageui.h
+        dhtableview.cpp dhtableview.h
+        dhlinklikebutton.cpp dhlinklikebutton.h
+        loadregionui.cpp loadregionui.h
+        ../resources/dhlrc.qrc
+        generalchoosedialog.cpp generalchoosedialog.h
+        blockreaderui.cpp blockreaderui.h
+        utility.cpp utility.h
+        regionmodifyui.cpp regionmodifyui.h
+        blocklistui.cpp blocklistui.h
+        blockshowui.cpp blockshowui.h
+        palettelistui.cpp palettelistui.h
+        nbtreaderui.cpp
+        nbtreaderui.h
+        dhtreefilter.cpp dhtreefilter.h
+        externalnbtreaderui.cpp
+        externalnbtreaderui.h
+        nbtvec.h
+        dhgameconfigui.h
+        saveregionui.h saveregionui.cpp
+)
 
-#install(TARGETS dhlrc_conv dhlrc_mcdata dhlrc_qt dhlrc_recipe
-#        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}/dhlrc/modules)
-install(FILES ${CMAKE_BINARY_DIR}/dhlrc_resources DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/dhlrc)
+ki18n_wrap_ui(TEMP_PROJECT_SOURCES ${ui_files})
+
+if (${QT_VERSION_MAJOR} GREATER_EQUAL 6)
+    qt_add_executable(dhlrc_qt
+            MANUAL_FINALIZATION
+            ${TEMP_PROJECT_SOURCES}
+    )
+    # Define target properties for Android with Qt 6 as:
+    #    set_property(TARGET dhlrc_qt APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR
+    #                 ${CMAKE_CURRENT_SOURCE_DIR}/android)
+    # For more information, see https://doc.qt.io/qt-6/qt-add-executable.html#target-creation
+else ()
+    if (ANDROID)
+        add_library(dhlrc_qt SHARED
+                ${TEMP_PROJECT_SOURCES}
+        )
+        # Define properties for Android with Qt 5 after find_package() calls as:
+        #    set(ANDROID_PACKAGE_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/android")
+    else ()
+        add_executable(dhlrc_qt
+                ${TEMP_PROJECT_SOURCES}
+        )
+    endif ()
+endif ()
+
+target_link_libraries(dhlrc_qt PRIVATE Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::Svg KF6::ColorScheme
+        KF6::ConfigWidgets KF6::I18n KF6::I18nLocaleData region_rs Qt6::Concurrent nbt_to_vec)
+target_link_directories(dhlrc_qt PRIVATE ${CMAKE_BINARY_DIR})
+target_include_directories(dhlrc_qt PUBLIC
+        "${PROJECT_BINARY_DIR}" "${PROJECT_SOURCE_DIR}"
+)
+
+kconfig_add_kcfg_files(dhlrc_qt config/settings.kcfgc)
+
+# Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
+# If you are developing for iOS or macOS you should consider setting an
+# explicit, fixed bundle identifier manually though.
+if (${QT_VERSION} VERSION_LESS 6.1.0)
+    set(BUNDLE_ID_OPTION MACOSX_BUNDLE_GUI_IDENTIFIER com.example.dhlrc_qt)
+endif ()
+set_target_properties(dhlrc_qt PROPERTIES
+        ${BUNDLE_ID_OPTION}
+        MACOSX_BUNDLE TRUE
+        WIN32_EXECUTABLE TRUE
+)
+
+include(GNUInstallDirs)
+
+if (QT_VERSION_MAJOR EQUAL 6)
+    qt_finalize_executable(dhlrc_qt)
+endif ()

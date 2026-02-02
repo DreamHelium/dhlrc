@@ -1,0 +1,13 @@
+[package]
+name = "region-litematic-rs"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+crab-nbt-ext = { path = "../crab-nbt-ext" }
+crab_nbt = "0.2.11"
+formatx = "0.2.4"
+sysinfo = "0.37.2"
+
+[lib]
+crate-type = ["cdylib"]

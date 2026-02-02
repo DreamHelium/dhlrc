@@ -1,44 +1,21 @@
-# Litematica Reader in C language
+# Minecraft Structure Modifier
 
 [中文文档](README_zh.md)
 
-**Note: The most part of the code will be transformed to C++, so the project might be dhlrcpp in the future.**
+## License Problem
 
-## Announcement
-
-I will port the project to `Rust` language, so the `main` branch will not update until I finish porting. At this time, 
-you can see the `rust-dev` branch for more information.
+Since `crabnbt` is licensed under GPL, I had to use GPL license. Sorry for the inconvenience.
 
 ## Introduction
 
-Although it was named as `litematica_reader_c`, **it's not only intended to read litematica file**, but process the
-material list in blocks in a litematica file region. Reading litematica file is just the first step to process, or in
-other words **there should be a source of material list to process, and reading a litematica file is the most
-convenient.**
-
-It uses [libnbt](https://github.com/djytw/libnbt) as the library to read litematica file.
-
-Since it's a general-purpose project, the `assets` and `data` file should be provided by user. Luckily, there's a simple
-wizard in `utility` in Qt module which helps you to do this.
+You can import your structure into a `Region` structure. Then do some modification (Although it's currently working in
+progress). After that you can export the structure to the type you wish.
 
 ## Dependencies
 
-- [libnbt](https://github.com/djytw/libnbt) (already in submodule of the repo)
-- `zlib`
-- [cJSON](https://github.com/DaveGamble/cJSON) `>= 1.7.13`
-- `gettext` (It's a part of `glibc` so you might not need to install it in GNU/Linux but other systems might need)(
-  Optional -- if you need translation)
-- `glib2`
-- `minizip-ng`
-- [dhutil](https://github.com/DreamHelium/dhutil) (already in submodule of the repo)
+See `Cargo.toml` in `*-rs` directories, and `CMakeLists.txt` in `src`.
 
 ## Compile
-
-Use `git` to get this repo, then get submodule.
-
-```bash
-git submodule update --init
-```
 
 If there's already CMake installed, just compile using command:
 
@@ -47,19 +24,13 @@ cmake -B build
 cmake --build build
 ```
 
-If not, install one.
+You might need to copy `region_rs` library from `region-rs/target/debug(or release)` into root directory and build
+directory. If it's allowed, using a soft link.
 
 ## Features
 
-- NBT management (NBT `interface` support and NBT Reader).
-  Note: if you want to modify the content, you might need to use the `get_current_nbt` method and modify by yourself.
-- Partly support of `NBT Struct` and `Litematic` using general `Region`.
-  Note: support easily read block state and palette, generate block list (~Although it's called item list~), generate
-  `NBT Struct` from `Region`.
-- Partly recipe support
+todo.
 
 ## Usage
 
-Just run `dhlrc.bin`, and the Qt backend will start unless you are using Linux tty.
-
-If you just want to convert file, just run `dhlrc.bin conv --help` and do with the instruction.
+Just run `dhlrc_qt`, and the Qt backend will start unless you are using Linux tty.
