@@ -244,7 +244,9 @@ void
 MainWindow::showabout ()
 {
   QString str = _ ("Version: ") + QString::number (DHLRC_COMPILE_DATE);
-  QMessageBox::about (this, _ ("About Litematica Reader"), str);
+  str += '\n';
+  str += _ ("Graphical Backend: Qt");
+  QMessageBox::about (this, _ ("About Minecraft Structure Modifier"), str);
 }
 
 void
