@@ -32,3 +32,6 @@ po/*/*.po~
 .vscode
 
 .idea
+
+# cargo build
+*/target

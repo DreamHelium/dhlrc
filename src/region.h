@@ -30,9 +30,13 @@ extern "C"
   uint32_t region_get_data_version (void *region);
   void region_set_data_version (void *region, uint32_t version);
   void region_set_size (void *region, int32_t x, int32_t y, int32_t z);
+  void region_set_offset (void *region, int32_t x, int32_t y, int32_t z);
   int32_t region_get_x (void *region);
   int32_t region_get_y (void *region);
   int32_t region_get_z (void *region);
+  int32_t region_get_offset_x (void *region);
+  int32_t region_get_offset_y (void *region);
+  int32_t region_get_offset_z (void *region);
   uint32_t region_get_block_id_by_index (void *region, size_t index);
   const char *region_get_palette_id_name (void *region, size_t id);
   size_t region_get_palette_property_len (void *region, size_t id);

@@ -8,3 +8,4 @@ crab_nbt = "0.2.11"
 gettext-rs = "0.7.7"
 formatx = "0.2.4"
 bytes = "1.11.0"
+common-rs = { path = "../common-rs" }

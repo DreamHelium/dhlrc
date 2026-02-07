@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>551</width>
-    <height>367</height>
+    <width>606</width>
+    <height>465</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -68,6 +68,26 @@
      </item>
      <item>
       <widget class="QTextEdit" name="textEdit"/>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_8">
+     <item>
+      <widget class="QLabel" name="label_8">
+       <property name="text">
+        <string>Offset</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QSpinBox" name="xBox"/>
+     </item>
+     <item>
+      <widget class="QSpinBox" name="yBox"/>
+     </item>
+     <item>
+      <widget class="QSpinBox" name="zBox"/>
      </item>
     </layout>
    </item>

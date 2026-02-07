@@ -1,9 +1,5 @@
 use crab_nbt::NbtTag;
-use crab_nbt_ext::{
-    GetWithError, MyError, Palette, ProgressFn, TreeValue, convert_nbt_tag_to_tree_value,
-    convert_nbt_to_vec, get_palette_from_nbt_tag, i18n, init_translation_internal, nbt_create_real,
-    show_progress, string_to_ptr_fail_to_null,
-};
+use crab_nbt_ext::{convert_nbt_tag_to_tree_value, convert_nbt_to_vec, get_palette_from_nbt_tag, init_translation_internal, nbt_create_real, GetWithError, Palette};
 use formatx::formatx;
 use std::collections::HashMap;
 use std::error::Error;
@@ -13,6 +9,11 @@ use std::ptr::{null, null_mut};
 use std::sync::atomic::AtomicBool;
 use std::time::Instant;
 use sysinfo::System;
+use common_rs::i18n::i18n;
+use common_rs::my_error::MyError;
+use common_rs::ProgressFn;
+use common_rs::tree_value::TreeValue;
+use common_rs::util::{cstr_to_str, show_progress, string_to_ptr_fail_to_null};
 
 static mut FREE_MEMORY: usize = 500 * 1024 * 1024;
 
@@ -436,18 +437,6 @@ fn region_create_from_bytes_internal(
 
         Ok(region)
     }
-}
-
-fn cstr_to_str(string: *const c_char) -> Result<String, Box<dyn Error>> {
-    if string.is_null() {
-        return Err(Box::from(MyError {
-            /* NOTE: can be translated */
-            msg: i18n("Null pointer detected").to_string(),
-        }));
-    }
-    let str = unsafe { CStr::from_ptr(string) };
-    let ref_str = str.to_str()?;
-    Ok(ref_str.to_string())
 }
 
 #[unsafe(no_mangle)]

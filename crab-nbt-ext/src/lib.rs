@@ -1,77 +1,16 @@
 use crab_nbt::{Nbt, NbtCompound, NbtTag};
 use formatx::formatx;
 use gettextrs::gettext;
-use std::collections::HashMap;
 use std::error::Error;
-use std::ffi::{CStr, CString, c_char, c_int, c_void};
-use std::fmt::{Display, Formatter};
-use std::io::{Bytes, Cursor};
-use std::ptr::null_mut;
+use std::ffi::{c_char, c_void};
+use std::io::{Cursor};
 use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering};
-
-pub type ProgressFn = Option<
-    extern "C" fn(
-        main_klass: *mut c_void,
-        progress: c_int,
-        format: *const c_char,
-        text: *const c_char,
-    ),
->;
-
-pub fn string_to_ptr_fail_to_null(string: &str) -> *mut c_char {
-    let str = CString::new(string);
-    match str {
-        Ok(real_str) => real_str.into_raw(),
-        Err(_err) => null_mut(),
-    }
-}
-
-#[derive(Clone)]
-#[repr(i32)]
-pub enum TreeValue {
-    Byte(i8) = 1,
-    Short(i16) = 2,
-    Int(i32) = 3,
-    Long(i64) = 4,
-    Float(f32) = 5,
-    Double(f64) = 6,
-    String(String) = 7,
-    ByteArray(Vec<i8>) = 8,
-    IntArray(Vec<i32>) = 9,
-    LongArray(Vec<i64>) = 10,
-    List(Vec<TreeValue>) = 11,
-    Compound(Vec<(String, TreeValue)>) = 12,
-}
-
-#[derive(Debug)]
-pub struct MyError {
-    pub msg: String,
-}
-
-impl Display for MyError {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.msg)
-    }
-}
-
-impl Error for MyError {}
-
-fn cstr_to_str(string: *const c_char) -> Result<String, Box<dyn Error>> {
-    if string.is_null() {
-        return Err(Box::from(MyError {
-            /* NOTE: can be translated */
-            msg: "Null pointer detected".to_string(),
-        }));
-    }
-    let str = unsafe { CStr::from_ptr(string) };
-    let ref_str = str.to_str()?;
-    Ok(ref_str.to_string())
-}
-
-pub fn i18n(string: &str) -> &str {
-    string
-}
+use common_rs::i18n::i18n;
+use common_rs::my_error::MyError;
+use common_rs::ProgressFn;
+use common_rs::tree_value::TreeValue;
+use common_rs::util::{cstr_to_str, show_progress};
 
 pub fn init_translation_internal(path: *const c_char) -> Result<(), Box<dyn Error>> {
     gettextrs::bindtextdomain("dhlrc", cstr_to_str(path)?)?;
@@ -152,31 +91,6 @@ impl GetWithError for NbtCompound {
                 let formatted_str = formatx!(str, name)?;
                 Err(Box::new(MyError { msg: formatted_str }))
             }
-        }
-    }
-}
-
-pub fn show_progress(
-    progress_fn: ProgressFn,
-    main_klass: *mut c_void,
-    progress: c_int,
-    message: &str,
-    text: &str,
-) {
-    let msg = string_to_ptr_fail_to_null(message);
-    let mut real_text: *mut c_char = null_mut();
-    if !text.is_empty() {
-        real_text = string_to_ptr_fail_to_null(text);
-    }
-    unsafe {
-        if !progress_fn.is_none() {
-            if progress_fn.unwrap() as usize != 0 {
-                progress_fn.unwrap()(main_klass, progress, msg, real_text);
-            }
-        }
-        drop(Box::from_raw(msg));
-        if !real_text.is_null() {
-            drop(Box::from_raw(real_text));
         }
     }
 }

@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-30 22:28+0800\n"
+"POT-Creation-Date: 2026-02-07 22:35+0800\n"
 "PO-Revision-Date: 2024-11-30 07:00+0800\n"
 "Last-Translator: dream_he <48383878+DreamHelium@users.noreply.github.com>\n"
 "Language-Team: Chinese <kde-i18n-doc@kde.org>\n"
@@ -120,7 +120,7 @@ msgstr "描述：%10"
 msgid "Error!"
 msgstr "错误！"
 
-#: ../../src/blockreaderui.cpp:228 ../../region-rs/src/lib.rs:533
+#: ../../src/blockreaderui.cpp:228
 msgid "Out of memory!"
 msgstr ""
 
@@ -232,7 +232,7 @@ msgstr ""
 msgid "Enter description here."
 msgstr "在此输入描述。"
 
-#: ../../src/lrchooseui.cpp:79 rc.cpp:165 rc.cpp:201 rc.cpp:255
+#: ../../src/lrchooseui.cpp:79 rc.cpp:165 rc.cpp:201 rc.cpp:258
 msgid "&OK"
 msgstr "确定(&O)"
 
@@ -258,9 +258,13 @@ msgstr "游戏"
 msgid "Version: "
 msgstr "版本： "
 
-#: ../../src/mainwindow.cpp:247
-msgid "About Litematica Reader"
-msgstr "关于投影文件阅读器"
+#: ../../src/mainwindow.cpp:248
+msgid "Graphical Backend: Qt"
+msgstr ""
+
+#: ../../src/mainwindow.cpp:249
+msgid "About Minecraft Structure Modifier"
+msgstr ""
 
 #: ../../src/manage.cpp:15
 msgid "No row is selected!"
@@ -342,7 +346,7 @@ msgstr ""
 msgid "Please enter a data."
 msgstr ""
 
-#: ../../src/paletteaddui.cpp:68 rc.cpp:246
+#: ../../src/paletteaddui.cpp:68 rc.cpp:249
 msgid "Name"
 msgstr "名称"
 
@@ -350,7 +354,7 @@ msgstr "名称"
 msgid "Data"
 msgstr ""
 
-#: ../../src/regionmodifyui.cpp:54
+#: ../../src/regionmodifyui.cpp:57
 msgid "Unknown!"
 msgstr ""
 
@@ -619,154 +623,100 @@ msgid "Modify Time"
 msgstr ""
 
 #: rc.cpp:243
+msgid "Offset"
+msgstr ""
+
+#: rc.cpp:246
 msgid "Author"
 msgstr ""
 
-#: rc.cpp:249
+#: rc.cpp:252
 msgid "Data Version"
 msgstr "数据版本"
 
-#: rc.cpp:252
+#: rc.cpp:255
 msgid "Version"
 msgstr ""
 
-#: rc.cpp:258
+#: rc.cpp:261
 msgid "&Cancel"
 msgstr "取消(&C)"
 
-#: ../../region-rs/src/lib.rs:232
-msgid "Null pointer detected"
-msgstr ""
-
-#: ../../region-rs/src/lib.rs:486 ../../region-rs/src/lib.rs:490
+#: ../../region-rs/src/lib.rs:273 ../../region-rs/src/lib.rs:277
 msgid "The index is out of range."
 msgstr ""
 
-#: ../../region-rs/src/lib.rs:560
-msgid "Loading file."
-msgstr "加载文件中。"
-
-#: ../../region-rs/src/lib.rs:568
-msgid "The loading operation is cancelled."
-msgstr "加载操作被取消。"
-
-#: ../../region-rs/src/lib.rs:602 ../../region-rs/src/lib.rs:682
-msgid "Uncompressing data."
-msgstr "解压数据中。"
-
-#: ../../region-rs/src/lib.rs:610
-msgid "The uncompressing operation is cancelled."
-msgstr "解压操作被取消。"
-
-#: ../../region-rs/src/lib.rs:626 ../../region-rs/src/lib.rs:709
-msgid "Uncompress finish!"
-msgstr "解压完成！"
-
-#: ../../region-rs/src/lib.rs:690
-msgid "The compressing operation is cancelled."
-msgstr ""
-
-#: ../../region-rs/src/lib.rs:883
-msgid "Byte"
-msgstr ""
-
-#: ../../region-rs/src/lib.rs:884
-msgid "Int"
-msgstr ""
-
-#: ../../region-rs/src/lib.rs:885
-msgid "Short"
-msgstr ""
-
-#: ../../region-rs/src/lib.rs:886
-msgid "Long"
-msgstr ""
-
-#: ../../region-rs/src/lib.rs:887
-msgid "Byte Array"
-msgstr ""
-
-#: ../../region-rs/src/lib.rs:888
-msgid "Long Array"
-msgstr ""
-
-#: ../../region-rs/src/lib.rs:889
-msgid "String"
-msgstr ""
-
-#: ../../region-rs/src/lib.rs:890
-msgid "Float"
-msgstr ""
-
-#: ../../region-rs/src/lib.rs:891
-msgid "Double"
-msgstr ""
-
-#: ../../region-rs/src/lib.rs:892
-msgid "Int Array"
-msgstr ""
-
-#: ../../region-rs/src/lib.rs:893
-msgid "List"
-msgstr ""
-
-#: ../../region-rs/src/lib.rs:894
-msgid "Compound"
-msgstr ""
-
-#: ../../crab-nbt-ext/src/lib.rs:96
+#: ../../crab-nbt-ext/src/lib.rs:35
 #, rust-format
 msgid "Couldn't get compound of {}."
 msgstr "无法获取到{}的集合。"
 
-#: ../../crab-nbt-ext/src/lib.rs:107
+#: ../../crab-nbt-ext/src/lib.rs:46
 #, rust-format
 msgid "Couldn't get int of {}."
 msgstr "无法获取到{}的整形。"
 
-#: ../../crab-nbt-ext/src/lib.rs:118
+#: ../../crab-nbt-ext/src/lib.rs:57
 #, rust-format
 msgid "Couldn't get list of {}."
 msgstr "无法获取到{}的列表。"
 
-#: ../../crab-nbt-ext/src/lib.rs:129
+#: ../../crab-nbt-ext/src/lib.rs:68
 #, rust-format
 msgid "Couldn't get string of {}."
 msgstr "无法获取到{}的字符串。"
 
-#: ../../crab-nbt-ext/src/lib.rs:140
+#: ../../crab-nbt-ext/src/lib.rs:79
 #, rust-format
 msgid "Couldn't get long of {}."
 msgstr ""
 
-#: ../../crab-nbt-ext/src/lib.rs:151
+#: ../../crab-nbt-ext/src/lib.rs:90
 #, rust-format
 msgid "Couldn't get long array of {}."
 msgstr ""
 
-#: ../../crab-nbt-ext/src/lib.rs:207
+#: ../../crab-nbt-ext/src/lib.rs:121
 msgid "Reading NBT."
 msgstr ""
 
-#: ../../crab-nbt-ext/src/lib.rs:212 ../../crab-nbt-ext/src/lib.rs:218
+#: ../../crab-nbt-ext/src/lib.rs:126 ../../crab-nbt-ext/src/lib.rs:132
 msgid "The parsing operation is cancelled."
 msgstr ""
 
-#: ../../crab-nbt-ext/src/lib.rs:225
+#: ../../crab-nbt-ext/src/lib.rs:139
 msgid "Reading NBT finish."
 msgstr ""
 
-#: ../../crab-nbt-ext/src/lib.rs:367
+#: ../../crab-nbt-ext/src/lib.rs:281
 msgid "Reading palette is cancelled!"
 msgstr ""
 
-#: ../../crab-nbt-ext/src/lib.rs:374
+#: ../../crab-nbt-ext/src/lib.rs:288
 msgid "Wrong type of palette!"
 msgstr ""
 
-#: ../../crab-nbt-ext/src/lib.rs:389
+#: ../../crab-nbt-ext/src/lib.rs:303
 msgid "Wrong type of property!"
 msgstr ""
+
+#~ msgid "About Litematica Reader"
+#~ msgstr "关于投影文件阅读器"
+
+#~ msgid "Loading file."
+#~ msgstr "加载文件中。"
+
+#~ msgid "The loading operation is cancelled."
+#~ msgstr "加载操作被取消。"
+
+#~ msgid "Uncompressing data."
+#~ msgstr "解压数据中。"
+
+#~ msgid "The uncompressing operation is cancelled."
+#~ msgstr "解压操作被取消。"
+
+#~ msgid "Uncompress finish!"
+#~ msgstr "解压完成！"
 
 #~ msgid "The following files are not added:\n"
 #~ msgstr "以下文件将不会被添加：\n"

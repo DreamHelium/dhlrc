@@ -8,6 +8,7 @@ crab-nbt-ext = { path = "../crab-nbt-ext" }
 crab_nbt = "0.2.11"
 formatx = "0.2.4"
 sysinfo = "0.37.2"
+common-rs = { path = "../common-rs" }
 
 [lib]
 crate-type = ["cdylib"]

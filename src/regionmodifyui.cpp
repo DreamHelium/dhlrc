@@ -36,6 +36,9 @@ RegionModifyUI::initData ()
   string_free (name);
   string_free (author);
   string_free (description);
+  ui->xBox->setValue (region_get_offset_x (region));
+  ui->yBox->setValue (region_get_offset_y (region));
+  ui->zBox->setValue (region_get_offset_z (region));
   ui->lineEdit_3->setText (QString::number (region_get_data_version (region)));
 }
 

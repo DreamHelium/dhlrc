@@ -1,8 +1,12 @@
+use common_rs::ProgressFn;
+use common_rs::i18n::i18n;
+use common_rs::my_error::MyError;
+use common_rs::tree_value::TreeValue;
+use common_rs::util::{show_progress, string_to_ptr_fail_to_null};
 use crab_nbt::{Nbt, NbtCompound, NbtTag};
 use crab_nbt_ext::{
-    GetWithError, MyError, Palette, ProgressFn, TreeValue, convert_nbt_to_vec, convert_vec_to_nbt,
-    get_palette_from_nbt_tag, i18n, init_translation_internal, nbt_create_real, show_progress,
-    string_to_ptr_fail_to_null,
+    GetWithError, Palette, convert_nbt_to_vec, convert_vec_to_nbt, get_palette_from_nbt_tag,
+    init_translation_internal, nbt_create_real,
 };
 use formatx::formatx;
 use std::collections::HashMap;
@@ -10,8 +14,6 @@ use std::error::Error;
 use std::ffi::{CStr, c_char, c_int, c_void};
 use std::fs::File;
 use std::io::Write;
-use std::ops::IndexMut;
-use std::ptr;
 use std::ptr::{null, null_mut};
 use std::string::String;
 use std::sync::atomic::AtomicBool;
@@ -19,6 +21,7 @@ use std::time::Instant;
 
 #[link(name = "region_rs")]
 unsafe extern "C" {
+    fn cancel_flag_is_cancelled(ptr: *const AtomicBool) -> c_int;
     fn region_new() -> *mut c_void;
     fn region_free(region: *mut c_void);
     fn region_set_time(region: *mut c_void, create_time: i64, modify_time: i64) -> *const c_char;
@@ -84,7 +87,6 @@ unsafe extern "C" {
     fn vec_free(vec: *mut Vec<u8>);
     fn vec_to_cstr(vec: *mut Vec<u8>) -> *mut c_char;
     fn region_get_index(region: *mut c_void, x: i32, y: i32, z: i32) -> i32;
-    fn cancel_flag_is_cancelled(ptr: *const AtomicBool) -> c_int;
     fn region_set_block_entities_from_vec(
         region: *mut c_void,
         block_entities: *mut Vec<BlockEntity>,
