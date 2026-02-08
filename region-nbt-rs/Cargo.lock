@@ -280,7 +280,7 @@ dependencies = [
  "crab-nbt-ext",
  "crab_nbt",
  "formatx",
- "gettext-rs",
+ "sysinfo",
 ]
 
 [[package]]

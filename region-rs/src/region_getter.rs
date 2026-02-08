@@ -1,8 +1,8 @@
+use crate::{Region, string_to_ptr_fail_to_null};
+use common_rs::tree_value::TreeValue;
 use std::ffi::c_char;
 use std::ptr;
 use std::ptr::{null, null_mut};
-use common_rs::tree_value::TreeValue;
-use crate::{string_to_ptr_fail_to_null, Region};
 
 #[unsafe(no_mangle)]
 pub extern "C" fn region_get_palette_len(region: *mut Region) -> usize {
@@ -176,6 +176,11 @@ pub extern "C" fn region_get_description(region: *mut Region) -> *const c_char {
 #[unsafe(no_mangle)]
 pub extern "C" fn region_get_name(region: *mut Region) -> *const c_char {
     unsafe { string_to_ptr_fail_to_null((*region).base_data.get_name()) }
+}
+
+#[unsafe(no_mangle)]
+pub extern "C" fn region_get_region_name(region: *mut Region) -> *const c_char {
+    unsafe { string_to_ptr_fail_to_null((*region).base_data.get_region_name()) }
 }
 
 #[unsafe(no_mangle)]

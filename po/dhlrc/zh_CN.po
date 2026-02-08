@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-02-07 22:35+0800\n"
+"POT-Creation-Date: 2026-02-08 19:56+0800\n"
 "PO-Revision-Date: 2024-11-30 07:00+0800\n"
 "Last-Translator: dream_he <48383878+DreamHelium@users.noreply.github.com>\n"
 "Language-Team: Chinese <kde-i18n-doc@kde.org>\n"
@@ -115,14 +115,27 @@ msgstr "描述：%10"
 
 #: ../../src/blockreaderui.cpp:227 ../../src/loadregionui.cpp:62
 #: ../../src/manage.cpp:15 ../../src/manage.cpp:158
-#: ../../src/saveregionui.cpp:44 ../../src/utility.cpp:21
-#: ../../src/utility.cpp:38 ../../src/utility.cpp:46
+#: ../../src/regionmodifyui.cpp:12 ../../src/saveregionui.cpp:45
+#: ../../src/utility.cpp:21 ../../src/utility.cpp:38 ../../src/utility.cpp:46
 msgid "Error!"
 msgstr "错误！"
 
 #: ../../src/blockreaderui.cpp:228
 msgid "Out of memory!"
 msgstr ""
+
+#: ../../src/configobjectui.cpp:62
+msgid "Setting options:"
+msgstr ""
+
+#: ../../src/configobjectui.cpp:86 ../../src/lrchooseui.cpp:79 rc.cpp:165
+#: rc.cpp:201 rc.cpp:261
+msgid "&OK"
+msgstr "确定(&O)"
+
+#: ../../src/configobjectui.cpp:87 rc.cpp:264
+msgid "&Cancel"
+msgstr "取消(&C)"
 
 #: ../../src/dhloadobject.cpp:11
 msgid "Loading..."
@@ -173,11 +186,11 @@ msgstr "结束！"
 msgid "Loading file(s) to Region(s)."
 msgstr "加载文件至Region。"
 
-#: ../../src/loadregionui.cpp:47 ../../src/saveregionui.cpp:29
+#: ../../src/loadregionui.cpp:47 ../../src/saveregionui.cpp:30
 msgid "Cancelled."
 msgstr ""
 
-#: ../../src/loadregionui.cpp:52 ../../src/saveregionui.cpp:34
+#: ../../src/loadregionui.cpp:52 ../../src/saveregionui.cpp:35
 msgid ""
 "The following files are not added:\n"
 "\n"
@@ -207,7 +220,7 @@ msgstr ""
 msgid "Parsing NBT"
 msgstr "传递NBT中"
 
-#: ../../src/loadregionui.cpp:293
+#: ../../src/loadregionui.cpp:294
 msgid "unknown"
 msgstr ""
 
@@ -231,10 +244,6 @@ msgstr ""
 #: ../../src/lrchooseui.cpp:67
 msgid "Enter description here."
 msgstr "在此输入描述。"
-
-#: ../../src/lrchooseui.cpp:79 rc.cpp:165 rc.cpp:201 rc.cpp:258
-msgid "&OK"
-msgstr "确定(&O)"
 
 #: ../../src/main.cpp:31
 msgid "Minecraft Structure Modifier"
@@ -282,39 +291,39 @@ msgstr ""
 msgid "No file selected!"
 msgstr ""
 
-#: ../../src/manage.cpp:213
+#: ../../src/manage.cpp:216
 msgid "Choose Save Option"
 msgstr ""
 
-#: ../../src/manage.cpp:214
+#: ../../src/manage.cpp:217
 msgid "Choose whether format you want to save to."
 msgstr ""
 
-#: ../../src/manage.cpp:221
+#: ../../src/manage.cpp:224
 msgid "Use MultiFunc?"
 msgstr ""
 
-#: ../../src/manage.cpp:222
+#: ../../src/manage.cpp:225
 msgid "This type supports regions to save as one file, do you want to use it?"
 msgstr ""
 
-#: ../../src/manage.cpp:234
+#: ../../src/manage.cpp:237
 msgid "Select Directory"
 msgstr ""
 
-#: ../../src/manage.cpp:282
+#: ../../src/manage.cpp:287
 msgid "Locked!"
 msgstr ""
 
-#: ../../src/manage.cpp:291 rc.cpp:240
+#: ../../src/manage.cpp:296 rc.cpp:240
 msgid "Description"
 msgstr "描述"
 
-#: ../../src/manage.cpp:291
+#: ../../src/manage.cpp:296
 msgid "UUID"
 msgstr "唯一码"
 
-#: ../../src/manage.cpp:291
+#: ../../src/manage.cpp:296
 msgid "Time"
 msgstr "时间"
 
@@ -354,8 +363,12 @@ msgstr "名称"
 msgid "Data"
 msgstr ""
 
-#: ../../src/regionmodifyui.cpp:57
+#: ../../src/regionmodifyui.cpp:86
 msgid "Unknown!"
+msgstr ""
+
+#: ../../src/saveregionui.cpp:97
+msgid "Please click `Continue` to choose options."
 msgstr ""
 
 #: ../../src/utility.cpp:22
@@ -631,18 +644,18 @@ msgid "Author"
 msgstr ""
 
 #: rc.cpp:252
+msgid "Region Name"
+msgstr ""
+
+#: rc.cpp:255
 msgid "Data Version"
 msgstr "数据版本"
 
-#: rc.cpp:255
+#: rc.cpp:258
 msgid "Version"
 msgstr ""
 
-#: rc.cpp:261
-msgid "&Cancel"
-msgstr "取消(&C)"
-
-#: ../../region-rs/src/lib.rs:273 ../../region-rs/src/lib.rs:277
+#: ../../region-rs/src/lib.rs:299 ../../region-rs/src/lib.rs:303
 msgid "The index is out of range."
 msgstr ""
 

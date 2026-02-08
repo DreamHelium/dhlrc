@@ -63,7 +63,7 @@ LoadObjectUI::LoadObjectUI (QWidget *parent)
              });
 }
 
-LoadObjectUI::~LoadObjectUI () {}
+LoadObjectUI::~LoadObjectUI () { delete ui; }
 
 void
 LoadObjectUI::setLabel (const QString &str)

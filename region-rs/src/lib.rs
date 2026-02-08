@@ -23,6 +23,8 @@ struct BaseData {
     author: String,
     /** Default: Converted */
     name: String,
+    /** Default: Unnamed */
+    region_name: String,
 }
 
 impl BaseData {
@@ -64,6 +66,14 @@ impl BaseData {
     fn set_name(&mut self, string: &str) {
         self.name = string.to_string()
     }
+
+    fn set_region_name(&mut self, string: &str) {
+        self.region_name = string.to_string();
+    }
+
+    fn get_region_name(&mut self) -> &str {
+        self.region_name.as_str()
+    }
 }
 
 impl Default for BaseData {
@@ -76,6 +86,7 @@ impl Default for BaseData {
             description: "".to_string(),
             author: real_username,
             name: "Converted".to_string(),
+            region_name: "Unnamed".to_string(),
         }
     }
 }
@@ -156,6 +167,21 @@ pub extern "C" fn region_set_name(region: *mut Region, string: *const c_char) ->
     match real_str {
         Ok(str) => unsafe {
             (*region).base_data.set_name(&str);
+            null()
+        },
+        Err(err) => string_to_ptr_fail_to_null(&err.to_string()),
+    }
+}
+
+#[unsafe(no_mangle)]
+pub extern "C" fn region_set_region_name(
+    region: *mut Region,
+    string: *const c_char,
+) -> *const c_char {
+    let real_str = cstr_to_str(string);
+    match real_str {
+        Ok(str) => unsafe {
+            (*region).base_data.set_region_name(&str);
             null()
         },
         Err(err) => string_to_ptr_fail_to_null(&err.to_string()),

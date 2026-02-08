@@ -7,9 +7,9 @@ edition = "2024"
 [dependencies]
 crab_nbt = "0.2.11"
 crab-nbt-ext = { path = "../crab-nbt-ext" }
-gettext-rs = "0.7.7"
 formatx = "0.2.4"
 common-rs = { path = "../common-rs" }
+sysinfo = "0.38.1"
 
 [lib]
 crate-type = ["cdylib"]

@@ -1,5 +1,13 @@
+use common_rs::ProgressFn;
+use common_rs::i18n::i18n;
+use common_rs::my_error::MyError;
+use common_rs::tree_value::TreeValue;
+use common_rs::util::{cstr_to_str, show_progress, string_to_ptr_fail_to_null};
 use crab_nbt::NbtTag;
-use crab_nbt_ext::{convert_nbt_tag_to_tree_value, convert_nbt_to_vec, get_palette_from_nbt_tag, init_translation_internal, nbt_create_real, GetWithError, Palette};
+use crab_nbt_ext::{
+    GetWithError, Palette, convert_nbt_tag_to_tree_value, convert_nbt_to_vec,
+    get_palette_from_nbt_tag, init_translation_internal, nbt_create_real,
+};
 use formatx::formatx;
 use std::collections::HashMap;
 use std::error::Error;
@@ -9,11 +17,6 @@ use std::ptr::{null, null_mut};
 use std::sync::atomic::AtomicBool;
 use std::time::Instant;
 use sysinfo::System;
-use common_rs::i18n::i18n;
-use common_rs::my_error::MyError;
-use common_rs::ProgressFn;
-use common_rs::tree_value::TreeValue;
-use common_rs::util::{cstr_to_str, show_progress, string_to_ptr_fail_to_null};
 
 static mut FREE_MEMORY: usize = 500 * 1024 * 1024;
 
@@ -28,6 +31,8 @@ unsafe extern "C" {
     fn region_get_size(region: *mut c_void);
     fn region_get_name(region: *mut c_void) -> *const c_char;
     fn region_set_name(region: *mut c_void, string: *const c_char) -> *const c_char;
+    fn region_get_region_name(region: *mut c_void) -> *const c_char;
+    fn region_set_region_name(region: *mut c_void, string: *const c_char) -> *const c_char;
     fn region_get_description(region: *mut c_void) -> *const c_char;
     fn region_set_description(region: *mut c_void, string: *const c_char) -> *const c_char;
     fn region_get_author(region: *mut c_void) -> *const c_char;
@@ -177,7 +182,7 @@ fn get_bits(num: usize) -> u32 {
 
 fn finish_oom(system: &mut System) -> Result<(), MyError> {
     system.refresh_all();
-    if unsafe { system.free_memory() < FREE_MEMORY as u64 } {
+    if unsafe { system.available_memory() < FREE_MEMORY as u64 } {
         return Err(MyError {
             msg: i18n("Out of memory!").to_string(),
         });
@@ -279,6 +284,7 @@ fn region_create_from_bytes_internal(
     let name = metadata.get_string_with_err("Name")?;
 
     let region_parent_nbt = nbt.get_compound_with_err("Regions")?;
+    let region_name = &region_parent_nbt.child_tags[index as usize].0;
     let region_nbt = &region_parent_nbt.child_tags[index as usize].1;
     let real_region_nbt = match region_nbt {
         NbtTag::Compound(c) => c,
@@ -402,13 +408,25 @@ fn region_create_from_bytes_internal(
         let real_name = string_to_ptr_fail_to_null(name);
         let real_description = string_to_ptr_fail_to_null(description);
         let real_author = string_to_ptr_fail_to_null(author);
+        let real_region_name = string_to_ptr_fail_to_null(region_name);
         let name_err = region_set_name(region, real_name);
         let description_err = region_set_description(region, real_description);
         let author_err = region_set_author(region, real_author);
-        if !name_err.is_null() || !description_err.is_null() || !author_err.is_null() {
+        let region_name_err = region_set_region_name(region, real_region_name);
+        if !name_err.is_null()
+            || !description_err.is_null()
+            || !author_err.is_null()
+            || !region_name_err.is_null()
+        {
+            string_free(real_name);
+            string_free(real_description);
+            string_free(real_author);
+            string_free(real_region_name);
+
             string_free(name_err as *mut c_char);
             string_free(description_err as *mut c_char);
             string_free(author_err as *mut c_char);
+            string_free(region_name_err as *mut c_char);
             region_free(region);
             return Err(Box::from(MyError {
                 msg: String::from(i18n("Setting base data error!")),
@@ -417,6 +435,7 @@ fn region_create_from_bytes_internal(
         string_free(real_name);
         string_free(real_description);
         string_free(real_author);
+        string_free(real_region_name);
         region_set_block_entities_from_vec(region, Box::into_raw(Box::new(tile_entities_vec)));
         region_set_entity_from_vec(region, Box::into_raw(Box::new(entities_vec)));
         let msg = region_set_time(region, create_time, modify_time);

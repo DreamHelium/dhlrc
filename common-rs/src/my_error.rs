@@ -13,3 +13,9 @@ impl Display for MyError {
 }
 
 impl Error for MyError {}
+
+impl MyError {
+    pub fn new(msg: String) -> Self {
+        MyError { msg }
+    }
+}

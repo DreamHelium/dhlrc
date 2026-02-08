@@ -211,7 +211,7 @@ LoadRegionUI::process ()
                                          &singleRegion, this, cancel_flag,
                                          index);
 
-                  auto name = indexFn (object.get (), index);
+                  auto name = region_get_region_name (singleRegion);
                   pushRegionFunc (dir, name, singleRegion);
                   string_free (name);
                 }
@@ -286,7 +286,8 @@ LoadRegionUI::process ()
               if (nameFn)
                 {
                   auto typeName = nameFn ();
-                  name = typeName;
+                  if (typeName)
+                    name = typeName;
                   string_free (typeName);
                 }
               if (name.isEmpty ())

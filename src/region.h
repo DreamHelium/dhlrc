@@ -20,6 +20,8 @@ extern "C"
   /* Note: The getter should not return nullptr unless error occurred */
   const char *region_get_name (void *region);
   const char *region_set_name (void *region, const char *name);
+  const char *region_get_region_name (void *region);
+  const char *region_set_region_name (void *region, const char *name);
   const char *region_get_description (void *region);
   const char *region_set_description (void *region, const char *description);
   const char *region_get_author (void *region);

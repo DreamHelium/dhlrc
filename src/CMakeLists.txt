@@ -48,7 +48,6 @@ set(PROJECT_SOURCES
         manage.h manage.cpp
         utility.h utility.cpp
         dhtreefilter.h dhtreefilter.cpp
-        generalchooseui.h
         #        propertymodifyui.cpp
         #        propertymodifyui.h
         #        propertymodifyui.ui
@@ -102,6 +101,8 @@ set(TEMP_PROJECT_SOURCES
         nbtvec.h
         dhgameconfigui.h
         saveregionui.h saveregionui.cpp
+        configobjectui.cpp
+        configobjectui.h
 )
 
 ki18n_wrap_ui(TEMP_PROJECT_SOURCES ${ui_files})

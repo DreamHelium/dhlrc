@@ -81,13 +81,34 @@
       </widget>
      </item>
      <item>
-      <widget class="QSpinBox" name="xBox"/>
+      <widget class="QSpinBox" name="xBox">
+       <property name="minimum">
+        <number>-2147483647</number>
+       </property>
+       <property name="maximum">
+        <number>2147483647</number>
+       </property>
+      </widget>
      </item>
      <item>
-      <widget class="QSpinBox" name="yBox"/>
+      <widget class="QSpinBox" name="yBox">
+       <property name="minimum">
+        <number>-2147483647</number>
+       </property>
+       <property name="maximum">
+        <number>2147483647</number>
+       </property>
+      </widget>
      </item>
      <item>
-      <widget class="QSpinBox" name="zBox"/>
+      <widget class="QSpinBox" name="zBox">
+       <property name="minimum">
+        <number>-2147483647</number>
+       </property>
+       <property name="maximum">
+        <number>2147483647</number>
+       </property>
+      </widget>
      </item>
     </layout>
    </item>
@@ -120,6 +141,20 @@
     </layout>
    </item>
    <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_9">
+     <item>
+      <widget class="QLabel" name="label_9">
+       <property name="text">
+        <string>Region Name</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="lineEdit_3"/>
+     </item>
+    </layout>
+   </item>
+   <item>
     <layout class="QHBoxLayout" name="horizontalLayout_6">
      <item>
       <widget class="QLabel" name="label_7">
@@ -129,7 +164,11 @@
       </widget>
      </item>
      <item>
-      <widget class="QLineEdit" name="lineEdit_3"/>
+      <widget class="QSpinBox" name="spinBox">
+       <property name="maximum">
+        <number>2147483647</number>
+       </property>
+      </widget>
      </item>
      <item>
       <widget class="QLabel" name="versionLabel">

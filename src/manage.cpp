@@ -172,6 +172,7 @@ ManageRegion::save_triggered (QList<int> rows)
       QStringList supportList;
       QList<multiTransFunc> multiFuncList;
       QList<singleTransFunc> singleFuncList;
+      QList<QLibrary*> libraries;
       for (auto lib : modules)
         {
           auto nameFn = reinterpret_cast<const char *(*)()> (
@@ -188,6 +189,7 @@ ManageRegion::save_triggered (QList<int> rows)
               if (singleTransFn)
                 {
                   supportList << name;
+                  libraries << lib;
                   singleFuncList << singleTransFn;
                 }
               if (transMultiFn)
@@ -202,6 +204,7 @@ ManageRegion::save_triggered (QList<int> rows)
               if (transFn)
                 {
                   supportList << name;
+                  libraries << lib;
                   singleFuncList << transFn;
                   multiFuncList << nullptr;
                 }
@@ -240,7 +243,9 @@ ManageRegion::save_triggered (QList<int> rows)
                       auto region = regions[i].get ();
                       transRegions << region;
                     }
-                  auto srui = new SaveRegionUI(transRegions, dir, singleFuncList[index]);
+                  auto srui = new SaveRegionUI (transRegions, dir,
+                                                singleFuncList[index],
+                                                libraries[index]);
                   srui->setAttribute (Qt::WA_DeleteOnClose);
                   srui->show ();
                 }

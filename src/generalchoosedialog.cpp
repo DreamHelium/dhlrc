@@ -16,7 +16,7 @@ GeneralChooseDialog::GeneralChooseDialog (const QString &title,
   layout = new QVBoxLayout (this);
   QLabel *contentLabel = new QLabel (label);
   layout->addWidget (contentLabel);
-  group = new QButtonGroup ();
+  group = new QButtonGroup (this);
   int index = 0;
   if (needMulti)
     {
@@ -24,13 +24,13 @@ GeneralChooseDialog::GeneralChooseDialog (const QString &title,
       group->setExclusive (false);
       group->addButton (checkBox, index++);
       layout->addWidget (checkBox);
-      QObject::connect (checkBox, &QCheckBox::clicked, this,
-                        [&] (bool checked)
-                          {
-                            auto btns = group->buttons ();
-                            for (auto i : btns)
-                              i->setChecked (checked);
-                          });
+      connect (checkBox, &QCheckBox::clicked, this,
+               [&] (bool checked)
+                 {
+                   auto btns = group->buttons ();
+                   for (auto i : btns)
+                     i->setChecked (checked);
+                 });
     }
   for (auto i : list)
     {
@@ -38,22 +38,22 @@ GeneralChooseDialog::GeneralChooseDialog (const QString &title,
       if (needMulti)
         {
           btn = new QCheckBox (i);
-          QObject::connect (btn, &QAbstractButton::clicked, this,
-                            [&] (bool checked)
-                              {
-                                bool same = true;
-                                auto btns = group->buttons ();
-                                for (int j = 1; j < btns.size (); j++)
-                                  {
-                                    auto button = btns[j];
-                                    if (button->isChecked () != checked)
-                                      same = false;
-                                  }
-                                if (same)
-                                  btns[0]->setChecked (checked);
-                                else
-                                  btns[0]->setChecked (false);
-                              });
+          connect (btn, &QAbstractButton::clicked, this,
+                   [&] (bool checked)
+                     {
+                       bool same = true;
+                       auto btns = group->buttons ();
+                       for (int j = 1; j < btns.size (); j++)
+                         {
+                           auto button = btns[j];
+                           if (button->isChecked () != checked)
+                             same = false;
+                         }
+                       if (same)
+                         btns[0]->setChecked (checked);
+                       else
+                         btns[0]->setChecked (false);
+                     });
         }
       else
         btn = new QRadioButton (i);

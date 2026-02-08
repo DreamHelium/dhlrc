@@ -2,14 +2,15 @@
 
 #include <QDir>
 #include <QMessageBox>
+#include <configobjectui.h>
 #include <manage.h>
 #include <thread>
 
 SaveRegionUI::SaveRegionUI (const QList<Region *> &list,
                             const QString &outputDir, singleTransFunc func,
-                            QWidget *parent)
+                            QLibrary *library, QWidget *parent)
     : LoadObjectUI (parent), list (list), outputDir (outputDir), func (func),
-      cancel_flag (cancel_flag_new ())
+      cancel_flag (cancel_flag_new ()), library (library)
 {
   connect (this, &SaveRegionUI::winClose, this,
            [&]
@@ -48,6 +49,14 @@ SaveRegionUI::SaveRegionUI (const QList<Region *> &list,
                    delete messageBox;
                  }
              });
+  connect (this, &SaveRegionUI::continued, this,
+           [&]
+             {
+               configObject
+                   = ConfigObjectUI::getObject (this->library, CONFIG_OUTPUT);
+               cv.notify_one ();
+               Q_EMIT continueProgress ();
+             });
   process ();
 }
 
@@ -56,18 +65,25 @@ SaveRegionUI::~SaveRegionUI () { cancel_flag_destroy (cancel_flag); }
 void
 SaveRegionUI::process ()
 {
-  auto full_set = [] (void *main_klass, int value, const char *string)
+  auto full_set
+      = [] (void *main_klass, int value, const char *text, const char *arg)
     {
       auto klass = static_cast<SaveRegionUI *> (main_klass);
-      Q_EMIT klass->refreshSubProgress (value);
-      Q_EMIT klass->refreshSubLabel (string);
+      klass->refreshSubProgress (value);
+      if (!arg)
+        klass->refreshSubLabel (gettext (text));
+      else
+        {
+          auto msg = QString::asprintf (gettext (text), arg);
+          klass->refreshSubLabel (msg);
+        }
     };
   auto real_task = [&, full_set]
     {
       int i = 0;
-      bool ignore_air = true;
       for (auto st : list)
         {
+          currentRegion = region_get_name (st->region.get ());
           if (cancel_flag_is_cancelled (cancel_flag))
             break;
           Q_EMIT refreshFullProgress ((i + 1) * 100 / list.size ());
@@ -77,7 +93,16 @@ SaveRegionUI::process ()
           i++;
           /* Processing stuff */
           QString realDir = outputDir + QDir::separator () + st->name;
-          func (st->region.get (), realDir.toUtf8 ());
+          Q_EMIT refreshFullLabel (
+              _ ("Please click `Continue` to choose options."));
+          /* Emit the stop signal to stop, and use loop to
+           * stop the process. */
+          Q_EMIT stopProgress ();
+          std::unique_lock lock (mutex);
+          cv.wait (lock);
+          if (!cancel_flag_is_cancelled (cancel_flag))
+            func (st->region.get (), realDir.toUtf8 (), configObject, full_set,
+                  this, cancel_flag);
         }
       Q_EMIT refreshFullProgress (100);
       cv.notify_one ();
