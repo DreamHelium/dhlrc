@@ -5,6 +5,7 @@ pub mod cancel_flag;
 pub mod util;
 pub mod i18n;
 pub mod my_error;
+pub mod region;
 
 pub type ProgressFn = Option<
     extern "C" fn(

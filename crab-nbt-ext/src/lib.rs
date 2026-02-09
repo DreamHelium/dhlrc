@@ -9,6 +9,7 @@ use std::sync::atomic::{AtomicBool, Ordering};
 use common_rs::i18n::i18n;
 use common_rs::my_error::MyError;
 use common_rs::ProgressFn;
+use common_rs::region::Palette;
 use common_rs::tree_value::TreeValue;
 use common_rs::util::{cstr_to_str, show_progress};
 
@@ -266,10 +267,6 @@ pub fn convert_vec_to_nbt(vec: &Vec<(String, TreeValue)>, str: &str, from_file: 
     }
 }
 
-pub struct Palette {
-    pub id_name: String,
-    pub property: Vec<(String, String)>,
-}
 pub fn get_palette_from_nbt_tag(
     palette_list: &Vec<NbtTag>,
     cancel_flag: *const AtomicBool,

@@ -1,23 +1,17 @@
 use crate::config::OutputConfig;
-use crate::{
-    get_size_double, region_get_block_entity, region_get_block_id_by_index,
-    region_get_data_version, region_get_entity, region_get_entity_len, region_get_palette_id_name,
-    region_get_palette_len, region_get_palette_property_data, region_get_palette_property_len,
-    region_get_palette_property_name, region_get_x, region_get_y, region_get_z, string_free,
-    vec_try_compress,
-};
+use crate::{get_size_double, real_show_progress, region_get_block_entity, region_get_block_id_by_index, region_get_data_version, region_get_entity, region_get_entity_len, region_get_palette_id_name, region_get_palette_len, region_get_palette_property_data, region_get_palette_property_len, region_get_palette_property_name, region_get_x, region_get_y, region_get_z, string_free, vec_try_compress};
 use common_rs::ProgressFn;
 use common_rs::i18n::i18n;
 use common_rs::my_error::MyError;
 use common_rs::tree_value::TreeValue;
-use common_rs::util::{real_show_progress, string_to_ptr_fail_to_null};
+use common_rs::util::{string_to_ptr_fail_to_null};
 use crab_nbt::{Nbt, NbtCompound, NbtTag};
 use crab_nbt_ext::convert_vec_to_nbt;
 use std::error::Error;
 use std::ffi::{CStr, CString, c_char, c_int, c_void};
 use std::fs::File;
 use std::io::Write;
-use std::ptr::{null, null_mut};
+use std::ptr::{null};
 use std::sync::atomic::AtomicBool;
 use std::time::Instant;
 use formatx::formatx;
@@ -143,15 +137,17 @@ impl NbtCreate for NbtTag {
         for state in states {
             let string = i18n("Adding blocks to NBT: {} / {}.");
             let real_string = formatx!(string, i, states.len())?;
-            real_show_progress(
-                instant,
-                system,
-                progress_fn,
-                main_klass,
-                (((i + 1) as usize * 100) / states.len()) as c_int,
-                &real_string,
-                "",
-            )?;
+            unsafe {
+                real_show_progress(
+                    instant,
+                    system,
+                    progress_fn,
+                    main_klass,
+                    (((i + 1) as usize * 100) / states.len()) as c_int,
+                    &real_string,
+                    "",
+                )?;
+            }
             let mut single_block_vec = vec![];
             if ignore_air && *state == 0 {
                 size_change(&mut x, &mut y, &mut z, region_x, region_y, region_z);
@@ -268,15 +264,17 @@ fn region_save_internal(
     let mut start = Instant::now();
     let mut sys = System::new_all();
     while i < size {
-        real_show_progress(
-            &mut start,
-            &mut sys,
-            progress_fn,
-            main_klass,
-            (((i + 1) as usize * 100) / size as usize) as c_int,
-            i18n("Pushing index."),
-            "",
-        )?;
+        unsafe {
+            real_show_progress(
+                &mut start,
+                &mut sys,
+                progress_fn,
+                main_klass,
+                (((i + 1) as usize * 100) / size as usize) as c_int,
+                i18n("Pushing index."),
+                "",
+            )?;
+        }
         unsafe { id.push(region_get_block_id_by_index(region, i as usize)) };
         i += 1;
     }

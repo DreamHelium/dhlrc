@@ -55,8 +55,6 @@ MainWindow::MainWindow (QWidget *parent)
 {
   ui->setupUi (this);
 
-  KConfigDialog::showDialog ("dhlrc");
-
   auto manager = KColorSchemeManager::instance ();
   auto menu = KColorSchemeMenu::createMenu (manager, this);
   ui->menu_Tools->addAction (menu);
@@ -65,7 +63,7 @@ MainWindow::MainWindow (QWidget *parent)
   ui->tabWidget->setTabIcon (0, QIcon (":/cn/dh/dhlrc/region.svg"));
 
   // ui->tabWidget->setTabIcon (1, QIcon(":/cn/dh/dhlrc/item_list.svg"));
-
+  DhGeneralConfigUI::setConfig ();
   initSignalSlots ();
   initShortcuts ();
 }

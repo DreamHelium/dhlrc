@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-02-08 19:56+0800\n"
+"POT-Creation-Date: 2026-02-09 23:51+0800\n"
 "PO-Revision-Date: 2024-11-30 07:00+0800\n"
 "Last-Translator: dream_he <48383878+DreamHelium@users.noreply.github.com>\n"
 "Language-Team: Chinese <kde-i18n-doc@kde.org>\n"
@@ -128,12 +128,12 @@ msgstr ""
 msgid "Setting options:"
 msgstr ""
 
-#: ../../src/configobjectui.cpp:86 ../../src/lrchooseui.cpp:79 rc.cpp:165
-#: rc.cpp:201 rc.cpp:261
+#: ../../src/configobjectui.cpp:86 ../../src/lrchooseui.cpp:79 rc.cpp:177
+#: rc.cpp:213 rc.cpp:273
 msgid "&OK"
 msgstr "确定(&O)"
 
-#: ../../src/configobjectui.cpp:87 rc.cpp:264
+#: ../../src/configobjectui.cpp:87 rc.cpp:276
 msgid "&Cancel"
 msgstr "取消(&C)"
 
@@ -146,7 +146,7 @@ msgid "NBT Reader"
 msgstr ""
 
 #: ../../src/externalnbtreaderui.cpp:29 ../../src/lrchooseui.cpp:80 rc.cpp:12
-#: rc.cpp:54 rc.cpp:168 rc.cpp:189
+#: rc.cpp:54 rc.cpp:180 rc.cpp:201
 msgid "&Close"
 msgstr "关闭(&C)"
 
@@ -255,23 +255,23 @@ msgid ""
 "window that's using the Region."
 msgstr "Region被锁定！可能不是写锁！请尝试关闭正在使用此Region的窗口。"
 
-#: ../../src/mainwindow.cpp:121
+#: ../../src/mainwindow.cpp:119
 msgid "General"
 msgstr "概况"
 
-#: ../../src/mainwindow.cpp:122
+#: ../../src/mainwindow.cpp:120
 msgid "Game"
 msgstr "游戏"
 
-#: ../../src/mainwindow.cpp:246
+#: ../../src/mainwindow.cpp:244
 msgid "Version: "
 msgstr "版本： "
 
-#: ../../src/mainwindow.cpp:248
+#: ../../src/mainwindow.cpp:246
 msgid "Graphical Backend: Qt"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:249
+#: ../../src/mainwindow.cpp:247
 msgid "About Minecraft Structure Modifier"
 msgstr ""
 
@@ -315,7 +315,7 @@ msgstr ""
 msgid "Locked!"
 msgstr ""
 
-#: ../../src/manage.cpp:296 rc.cpp:240
+#: ../../src/manage.cpp:296 rc.cpp:252
 msgid "Description"
 msgstr "描述"
 
@@ -355,7 +355,7 @@ msgstr ""
 msgid "Please enter a data."
 msgstr ""
 
-#: ../../src/paletteaddui.cpp:68 rc.cpp:249
+#: ../../src/paletteaddui.cpp:68 rc.cpp:261
 msgid "Name"
 msgstr "名称"
 
@@ -395,19 +395,37 @@ msgstr ""
 msgid "Whether to ignore leftover data in NBT when parsing."
 msgstr ""
 
-#: ../../build/src/settings.cpp:46 rc.cpp:78
+#: ../../build/src/settings.cpp:43 rc.cpp:78
+msgid "Application Memory Limit"
+msgstr "应用内存限制"
+
+#: ../../build/src/settings.cpp:44 rc.cpp:81
+msgid "The limit memory for application."
+msgstr "应用限制内存。"
+
+#: ../../build/src/settings.cpp:47 rc.cpp:84
+msgid "Elapsed Milliseconds"
+msgstr "持续毫秒"
+
+#: ../../build/src/settings.cpp:48 rc.cpp:87
+msgid ""
+"The elapsed milliseconds for the progress bar, if set too small will affect "
+"the speed."
+msgstr "进度条的持续毫秒，如果设置太小将会影响速度。"
+
+#: ../../build/src/settings.cpp:54 rc.cpp:90
 msgid "Override Settings"
 msgstr "覆盖设置"
 
-#: ../../build/src/settings.cpp:47 rc.cpp:81
+#: ../../build/src/settings.cpp:55 rc.cpp:93
 msgid "Whether to override setting or not."
 msgstr "是否覆盖设置。"
 
-#: ../../build/src/settings.cpp:50 rc.cpp:84
+#: ../../build/src/settings.cpp:58 rc.cpp:96
 msgid "Override Version"
 msgstr "覆盖版本"
 
-#: ../../build/src/settings.cpp:51 rc.cpp:87
+#: ../../build/src/settings.cpp:59 rc.cpp:99
 msgid "The version to override in translation stage."
 msgstr "在翻译阶段覆盖的版本。"
 
@@ -459,7 +477,7 @@ msgstr "展示实体NBT(&S)"
 msgid "&List blocks"
 msgstr "列出方块(&L)"
 
-#: rc.cpp:51 rc.cpp:207
+#: rc.cpp:51 rc.cpp:219
 msgid "&Show blocks"
 msgstr "展示方块 (&S)"
 
@@ -479,237 +497,237 @@ msgstr ""
 msgid "Modify &Block"
 msgstr ""
 
-#: rc.cpp:90
+#: rc.cpp:102
 msgid "What happened in this step?"
 msgstr "在此步发生了什么？"
 
-#: rc.cpp:93
+#: rc.cpp:105
 msgid "Details"
 msgstr "细节"
 
-#: rc.cpp:96
+#: rc.cpp:108
 msgid "&Continue"
 msgstr "继续(&C)"
 
-#: rc.cpp:99
+#: rc.cpp:111
 msgid "C&ancel"
 msgstr "取消(&C)"
 
-#: rc.cpp:102
+#: rc.cpp:114
 msgid "&NBT File Reader"
 msgstr ""
 
-#: rc.cpp:105
+#: rc.cpp:117
 msgid "&Manage Region"
 msgstr "管理Region(&M)"
 
-#: rc.cpp:108
+#: rc.cpp:120
 msgid "M&odify Region"
 msgstr ""
 
-#: rc.cpp:111
+#: rc.cpp:123
 msgid "&Block reader"
 msgstr "方块阅读器(&B)"
 
-#: rc.cpp:114
+#: rc.cpp:126
 msgid "Shortcuts"
 msgstr ""
 
-#: rc.cpp:117
+#: rc.cpp:129
 msgid "Utility"
 msgstr ""
 
-#: rc.cpp:120
+#: rc.cpp:132
 msgid "&Configure"
 msgstr ""
 
-#: rc.cpp:123
+#: rc.cpp:135
 msgid "&Run Script"
 msgstr ""
 
-#: rc.cpp:126 rc.cpp:135
+#: rc.cpp:138 rc.cpp:147
 msgid "&About"
 msgstr "关于(&A)"
 
-#: rc.cpp:129
+#: rc.cpp:141
 msgid "&Tools"
 msgstr "工具(&T)"
 
-#: rc.cpp:132
+#: rc.cpp:144
 msgid "Icons"
 msgstr "图标"
 
-#: rc.cpp:138 rc.cpp:147
+#: rc.cpp:150 rc.cpp:159
 msgid "test"
 msgstr ""
 
-#: rc.cpp:141
+#: rc.cpp:153
 msgid "test\\"
 msgstr ""
 
-#: rc.cpp:144
+#: rc.cpp:156
 msgid "tetst"
 msgstr ""
 
-#: rc.cpp:150 rc.cpp:171
+#: rc.cpp:162 rc.cpp:183
 msgid "Form"
 msgstr ""
 
-#: rc.cpp:153 rc.cpp:195
+#: rc.cpp:165 rc.cpp:207
 msgid "&Add"
 msgstr "添加(&A)"
 
-#: rc.cpp:156 rc.cpp:198
+#: rc.cpp:168 rc.cpp:210
 msgid "&Remove"
 msgstr "移除(&R)"
 
-#: rc.cpp:159
+#: rc.cpp:171
 msgid "R&efresh"
 msgstr "刷新(&E)"
 
-#: rc.cpp:162
+#: rc.cpp:174
 msgid "&Save"
 msgstr "保存(&S)"
 
-#: rc.cpp:174
+#: rc.cpp:186
 msgid "Type:"
 msgstr ""
 
-#: rc.cpp:177
+#: rc.cpp:189
 msgid "Key:"
 msgstr ""
 
-#: rc.cpp:180
+#: rc.cpp:192
 msgid "Value:"
 msgstr ""
 
-#: rc.cpp:183
+#: rc.cpp:195
 msgid "&Export"
 msgstr ""
 
-#: rc.cpp:186
+#: rc.cpp:198
 msgid "PushButton"
 msgstr ""
 
-#: rc.cpp:192
+#: rc.cpp:204
 msgid "PaletteAddUI"
 msgstr ""
 
-#: rc.cpp:204
+#: rc.cpp:216
 msgid "PaletteListUI"
 msgstr ""
 
-#: rc.cpp:210
+#: rc.cpp:222
 msgid "Modify Property of Block(s)"
 msgstr ""
 
-#: rc.cpp:213
+#: rc.cpp:225
 msgid "Modify the property of the block in:"
 msgstr "更改在此的方块属性："
 
-#: rc.cpp:216
+#: rc.cpp:228
 msgid "With the block that is the same property"
 msgstr "以及同属性的方块"
 
-#: rc.cpp:219
+#: rc.cpp:231
 msgid "Properties:"
 msgstr ""
 
-#: rc.cpp:222
+#: rc.cpp:234
 msgid "RegionModifyUI"
 msgstr ""
 
-#: rc.cpp:225
+#: rc.cpp:237
 msgid "Modify the infomation of the Region."
 msgstr ""
 
-#: rc.cpp:228
+#: rc.cpp:240
 msgid "Create Time"
 msgstr ""
 
-#: rc.cpp:231 rc.cpp:237
+#: rc.cpp:243 rc.cpp:249
 msgid "yyyy/MM/dd HH:mm:ss.zzz"
 msgstr ""
 
-#: rc.cpp:234
+#: rc.cpp:246
 msgid "Modify Time"
 msgstr ""
 
-#: rc.cpp:243
+#: rc.cpp:255
 msgid "Offset"
 msgstr ""
 
-#: rc.cpp:246
+#: rc.cpp:258
 msgid "Author"
 msgstr ""
 
-#: rc.cpp:252
+#: rc.cpp:264
 msgid "Region Name"
 msgstr ""
 
-#: rc.cpp:255
+#: rc.cpp:267
 msgid "Data Version"
 msgstr "数据版本"
 
-#: rc.cpp:258
+#: rc.cpp:270
 msgid "Version"
 msgstr ""
 
-#: ../../region-rs/src/lib.rs:299 ../../region-rs/src/lib.rs:303
+#: ../../region-rs/src/lib.rs:175 ../../region-rs/src/lib.rs:179
 msgid "The index is out of range."
 msgstr ""
 
-#: ../../crab-nbt-ext/src/lib.rs:35
+#: ../../crab-nbt-ext/src/lib.rs:36
 #, rust-format
 msgid "Couldn't get compound of {}."
 msgstr "无法获取到{}的集合。"
 
-#: ../../crab-nbt-ext/src/lib.rs:46
+#: ../../crab-nbt-ext/src/lib.rs:47
 #, rust-format
 msgid "Couldn't get int of {}."
 msgstr "无法获取到{}的整形。"
 
-#: ../../crab-nbt-ext/src/lib.rs:57
+#: ../../crab-nbt-ext/src/lib.rs:58
 #, rust-format
 msgid "Couldn't get list of {}."
 msgstr "无法获取到{}的列表。"
 
-#: ../../crab-nbt-ext/src/lib.rs:68
+#: ../../crab-nbt-ext/src/lib.rs:69
 #, rust-format
 msgid "Couldn't get string of {}."
 msgstr "无法获取到{}的字符串。"
 
-#: ../../crab-nbt-ext/src/lib.rs:79
+#: ../../crab-nbt-ext/src/lib.rs:80
 #, rust-format
 msgid "Couldn't get long of {}."
 msgstr ""
 
-#: ../../crab-nbt-ext/src/lib.rs:90
+#: ../../crab-nbt-ext/src/lib.rs:91
 #, rust-format
 msgid "Couldn't get long array of {}."
 msgstr ""
 
-#: ../../crab-nbt-ext/src/lib.rs:121
+#: ../../crab-nbt-ext/src/lib.rs:122
 msgid "Reading NBT."
 msgstr ""
 
-#: ../../crab-nbt-ext/src/lib.rs:126 ../../crab-nbt-ext/src/lib.rs:132
+#: ../../crab-nbt-ext/src/lib.rs:127 ../../crab-nbt-ext/src/lib.rs:133
 msgid "The parsing operation is cancelled."
 msgstr ""
 
-#: ../../crab-nbt-ext/src/lib.rs:139
+#: ../../crab-nbt-ext/src/lib.rs:140
 msgid "Reading NBT finish."
 msgstr ""
 
-#: ../../crab-nbt-ext/src/lib.rs:281
+#: ../../crab-nbt-ext/src/lib.rs:278
 msgid "Reading palette is cancelled!"
 msgstr ""
 
-#: ../../crab-nbt-ext/src/lib.rs:288
+#: ../../crab-nbt-ext/src/lib.rs:285
 msgid "Wrong type of palette!"
 msgstr ""
 
-#: ../../crab-nbt-ext/src/lib.rs:303
+#: ../../crab-nbt-ext/src/lib.rs:300
 msgid "Wrong type of property!"
 msgstr ""
 

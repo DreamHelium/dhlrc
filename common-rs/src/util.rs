@@ -73,6 +73,11 @@ pub extern "C" fn reset_available_memory(memory: usize) {
 }
 
 #[unsafe(no_mangle)]
+pub extern "C" fn reset_elapsed_millisecs(millisecond: u64) {
+    unsafe { ELAPSED_MILLISECS = millisecond };
+}
+
+#[unsafe(no_mangle)]
 pub extern "C" fn get_limit_available_memory() -> usize {
     unsafe { FREE_MEMORY }
 }
@@ -97,24 +102,19 @@ pub fn cstr_to_str(string: *const c_char) -> Result<String, Box<dyn Error>> {
     Ok(ref_str.to_string())
 }
 
-pub fn real_show_progress(
+#[unsafe(no_mangle)]
+pub extern "C" fn real_show_progress(
     instant: &mut Instant,
     system: &mut System,
     progress_fn: ProgressFn,
     main_klass: *mut c_void,
     percentage: c_int,
-    msg : &str,
-    text : &str
+    msg: &str,
+    text: &str,
 ) -> Result<(), MyError> {
     if instant.elapsed().as_millis() >= unsafe { ELAPSED_MILLISECS as u128 } {
         finish_oom(system)?;
-        show_progress(
-            progress_fn,
-            main_klass,
-            percentage,
-            msg,
-            text,
-        );
+        show_progress(progress_fn, main_klass, percentage, msg, text);
         *instant = Instant::now();
     }
     Ok(())

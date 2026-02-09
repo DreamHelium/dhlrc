@@ -1,6 +1,6 @@
 # Minecraft Structure Modifier
 
-[中文文档](README_zh.md)
+[中文文档](README_zh.md) | [Development Document](dev-doc/README.md)
 
 ## License Problem
 

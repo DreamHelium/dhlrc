@@ -5,18 +5,19 @@ use common_rs::tree_value::TreeValue;
 use common_rs::util::{cstr_to_str, show_progress, string_to_ptr_fail_to_null};
 use crab_nbt::NbtTag;
 use crab_nbt_ext::{
-    GetWithError, Palette, convert_nbt_tag_to_tree_value, convert_nbt_to_vec,
+    GetWithError, convert_nbt_tag_to_tree_value, convert_nbt_to_vec,
     get_palette_from_nbt_tag, init_translation_internal, nbt_create_real,
 };
 use formatx::formatx;
 use std::collections::HashMap;
 use std::error::Error;
-use std::ffi::{CStr, c_char, c_int, c_void};
-use std::ops::{IndexMut, Shl, Shr};
+use std::ffi::{c_char, c_int, c_void};
+use std::ops::{Shl, Shr};
 use std::ptr::{null, null_mut};
 use std::sync::atomic::AtomicBool;
 use std::time::Instant;
 use sysinfo::System;
+use common_rs::region::Palette;
 
 static mut FREE_MEMORY: usize = 500 * 1024 * 1024;
 

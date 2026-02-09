@@ -86,6 +86,9 @@ extern "C"
   size_t region_get_entity_len (void *region);
   const void *region_get_entity (void *region, size_t index);
   const char *region_get_entity_id (void *region, size_t index);
+  void reset_available_memory (size_t memory);
+  void reset_elapsed_millisecs(uint64_t millisecond);
+
 #ifdef __cplusplus
 }
 #endif

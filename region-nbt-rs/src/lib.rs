@@ -4,23 +4,24 @@ mod output;
 use common_rs::ProgressFn;
 use common_rs::i18n::i18n;
 use common_rs::my_error::MyError;
+use common_rs::region::{BlockEntity, Palette, Region};
 use common_rs::tree_value::TreeValue;
-use common_rs::util::{show_progress, string_to_ptr_fail_to_null};
+use common_rs::util::string_to_ptr_fail_to_null;
 use crab_nbt::{Nbt, NbtCompound, NbtTag};
 use crab_nbt_ext::{
-    GetWithError, Palette, convert_nbt_to_vec, convert_vec_to_nbt, get_palette_from_nbt_tag,
-    init_translation_internal, nbt_create_real,
+    GetWithError, convert_nbt_to_vec, get_palette_from_nbt_tag, init_translation_internal,
+    nbt_create_real,
 };
 use formatx::formatx;
 use std::collections::HashMap;
 use std::error::Error;
-use std::ffi::{CStr, c_char, c_int, c_void};
-use std::fs::File;
+use std::ffi::{c_char, c_int, c_void};
 use std::io::Write;
 use std::ptr::{null, null_mut};
 use std::string::String;
 use std::sync::atomic::AtomicBool;
 use std::time::Instant;
+use sysinfo::System;
 
 #[link(name = "region_rs")]
 unsafe extern "C" {
@@ -112,6 +113,15 @@ unsafe extern "C" {
         zlib: bool,
         cancel_flag: *const AtomicBool,
     ) -> *mut Vec<u8>;
+    pub fn real_show_progress(
+        instant: &mut Instant,
+        system: &mut System,
+        progress_fn: ProgressFn,
+        main_klass: *mut c_void,
+        percentage: c_int,
+        msg: &str,
+        text: &str,
+    ) -> Result<(), MyError>;
 }
 
 #[unsafe(no_mangle)]
@@ -122,11 +132,6 @@ pub extern "C" fn region_type() -> *const c_char {
 #[unsafe(no_mangle)]
 pub extern "C" fn region_is_multi() -> i32 {
     0
-}
-
-pub struct BlockEntity {
-    pos: (i32, i32, i32),
-    entity: Vec<(String, TreeValue)>,
 }
 
 fn get_int_from_nbt_tag(nbt: &NbtTag) -> Result<i32, MyError> {
@@ -177,7 +182,7 @@ pub extern "C" fn region_get_object(
     progress_fn: ProgressFn,
     main_klass: *mut c_void,
     cancel_flag: *const AtomicBool,
-    object: *mut *mut crab_nbt::Nbt,
+    object: *mut *mut Nbt,
 ) -> *const c_char {
     match nbt_create_real(bytes, progress_fn, main_klass, cancel_flag) {
         Ok(nbt) => {
@@ -194,7 +199,7 @@ pub extern "C" fn region_get_object(
 }
 
 fn region_get_entity_internal(
-    nbt: &crab_nbt::Nbt,
+    nbt: &Nbt,
     cancel_flag: *const AtomicBool,
 ) -> Result<Vec<Vec<(String, TreeValue)>>, Box<dyn Error>> {
     let entity_nbt = nbt.get_list_with_err("entities")?;
@@ -261,7 +266,7 @@ fn region_create_from_bytes_internal(
     progress_fn: ProgressFn,
     main_klass: *mut c_void,
     cancel_flag: *const AtomicBool,
-) -> Result<*mut c_void, Box<dyn Error>> {
+) -> Result<*mut Region, Box<dyn Error>> {
     let nbt = unsafe { (*o_nbt).clone() };
     let data_version = nbt.get_int_with_err("DataVersion")?;
     let size_compound = nbt.get_list_with_err("size")?;
@@ -286,6 +291,7 @@ fn region_create_from_bytes_internal(
         i += 1;
     }
     palette_vec.swap(0, air_palette);
+
     let block_compound = nbt.get_list_with_err("blocks")?;
     let mut blocks: Vec<u32> = vec![0; (x * y * z) as usize];
     let mut block_entities: Vec<BlockEntity> = vec![];
@@ -293,22 +299,26 @@ fn region_create_from_bytes_internal(
     let mut min_x = 0;
     let mut min_y = 0;
     let mut min_z = 0;
+    let mut sys = System::new_all();
 
     i = 0;
+
+    fn get_internal_block(block: &NbtTag) -> Result<&NbtCompound, MyError> {
+        match block {
+            NbtTag::Compound(c) => Ok(c),
+            _ => Err(MyError {
+                msg: String::from(i18n("Wrong type of block!")),
+            }),
+        }
+    }
+
     for block in block_compound {
         if unsafe { cancel_flag_is_cancelled(cancel_flag) } == 1 {
             return Err(Box::from(MyError {
                 msg: String::from(i18n("Reading blocks is cancelled!")),
             }));
         }
-        let internal_block = match block {
-            NbtTag::Compound(c) => c,
-            _ => {
-                return Err(Box::from(MyError {
-                    msg: String::from(i18n("Wrong type of block!")),
-                }));
-            }
-        };
+        let internal_block = get_internal_block(block)?;
         let pos = internal_block.get_list_with_err("pos")?;
         let block_pos = get_size(pos)?;
         if i == 0 {
@@ -331,25 +341,20 @@ fn region_create_from_bytes_internal(
                 msg: String::from(i18n("Reading blocks is cancelled!")),
             }));
         }
-        let internal_block = match block {
-            NbtTag::Compound(c) => c,
-            _ => {
-                return Err(Box::from(MyError {
-                    msg: String::from(i18n("Wrong type of block!")),
-                }));
-            }
-        };
+        let internal_block = get_internal_block(block)?;
         let string = i18n("Processing blocks: {} / {}.");
         let real_string = formatx!(string, j, block_num)?;
-        if start.elapsed().as_millis() >= 500 || j == block_num - 1 {
-            show_progress(
+
+        unsafe {
+            real_show_progress(
+                &mut start,
+                &mut sys,
                 progress_fn,
                 main_klass,
                 (j * 100 / block_num) as c_int,
                 &real_string,
-                &String::new(),
-            );
-            start = Instant::now();
+                "",
+            )?;
         }
 
         let pos = internal_block.get_list_with_err("pos")?;
@@ -381,26 +386,15 @@ fn region_create_from_bytes_internal(
         j += 1;
     }
     let entities = region_get_entity_internal(&nbt, cancel_flag)?;
-    unsafe {
-        let region = region_new();
-        region_set_data_version(region, data_version as u32);
-        region_set_size(region, x, y, z);
-        for palette in palette_vec {
-            if { cancel_flag_is_cancelled(cancel_flag) } == 1 {
-                region_free(region);
-                return Err(Box::from(MyError {
-                    msg: String::from(i18n("Adding palette is cancelled!")),
-                }));
-            }
-            let string = string_to_ptr_fail_to_null(&palette.id_name);
-            region_append_palette(region, string, Box::into_raw(Box::new(palette.property)));
-            string_free(string);
-        }
-        region_set_block_entities_from_vec(region, Box::into_raw(Box::new(block_entities)));
-        region_set_blocks_from_vec(region, Box::into_raw(Box::new(blocks)));
-        region_set_entity_from_vec(region, Box::into_raw(Box::new(entities)));
-        Ok(region)
-    }
+
+    let mut region = Region::default();
+    region.data_version = data_version as u32;
+    region.region_size = (x, y, z);
+    region.palette_array = palette_vec;
+    region.block_entity_array = block_entities;
+    region.block_array = blocks;
+    region.entity_array = entities;
+    Ok(Box::into_raw(Box::new(region)))
 }
 
 #[unsafe(no_mangle)]
@@ -413,9 +407,9 @@ pub extern "C" fn init_translation(path: *const c_char) -> *const c_char {
 
 #[unsafe(no_mangle)]
 pub extern "C" fn region_create_from_file(
-    nbt: *mut crab_nbt::Nbt,
+    nbt: *mut Nbt,
     progress_fn: ProgressFn,
-    region: *mut *mut c_void,
+    region: *mut *mut Region,
     main_klass: *mut c_void,
     cancel_flag: *const AtomicBool,
 ) -> *const c_char {
@@ -442,6 +436,6 @@ pub extern "C" fn region_create_from_file(
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn object_free(object: *mut crab_nbt::Nbt) {
+pub extern "C" fn object_free(object: *mut Nbt) {
     drop(unsafe { Box::from_raw(object) });
 }

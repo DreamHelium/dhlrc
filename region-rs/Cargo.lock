@@ -31,6 +31,8 @@ name = "common-rs"
 version = "0.1.0"
 dependencies = [
  "sysinfo",
+ "time",
+ "whoami",
 ]
 
 [[package]]
@@ -175,8 +177,6 @@ dependencies = [
  "common-rs",
  "flate2",
  "sysinfo",
- "time",
- "whoami",
 ]
 
 [[package]]

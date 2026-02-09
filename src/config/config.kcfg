@@ -10,6 +10,16 @@
             <tooltip>Whether to ignore leftover data in NBT when parsing.</tooltip>
             <default>false</default>
         </entry>
+        <entry name="MemoryLimit" type="Int">
+            <label>Application Memory Limit</label>
+            <tooltip>The limit memory for application.</tooltip>
+            <default>524288000</default>
+        </entry>
+        <entry name="ElapsedMilliseconds" type="Int">
+            <label>Elapsed Milliseconds</label>
+            <tooltip>The elapsed milliseconds for the progress bar, if set too small will affect the speed.</tooltip>
+            <default>500</default>
+        </entry>
     </group>
     <group name="Game">
         <entry name="OverrideSetting" type="Bool">

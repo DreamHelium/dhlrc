@@ -1,5 +1,7 @@
 # Minecraft结构修改器
 
+[开发文档（英文）](dev-doc/README.md)
+
 ## 许可证问题
 
 因为`crabnbt`使用GPL协议，所以本程序也得使用GPL协议，对此的不便敬请谅解！
