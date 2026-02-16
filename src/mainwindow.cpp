@@ -36,6 +36,7 @@
 // #include <qnamespace.h>
 #include <QPushButton>
 #include <blockreaderui.h>
+#include <debugloadingui.h>
 #include <externalnbtreaderui.h>
 #include <generalchoosedialog.h>
 #include <libintl.h>
@@ -66,6 +67,9 @@ MainWindow::MainWindow (QWidget *parent)
   DhGeneralConfigUI::setConfig ();
   initSignalSlots ();
   initShortcuts ();
+#ifndef DH_DEBUG_IN_IDE
+  ui->debugBtn->hide ();
+#endif
 }
 
 MainWindow::~MainWindow ()
@@ -126,32 +130,15 @@ MainWindow::initSignalSlots ()
                    dialog->show ();
                  }
              });
-  // connect (ui->debugBtn, &QPushButton::clicked,
-  //          [&]
-  //            {
-  //              auto allList = dh_info_get_all_uuid (DH_TYPE_REGION);
-  //              auto region_1 = (Region *)dh_info_get_data (DH_TYPE_REGION,
-  //                                                          (*allList)[0]);
-  //              auto region_2 = (Region *)dh_info_get_data (DH_TYPE_REGION,
-  //                                                          (*allList)[1]);
-  //              bool dif = false;
-  //              int i = 0;
-  //              if (region_1->block_array_len == region_2->block_array_len)
-  //                for (; i < region_1->block_array_len; i++)
-  //                  {
-  //                    if (region_1->block_array[i] !=
-  //                    region_2->block_array[i])
-  //                      {
-  //                        g_message ("%64lb", region_1->block_array[i]);
-  //                        g_message ("%64lb", region_2->block_array[i]);
-  //                        dif = true;
-  //                      }
-  //                  }
-  //              else
-  //                dif = true;
-  //              g_message ("%d %d %d %d", dif, i, region_1->block_array_len,
-  //                         region_2->block_array_len);
-  //            });
+#ifdef DH_DEBUG_IN_IDE
+  connect (ui->debugBtn, &QPushButton::clicked,
+           [&]
+             {
+               auto dui = new DebugLoadingUI ();
+               dui->setAttribute (Qt::WA_DeleteOnClose);
+               dui->show ();
+             });
+#endif
 }
 
 void

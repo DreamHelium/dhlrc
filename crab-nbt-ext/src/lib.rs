@@ -1,22 +1,53 @@
+use common_rs::ProgressFn;
+use common_rs::i18n::i18n;
+use common_rs::my_error::MyError;
+use common_rs::region::Palette;
+use common_rs::tree_value::TreeValue;
+use common_rs::util::{cstr_to_str, show_progress, string_to_ptr_fail_to_null};
 use crab_nbt::{Nbt, NbtCompound, NbtTag};
 use formatx::formatx;
 use gettextrs::gettext;
 use std::error::Error;
 use std::ffi::{c_char, c_void};
-use std::io::{Cursor};
+use std::io::Cursor;
+use std::ptr::null;
 use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering};
-use common_rs::i18n::i18n;
-use common_rs::my_error::MyError;
-use common_rs::ProgressFn;
-use common_rs::region::Palette;
-use common_rs::tree_value::TreeValue;
-use common_rs::util::{cstr_to_str, show_progress};
 
 pub fn init_translation_internal(path: *const c_char) -> Result<(), Box<dyn Error>> {
     gettextrs::bindtextdomain("dhlrc", cstr_to_str(path)?)?;
     gettextrs::textdomain("dhlrc")?;
     Ok(())
+}
+
+#[unsafe(no_mangle)]
+pub extern "C" fn init_translation(path: *const c_char) -> *const c_char {
+    match init_translation_internal(path) {
+        Ok(_) => null(),
+        Err(e) => string_to_ptr_fail_to_null(&e.to_string()),
+    }
+}
+
+#[unsafe(no_mangle)]
+pub extern "C" fn region_get_object(
+    bytes: *mut Vec<u8>,
+    progress_fn: ProgressFn,
+    main_klass: *mut c_void,
+    cancel_flag: *const AtomicBool,
+    object: *mut *mut Nbt,
+) -> *const c_char {
+    match nbt_create_real(bytes, progress_fn, main_klass, cancel_flag) {
+        Ok(nbt) => {
+            if object.is_null() {
+                return string_to_ptr_fail_to_null(i18n("Region value not provided"));
+            }
+            unsafe {
+                *object = Box::into_raw(Box::new(nbt));
+            }
+            null()
+        }
+        Err(e) => string_to_ptr_fail_to_null(&e.to_string()),
+    }
 }
 
 pub trait GetWithError {
@@ -218,21 +249,19 @@ fn convert_tree_value_to_nbt_tag(tree_value: &TreeValue, str: &str) -> NbtTag {
             }
             NbtTag::List(list)
         }
-        TreeValue::Compound(c) => {
-            NbtTag::Compound(convert_vec_to_nbt_compound(&c))
-        }
+        TreeValue::Compound(c) => NbtTag::Compound(convert_vec_to_nbt_compound(&c)),
     }
 }
 
-fn convert_vec_to_nbt_compound(vec : &Vec<(String, TreeValue)>) -> NbtCompound{
+fn convert_vec_to_nbt_compound(vec: &Vec<(String, TreeValue)>) -> NbtCompound {
     let mut nbt_vec = vec![];
-    for child_node in vec{
+    for child_node in vec {
         let nbt_tag = convert_tree_value_to_nbt_tag(&child_node.1, &child_node.0);
         let real_nbt = (child_node.0.clone(), nbt_tag);
         nbt_vec.push(real_nbt);
     }
-    NbtCompound{
-        child_tags : nbt_vec
+    NbtCompound {
+        child_tags: nbt_vec,
     }
 }
 
@@ -255,7 +284,7 @@ pub fn convert_vec_to_nbt(vec: &Vec<(String, TreeValue)>, str: &str, from_file: 
         }
     } else {
         // let tag = NbtTag::Compound(NbtCompound {
-            // child_tags: nbt_vec,
+        // child_tags: nbt_vec,
         // });
         // let final_vec = vec![(str.to_string(), tag)];
         Nbt {
@@ -313,4 +342,8 @@ pub fn get_palette_from_nbt_tag(
         });
     }
     Ok(palette_vec)
+}
+
+pub fn gettext_text(str: &str) -> String {
+    gettext(str)
 }

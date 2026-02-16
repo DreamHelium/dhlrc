@@ -1,15 +1,15 @@
 use common_rs::ProgressFn;
 use common_rs::i18n::i18n;
 use common_rs::my_error::MyError;
+use common_rs::region::{BlockEntity, Palette, Region};
 use common_rs::tree_value::TreeValue;
-use common_rs::util::{cstr_to_str, show_progress, string_to_ptr_fail_to_null};
-use crab_nbt::NbtTag;
+use common_rs::util::string_to_ptr_fail_to_null;
+use crab_nbt::{Nbt, NbtTag};
 use crab_nbt_ext::{
-    GetWithError, convert_nbt_tag_to_tree_value, convert_nbt_to_vec,
-    get_palette_from_nbt_tag, init_translation_internal, nbt_create_real,
+    GetWithError, convert_nbt_tag_to_tree_value, convert_nbt_to_vec, get_palette_from_nbt_tag,
+    gettext_text,
 };
 use formatx::formatx;
-use std::collections::HashMap;
 use std::error::Error;
 use std::ffi::{c_char, c_int, c_void};
 use std::ops::{Shl, Shr};
@@ -17,98 +17,19 @@ use std::ptr::{null, null_mut};
 use std::sync::atomic::AtomicBool;
 use std::time::Instant;
 use sysinfo::System;
-use common_rs::region::Palette;
-
-static mut FREE_MEMORY: usize = 500 * 1024 * 1024;
 
 #[link(name = "region_rs")]
 unsafe extern "C" {
-    fn region_new() -> *mut c_void;
-    fn region_free(region: *mut c_void);
-    fn region_set_time(region: *mut c_void, create_time: i64, modify_time: i64) -> *const c_char;
-    fn string_free(string: *mut c_char);
-    fn region_get_create_timestamp(region: *mut c_void) -> i64;
-    fn region_get_modify_timestamp(region: *mut c_void) -> i64;
-    fn region_get_size(region: *mut c_void);
-    fn region_get_name(region: *mut c_void) -> *const c_char;
-    fn region_set_name(region: *mut c_void, string: *const c_char) -> *const c_char;
-    fn region_get_region_name(region: *mut c_void) -> *const c_char;
-    fn region_set_region_name(region: *mut c_void, string: *const c_char) -> *const c_char;
-    fn region_get_description(region: *mut c_void) -> *const c_char;
-    fn region_set_description(region: *mut c_void, string: *const c_char) -> *const c_char;
-    fn region_get_author(region: *mut c_void) -> *const c_char;
-    fn region_set_author(region: *mut c_void, string: *const c_char) -> *const c_char;
-    fn region_get_data_version(region: *mut c_void) -> u32;
-    fn region_set_data_version(region: *mut c_void, data_version: u32);
-    fn region_set_size(region: *mut c_void, x: i32, y: i32, z: i32);
-    fn region_get_x(region: *mut c_void) -> i32;
-    fn region_get_y(region: *mut c_void) -> i32;
-    fn region_get_z(region: *mut c_void) -> i32;
-    fn region_set_offset(region: *mut c_void, x: i32, y: i32, z: i32);
-    fn region_get_offset_x(region: *mut c_void) -> i32;
-    fn region_get_offset_y(region: *mut c_void) -> i32;
-    fn region_get_offset_z(region: *mut c_void) -> i32;
-    fn block_new_to_region(
-        region: *mut c_void,
-        index: usize,
-        id: u32,
-        tree: *mut HashMap<String, TreeValue>,
-    );
-    fn region_get_block_entity_tree_by_index(
-        region: *mut c_void,
-        index: usize,
-    ) -> *mut HashMap<String, TreeValue>;
-    fn region_get_block_id_by_index(region: *mut c_void, index: usize) -> u32;
-    fn region_append_palette(
-        region: *mut c_void,
-        id_name: *const c_char,
-        property: *mut Vec<(String, String)>,
-    ) -> *const c_char;
-    fn region_get_palette_id_name(region: *mut c_void, id: usize) -> *const c_char;
-    fn region_get_palette_property(region: *mut c_void, index: usize)
-    -> *mut Vec<(String, String)>;
-    fn region_get_palette_property_len(region: *mut c_void, id: usize) -> usize;
-    fn region_get_palette_property_name(
-        region: *mut c_void,
-        id: usize,
-        index: usize,
-    ) -> *const c_char;
-    fn region_get_palette_property_data(
-        region: *mut c_void,
-        id: usize,
-        index: usize,
-    ) -> *const c_char;
-    fn region_set_palette_property_name_and_data(
-        region: *mut c_void,
-        id: usize,
-        index: usize,
-        name: *const c_char,
-        data: *const c_char,
-    ) -> *const c_char;
-    fn file_try_uncompress(
-        filename: *const c_char,
+    fn cancel_flag_is_cancelled(ptr: *const AtomicBool) -> c_int;
+    pub fn real_show_progress(
+        instant: &mut Instant,
+        system: &mut System,
         progress_fn: ProgressFn,
         main_klass: *mut c_void,
-        failed: *mut c_int,
-    ) -> *mut Vec<u8>;
-    fn vec_free(vec: *mut Vec<u8>);
-    fn vec_to_cstr(vec: *mut Vec<u8>) -> *mut c_char;
-    fn region_get_index(region: *mut c_void, x: i32, y: i32, z: i32) -> i32;
-    fn cancel_flag_is_cancelled(ptr: *const AtomicBool) -> c_int;
-    fn region_set_blocks_from_vec(region: *mut c_void, blocks: *mut Vec<u32>);
-    fn region_set_entity_from_vec(
-        region: *mut c_void,
-        entities: *mut Vec<Vec<(String, TreeValue)>>,
-    );
-    fn region_set_block_entities_from_vec(
-        region: *mut c_void,
-        block_entities: *mut Vec<BlockEntity>,
-    );
-}
-
-pub struct BlockEntity {
-    pos: (i32, i32, i32),
-    entity: Vec<(String, TreeValue)>,
+        percentage: c_int,
+        msg: &str,
+        text: &str,
+    ) -> Result<(), MyError>;
 }
 
 #[unsafe(no_mangle)]
@@ -122,29 +43,7 @@ pub extern "C" fn region_is_multi() -> i32 {
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn region_get_object(
-    bytes: *mut Vec<u8>,
-    progress_fn: ProgressFn,
-    main_klass: *mut c_void,
-    cancel_flag: *const AtomicBool,
-    object: *mut *mut crab_nbt::Nbt,
-) -> *const c_char {
-    match nbt_create_real(bytes, progress_fn, main_klass, cancel_flag) {
-        Ok(nbt) => {
-            if object.is_null() {
-                return string_to_ptr_fail_to_null(i18n("Region value not provided"));
-            }
-            unsafe {
-                *object = Box::into_raw(Box::new(nbt));
-            }
-            null()
-        }
-        Err(e) => string_to_ptr_fail_to_null(&e.to_string()),
-    }
-}
-
-#[unsafe(no_mangle)]
-pub extern "C" fn region_num(region: *mut crab_nbt::Nbt) -> i32 {
+pub extern "C" fn region_num(region: *mut Nbt) -> i32 {
     if !region.is_null() {
         let real_nbt = unsafe { Box::from_raw(region) };
         let clone_nbt = real_nbt.clone();
@@ -160,7 +59,7 @@ pub extern "C" fn region_num(region: *mut crab_nbt::Nbt) -> i32 {
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn region_name_index(region: *mut crab_nbt::Nbt, index: i32) -> *const c_char {
+pub extern "C" fn region_name_index(region: *mut Nbt, index: i32) -> *const c_char {
     let real_nbt = unsafe { Box::from_raw(region) };
     let clone_nbt = real_nbt.clone();
     let _ = Box::into_raw(real_nbt);
@@ -181,16 +80,6 @@ fn get_bits(num: usize) -> u32 {
     ret
 }
 
-fn finish_oom(system: &mut System) -> Result<(), MyError> {
-    system.refresh_all();
-    if unsafe { system.available_memory() < FREE_MEMORY as u64 } {
-        return Err(MyError {
-            msg: i18n("Out of memory!").to_string(),
-        });
-    }
-    Ok(())
-}
-
 fn get_block_id(
     states: &Vec<i64>,
     block_num: i32,
@@ -204,18 +93,18 @@ fn get_block_id(
     let mut i = 0;
     let mut buf = vec![];
     loop {
-        if time.elapsed().as_secs() >= 1 {
-            finish_oom(sys)?;
-            let str = i18n("Reading block id: {} / {}.");
-            let real_str = formatx!(str, i, block_num)?;
-            show_progress(
+        let str = gettext_text(i18n("Reading block id: {} / {}."));
+        let real_str = formatx!(str, i, block_num)?;
+        unsafe {
+            real_show_progress(
+                &mut time,
+                sys,
                 progress_fn,
                 main_klass,
                 (i as u64 * 100 / block_num as u64) as c_int,
                 &real_str,
-                &String::new(),
-            );
-            time = Instant::now();
+                "",
+            )?;
         }
 
         let start_bit = i as u32 * move_bit;
@@ -247,34 +136,30 @@ fn get_block_id(
         buf.push(id as u32);
         i += 1;
         if i == block_num as usize {
-            show_progress(
-                progress_fn,
-                main_klass,
-                100,
-                i18n("Reading block finished!"),
-                &String::new(),
-            );
+            unsafe {
+                real_show_progress(
+                    &mut Instant::now(),
+                    &mut System::new_all(),
+                    progress_fn,
+                    main_klass,
+                    100,
+                    i18n("Reading block finished!"),
+                    "",
+                )?;
+            }
             break;
         }
     }
     Ok(buf)
 }
 
-#[unsafe(no_mangle)]
-pub extern "C" fn init_translation(path: *const c_char) -> *const c_char {
-    match init_translation_internal(path) {
-        Ok(_) => null(),
-        Err(e) => string_to_ptr_fail_to_null(&e.to_string()),
-    }
-}
-
 fn region_create_from_bytes_internal(
-    o_nbt: *mut crab_nbt::Nbt,
+    o_nbt: *mut Nbt,
     progress_fn: ProgressFn,
     main_klass: *mut c_void,
     cancel_flag: *const AtomicBool,
     index: i32,
-) -> Result<*mut c_void, Box<dyn Error>> {
+) -> Result<*mut Region, Box<dyn Error>> {
     let nbt = unsafe { (*o_nbt).clone() };
     let data_version = nbt.get_int_with_err("MinecraftDataVersion")?;
     let metadata = nbt.get_compound_with_err("Metadata")?;
@@ -389,81 +274,28 @@ fn region_create_from_bytes_internal(
         let value = convert_nbt_to_vec(internal_entity);
         entities_vec.push(value);
     }
-    unsafe {
-        let region = region_new();
-        region_set_data_version(region, data_version as u32);
-        region_set_size(region, region_x, region_y, region_z);
-        region_set_offset(region, offset_x, offset_y, offset_z);
-        for palette in palette_vec {
-            if { cancel_flag_is_cancelled(cancel_flag) } == 1 {
-                region_free(region);
-                return Err(Box::from(MyError {
-                    msg: String::from(i18n("Adding palette is cancelled!")),
-                }));
-            }
-            let string = string_to_ptr_fail_to_null(&palette.id_name);
-            region_append_palette(region, string, Box::into_raw(Box::new(palette.property)));
-            string_free(string);
-        }
-        region_set_blocks_from_vec(region, Box::into_raw(Box::new(blocks)));
-        let real_name = string_to_ptr_fail_to_null(name);
-        let real_description = string_to_ptr_fail_to_null(description);
-        let real_author = string_to_ptr_fail_to_null(author);
-        let real_region_name = string_to_ptr_fail_to_null(region_name);
-        let name_err = region_set_name(region, real_name);
-        let description_err = region_set_description(region, real_description);
-        let author_err = region_set_author(region, real_author);
-        let region_name_err = region_set_region_name(region, real_region_name);
-        if !name_err.is_null()
-            || !description_err.is_null()
-            || !author_err.is_null()
-            || !region_name_err.is_null()
-        {
-            string_free(real_name);
-            string_free(real_description);
-            string_free(real_author);
-            string_free(real_region_name);
 
-            string_free(name_err as *mut c_char);
-            string_free(description_err as *mut c_char);
-            string_free(author_err as *mut c_char);
-            string_free(region_name_err as *mut c_char);
-            region_free(region);
-            return Err(Box::from(MyError {
-                msg: String::from(i18n("Setting base data error!")),
-            }));
-        }
-        string_free(real_name);
-        string_free(real_description);
-        string_free(real_author);
-        string_free(real_region_name);
-        region_set_block_entities_from_vec(region, Box::into_raw(Box::new(tile_entities_vec)));
-        region_set_entity_from_vec(region, Box::into_raw(Box::new(entities_vec)));
-        let msg = region_set_time(region, create_time, modify_time);
-        if !msg.is_null() {
-            region_free(region);
-            let err = Box::new(MyError {
-                msg: match cstr_to_str(msg) {
-                    Ok(str) => str,
-                    Err(e) => {
-                        string_free(msg as *mut c_char);
-                        return Err(e);
-                    }
-                },
-            });
-            string_free(msg as *mut c_char);
-            return Err(err);
-        }
+    let mut region = Region::default();
+    region.data_version = data_version as u32;
+    region.region_size = (region_x, region_y, region_z);
+    region.region_offset = (offset_x, offset_y, offset_z);
+    region.palette_array = palette_vec;
+    region.block_array = blocks;
+    region.base_data.set_name(name);
+    region.base_data.set_description(description);
+    region.base_data.set_author(author);
+    region.base_data.set_region_name(region_name);
+    region.block_entity_array = tile_entities_vec;
+    region.set_data_time(create_time, modify_time)?;
 
-        Ok(region)
-    }
+    Ok(Box::into_raw(Box::new(region)))
 }
 
 #[unsafe(no_mangle)]
 pub extern "C" fn region_create_from_file_as_index(
-    nbt: *mut crab_nbt::Nbt,
+    nbt: *mut Nbt,
     progress_fn: ProgressFn,
-    region: *mut *mut c_void,
+    region: *mut *mut Region,
     main_klass: *mut c_void,
     cancel_flag: *const AtomicBool,
     index: i32,
@@ -496,6 +328,6 @@ pub extern "C" fn region_create_from_file_as_index(
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn object_free(object: *mut crab_nbt::Nbt) {
+pub extern "C" fn object_free(object: *mut Nbt) {
     drop(unsafe { Box::from_raw(object) });
 }

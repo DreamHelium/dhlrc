@@ -103,6 +103,8 @@ set(TEMP_PROJECT_SOURCES
         saveregionui.h saveregionui.cpp
         configobjectui.cpp
         configobjectui.h
+        debugloadingui.cpp
+        debugloadingui.h
 )
 
 ki18n_wrap_ui(TEMP_PROJECT_SOURCES ${ui_files})

@@ -1,10 +1,10 @@
 #include "loadregionui.h"
-
 #include <QApplication>
 #include <QDir>
 #include <QLibrary>
 #include <QMessageBox>
 #include <QTimer>
+#include <coroutine>
 #include <future>
 // #include <lrchooseui.h>
 #include <QThread>
@@ -36,8 +36,7 @@ LoadRegionUI::LoadRegionUI (QStringList list, dh::ManageRegion *mr,
                  {
                    cancel_flag_cancel (cancel_flag);
                    cv.notify_one ();
-                   std::unique_lock lock (mutex);
-                   cv.wait (lock);
+                   Q_EMIT refreshFullLabel (_ ("Please wait..."));
                  }
 
                if (stopped)
@@ -46,7 +45,7 @@ LoadRegionUI::LoadRegionUI (QStringList list, dh::ManageRegion *mr,
                    failedList.append (currentDir);
                    failedReason.append (_ ("Cancelled."));
                  }
-               if (!failedList.isEmpty () || !finished)
+               if (!failedList.isEmpty ())
                  {
                    QString errorMsg
                        = _ ("The following files are not added:\n\n");

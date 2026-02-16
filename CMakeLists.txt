@@ -41,7 +41,7 @@ if (NOT DH_ENABLE_TRANSLATION)
     add_definitions(-DDH_DISABLE_TRANSLATION)
 endif ()
 
-add_definitions(-DDH_DEBUG_IN_IDE)
+#add_definitions(-DDH_DEBUG_IN_IDE)
 
 add_subdirectory(src)
 #add_subdirectory(resources)

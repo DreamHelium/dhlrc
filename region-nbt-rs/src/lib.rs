@@ -1,16 +1,16 @@
 mod config;
 mod output;
 
-use common_rs::ProgressFn;
 use common_rs::i18n::i18n;
 use common_rs::my_error::MyError;
 use common_rs::region::{BlockEntity, Palette, Region};
 use common_rs::tree_value::TreeValue;
 use common_rs::util::string_to_ptr_fail_to_null;
+use common_rs::ProgressFn;
 use crab_nbt::{Nbt, NbtCompound, NbtTag};
 use crab_nbt_ext::{
-    GetWithError, convert_nbt_to_vec, get_palette_from_nbt_tag, init_translation_internal,
-    nbt_create_real,
+    convert_nbt_to_vec, get_palette_from_nbt_tag, nbt_create_real,
+    GetWithError,
 };
 use formatx::formatx;
 use std::collections::HashMap;
@@ -174,28 +174,6 @@ fn get_size_double(nbt: &Vec<NbtTag>) -> Result<(f64, f64, f64), MyError> {
     let y = get_double_from_nbt_tag(&nbt[1])?;
     let z = get_double_from_nbt_tag(&nbt[2])?;
     Ok((x, y, z))
-}
-
-#[unsafe(no_mangle)]
-pub extern "C" fn region_get_object(
-    bytes: *mut Vec<u8>,
-    progress_fn: ProgressFn,
-    main_klass: *mut c_void,
-    cancel_flag: *const AtomicBool,
-    object: *mut *mut Nbt,
-) -> *const c_char {
-    match nbt_create_real(bytes, progress_fn, main_klass, cancel_flag) {
-        Ok(nbt) => {
-            if object.is_null() {
-                return string_to_ptr_fail_to_null(i18n("Region value not provided"));
-            }
-            unsafe {
-                *object = Box::into_raw(Box::new(nbt));
-            }
-            null()
-        }
-        Err(e) => string_to_ptr_fail_to_null(&e.to_string()),
-    }
 }
 
 fn region_get_entity_internal(
@@ -395,14 +373,6 @@ fn region_create_from_bytes_internal(
     region.block_array = blocks;
     region.entity_array = entities;
     Ok(Box::into_raw(Box::new(region)))
-}
-
-#[unsafe(no_mangle)]
-pub extern "C" fn init_translation(path: *const c_char) -> *const c_char {
-    match init_translation_internal(path) {
-        Ok(_) => null(),
-        Err(e) => string_to_ptr_fail_to_null(&e.to_string()),
-    }
 }
 
 #[unsafe(no_mangle)]

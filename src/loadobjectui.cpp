@@ -1,6 +1,7 @@
 #include "loadobjectui.h"
 #include "ui_loadobjectui.h"
 #include <libintl.h>
+#include <qevent.h>
 #define _(str) gettext (str)
 
 LoadObjectUI::LoadObjectUI (QWidget *parent)
@@ -60,6 +61,7 @@ LoadObjectUI::LoadObjectUI (QWidget *parent)
                ui->fileLabel->setText (_ ("Finish!"));
                ui->continueBtn->setEnabled (true);
                finished = true;
+               this->close ();
              });
 }
 
@@ -75,5 +77,8 @@ void
 LoadObjectUI::closeEvent (QCloseEvent *event)
 {
   Q_EMIT winClose ();
-  QWidget::closeEvent (event);
+  if (finished)
+    event->accept ();
+  else
+    event->ignore ();
 }
