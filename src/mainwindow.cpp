@@ -48,8 +48,6 @@
   _ ("Region is locked! It might not be the writer lock! Please try to "      \
      "close the window that's using the Region.")
 
-static dh::ManageRegion *mr = nullptr;
-static KPageDialog *dialog = nullptr;
 
 MainWindow::MainWindow (QWidget *parent)
     : QMainWindow (parent), ui (new Ui::MainWindow)
@@ -206,8 +204,6 @@ MainWindow::brBtn_clicked ()
 void
 MainWindow::mrBtn_clicked ()
 {
-  if (!mr)
-    mr = new dh::ManageRegion ();
   mr->show ();
   mr->activateWindow ();
   mr->raise ();

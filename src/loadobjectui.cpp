@@ -1,5 +1,8 @@
 #include "loadobjectui.h"
 #include "ui_loadobjectui.h"
+
+#include <QMessageBox>
+#include <QThread>
 #include <libintl.h>
 #include <qevent.h>
 #define _(str) gettext (str)
@@ -63,6 +66,8 @@ LoadObjectUI::LoadObjectUI (QWidget *parent)
                finished = true;
                this->close ();
              });
+  connect (ui->whatHappened, &QPushButton::clicked, this,
+           [&] { Q_EMIT whatHappenedClicked (); });
 }
 
 LoadObjectUI::~LoadObjectUI () { delete ui; }

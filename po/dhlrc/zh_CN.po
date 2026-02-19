@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-02-16 22:58+0800\n"
+"POT-Creation-Date: 2026-02-20 00:14+0800\n"
 "PO-Revision-Date: 2024-11-30 07:00+0800\n"
 "Last-Translator: dream_he <48383878+DreamHelium@users.noreply.github.com>\n"
 "Language-Team: Chinese <kde-i18n-doc@kde.org>\n"
@@ -113,8 +113,8 @@ msgstr "创建时间：%6，修改时间：%7，作者：%8，名字：%9"
 msgid "Description: %10"
 msgstr "描述：%10"
 
-#: ../../src/blockreaderui.cpp:227 ../../src/loadregionui.cpp:61
-#: ../../src/manage.cpp:15 ../../src/manage.cpp:158
+#: ../../src/blockreaderui.cpp:227 ../../src/loadregionui.cpp:62
+#: ../../src/manage.cpp:15 ../../src/manage.cpp:179
 #: ../../src/regionmodifyui.cpp:12 ../../src/saveregionui.cpp:45
 #: ../../src/utility.cpp:21 ../../src/utility.cpp:38 ../../src/utility.cpp:46
 msgid "Error!"
@@ -128,14 +128,21 @@ msgstr ""
 msgid "Setting options:"
 msgstr ""
 
-#: ../../src/configobjectui.cpp:86 ../../src/lrchooseui.cpp:79 rc.cpp:177
-#: rc.cpp:213 rc.cpp:273
+#: ../../src/configobjectui.cpp:86 ../../src/lrchooseui.cpp:79 rc.cpp:185
+#: rc.cpp:221 rc.cpp:281
 msgid "&OK"
 msgstr "确定(&O)"
 
-#: ../../src/configobjectui.cpp:87 rc.cpp:276
+#: ../../src/configobjectui.cpp:87 rc.cpp:284
 msgid "&Cancel"
 msgstr "取消(&C)"
+
+#: ../../src/dhhelpui.cpp:53
+msgid ""
+"test\n"
+"\n"
+"![test_svg](:/cn/dh/dhlrc/show.svg)"
+msgstr ""
 
 #: ../../src/dhloadobject.cpp:11
 msgid "Loading..."
@@ -146,7 +153,7 @@ msgid "NBT Reader"
 msgstr ""
 
 #: ../../src/externalnbtreaderui.cpp:29 ../../src/lrchooseui.cpp:80 rc.cpp:12
-#: rc.cpp:54 rc.cpp:180 rc.cpp:201
+#: rc.cpp:54 rc.cpp:188 rc.cpp:209
 msgid "&Close"
 msgstr "关闭(&C)"
 
@@ -178,53 +185,53 @@ msgstr "确定"
 msgid "Cancel"
 msgstr ""
 
-#: ../../src/loadobjectui.cpp:61
+#: ../../src/loadobjectui.cpp:64
 msgid "Finish!"
 msgstr "结束！"
 
-#: ../../src/loadregionui.cpp:31
+#: ../../src/loadregionui.cpp:32
 msgid "Loading file(s) to Region(s)."
 msgstr "加载文件至Region。"
 
-#: ../../src/loadregionui.cpp:39
+#: ../../src/loadregionui.cpp:40
 msgid "Please wait..."
 msgstr ""
 
-#: ../../src/loadregionui.cpp:46 ../../src/saveregionui.cpp:30
+#: ../../src/loadregionui.cpp:47 ../../src/saveregionui.cpp:30
 msgid "Cancelled."
 msgstr ""
 
-#: ../../src/loadregionui.cpp:51 ../../src/saveregionui.cpp:35
+#: ../../src/loadregionui.cpp:52 ../../src/saveregionui.cpp:35
 msgid ""
 "The following files are not added:\n"
 "\n"
 msgstr ""
 
-#: ../../src/loadregionui.cpp:74
+#: ../../src/loadregionui.cpp:75
 msgid "Select a Region"
 msgstr ""
 
-#: ../../src/loadregionui.cpp:74 ../../src/utility.cpp:30
+#: ../../src/loadregionui.cpp:75 ../../src/utility.cpp:30
 msgid "Please select a region."
 msgstr ""
 
-#: ../../src/loadregionui.cpp:192
+#: ../../src/loadregionui.cpp:195
 msgid "Please click `Continue` to choose region(s)."
 msgstr ""
 
-#: ../../src/loadregionui.cpp:227
+#: ../../src/loadregionui.cpp:230
 msgid "No region found in this type."
 msgstr ""
 
-#: ../../src/loadregionui.cpp:228
+#: ../../src/loadregionui.cpp:231
 msgid "%1 try's fail message: %2"
 msgstr ""
 
-#: ../../src/loadregionui.cpp:248
+#: ../../src/loadregionui.cpp:251
 msgid "Parsing NBT"
 msgstr "传递NBT中"
 
-#: ../../src/loadregionui.cpp:293
+#: ../../src/loadregionui.cpp:296
 msgid "unknown"
 msgstr ""
 
@@ -259,23 +266,23 @@ msgid ""
 "window that's using the Region."
 msgstr "Region被锁定！可能不是写锁！请尝试关闭正在使用此Region的窗口。"
 
-#: ../../src/mainwindow.cpp:123
+#: ../../src/mainwindow.cpp:121
 msgid "General"
 msgstr "概况"
 
-#: ../../src/mainwindow.cpp:124
+#: ../../src/mainwindow.cpp:122
 msgid "Game"
 msgstr "游戏"
 
-#: ../../src/mainwindow.cpp:231
+#: ../../src/mainwindow.cpp:227
 msgid "Version: "
 msgstr "版本： "
 
-#: ../../src/mainwindow.cpp:233
+#: ../../src/mainwindow.cpp:229
 msgid "Graphical Backend: Qt"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:234
+#: ../../src/mainwindow.cpp:230
 msgid "About Minecraft Structure Modifier"
 msgstr ""
 
@@ -287,47 +294,47 @@ msgstr "没有选择行！"
 msgid "Manage Region"
 msgstr "管理Region"
 
-#: ../../src/manage.cpp:155
+#: ../../src/manage.cpp:176
 msgid "Select Files"
 msgstr ""
 
-#: ../../src/manage.cpp:158
+#: ../../src/manage.cpp:179
 msgid "No file selected!"
 msgstr ""
 
-#: ../../src/manage.cpp:216
+#: ../../src/manage.cpp:237
 msgid "Choose Save Option"
 msgstr ""
 
-#: ../../src/manage.cpp:217
+#: ../../src/manage.cpp:238
 msgid "Choose whether format you want to save to."
 msgstr ""
 
-#: ../../src/manage.cpp:224
+#: ../../src/manage.cpp:245
 msgid "Use MultiFunc?"
 msgstr ""
 
-#: ../../src/manage.cpp:225
+#: ../../src/manage.cpp:246
 msgid "This type supports regions to save as one file, do you want to use it?"
 msgstr ""
 
-#: ../../src/manage.cpp:237
+#: ../../src/manage.cpp:258
 msgid "Select Directory"
 msgstr ""
 
-#: ../../src/manage.cpp:287
+#: ../../src/manage.cpp:308
 msgid "Locked!"
 msgstr ""
 
-#: ../../src/manage.cpp:296 rc.cpp:252
+#: ../../src/manage.cpp:317 rc.cpp:260
 msgid "Description"
 msgstr "描述"
 
-#: ../../src/manage.cpp:296
+#: ../../src/manage.cpp:317
 msgid "UUID"
 msgstr "唯一码"
 
-#: ../../src/manage.cpp:296
+#: ../../src/manage.cpp:317
 msgid "Time"
 msgstr "时间"
 
@@ -359,7 +366,7 @@ msgstr ""
 msgid "Please enter a data."
 msgstr ""
 
-#: ../../src/paletteaddui.cpp:68 rc.cpp:261
+#: ../../src/paletteaddui.cpp:68 rc.cpp:269
 msgid "Name"
 msgstr "名称"
 
@@ -417,19 +424,31 @@ msgid ""
 "the speed."
 msgstr "进度条的持续毫秒，如果设置太小将会影响速度。"
 
-#: ../../build/src/settings.cpp:54 rc.cpp:90
+#: ../../build/src/settings.cpp:51 rc.cpp:90
+msgid "General Config for Input"
+msgstr ""
+
+#: ../../build/src/settings.cpp:52 rc.cpp:93
+msgid ""
+"If you choose this, the input config will not be asked, and you need to "
+"configure in the configure\n"
+"                interface.\n"
+"            "
+msgstr ""
+
+#: ../../build/src/settings.cpp:60 rc.cpp:98
 msgid "Override Settings"
 msgstr "覆盖设置"
 
-#: ../../build/src/settings.cpp:55 rc.cpp:93
+#: ../../build/src/settings.cpp:61 rc.cpp:101
 msgid "Whether to override setting or not."
 msgstr "是否覆盖设置。"
 
-#: ../../build/src/settings.cpp:58 rc.cpp:96
+#: ../../build/src/settings.cpp:64 rc.cpp:104
 msgid "Override Version"
 msgstr "覆盖版本"
 
-#: ../../build/src/settings.cpp:59 rc.cpp:99
+#: ../../build/src/settings.cpp:65 rc.cpp:107
 msgid "The version to override in translation stage."
 msgstr "在翻译阶段覆盖的版本。"
 
@@ -481,7 +500,7 @@ msgstr "展示实体NBT(&S)"
 msgid "&List blocks"
 msgstr "列出方块(&L)"
 
-#: rc.cpp:51 rc.cpp:219
+#: rc.cpp:51 rc.cpp:227
 msgid "&Show blocks"
 msgstr "展示方块 (&S)"
 
@@ -501,179 +520,179 @@ msgstr ""
 msgid "Modify &Block"
 msgstr ""
 
-#: rc.cpp:102
+#: rc.cpp:110
 msgid "What happened in this step?"
 msgstr "在此步发生了什么？"
 
-#: rc.cpp:105
+#: rc.cpp:113
 msgid "Details"
 msgstr "细节"
 
-#: rc.cpp:108
+#: rc.cpp:116
 msgid "&Continue"
 msgstr "继续(&C)"
 
-#: rc.cpp:111
+#: rc.cpp:119
 msgid "C&ancel"
 msgstr "取消(&C)"
 
-#: rc.cpp:114
+#: rc.cpp:122
 msgid "&NBT File Reader"
 msgstr ""
 
-#: rc.cpp:117
+#: rc.cpp:125
 msgid "&Manage Region"
 msgstr "管理Region(&M)"
 
-#: rc.cpp:120
+#: rc.cpp:128
 msgid "M&odify Region"
 msgstr ""
 
-#: rc.cpp:123
+#: rc.cpp:131
 msgid "&Block reader"
 msgstr "方块阅读器(&B)"
 
-#: rc.cpp:126
+#: rc.cpp:134
 msgid "Shortcuts"
 msgstr ""
 
-#: rc.cpp:129
+#: rc.cpp:137
 msgid "Utility"
 msgstr ""
 
-#: rc.cpp:132
+#: rc.cpp:140
 msgid "&Configure"
 msgstr ""
 
-#: rc.cpp:135
+#: rc.cpp:143
 msgid "&Run Script"
 msgstr ""
 
-#: rc.cpp:138 rc.cpp:147
+#: rc.cpp:146 rc.cpp:155
 msgid "&About"
 msgstr "关于(&A)"
 
-#: rc.cpp:141
+#: rc.cpp:149
 msgid "&Tools"
 msgstr "工具(&T)"
 
-#: rc.cpp:144
+#: rc.cpp:152
 msgid "Icons"
 msgstr "图标"
 
-#: rc.cpp:150 rc.cpp:159
+#: rc.cpp:158 rc.cpp:167
 msgid "test"
 msgstr ""
 
-#: rc.cpp:153
+#: rc.cpp:161
 msgid "test\\"
 msgstr ""
 
-#: rc.cpp:156
+#: rc.cpp:164
 msgid "tetst"
 msgstr ""
 
-#: rc.cpp:162 rc.cpp:183
+#: rc.cpp:170 rc.cpp:191
 msgid "Form"
 msgstr ""
 
-#: rc.cpp:165 rc.cpp:207
+#: rc.cpp:173 rc.cpp:215
 msgid "&Add"
 msgstr "添加(&A)"
 
-#: rc.cpp:168 rc.cpp:210
+#: rc.cpp:176 rc.cpp:218
 msgid "&Remove"
 msgstr "移除(&R)"
 
-#: rc.cpp:171
+#: rc.cpp:179
 msgid "R&efresh"
 msgstr "刷新(&E)"
 
-#: rc.cpp:174
+#: rc.cpp:182
 msgid "&Save"
 msgstr "保存(&S)"
 
-#: rc.cpp:186
+#: rc.cpp:194
 msgid "Type:"
 msgstr ""
 
-#: rc.cpp:189
+#: rc.cpp:197
 msgid "Key:"
 msgstr ""
 
-#: rc.cpp:192
+#: rc.cpp:200
 msgid "Value:"
 msgstr ""
 
-#: rc.cpp:195
+#: rc.cpp:203
 msgid "&Export"
 msgstr ""
 
-#: rc.cpp:198
+#: rc.cpp:206
 msgid "PushButton"
 msgstr ""
 
-#: rc.cpp:204
+#: rc.cpp:212
 msgid "PaletteAddUI"
 msgstr ""
 
-#: rc.cpp:216
+#: rc.cpp:224
 msgid "PaletteListUI"
 msgstr ""
 
-#: rc.cpp:222
+#: rc.cpp:230
 msgid "Modify Property of Block(s)"
 msgstr ""
 
-#: rc.cpp:225
+#: rc.cpp:233
 msgid "Modify the property of the block in:"
 msgstr "更改在此的方块属性："
 
-#: rc.cpp:228
+#: rc.cpp:236
 msgid "With the block that is the same property"
 msgstr "以及同属性的方块"
 
-#: rc.cpp:231
+#: rc.cpp:239
 msgid "Properties:"
 msgstr ""
 
-#: rc.cpp:234
+#: rc.cpp:242
 msgid "RegionModifyUI"
 msgstr ""
 
-#: rc.cpp:237
+#: rc.cpp:245
 msgid "Modify the infomation of the Region."
 msgstr ""
 
-#: rc.cpp:240
+#: rc.cpp:248
 msgid "Create Time"
 msgstr ""
 
-#: rc.cpp:243 rc.cpp:249
+#: rc.cpp:251 rc.cpp:257
 msgid "yyyy/MM/dd HH:mm:ss.zzz"
 msgstr ""
 
-#: rc.cpp:246
+#: rc.cpp:254
 msgid "Modify Time"
 msgstr ""
 
-#: rc.cpp:255
+#: rc.cpp:263
 msgid "Offset"
 msgstr ""
 
-#: rc.cpp:258
+#: rc.cpp:266
 msgid "Author"
 msgstr ""
 
-#: rc.cpp:264
+#: rc.cpp:272
 msgid "Region Name"
 msgstr ""
 
-#: rc.cpp:267
+#: rc.cpp:275
 msgid "Data Version"
 msgstr "数据版本"
 
-#: rc.cpp:270
+#: rc.cpp:278
 msgid "Version"
 msgstr ""
 
@@ -729,7 +748,7 @@ msgstr ""
 msgid "Null pointer detected"
 msgstr ""
 
-#: ../../crab-nbt-ext/src/lib.rs:42 ../../region-litematic-rs/src/lib.rs:321
+#: ../../crab-nbt-ext/src/lib.rs:42 ../../region-litematic-rs/src/lib.rs:336
 #: ../../region-nbt-rs/src/lib.rs:399
 msgid "Region value not provided"
 msgstr ""
@@ -788,36 +807,36 @@ msgstr ""
 msgid "Wrong type of property!"
 msgstr ""
 
-#: ../../region-litematic-rs/src/lib.rs:96
+#: ../../region-litematic-rs/src/lib.rs:111
 #, rust-format
 msgid "Reading block id: {} / {}."
 msgstr "阅读方块索引：{} / {}。"
 
-#: ../../region-litematic-rs/src/lib.rs:118
+#: ../../region-litematic-rs/src/lib.rs:133
 msgid "Cancelled when reading blocks"
 msgstr ""
 
-#: ../../region-litematic-rs/src/lib.rs:129
+#: ../../region-litematic-rs/src/lib.rs:144
 msgid "Out of range!"
 msgstr ""
 
-#: ../../region-litematic-rs/src/lib.rs:146
+#: ../../region-litematic-rs/src/lib.rs:161
 msgid "Reading block finished!"
 msgstr ""
 
-#: ../../region-litematic-rs/src/lib.rs:179
+#: ../../region-litematic-rs/src/lib.rs:194
 msgid "Wrong type of region."
 msgstr ""
 
-#: ../../region-litematic-rs/src/lib.rs:223
+#: ../../region-litematic-rs/src/lib.rs:238
 msgid "Wrong type of tile entity."
 msgstr ""
 
-#: ../../region-litematic-rs/src/lib.rs:263 ../../region-nbt-rs/src/lib.rs:188
+#: ../../region-litematic-rs/src/lib.rs:278 ../../region-nbt-rs/src/lib.rs:188
 msgid "Reading entities is cancelled!"
 msgstr ""
 
-#: ../../region-litematic-rs/src/lib.rs:270 ../../region-nbt-rs/src/lib.rs:196
+#: ../../region-litematic-rs/src/lib.rs:285 ../../region-nbt-rs/src/lib.rs:196
 msgid "Wrong type of entity!"
 msgstr ""
 

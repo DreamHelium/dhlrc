@@ -9,6 +9,7 @@
 // #include <lrchooseui.h>
 #include <QThread>
 #include <QUuid>
+#include <dhhelpui.h>
 #include <generalchoosedialog.h>
 #include <manage.h>
 #include <region.h>
@@ -56,7 +57,7 @@ LoadRegionUI::LoadRegionUI (QStringList list, dh::ManageRegion *mr,
                        errorMsg
                            += "**" + dir + "**" + ":\n\n" + reason + "\n\n";
                      }
-                   auto messageBox = new QMessageBox (this);
+                   auto messageBox = new QMessageBox ();
                    messageBox->setIcon (QMessageBox::Critical);
                    messageBox->setWindowTitle (_ ("Error!"));
                    messageBox->setText (errorMsg);
@@ -81,6 +82,8 @@ LoadRegionUI::LoadRegionUI (QStringList list, dh::ManageRegion *mr,
              });
   connect (this, &LoadRegionUI::finishLoadOne, mr,
            &dh::ManageRegion::refresh_triggered);
+  connect (this, &LoadRegionUI::whatHappenedClicked, this,
+           [&] { DhHelpUI::showHelp ("loading"); });
   process ();
 }
 

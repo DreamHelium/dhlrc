@@ -8,5 +8,6 @@
         <file>handle_block.json</file>
         <file>show.svg</file>
         <file>hide.svg</file>
+        <file>region_create.md</file>
     </qresource>
 </RCC>

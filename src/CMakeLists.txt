@@ -35,7 +35,7 @@ set(ui_files mainwindow.ui
         #        paletteaddui.ui
         loadobjectui.ui
         nbtreaderui.ui
-)
+        )
 
 set(PROJECT_SOURCES
         main.cpp
@@ -105,7 +105,9 @@ set(TEMP_PROJECT_SOURCES
         configobjectui.h
         debugloadingui.cpp
         debugloadingui.h
-)
+        dhhelpui.cpp
+        dhhelpui.h
+        )
 
 ki18n_wrap_ui(TEMP_PROJECT_SOURCES ${ui_files})
 

@@ -30,6 +30,7 @@ Q_SIGNALS:
   void refreshSubProgress (int value);
   void refreshFullLabel (const QString &label);
   void refreshSubLabel (const QString &label);
+  void whatHappenedClicked ();
   void continueProgress ();
   void stopProgress ();
   void finish ();

@@ -2,12 +2,14 @@
 #define MAINWINDOW_H
 
 // #include "../feature/dh_module.h"
+#include <KPageDialog>
 #include <QDateTime>
 #include <QEvent>
 #include <QLabel>
 #include <QMainWindow>
 
 #include <QButtonGroup>
+#include <manage.h>
 
 QT_BEGIN_NAMESPACE
 namespace Ui
@@ -21,9 +23,8 @@ class MainWindow : public QMainWindow
   Q_OBJECT
 
 public:
-  MainWindow (QWidget *parent = nullptr);
+  explicit MainWindow (QWidget *parent = nullptr);
   ~MainWindow ();
-  // static QList<DhModule *> modules;
 
 Q_SIGNALS:
   void winClose ();
@@ -34,6 +35,8 @@ private:
   void initShortcuts ();
   QButtonGroup *group;
   void closeEvent (QCloseEvent *event) override;
+  dh::ManageRegion *mr = new dh::ManageRegion ();
+  KPageDialog *dialog = nullptr;
 
 protected:
   void virtual dragEnterEvent (QDragEnterEvent *event);

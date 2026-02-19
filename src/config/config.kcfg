@@ -20,6 +20,13 @@
             <tooltip>The elapsed milliseconds for the progress bar, if set too small will affect the speed.</tooltip>
             <default>500</default>
         </entry>
+        <entry name="GeneralConfigForInput" type="Bool">
+            <label>General Config for Input</label>
+            <tooltip>If you choose this, the input config will not be asked, and you need to configure in the configure
+                interface.
+            </tooltip>
+            <default>true</default>
+        </entry>
     </group>
     <group name="Game">
         <entry name="OverrideSetting" type="Bool">

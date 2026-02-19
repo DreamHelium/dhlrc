@@ -125,7 +125,7 @@ ManageBase::updateModel ()
 ManageRegion::ManageRegion ()
 {
   setDND (true);
-  QObject::connect (mui, &ManageUI::dnd, this, &ManageRegion::dnd_triggered);
+  connect (mui, &ManageUI::dnd, this, &ManageRegion::dnd_triggered);
   setWindowTitle (_ ("Manage Region"));
   auto moduleDir = QApplication::applicationDirPath ();
   moduleDir += QDir::toNativeSeparators ("/");
@@ -139,7 +139,28 @@ ManageRegion::ManageRegion ()
       if (library->load ())
         modules.append (library);
       else
-        delete library;
+        {
+          delete library;
+          library = nullptr;
+        }
+
+      if (library)
+        {
+          auto configFn = reinterpret_cast<void *(*)()> (
+              library->resolve ("input_config_new"));
+          auto freeFn = reinterpret_cast<void (*) (void *)> (
+              library->resolve ("input_config_free"));
+          if (configFn && freeFn)
+            {
+              auto newConfig = configFn ();
+              inputConfigs.emplace_back (
+                  std::unique_ptr<void, void (*) (void *)>{ newConfig,
+                                                            freeFn });
+            }
+          else
+            inputConfigs.emplace_back (
+                std::unique_ptr<void, void (*) (void *)>{ nullptr, nullptr });
+        }
     }
 }
 
@@ -172,7 +193,7 @@ ManageRegion::save_triggered (QList<int> rows)
       QStringList supportList;
       QList<multiTransFunc> multiFuncList;
       QList<singleTransFunc> singleFuncList;
-      QList<QLibrary*> libraries;
+      QList<QLibrary *> libraries;
       for (auto lib : modules)
         {
           auto nameFn = reinterpret_cast<const char *(*)()> (

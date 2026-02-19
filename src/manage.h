@@ -149,10 +149,8 @@ private Q_SLOTS:
 private:
   std::vector<std::unique_ptr<Region>> regions = {};
   QList<QLibrary *> modules = {};
+  std::vector<std::unique_ptr<void, void (*) (void *)>> inputConfigs = {};
 };
-
-/* There might be a `ManageNbtNode`, but since ManageRegion is better, we might
- * not need this */
 }
 
 #endif /* MANAGE_H */

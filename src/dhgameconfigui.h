@@ -75,6 +75,14 @@ public:
     checkBox->setChecked (DhConfig::ignoreLeftover ());
     vLayout->addWidget (checkBox);
 
+    inputConfigBox = new QCheckBox ();
+    inputConfigBox->setText (
+        DhConfig::self ()->generalConfigForInputItem ()->label ());
+    inputConfigBox->setToolTip (
+        DhConfig::self ()->generalConfigForInputItem ()->toolTip ());
+    inputConfigBox->setChecked (DhConfig::generalConfigForInput ());
+    vLayout->addWidget (inputConfigBox);
+
     limitLayout = new QHBoxLayout ();
     limitLabel = new QLabel (DhConfig::self ()->memoryLimitItem ()->label ());
     limitBox = new QSpinBox ();
@@ -103,6 +111,7 @@ public:
 
 private:
   QCheckBox *checkBox;
+  QCheckBox *inputConfigBox;
   QHBoxLayout *limitLayout;
   QLabel *limitLabel;
   QSpinBox *limitBox;
@@ -123,6 +132,7 @@ private Q_SLOTS:
   updateUI ()
   {
     checkBox->setChecked (DhConfig::ignoreLeftover ());
+    inputConfigBox->setChecked (DhConfig::generalConfigForInput ());
     limitBox->setValue (DhConfig::memoryLimit ());
     secBox->setValue (DhConfig::elapsedMilliseconds ());
   }
@@ -139,6 +149,8 @@ public Q_SLOTS:
   {
     DhConfig::self ()->ignoreLeftoverItem ()->setValue (
         checkBox->isChecked ());
+    DhConfig::self ()->generalConfigForInputItem ()->setValue (
+        inputConfigBox->isChecked ());
     DhConfig::self ()->memoryLimitItem ()->setValue (limitBox->value ());
     DhConfig::self ()->elapsedMillisecondsItem ()->setValue (secBox->value ());
     DhConfig::self ()->save ();

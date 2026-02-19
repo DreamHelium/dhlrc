@@ -32,6 +32,21 @@ unsafe extern "C" {
     ) -> Result<(), MyError>;
 }
 
+#[derive(Default)]
+pub struct InputConfig {
+    ignore_base_data: bool,
+}
+
+#[unsafe(no_mangle)]
+pub extern "C" fn input_config_new() -> *mut InputConfig {
+    Box::into_raw(Box::new(InputConfig::default()))
+}
+
+#[unsafe(no_mangle)]
+pub extern "C" fn input_config_free(input_config: *mut InputConfig) {
+    drop(unsafe { Box::from_raw(input_config) })
+}
+
 #[unsafe(no_mangle)]
 pub extern "C" fn region_type() -> *const c_char {
     string_to_ptr_fail_to_null("litematic")
