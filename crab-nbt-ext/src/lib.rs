@@ -174,7 +174,7 @@ pub fn nbt_create_real(
     Ok(nbt)
 }
 
-fn vec_u8_to_i8_safest(vec: Vec<u8>) -> Vec<i8> {
+pub fn vec_u8_to_i8_safest(vec: Vec<u8>) -> Vec<i8> {
     let mut result = Vec::with_capacity(vec.len());
     for byte in vec {
         result.push(byte as i8);
