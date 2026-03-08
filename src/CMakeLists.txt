@@ -141,6 +141,8 @@ target_include_directories(dhlrc_qt PUBLIC
         "${PROJECT_BINARY_DIR}" "${PROJECT_SOURCE_DIR}"
 )
 
+add_dependencies(dhlrc_qt dhlrc_cargo_build)
+
 kconfig_add_kcfg_files(dhlrc_qt config/settings.kcfgc)
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.

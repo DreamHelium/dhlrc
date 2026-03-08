@@ -35,3 +35,4 @@ po/*/*.po~
 
 # cargo build
 */target
+target

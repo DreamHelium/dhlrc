@@ -1,0 +1,5 @@
+#[package]
+#name = "dhlrc-deps"
+#
+[workspace]
+members = ["region-rs", "region-nbt-rs", "region-litematic-rs", "nbt-to-vec"]

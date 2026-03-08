@@ -24,9 +24,6 @@ cmake -B build
 cmake --build build
 ```
 
-You might need to copy `region_rs` library from `region-rs/target/debug(or release)` into root directory and build
-directory. If it's allowed, using a soft link.
-
 ## Features
 
 todo.
