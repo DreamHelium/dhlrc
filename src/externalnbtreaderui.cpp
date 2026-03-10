@@ -6,6 +6,7 @@
 #include <qevent.h>
 #include <qmimedata.h>
 #define _(str) gettext (str)
+#undef asprintf
 
 ExternalNbtReaderUI::ExternalNbtReaderUI (QWidget *parent) : QWidget (parent)
 {
