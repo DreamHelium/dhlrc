@@ -20,6 +20,7 @@ public:
   explicit DhHelpUI (QWidget *parent = nullptr);
   ~DhHelpUI () override;
   static void showHelp (const QString &str);
+  static void free ();
 
 protected:
   void resizeEvent (QResizeEvent *event) override;

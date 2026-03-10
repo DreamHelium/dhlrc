@@ -6,6 +6,7 @@
 #include <QTranslator>
 #include <QWidget>
 #include <qcoreapplication.h>
+#include <oclero/qlementine.hpp>
 
 int
 main (int argc, char *argv[])
@@ -19,6 +20,9 @@ main (int argc, char *argv[])
 #endif
 
   auto dir = dh::getTranslationDir ();
+
+  auto style = new oclero::qlementine::QlementineStyle (&a);
+  QApplication::setStyle (style);
 
   bindtextdomain ("dhlrc", dir.toUtf8 ().constData ());
   bind_textdomain_codeset ("dhlrc", "UTF-8");

@@ -2,11 +2,12 @@
 #include <QSplitter>
 #include <libintl.h>
 #define _(str) gettext (str)
+#include <QApplicationStatic>
 #include <QDockWidget>
 #include <QFile>
 #include <QSortFilterProxyModel>
 
-Q_GLOBAL_STATIC (DhHelpUI, dhui)
+static DhHelpUI *dhui = nullptr;
 
 DhHelpUI::DhHelpUI (QWidget *parent) : QWidget (parent)
 {
@@ -71,10 +72,18 @@ DhHelpUI::~DhHelpUI () {}
 void
 DhHelpUI::showHelp (const QString &str)
 {
+  if (!dhui)
+    dhui = new DhHelpUI ();
   dhui->show ();
   dhui->activateWindow ();
   dhui->raise ();
   dhui->showSome (str);
+}
+
+void
+DhHelpUI::free ()
+{
+  delete dhui;
 }
 
 void

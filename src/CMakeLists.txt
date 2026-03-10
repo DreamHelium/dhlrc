@@ -2,6 +2,10 @@ cmake_minimum_required(VERSION 3.17)
 
 project(dhlrc_qt LANGUAGES CXX)
 
+add_subdirectory(qlementine)
+
+find_package(Intl)
+
 add_definitions(-DDHLRC_VERSION="${dhlrc_qt_VERSION}")
 string(TIMESTAMP CURRENT_DAY %Y%m%d)
 add_definitions(-DDHLRC_COMPILE_DATE=${CURRENT_DAY})
@@ -35,7 +39,7 @@ set(ui_files mainwindow.ui
         #        paletteaddui.ui
         loadobjectui.ui
         nbtreaderui.ui
-        )
+)
 
 set(PROJECT_SOURCES
         main.cpp
@@ -107,7 +111,7 @@ set(TEMP_PROJECT_SOURCES
         debugloadingui.h
         dhhelpui.cpp
         dhhelpui.h
-        )
+)
 
 ki18n_wrap_ui(TEMP_PROJECT_SOURCES ${ui_files})
 
@@ -135,7 +139,7 @@ else ()
 endif ()
 
 target_link_libraries(dhlrc_qt PRIVATE Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::Svg KF6::ColorScheme
-        KF6::ConfigWidgets KF6::I18n KF6::I18nLocaleData region_rs Qt6::Concurrent nbt_to_vec)
+        KF6::ConfigWidgets KF6::I18n KF6::I18nLocaleData region_rs Qt6::Concurrent nbt_to_vec ${INTL_LIBRARIES} qlementine)
 target_link_directories(dhlrc_qt PRIVATE ${CMAKE_BINARY_DIR})
 target_include_directories(dhlrc_qt PUBLIC
         "${PROJECT_BINARY_DIR}" "${PROJECT_SOURCE_DIR}"

@@ -1,0 +1,3 @@
+[submodule "src/qlementine"]
+	path = src/qlementine
+	url = https://github.com/oclero/qlementine

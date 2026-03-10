@@ -36,7 +36,10 @@
 // #include <qnamespace.h>
 #include <QPushButton>
 #include <blockreaderui.h>
+#ifdef DH_DEBUG_IN_IDE
 #include <debugloadingui.h>
+#endif
+#include <dhhelpui.h>
 #include <externalnbtreaderui.h>
 #include <generalchoosedialog.h>
 #include <libintl.h>
@@ -47,7 +50,6 @@
 #define REGION_LOCKED_MSG                                                     \
   _ ("Region is locked! It might not be the writer lock! Please try to "      \
      "close the window that's using the Region.")
-
 
 MainWindow::MainWindow (QWidget *parent)
     : QMainWindow (parent), ui (new Ui::MainWindow)
@@ -75,6 +77,7 @@ MainWindow::~MainWindow ()
   delete mr;
   delete dialog;
   delete ui;
+  DhHelpUI::free ();
 }
 
 void
