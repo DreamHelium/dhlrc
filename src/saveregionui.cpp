@@ -5,6 +5,7 @@
 #include <configobjectui.h>
 #include <manage.h>
 #include <thread>
+#undef asprintf
 
 SaveRegionUI::SaveRegionUI (const QList<Region *> &list,
                             const QString &outputDir, singleTransFunc func,

@@ -42,7 +42,7 @@ endif ()
 
 
 add_custom_command(
-        COMMAND cp ${DHLRC_BUILD_LIBRARIES} ${CMAKE_BINARY_DIR}
+        COMMAND ${CMAKE_EXECUTABLE} -E copy ${DHLRC_BUILD_LIBRARIES} ${CMAKE_BINARY_DIR}
         TARGET dhlrc_cargo_build POST_BUILD
 )
 add_custom_command(
