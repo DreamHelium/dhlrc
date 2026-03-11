@@ -36,6 +36,7 @@
 // #include <qnamespace.h>
 #include <QPushButton>
 #include <blockreaderui.h>
+#include <oclero/qlementine/widgets/AboutDialog.hpp>
 #ifdef DH_DEBUG_IN_IDE
 #include <debugloadingui.h>
 #endif
@@ -227,10 +228,18 @@ MainWindow::mrBtn_2_clicked ()
 void
 MainWindow::showabout ()
 {
-  QString str = _ ("Version: ") + QString::number (DHLRC_COMPILE_DATE);
-  str += '\n';
-  str += _ ("Graphical Backend: Qt");
-  QMessageBox::about (this, _ ("About Minecraft Structure Modifier"), str);
+  auto dialog = new oclero::qlementine::AboutDialog (this);
+  dialog->setAttribute (Qt::WA_DeleteOnClose);
+  dialog->setApplicationVersion (QString::number (DHLRC_COMPILE_DATE));
+  dialog->setCopyright ("GPL v3");
+  dialog->setDescription (_ ("An application that can read, modify, and "
+                             "export Minecraft structure."));
+  dialog->addSocialMediaLink ("GitHub", "https://github.com/DreamHelium",
+                              QIcon (":/cn/dh/dhlrc/github.svg"));
+  dialog->addSocialMediaLink ("bilibili",
+                              "https://space.bilibili.com/13499876",
+                              QIcon (":/cn/dh/dhlrc/bilibili.svg"));
+  dialog->exec ();
 }
 
 void

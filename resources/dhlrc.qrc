@@ -9,5 +9,7 @@
         <file>show.svg</file>
         <file>hide.svg</file>
         <file>region_create.md</file>
+        <file>bilibili.svg</file>
+        <file>github.svg</file>
     </qresource>
 </RCC>
