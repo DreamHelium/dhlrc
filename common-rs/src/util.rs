@@ -7,9 +7,6 @@ use std::ptr::null_mut;
 use std::time::Instant;
 use sysinfo::System;
 
-static mut FREE_MEMORY: usize = 500 * 1024 * 1024;
-static mut ELAPSED_MILLISECS: u64 = 500;
-
 #[unsafe(no_mangle)]
 pub extern "C" fn string_free(string: *mut c_char) {
     if string.is_null() {
@@ -39,9 +36,9 @@ pub fn show_progress(
     string_free(real_text);
 }
 
-pub fn finish_oom(system: &mut System) -> Result<(), MyError> {
+pub fn finish_oom(system: &mut System, free_memory: u64) -> Result<(), MyError> {
     system.refresh_all();
-    if unsafe { system.available_memory() < FREE_MEMORY as u64 } {
+    if system.available_memory() < free_memory {
         println!("{}", system.free_memory());
         return Err(MyError {
             msg: i18n("Out of memory!").to_string(),
@@ -67,21 +64,6 @@ pub extern "C" fn system_info_object_free(system: *mut System) {
     drop(unsafe { Box::from_raw(system) })
 }
 
-#[unsafe(no_mangle)]
-pub extern "C" fn reset_available_memory(memory: usize) {
-    unsafe { FREE_MEMORY = memory };
-}
-
-#[unsafe(no_mangle)]
-pub extern "C" fn reset_elapsed_millisecs(millisecond: u64) {
-    unsafe { ELAPSED_MILLISECS = millisecond };
-}
-
-#[unsafe(no_mangle)]
-pub extern "C" fn get_limit_available_memory() -> usize {
-    unsafe { FREE_MEMORY }
-}
-
 pub fn string_to_ptr_fail_to_null(string: &str) -> *mut c_char {
     let str = CString::new(string);
     match str {
@@ -102,8 +84,7 @@ pub fn cstr_to_str(string: *const c_char) -> Result<String, Box<dyn Error>> {
     Ok(ref_str.to_string())
 }
 
-#[unsafe(no_mangle)]
-pub extern "C" fn real_show_progress(
+pub fn real_show_progress(
     instant: &mut Instant,
     system: &mut System,
     progress_fn: ProgressFn,
@@ -111,9 +92,11 @@ pub extern "C" fn real_show_progress(
     percentage: c_int,
     msg: &str,
     text: &str,
+    elapsed_millisecs: u128,
+    free_memory: u64,
 ) -> Result<(), MyError> {
-    if instant.elapsed().as_millis() >= unsafe { ELAPSED_MILLISECS as u128 } {
-        finish_oom(system)?;
+    if instant.elapsed().as_millis() >= elapsed_millisecs {
+        finish_oom(system, free_memory)?;
         show_progress(progress_fn, main_klass, percentage, msg, text);
         *instant = Instant::now();
     }

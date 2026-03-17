@@ -16,6 +16,7 @@
 #include <utility.h>
 #define _(str) gettext (str)
 #undef asprintf
+#include "settings.h"
 
 #define err_msg_handle_func(msg, func, ...)                                   \
   if (msg)                                                                    \
@@ -147,7 +148,8 @@ LoadRegionUI::process ()
           std::unique_ptr<void, void (*) (void *)> object{ nullptr, nullptr };
           void *region = nullptr;
           typedef const char *(*LoadFunc) (void *, ProgressFunc, void **,
-                                           void *, const void *);
+                                           void *, const void *, quint64,
+                                           quint64);
           auto func = reinterpret_cast<LoadFunc> (
               lib->resolve ("region_create_from_file"));
 
@@ -159,7 +161,9 @@ LoadRegionUI::process ()
             }
           if (func)
             err_msg_handle_func (msg, func, object.get (), setFunc, &region,
-                                 this, cancel_flag);
+                                 this, cancel_flag,
+                                 quint64 (DhConfig::elapsedMilliseconds ()),
+                                 quint64 (DhConfig::memoryLimit ()));
 
           pushRegionFunc (dir, {}, region);
           return true;
@@ -202,16 +206,19 @@ LoadRegionUI::process ()
               /* Continue */
               Q_EMIT refreshFullLabel (realLabel);
               typedef const char *(*LoadFunc) (void *, ProgressFunc, void **,
-                                               void *, const void *, int32_t);
+                                               void *, const void *, int32_t,
+                                               quint64, quint64);
               auto func = reinterpret_cast<LoadFunc> (
                   lib->resolve ("region_create_from_file_as_index"));
               for (auto index : regionIndexes)
                 {
                   void *singleRegion = nullptr;
                   if (func)
-                    err_msg_handle_func (msg, func, object.get (), setFunc,
-                                         &singleRegion, this, cancel_flag,
-                                         index);
+                    err_msg_handle_func (
+                        msg, func, object.get (), setFunc, &singleRegion, this,
+                        cancel_flag, index,
+                        quint64 (DhConfig::elapsedMilliseconds ()),
+                        quint64 (DhConfig::memoryLimit ()));
 
                   auto name = region_get_region_name (singleRegion);
                   pushRegionFunc (dir, name, singleRegion);
@@ -250,8 +257,10 @@ LoadRegionUI::process ()
           /* Processing stuff */
           Q_EMIT refreshSubLabel (_ ("Parsing NBT"));
           int failed = 0;
-          void *o_data = file_try_uncompress (dir.toUtf8 (), setFunc, this,
-                                              &failed, cancel_flag);
+          void *o_data = file_try_uncompress (
+              dir.toUtf8 (), setFunc, this, &failed, cancel_flag,
+              quint64 (DhConfig::elapsedMilliseconds ()),
+              quint64 (DhConfig::memoryLimit ()));
           if (failed)
             {
               auto err_msg = vec_to_cstr (o_data);

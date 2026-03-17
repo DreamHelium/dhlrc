@@ -7,7 +7,7 @@
 #include <thread>
 #undef asprintf
 
-SaveRegionUI::SaveRegionUI (const QList<Region *> &list,
+SaveRegionUI::SaveRegionUI (const QList<RegionClass*> &list,
                             const QString &outputDir, singleTransFunc func,
                             QLibrary *library, QWidget *parent)
     : LoadObjectUI (parent), list (list), outputDir (outputDir), func (func),
@@ -84,16 +84,16 @@ SaveRegionUI::process ()
       int i = 0;
       for (auto st : list)
         {
-          currentRegion = region_get_name (st->region.get ());
+          currentRegion = region_get_name (st->get_region ());
           if (cancel_flag_is_cancelled (cancel_flag))
             break;
           Q_EMIT refreshFullProgress ((i + 1) * 100 / list.size ());
           QString realLabel = "[%1/%2] %3";
-          realLabel = realLabel.arg (i + 1).arg (list.size ()).arg (st->name);
+          realLabel = realLabel.arg (i + 1).arg (list.size ()).arg (st->get_name ());
           Q_EMIT refreshFullLabel (realLabel);
           i++;
           /* Processing stuff */
-          QString realDir = outputDir + QDir::separator () + st->name;
+          QString realDir = outputDir + QDir::separator () + st->get_name ();
           Q_EMIT refreshFullLabel (
               _ ("Please click `Continue` to choose options."));
           /* Emit the stop signal to stop, and use loop to
@@ -102,7 +102,7 @@ SaveRegionUI::process ()
           std::unique_lock lock (mutex);
           cv.wait (lock);
           if (!cancel_flag_is_cancelled (cancel_flag))
-            func (st->region.get (), realDir.toUtf8 (), configObject, full_set,
+            func (st->get_region (), realDir.toUtf8 (), configObject, full_set,
                   this, cancel_flag);
         }
       Q_EMIT refreshFullProgress (100);

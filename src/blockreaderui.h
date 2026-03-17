@@ -25,7 +25,6 @@ public:
 private:
   Ui::BlockReaderUI *ui;
   void *region;
-  QReadLocker lock;
   //   QString uuid = {};
   void setText ();
   char *large_version = nullptr;
@@ -34,6 +33,7 @@ private:
   void closeEvent (QCloseEvent *event) override;
   BlockShowUI *bsui = nullptr;
   const void *nbt = nullptr;
+  AutoLocker locker;
 
 Q_SIGNALS:
   void changeVal (int value);

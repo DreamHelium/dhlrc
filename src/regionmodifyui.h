@@ -26,8 +26,8 @@ public:
 private:
   Ui::RegionModifyUI *ui;
   void *region = nullptr;
-  QWriteLocker lock;
   void initData ();
+  AutoLocker locker;
 
 private Q_SLOTS:
   void okBtn_clicked ();

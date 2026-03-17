@@ -1,17 +1,14 @@
 mod config;
 mod output;
 
+use common_rs::ProgressFn;
 use common_rs::i18n::i18n;
 use common_rs::my_error::MyError;
 use common_rs::region::{BlockEntity, Palette, Region};
 use common_rs::tree_value::TreeValue;
-use common_rs::util::string_to_ptr_fail_to_null;
-use common_rs::ProgressFn;
+use common_rs::util::{real_show_progress, string_to_ptr_fail_to_null};
 use crab_nbt::{Nbt, NbtCompound, NbtTag};
-use crab_nbt_ext::{
-    convert_nbt_to_vec, get_palette_from_nbt_tag, nbt_create_real,
-    GetWithError,
-};
+use crab_nbt_ext::{GetWithError, convert_nbt_to_vec, get_palette_from_nbt_tag, nbt_create_real};
 use formatx::formatx;
 use std::collections::HashMap;
 use std::error::Error;
@@ -26,44 +23,13 @@ use sysinfo::System;
 #[link(name = "region_rs")]
 unsafe extern "C" {
     fn cancel_flag_is_cancelled(ptr: *const AtomicBool) -> c_int;
-    fn region_new() -> *mut c_void;
-    fn region_free(region: *mut c_void);
-    fn region_set_time(region: *mut c_void, create_time: i64, modify_time: i64) -> *const c_char;
     fn string_free(string: *mut c_char);
-    fn region_get_create_timestamp(region: *mut c_void) -> i64;
-    fn region_get_modify_timestamp(region: *mut c_void) -> i64;
-    fn region_get_size(region: *mut c_void);
-    fn region_get_name(region: *mut c_void) -> *const c_char;
-    fn region_set_name(region: *mut c_void, string: *const c_char) -> *const c_char;
-    fn region_get_description(region: *mut c_void) -> *const c_char;
-    fn region_set_description(region: *mut c_void, string: *const c_char) -> *const c_char;
-    fn region_get_author(region: *mut c_void) -> *const c_char;
-    fn region_set_author(region: *mut c_void, string: *const c_char) -> *const c_char;
     fn region_get_data_version(region: *mut c_void) -> u32;
-    fn region_set_data_version(region: *mut c_void, data_version: u32);
-    fn region_set_size(region: *mut c_void, x: i32, y: i32, z: i32);
     fn region_get_x(region: *mut c_void) -> i32;
     fn region_get_y(region: *mut c_void) -> i32;
     fn region_get_z(region: *mut c_void) -> i32;
-    fn block_new_to_region(
-        region: *mut c_void,
-        index: usize,
-        id: u32,
-        tree: *mut HashMap<String, TreeValue>,
-    );
-    fn region_get_block_entity_tree_by_index(
-        region: *mut c_void,
-        index: usize,
-    ) -> *mut HashMap<String, TreeValue>;
     fn region_get_block_id_by_index(region: *mut c_void, index: usize) -> u32;
-    fn region_append_palette(
-        region: *mut c_void,
-        id_name: *const c_char,
-        property: *mut Vec<(String, String)>,
-    ) -> *const c_char;
     fn region_get_palette_id_name(region: *mut c_void, id: usize) -> *const c_char;
-    fn region_get_palette_property(region: *mut c_void, index: usize)
-    -> *mut Vec<(String, String)>;
     fn region_get_palette_property_len(region: *mut c_void, id: usize) -> usize;
     fn region_get_palette_property_name(
         region: *mut c_void,
@@ -75,31 +41,6 @@ unsafe extern "C" {
         id: usize,
         index: usize,
     ) -> *const c_char;
-    fn region_set_palette_property_name_and_data(
-        region: *mut c_void,
-        id: usize,
-        index: usize,
-        name: *const c_char,
-        data: *const c_char,
-    ) -> *const c_char;
-    fn file_try_uncompress(
-        filename: *const c_char,
-        progress_fn: ProgressFn,
-        main_klass: *mut c_void,
-        failed: *mut c_int,
-    ) -> *mut Vec<u8>;
-    fn vec_free(vec: *mut Vec<u8>);
-    fn vec_to_cstr(vec: *mut Vec<u8>) -> *mut c_char;
-    fn region_get_index(region: *mut c_void, x: i32, y: i32, z: i32) -> i32;
-    fn region_set_block_entities_from_vec(
-        region: *mut c_void,
-        block_entities: *mut Vec<BlockEntity>,
-    );
-    fn region_set_blocks_from_vec(region: *mut c_void, blocks: *mut Vec<u32>);
-    fn region_set_entity_from_vec(
-        region: *mut c_void,
-        entities: *mut Vec<Vec<(String, TreeValue)>>,
-    );
     fn region_get_entity_len(region: *mut c_void) -> usize;
     fn region_get_entity_id(region: *mut c_void, index: usize) -> *const c_char;
     fn region_get_entity(region: *mut c_void, index: usize) -> *const Vec<(String, TreeValue)>;
@@ -112,16 +53,9 @@ unsafe extern "C" {
         failed: *mut c_int,
         zlib: bool,
         cancel_flag: *const AtomicBool,
+        elapsed_millisecs: u64,
+        free_memory: u64,
     ) -> *mut Vec<u8>;
-    pub fn real_show_progress(
-        instant: &mut Instant,
-        system: &mut System,
-        progress_fn: ProgressFn,
-        main_klass: *mut c_void,
-        percentage: c_int,
-        msg: &str,
-        text: &str,
-    ) -> Result<(), MyError>;
 }
 
 #[unsafe(no_mangle)]
@@ -244,6 +178,8 @@ fn region_create_from_bytes_internal(
     progress_fn: ProgressFn,
     main_klass: *mut c_void,
     cancel_flag: *const AtomicBool,
+    elapsed_millisecs: u128,
+    free_memory: u64,
 ) -> Result<*mut Region, Box<dyn Error>> {
     let nbt = unsafe { (*o_nbt).clone() };
     let data_version = nbt.get_int_with_err("DataVersion")?;
@@ -323,17 +259,17 @@ fn region_create_from_bytes_internal(
         let string = i18n("Processing blocks: {} / {}.");
         let real_string = formatx!(string, j, block_num)?;
 
-        unsafe {
-            real_show_progress(
-                &mut start,
-                &mut sys,
-                progress_fn,
-                main_klass,
-                (j * 100 / block_num) as c_int,
-                &real_string,
-                "",
-            )?;
-        }
+        real_show_progress(
+            &mut start,
+            &mut sys,
+            progress_fn,
+            main_klass,
+            (j * 100 / block_num) as c_int,
+            &real_string,
+            "",
+            elapsed_millisecs,
+            free_memory,
+        )?;
 
         let pos = internal_block.get_list_with_err("pos")?;
         let block_pos = get_size(pos)?;
@@ -382,18 +318,26 @@ pub extern "C" fn region_create_from_file(
     region: *mut *mut Region,
     main_klass: *mut c_void,
     cancel_flag: *const AtomicBool,
+    elapsed_millisecs: u64,
+    free_memory: u64,
 ) -> *const c_char {
     let mut err_string: String = String::new();
     if !region.is_null() {
         unsafe {
-            *region =
-                match region_create_from_bytes_internal(nbt, progress_fn, main_klass, cancel_flag) {
-                    Ok(ret) => ret,
-                    Err(err) => {
-                        err_string = err.to_string();
-                        null_mut()
-                    }
+            *region = match region_create_from_bytes_internal(
+                nbt,
+                progress_fn,
+                main_klass,
+                cancel_flag,
+                elapsed_millisecs as u128,
+                free_memory,
+            ) {
+                Ok(ret) => ret,
+                Err(err) => {
+                    err_string = err.to_string();
+                    null_mut()
                 }
+            }
         }
     } else {
         err_string = String::from(i18n("Region value not provided"));

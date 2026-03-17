@@ -17,6 +17,8 @@ fn file_try_uncompress_real(
     progress_fn: ProgressFn,
     main_klass: *mut c_void,
     cancel_flag: *const AtomicBool,
+    elapsed_millisecs: u128,
+    free_memory: u64,
 ) -> Result<Vec<u8>, Box<dyn Error>> {
     let str = cstr_to_str(filename)?;
     let mut file = File::open(str)?;
@@ -36,6 +38,8 @@ fn file_try_uncompress_real(
             (file_pos * 100 / file_size) as c_int,
             i18n("Loading file."),
             "",
+            elapsed_millisecs,
+            free_memory,
         )?;
 
         if cancel_flag_is_cancelled(cancel_flag) == 1 {
@@ -76,6 +80,8 @@ fn file_try_uncompress_real(
             (pos * 100 / data_size) as c_int,
             i18n("Uncompressing data."),
             "",
+            elapsed_millisecs,
+            free_memory,
         )?;
 
         if cancel_flag_is_cancelled(cancel_flag) == 1 {
@@ -113,8 +119,17 @@ pub extern "C" fn file_try_uncompress(
     main_klass: *mut c_void,
     failed: *mut c_int,
     cancel_flag: *const AtomicBool,
+    elapsed_millisecs: u64,
+    free_memory: u64,
 ) -> *mut Vec<u8> {
-    match file_try_uncompress_real(filename, progress_fn, main_klass, cancel_flag) {
+    match file_try_uncompress_real(
+        filename,
+        progress_fn,
+        main_klass,
+        cancel_flag,
+        elapsed_millisecs as u128,
+        free_memory,
+    ) {
         Ok(r) => Box::into_raw(Box::new(r)),
         Err(err) => {
             unsafe {
@@ -132,6 +147,8 @@ fn vec_try_compress_real(
     main_klass: *mut c_void,
     zlib: bool,
     cancel_flag: *const AtomicBool,
+    elapsed_millisecs: u128,
+    free_memory: u64,
 ) -> Result<Vec<u8>, Box<dyn Error>> {
     let real_vec = unsafe { Box::from_raw(vec) };
     let mut compressor;
@@ -154,6 +171,8 @@ fn vec_try_compress_real(
             (pos * 100 / vec_size) as c_int,
             i18n("Uncompressing data."),
             "",
+            elapsed_millisecs,
+            free_memory,
         )?;
 
         if cancel_flag_is_cancelled(cancel_flag) == 1 {
@@ -195,8 +214,18 @@ pub extern "C" fn vec_try_compress(
     failed: *mut c_int,
     zlib: bool,
     cancel_flag: *const AtomicBool,
+    elapsed_millisecs: u64,
+    free_memory: u64,
 ) -> *mut Vec<u8> {
-    match vec_try_compress_real(vec, progress_fn, main_klass, zlib, cancel_flag) {
+    match vec_try_compress_real(
+        vec,
+        progress_fn,
+        main_klass,
+        zlib,
+        cancel_flag,
+        elapsed_millisecs as u128,
+        free_memory,
+    ) {
         Ok(r) => Box::into_raw(Box::new(r)),
         Err(err) => {
             unsafe {

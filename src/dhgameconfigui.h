@@ -141,8 +141,6 @@ public Q_SLOTS:
   static void
   setConfig ()
   {
-    reset_available_memory (DhConfig::memoryLimit ());
-    reset_elapsed_millisecs (DhConfig::elapsedMilliseconds ());
   }
   void
   changeSettings ()

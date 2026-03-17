@@ -37,6 +37,8 @@ trait NbtCreate {
         system: &mut System,
         progress_fn: ProgressFn,
         main_klass: *mut c_void,
+        elapsed_millisecs: u128,
+        free_memory: u64,
     ) -> Result<Self, Box<dyn Error>>
     where
         Self: Sized;
@@ -112,6 +114,8 @@ impl NbtCreate for NbtTag {
         system: &mut System,
         progress_fn: ProgressFn,
         main_klass: *mut c_void,
+        elapsed_millisecs: u128,
+        free_memory: u64,
     ) -> Result<Self, Box<dyn Error>> {
         let region_x = unsafe { region_get_x(region) };
         let region_y = unsafe { region_get_y(region) };
@@ -143,17 +147,17 @@ impl NbtCreate for NbtTag {
         for state in states {
             let string = i18n("Adding blocks to NBT: {} / {}.");
             let real_string = formatx!(string, i, states.len())?;
-            unsafe {
-                real_show_progress(
-                    instant,
-                    system,
-                    progress_fn,
-                    main_klass,
-                    (((i + 1) as usize * 100) / states.len()) as c_int,
-                    &real_string,
-                    "",
-                )?;
-            }
+            real_show_progress(
+                instant,
+                system,
+                progress_fn,
+                main_klass,
+                (((i + 1) as usize * 100) / states.len()) as c_int,
+                &real_string,
+                "",
+                elapsed_millisecs,
+                free_memory,
+            )?;
             let mut single_block_vec = vec![];
             if ignore_air && *state == 0 {
                 size_change(&mut x, &mut y, &mut z, region_x, region_y, region_z);
@@ -245,6 +249,8 @@ fn region_save_internal(
     progress_fn: ProgressFn,
     main_klass: *mut c_void,
     cancel_flag: *const c_void,
+    elapsed_millisecs: u128,
+    free_memory: u64,
 ) -> Result<(), Box<dyn Error>> {
     if region.is_null() || filename.is_null() {
         return Err(Box::new(MyError {
@@ -270,17 +276,17 @@ fn region_save_internal(
     let mut start = Instant::now();
     let mut sys = System::new_all();
     while i < size {
-        unsafe {
-            real_show_progress(
-                &mut start,
-                &mut sys,
-                progress_fn,
-                main_klass,
-                (((i + 1) as usize * 100) / size as usize) as c_int,
-                i18n("Pushing index."),
-                "",
-            )?;
-        }
+        real_show_progress(
+            &mut start,
+            &mut sys,
+            progress_fn,
+            main_klass,
+            (((i + 1) as usize * 100) / size as usize) as c_int,
+            i18n("Pushing index."),
+            "",
+            elapsed_millisecs,
+            free_memory,
+        )?;
         unsafe { id.push(region_get_block_id_by_index(region, i as usize)) };
         i += 1;
     }
@@ -298,6 +304,8 @@ fn region_save_internal(
         &mut sys,
         progress_fn,
         main_klass,
+        elapsed_millisecs,
+        free_memory,
     );
     let palette_nbt = NbtTag::create_palette(region);
     let data_version_nbt =
@@ -326,6 +334,8 @@ fn region_save_internal(
             &mut failed as *mut c_int,
             false,
             cancel_flag as *const AtomicBool,
+            elapsed_millisecs as u64,
+            free_memory,
         )
     };
     let real_ret;
@@ -350,6 +360,8 @@ pub extern "C" fn region_save(
     progress_fn: ProgressFn,
     main_klass: *mut c_void,
     cancel_flag: *const c_void,
+    elapsed_millisecs: u64,
+    free_memory: u64,
 ) -> *const c_char {
     match region_save_internal(
         region,
@@ -358,6 +370,8 @@ pub extern "C" fn region_save(
         progress_fn,
         main_klass,
         cancel_flag,
+        elapsed_millisecs as u128,
+        free_memory,
     ) {
         Ok(()) => null(),
         Err(e) => string_to_ptr_fail_to_null(&e.to_string()),

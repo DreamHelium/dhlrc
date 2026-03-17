@@ -3,7 +3,7 @@ use common_rs::i18n::i18n;
 use common_rs::my_error::MyError;
 use common_rs::region::{BlockEntity, Palette, Region};
 use common_rs::tree_value::TreeValue;
-use common_rs::util::string_to_ptr_fail_to_null;
+use common_rs::util::{real_show_progress, string_to_ptr_fail_to_null};
 use crab_nbt::{Nbt, NbtTag};
 use crab_nbt_ext::{
     GetWithError, convert_nbt_tag_to_tree_value, convert_nbt_to_vec, get_palette_from_nbt_tag,
@@ -21,15 +21,6 @@ use sysinfo::System;
 #[link(name = "region_rs")]
 unsafe extern "C" {
     fn cancel_flag_is_cancelled(ptr: *const AtomicBool) -> c_int;
-    pub fn real_show_progress(
-        instant: &mut Instant,
-        system: &mut System,
-        progress_fn: ProgressFn,
-        main_klass: *mut c_void,
-        percentage: c_int,
-        msg: &str,
-        text: &str,
-    ) -> Result<(), MyError>;
 }
 
 #[derive(Default)]
@@ -103,6 +94,8 @@ fn get_block_id(
     main_klass: *mut c_void,
     cancel_flag: *const AtomicBool,
     sys: &mut System,
+    elapsed_millisecs: u128,
+    free_memory: u64,
 ) -> Result<Vec<u32>, Box<dyn Error>> {
     let mut time = Instant::now();
     let mut i = 0;
@@ -110,17 +103,17 @@ fn get_block_id(
     loop {
         let str = gettext_text(i18n("Reading block id: {} / {}."));
         let real_str = formatx!(str, i, block_num)?;
-        unsafe {
-            real_show_progress(
-                &mut time,
-                sys,
-                progress_fn,
-                main_klass,
-                (i as u64 * 100 / block_num as u64) as c_int,
-                &real_str,
-                "",
-            )?;
-        }
+        real_show_progress(
+            &mut time,
+            sys,
+            progress_fn,
+            main_klass,
+            (i as u64 * 100 / block_num as u64) as c_int,
+            &real_str,
+            "",
+            elapsed_millisecs,
+            free_memory,
+        )?;
 
         let start_bit = i as u32 * move_bit;
         let start_state = start_bit / 64;
@@ -151,17 +144,17 @@ fn get_block_id(
         buf.push(id as u32);
         i += 1;
         if i == block_num as usize {
-            unsafe {
-                real_show_progress(
-                    &mut Instant::now(),
-                    &mut System::new_all(),
-                    progress_fn,
-                    main_klass,
-                    100,
-                    i18n("Reading block finished!"),
-                    "",
-                )?;
-            }
+            real_show_progress(
+                &mut Instant::now(),
+                &mut System::new_all(),
+                progress_fn,
+                main_klass,
+                100,
+                i18n("Reading block finished!"),
+                "",
+                elapsed_millisecs,
+                free_memory,
+            )?;
             break;
         }
     }
@@ -174,6 +167,8 @@ fn region_create_from_bytes_internal(
     main_klass: *mut c_void,
     cancel_flag: *const AtomicBool,
     index: i32,
+    elapsed_millisecs: u128,
+    free_memory: u64,
 ) -> Result<*mut Region, Box<dyn Error>> {
     let nbt = unsafe { (*o_nbt).clone() };
     let data_version = nbt.get_int_with_err("MinecraftDataVersion")?;
@@ -226,6 +221,8 @@ fn region_create_from_bytes_internal(
         main_klass,
         cancel_flag,
         &mut sys,
+        elapsed_millisecs,
+        free_memory,
     )?;
     let blocks = block_ids;
     let mut tile_entities_vec = vec![];
@@ -314,6 +311,8 @@ pub extern "C" fn region_create_from_file_as_index(
     main_klass: *mut c_void,
     cancel_flag: *const AtomicBool,
     index: i32,
+    elapsed_millisecs : u64,
+    free_memory : u64
 ) -> *const c_char {
     let mut err_string: String = String::new();
     if !region.is_null() {
@@ -324,6 +323,8 @@ pub extern "C" fn region_create_from_file_as_index(
                 main_klass,
                 cancel_flag,
                 index,
+                elapsed_millisecs as u128,
+                free_memory
             ) {
                 Ok(ret) => ret,
                 Err(err) => {

@@ -56,7 +56,8 @@ extern "C"
   typedef void (*ProgressFunc) (void *, int, const char *, const char *);
   void *file_try_uncompress (const char *filename, ProgressFunc progress_func,
                              void *main_klass, int *failed,
-                             const void *cancel_flag);
+                             const void *cancel_flag,
+                             uint64_t elapsed_millisecs, uint64_t free_memory);
   void vec_free (void *vec);
   char *vec_to_cstr (void *vec);
   const void *cancel_flag_new ();
@@ -86,8 +87,6 @@ extern "C"
   size_t region_get_entity_len (void *region);
   const void *region_get_entity (void *region, size_t index);
   const char *region_get_entity_id (void *region, size_t index);
-  void reset_available_memory (size_t memory);
-  void reset_elapsed_millisecs(uint64_t millisecond);
 
 #ifdef __cplusplus
 }

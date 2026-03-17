@@ -25,8 +25,8 @@ set_func (void *klass, int value)
 
 BlockReaderUI::BlockReaderUI (int index, dh::ManageRegion *mr, QWidget *parent)
     : QWidget (parent), ui (new Ui::BlockReaderUI),
-      region (mr->getRegions ()[index].get ()->region.get ()),
-      lock (mr->getRegions ()[index].get ()->lock.get ())
+      region (mr->getRegions ()[index].get_region ()),
+      locker (mr->getRegions ()[index])
 {
   ui->setupUi (this);
   // auto version = dh::getVersion (region->data_version);

@@ -27,9 +27,9 @@ class SaveRegionUI : public LoadObjectUI
   Q_OBJECT
 
 public:
-  explicit SaveRegionUI (const QList<Region *> &list, const QString &outputDir,
-                         singleTransFunc func, QLibrary *library,
-                         QWidget *parent = nullptr);
+  explicit SaveRegionUI (const QList<RegionClass *> &list,
+                         const QString &outputDir, singleTransFunc func,
+                         QLibrary *library, QWidget *parent = nullptr);
   ~SaveRegionUI () override;
   char *description = nullptr;
 
@@ -41,7 +41,7 @@ private:
   std::condition_variable cv;
   QString currentRegion;
   const void *cancel_flag;
-  QList<Region *> list;
+  QList<RegionClass *> list;
   QStringList failedList;
   QStringList failedReason;
   QString outputDir;

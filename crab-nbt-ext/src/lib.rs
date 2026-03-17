@@ -3,7 +3,7 @@ use common_rs::i18n::i18n;
 use common_rs::my_error::MyError;
 use common_rs::region::Palette;
 use common_rs::tree_value::TreeValue;
-use common_rs::util::{cstr_to_str, show_progress, string_to_ptr_fail_to_null};
+use common_rs::util::{cstr_to_str, real_show_progress, show_progress, string_to_ptr_fail_to_null};
 use crab_nbt::{Nbt, NbtCompound, NbtTag};
 use formatx::formatx;
 use gettextrs::gettext;

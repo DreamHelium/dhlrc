@@ -258,11 +258,11 @@ ManageRegion::save_triggered (QList<int> rows)
                   this, _ ("Select Directory"));
               if (!dir.isEmpty ())
                 {
-                  QList<Region *> transRegions;
+                  QList<RegionClass *> transRegions;
                   for (auto i : rows)
                     {
-                      auto region = regions[i].get ();
-                      transRegions << region;
+                      if (!regions[i].get_lock_status ())
+                        transRegions << &regions[i];
                     }
                   auto srui = new SaveRegionUI (transRegions, dir,
                                                 singleFuncList[index],
@@ -292,22 +292,19 @@ ManageRegion::updateModel ()
 {
   QList<QList<QStandardItem *>> itemList;
 
-  for (const auto &i : getRegions ())
+  for (auto &i : getRegions ())
     {
       QStandardItem *description = new QStandardItem;
       QStandardItem *uuid = new QStandardItem;
       QStandardItem *time = new QStandardItem;
       uuid->setEditable (false);
       time->setEditable (false);
-      if (i->lock->tryLockForRead ())
-        {
-          description->setData (i->name, 2);
-          i->lock->unlock ();
-        }
+      if (!i.get_lock_status ())
+        description->setData (i.get_name (), 2);
       else
         description->setData (QString (_ ("Locked!")), 2);
-      uuid->setData (i->uuid, 0);
-      time->setData (i->dateTime, 0);
+      uuid->setData (i.get_uuid (), 0);
+      time->setData (i.get_date_time (), 0);
       QList list = { description, uuid, time };
       itemList.append (list);
     }
