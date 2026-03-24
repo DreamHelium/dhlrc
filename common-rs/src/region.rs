@@ -4,17 +4,17 @@ use crate::tree_value::TreeValue;
 
 pub struct BaseData {
     /** Default: time of generated */
-    create_time: UtcDateTime,
+    pub create_time: UtcDateTime,
     /** Default: time of generated */
-    modify_time: UtcDateTime,
+    pub modify_time: UtcDateTime,
     /** Default: "" */
-    description: String,
+    pub description: String,
     /** Default: username */
-    author: String,
+    pub author: String,
     /** Default: Converted */
-    name: String,
+    pub name: String,
     /** Default: Unnamed */
-    region_name: String,
+    pub region_name: String,
 }
 
 impl BaseData {
@@ -66,21 +66,6 @@ impl BaseData {
     }
 }
 
-impl Default for BaseData {
-    fn default() -> Self {
-        let temp_username = whoami::username();
-        let real_username = temp_username.unwrap_or_else(|_err| "".to_string());
-        BaseData {
-            create_time: UtcDateTime::now(),
-            modify_time: UtcDateTime::now(),
-            description: "".to_string(),
-            author: real_username,
-            name: "Converted".to_string(),
-            region_name: "Unnamed".to_string(),
-        }
-    }
-}
-
 pub struct Palette {
     pub id_name: String,
     pub property: Vec<(String, String)>,
@@ -91,7 +76,6 @@ pub struct BlockEntity {
     pub entity: Vec<(String, TreeValue)>,
 }
 
-#[derive(Default)]
 pub struct Region {
     /* Base information */
     pub data_version: u32,

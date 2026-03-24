@@ -70,10 +70,6 @@ public:
   explicit DhGeneralConfigUI ()
   {
     vLayout = new QVBoxLayout (this);
-    checkBox = new QCheckBox ();
-    checkBox->setText (DhConfig::self ()->ignoreLeftoverItem ()->label ());
-    checkBox->setChecked (DhConfig::ignoreLeftover ());
-    vLayout->addWidget (checkBox);
 
     inputConfigBox = new QCheckBox ();
     inputConfigBox->setText (
@@ -110,7 +106,6 @@ public:
   }
 
 private:
-  QCheckBox *checkBox;
   QCheckBox *inputConfigBox;
   QHBoxLayout *limitLayout;
   QLabel *limitLabel;
@@ -131,7 +126,6 @@ private Q_SLOTS:
   void
   updateUI ()
   {
-    checkBox->setChecked (DhConfig::ignoreLeftover ());
     inputConfigBox->setChecked (DhConfig::generalConfigForInput ());
     limitBox->setValue (DhConfig::memoryLimit ());
     secBox->setValue (DhConfig::elapsedMilliseconds ());
@@ -141,12 +135,16 @@ public Q_SLOTS:
   static void
   setConfig ()
   {
+    const char *realAuthor = DhConfig::author ().isEmpty ()
+                                 ? nullptr
+                                 : DhConfig::author ().toUtf8 ().constData ();
+    init_default_strings (realAuthor, DhConfig::baseName ().toUtf8 (),
+                          DhConfig::regionName ().toUtf8 (),
+                          DhConfig::description ().toUtf8 ());
   }
   void
   changeSettings ()
   {
-    DhConfig::self ()->ignoreLeftoverItem ()->setValue (
-        checkBox->isChecked ());
     DhConfig::self ()->generalConfigForInputItem ()->setValue (
         inputConfigBox->isChecked ());
     DhConfig::self ()->memoryLimitItem ()->setValue (limitBox->value ());

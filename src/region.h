@@ -88,6 +88,11 @@ extern "C"
   const void *region_get_entity (void *region, size_t index);
   const char *region_get_entity_id (void *region, size_t index);
 
+  void init_default_strings (const char *new_author, const char *new_base_name,
+                             const char *new_region_name,
+                             const char *new_description);
+  void reset_default_description (const char *new_description);
+
 #ifdef __cplusplus
 }
 #endif

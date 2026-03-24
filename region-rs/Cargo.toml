@@ -7,6 +7,9 @@ edition = "2024"
 flate2 = { version = "1.1.8", features = ["zlib-rs"] }
 sysinfo = "0.38.1"
 common-rs = { path = "../common-rs" }
+time = "0.3.44"
+whoami = "2.0.1"
+gettext-rs = {version = "0.7.7", features = ["gettext-system"]}
 
 [lib]
 crate-type = ["cdylib"]

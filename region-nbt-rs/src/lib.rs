@@ -22,6 +22,7 @@ use sysinfo::System;
 
 #[link(name = "region_rs")]
 unsafe extern "C" {
+    fn region_new() -> *mut Region;
     fn cancel_flag_is_cancelled(ptr: *const AtomicBool) -> c_int;
     fn string_free(string: *mut c_char);
     fn region_get_data_version(region: *mut c_void) -> u32;
@@ -301,14 +302,14 @@ fn region_create_from_bytes_internal(
     }
     let entities = region_get_entity_internal(&nbt, cancel_flag)?;
 
-    let mut region = Region::default();
+    let mut region = unsafe { Box::from_raw(region_new()) };
     region.data_version = data_version as u32;
     region.region_size = (x, y, z);
     region.palette_array = palette_vec;
     region.block_entity_array = block_entities;
     region.block_array = blocks;
     region.entity_array = entities;
-    Ok(Box::into_raw(Box::new(region)))
+    Ok(Box::into_raw(region))
 }
 
 #[unsafe(no_mangle)]

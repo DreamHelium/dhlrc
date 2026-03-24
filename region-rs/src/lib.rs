@@ -1,5 +1,6 @@
 mod file;
 mod region_getter;
+mod default;
 
 use common_rs::ProgressFn;
 use common_rs::i18n::i18n;
@@ -10,10 +11,11 @@ use std::ops::IndexMut;
 use std::ptr::null;
 use std::string::String;
 use common_rs::region::{BlockEntity, Palette, Region};
+use crate::default::NewOne;
 
 #[unsafe(no_mangle)]
 pub extern "C" fn region_new() -> *mut Region {
-    let region = Box::new(Region::default());
+    let region = Box::new(Region::new_one());
     Box::into_raw(region)
 }
 

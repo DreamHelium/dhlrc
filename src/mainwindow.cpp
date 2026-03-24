@@ -56,7 +56,7 @@ MainWindow::MainWindow (QWidget *parent)
     : QMainWindow (parent), ui (new Ui::MainWindow)
 {
   ui->setupUi (this);
-
+  
   auto manager = KColorSchemeManager::instance ();
   auto menu = KColorSchemeMenu::createMenu (manager, this);
   ui->menu_Tools->addAction (menu);

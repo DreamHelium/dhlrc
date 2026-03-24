@@ -21,6 +21,7 @@ use sysinfo::System;
 #[link(name = "region_rs")]
 unsafe extern "C" {
     fn cancel_flag_is_cancelled(ptr: *const AtomicBool) -> c_int;
+    fn region_new() -> *mut Region;
 }
 
 #[derive(Default)]
@@ -287,7 +288,7 @@ fn region_create_from_bytes_internal(
         entities_vec.push(value);
     }
 
-    let mut region = Region::default();
+    let mut region = unsafe { Box::from_raw(region_new()) };
     region.data_version = data_version as u32;
     region.region_size = (region_x, region_y, region_z);
     region.region_offset = (offset_x, offset_y, offset_z);
@@ -300,7 +301,7 @@ fn region_create_from_bytes_internal(
     region.block_entity_array = tile_entities_vec;
     region.set_data_time(create_time, modify_time)?;
 
-    Ok(Box::into_raw(Box::new(region)))
+    Ok(Box::into_raw(region))
 }
 
 #[unsafe(no_mangle)]
@@ -311,8 +312,8 @@ pub extern "C" fn region_create_from_file_as_index(
     main_klass: *mut c_void,
     cancel_flag: *const AtomicBool,
     index: i32,
-    elapsed_millisecs : u64,
-    free_memory : u64
+    elapsed_millisecs: u64,
+    free_memory: u64,
 ) -> *const c_char {
     let mut err_string: String = String::new();
     if !region.is_null() {
@@ -324,7 +325,7 @@ pub extern "C" fn region_create_from_file_as_index(
                 cancel_flag,
                 index,
                 elapsed_millisecs as u128,
-                free_memory
+                free_memory,
             ) {
                 Ok(ret) => ret,
                 Err(err) => {

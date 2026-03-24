@@ -4,12 +4,6 @@
       xsi:schemaLocation="http://www.kde.org/standards/kcfg/1.0
                           http://www.kde.org/standards/kcfg/1.0/kcfg.xsd">
     <group name="General">
-        <!-- The language overriding setting is of no use. -->
-        <entry name="IgnoreLeftover" type="Bool">
-            <label>Ignore Leftover Data</label>
-            <tooltip>Whether to ignore leftover data in NBT when parsing.</tooltip>
-            <default>false</default>
-        </entry>
         <entry name="MemoryLimit" type="Int">
             <label>Application Memory Limit</label>
             <tooltip>The limit memory for application.</tooltip>
@@ -26,6 +20,26 @@
                 interface.
             </tooltip>
             <default>true</default>
+        </entry>
+    </group>
+    <group name="Default">
+        <entry name="BaseName" type="String">
+            <label>Region Base Name</label>
+            <tooltip>The default base name for the region.</tooltip>
+            <default code="true">i18n("Converted")</default>
+        </entry>
+        <entry name="RegionName" type="String">
+            <label>Region Name</label>
+            <tooltip>The default name for the region.</tooltip>
+            <default code="true">i18n("Unnamed")</default>
+        </entry>
+        <entry name="Description" type="String">
+            <label>Region Description</label>
+            <tooltip>The default description for the region.</tooltip>
+        </entry>
+        <entry name="Author" type="String">
+            <label>Region Author</label>
+            <tooltip>The default author for the region.</tooltip>
         </entry>
     </group>
     <group name="Game">

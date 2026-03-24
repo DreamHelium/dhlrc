@@ -69,7 +69,6 @@ version = "0.1.0"
 dependencies = [
  "sysinfo",
  "time",
- "whoami",
 ]
 
 [[package]]
@@ -411,7 +410,10 @@ version = "0.1.0"
 dependencies = [
  "common-rs",
  "flate2",
+ "gettext-rs",
  "sysinfo",
+ "time",
+ "whoami",
 ]
 
 [[package]]

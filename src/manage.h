@@ -24,7 +24,7 @@ class RegionClass
 {
 private:
   using NotifyFunc = void (*) (void *);
-  void *region;
+  std::unique_ptr<void, void (*) (void *)> region;
   QString name;
   QString uuid;
   QDateTime dateTime;
@@ -45,14 +45,14 @@ public:
   explicit RegionClass (void *region, const QString &name, const QString &uuid,
                         const QDateTime &dateTime, NotifyFunc func,
                         void *main_klass)
-      : region (region), name (name), uuid (uuid), dateTime (dateTime),
-        internalLock (std::make_unique<InternalLock> ())
+      : region (region, region_free), name (name), uuid (uuid),
+        dateTime (dateTime), internalLock (std::make_unique<InternalLock> ())
   {
     if (func && main_klass)
       notifyStructs.emplace_back (func, main_klass);
   }
-  ~RegionClass () { region_free (region); }
-  RegionClass (RegionClass &&) = default;
+  ~RegionClass () = default;
+  RegionClass (RegionClass &&) noexcept = default;
   std::mutex &
   get_lock ()
   {
@@ -90,7 +90,7 @@ public:
   get_region ()
   {
     if (!get_lock_status ())
-      return region;
+      return region.get ();
     else
       return nullptr;
   }
