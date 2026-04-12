@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-03-24 22:40+0800\n"
+"POT-Creation-Date: 2026-04-12 21:11+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -66,7 +66,7 @@ msgstr ""
 msgid "Lack the translation module, will not try to get translation!"
 msgstr ""
 
-#: ../../src/blockreaderui.cpp:139
+#: ../../src/blockreaderui.cpp:124
 msgid ""
 "Name: %1\n"
 "Translation name: %2\n"
@@ -75,7 +75,7 @@ msgid ""
 "Properties:\n"
 msgstr ""
 
-#: ../../src/blockreaderui.cpp:149
+#: ../../src/blockreaderui.cpp:134
 msgid ""
 "Name: %1\n"
 "Index: %2\n"
@@ -83,30 +83,30 @@ msgid ""
 "Properties:\n"
 msgstr ""
 
-#: ../../src/blockreaderui.cpp:202
+#: ../../src/blockreaderui.cpp:171
 msgid "Not valid!"
 msgstr ""
 
-#: ../../src/blockreaderui.cpp:221
+#: ../../src/blockreaderui.cpp:189
 msgid "With DataVersion %4, version %5."
 msgstr ""
 
-#: ../../src/blockreaderui.cpp:223
+#: ../../src/blockreaderui.cpp:191
 msgid "Created time: %6, Modified time: %7, Author: %8, Name: %9"
 msgstr ""
 
-#: ../../src/blockreaderui.cpp:225
+#: ../../src/blockreaderui.cpp:193
 msgid "Description: %10"
 msgstr ""
 
-#: ../../src/blockreaderui.cpp:259 ../../src/loadregionui.cpp:63
+#: ../../src/blockreaderui.cpp:227 ../../src/loadregionui.cpp:63
 #: ../../src/manage.cpp:15 ../../src/manage.cpp:179
 #: ../../src/regionmodifyui.cpp:12 ../../src/saveregionui.cpp:46
 #: ../../src/utility.cpp:21 ../../src/utility.cpp:38 ../../src/utility.cpp:46
 msgid "Error!"
 msgstr ""
 
-#: ../../src/blockreaderui.cpp:260 ../../common-rs/src/util.rs:44
+#: ../../src/blockreaderui.cpp:228 ../../common-rs/src/util.rs:44
 msgid "Out of memory!"
 msgstr ""
 
@@ -114,16 +114,16 @@ msgstr ""
 msgid "Setting options:"
 msgstr ""
 
-#: ../../src/configobjectui.cpp:86 ../../src/lrchooseui.cpp:79 rc.cpp:207
-#: rc.cpp:243 rc.cpp:303
+#: ../../src/configobjectui.cpp:86 ../../src/lrchooseui.cpp:79 rc.cpp:205
+#: rc.cpp:241 rc.cpp:301
 msgid "&OK"
 msgstr ""
 
-#: ../../src/configobjectui.cpp:87 rc.cpp:306
+#: ../../src/configobjectui.cpp:87 rc.cpp:304
 msgid "&Cancel"
 msgstr ""
 
-#: ../../src/dhhelpui.cpp:54
+#: ../../src/dhhelpui.cpp:49
 msgid ""
 "test\n"
 "\n"
@@ -139,7 +139,7 @@ msgid "NBT Reader"
 msgstr ""
 
 #: ../../src/externalnbtreaderui.cpp:30 ../../src/lrchooseui.cpp:80 rc.cpp:12
-#: rc.cpp:54 rc.cpp:210 rc.cpp:231
+#: rc.cpp:54 rc.cpp:208 rc.cpp:229
 msgid "&Close"
 msgstr ""
 
@@ -147,16 +147,12 @@ msgstr ""
 msgid "Drag file to read NBT."
 msgstr ""
 
-#: ../../src/externalnbtreaderui.cpp:79 ../../src/externalnbtreaderui.cpp:108
+#: ../../src/externalnbtreaderui.cpp:79 ../../src/externalnbtreaderui.cpp:110
 msgid "Error"
 msgstr ""
 
 #: ../../src/externalnbtreaderui.cpp:79
 msgid "Multiple files dropped!"
-msgstr ""
-
-#: ../../src/externalnbtreaderui.cpp:108
-msgid "Not a valid NBT!"
 msgstr ""
 
 #: ../../src/generalchoosedialog.cpp:23
@@ -240,26 +236,22 @@ msgstr ""
 msgid "Enter description here."
 msgstr ""
 
-#: ../../src/main.cpp:35
+#: ../../src/main.cpp:31
 msgid "Minecraft Structure Modifier"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:52
+#: ../../src/mainwindow.cpp:53
 msgid ""
 "Region is locked! It might not be the writer lock! Please try to close the "
 "window that's using the Region."
 msgstr ""
 
-#: ../../src/mainwindow.cpp:125
-msgid "General"
+#: ../../src/mainwindow.cpp:243
+msgid "Version: "
 msgstr ""
 
-#: ../../src/mainwindow.cpp:126
-msgid "Game"
-msgstr ""
-
-#: ../../src/mainwindow.cpp:235
-msgid "An application that can read, modify, and export Minecraft structure."
+#: ../../src/mainwindow.cpp:245
+msgid "About"
 msgstr ""
 
 #: ../../src/manage.cpp:15
@@ -298,11 +290,11 @@ msgstr ""
 msgid "Select Directory"
 msgstr ""
 
-#: ../../src/manage.cpp:305
+#: ../../src/manage.cpp:305 ../../src/manage.h:259
 msgid "Locked!"
 msgstr ""
 
-#: ../../src/manage.cpp:314 rc.cpp:282
+#: ../../src/manage.cpp:314 rc.cpp:280
 msgid "Description"
 msgstr ""
 
@@ -354,7 +346,7 @@ msgstr ""
 msgid "Unknown!"
 msgstr ""
 
-#: ../../src/saveregionui.cpp:98
+#: ../../src/saveregionui.cpp:99
 msgid "Please click `Continue` to choose options."
 msgstr ""
 
@@ -379,7 +371,7 @@ msgid "Application Memory Limit"
 msgstr ""
 
 #: ../../build/src/settings.cpp:40 rc.cpp:75
-msgid "The limit memory for application."
+msgid "The limit memory(bytes) for application."
 msgstr ""
 
 #: ../../build/src/settings.cpp:43 rc.cpp:78
@@ -399,64 +391,62 @@ msgstr ""
 #: ../../build/src/settings.cpp:48 rc.cpp:87
 msgid ""
 "If you choose this, the input config will not be asked, and you need to "
-"configure in the configure\n"
-"                interface.\n"
-"            "
+"configure in the configure interface."
 msgstr ""
 
-#: ../../build/src/settings.cpp:55 rc.cpp:127 ../../region-rs/src/default.rs:58
+#: ../../build/src/settings.cpp:53 rc.cpp:125 ../../region-rs/src/default.rs:58
 msgid "Converted"
 msgstr ""
 
-#: ../../build/src/settings.cpp:56 rc.cpp:92
+#: ../../build/src/settings.cpp:54 rc.cpp:90
 msgid "Region Base Name"
 msgstr ""
 
-#: ../../build/src/settings.cpp:57 rc.cpp:95
+#: ../../build/src/settings.cpp:55 rc.cpp:93
 msgid "The default base name for the region."
 msgstr ""
 
-#: ../../build/src/settings.cpp:59 rc.cpp:129 ../../region-rs/src/default.rs:60
+#: ../../build/src/settings.cpp:57 rc.cpp:127 ../../region-rs/src/default.rs:60
 msgid "Unnamed"
 msgstr ""
 
-#: ../../build/src/settings.cpp:60 rc.cpp:98 rc.cpp:294
+#: ../../build/src/settings.cpp:58 rc.cpp:96 rc.cpp:292
 msgid "Region Name"
 msgstr ""
 
-#: ../../build/src/settings.cpp:61 rc.cpp:101
+#: ../../build/src/settings.cpp:59 rc.cpp:99
 msgid "The default name for the region."
 msgstr ""
 
-#: ../../build/src/settings.cpp:64 rc.cpp:104
+#: ../../build/src/settings.cpp:62 rc.cpp:102
 msgid "Region Description"
 msgstr ""
 
-#: ../../build/src/settings.cpp:65 rc.cpp:107
+#: ../../build/src/settings.cpp:63 rc.cpp:105
 msgid "The default description for the region."
 msgstr ""
 
-#: ../../build/src/settings.cpp:68 rc.cpp:110
+#: ../../build/src/settings.cpp:66 rc.cpp:108
 msgid "Region Author"
 msgstr ""
 
-#: ../../build/src/settings.cpp:69 rc.cpp:113
+#: ../../build/src/settings.cpp:67 rc.cpp:111
 msgid "The default author for the region."
 msgstr ""
 
-#: ../../build/src/settings.cpp:75 rc.cpp:116
+#: ../../build/src/settings.cpp:73 rc.cpp:114
 msgid "Override Settings"
 msgstr ""
 
-#: ../../build/src/settings.cpp:76 rc.cpp:119
+#: ../../build/src/settings.cpp:74 rc.cpp:117
 msgid "Whether to override setting or not."
 msgstr ""
 
-#: ../../build/src/settings.cpp:79 rc.cpp:122
+#: ../../build/src/settings.cpp:77 rc.cpp:120
 msgid "Override Version"
 msgstr ""
 
-#: ../../build/src/settings.cpp:80 rc.cpp:125
+#: ../../build/src/settings.cpp:78 rc.cpp:123
 msgid "The version to override in translation stage."
 msgstr ""
 
@@ -508,7 +498,7 @@ msgstr ""
 msgid "&List blocks"
 msgstr ""
 
-#: rc.cpp:51 rc.cpp:249
+#: rc.cpp:51 rc.cpp:247
 msgid "&Show blocks"
 msgstr ""
 
@@ -528,179 +518,179 @@ msgstr ""
 msgid "Modify &Block"
 msgstr ""
 
-#: rc.cpp:132
+#: rc.cpp:130
 msgid "What happened in this step?"
 msgstr ""
 
-#: rc.cpp:135
+#: rc.cpp:133
 msgid "Details"
 msgstr ""
 
-#: rc.cpp:138
+#: rc.cpp:136
 msgid "&Continue"
 msgstr ""
 
-#: rc.cpp:141
+#: rc.cpp:139
 msgid "C&ancel"
 msgstr ""
 
-#: rc.cpp:144
+#: rc.cpp:142
 msgid "&NBT File Reader"
 msgstr ""
 
-#: rc.cpp:147
+#: rc.cpp:145
 msgid "&Manage Region"
 msgstr ""
 
-#: rc.cpp:150
+#: rc.cpp:148
 msgid "M&odify Region"
 msgstr ""
 
-#: rc.cpp:153
+#: rc.cpp:151
 msgid "&Block reader"
 msgstr ""
 
-#: rc.cpp:156
+#: rc.cpp:154
 msgid "Shortcuts"
 msgstr ""
 
-#: rc.cpp:159
+#: rc.cpp:157
 msgid "Utility"
 msgstr ""
 
-#: rc.cpp:162
+#: rc.cpp:160
 msgid "&Configure"
 msgstr ""
 
-#: rc.cpp:165
+#: rc.cpp:163
 msgid "&Run Script"
 msgstr ""
 
-#: rc.cpp:168 rc.cpp:177
+#: rc.cpp:166 rc.cpp:175
 msgid "&About"
 msgstr ""
 
-#: rc.cpp:171
+#: rc.cpp:169
 msgid "&Tools"
 msgstr ""
 
-#: rc.cpp:174
+#: rc.cpp:172
 msgid "Icons"
 msgstr ""
 
-#: rc.cpp:180 rc.cpp:189
+#: rc.cpp:178 rc.cpp:187
 msgid "test"
 msgstr ""
 
-#: rc.cpp:183
+#: rc.cpp:181
 msgid "test\\"
 msgstr ""
 
-#: rc.cpp:186
+#: rc.cpp:184
 msgid "tetst"
 msgstr ""
 
-#: rc.cpp:192 rc.cpp:213
+#: rc.cpp:190 rc.cpp:211
 msgid "Form"
 msgstr ""
 
-#: rc.cpp:195 rc.cpp:237
+#: rc.cpp:193 rc.cpp:235
 msgid "&Add"
 msgstr ""
 
-#: rc.cpp:198 rc.cpp:240
+#: rc.cpp:196 rc.cpp:238
 msgid "&Remove"
 msgstr ""
 
-#: rc.cpp:201
+#: rc.cpp:199
 msgid "R&efresh"
 msgstr ""
 
-#: rc.cpp:204
+#: rc.cpp:202
 msgid "&Save"
 msgstr ""
 
-#: rc.cpp:216
+#: rc.cpp:214
 msgid "Type:"
 msgstr ""
 
-#: rc.cpp:219
+#: rc.cpp:217
 msgid "Key:"
 msgstr ""
 
-#: rc.cpp:222
+#: rc.cpp:220
 msgid "Value:"
 msgstr ""
 
-#: rc.cpp:225
+#: rc.cpp:223
 msgid "&Export"
 msgstr ""
 
-#: rc.cpp:228
+#: rc.cpp:226
 msgid "PushButton"
 msgstr ""
 
-#: rc.cpp:234
+#: rc.cpp:232
 msgid "PaletteAddUI"
 msgstr ""
 
-#: rc.cpp:246
+#: rc.cpp:244
 msgid "PaletteListUI"
 msgstr ""
 
-#: rc.cpp:252
+#: rc.cpp:250
 msgid "Modify Property of Block(s)"
 msgstr ""
 
-#: rc.cpp:255
+#: rc.cpp:253
 msgid "Modify the property of the block in:"
 msgstr ""
 
-#: rc.cpp:258
+#: rc.cpp:256
 msgid "With the block that is the same property"
 msgstr ""
 
-#: rc.cpp:261
+#: rc.cpp:259
 msgid "Properties:"
 msgstr ""
 
-#: rc.cpp:264
+#: rc.cpp:262
 msgid "RegionModifyUI"
 msgstr ""
 
-#: rc.cpp:267
+#: rc.cpp:265
 msgid "Modify the infomation of the Region."
 msgstr ""
 
-#: rc.cpp:270
+#: rc.cpp:268
 msgid "Create Time"
 msgstr ""
 
-#: rc.cpp:273 rc.cpp:279
+#: rc.cpp:271 rc.cpp:277
 msgid "yyyy/MM/dd HH:mm:ss.zzz"
 msgstr ""
 
-#: rc.cpp:276
+#: rc.cpp:274
 msgid "Modify Time"
 msgstr ""
 
-#: rc.cpp:285
+#: rc.cpp:283
 msgid "Offset"
 msgstr ""
 
-#: rc.cpp:288
+#: rc.cpp:286
 msgid "Author"
 msgstr ""
 
-#: rc.cpp:291
+#: rc.cpp:289
 msgid "Base Name"
 msgstr ""
 
-#: rc.cpp:297
+#: rc.cpp:295
 msgid "Data Version"
 msgstr ""
 
-#: rc.cpp:300
+#: rc.cpp:298
 msgid "Version"
 msgstr ""
 
@@ -928,4 +918,16 @@ msgstr ""
 
 #: ../../region-rs/src/lib.rs:177 ../../region-rs/src/lib.rs:181
 msgid "The index is out of range."
+msgstr ""
+
+#: ../../src/dhgameconfigui.h:15
+msgid "General"
+msgstr ""
+
+#: ../../src/dhgameconfigui.h:15
+msgid "Default"
+msgstr ""
+
+#: ../../src/dhgameconfigui.h:15
+msgid "Game"
 msgstr ""

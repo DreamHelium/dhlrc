@@ -218,9 +218,9 @@ public:
   void
   appendRegion (void *region, const QString &name)
   {
-    regions.emplace_back (region, name,
-                          QUuid::createUuid ().toString (QUuid::WithoutBraces),
-                          QDateTime::currentDateTime (), notify_func, this);
+    regions.emplace_back (std::make_shared<RegionClass> (
+        region, name, QUuid::createUuid ().toString (QUuid::WithoutBraces),
+        QDateTime::currentDateTime (), notify_func, this));
   }
   qsizetype
   regionNum ()
@@ -252,7 +252,7 @@ public:
     QList<NameAndLocked> list;
     for (auto &r : regions)
       {
-        auto r_name = r.get_name ();
+        auto r_name = r->get_name ();
         if (!r_name.isEmpty ())
           list.append ({ r_name, true });
         else
@@ -267,7 +267,7 @@ private Q_SLOTS:
   void dnd_triggered (const QMimeData *data);
 
 private:
-  std::vector<RegionClass> regions = {};
+  std::vector<std::shared_ptr<RegionClass>> regions = {};
   QList<QLibrary *> modules = {};
   std::vector<std::unique_ptr<void, void (*) (void *)>> inputConfigs = {};
 };

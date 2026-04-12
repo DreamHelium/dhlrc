@@ -89,7 +89,9 @@ ExternalNbtReaderUI::dropEvent (QDropEvent *event)
       nbt_vec_free (nbt);
     }
   filename = filelist.at (0);
-  nbt = file_to_nbt_vec (filename.toUtf8 ().constData (), progressFn, this);
+  char *failMessage = nullptr;
+  nbt = file_to_nbt_vec (filename.toUtf8 ().constData (), progressFn, this,
+                         &failMessage);
   if (nbt)
     {
       if (first)
@@ -105,5 +107,5 @@ ExternalNbtReaderUI::dropEvent (QDropEvent *event)
       nrui->show ();
     }
   else
-    QMessageBox::critical (this, _ ("Error"), _ ("Not a valid NBT!"));
+    QMessageBox::critical (this, _ ("Error"), failMessage);
 }

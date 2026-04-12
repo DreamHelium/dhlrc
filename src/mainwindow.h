@@ -2,6 +2,8 @@
 #define MAINWINDOW_H
 
 // #include "../feature/dh_module.h"
+#include "dhconfigdialog/src/dhconfigdialog.h"
+
 #include <KPageDialog>
 #include <QDateTime>
 #include <QEvent>
@@ -33,10 +35,10 @@ private:
   Ui::MainWindow *ui;
   void initSignalSlots ();
   void initShortcuts ();
-  QButtonGroup *group;
+  // QButtonGroup *group;
   void closeEvent (QCloseEvent *event) override;
   dh::ManageRegion *mr = new dh::ManageRegion ();
-  KPageDialog *dialog = nullptr;
+  DhConfigDialog *dialog = nullptr;
 
 protected:
   void virtual dragEnterEvent (QDragEnterEvent *event);

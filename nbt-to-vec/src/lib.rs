@@ -1,15 +1,15 @@
 use common_rs::tree_value::TreeValue;
+use common_rs::util::string_to_ptr_fail_to_null;
 use crab_nbt_ext::{convert_nbt_to_vec, convert_vec_to_nbt, nbt_create_real, vec_u8_to_i8_safest};
 use std::error::Error;
-use std::ffi::{CStr, c_char, c_int, c_void};
+use std::ffi::{CStr, CString, c_char, c_int, c_void};
 use std::fs::File;
-use std::io::{Cursor, Read, Write};
-use std::ops::Deref;
+use std::io::{Cursor, Write};
 use std::ptr::{null, null_mut};
 use std::sync::atomic::AtomicBool;
 use zuri_nbt::NBTTag;
 use zuri_nbt::encoding::LittleEndian;
-use zuri_nbt::reader::{Reader, Res};
+use zuri_nbt::reader::Reader;
 use zuri_nbt::tag::Compound;
 
 type ProgressFn = Option<
@@ -99,6 +99,7 @@ pub extern "C" fn file_to_nbt_vec(
     filename: *const c_char,
     progress_fn: ProgressFn,
     main_klass: *mut c_void,
+    fail_message: *mut *mut c_char,
 ) -> *mut Vec<(String, TreeValue)> {
     let mut failed = 0;
     let vector = unsafe {
@@ -111,7 +112,11 @@ pub extern "C" fn file_to_nbt_vec(
         )
     };
     if failed == 1 {
-        unsafe { vec_free(vector) };
+        let fail_vector = unsafe { Box::from_raw(vector) };
+        let fail_str = unsafe { CString::from_vec_unchecked(*fail_vector).into_raw() };
+        if !fail_message.is_null() {
+            unsafe { *fail_message = fail_str };
+        }
         null_mut()
     } else {
         match nbt_create_real(vector, progress_fn, main_klass, null()) {
@@ -123,11 +128,22 @@ pub extern "C" fn file_to_nbt_vec(
                 let ret = vec![(nbt_string, tree_value)];
                 Box::into_raw(Box::new(ret))
             }
-            Err(_) => {
+            Err(outer_err) => {
                 /* Try to convert to Bedrock NBT */
                 let real_vec = unsafe { Box::from_raw(vector) };
                 match vec_to_le_nbt(*real_vec) {
-                    Err(_) => null_mut(),
+                    Err(err) => {
+                        let err_msg = format!(
+                            "Java NBT err: {}\nBedrock NBT err: {}",
+                            outer_err.to_string(),
+                            err.to_string(),
+                        );
+
+                        if !fail_message.is_null() {
+                            unsafe { *fail_message = string_to_ptr_fail_to_null(&err_msg.to_string()) }
+                        }
+                        null_mut()
+                    }
                     Ok(vec) => match vec {
                         TreeValue::Compound(c) => Box::into_raw(Box::new(c)),
                         _ => null_mut(),

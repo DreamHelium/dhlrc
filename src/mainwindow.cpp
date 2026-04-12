@@ -34,9 +34,10 @@
 // #include <qinputdialog.h>
 // #include <qmessagebox.h>
 // #include <qnamespace.h>
+#include "dhconfigdialog/src/dhconfigdialog.h"
+
 #include <QPushButton>
 #include <blockreaderui.h>
-#include <oclero/qlementine/widgets/AboutDialog.hpp>
 #ifdef DH_DEBUG_IN_IDE
 #include <debugloadingui.h>
 #endif
@@ -52,11 +53,12 @@
   _ ("Region is locked! It might not be the writer lock! Please try to "      \
      "close the window that's using the Region.")
 
+
 MainWindow::MainWindow (QWidget *parent)
     : QMainWindow (parent), ui (new Ui::MainWindow)
 {
   ui->setupUi (this);
-  
+
   auto manager = KColorSchemeManager::instance ();
   auto menu = KColorSchemeMenu::createMenu (manager, this);
   ui->menu_Tools->addAction (menu);
@@ -64,8 +66,13 @@ MainWindow::MainWindow (QWidget *parent)
 
   ui->tabWidget->setTabIcon (0, QIcon (":/cn/dh/dhlrc/region.svg"));
 
+  dialog = new DhConfigDialog (DhConfig::self (), "dhlrcrc", true, this);
+  dialog->addAssistant (std::make_unique<DhSetConfigAssistant> ());
+  dialog->addLongTextItems ("Description");
+  // dialog->addPages ();
+
   // ui->tabWidget->setTabIcon (1, QIcon(":/cn/dh/dhlrc/item_list.svg"));
-  DhGeneralConfigUI::setConfig ();
+  // DhGeneralConfigUI::setConfig ();
   initSignalSlots ();
   initShortcuts ();
 #ifndef DH_DEBUG_IN_IDE
@@ -115,22 +122,27 @@ MainWindow::initSignalSlots ()
   connect (ui->configBtn, &QPushButton::clicked, this,
            [&]
              {
-               if (dialog)
-                 dialog->show ();
-               else
-                 {
-                   dialog = new KPageDialog (this);
-                   auto general = new DhGeneralConfigUI ();
-                   auto game = new DhGameConfigUI ();
-                   dialog->addPage (general, i18n ("General"));
-                   dialog->addPage (game, i18n ("Game"));
-                   auto okBtn = dialog->button (QDialogButtonBox::Ok);
-                   connect (okBtn, &QPushButton::clicked, general,
-                            &DhGeneralConfigUI::changeSettings);
-                   connect (okBtn, &QPushButton::clicked, game,
-                            &DhGameConfigUI::changeSettings);
-                   dialog->show ();
-                 }
+               // if (dialog)
+               //   dialog->show ();
+               // else
+               //   {
+               //     dialog = new KPageDialog (this);
+               //     dialog->setStandardButtons (
+               //         QDialogButtonBox::RestoreDefaults
+               //         | QDialogButtonBox::Apply | QDialogButtonBox::Ok
+               //         | QDialogButtonBox::Cancel);
+               //     auto general = new DhGeneralConfigUI ();
+               //     auto game = new DhGameConfigUI ();
+               //     dialog->addPage (general, i18n ("General"));
+               //     dialog->addPage (game, i18n ("Game"));
+               //     auto okBtn = dialog->button (QDialogButtonBox::Ok);
+               //     connect (okBtn, &QPushButton::clicked, general,
+               //              &DhGeneralConfigUI::changeSettings);
+               //     connect (okBtn, &QPushButton::clicked, game,
+               //              &DhGameConfigUI::changeSettings);
+               //     dialog->show ();
+               //   }
+               dialog->show ();
              });
 #ifdef DH_DEBUG_IN_IDE
   connect (ui->debugBtn, &QPushButton::clicked,
@@ -228,18 +240,9 @@ MainWindow::mrBtn_2_clicked ()
 void
 MainWindow::showabout ()
 {
-  auto dialog = new oclero::qlementine::AboutDialog (this);
-  dialog->setAttribute (Qt::WA_DeleteOnClose);
-  dialog->setApplicationVersion (QString::number (DHLRC_COMPILE_DATE));
-  dialog->setCopyright ("GPL v3");
-  dialog->setDescription (_ ("An application that can read, modify, and "
-                             "export Minecraft structure."));
-  dialog->addSocialMediaLink ("GitHub", "https://github.com/DreamHelium",
-                              QIcon (":/cn/dh/dhlrc/github.svg"));
-  dialog->addSocialMediaLink ("bilibili",
-                              "https://space.bilibili.com/13499876",
-                              QIcon (":/cn/dh/dhlrc/bilibili.svg"));
-  dialog->exec ();
+  QString text = _("Version: ");
+  text += QString::number (DHLRC_COMPILE_DATE);
+  QMessageBox::about(this, _("About"), text);
 }
 
 void

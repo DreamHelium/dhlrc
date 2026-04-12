@@ -69,7 +69,7 @@
             </widget>
            </item>
            <item>
-            <widget class="oclero::qlementine::LineEdit" name="xEdit"/>
+            <widget class="QLineEdit" name="xEdit"/>
            </item>
           </layout>
          </item>
@@ -83,7 +83,7 @@
             </widget>
            </item>
            <item>
-            <widget class="oclero::qlementine::LineEdit" name="yEdit"/>
+            <widget class="QLineEdit" name="yEdit"/>
            </item>
           </layout>
          </item>
@@ -97,7 +97,7 @@
             </widget>
            </item>
            <item>
-            <widget class="oclero::qlementine::LineEdit" name="zEdit"/>
+            <widget class="QLineEdit" name="zEdit"/>
            </item>
           </layout>
          </item>
@@ -182,13 +182,6 @@
    </item>
   </layout>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>oclero::qlementine::LineEdit</class>
-   <extends>QLineEdit</extends>
-   <header>oclero/qlementine/widgets/LineEdit.hpp</header>
-  </customwidget>
- </customwidgets>
  <resources/>
  <connections>
   <connection>

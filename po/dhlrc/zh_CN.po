@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-03-24 22:08+0800\n"
+"POT-Creation-Date: 2026-04-12 21:08+0800\n"
 "PO-Revision-Date: 2024-11-30 07:00+0800\n"
 "Last-Translator: dream_he <48383878+DreamHelium@users.noreply.github.com>\n"
 "Language-Team: Chinese <kde-i18n-doc@kde.org>\n"
@@ -61,17 +61,17 @@ msgstr "偏移码"
 
 #: ../../src/blockreaderui.cpp:63
 msgid "Choose an Index"
-msgstr ""
+msgstr "选择一个索引"
 
 #: ../../src/blockreaderui.cpp:63
 msgid "Please choose an index."
-msgstr ""
+msgstr "请选择一个索引。"
 
 #: ../../src/blockreaderui.cpp:75
 msgid "Lack the translation module, will not try to get translation!"
 msgstr "缺少翻译模块，将不会尝试获取翻译！"
 
-#: ../../src/blockreaderui.cpp:139
+#: ../../src/blockreaderui.cpp:124
 msgid ""
 "Name: %1\n"
 "Translation name: %2\n"
@@ -85,7 +85,7 @@ msgstr ""
 "偏移量：%4\n"
 "属性：\n"
 
-#: ../../src/blockreaderui.cpp:149
+#: ../../src/blockreaderui.cpp:134
 msgid ""
 "Name: %1\n"
 "Index: %2\n"
@@ -97,47 +97,47 @@ msgstr ""
 "偏移量：%3\n"
 "属性：\n"
 
-#: ../../src/blockreaderui.cpp:202
+#: ../../src/blockreaderui.cpp:171
 msgid "Not valid!"
 msgstr "无效！"
 
-#: ../../src/blockreaderui.cpp:221
+#: ../../src/blockreaderui.cpp:189
 msgid "With DataVersion %4, version %5."
 msgstr "数据版本%4，版本%5。"
 
-#: ../../src/blockreaderui.cpp:223
+#: ../../src/blockreaderui.cpp:191
 msgid "Created time: %6, Modified time: %7, Author: %8, Name: %9"
 msgstr "创建时间：%6，修改时间：%7，作者：%8，名字：%9"
 
-#: ../../src/blockreaderui.cpp:225
+#: ../../src/blockreaderui.cpp:193
 msgid "Description: %10"
 msgstr "描述：%10"
 
-#: ../../src/blockreaderui.cpp:259 ../../src/loadregionui.cpp:63
+#: ../../src/blockreaderui.cpp:227 ../../src/loadregionui.cpp:63
 #: ../../src/manage.cpp:15 ../../src/manage.cpp:179
 #: ../../src/regionmodifyui.cpp:12 ../../src/saveregionui.cpp:46
 #: ../../src/utility.cpp:21 ../../src/utility.cpp:38 ../../src/utility.cpp:46
 msgid "Error!"
 msgstr "错误！"
 
-#: ../../src/blockreaderui.cpp:260 ../../common-rs/src/util.rs:44
+#: ../../src/blockreaderui.cpp:228 ../../common-rs/src/util.rs:44
 msgid "Out of memory!"
-msgstr ""
+msgstr "内存不足！"
 
 #: ../../src/configobjectui.cpp:62
 msgid "Setting options:"
 msgstr ""
 
-#: ../../src/configobjectui.cpp:86 ../../src/lrchooseui.cpp:79 rc.cpp:207
-#: rc.cpp:243 rc.cpp:303
+#: ../../src/configobjectui.cpp:86 ../../src/lrchooseui.cpp:79 rc.cpp:205
+#: rc.cpp:241 rc.cpp:301
 msgid "&OK"
 msgstr "确定(&O)"
 
-#: ../../src/configobjectui.cpp:87 rc.cpp:306
+#: ../../src/configobjectui.cpp:87 rc.cpp:304
 msgid "&Cancel"
 msgstr "取消(&C)"
 
-#: ../../src/dhhelpui.cpp:54
+#: ../../src/dhhelpui.cpp:49
 msgid ""
 "test\n"
 "\n"
@@ -150,28 +150,24 @@ msgstr "加载中……"
 
 #: ../../src/externalnbtreaderui.cpp:13
 msgid "NBT Reader"
-msgstr ""
+msgstr "NBT阅读器"
 
 #: ../../src/externalnbtreaderui.cpp:30 ../../src/lrchooseui.cpp:80 rc.cpp:12
-#: rc.cpp:54 rc.cpp:210 rc.cpp:231
+#: rc.cpp:54 rc.cpp:208 rc.cpp:229
 msgid "&Close"
 msgstr "关闭(&C)"
 
 #: ../../src/externalnbtreaderui.cpp:34
 msgid "Drag file to read NBT."
-msgstr ""
+msgstr "拖动文件以阅读NBT。"
 
-#: ../../src/externalnbtreaderui.cpp:79 ../../src/externalnbtreaderui.cpp:108
+#: ../../src/externalnbtreaderui.cpp:79 ../../src/externalnbtreaderui.cpp:110
 msgid "Error"
-msgstr ""
+msgstr "错误"
 
 #: ../../src/externalnbtreaderui.cpp:79
 msgid "Multiple files dropped!"
-msgstr ""
-
-#: ../../src/externalnbtreaderui.cpp:108
-msgid "Not a valid NBT!"
-msgstr ""
+msgstr "多个文件被拖入！"
 
 #: ../../src/generalchoosedialog.cpp:23
 msgid "All"
@@ -183,7 +179,7 @@ msgstr "确定"
 
 #: ../../src/generalchoosedialog.cpp:65
 msgid "Cancel"
-msgstr ""
+msgstr "取消"
 
 #: ../../src/loadobjectui.cpp:64
 msgid "Finish!"
@@ -195,37 +191,39 @@ msgstr "加载文件至Region。"
 
 #: ../../src/loadregionui.cpp:41
 msgid "Please wait..."
-msgstr ""
+msgstr "请稍等……"
 
 #: ../../src/loadregionui.cpp:48 ../../src/saveregionui.cpp:31
 msgid "Cancelled."
-msgstr ""
+msgstr "已取消。"
 
 #: ../../src/loadregionui.cpp:53 ../../src/saveregionui.cpp:36
 msgid ""
 "The following files are not added:\n"
 "\n"
 msgstr ""
+"以下文件未被添加：\n"
+"\n"
 
 #: ../../src/loadregionui.cpp:76
 msgid "Select a Region"
-msgstr ""
+msgstr "选择一个区域"
 
 #: ../../src/loadregionui.cpp:76 ../../src/utility.cpp:30
 msgid "Please select a region."
-msgstr ""
+msgstr "请选择一个区域。"
 
 #: ../../src/loadregionui.cpp:199
 msgid "Please click `Continue` to choose region(s)."
-msgstr ""
+msgstr "请点击`继续`选择区域。"
 
 #: ../../src/loadregionui.cpp:237
 msgid "No region found in this type."
-msgstr ""
+msgstr "在该类型中未找到区域。"
 
 #: ../../src/loadregionui.cpp:238
 msgid "%1 try's fail message: %2"
-msgstr ""
+msgstr "%1的尝试的错误信息：%2"
 
 #: ../../src/loadregionui.cpp:258
 msgid "Parsing NBT"
@@ -256,26 +254,22 @@ msgstr ""
 msgid "Enter description here."
 msgstr "在此输入描述。"
 
-#: ../../src/main.cpp:35
+#: ../../src/main.cpp:31
 msgid "Minecraft Structure Modifier"
 msgstr "Minecraft结构修改器"
 
-#: ../../src/mainwindow.cpp:52
+#: ../../src/mainwindow.cpp:53
 msgid ""
 "Region is locked! It might not be the writer lock! Please try to close the "
 "window that's using the Region."
 msgstr "Region被锁定！可能不是写锁！请尝试关闭正在使用此Region的窗口。"
 
-#: ../../src/mainwindow.cpp:125
-msgid "General"
-msgstr "概况"
+#: ../../src/mainwindow.cpp:243
+msgid "Version: "
+msgstr "版本： "
 
-#: ../../src/mainwindow.cpp:126
-msgid "Game"
-msgstr "游戏"
-
-#: ../../src/mainwindow.cpp:235
-msgid "An application that can read, modify, and export Minecraft structure."
+#: ../../src/mainwindow.cpp:245
+msgid "About"
 msgstr ""
 
 #: ../../src/manage.cpp:15
@@ -314,11 +308,11 @@ msgstr ""
 msgid "Select Directory"
 msgstr ""
 
-#: ../../src/manage.cpp:305
+#: ../../src/manage.cpp:305 ../../src/manage.h:259
 msgid "Locked!"
 msgstr ""
 
-#: ../../src/manage.cpp:314 rc.cpp:282
+#: ../../src/manage.cpp:314 rc.cpp:280
 msgid "Description"
 msgstr "描述"
 
@@ -368,9 +362,9 @@ msgstr ""
 
 #: ../../src/regionmodifyui.cpp:86
 msgid "Unknown!"
-msgstr ""
+msgstr "未知！"
 
-#: ../../src/saveregionui.cpp:98
+#: ../../src/saveregionui.cpp:99
 msgid "Please click `Continue` to choose options."
 msgstr ""
 
@@ -380,11 +374,11 @@ msgstr ""
 
 #: ../../src/utility.cpp:30
 msgid "Select Region"
-msgstr ""
+msgstr "选择区域"
 
 #: ../../src/utility.cpp:39
 msgid "Region is locked!"
-msgstr ""
+msgstr "区域被锁定！"
 
 #: ../../src/utility.cpp:47
 msgid "No Region or no Region selected!"
@@ -395,8 +389,8 @@ msgid "Application Memory Limit"
 msgstr "应用内存限制"
 
 #: ../../build/src/settings.cpp:40 rc.cpp:75
-msgid "The limit memory for application."
-msgstr "应用限制内存。"
+msgid "The limit memory(bytes) for application."
+msgstr "应用限制内存（以字节计）。"
 
 #: ../../build/src/settings.cpp:43 rc.cpp:78
 msgid "Elapsed Milliseconds"
@@ -415,64 +409,62 @@ msgstr ""
 #: ../../build/src/settings.cpp:48 rc.cpp:87
 msgid ""
 "If you choose this, the input config will not be asked, and you need to "
-"configure in the configure\n"
-"                interface.\n"
-"            "
+"configure in the configure interface."
 msgstr ""
 
-#: ../../build/src/settings.cpp:55 rc.cpp:127 ../../region-rs/src/default.rs:58
+#: ../../build/src/settings.cpp:53 rc.cpp:125 ../../region-rs/src/default.rs:58
 msgid "Converted"
 msgstr "已转换"
 
-#: ../../build/src/settings.cpp:56 rc.cpp:92
+#: ../../build/src/settings.cpp:54 rc.cpp:90
 msgid "Region Base Name"
-msgstr ""
+msgstr "区域基础名字"
 
-#: ../../build/src/settings.cpp:57 rc.cpp:95
+#: ../../build/src/settings.cpp:55 rc.cpp:93
 msgid "The default base name for the region."
-msgstr ""
+msgstr "默认的区域基础名字"
 
-#: ../../build/src/settings.cpp:59 rc.cpp:129 ../../region-rs/src/default.rs:60
+#: ../../build/src/settings.cpp:57 rc.cpp:127 ../../region-rs/src/default.rs:60
 msgid "Unnamed"
 msgstr "未命名"
 
-#: ../../build/src/settings.cpp:60 rc.cpp:98 rc.cpp:294
+#: ../../build/src/settings.cpp:58 rc.cpp:96 rc.cpp:292
 msgid "Region Name"
-msgstr ""
+msgstr "区域名称"
 
-#: ../../build/src/settings.cpp:61 rc.cpp:101
+#: ../../build/src/settings.cpp:59 rc.cpp:99
 msgid "The default name for the region."
-msgstr ""
+msgstr "默认的区域名字"
 
-#: ../../build/src/settings.cpp:64 rc.cpp:104
+#: ../../build/src/settings.cpp:62 rc.cpp:102
 msgid "Region Description"
-msgstr ""
+msgstr "区域描述"
 
-#: ../../build/src/settings.cpp:65 rc.cpp:107
+#: ../../build/src/settings.cpp:63 rc.cpp:105
 msgid "The default description for the region."
-msgstr ""
+msgstr "默认的区域描述"
 
-#: ../../build/src/settings.cpp:68 rc.cpp:110
+#: ../../build/src/settings.cpp:66 rc.cpp:108
 msgid "Region Author"
-msgstr ""
+msgstr "区域作者"
 
-#: ../../build/src/settings.cpp:69 rc.cpp:113
+#: ../../build/src/settings.cpp:67 rc.cpp:111
 msgid "The default author for the region."
-msgstr ""
+msgstr "默认的区域作者"
 
-#: ../../build/src/settings.cpp:75 rc.cpp:116
+#: ../../build/src/settings.cpp:73 rc.cpp:114
 msgid "Override Settings"
 msgstr "覆盖设置"
 
-#: ../../build/src/settings.cpp:76 rc.cpp:119
+#: ../../build/src/settings.cpp:74 rc.cpp:117
 msgid "Whether to override setting or not."
 msgstr "是否覆盖设置。"
 
-#: ../../build/src/settings.cpp:79 rc.cpp:122
+#: ../../build/src/settings.cpp:77 rc.cpp:120
 msgid "Override Version"
 msgstr "覆盖版本"
 
-#: ../../build/src/settings.cpp:80 rc.cpp:125
+#: ../../build/src/settings.cpp:78 rc.cpp:123
 msgid "The version to override in translation stage."
 msgstr "在翻译阶段覆盖的版本。"
 
@@ -524,7 +516,7 @@ msgstr "展示实体NBT(&S)"
 msgid "&List blocks"
 msgstr "列出方块(&L)"
 
-#: rc.cpp:51 rc.cpp:249
+#: rc.cpp:51 rc.cpp:247
 msgid "&Show blocks"
 msgstr "展示方块 (&S)"
 
@@ -544,238 +536,238 @@ msgstr ""
 msgid "Modify &Block"
 msgstr ""
 
-#: rc.cpp:132
+#: rc.cpp:130
 msgid "What happened in this step?"
 msgstr "在此步发生了什么？"
 
-#: rc.cpp:135
+#: rc.cpp:133
 msgid "Details"
 msgstr "细节"
 
-#: rc.cpp:138
+#: rc.cpp:136
 msgid "&Continue"
 msgstr "继续(&C)"
 
-#: rc.cpp:141
+#: rc.cpp:139
 msgid "C&ancel"
 msgstr "取消(&C)"
 
-#: rc.cpp:144
+#: rc.cpp:142
 msgid "&NBT File Reader"
 msgstr ""
 
-#: rc.cpp:147
+#: rc.cpp:145
 msgid "&Manage Region"
 msgstr "管理Region(&M)"
 
-#: rc.cpp:150
+#: rc.cpp:148
 msgid "M&odify Region"
 msgstr ""
 
-#: rc.cpp:153
+#: rc.cpp:151
 msgid "&Block reader"
 msgstr "方块阅读器(&B)"
 
-#: rc.cpp:156
+#: rc.cpp:154
 msgid "Shortcuts"
 msgstr ""
 
-#: rc.cpp:159
+#: rc.cpp:157
 msgid "Utility"
 msgstr ""
 
-#: rc.cpp:162
+#: rc.cpp:160
 msgid "&Configure"
 msgstr ""
 
-#: rc.cpp:165
+#: rc.cpp:163
 msgid "&Run Script"
 msgstr ""
 
-#: rc.cpp:168 rc.cpp:177
+#: rc.cpp:166 rc.cpp:175
 msgid "&About"
 msgstr "关于(&A)"
 
-#: rc.cpp:171
+#: rc.cpp:169
 msgid "&Tools"
 msgstr "工具(&T)"
 
-#: rc.cpp:174
+#: rc.cpp:172
 msgid "Icons"
 msgstr "图标"
 
-#: rc.cpp:180 rc.cpp:189
+#: rc.cpp:178 rc.cpp:187
 msgid "test"
 msgstr ""
 
-#: rc.cpp:183
+#: rc.cpp:181
 msgid "test\\"
 msgstr ""
 
-#: rc.cpp:186
+#: rc.cpp:184
 msgid "tetst"
 msgstr ""
 
-#: rc.cpp:192 rc.cpp:213
+#: rc.cpp:190 rc.cpp:211
 msgid "Form"
 msgstr ""
 
-#: rc.cpp:195 rc.cpp:237
+#: rc.cpp:193 rc.cpp:235
 msgid "&Add"
 msgstr "添加(&A)"
 
-#: rc.cpp:198 rc.cpp:240
+#: rc.cpp:196 rc.cpp:238
 msgid "&Remove"
 msgstr "移除(&R)"
 
-#: rc.cpp:201
+#: rc.cpp:199
 msgid "R&efresh"
 msgstr "刷新(&E)"
 
-#: rc.cpp:204
+#: rc.cpp:202
 msgid "&Save"
 msgstr "保存(&S)"
 
-#: rc.cpp:216
+#: rc.cpp:214
 msgid "Type:"
-msgstr ""
+msgstr "类型："
 
-#: rc.cpp:219
+#: rc.cpp:217
 msgid "Key:"
-msgstr ""
+msgstr "键："
 
-#: rc.cpp:222
+#: rc.cpp:220
 msgid "Value:"
-msgstr ""
+msgstr "值："
 
-#: rc.cpp:225
+#: rc.cpp:223
 msgid "&Export"
-msgstr ""
+msgstr "导出(&E)"
 
-#: rc.cpp:228
+#: rc.cpp:226
 msgid "PushButton"
 msgstr ""
 
-#: rc.cpp:234
+#: rc.cpp:232
 msgid "PaletteAddUI"
 msgstr ""
 
-#: rc.cpp:246
+#: rc.cpp:244
 msgid "PaletteListUI"
 msgstr ""
 
-#: rc.cpp:252
+#: rc.cpp:250
 msgid "Modify Property of Block(s)"
 msgstr ""
 
-#: rc.cpp:255
+#: rc.cpp:253
 msgid "Modify the property of the block in:"
 msgstr "更改在此的方块属性："
 
-#: rc.cpp:258
+#: rc.cpp:256
 msgid "With the block that is the same property"
 msgstr "以及同属性的方块"
 
-#: rc.cpp:261
+#: rc.cpp:259
 msgid "Properties:"
 msgstr ""
 
-#: rc.cpp:264
+#: rc.cpp:262
 msgid "RegionModifyUI"
 msgstr ""
 
-#: rc.cpp:267
+#: rc.cpp:265
 msgid "Modify the infomation of the Region."
 msgstr ""
 
-#: rc.cpp:270
+#: rc.cpp:268
 msgid "Create Time"
-msgstr ""
+msgstr "创建时间"
 
-#: rc.cpp:273 rc.cpp:279
+#: rc.cpp:271 rc.cpp:277
 msgid "yyyy/MM/dd HH:mm:ss.zzz"
 msgstr ""
 
-#: rc.cpp:276
+#: rc.cpp:274
 msgid "Modify Time"
-msgstr ""
+msgstr "修改时间"
 
-#: rc.cpp:285
+#: rc.cpp:283
 msgid "Offset"
-msgstr ""
+msgstr "偏移"
 
-#: rc.cpp:288
+#: rc.cpp:286
 msgid "Author"
-msgstr ""
+msgstr "作者"
 
-#: rc.cpp:291
+#: rc.cpp:289
 msgid "Base Name"
-msgstr ""
+msgstr "基础名称"
 
-#: rc.cpp:297
+#: rc.cpp:295
 msgid "Data Version"
 msgstr "数据版本"
 
-#: rc.cpp:300
+#: rc.cpp:298
 msgid "Version"
-msgstr ""
+msgstr "版本"
 
 #: ../../common-rs/src/tree_value.rs:36
 msgid "Byte"
-msgstr ""
+msgstr "字节"
 
 #: ../../common-rs/src/tree_value.rs:37
 msgid "Int"
-msgstr ""
+msgstr "整形"
 
 #: ../../common-rs/src/tree_value.rs:38
 msgid "Short"
-msgstr ""
+msgstr "短整形"
 
 #: ../../common-rs/src/tree_value.rs:39
 msgid "Long"
-msgstr ""
+msgstr "长整形"
 
 #: ../../common-rs/src/tree_value.rs:40
 msgid "Byte Array"
-msgstr ""
+msgstr "字节数组"
 
 #: ../../common-rs/src/tree_value.rs:41
 msgid "Long Array"
-msgstr ""
+msgstr "长数组"
 
 #: ../../common-rs/src/tree_value.rs:42
 msgid "String"
-msgstr ""
+msgstr "字符串"
 
 #: ../../common-rs/src/tree_value.rs:43
 msgid "Float"
-msgstr ""
+msgstr "浮点型"
 
 #: ../../common-rs/src/tree_value.rs:44
 msgid "Double"
-msgstr ""
+msgstr "双浮点型"
 
 #: ../../common-rs/src/tree_value.rs:45
 msgid "Int Array"
-msgstr ""
+msgstr "整形数组"
 
 #: ../../common-rs/src/tree_value.rs:46
 msgid "List"
-msgstr ""
+msgstr "列表"
 
 #: ../../common-rs/src/tree_value.rs:47
 msgid "Compound"
-msgstr ""
+msgstr "集合"
 
 #: ../../common-rs/src/util.rs:79
 msgid "Null pointer detected"
-msgstr ""
+msgstr "检测到空指针"
 
 #: ../../crab-nbt-ext/src/lib.rs:42 ../../region-litematic-rs/src/lib.rs:338
 #: ../../region-nbt-rs/src/lib.rs:344
 msgid "Region value not provided"
-msgstr ""
+msgstr "结构值未提供"
 
 #: ../../crab-nbt-ext/src/lib.rs:67
 #, rust-format
@@ -800,24 +792,24 @@ msgstr "无法获取到{}的字符串。"
 #: ../../crab-nbt-ext/src/lib.rs:111
 #, rust-format
 msgid "Couldn't get long of {}."
-msgstr ""
+msgstr "无法获取到{}的长整型。"
 
 #: ../../crab-nbt-ext/src/lib.rs:122
 #, rust-format
 msgid "Couldn't get long array of {}."
-msgstr ""
+msgstr "无法获取到{}的长整型数组。"
 
 #: ../../crab-nbt-ext/src/lib.rs:153
 msgid "Reading NBT."
-msgstr ""
+msgstr "读取NBT。"
 
 #: ../../crab-nbt-ext/src/lib.rs:158 ../../crab-nbt-ext/src/lib.rs:164
 msgid "The parsing operation is cancelled."
-msgstr ""
+msgstr "传递操作被取消。"
 
 #: ../../crab-nbt-ext/src/lib.rs:171
 msgid "Reading NBT finish."
-msgstr ""
+msgstr "结束读取NBT。"
 
 #: ../../crab-nbt-ext/src/lib.rs:307
 msgid "Reading palette is cancelled!"
@@ -946,8 +938,23 @@ msgstr ""
 msgid "The index is out of range."
 msgstr ""
 
-#~ msgid "Version: "
-#~ msgstr "版本： "
+#: ../../src/dhgameconfigui.h:15
+msgid "General"
+msgstr "概况"
+
+#: ../../src/dhgameconfigui.h:15
+msgid "Default"
+msgstr "默认"
+
+#: ../../src/dhgameconfigui.h:15
+msgid "Game"
+msgstr "游戏"
+
+#~ msgid "Not a valid NBT!"
+#~ msgstr "不是一个有效的NBT！"
+
+#~ msgid "The limit memory for application."
+#~ msgstr "应用限制内存。"
 
 #~ msgid "About Litematica Reader"
 #~ msgstr "关于投影文件阅读器"

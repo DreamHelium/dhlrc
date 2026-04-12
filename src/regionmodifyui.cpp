@@ -16,8 +16,8 @@
 RegionModifyUI::RegionModifyUI (int index, dh::ManageRegion *mr,
                                 QWidget *parent)
     : QWidget (parent), ui (new Ui::RegionModifyUI),
-      region (mr->getRegions ()[index].get_region ()),
-      locker (mr->getRegions ()[index])
+      region (mr->getRegions ()[index]->get_region ()),
+      locker (*mr->getRegions ()[index])
 {
   ui->setupUi (this);
   connect (ui->spinBox, &QSpinBox::valueChanged, this,

@@ -25,8 +25,8 @@ set_func (void *klass, int value)
 
 BlockReaderUI::BlockReaderUI (int index, dh::ManageRegion *mr, QWidget *parent)
     : QWidget (parent), ui (new Ui::BlockReaderUI),
-      region (mr->getRegions ()[index].get_region ()),
-      locker (mr->getRegions ()[index])
+      region (mr->getRegions ()[index]->get_region ()),
+      locker (*mr->getRegions ()[index])
 {
   ui->setupUi (this);
   // auto version = dh::getVersion (region->data_version);
@@ -95,18 +95,6 @@ BlockReaderUI::closeEvent (QCloseEvent *event)
 void
 BlockReaderUI::textChanged_cb ()
 {
-  if (ui->xEdit->text ().isEmpty ())
-    ui->xEdit->setStatus (oclero::qlementine::Status::Error);
-  else
-    ui->xEdit->setStatus (oclero::qlementine::Status::Default);
-  if (ui->yEdit->text ().isEmpty ())
-    ui->yEdit->setStatus (oclero::qlementine::Status::Error);
-  else
-    ui->yEdit->setStatus (oclero::qlementine::Status::Default);
-  if (ui->zEdit->text ().isEmpty ())
-    ui->zEdit->setStatus (oclero::qlementine::Status::Error);
-  else
-    ui->zEdit->setStatus (oclero::qlementine::Status::Default);
   if (!ui->xEdit->text ().isEmpty () && !ui->yEdit->text ().isEmpty ()
       && !ui->zEdit->text ().isEmpty ())
     {
@@ -122,9 +110,6 @@ BlockReaderUI::textChanged_cb ()
           && ui->zEdit->validator ()->validate (zText, pos)
                  == QValidator::Acceptable)
         {
-          ui->xEdit->setStatus (oclero::qlementine::Status::Default);
-          ui->yEdit->setStatus (oclero::qlementine::Status::Default);
-          ui->zEdit->setStatus (oclero::qlementine::Status::Default);
           int index = region_get_index (region, xText.toInt (), yText.toInt (),
                                         zText.toInt ());
 
@@ -183,24 +168,7 @@ BlockReaderUI::textChanged_cb ()
             ui->entityBtn->setEnabled (false);
         }
       else
-        {
-          if (ui->xEdit->validator ()->validate (xText, pos)
-              != QValidator::Acceptable)
-            ui->xEdit->setStatus (oclero::qlementine::Status::Warning);
-          else
-            ui->xEdit->setStatus (oclero::qlementine::Status::Default);
-          if (ui->yEdit->validator ()->validate (yText, pos)
-              != QValidator::Acceptable)
-            ui->yEdit->setStatus (oclero::qlementine::Status::Warning);
-          else
-            ui->yEdit->setStatus (oclero::qlementine::Status::Default);
-          if (ui->zEdit->validator ()->validate (zText, pos)
-              != QValidator::Acceptable)
-            ui->zEdit->setStatus (oclero::qlementine::Status::Warning);
-          else
-            ui->zEdit->setStatus (oclero::qlementine::Status::Default);
-          infos = _ ("Not valid!");
-        }
+        infos = _ ("Not valid!");
       ui->infoLabel->setText (infos);
     }
 }

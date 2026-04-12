@@ -5,6 +5,7 @@
 #include <QLineEdit>
 #include <QListView>
 #include <QMainWindow>
+#include <QPushButton>
 #include <QScrollArea>
 #include <QSortFilterProxyModel>
 #include <QSplitter>
@@ -23,25 +24,23 @@ public:
   static void free ();
 
 protected:
-  void resizeEvent (QResizeEvent *event) override;
+  // void resizeEvent (QResizeEvent *event) override;
 
 private:
-  QSplitter *splitter;
   QStandardItemModel *model;
   QSortFilterProxyModel *sortmodel;
   void showSome (const QString &str);
+  QWidget *layoutWidget;
   QString loadingStr;
-  QWidget *dockWidget;
   QVBoxLayout *layout;
   QVBoxLayout *labelLayout;
   QWidget *labelWidget;
-  QDockWidget *dock;
   QLineEdit *lineEdit;
   QListView *listView;
   QScrollArea *scrollArea;
-  QWidget *widget;
   QLabel *label;
   QHBoxLayout *hLayout;
+  QPushButton *pushButton;
 };
 
 #endif // DHLRC_DHHELPUI_H

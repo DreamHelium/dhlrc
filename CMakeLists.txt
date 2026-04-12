@@ -80,6 +80,10 @@ endif ()
 #add_definitions(-DDH_DEBUG_IN_IDE)
 
 add_subdirectory(src)
+
+# Reserved for future?
+#add_subdirectory(src-qml)
+
 #add_subdirectory(resources)
 if (DH_ENABLE_TRANSLATION)
     add_subdirectory(po)

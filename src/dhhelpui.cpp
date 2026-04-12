@@ -13,20 +13,17 @@ DhHelpUI::DhHelpUI (QWidget *parent) : QWidget (parent)
 {
   resize (400, 400);
   hLayout = new QHBoxLayout (this);
-  splitter = new QSplitter ();
-  dockWidget = new QWidget ();
+  pushButton = new QPushButton ();
+  hLayout->addWidget (pushButton);
+
   layout = new QVBoxLayout ();
   lineEdit = new QLineEdit ();
   listView = new QListView ();
+  pushButton = new QPushButton ();
   layout->addWidget (lineEdit);
   layout->addWidget (listView);
-
-  dockWidget->setLayout (layout);
-  dock = new QDockWidget ();
-  dock->setWidget (dockWidget);
-  dock->setWindowFlag (Qt::WindowCloseButtonHint, false);
-
-  splitter->addWidget (dock);
+  layoutWidget = new QWidget ();
+  layoutWidget->setLayout (layout);
 
   scrollArea = new QScrollArea ();
   labelLayout = new QVBoxLayout ();
@@ -39,9 +36,7 @@ DhHelpUI::DhHelpUI (QWidget *parent) : QWidget (parent)
   scrollArea->setWidget (labelWidget);
   scrollArea->setWidgetResizable (true);
 
-  splitter->addWidget (scrollArea);
-
-  hLayout->addWidget (splitter);
+  hLayout->addWidget (scrollArea);
   model = new QStandardItemModel (this);
   model->appendRow (new QStandardItem ("loading"));
   model->appendRow (new QStandardItem ("region-create"));
@@ -86,13 +81,13 @@ DhHelpUI::free ()
   delete dhui;
 }
 
-void
-DhHelpUI::resizeEvent (QResizeEvent *event)
-{
-  auto labelWidth = width () - dock->width () - 50;
-  label->setFixedWidth (labelWidth > 0 ? labelWidth : 10);
-  QWidget::resizeEvent (event);
-}
+// void
+// DhHelpUI::resizeEvent (QResizeEvent *event)
+// {
+//   auto labelWidth = width () - dock->width () - 50;
+//   label->setFixedWidth (labelWidth > 0 ? labelWidth : 10);
+//   QWidget::resizeEvent (event);
+// }
 
 void
 DhHelpUI::showSome (const QString &str)

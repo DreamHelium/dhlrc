@@ -6,7 +6,7 @@
     <group name="General">
         <entry name="MemoryLimit" type="Int">
             <label>Application Memory Limit</label>
-            <tooltip>The limit memory for application.</tooltip>
+            <tooltip>The limit memory(bytes) for application.</tooltip>
             <default>524288000</default>
         </entry>
         <entry name="ElapsedMilliseconds" type="Int">
@@ -16,9 +16,7 @@
         </entry>
         <entry name="GeneralConfigForInput" type="Bool">
             <label>General Config for Input</label>
-            <tooltip>If you choose this, the input config will not be asked, and you need to configure in the configure
-                interface.
-            </tooltip>
+            <tooltip>If you choose this, the input config will not be asked, and you need to configure in the configure interface.</tooltip>
             <default>true</default>
         </entry>
     </group>
