@@ -4,6 +4,8 @@
 #include "loadobjectui.h"
 #include <QWidget>
 // #include <lrchooseui.h>
+#include "manageregionui.h"
+
 #include <QEventLoop>
 #include <condition_variable>
 #include <coroutine>
@@ -15,11 +17,11 @@ class LoadRegionUI : public LoadObjectUI
   Q_OBJECT
 
 public:
-  explicit LoadRegionUI (QStringList list, dh::ManageRegion *mr,
+  explicit LoadRegionUI (QStringList list, ManageRegionUI *mr,
                          QWidget *parent = nullptr);
   ~LoadRegionUI () override;
   char *description = nullptr;
-  dh::ManageRegion *mr = nullptr;
+  ManageRegionUI *mr = nullptr;
 
 Q_SIGNALS:
   void finishLoadOne ();

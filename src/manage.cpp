@@ -179,9 +179,9 @@ ManageRegion::add_triggered ()
     QMessageBox::critical (this, _ ("Error!"), _ ("No file selected!"));
   else
     {
-      auto lrui = new LoadRegionUI (dirs, this);
-      lrui->setAttribute (Qt::WA_DeleteOnClose);
-      lrui->show ();
+      // auto lrui = new LoadRegionUI (dirs, this);
+      // lrui->setAttribute (Qt::WA_DeleteOnClose);
+      // lrui->show ();
     }
 }
 
@@ -282,9 +282,9 @@ ManageRegion::dnd_triggered (const QMimeData *data)
   QStringList filelist;
   for (const auto &file : dir)
     filelist << file.toLocalFile ();
-  auto lrui = new LoadRegionUI (filelist, this);
-  lrui->setAttribute (Qt::WA_DeleteOnClose);
-  lrui->show ();
+  // auto lrui = new LoadRegionUI (filelist, this);
+  // lrui->setAttribute (Qt::WA_DeleteOnClose);
+  // lrui->show ();
 }
 
 void

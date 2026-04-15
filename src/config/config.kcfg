@@ -51,4 +51,22 @@
             <tooltip>The version to override in translation stage.</tooltip>
         </entry>
     </group>
+    <group name="Manage">
+        <entry name="BorderColor" type="Color">
+            <label>Frame Border Color</label>
+            <tooltip>The color of the frame's border.</tooltip>
+        </entry>
+        <entry name="BackgroundColor" type="Color">
+            <label>Frame Background Color</label>
+            <tooltip>The color of the frame's background.</tooltip>
+        </entry>
+        <entry name="BorderRadius" type="Int">
+            <label>Frame Border Radius</label>
+            <tooltip>The radius of the frame's border.</tooltip>
+        </entry>
+        <entry name="BorderWidth" type="Int">
+            <label>Frame Border Width</label>
+            <tooltip>The line width of the frame's border.</tooltip>
+        </entry>
+    </group>
 </kcfg>

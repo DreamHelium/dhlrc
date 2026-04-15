@@ -1,5 +1,7 @@
 #include "externalnbtreaderui.h"
+#include "../src-qml/region.h"
 #include "nbtvec.h"
+#include "settings.h"
 
 #include <QMessageBox>
 #include <libintl.h>
@@ -14,6 +16,12 @@ ExternalNbtReaderUI::ExternalNbtReaderUI (QWidget *parent) : QWidget (parent)
   resize (500, 500);
   setAcceptDrops (true);
   layout = new QVBoxLayout (this);
+
+  messageWidget = new KMessageWidget ();
+  messageWidget->setIcon (QIcon::fromTheme ("dialog-warning"));
+  messageWidget->setMessageType (KMessageWidget::Warning);
+  layout->addWidget (messageWidget);
+  messageWidget->setVisible (false);
 
   progressLayout = new QVBoxLayout;
   layout->addLayout (progressLayout);
@@ -91,9 +99,13 @@ ExternalNbtReaderUI::dropEvent (QDropEvent *event)
   filename = filelist.at (0);
   char *failMessage = nullptr;
   nbt = file_to_nbt_vec (filename.toUtf8 ().constData (), progressFn, this,
-                         &failMessage);
+                         &failMessage, DhConfig::elapsedMilliseconds (),
+                         DhConfig::memoryLimit ());
+  QString realFailMessage = failMessage;
+  string_free (failMessage);
   if (nbt)
     {
+      messageWidget->setVisible (false);
       if (first)
         {
           wLayout->removeWidget (label);
@@ -107,5 +119,8 @@ ExternalNbtReaderUI::dropEvent (QDropEvent *event)
       nrui->show ();
     }
   else
-    QMessageBox::critical (this, _ ("Error"), failMessage);
+    {
+      messageWidget->setText (realFailMessage);
+      messageWidget->setVisible (true);
+    }
 }

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-04-12 21:11+0800\n"
+"POT-Creation-Date: 2026-04-16 00:01+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -101,8 +101,9 @@ msgstr ""
 
 #: ../../src/blockreaderui.cpp:227 ../../src/loadregionui.cpp:63
 #: ../../src/manage.cpp:15 ../../src/manage.cpp:179
-#: ../../src/regionmodifyui.cpp:12 ../../src/saveregionui.cpp:46
-#: ../../src/utility.cpp:21 ../../src/utility.cpp:38 ../../src/utility.cpp:46
+#: ../../src/manageregionui.cpp:84 ../../src/regionmodifyui.cpp:12
+#: ../../src/saveregionui.cpp:46 ../../src/utility.cpp:21
+#: ../../src/utility.cpp:38 ../../src/utility.cpp:46
 msgid "Error!"
 msgstr ""
 
@@ -114,12 +115,12 @@ msgstr ""
 msgid "Setting options:"
 msgstr ""
 
-#: ../../src/configobjectui.cpp:86 ../../src/lrchooseui.cpp:79 rc.cpp:205
-#: rc.cpp:241 rc.cpp:301
+#: ../../src/configobjectui.cpp:86 ../../src/lrchooseui.cpp:79 rc.cpp:232
+#: rc.cpp:268 rc.cpp:328
 msgid "&OK"
 msgstr ""
 
-#: ../../src/configobjectui.cpp:87 rc.cpp:304
+#: ../../src/configobjectui.cpp:87 rc.cpp:331
 msgid "&Cancel"
 msgstr ""
 
@@ -134,24 +135,24 @@ msgstr ""
 msgid "Loading..."
 msgstr ""
 
-#: ../../src/externalnbtreaderui.cpp:13
+#: ../../src/externalnbtreaderui.cpp:15
 msgid "NBT Reader"
 msgstr ""
 
-#: ../../src/externalnbtreaderui.cpp:30 ../../src/lrchooseui.cpp:80 rc.cpp:12
-#: rc.cpp:54 rc.cpp:208 rc.cpp:229
+#: ../../src/externalnbtreaderui.cpp:38 ../../src/lrchooseui.cpp:80 rc.cpp:12
+#: rc.cpp:54 rc.cpp:235 rc.cpp:256
 msgid "&Close"
 msgstr ""
 
-#: ../../src/externalnbtreaderui.cpp:34
+#: ../../src/externalnbtreaderui.cpp:42
 msgid "Drag file to read NBT."
 msgstr ""
 
-#: ../../src/externalnbtreaderui.cpp:79 ../../src/externalnbtreaderui.cpp:110
+#: ../../src/externalnbtreaderui.cpp:87
 msgid "Error"
 msgstr ""
 
-#: ../../src/externalnbtreaderui.cpp:79
+#: ../../src/externalnbtreaderui.cpp:87
 msgid "Multiple files dropped!"
 msgstr ""
 
@@ -240,17 +241,17 @@ msgstr ""
 msgid "Minecraft Structure Modifier"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:53
+#: ../../src/mainwindow.cpp:54
 msgid ""
 "Region is locked! It might not be the writer lock! Please try to close the "
 "window that's using the Region."
 msgstr ""
 
-#: ../../src/mainwindow.cpp:243
+#: ../../src/mainwindow.cpp:221
 msgid "Version: "
 msgstr ""
 
-#: ../../src/mainwindow.cpp:245
+#: ../../src/mainwindow.cpp:223
 msgid "About"
 msgstr ""
 
@@ -262,11 +263,11 @@ msgstr ""
 msgid "Manage Region"
 msgstr ""
 
-#: ../../src/manage.cpp:176
+#: ../../src/manage.cpp:176 ../../src/manageregionui.cpp:82
 msgid "Select Files"
 msgstr ""
 
-#: ../../src/manage.cpp:179
+#: ../../src/manage.cpp:179 ../../src/manageregionui.cpp:85
 msgid "No file selected!"
 msgstr ""
 
@@ -294,7 +295,7 @@ msgstr ""
 msgid "Locked!"
 msgstr ""
 
-#: ../../src/manage.cpp:314 rc.cpp:280
+#: ../../src/manage.cpp:314 rc.cpp:307
 msgid "Description"
 msgstr ""
 
@@ -304,6 +305,18 @@ msgstr ""
 
 #: ../../src/manage.cpp:314
 msgid "Time"
+msgstr ""
+
+#: ../../src/manageregionui.cpp:59
+msgid "&Settings"
+msgstr ""
+
+#: ../../src/manageregionui.cpp:61 rc.cpp:220 rc.cpp:262
+msgid "&Add"
+msgstr ""
+
+#: ../../src/manageregionui.cpp:97
+msgid "Manage"
 msgstr ""
 
 #: ../../src/nbtreaderui.cpp:46
@@ -394,7 +407,7 @@ msgid ""
 "configure in the configure interface."
 msgstr ""
 
-#: ../../build/src/settings.cpp:53 rc.cpp:125 ../../region-rs/src/default.rs:58
+#: ../../build/src/settings.cpp:53 rc.cpp:149 ../../region-rs/src/default.rs:58
 msgid "Converted"
 msgstr ""
 
@@ -406,11 +419,11 @@ msgstr ""
 msgid "The default base name for the region."
 msgstr ""
 
-#: ../../build/src/settings.cpp:57 rc.cpp:127 ../../region-rs/src/default.rs:60
+#: ../../build/src/settings.cpp:57 rc.cpp:151 ../../region-rs/src/default.rs:60
 msgid "Unnamed"
 msgstr ""
 
-#: ../../build/src/settings.cpp:58 rc.cpp:96 rc.cpp:292
+#: ../../build/src/settings.cpp:58 rc.cpp:96 rc.cpp:319
 msgid "Region Name"
 msgstr ""
 
@@ -448,6 +461,38 @@ msgstr ""
 
 #: ../../build/src/settings.cpp:78 rc.cpp:123
 msgid "The version to override in translation stage."
+msgstr ""
+
+#: ../../build/src/settings.cpp:84 rc.cpp:126
+msgid "Frame Border Color"
+msgstr ""
+
+#: ../../build/src/settings.cpp:85 rc.cpp:129
+msgid "The color of the frame's border."
+msgstr ""
+
+#: ../../build/src/settings.cpp:88 rc.cpp:132
+msgid "Frame Background Color"
+msgstr ""
+
+#: ../../build/src/settings.cpp:89 rc.cpp:135
+msgid "The color of the frame's background."
+msgstr ""
+
+#: ../../build/src/settings.cpp:92 rc.cpp:138
+msgid "Frame Border Radius"
+msgstr ""
+
+#: ../../build/src/settings.cpp:93 rc.cpp:141
+msgid "The radius of the frame's border."
+msgstr ""
+
+#: ../../build/src/settings.cpp:96 rc.cpp:144
+msgid "Frame Border Width"
+msgstr ""
+
+#: ../../build/src/settings.cpp:97 rc.cpp:147
+msgid "The line width of the frame's border."
 msgstr ""
 
 #: rc.cpp:3
@@ -498,7 +543,7 @@ msgstr ""
 msgid "&List blocks"
 msgstr ""
 
-#: rc.cpp:51 rc.cpp:247
+#: rc.cpp:51 rc.cpp:274
 msgid "&Show blocks"
 msgstr ""
 
@@ -518,179 +563,175 @@ msgstr ""
 msgid "Modify &Block"
 msgstr ""
 
-#: rc.cpp:130
+#: rc.cpp:154
 msgid "What happened in this step?"
 msgstr ""
 
-#: rc.cpp:133
+#: rc.cpp:157
 msgid "Details"
 msgstr ""
 
-#: rc.cpp:136
+#: rc.cpp:160
 msgid "&Continue"
 msgstr ""
 
-#: rc.cpp:139
+#: rc.cpp:163
 msgid "C&ancel"
 msgstr ""
 
-#: rc.cpp:142
+#: rc.cpp:166
 msgid "&NBT File Reader"
 msgstr ""
 
-#: rc.cpp:145
+#: rc.cpp:169 rc.cpp:172
 msgid "&Manage Region"
 msgstr ""
 
-#: rc.cpp:148
+#: rc.cpp:175
 msgid "M&odify Region"
 msgstr ""
 
-#: rc.cpp:151
+#: rc.cpp:178
 msgid "&Block reader"
 msgstr ""
 
-#: rc.cpp:154
+#: rc.cpp:181
 msgid "Shortcuts"
 msgstr ""
 
-#: rc.cpp:157
+#: rc.cpp:184
 msgid "Utility"
 msgstr ""
 
-#: rc.cpp:160
+#: rc.cpp:187
 msgid "&Configure"
 msgstr ""
 
-#: rc.cpp:163
+#: rc.cpp:190
 msgid "&Run Script"
 msgstr ""
 
-#: rc.cpp:166 rc.cpp:175
+#: rc.cpp:193 rc.cpp:202
 msgid "&About"
 msgstr ""
 
-#: rc.cpp:169
+#: rc.cpp:196
 msgid "&Tools"
 msgstr ""
 
-#: rc.cpp:172
+#: rc.cpp:199
 msgid "Icons"
 msgstr ""
 
-#: rc.cpp:178 rc.cpp:187
+#: rc.cpp:205 rc.cpp:214
 msgid "test"
 msgstr ""
 
-#: rc.cpp:181
+#: rc.cpp:208
 msgid "test\\"
 msgstr ""
 
-#: rc.cpp:184
+#: rc.cpp:211
 msgid "tetst"
 msgstr ""
 
-#: rc.cpp:190 rc.cpp:211
+#: rc.cpp:217 rc.cpp:238
 msgid "Form"
 msgstr ""
 
-#: rc.cpp:193 rc.cpp:235
-msgid "&Add"
-msgstr ""
-
-#: rc.cpp:196 rc.cpp:238
+#: rc.cpp:223 rc.cpp:265
 msgid "&Remove"
 msgstr ""
 
-#: rc.cpp:199
+#: rc.cpp:226
 msgid "R&efresh"
 msgstr ""
 
-#: rc.cpp:202
+#: rc.cpp:229
 msgid "&Save"
 msgstr ""
 
-#: rc.cpp:214
+#: rc.cpp:241
 msgid "Type:"
 msgstr ""
 
-#: rc.cpp:217
+#: rc.cpp:244
 msgid "Key:"
 msgstr ""
 
-#: rc.cpp:220
+#: rc.cpp:247
 msgid "Value:"
 msgstr ""
 
-#: rc.cpp:223
+#: rc.cpp:250
 msgid "&Export"
 msgstr ""
 
-#: rc.cpp:226
+#: rc.cpp:253
 msgid "PushButton"
 msgstr ""
 
-#: rc.cpp:232
+#: rc.cpp:259
 msgid "PaletteAddUI"
 msgstr ""
 
-#: rc.cpp:244
+#: rc.cpp:271
 msgid "PaletteListUI"
 msgstr ""
 
-#: rc.cpp:250
+#: rc.cpp:277
 msgid "Modify Property of Block(s)"
 msgstr ""
 
-#: rc.cpp:253
+#: rc.cpp:280
 msgid "Modify the property of the block in:"
 msgstr ""
 
-#: rc.cpp:256
+#: rc.cpp:283
 msgid "With the block that is the same property"
 msgstr ""
 
-#: rc.cpp:259
+#: rc.cpp:286
 msgid "Properties:"
 msgstr ""
 
-#: rc.cpp:262
+#: rc.cpp:289
 msgid "RegionModifyUI"
 msgstr ""
 
-#: rc.cpp:265
+#: rc.cpp:292
 msgid "Modify the infomation of the Region."
 msgstr ""
 
-#: rc.cpp:268
+#: rc.cpp:295
 msgid "Create Time"
 msgstr ""
 
-#: rc.cpp:271 rc.cpp:277
+#: rc.cpp:298 rc.cpp:304
 msgid "yyyy/MM/dd HH:mm:ss.zzz"
 msgstr ""
 
-#: rc.cpp:274
+#: rc.cpp:301
 msgid "Modify Time"
 msgstr ""
 
-#: rc.cpp:283
+#: rc.cpp:310
 msgid "Offset"
 msgstr ""
 
-#: rc.cpp:286
+#: rc.cpp:313
 msgid "Author"
 msgstr ""
 
-#: rc.cpp:289
+#: rc.cpp:316
 msgid "Base Name"
 msgstr ""
 
-#: rc.cpp:295
+#: rc.cpp:322
 msgid "Data Version"
 msgstr ""
 
-#: rc.cpp:298
+#: rc.cpp:325
 msgid "Version"
 msgstr ""
 

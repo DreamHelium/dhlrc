@@ -3,6 +3,7 @@
 
 // #include "../feature/dh_module.h"
 #include "dhconfigdialog/src/dhconfigdialog.h"
+#include "manageregionui.h"
 
 #include <KPageDialog>
 #include <QDateTime>
@@ -27,7 +28,8 @@ class MainWindow : public QMainWindow
 public:
   explicit MainWindow (QWidget *parent = nullptr);
   ~MainWindow ();
-
+  ManageRegionUI *mrui = nullptr;
+  DhConfigDialog *dialog = nullptr;
 Q_SIGNALS:
   void winClose ();
 
@@ -38,7 +40,7 @@ private:
   // QButtonGroup *group;
   void closeEvent (QCloseEvent *event) override;
   dh::ManageRegion *mr = new dh::ManageRegion ();
-  DhConfigDialog *dialog = nullptr;
+
 
 protected:
   void virtual dragEnterEvent (QDragEnterEvent *event);

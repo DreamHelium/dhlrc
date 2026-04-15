@@ -29,6 +29,8 @@ unsafe extern "C" {
         main_klass: *mut c_void,
         failed: *mut c_int,
         cancel_flag: *const AtomicBool,
+        elapsed_millisecs: u64,
+        free_memory: u64,
     ) -> *mut Vec<u8>;
     fn vec_free(vec: *mut Vec<u8>);
 }
@@ -100,6 +102,8 @@ pub extern "C" fn file_to_nbt_vec(
     progress_fn: ProgressFn,
     main_klass: *mut c_void,
     fail_message: *mut *mut c_char,
+    elapsed_millisecs: u64,
+    free_memory: u64,
 ) -> *mut Vec<(String, TreeValue)> {
     let mut failed = 0;
     let vector = unsafe {
@@ -109,6 +113,8 @@ pub extern "C" fn file_to_nbt_vec(
             main_klass,
             &mut failed as *mut c_int,
             null(),
+            elapsed_millisecs,
+            free_memory,
         )
     };
     if failed == 1 {

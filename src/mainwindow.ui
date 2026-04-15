@@ -39,6 +39,13 @@
            </widget>
           </item>
           <item>
+           <widget class="QPushButton" name="mrBtn_3">
+            <property name="text">
+             <string>&amp;Manage Region</string>
+            </property>
+           </widget>
+          </item>
+          <item>
            <widget class="QPushButton" name="mrBtn_2">
             <property name="text">
              <string>M&amp;odify Region</string>

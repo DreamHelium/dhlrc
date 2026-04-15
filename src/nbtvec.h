@@ -10,7 +10,8 @@ extern "C"
   typedef void (*ProgressFunc) (void *, int, const char *, const char *);
 
   void *file_to_nbt_vec (const char *filename, ProgressFunc progress_func,
-                         void *main_klass, char **error_message);
+                         void *main_klass, char **error_message,
+                         uint64_t elapsed_millisecs, uint64_t free_memory);
   void nbt_vec_free (void *vec);
   void nbt_vec_to_file (const void *vec, const char *filename, int from_file);
 

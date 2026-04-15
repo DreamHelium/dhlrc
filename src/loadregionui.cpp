@@ -25,7 +25,7 @@
   if (msg)                                                                    \
     return false;
 
-LoadRegionUI::LoadRegionUI (QStringList list, dh::ManageRegion *mr,
+LoadRegionUI::LoadRegionUI (QStringList list, ManageRegionUI *mr,
                             QWidget *parent)
     : LoadObjectUI (parent), mr (mr), list (list),
       cancel_flag (cancel_flag_new ())
@@ -82,7 +82,7 @@ LoadRegionUI::LoadRegionUI (QStringList list, dh::ManageRegion *mr,
                  }
              });
   connect (this, &LoadRegionUI::finishLoadOne, mr,
-           &dh::ManageRegion::refresh_triggered);
+           &ManageRegionUI::refresh_triggered);
   connect (this, &LoadRegionUI::whatHappenedClicked, this,
            [&] { DhHelpUI::showHelp ("loading"); });
   process ();

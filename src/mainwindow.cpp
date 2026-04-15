@@ -35,6 +35,7 @@
 // #include <qmessagebox.h>
 // #include <qnamespace.h>
 #include "dhconfigdialog/src/dhconfigdialog.h"
+#include "manageregionui.h"
 
 #include <QPushButton>
 #include <blockreaderui.h>
@@ -53,12 +54,11 @@
   _ ("Region is locked! It might not be the writer lock! Please try to "      \
      "close the window that's using the Region.")
 
-
 MainWindow::MainWindow (QWidget *parent)
     : QMainWindow (parent), ui (new Ui::MainWindow)
 {
   ui->setupUi (this);
-
+  mrui = new ManageRegionUI (this);
   auto manager = KColorSchemeManager::instance ();
   auto menu = KColorSchemeMenu::createMenu (manager, this);
   ui->menu_Tools->addAction (menu);
@@ -68,11 +68,9 @@ MainWindow::MainWindow (QWidget *parent)
 
   dialog = new DhConfigDialog (DhConfig::self (), "dhlrcrc", true, this);
   dialog->addAssistant (std::make_unique<DhSetConfigAssistant> ());
+  dialog->addAssistant (std::make_unique<DhSetColorConfigAssistant> (this));
   dialog->addLongTextItems ("Description");
-  // dialog->addPages ();
 
-  // ui->tabWidget->setTabIcon (1, QIcon(":/cn/dh/dhlrc/item_list.svg"));
-  // DhGeneralConfigUI::setConfig ();
   initSignalSlots ();
   initShortcuts ();
 #ifndef DH_DEBUG_IN_IDE
@@ -99,6 +97,7 @@ MainWindow::initSignalSlots ()
                     &MainWindow::showabout);
   QObject::connect (ui->mrBtn_2, &QPushButton::clicked, this,
                     &MainWindow::mrBtn_2_clicked);
+  connect (ui->mrBtn_3, &QPushButton::clicked, mrui, &ManageRegionUI::show);
   QObject::connect (ui->nbtBtn, &QPushButton::clicked, this,
                     &MainWindow::nbtBtn_clicked);
   // QObject::connect (ui->scriptBtn, &QPushButton::clicked, this,
@@ -120,30 +119,9 @@ MainWindow::initSignalSlots ()
   //                       lua_close (L);
   //                     });
   connect (ui->configBtn, &QPushButton::clicked, this,
-           [&]
-             {
-               // if (dialog)
-               //   dialog->show ();
-               // else
-               //   {
-               //     dialog = new KPageDialog (this);
-               //     dialog->setStandardButtons (
-               //         QDialogButtonBox::RestoreDefaults
-               //         | QDialogButtonBox::Apply | QDialogButtonBox::Ok
-               //         | QDialogButtonBox::Cancel);
-               //     auto general = new DhGeneralConfigUI ();
-               //     auto game = new DhGameConfigUI ();
-               //     dialog->addPage (general, i18n ("General"));
-               //     dialog->addPage (game, i18n ("Game"));
-               //     auto okBtn = dialog->button (QDialogButtonBox::Ok);
-               //     connect (okBtn, &QPushButton::clicked, general,
-               //              &DhGeneralConfigUI::changeSettings);
-               //     connect (okBtn, &QPushButton::clicked, game,
-               //              &DhGameConfigUI::changeSettings);
-               //     dialog->show ();
-               //   }
-               dialog->show ();
-             });
+           [&] { dialog->show (); });
+  connect (this, &MainWindow::winClose, dialog, &DhConfigDialog::close);
+  connect (this, &MainWindow::winClose, mrui, &ManageRegionUI::close);
 #ifdef DH_DEBUG_IN_IDE
   connect (ui->debugBtn, &QPushButton::clicked,
            [&]
@@ -240,9 +218,9 @@ MainWindow::mrBtn_2_clicked ()
 void
 MainWindow::showabout ()
 {
-  QString text = _("Version: ");
+  QString text = _ ("Version: ");
   text += QString::number (DHLRC_COMPILE_DATE);
-  QMessageBox::about(this, _("About"), text);
+  QMessageBox::about (this, _ ("About"), text);
 }
 
 void

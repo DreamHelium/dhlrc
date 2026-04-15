@@ -1,6 +1,7 @@
 #ifndef DHLRC_EXTERNALNBTREADERUI_H
 #define DHLRC_EXTERNALNBTREADERUI_H
 
+#include <KMessageWidget>
 #include <QLabel>
 #include <QProgressBar>
 #include <QPushButton>
@@ -36,6 +37,7 @@ private:
   QPushButton *closeBtn;
   QHBoxLayout *hLayout;
   QLabel *label;
+  KMessageWidget *messageWidget;
 };
 
 #endif // DHLRC_EXTERNALNBTREADERUI_H
