@@ -1,7 +1,10 @@
 #include "regionmodifyui.h"
+
+#include "manageregionui.h"
 #include "ui_regionmodifyui.h"
 #include "utility.h"
 #include <QLineEdit>
+#include <QMessageBox>
 #define _(str) gettext (str)
 
 #define dh_close_if_fail(msg, func, ...)                                      \
@@ -13,11 +16,9 @@
       close ();                                                               \
     }
 
-RegionModifyUI::RegionModifyUI (int index, dh::ManageRegion *mr,
-                                QWidget *parent)
+RegionModifyUI::RegionModifyUI (void* region, QWidget *parent)
     : QWidget (parent), ui (new Ui::RegionModifyUI),
-      region (mr->getRegions ()[index]->get_region ()),
-      locker (*mr->getRegions ()[index])
+      region (region)
 {
   ui->setupUi (this);
   connect (ui->spinBox, &QSpinBox::valueChanged, this,

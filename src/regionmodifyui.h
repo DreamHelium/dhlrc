@@ -1,10 +1,10 @@
 #ifndef REGIONMODIFYUI_H
 #define REGIONMODIFYUI_H
 
+#include "manageregionui.h"
 #include "region.h"
 #include <QWidget>
 
-#include <manage.h>
 #include <qreadwritelock.h>
 
 QT_BEGIN_NAMESPACE
@@ -19,15 +19,13 @@ class RegionModifyUI : public QWidget
   Q_OBJECT
 
 public:
-  explicit RegionModifyUI (int index, dh::ManageRegion *mr,
-                           QWidget *parent = nullptr);
+  explicit RegionModifyUI (void *region, QWidget *parent = nullptr);
   ~RegionModifyUI () override;
 
 private:
   Ui::RegionModifyUI *ui;
   void *region = nullptr;
   void initData ();
-  AutoLocker locker;
 
 private Q_SLOTS:
   void okBtn_clicked ();

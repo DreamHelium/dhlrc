@@ -11,7 +11,6 @@
 #include <QUuid>
 #include <dhhelpui.h>
 #include <generalchoosedialog.h>
-#include <manage.h>
 #include <region.h>
 #include <utility.h>
 #define _(str) gettext (str)

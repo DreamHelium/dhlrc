@@ -34,7 +34,6 @@ private:
   QLabel *progressLabel;
   QVBoxLayout *layout;
   QVBoxLayout *wLayout;
-  QPushButton *closeBtn;
   QHBoxLayout *hLayout;
   QLabel *label;
   KMessageWidget *messageWidget;

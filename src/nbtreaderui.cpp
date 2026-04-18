@@ -2,9 +2,10 @@
 #include "ui_nbtreaderui.h"
 
 #include <QFileDialog>
-#include <manage.h>
+#include <libintl.h>
 #include <nbtvec.h>
 #include <region.h>
+#define _(str) gettext (str)
 
 NbtReaderUI::NbtReaderUI (const void *nbt, bool fromFile, QWidget *parent)
     : QWidget (parent), ui (new Ui::NbtReaderUI), nbt (nbt),
@@ -45,7 +46,8 @@ NbtReaderUI::NbtReaderUI (const void *nbt, bool fromFile, QWidget *parent)
                auto dir = QFileDialog::getSaveFileName (
                    this, _ ("Export NBT To ..."));
                if (!dir.isEmpty ())
-                 nbt_vec_to_file (this->nbt, dir.toUtf8 ().constData (), this->fromFile);
+                 nbt_vec_to_file (this->nbt, dir.toUtf8 ().constData (),
+                                  this->fromFile);
              });
 }
 

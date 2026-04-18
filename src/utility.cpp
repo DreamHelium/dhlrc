@@ -1,7 +1,10 @@
 #include "utility.h"
 #include "generalchoosedialog.h"
+#include "manageregionui.h"
+
 #include <QApplication>
 #include <QDir>
+#include <QMessageBox>
 #define _(str) gettext (str)
 
 QString
@@ -14,7 +17,7 @@ dh::getTranslationDir ()
 }
 
 int
-dh::getRegion (QWidget *widget, dh::ManageRegion *mr, bool write)
+dh::getRegion (QWidget *widget, ManageRegionUI *mr, bool write)
 {
   if (!mr)
     {
@@ -22,7 +25,7 @@ dh::getRegion (QWidget *widget, dh::ManageRegion *mr, bool write)
                              _ ("Manage Region window is not initialized"));
       return -1;
     }
-  auto realList = mr->regionNames (write);
+  auto realList = mr->regionNames ();
   QStringList nameList;
   for (const auto &i : realList)
     nameList.append (i.name);

@@ -1,12 +1,14 @@
 #ifndef UTILITY_H
 #define UTILITY_H
-#include "manage.h"
+
+#include "manageregionui.h"
+
 #include <QString>
 
 namespace dh
 {
 QString getTranslationDir ();
-int getRegion (QWidget *widget, ManageRegion *mr, bool write);
+int getRegion (QWidget *widget, ManageRegionUI *mr, bool write);
 QDateTime getDateTimeFromTimeStamp (qint64 timeStamp);
 }
 

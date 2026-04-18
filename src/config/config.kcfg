@@ -16,7 +16,9 @@
         </entry>
         <entry name="GeneralConfigForInput" type="Bool">
             <label>General Config for Input</label>
-            <tooltip>If you choose this, the input config will not be asked, and you need to configure in the configure interface.</tooltip>
+            <tooltip>If you choose this, the input config will not be asked, and you need to configure in the configure
+                interface.
+            </tooltip>
             <default>true</default>
         </entry>
     </group>
@@ -52,6 +54,10 @@
         </entry>
     </group>
     <group name="Manage">
+        <entry name="CustomFrameStylesheet" type="String">
+            <label>Custom Frame Stylesheet</label>
+            <tooltip>The custom value of the frame stylesheet.</tooltip>
+        </entry>
         <entry name="BorderColor" type="Color">
             <label>Frame Border Color</label>
             <tooltip>The color of the frame's border.</tooltip>
@@ -67,6 +73,10 @@
         <entry name="BorderWidth" type="Int">
             <label>Frame Border Width</label>
             <tooltip>The line width of the frame's border.</tooltip>
+        </entry>
+        <entry name="EnableCustomFrameStylesheet" type="Bool">
+            <label>Enable Custom Frame Stylesheet</label>
+            <tooltip>If you enable this, other custom options will be disabled.</tooltip>
         </entry>
     </group>
 </kcfg>

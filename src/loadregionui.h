@@ -9,7 +9,6 @@
 #include <QEventLoop>
 #include <condition_variable>
 #include <coroutine>
-#include <manage.h>
 #include <qeventloop.h>
 
 class LoadRegionUI : public LoadObjectUI

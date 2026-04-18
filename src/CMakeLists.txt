@@ -29,10 +29,9 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets Svg Concurrent)
 
 add_definitions(-DQT_NO_SIGNALS_SLOTS_KEYWORDS)
 
-set(ui_files mainwindow.ui
+set(ui_files
         blocklistui.ui
         blockreaderui.ui
-        manageui.ui
         blockshowui.ui
         regionmodifyui.ui
         palettelistui.ui
@@ -41,51 +40,9 @@ set(ui_files mainwindow.ui
         nbtreaderui.ui
 )
 
-set(PROJECT_SOURCES
-        main.cpp
-        mainwindow.cpp mainwindow.h
-        blocklistui.cpp blocklistui.h
-        blockreaderui.cpp blockreaderui.h
-        manageui.h manageui.cpp
-        dhtableview.h dhtableview.cpp
-        lrchooseui.h lrchooseui.cpp
-        manage.h manage.cpp
-        utility.h utility.cpp
-        dhtreefilter.h dhtreefilter.cpp
-        #        propertymodifyui.cpp
-        #        propertymodifyui.h
-        #        propertymodifyui.ui
-        blockshowui.cpp
-        blockshowui.h
-        regionmodifyui.cpp
-        regionmodifyui.h
-        palettelistui.cpp
-        palettelistui.h
-        paletteaddui.cpp
-        paletteaddui.h
-        generalchoosedialog.cpp
-        generalchoosedialog.h
-        dhloadobject.cpp
-        dhloadobject.h
-        loadregionui.cpp
-        loadregionui.h
-        dhlinklikebutton.cpp
-        dhlinklikebutton.h
-        loadobjectui.cpp
-        loadobjectui.h
-        saveregionui.cpp
-        saveregionui.h
-        dhgameconfigui.h
-        dhcheckboxgroup.cpp
-        dhcheckboxgroup.h
-)
-
 set(TEMP_PROJECT_SOURCES
         main.cpp
-        mainwindow.cpp mainwindow.h
         loadobjectui.cpp loadobjectui.h
-        manage.cpp manage.h
-        manageui.cpp manageui.h
         dhtableview.cpp dhtableview.h
         dhlinklikebutton.cpp dhlinklikebutton.h
         loadregionui.cpp loadregionui.h
@@ -111,6 +68,7 @@ set(TEMP_PROJECT_SOURCES
         dhhelpui.h
         manageregionui.cpp
         manageregionui.h
+        mainwindow.h mainwindow.cpp
 )
 
 ki18n_wrap_ui(TEMP_PROJECT_SOURCES ${ui_files})

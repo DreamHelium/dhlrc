@@ -35,9 +35,6 @@ ExternalNbtReaderUI::ExternalNbtReaderUI (QWidget *parent) : QWidget (parent)
   layout->addLayout (wLayout, 1);
   hLayout = new QHBoxLayout;
   layout->addLayout (hLayout);
-  closeBtn = new QPushButton (_ ("&Close"));
-  hLayout->addStretch ();
-  hLayout->addWidget (closeBtn);
 
   label = new QLabel (_ ("Drag file to read NBT."));
   label->setAlignment (Qt::AlignCenter);
@@ -46,7 +43,6 @@ ExternalNbtReaderUI::ExternalNbtReaderUI (QWidget *parent) : QWidget (parent)
   font.setBold (true);
   label->setFont (font);
   wLayout->addWidget (label);
-  connect (closeBtn, &QPushButton::clicked, this, &ExternalNbtReaderUI::close);
   connect (this, &ExternalNbtReaderUI::setValue, progressBar,
            &QProgressBar::setValue);
   connect (this, &ExternalNbtReaderUI::setLabel, progressLabel,

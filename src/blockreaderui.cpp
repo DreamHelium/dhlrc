@@ -23,7 +23,7 @@ set_func (void *klass, int value)
   emit brui->changeVal (value);
 }
 
-BlockReaderUI::BlockReaderUI (int index, dh::ManageRegion *mr, QWidget *parent)
+BlockReaderUI::BlockReaderUI (int index, ManageRegionUI *mr, QWidget *parent)
     : QWidget (parent), ui (new Ui::BlockReaderUI),
       region (mr->getRegions ()[index]->get_region ()),
       locker (*mr->getRegions ()[index])
@@ -70,6 +70,7 @@ BlockReaderUI::BlockReaderUI (int index, dh::ManageRegion *mr, QWidget *parent)
                    nrui->show ();
                  }
              });
+
   ui->entityBtn->setEnabled (false);
   ui->propertyBtn->setEnabled (false);
   ui->label_7->setText (_ ("Lack the translation module, will not "

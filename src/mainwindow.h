@@ -1,60 +1,37 @@
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#ifndef DHLRC_DEBUGLOADINGUI_H
+#define DHLRC_DEBUGLOADINGUI_H
 
-// #include "../feature/dh_module.h"
 #include "dhconfigdialog/src/dhconfigdialog.h"
 #include "manageregionui.h"
 
-#include <KPageDialog>
-#include <QDateTime>
-#include <QEvent>
-#include <QLabel>
+#include <QListView>
 #include <QMainWindow>
-
-#include <QButtonGroup>
-#include <manage.h>
-
-QT_BEGIN_NAMESPACE
-namespace Ui
-{
-class MainWindow;
-}
-QT_END_NAMESPACE
+#include <QSortFilterProxyModel>
+#include <QSplitter>
+#include <QStandardItemModel>
+#include <QTabWidget>
+#include <QVBoxLayout>
+#include <QWidget>
 
 class MainWindow : public QMainWindow
 {
   Q_OBJECT
-
 public:
   explicit MainWindow (QWidget *parent = nullptr);
-  ~MainWindow ();
-  ManageRegionUI *mrui = nullptr;
+  ~MainWindow () override;
+  ManageRegionUI *mrui = new ManageRegionUI (this);
   DhConfigDialog *dialog = nullptr;
-Q_SIGNALS:
-  void winClose ();
 
 private:
-  Ui::MainWindow *ui;
-  void initSignalSlots ();
-  void initShortcuts ();
-  // QButtonGroup *group;
-  void closeEvent (QCloseEvent *event) override;
-  dh::ManageRegion *mr = new dh::ManageRegion ();
-
-
-protected:
-  void virtual dragEnterEvent (QDragEnterEvent *event);
-  void virtual dropEvent (QDropEvent *event);
-
-private Q_SLOTS:
-  void brBtn_clicked ();
-  void mrBtn_clicked ();
-  void mrBtn_2_clicked ();
-  void showabout ();
-  void groupBtn_clicked (int id);
-  void nbtBtn_clicked ();
+  QSplitter *splitter;
+  QWidget *leftWidget;
+  QVBoxLayout *leftLayout;
+  QSortFilterProxyModel *proxyModel;
+  QListView *listView;
+  QLineEdit *lineEdit;
+  QTabWidget *tabWidget;
+  QStandardItemModel *model;
+  QAction *actionSearch;
 };
 
-// inline QList<DhModule *> MainWindow::modules = {};
-
-#endif // MAINWINDOW_H
+#endif // DHLRC_DEBUGLOADINGUI_H

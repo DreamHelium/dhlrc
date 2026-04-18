@@ -2,9 +2,10 @@
 #define DHLRC_SAVEREGIONUI_H
 
 #include "loadobjectui.h"
+#include "manageregionui.h"
+
 #include <QWidget>
 #include <condition_variable>
-#include <manage.h>
 #include <qeventloop.h>
 
 /*

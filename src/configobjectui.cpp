@@ -2,8 +2,9 @@
 
 #include <QCheckBox>
 #include <QPushButton>
-#include <manage.h>
+#include <libintl.h>
 #include <region.h>
+#define _(str) gettext (str)
 
 using getFunc = qsizetype (*) ();
 using newFunc = void *(*)();
@@ -95,7 +96,7 @@ ConfigObjectUI::ConfigObjectUI (QLibrary *library, ConfigType type,
 void *
 ConfigObjectUI::getObject (QLibrary *library, ConfigType type)
 {
-  const char* getFnName = nullptr;
+  const char *getFnName = nullptr;
   switch (type)
     {
     case CONFIG_INPUT:
@@ -105,8 +106,7 @@ ConfigObjectUI::getObject (QLibrary *library, ConfigType type)
       getFnName = "output_config_num";
       break;
     }
-  auto getFn
-      = reinterpret_cast<getFunc> (library->resolve (getFnName));
+  auto getFn = reinterpret_cast<getFunc> (library->resolve (getFnName));
   if (!getFn || !getFn ())
     return nullptr;
   auto len = getFn ();
@@ -130,7 +130,8 @@ ConfigObjectUI::okBtn_clicked ()
       setBoolFnName = "output_config_item_set_bool";
       break;
     }
-  auto setBoolFn = reinterpret_cast<setBoolFunc> (library->resolve(setBoolFnName));
+  auto setBoolFn
+      = reinterpret_cast<setBoolFunc> (library->resolve (setBoolFnName));
   for (int i = 0; i < widgets.count (); i++)
     {
       auto type = items[i].split (':')[1];
@@ -139,7 +140,7 @@ ConfigObjectUI::okBtn_clicked ()
           auto widget = qobject_cast<QCheckBox *> (widgets.at (i));
           if (!widget)
             break;
-          setBoolFn(defaultObject, i, widget->isChecked());
+          setBoolFn (defaultObject, i, widget->isChecked ());
         }
     }
   close ();

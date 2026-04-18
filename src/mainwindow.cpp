@@ -1,247 +1,171 @@
 #include "mainwindow.h"
-#include "manage.h"
-#include "ui_mainwindow.h"
-#include <KPageDialog>
-// #include "../common_info.h"
-// #include "../feature/conv_feature.h"
-// #include "../global_variant.h"
-// #include "../region.h"
-// #include "../script.h"
-// #include "../translation.h"
-// #include "blockreaderui.h"
-// #include "dh_file_util.h"
-// #include "dh_type.h"
-#include "dhgameconfigui.h"
-// #include "generalchoosedialog.h"
-// #include "glib.h"
-// #include "manage.h"
-// #include "settings.h"
-// #include "utility.h"
-#include <KActionMenu>
-#include <KColorSchemeManager>
-#include <KColorSchemeMenu>
-#include <KConfigDialog>
-#include <KStyleManager>
-// #include <QFileDialog>
-// #include <generalchooseui.h>
-// G_BEGIN_DECLS
-// #include <lauxlib.h>
-// #include <lua.h>
-// #include <lualib.h>
-// G_END_DECLS
-// #include <qdialog.h>
-// #include <qevent.h>
-// #include <qinputdialog.h>
-// #include <qmessagebox.h>
-// #include <qnamespace.h>
-#include "dhconfigdialog/src/dhconfigdialog.h"
-#include "manageregionui.h"
-
-#include <QPushButton>
-#include <blockreaderui.h>
-#ifdef DH_DEBUG_IN_IDE
-#include <debugloadingui.h>
-#endif
-#include <dhhelpui.h>
-#include <externalnbtreaderui.h>
-#include <generalchoosedialog.h>
 #include <libintl.h>
-#include <regionmodifyui.h>
-#include <utility.h>
 #define _(str) gettext (str)
+#include "blockreaderui.h"
+#include "dhgameconfigui.h"
+#include "externalnbtreaderui.h"
+#include "settings.h"
+#include "utility.h"
 
-#define REGION_LOCKED_MSG                                                     \
-  _ ("Region is locked! It might not be the writer lock! Please try to "      \
-     "close the window that's using the Region.")
+#include "dhconfigdialog/src/dhconfigtemplates.h"
+#include <QLineEdit>
+#include <QSortFilterProxyModel>
+#include <QTabBar>
 
-MainWindow::MainWindow (QWidget *parent)
-    : QMainWindow (parent), ui (new Ui::MainWindow)
+class DhFrameControlConfigTemplate : public DhBoolConfigTemplate
 {
-  ui->setupUi (this);
-  mrui = new ManageRegionUI (this);
-  auto manager = KColorSchemeManager::instance ();
-  auto menu = KColorSchemeMenu::createMenu (manager, this);
-  ui->menu_Tools->addAction (menu);
-  ui->menu_Tools->addAction (KStyleManager::createConfigureAction (this));
+public:
+  DhFrameControlConfigTemplate (KConfigSkeletonItem *item, QVBoxLayout *layout,
+                                DhConfigDialog *dialog)
+      : DhBoolConfigTemplate (item, layout, dialog)
+  {
+    auto changeFunc = [dialog] (Qt::CheckState state)
+      {
+        if (state == Qt::Checked)
+          {
+            for (const auto &i : dialog->templates)
+              {
+                if (i->item == DhConfig::self ()->backgroundColorItem ()
+                    || i->item == DhConfig::self ()->borderColorItem ()
+                    || i->item == DhConfig::self ()->borderRadiusItem ()
+                    || i->item == DhConfig::self ()->borderWidthItem ())
+                  i->widget->setEnabled (false);
+                else if (i->item
+                         == DhConfig::self ()->customFrameStylesheetItem ())
+                  i->widget->setEnabled (true);
+              }
+          }
+        else if (state == Qt::Unchecked)
+          {
+            for (const auto &i : dialog->templates)
+              {
+                if (i->item == DhConfig::self ()->backgroundColorItem ()
+                    || i->item == DhConfig::self ()->borderColorItem ()
+                    || i->item == DhConfig::self ()->borderRadiusItem ()
+                    || i->item == DhConfig::self ()->borderWidthItem ())
+                  i->widget->setEnabled (true);
+                else if (i->item
+                         == DhConfig::self ()->customFrameStylesheetItem ())
+                  i->widget->setEnabled (false);
+              }
+          }
+      };
+    changeFunc (qobject_cast<QCheckBox *> (widget)->checkState ());
+    QObject::connect (qobject_cast<QCheckBox *> (widget),
+                      &QCheckBox::checkStateChanged, dialog, changeFunc);
+  }
+};
 
-  ui->tabWidget->setTabIcon (0, QIcon (":/cn/dh/dhlrc/region.svg"));
+MainWindow::MainWindow (QWidget *parent) : QMainWindow (parent)
+{
+  splitter = new QSplitter (this);
+  setCentralWidget (splitter);
+  leftWidget = new QWidget ();
+  leftLayout = new QVBoxLayout ();
+  leftWidget->setLayout (leftLayout);
+  lineEdit = new QLineEdit ();
+  lineEdit->setPlaceholderText (_ ("Search..."));
+
+  actionSearch = new QAction (this);
+  actionSearch->setIcon (QIcon::fromTheme ("search"));
+  lineEdit->addAction (actionSearch, QLineEdit::LeadingPosition);
+
+  listView = new QListView ();
+  listView->setSelectionMode (QAbstractItemView::SingleSelection);
+  listView->setFrameStyle (QFrame::NoFrame);
+  auto palette = listView->palette ();
+  palette.setColor (listView->viewport ()->backgroundRole (), Qt::transparent);
+  listView->setPalette (palette);
+  listView->setEditTriggers (QAbstractItemView::NoEditTriggers);
+
+  leftLayout->addWidget (lineEdit);
+  leftLayout->addWidget (listView);
+
+  tabWidget = new QTabWidget (this);
+  tabWidget->setTabsClosable (true);
+
+  splitter->addWidget (leftWidget);
+  splitter->addWidget (tabWidget);
+  splitter->setCollapsible (1, false);
+
+  model = new QStandardItemModel (this);
+
+  model->appendRow (new QStandardItem (_ ("NBT File Reader")));
+  model->appendRow (new QStandardItem (_ ("Manage Region")));
+  model->appendRow (new QStandardItem (_ ("Region Reader/Modifier")));
+  model->appendRow (new QStandardItem (_ ("Settings")));
+  proxyModel = new QSortFilterProxyModel (this);
+  proxyModel->setSourceModel (model);
+  listView->setModel (proxyModel);
 
   dialog = new DhConfigDialog (DhConfig::self (), "dhlrcrc", true, this);
   dialog->addAssistant (std::make_unique<DhSetConfigAssistant> ());
   dialog->addAssistant (std::make_unique<DhSetColorConfigAssistant> (this));
   dialog->addLongTextItems ("Description");
+  dialog->addLongTextItems ("CustomFrameStylesheet");
 
-  initSignalSlots ();
-  initShortcuts ();
-#ifndef DH_DEBUG_IN_IDE
-  ui->debugBtn->hide ();
-#endif
+  dialog->addTemplateByItem (
+      DhConfig::self ()->enableCustomFrameStylesheetItem (),
+      [] (KConfigSkeletonItem *item, QVBoxLayout *layout,
+          DhConfigDialog *dialog)
+        {
+          return std::make_unique<DhFrameControlConfigTemplate> (item, layout,
+                                                                 dialog);
+        });
+
+  connect (lineEdit, &QLineEdit::textChanged, this,
+           [&] (const QString &pattern)
+             { proxyModel->setFilterRegularExpression (pattern); });
+  connect (listView, &QListView::doubleClicked, this,
+           [&] (const QModelIndex &index)
+             {
+               switch (index.row ())
+                 {
+                 case 0:
+                   {
+                     auto enui = new ExternalNbtReaderUI ();
+                     tabWidget->addTab (enui, _ ("NBT Reader"));
+                     break;
+                   }
+                 case 1:
+                   {
+                     auto uiIndex = tabWidget->indexOf (mrui);
+                     if (uiIndex == -1)
+                       uiIndex = tabWidget->addTab (mrui, _ ("Manage Region"));
+                     tabWidget->setCurrentIndex (uiIndex);
+                     break;
+                   }
+                 case 2:
+                   {
+                     auto region = dh::getRegion (this, mrui, false);
+                     if (region != -1)
+                       {
+                         auto brui = new BlockReaderUI (region, mrui);
+                         tabWidget->addTab (brui, _ ("Block Reader/Modifier"));
+                       }
+                     break;
+                   }
+                 case 3:
+                   {
+                     dialog->raise ();
+                     dialog->activateWindow ();
+                     dialog->show ();
+                     break;
+                   }
+                 default:
+                   break;
+                 }
+             });
+  connect (tabWidget, &QTabWidget::tabCloseRequested, this,
+           [&] (int index)
+             {
+               delete tabWidget->widget (index);
+               tabWidget->removeTab (index);
+             });
 }
 
 MainWindow::~MainWindow ()
 {
-  delete mr;
+  delete mrui;
   delete dialog;
-  delete ui;
-  DhHelpUI::free ();
-}
-
-void
-MainWindow::initSignalSlots ()
-{
-  QObject::connect (ui->brBtn, &QPushButton::clicked, this,
-                    &MainWindow::brBtn_clicked);
-  QObject::connect (ui->mrBtn, &QPushButton::clicked, this,
-                    &MainWindow::mrBtn_clicked);
-  QObject::connect (ui->action_about, &QAction::triggered, this,
-                    &MainWindow::showabout);
-  QObject::connect (ui->mrBtn_2, &QPushButton::clicked, this,
-                    &MainWindow::mrBtn_2_clicked);
-  connect (ui->mrBtn_3, &QPushButton::clicked, mrui, &ManageRegionUI::show);
-  QObject::connect (ui->nbtBtn, &QPushButton::clicked, this,
-                    &MainWindow::nbtBtn_clicked);
-  // QObject::connect (ui->scriptBtn, &QPushButton::clicked, this,
-  //                   [&]
-  //                     {
-  //                       auto filename = QFileDialog::getOpenFileName (
-  //                           this, _ ("Load File"), nullptr,
-  //                           _ ("Lua Script File (*.lua)"));
-  //                       if (filename.isEmpty ())
-  //                         {
-  //                           QMessageBox::warning (this, _ ("Error!"),
-  //                                                 _ ("No file selected."));
-  //                           return;
-  //                         }
-  //                       lua_State *L = luaL_newstate ();
-  //                       luaL_openlibs (L);
-  //                       dhlrc_script_load_functions (L);
-  //                       luaL_dofile (L, filename.toUtf8 ());
-  //                       lua_close (L);
-  //                     });
-  connect (ui->configBtn, &QPushButton::clicked, this,
-           [&] { dialog->show (); });
-  connect (this, &MainWindow::winClose, dialog, &DhConfigDialog::close);
-  connect (this, &MainWindow::winClose, mrui, &ManageRegionUI::close);
-#ifdef DH_DEBUG_IN_IDE
-  connect (ui->debugBtn, &QPushButton::clicked,
-           [&]
-             {
-               auto dui = new DebugLoadingUI ();
-               dui->setAttribute (Qt::WA_DeleteOnClose);
-               dui->show ();
-             });
-#endif
-}
-
-void
-MainWindow::initShortcuts ()
-{
-  // group = new QButtonGroup ();
-  // auto list = dh_info_get_all_uuid (DH_TYPE_MODULE);
-  // int num = 0;
-  // for (int i = 0; list && i < **list; i++)
-  //   {
-  //     auto uuid = (*list)[i];
-  //     auto module
-  //         = static_cast<DhModule *> (dh_info_get_data (DH_TYPE_MODULE,
-  //         uuid));
-  //     if (g_str_equal (module->module_type, "qt-shortcut"))
-  //       {
-  //         modules.append (module);
-  //         QPushButton *btn = new QPushButton (module->module_description);
-  //         ui->verticalLayout_7->addWidget (btn);
-  //         group->addButton (btn, num);
-  //         num++;
-  //       }
-  //   }
-  // connect (group, &QButtonGroup::idClicked, this,
-  //          &MainWindow::groupBtn_clicked);
-}
-
-void
-MainWindow::closeEvent (QCloseEvent *event)
-{
-  Q_EMIT winClose ();
-  QMainWindow::closeEvent (event);
-}
-
-void
-MainWindow::dragEnterEvent (QDragEnterEvent *event)
-{
-  // event->acceptProposedAction ();
-}
-
-void
-MainWindow::dropEvent (QDropEvent *event)
-{
-  // auto urls = event->mimeData ()->urls ();
-  // QStringList filelist;
-  // for (int i = 0; i < urls.length (); i++)
-  //   {
-  //     filelist << urls[i].toLocalFile ();
-  //   }
-  // dh::loadNbtInstances (this, filelist);
-}
-
-void
-MainWindow::brBtn_clicked ()
-{
-  auto region = dh::getRegion (this, mr, false);
-  if (region != -1)
-    {
-      auto brui = new BlockReaderUI (region, mr);
-      brui->setAttribute (Qt::WA_DeleteOnClose);
-      brui->show ();
-    }
-}
-
-void
-MainWindow::mrBtn_clicked ()
-{
-  mr->show ();
-  mr->activateWindow ();
-  mr->raise ();
-}
-
-void
-MainWindow::mrBtn_2_clicked ()
-{
-  auto region = dh::getRegion (this, mr, true);
-  if (region != -1)
-    {
-      auto rmui = new RegionModifyUI (region, mr);
-      rmui->setAttribute (Qt::WA_DeleteOnClose);
-      rmui->show ();
-    }
-}
-
-void
-MainWindow::showabout ()
-{
-  QString text = _ ("Version: ");
-  text += QString::number (DHLRC_COMPILE_DATE);
-  QMessageBox::about (this, _ ("About"), text);
-}
-
-void
-MainWindow::groupBtn_clicked (int id)
-{
-  // typedef void *(*newFunc) ();
-  // std::function func
-  //     = reinterpret_cast<newFunc> (modules[id]->module_functions->pdata[0]);
-  // void *newWin = func ();
-  // if (newWin)
-  //   {
-  //     auto win = static_cast<QWidget *> (newWin);
-  //     win->show ();
-  //     connect (this, &MainWindow::winClose, win, &QWidget::close);
-  //   }
-}
-
-void
-MainWindow::nbtBtn_clicked ()
-{
-  auto enrui = new ExternalNbtReaderUI ();
-  enrui->setAttribute (Qt::WA_DeleteOnClose);
-  enrui->show ();
 }

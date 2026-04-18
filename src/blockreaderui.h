@@ -2,8 +2,9 @@
 #define BLOCKREADERUI_H
 
 #include "blockshowui.h"
+#include "manageregionui.h"
+
 #include <QWidget>
-#include <manage.h>
 
 // #include "blockshowui.h"
 
@@ -19,7 +20,7 @@ class BlockReaderUI : public QWidget
   Q_OBJECT
 
 public:
-  BlockReaderUI (int index, dh::ManageRegion *mr, QWidget *parent = nullptr);
+  BlockReaderUI (int index, ManageRegionUI *mr, QWidget *parent = nullptr);
   ~BlockReaderUI ();
 
 private:

@@ -7,6 +7,7 @@
 #include <QApplication>
 #include <QCheckBox>
 #include <QFileDialog>
+#include <QMessageBox>
 #include <QPushButton>
 
 ManageRegionUI::ManageRegionUI (QWidget *mainWindow, QWidget *parent)
@@ -105,6 +106,8 @@ ManageRegionUI::~ManageRegionUI ()
   for (auto &widget : itemFrames)
     delete widget;
   itemFrames.clear ();
+  for (auto &library : modules)
+    delete library;
 }
 
 void
@@ -155,7 +158,11 @@ ItemFrame::ItemFrame (RegionClass *region, int index, QWidget *parent)
   checkBox->setSizePolicy (QSizePolicy::Fixed, QSizePolicy::Fixed);
   layout->addWidget (checkBox);
 
-  nameLabel = new QLabel (region->get_name ());
+  QString regionLockedName = _ ("Locked!");
+  if (region->get_lock_status ())
+    nameLabel = new QLabel (regionLockedName);
+  else
+    nameLabel = new QLabel (region->get_name ());
   uuidLabel = new QLabel (region->get_uuid ());
   timeLabel = new QLabel (region->get_date_time ().toString ());
   labelLayout = new QVBoxLayout ();
@@ -164,8 +171,8 @@ ItemFrame::ItemFrame (RegionClass *region, int index, QWidget *parent)
   labelLayout->addWidget (timeLabel);
   layout->addLayout (labelLayout);
   QString stylesheet
-          = "QFrame #%1 {border-radius:%2;border-style:solid;border-"
-            "width:%3;border-color:%4;background-color:%5;}";
+      = "QFrame #%1 {border-radius:%2;border-style:solid;border-"
+        "width:%3;border-color:%4;background-color:%5;}";
   QString realsheet
       = stylesheet.arg (objectName ())
             .arg (DhConfig::borderRadius ())
