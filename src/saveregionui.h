@@ -28,7 +28,7 @@ class SaveRegionUI : public LoadObjectUI
   Q_OBJECT
 
 public:
-  explicit SaveRegionUI (const QList<std::weak_ptr<RegionClass>> &list,
+  explicit SaveRegionUI (const QList<std::shared_ptr<RegionClass>> &list,
                          const QString &outputDir, singleTransFunc func,
                          QLibrary *library, QWidget *parent = nullptr);
   ~SaveRegionUI () override;
@@ -42,7 +42,7 @@ private:
   std::condition_variable cv;
   QString currentRegion;
   const void *cancel_flag;
-  QList<std::weak_ptr<RegionClass>> list;
+  QList<std::shared_ptr<RegionClass>> list;
   QStringList failedList;
   QStringList failedReason;
   QString outputDir;
@@ -50,6 +50,7 @@ private:
   multiTransFunc multiFunc = nullptr;
   QLibrary *library = nullptr;
   void *configObject = nullptr;
+  std::vector<std::unique_ptr<AutoLocker>> locks;
 
 public Q_SLOTS:
   void process ();

@@ -9,57 +9,15 @@
 
 #include "dhconfigdialog/src/dhconfigtemplates.h"
 #include <QLineEdit>
+#include <QResizeEvent>
 #include <QSortFilterProxyModel>
 #include <QTabBar>
-
-class DhFrameControlConfigTemplate : public DhBoolConfigTemplate
-{
-public:
-  DhFrameControlConfigTemplate (KConfigSkeletonItem *item, QVBoxLayout *layout,
-                                DhConfigDialog *dialog)
-      : DhBoolConfigTemplate (item, layout, dialog)
-  {
-    auto changeFunc = [dialog] (Qt::CheckState state)
-      {
-        if (state == Qt::Checked)
-          {
-            for (const auto &i : dialog->templates)
-              {
-                if (i->item == DhConfig::self ()->backgroundColorItem ()
-                    || i->item == DhConfig::self ()->borderColorItem ()
-                    || i->item == DhConfig::self ()->borderRadiusItem ()
-                    || i->item == DhConfig::self ()->borderWidthItem ())
-                  i->widget->setEnabled (false);
-                else if (i->item
-                         == DhConfig::self ()->customFrameStylesheetItem ())
-                  i->widget->setEnabled (true);
-              }
-          }
-        else if (state == Qt::Unchecked)
-          {
-            for (const auto &i : dialog->templates)
-              {
-                if (i->item == DhConfig::self ()->backgroundColorItem ()
-                    || i->item == DhConfig::self ()->borderColorItem ()
-                    || i->item == DhConfig::self ()->borderRadiusItem ()
-                    || i->item == DhConfig::self ()->borderWidthItem ())
-                  i->widget->setEnabled (true);
-                else if (i->item
-                         == DhConfig::self ()->customFrameStylesheetItem ())
-                  i->widget->setEnabled (false);
-              }
-          }
-      };
-    changeFunc (qobject_cast<QCheckBox *> (widget)->checkState ());
-    QObject::connect (qobject_cast<QCheckBox *> (widget),
-                      &QCheckBox::checkStateChanged, dialog, changeFunc);
-  }
-};
 
 MainWindow::MainWindow (QWidget *parent) : QMainWindow (parent)
 {
   splitter = new QSplitter (this);
   setCentralWidget (splitter);
+
   leftWidget = new QWidget ();
   leftLayout = new QVBoxLayout ();
   leftWidget->setLayout (leftLayout);
@@ -88,6 +46,8 @@ MainWindow::MainWindow (QWidget *parent) : QMainWindow (parent)
   splitter->addWidget (tabWidget);
   splitter->setCollapsible (1, false);
 
+  splitter->setStretchFactor (0, 0);
+  splitter->setStretchFactor (1, 1);
   model = new QStandardItemModel (this);
 
   model->appendRow (new QStandardItem (_ ("NBT File Reader")));
@@ -100,18 +60,7 @@ MainWindow::MainWindow (QWidget *parent) : QMainWindow (parent)
 
   dialog = new DhConfigDialog (DhConfig::self (), "dhlrcrc", true, this);
   dialog->addAssistant (std::make_unique<DhSetConfigAssistant> ());
-  dialog->addAssistant (std::make_unique<DhSetColorConfigAssistant> (this));
   dialog->addLongTextItems ("Description");
-  dialog->addLongTextItems ("CustomFrameStylesheet");
-
-  dialog->addTemplateByItem (
-      DhConfig::self ()->enableCustomFrameStylesheetItem (),
-      [] (KConfigSkeletonItem *item, QVBoxLayout *layout,
-          DhConfigDialog *dialog)
-        {
-          return std::make_unique<DhFrameControlConfigTemplate> (item, layout,
-                                                                 dialog);
-        });
 
   connect (lineEdit, &QLineEdit::textChanged, this,
            [&] (const QString &pattern)
@@ -157,15 +106,22 @@ MainWindow::MainWindow (QWidget *parent) : QMainWindow (parent)
                  }
              });
   connect (tabWidget, &QTabWidget::tabCloseRequested, this,
-           [&] (int index)
-             {
-               delete tabWidget->widget (index);
-               tabWidget->removeTab (index);
-             });
+           [&] (int index) { delete tabWidget->widget (index); });
 }
 
 MainWindow::~MainWindow ()
 {
+  for (int i = tabWidget->count () - 1; i >= 0; i--)
+    {
+      if (tabWidget->widget (i) != mrui)
+        delete tabWidget->widget (i);
+    }
   delete mrui;
   delete dialog;
+}
+
+void
+MainWindow::resizeEvent (QResizeEvent *event)
+{
+  QMainWindow::resizeEvent (event);
 }

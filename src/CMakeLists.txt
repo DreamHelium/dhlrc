@@ -69,6 +69,8 @@ set(TEMP_PROJECT_SOURCES
         manageregionui.cpp
         manageregionui.h
         mainwindow.h mainwindow.cpp
+        dhpushbutton.cpp
+        dhpushbutton.h
 )
 
 ki18n_wrap_ui(TEMP_PROJECT_SOURCES ${ui_files})

@@ -29,8 +29,10 @@ NbtReaderUI::NbtReaderUI (const void *nbt, bool fromFile, QWidget *parent)
           if (!selection.isEmpty ())
             {
               auto index = selection.indexes ()[0];
-              auto typeItem
-                  = model->data (index, Qt::UserRole + 2).toString ();
+              auto typeItem = gettext (model->data (index, Qt::UserRole + 2)
+                                           .toString ()
+                                           .toUtf8 ()
+                                           .constData ());
               ui->typeLabel->setText (typeItem);
               auto keyItem = model->data (index, Qt::DisplayRole).toString ();
               ui->keyLabel->setText (keyItem);

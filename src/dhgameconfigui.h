@@ -29,21 +29,4 @@ public:
   }
 };
 
-class DhSetColorConfigAssistant : public DhHelpAssistant
-{
-public:
-  explicit DhSetColorConfigAssistant (MainWindow *mainWindow = nullptr)
-      : mw (mainWindow)
-  {
-  }
-  void
-  applyHelp () const override
-  {
-    mw->mrui->itemFrameChangeColor ();
-  }
-
-private:
-  MainWindow *mw;
-};
-
 #endif // DHLRC_DHGAMECONFIGUI_H

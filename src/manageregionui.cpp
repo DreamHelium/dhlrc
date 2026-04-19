@@ -1,8 +1,11 @@
 #include "manageregionui.h"
 
+#include "generalchoosedialog.h"
 #include "loadregionui.h"
 #include "mainwindow.h"
-#include "settings.h"
+#include "saveregionui.h"
+
+#include <QInputDialog>
 
 #include <QApplication>
 #include <QCheckBox>
@@ -28,6 +31,44 @@ ManageRegionUI::ManageRegionUI (QWidget *mainWindow, QWidget *parent)
         {
           delete library;
           library = nullptr;
+        }
+      if (library)
+        {
+          auto nameFn = reinterpret_cast<const char *(*)()> (
+              library->resolve ("region_type"));
+          auto name = nameFn ();
+          auto multiFn = reinterpret_cast<int (*) ()> (
+              library->resolve ("region_is_multi"));
+          if (multiFn && multiFn ())
+            {
+              auto transMultiFn = reinterpret_cast<multiTransFunc> (
+                  library->resolve ("region_save_into_multi"));
+              auto singleTransFn = reinterpret_cast<singleTransFunc> (
+                  library->resolve ("region_save"));
+              if (singleTransFn)
+                {
+                  supportList << name;
+                  libraries << library;
+                  singleFuncList << singleTransFn;
+                }
+              if (transMultiFn)
+                multiFuncList << transMultiFn;
+              else
+                multiFuncList << nullptr;
+            }
+          else
+            {
+              auto transFn = reinterpret_cast<singleTransFunc> (
+                  library->resolve ("region_save"));
+              if (transFn)
+                {
+                  supportList << name;
+                  libraries << library;
+                  singleFuncList << transFn;
+                  multiFuncList << nullptr;
+                }
+            }
+          string_free (name);
         }
 
       // if (library)
@@ -57,12 +98,13 @@ ManageRegionUI::ManageRegionUI (QWidget *mainWindow, QWidget *parent)
 
   btnLayout = new QHBoxLayout ();
 
-  settingButton = new QPushButton (_ ("&Settings"));
-  settingButton->setIcon (QIcon::fromTheme ("settings-configure"));
+  selectButton = new DhPushButton (_ ("&Select"));
+  selectButton->setIcon (QIcon::fromTheme ("edit-select"));
+
+  btnLayout->addWidget (selectButton);
   addButton = new QPushButton (_ ("&Add"));
   addButton->setIcon (QIcon::fromTheme ("list-add"));
   btnLayout->addStretch ();
-  btnLayout->addWidget (settingButton);
   btnLayout->addWidget (addButton);
 
   layout->addLayout (btnLayout);
@@ -91,11 +133,15 @@ ManageRegionUI::ManageRegionUI (QWidget *mainWindow, QWidget *parent)
                    lrui->show ();
                  }
              });
-  connect (settingButton, &QPushButton::clicked, this,
+  connect (selectButton, &DhPushButton::clicked, this,
            [&]
              {
-               qobject_cast<MainWindow *> (this->mainWindow)
-                   ->dialog->show (_ ("Manage"));
+               for (auto &widget : itemFrames)
+                 {
+                   widget->setCheckBoxVisible (!selectButton->isDown ());
+                   widget->setButtonEnable (selectButton->isDown ());
+                 }
+               selectButton->setDown (!selectButton->isDown ());
              });
 }
 
@@ -111,21 +157,49 @@ ManageRegionUI::~ManageRegionUI ()
 }
 
 void
-ManageRegionUI::itemFrameChangeColor ()
+ManageRegionUI::save (const QList<int> &list)
 {
-  for (auto &widget : itemFrames)
+  auto saveIndex = GeneralChooseDialog::getIndex (
+      _ ("Choose Save Option"),
+      _ ("Choose whether format you want to save to."), supportList, this);
+  if (saveIndex != -1)
     {
-      QString stylesheet
-          = "QFrame #%1 {border-radius:%2;border-style:solid;border-"
-            "width:%3;border-color:%4;background-color:%5;}";
-      QString realsheet
-          = stylesheet.arg (widget->objectName ())
-                .arg (DhConfig::borderRadius ())
-                .arg (DhConfig::borderWidth ())
-                .arg (DhConfig::borderColor ().name (QColor::HexArgb))
-                .arg (DhConfig::backgroundColor ().name (QColor::HexArgb));
-      widget->setStyleSheet (realsheet);
+      bool useMulti = false;
+      if (multiFuncList[saveIndex] != nullptr)
+        {
+          auto btn = QMessageBox::question (this, _ ("Use MultiFunc?"),
+                                            _ ("This type supports regions to "
+                                               "save as one file, do you want "
+                                               "to use it?"));
+          if (btn == QMessageBox::Ok)
+            useMulti = true;
+        }
+      if (useMulti)
+        { /* TODO */
+        }
+      else
+        {
+          auto dir = QFileDialog::getExistingDirectory (
+              this, _ ("Select Directory"));
+          if (!dir.isEmpty ())
+            {
+              QList<std::shared_ptr<RegionClass>> transRegions;
+              for (auto index : list)
+                transRegions << regions[index];
+              auto srui = new SaveRegionUI (transRegions, dir,
+                                            singleFuncList[saveIndex],
+                                            libraries[saveIndex]);
+              srui->setAttribute (Qt::WA_DeleteOnClose);
+              srui->show ();
+            }
+        }
     }
+}
+
+bool
+ManageRegionUI::selectButtonIsDown ()
+{
+  return selectButton->isDown ();
 }
 
 void
@@ -140,22 +214,28 @@ ManageRegionUI::refresh_triggered ()
   int i = 0;
   for (auto &region : regions)
     {
-      auto frame = new ItemFrame (region.get (), i);
+      auto frame = new ItemFrame (region.get (), i, this);
+      if (region->get_lock_status ())
+        {
+          frame->setCheckBoxEnabled (false);
+          frame->setButtonEnable (false);
+        }
       frameLayout->addWidget (frame);
       itemFrames.append (frame);
       i++;
     }
 }
 
-ItemFrame::ItemFrame (RegionClass *region, int index, QWidget *parent)
-    : QFrame (parent)
+ItemFrame::ItemFrame (RegionClass *region, int index, ManageRegionUI *mrui,
+                      QWidget *parent)
+    : QFrame (parent), index (index), region (region), mrui (mrui)
 {
-  auto objname = QString ("ItemFrame") + QString::number (index);
-  setObjectName (objname);
   setSizePolicy (QSizePolicy::Preferred, QSizePolicy::Fixed);
-  layout = new QHBoxLayout (this);
+  allLayout = new QVBoxLayout (this);
+  layout = new QHBoxLayout ();
   checkBox = new QCheckBox ();
   checkBox->setSizePolicy (QSizePolicy::Fixed, QSizePolicy::Fixed);
+  checkBox->setVisible (mrui->selectButtonIsDown ());
   layout->addWidget (checkBox);
 
   QString regionLockedName = _ ("Locked!");
@@ -170,16 +250,82 @@ ItemFrame::ItemFrame (RegionClass *region, int index, QWidget *parent)
   labelLayout->addWidget (uuidLabel);
   labelLayout->addWidget (timeLabel);
   layout->addLayout (labelLayout);
-  QString stylesheet
-      = "QFrame #%1 {border-radius:%2;border-style:solid;border-"
-        "width:%3;border-color:%4;background-color:%5;}";
-  QString realsheet
-      = stylesheet.arg (objectName ())
-            .arg (DhConfig::borderRadius ())
-            .arg (DhConfig::borderWidth ())
-            .arg (DhConfig::borderColor ().name (QColor::HexArgb))
-            .arg (DhConfig::backgroundColor ().name (QColor::HexArgb));
-  setStyleSheet (realsheet);
+
+  renameBtn = new QPushButton ();
+  renameBtn->setIcon (QIcon::fromTheme ("edit-rename"));
+  renameBtn->setFlat (true);
+  renameBtn->setSizePolicy (QSizePolicy::Fixed, QSizePolicy::Fixed);
+  renameBtn->setEnabled (!mrui->selectButtonIsDown ());
+  removeBtn = new QPushButton ();
+  removeBtn->setIcon (QIcon::fromTheme ("list-remove"));
+  removeBtn->setFlat (true);
+  removeBtn->setSizePolicy (QSizePolicy::Fixed, QSizePolicy::Fixed);
+  removeBtn->setEnabled (!mrui->selectButtonIsDown ());
+  saveBtn = new QPushButton ();
+  saveBtn->setIcon (QIcon::fromTheme ("document-save"));
+  saveBtn->setFlat (true);
+  saveBtn->setSizePolicy (QSizePolicy::Fixed, QSizePolicy::Fixed);
+  saveBtn->setEnabled (!mrui->selectButtonIsDown ());
+
+  layout->addWidget (renameBtn);
+  layout->addWidget (removeBtn);
+  layout->addWidget (saveBtn);
+  allLayout->addLayout (layout);
+  auto line = new QFrame ();
+  line->setFrameStyle (QFrame::HLine);
+  allLayout->addWidget (line);
+  connect (renameBtn, &QPushButton::clicked, this,
+           [&, mrui, index]
+             {
+               auto newName = QInputDialog::getText (
+                   this, _ ("Input a New Name"),
+                   _ ("Please input a new name for the region."),
+                   QLineEdit::Normal, mrui->getRegions ()[index]->get_name ());
+               if (!newName.isEmpty ())
+                 mrui->getRegions ()[index]->setName (newName);
+             });
+  connect (removeBtn, &QPushButton::clicked, this,
+           [&, mrui, index]
+             {
+               if (!this->mrui->getRegions ()[index]->get_lock_status ())
+                 this->mrui->getRegions ().erase (mrui->getRegions ().begin ()
+                                                  + index);
+               mrui->refresh_triggered ();
+             });
+  connect (saveBtn, &QPushButton::clicked, this,
+           [&, mrui, index] { mrui->save ({ index }); });
 }
 
 ItemFrame::~ItemFrame () = default;
+
+void
+ItemFrame::setButtonEnable (bool enable)
+{
+  renameBtn->setEnabled (enable);
+  removeBtn->setEnabled (enable);
+  saveBtn->setEnabled (enable);
+}
+
+bool
+ItemFrame::buttonEnabled ()
+{
+  return renameBtn->isEnabled ();
+}
+
+void
+ItemFrame::setCheckBoxVisible (bool visible)
+{
+  checkBox->setVisible (visible);
+}
+
+bool
+ItemFrame::checkBoxVisible ()
+{
+  return checkBox->isVisible ();
+}
+
+void
+ItemFrame::setCheckBoxEnabled (bool enable)
+{
+  checkBox->setEnabled (enable);
+}

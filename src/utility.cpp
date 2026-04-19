@@ -25,16 +25,16 @@ dh::getRegion (QWidget *widget, ManageRegionUI *mr, bool write)
                              _ ("Manage Region window is not initialized"));
       return -1;
     }
-  auto realList = mr->regionNames ();
+  auto realList = mr->getRegions ();
   QStringList nameList;
   for (const auto &i : realList)
-    nameList.append (i.name);
+    nameList.append (i->get_lock_status () ? _ ("Locked") : i->get_name ());
   int ret = GeneralChooseDialog::getIndex (
       _ ("Select Region"), _ ("Please select a region."), nameList);
 
   if (ret != -1)
     {
-      if (realList[ret].unlocked)
+      if (!realList[ret]->get_lock_status ())
         return ret;
       else
         {

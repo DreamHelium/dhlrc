@@ -1,6 +1,7 @@
 #ifndef DHLRC_MANAGEREGIONUI_H
 #define DHLRC_MANAGEREGIONUI_H
 
+#include "dhpushbutton.h"
 #include "region.h"
 
 #include <KColorButton>
@@ -20,6 +21,9 @@
 #define _(str) gettext (str)
 
 static QString emptyString{};
+using multiTransFunc = const char *(*)(void *, size_t, const char *);
+using singleTransFunc = const char *(*)(void *, const char *, void *,
+                                        ProgressFunc, void *, const void *);
 
 class RegionClass
 {
@@ -72,10 +76,7 @@ public:
   const QString &
   get_name ()
   {
-    if (get_lock_status ())
-      return emptyString;
-    else
-      return name;
+    return name;
   }
   const QString &
   get_uuid ()
@@ -90,10 +91,7 @@ public:
   void *
   get_region ()
   {
-    if (!get_lock_status ())
-      return region.get ();
-    else
-      return nullptr;
+    return region.get ();
   }
   void
   notify ()
@@ -117,6 +115,15 @@ public:
           notifyStructs.erase (notifyStructs.begin () + i);
       }
   }
+  void
+  setName (const QString &newName)
+  {
+    if (!get_lock_status ())
+      {
+        name = newName;
+        notify ();
+      }
+  }
 };
 
 class AutoLocker
@@ -134,6 +141,7 @@ public:
     region_class.change_lock_status (true);
     region_class.notify ();
   }
+
   ~AutoLocker ()
   {
     region_class.change_lock_status (false);
@@ -147,7 +155,6 @@ using Region = struct Region
   QString name;
   QString uuid;
   QDateTime dateTime;
-  std::unique_ptr<QReadWriteLock> lock;
 };
 
 using NameAndLocked = struct NameAndLocked
@@ -162,8 +169,7 @@ class ManageRegionUI : public QWidget
   Q_OBJECT
 public:
   explicit ManageRegionUI (QWidget *mainWindow, QWidget *parent = nullptr);
-  ~ManageRegionUI ();
-  void itemFrameChangeColor ();
+  ~ManageRegionUI () override;
   static void
   notify_func (void *main_klass)
   {
@@ -214,10 +220,13 @@ public:
       }
     return list;
   }
+  void save (const QList<int> &list);
+  bool selectButtonIsDown ();
 
 private:
   std::vector<std::shared_ptr<RegionClass>> regions = {};
   QList<QLibrary *> modules = {};
+  DhPushButton *selectButton;
   QPushButton *addButton;
   QVBoxLayout *layout;
   QHBoxLayout *btnLayout;
@@ -226,9 +235,13 @@ private:
   QWidget *scrollAreaWidget;
   QMainWindow *mainWindow;
 
-  QPushButton *settingButton;
   QList<ItemFrame *> itemFrames;
   KMessageWidget *messageWidget;
+
+  QStringList supportList;
+  QList<multiTransFunc> multiFuncList;
+  QList<singleTransFunc> singleFuncList;
+  QList<QLibrary *> libraries;
 
 public Q_SLOTS:
   void refresh_triggered ();
@@ -238,17 +251,29 @@ class ItemFrame : public QFrame
 {
   Q_OBJECT
 public:
-  explicit ItemFrame (RegionClass *region, int index,
+  explicit ItemFrame (RegionClass *region, int index, ManageRegionUI *mrui,
                       QWidget *parent = nullptr);
   ~ItemFrame ();
+  void setButtonEnable (bool enable);
+  bool buttonEnabled ();
+  void setCheckBoxVisible (bool visible);
+  bool checkBoxVisible ();
+  void setCheckBoxEnabled (bool enable);
 
 private:
+  ManageRegionUI *mrui;
+  QVBoxLayout *allLayout;
   QHBoxLayout *layout;
   QCheckBox *checkBox;
   QVBoxLayout *labelLayout;
   QLabel *nameLabel;
   QLabel *uuidLabel;
   QLabel *timeLabel;
+  int index;
+  QPushButton *renameBtn;
+  QPushButton *removeBtn;
+  QPushButton *saveBtn;
+  RegionClass *region;
 };
 
 #endif // DHLRC_MANAGEREGIONUI_H

@@ -32,6 +32,9 @@ private:
   QTabWidget *tabWidget;
   QStandardItemModel *model;
   QAction *actionSearch;
+
+protected:
+  void resizeEvent (QResizeEvent *event) override;
 };
 
 #endif // DHLRC_DEBUGLOADINGUI_H
