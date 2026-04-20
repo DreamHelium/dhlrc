@@ -48,13 +48,10 @@ private:
 
 public:
   explicit RegionClass (void *region, const QString &name, const QString &uuid,
-                        const QDateTime &dateTime, NotifyFunc func,
-                        void *main_klass)
+                        const QDateTime &dateTime)
       : region (region, region_free), name (name), uuid (uuid),
         dateTime (dateTime), internalLock (std::make_unique<InternalLock> ())
   {
-    if (func && main_klass)
-      notifyStructs.emplace_back (func, main_klass);
   }
   ~RegionClass () = default;
   RegionClass (RegionClass &&) noexcept = default;
@@ -176,56 +173,15 @@ public:
     auto mr = static_cast<ManageRegionUI *> (main_klass);
     mr->refresh_triggered ();
   }
-  qsizetype
-  moduleNum ()
-  {
-    return modules.count ();
-  }
-  QLibrary *
-  getModule (qsizetype i)
-  {
-    if (i < modules.count ())
-      return modules.at (i);
-    else
-      return nullptr;
-  }
-  void
-  appendRegion (void *region, const QString &name)
-  {
-    regions.emplace_back (std::make_shared<RegionClass> (
-        region, name, QUuid::createUuid ().toString (QUuid::WithoutBraces),
-        QDateTime::currentDateTime (), notify_func, this));
-  }
-  qsizetype
-  regionNum ()
-  {
-    return regions.size ();
-  }
-  auto &
-  getRegions ()
-  {
-    return regions;
-  }
-  QList<NameAndLocked>
-  regionNames ()
-  {
-    QList<NameAndLocked> list;
-    for (auto &r : regions)
-      {
-        auto r_name = r->get_name ();
-        if (!r_name.isEmpty ())
-          list.append ({ r_name, true });
-        else
-          list.append ({ _ ("Locked!"), false });
-      }
-    return list;
-  }
+  static qsizetype moduleNum ();
+  static QLibrary *getModule (qsizetype i);
+  static void appendRegion (void *region, const QString &name);
+  static qsizetype regionNum ();
+  static std::vector<std::shared_ptr<RegionClass>> &getRegions ();
   void save (const QList<int> &list);
   bool selectButtonIsDown ();
 
 private:
-  std::vector<std::shared_ptr<RegionClass>> regions = {};
-  QList<QLibrary *> modules = {};
   DhPushButton *selectButton;
   QPushButton *addButton;
   QVBoxLayout *layout;

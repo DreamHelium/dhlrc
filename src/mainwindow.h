@@ -21,6 +21,7 @@ public:
   ~MainWindow () override;
   ManageRegionUI *mrui = new ManageRegionUI (this);
   DhConfigDialog *dialog = nullptr;
+  void addWidgetToToolBar (QWidget *widget);
 
 private:
   QSplitter *splitter;
@@ -32,6 +33,9 @@ private:
   QTabWidget *tabWidget;
   QStandardItemModel *model;
   QAction *actionSearch;
+  QWidget *container;
+  QVBoxLayout *topLayout;
+  QVBoxLayout *allLayout;
 
 protected:
   void resizeEvent (QResizeEvent *event) override;

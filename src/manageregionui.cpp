@@ -1,5 +1,6 @@
 #include "manageregionui.h"
 
+#include "dhloadjob.h"
 #include "generalchoosedialog.h"
 #include "loadregionui.h"
 #include "mainwindow.h"
@@ -12,6 +13,9 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QPushButton>
+
+Q_GLOBAL_STATIC (QList<QLibrary *>, modules)
+Q_GLOBAL_STATIC (std::vector<std::shared_ptr<RegionClass>>, regions)
 
 ManageRegionUI::ManageRegionUI (QWidget *mainWindow, QWidget *parent)
     : QWidget (parent), mainWindow (qobject_cast<QMainWindow *> (mainWindow))
@@ -26,7 +30,7 @@ ManageRegionUI::ManageRegionUI (QWidget *mainWindow, QWidget *parent)
       QString realDir = moduleDir + QDir::toNativeSeparators ("/") + module;
       auto library = new QLibrary (realDir);
       if (library->load ())
-        modules.append (library);
+        modules->append (library);
       else
         {
           delete library;
@@ -128,9 +132,12 @@ ManageRegionUI::ManageRegionUI (QWidget *mainWindow, QWidget *parent)
                                         _ ("No file selected!"));
                else
                  {
-                   auto lrui = new LoadRegionUI (dirs, this);
-                   lrui->setAttribute (Qt::WA_DeleteOnClose);
-                   lrui->show ();
+                   auto job = new DhAllLoadJob (
+                       dirs, qobject_cast<QMainWindow *> (this->mainWindow), this);
+                   job->start ();
+                   // auto lrui = new LoadRegionUI (dirs, this);
+                   // lrui->setAttribute (Qt::WA_DeleteOnClose);
+                   // lrui->show ();
                  }
              });
   connect (selectButton, &DhPushButton::clicked, this,
@@ -152,8 +159,43 @@ ManageRegionUI::~ManageRegionUI ()
   for (auto &widget : itemFrames)
     delete widget;
   itemFrames.clear ();
-  for (auto &library : modules)
+  for (auto &library : *modules)
     delete library;
+}
+
+qsizetype
+ManageRegionUI::moduleNum ()
+{
+  return modules->count ();
+}
+
+QLibrary *
+ManageRegionUI::getModule (qsizetype i)
+{
+  if (i < modules->count ())
+    return modules->at (i);
+  else
+    return nullptr;
+}
+
+void
+ManageRegionUI::appendRegion (void *region, const QString &name)
+{
+  regions->emplace_back (std::make_shared<RegionClass> (
+      region, name, QUuid::createUuid ().toString (QUuid::WithoutBraces),
+      QDateTime::currentDateTime ()));
+}
+
+qsizetype
+ManageRegionUI::regionNum ()
+{
+  return regions->size ();
+}
+
+std::vector<std::shared_ptr<RegionClass>> &
+ManageRegionUI::getRegions ()
+{
+  return *regions;
 }
 
 void
@@ -185,7 +227,7 @@ ManageRegionUI::save (const QList<int> &list)
             {
               QList<std::shared_ptr<RegionClass>> transRegions;
               for (auto index : list)
-                transRegions << regions[index];
+                transRegions << (*regions)[index];
               auto srui = new SaveRegionUI (transRegions, dir,
                                             singleFuncList[saveIndex],
                                             libraries[saveIndex]);
@@ -212,7 +254,7 @@ ManageRegionUI::refresh_triggered ()
   itemFrames.clear ();
 
   int i = 0;
-  for (auto &region : regions)
+  for (auto &region : *regions)
     {
       auto frame = new ItemFrame (region.get (), i, this);
       if (region->get_lock_status ())

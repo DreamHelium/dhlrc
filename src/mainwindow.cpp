@@ -12,11 +12,18 @@
 #include <QResizeEvent>
 #include <QSortFilterProxyModel>
 #include <QTabBar>
+#include <QToolBar>
 
 MainWindow::MainWindow (QWidget *parent) : QMainWindow (parent)
 {
-  splitter = new QSplitter (this);
-  setCentralWidget (splitter);
+  container = new QWidget ();
+  allLayout = new QVBoxLayout ();
+  container->setLayout (allLayout);
+  topLayout = new QVBoxLayout;
+  allLayout->addLayout (topLayout);
+  splitter = new QSplitter ();
+  allLayout->addWidget (splitter);
+  setCentralWidget (container);
 
   leftWidget = new QWidget ();
   leftLayout = new QVBoxLayout ();
@@ -118,6 +125,12 @@ MainWindow::~MainWindow ()
     }
   delete mrui;
   delete dialog;
+}
+
+void
+MainWindow::addWidgetToToolBar (QWidget *widget)
+{
+  topLayout->addWidget (widget);
 }
 
 void
