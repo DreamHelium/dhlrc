@@ -280,7 +280,7 @@ DhAllLoadJob::DhAllLoadJob (QStringList list, QMainWindow *mainWindow,
     : KCompositeJob (parent), cancel_flag (cancel_flag_new ()),
       mainWindow (mainWindow), mrui (mrui)
 {
-  auto realWindow = qobject_cast<MainWindow *> (mainWindow);
+  auto realWindow = qobject_cast<MainWindow *> (this->mainWindow);
   connect (this, &DhAllLoadJob::cancel, this,
            [&] { cancel_flag_cancel (this->cancel_flag); });
   jobNums = list.length ();
@@ -293,7 +293,7 @@ DhAllLoadJob::DhAllLoadJob (QStringList list, QMainWindow *mainWindow,
   connect (this, &DhAllLoadJob::percentChanged, this,
            [&]
              {
-               QString textb = _ ("Fininsh processing %1 of %2 (%3).");
+               QString textb = _ ("Fininsh processing %1 of %2 (%3%).");
                textb = textb.arg (this->finishedJobs)
                            .arg (this->jobNums)
                            .arg (percent ());
@@ -314,6 +314,9 @@ DhAllLoadJob::DhAllLoadJob (QStringList list, QMainWindow *mainWindow,
                    if (!failedText.isEmpty ())
                      {
                        auto failedWidget = new KMessageWidget ();
+                       connect (failedWidget,
+                                &KMessageWidget::hideAnimationFinished,
+                                failedWidget, &KMessageWidget::deleteLater);
                        qobject_cast<MainWindow *> (this->mainWindow)
                            ->addWidgetToToolBar (failedWidget);
                        failedWidget->setMessageType (KMessageWidget::Error);
@@ -332,21 +335,24 @@ DhAllLoadJob::DhAllLoadJob (QStringList list, QMainWindow *mainWindow,
                  });
       job->messageWidget = new KMessageWidget ();
       job->messageWidget->setCloseButtonVisible (false);
+      connect (job->messageWidget, &KMessageWidget::hideAnimationFinished,
+               job->messageWidget, &KMessageWidget::deleteLater);
       realWindow->addWidgetToToolBar (job->messageWidget);
       connect (
           job, &DhLoadJob::infoMessage, this,
           [&, i] (KJob *realjob, const QString &str)
             {
-              QString realStr = QString::number (i) + ": " + str;
+              QString realStr = "%1: %2 (%3%)";
+              realStr = realStr.arg (i).arg (str).arg (realjob->percent ());
               qobject_cast<DhLoadJob *> (realjob)->messageWidget->setText (
                   realStr);
             });
-      connect (job, &DhLoadJob::result, job,
-               [job] { job->messageWidget->deleteLater (); });
+      connect (job, &DhLoadJob::result, job->messageWidget,
+               &KMessageWidget::animatedHide);
       connect (job, &DhLoadJob::selfSuspended, this,
                [&] (KJob *realJob)
                  {
-                   auto castedJob = static_cast<DhLoadJob *> (realJob);
+                   auto castedJob = qobject_cast<DhLoadJob *> (realJob);
                    QAction *action = new QAction (_ ("Continue"));
                    connect (action, &QAction::triggered, castedJob,
                             &DhLoadJob::doResume);
@@ -355,7 +361,7 @@ DhAllLoadJob::DhAllLoadJob (QStringList list, QMainWindow *mainWindow,
       connect (job, &DhLoadJob::selfResumed, this,
                [&] (KJob *realJob)
                  {
-                   auto castedJob = static_cast<DhLoadJob *> (realJob);
+                   auto castedJob = qobject_cast<DhLoadJob *> (realJob);
                    castedJob->messageWidget->clearActions ();
                  });
       i++;

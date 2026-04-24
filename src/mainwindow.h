@@ -24,6 +24,9 @@ public:
   void addWidgetToToolBar (QWidget *widget);
 
 private:
+  QScrollArea *scrollArea;
+  QWidget *topWidget;
+  QSplitter *allSplitter;
   QSplitter *splitter;
   QWidget *leftWidget;
   QVBoxLayout *leftLayout;
@@ -33,12 +36,13 @@ private:
   QTabWidget *tabWidget;
   QStandardItemModel *model;
   QAction *actionSearch;
-  QWidget *container;
   QVBoxLayout *topLayout;
-  QVBoxLayout *allLayout;
 
-protected:
-  void resizeEvent (QResizeEvent *event) override;
+public Q_SLOTS:
+  void tryShrinkTopWidget ();
+
+public:
+  bool eventFilter (QObject *object, QEvent *event) override;
 };
 
 #endif // DHLRC_DEBUGLOADINGUI_H

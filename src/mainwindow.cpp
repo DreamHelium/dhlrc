@@ -16,14 +16,25 @@
 
 MainWindow::MainWindow (QWidget *parent) : QMainWindow (parent)
 {
-  container = new QWidget ();
-  allLayout = new QVBoxLayout ();
-  container->setLayout (allLayout);
+  resize (400, 400);
+
+  scrollArea = new QScrollArea ();
+  scrollArea->setWidgetResizable (true);
+  topWidget = new QWidget ();
+  scrollArea->setWidget (topWidget);
   topLayout = new QVBoxLayout;
-  allLayout->addLayout (topLayout);
+  topWidget->installEventFilter (this);
+  topWidget->setLayout (topLayout);
   splitter = new QSplitter ();
-  allLayout->addWidget (splitter);
-  setCentralWidget (container);
+
+  allSplitter = new QSplitter ();
+  allSplitter->setOrientation (Qt::Vertical);
+  allSplitter->addWidget (scrollArea);
+  allSplitter->addWidget (splitter);
+  allSplitter->setSizes ({ 0, height () });
+  allSplitter->setCollapsible (1, false);
+
+  setCentralWidget (allSplitter);
 
   leftWidget = new QWidget ();
   leftLayout = new QVBoxLayout ();
@@ -61,6 +72,16 @@ MainWindow::MainWindow (QWidget *parent) : QMainWindow (parent)
   model->appendRow (new QStandardItem (_ ("Manage Region")));
   model->appendRow (new QStandardItem (_ ("Region Reader/Modifier")));
   model->appendRow (new QStandardItem (_ ("Settings")));
+  auto maxLen = 0;
+  auto rows = model->rowCount ();
+  for (int i = 0; i < rows; i++)
+    {
+      auto str = model->item (i)->data (Qt::DisplayRole).toString ();
+      maxLen = std::max (
+          maxLen,
+          QFontMetrics (QFont ()).size (Qt::TextSingleLine, str).width ());
+    }
+  splitter->setSizes ({ maxLen + 20, width () - maxLen - 20 });
   proxyModel = new QSortFilterProxyModel (this);
   proxyModel->setSourceModel (model);
   listView->setModel (proxyModel);
@@ -130,11 +151,22 @@ MainWindow::~MainWindow ()
 void
 MainWindow::addWidgetToToolBar (QWidget *widget)
 {
+  if (allSplitter->sizes ()[0] == 0)
+    allSplitter->setSizes ({ 50, height () - 50 });
   topLayout->addWidget (widget);
 }
 
 void
-MainWindow::resizeEvent (QResizeEvent *event)
+MainWindow::tryShrinkTopWidget ()
 {
-  QMainWindow::resizeEvent (event);
+  if (topLayout->count () == 0)
+    allSplitter->setSizes ({ 0, height () });
+}
+
+bool
+MainWindow::eventFilter (QObject *object, QEvent *event)
+{
+  if (object == topWidget && event->type () == QEvent::ChildRemoved)
+    tryShrinkTopWidget ();
+  return QMainWindow::eventFilter (object, event);
 }
