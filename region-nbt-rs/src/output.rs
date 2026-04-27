@@ -1,4 +1,7 @@
+use crate::cancel_flag_is_cancelled;
 use crate::config::OutputConfig;
+use crate::finish_oom;
+use crate::show_progress;
 use crate::{
     get_size_double, real_show_progress, region_get_block_entity, region_get_block_id_by_index,
     region_get_data_version, region_get_entity, region_get_entity_len, region_get_palette_id_name,
@@ -6,11 +9,12 @@ use crate::{
     region_get_palette_property_name, region_get_x, region_get_y, region_get_z, string_free,
     vec_try_compress,
 };
-use common_rs::ProgressFn;
 use common_rs::i18n::i18n;
 use common_rs::my_error::MyError;
+use common_rs::region::Region;
 use common_rs::tree_value::TreeValue;
 use common_rs::util::string_to_ptr_fail_to_null;
+use common_rs::{ProgressFn, show_progress_macro};
 use crab_nbt::{Nbt, NbtCompound, NbtTag};
 use crab_nbt_ext::convert_vec_to_nbt;
 use formatx::formatx;
@@ -37,6 +41,7 @@ trait NbtCreate {
         system: &mut System,
         progress_fn: ProgressFn,
         main_klass: *mut c_void,
+        cancel_flag: *const AtomicBool,
         elapsed_millisecs: u128,
         free_memory: u64,
     ) -> Result<Self, Box<dyn Error>>
@@ -114,9 +119,11 @@ impl NbtCreate for NbtTag {
         system: &mut System,
         progress_fn: ProgressFn,
         main_klass: *mut c_void,
+        cancel_flag: *const AtomicBool,
         elapsed_millisecs: u128,
         free_memory: u64,
     ) -> Result<Self, Box<dyn Error>> {
+        let real_region = region as *mut Region;
         let region_x = unsafe { region_get_x(region) };
         let region_y = unsafe { region_get_y(region) };
         let region_z = unsafe { region_get_z(region) };
@@ -145,19 +152,19 @@ impl NbtCreate for NbtTag {
         let mut i = 0;
         let mut block_vec = vec![];
         for state in states {
-            let string = i18n("Adding blocks to NBT: {} / {}.");
-            let real_string = formatx!(string, i, states.len())?;
-            real_show_progress(
+            show_progress_macro!(
                 instant,
                 system,
                 progress_fn,
                 main_klass,
-                (((i + 1) as usize * 100) / states.len()) as c_int,
-                &real_string,
-                "",
+                (((i + 1) * 100) / states.len()) as c_int,
                 elapsed_millisecs,
                 free_memory,
-            )?;
+                &formatx!(i18n("Adding blocks to NBT: {} / {}."), i, states.len())?,
+                cancel_flag,
+                i18n("Adding blocks is cancelled.")
+            );
+
             let mut single_block_vec = vec![];
             if ignore_air && *state == 0 {
                 size_change(&mut x, &mut y, &mut z, region_x, region_y, region_z);
@@ -166,11 +173,22 @@ impl NbtCreate for NbtTag {
             }
             let pos = NbtTag::create_size(x, y, z);
             let state = NbtTag::Int(*state as i32);
-            let nbt = unsafe { region_get_block_entity(region, i) };
+
+            let nbt: Option<&Vec<(String, TreeValue)>> = unsafe {
+                match &(*real_region)
+                    .block_entity_array
+                    .binary_search_by_key(&i, |entity| entity.index)
+                {
+                    Ok(pos) => Some(&((&*real_region).block_entity_array[*pos].entity)),
+                    Err(_) => None,
+                }
+            };
+
+            // let nbt = unsafe { region_get_block_entity(region, i) };
             let mut nbt_nbt: Option<NbtTag> = None;
 
-            if !nbt.is_null() {
-                let real_nbt = convert_vec_to_nbt(unsafe { &*nbt }, "", false).root_tag;
+            if nbt.is_some() {
+                let real_nbt = convert_vec_to_nbt(nbt.unwrap(), "", false).root_tag;
                 nbt_nbt = Some(NbtTag::Compound(real_nbt));
             }
             single_block_vec.push(("pos".to_string(), pos));
@@ -304,6 +322,7 @@ fn region_save_internal(
         &mut sys,
         progress_fn,
         main_klass,
+        cancel_flag as *const AtomicBool,
         elapsed_millisecs,
         free_memory,
     );

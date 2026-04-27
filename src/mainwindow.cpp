@@ -14,8 +14,11 @@
 #include <QTabBar>
 #include <QToolBar>
 
+static MainWindow *mainWindow = nullptr;
+
 MainWindow::MainWindow (QWidget *parent) : QMainWindow (parent)
 {
+  mainWindow = this;
   resize (400, 400);
 
   scrollArea = new QScrollArea ();
@@ -101,7 +104,9 @@ MainWindow::MainWindow (QWidget *parent) : QMainWindow (parent)
                  case 0:
                    {
                      auto enui = new ExternalNbtReaderUI ();
-                     tabWidget->addTab (enui, _ ("NBT Reader"));
+                     auto tabIndex
+                         = tabWidget->addTab (enui, _ ("NBT Reader"));
+                     tabWidget->setCurrentIndex (tabIndex);
                      break;
                    }
                  case 1:
@@ -118,7 +123,9 @@ MainWindow::MainWindow (QWidget *parent) : QMainWindow (parent)
                      if (region != -1)
                        {
                          auto brui = new BlockReaderUI (region, mrui);
-                         tabWidget->addTab (brui, _ ("Block Reader/Modifier"));
+                         auto tabIndex = tabWidget->addTab (
+                             brui, _ ("Block Reader/Modifier"));
+                         tabWidget->setCurrentIndex (tabIndex);
                        }
                      break;
                    }
@@ -151,9 +158,22 @@ MainWindow::~MainWindow ()
 void
 MainWindow::addWidgetToToolBar (QWidget *widget)
 {
-  if (allSplitter->sizes ()[0] == 0)
-    allSplitter->setSizes ({ 50, height () - 50 });
-  topLayout->addWidget (widget);
+  if (mainWindow)
+    {
+      if (mainWindow->allSplitter->sizes ()[0] == 0)
+        mainWindow->allSplitter->setSizes ({ 50, mainWindow->height () - 50 });
+      mainWindow->topLayout->addWidget (widget);
+    }
+}
+
+void
+MainWindow::addWidgetToTab (QWidget *widget, const QString &title)
+{
+  if (mainWindow)
+    {
+      auto tabIndex = mainWindow->tabWidget->addTab (widget, title);
+      mainWindow->tabWidget->setCurrentIndex (tabIndex);
+    }
 }
 
 void

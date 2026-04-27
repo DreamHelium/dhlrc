@@ -2,12 +2,14 @@ use common_rs::i18n::i18n;
 use common_rs::my_error::MyError;
 use common_rs::region::{BlockEntity, Palette, Region};
 use common_rs::tree_value::TreeValue;
+use common_rs::util::finish_oom;
+use common_rs::util::show_progress;
 use common_rs::util::{real_show_progress, string_to_ptr_fail_to_null};
-use common_rs::ProgressFn;
+use common_rs::{ProgressFn, show_progress_macro};
 use crab_nbt::{Nbt, NbtTag};
 use crab_nbt_ext::{
-    convert_nbt_tag_to_tree_value, convert_nbt_to_vec, get_palette_from_nbt_tag, gettext_text,
-    GetWithError,
+    GetWithError, convert_nbt_tag_to_tree_value, convert_nbt_to_vec, get_palette_from_nbt_tag,
+    gettext_text,
 };
 use formatx::formatx;
 use std::error::Error;
@@ -100,33 +102,30 @@ fn get_block_id(
 ) -> Result<Vec<u32>, Box<dyn Error>> {
     let mut time = Instant::now();
     let mut i = 0;
-    let mut buf = vec![];
+    let mut buf = vec![0; block_num as usize];
     loop {
-        let str = gettext_text(i18n("Reading block id: {} / {}."));
-        let real_str = formatx!(str, i, block_num)?;
-        real_show_progress(
+        show_progress_macro!(
             &mut time,
             sys,
             progress_fn,
             main_klass,
             (i as u64 * 100 / block_num as u64) as c_int,
-            &real_str,
-            "",
             elapsed_millisecs,
             free_memory,
-        )?;
+            &formatx!(
+                gettext_text(i18n("Reading block id: {} / {}.")),
+                i,
+                block_num
+            )?,
+            cancel_flag,
+            i18n("Cancelled when reading blocks")
+        );
 
         let start_bit = i as u32 * move_bit;
         let start_state = start_bit / 64;
         let and_num = (1 << move_bit) - 1;
         let move_num = start_bit & 63;
         let end_num = move_num + move_bit;
-
-        if unsafe { cancel_flag_is_cancelled(cancel_flag) } == 1 {
-            return Err(Box::new(MyError {
-                msg: i18n("Cancelled when reading blocks").to_string(),
-            }));
-        }
 
         let id;
         if end_num <= 64 {
@@ -142,7 +141,7 @@ fn get_block_id(
                 | ((states[(start_state + 1) as usize] as u64).shl(move_num_2 as u64)))
                 & and_num;
         }
-        buf.push(id as u32);
+        buf[i] = id as u32;
         i += 1;
         if i == block_num as usize {
             real_show_progress(
@@ -265,6 +264,7 @@ fn region_create_from_bytes_internal(
         let block_entity = BlockEntity {
             pos: (entity_x, entity_y, entity_z),
             entity: single_entity_vec,
+            index: entity_index as usize,
         };
         tile_entities_vec.push(block_entity);
     }
@@ -299,6 +299,7 @@ fn region_create_from_bytes_internal(
     region.base_data.set_author(author);
     region.base_data.set_region_name(region_name);
     region.block_entity_array = tile_entities_vec;
+    region.sort_block_entity_array();
     region.set_data_time(create_time, modify_time)?;
 
     Ok(Box::into_raw(region))

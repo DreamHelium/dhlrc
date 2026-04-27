@@ -14,12 +14,14 @@
 #include <QMessageBox>
 #include <QPushButton>
 
-Q_GLOBAL_STATIC (QList<QLibrary *>, modules)
-Q_GLOBAL_STATIC (std::vector<std::shared_ptr<RegionClass>>, regions)
+static QList<QLibrary *> modules = {};
+static std::vector<std::shared_ptr<RegionClass>> regions = {};
+static std::vector<NotifyStruct> notifiers = {};
 
 ManageRegionUI::ManageRegionUI (QWidget *mainWindow, QWidget *parent)
     : QWidget (parent), mainWindow (qobject_cast<QMainWindow *> (mainWindow))
 {
+  notifiers.emplace_back (notify_func, this);
   auto moduleDir = QApplication::applicationDirPath ();
   moduleDir += QDir::toNativeSeparators ("/");
   moduleDir += "region_module";
@@ -30,7 +32,7 @@ ManageRegionUI::ManageRegionUI (QWidget *mainWindow, QWidget *parent)
       QString realDir = moduleDir + QDir::toNativeSeparators ("/") + module;
       auto library = new QLibrary (realDir);
       if (library->load ())
-        modules->append (library);
+        modules.append (library);
       else
         {
           delete library;
@@ -133,7 +135,8 @@ ManageRegionUI::ManageRegionUI (QWidget *mainWindow, QWidget *parent)
                else
                  {
                    auto job = new DhAllLoadJob (
-                       dirs, qobject_cast<QMainWindow *> (this->mainWindow), this);
+                       dirs, qobject_cast<QMainWindow *> (this->mainWindow),
+                       this);
                    job->start ();
                    // auto lrui = new LoadRegionUI (dirs, this);
                    // lrui->setAttribute (Qt::WA_DeleteOnClose);
@@ -159,21 +162,21 @@ ManageRegionUI::~ManageRegionUI ()
   for (auto &widget : itemFrames)
     delete widget;
   itemFrames.clear ();
-  for (auto &library : *modules)
+  for (auto &library : modules)
     delete library;
 }
 
 qsizetype
 ManageRegionUI::moduleNum ()
 {
-  return modules->count ();
+  return modules.count ();
 }
 
 QLibrary *
 ManageRegionUI::getModule (qsizetype i)
 {
-  if (i < modules->count ())
-    return modules->at (i);
+  if (i < modules.count ())
+    return modules.at (i);
   else
     return nullptr;
 }
@@ -181,7 +184,7 @@ ManageRegionUI::getModule (qsizetype i)
 void
 ManageRegionUI::appendRegion (void *region, const QString &name)
 {
-  regions->emplace_back (std::make_shared<RegionClass> (
+  regions.emplace_back (std::make_shared<RegionClass> (
       region, name, QUuid::createUuid ().toString (QUuid::WithoutBraces),
       QDateTime::currentDateTime ()));
 }
@@ -189,13 +192,20 @@ ManageRegionUI::appendRegion (void *region, const QString &name)
 qsizetype
 ManageRegionUI::regionNum ()
 {
-  return regions->size ();
+  return regions.size ();
 }
 
 std::vector<std::shared_ptr<RegionClass>> &
 ManageRegionUI::getRegions ()
 {
-  return *regions;
+  return regions;
+}
+
+void
+ManageRegionUI::notify ()
+{
+  for (const auto &notifier : notifiers)
+    notifier.notify_func (notifier.main_klass);
 }
 
 void
@@ -227,7 +237,7 @@ ManageRegionUI::save (const QList<int> &list)
             {
               QList<std::shared_ptr<RegionClass>> transRegions;
               for (auto index : list)
-                transRegions << (*regions)[index];
+                transRegions << regions[index];
               auto srui = new SaveRegionUI (transRegions, dir,
                                             singleFuncList[saveIndex],
                                             libraries[saveIndex]);
@@ -254,7 +264,7 @@ ManageRegionUI::refresh_triggered ()
   itemFrames.clear ();
 
   int i = 0;
-  for (auto &region : *regions)
+  for (auto &region : regions)
     {
       auto frame = new ItemFrame (region.get (), i, this);
       if (region->get_lock_status ())
@@ -317,22 +327,26 @@ ItemFrame::ItemFrame (RegionClass *region, int index, ManageRegionUI *mrui,
   line->setFrameStyle (QFrame::HLine);
   allLayout->addWidget (line);
   connect (renameBtn, &QPushButton::clicked, this,
-           [&, mrui, index]
+           [&, index]
              {
                auto newName = QInputDialog::getText (
                    this, _ ("Input a New Name"),
                    _ ("Please input a new name for the region."),
-                   QLineEdit::Normal, mrui->getRegions ()[index]->get_name ());
+                   QLineEdit::Normal,
+                   ManageRegionUI::getRegions ()[index]->get_name ());
                if (!newName.isEmpty ())
-                 mrui->getRegions ()[index]->setName (newName);
+                 {
+                   ManageRegionUI::getRegions ()[index]->setName (newName);
+                   ManageRegionUI::notify ();
+                 }
              });
   connect (removeBtn, &QPushButton::clicked, this,
-           [&, mrui, index]
+           [&, index]
              {
-               if (!this->mrui->getRegions ()[index]->get_lock_status ())
-                 this->mrui->getRegions ().erase (mrui->getRegions ().begin ()
-                                                  + index);
-               mrui->refresh_triggered ();
+               if (!ManageRegionUI::getRegions ()[index]->get_lock_status ())
+                 ManageRegionUI::getRegions ().erase (
+                     ManageRegionUI::getRegions ().begin () + index);
+               ManageRegionUI::notify ();
              });
   connect (saveBtn, &QPushButton::clicked, this,
            [&, mrui, index] { mrui->save ({ index }); });

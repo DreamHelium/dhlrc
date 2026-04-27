@@ -6,6 +6,7 @@ use std::ffi::{CStr, CString, c_char, c_int, c_void};
 use std::ptr::null_mut;
 use std::time::Instant;
 use sysinfo::System;
+use crate::cancel_flag::cancel_flag_is_cancelled;
 
 #[unsafe(no_mangle)]
 pub extern "C" fn string_free(string: *mut c_char) {
@@ -101,4 +102,19 @@ pub fn real_show_progress(
         *instant = Instant::now();
     }
     Ok(())
+}
+
+#[macro_export]
+macro_rules! show_progress_macro {
+    ($time : expr, $sys : expr, $progress_fn : ident, $main_klass : ident, $percentage : expr,
+     $elapsed_ms : ident, $free_memory : ident, $str : expr, $cancel_flag : ident, $err_msg : expr ) => {
+        if $time.elapsed().as_millis() >= $elapsed_ms {
+            if unsafe{cancel_flag_is_cancelled($cancel_flag) == 1}{
+                return Err(Box::new(MyError{msg : $err_msg.to_string()}))
+            }
+            finish_oom($sys, $free_memory)?;
+            show_progress($progress_fn, $main_klass, $percentage, $str, "");
+            *$time = Instant::now();
+        }
+    };
 }

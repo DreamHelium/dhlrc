@@ -20,8 +20,9 @@
  */
 
 using multiTransFunc = const char *(*)(void *, size_t, const char *);
-using singleTransFunc = const char *(*)(void *, const char *, void *,
-                                        ProgressFunc, void *, const void *);
+using singleTransFunc
+    = const char *(*)(void *, const char *, void *, ProgressFunc, void *,
+                      const void *, quint64, quint64);
 
 class SaveRegionUI : public LoadObjectUI
 {

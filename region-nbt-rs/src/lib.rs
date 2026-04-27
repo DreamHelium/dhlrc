@@ -1,14 +1,18 @@
 mod config;
 mod output;
 
-use common_rs::ProgressFn;
 use common_rs::i18n::i18n;
 use common_rs::my_error::MyError;
 use common_rs::region::{BlockEntity, Palette, Region};
 use common_rs::tree_value::TreeValue;
+use common_rs::util::finish_oom;
+use common_rs::util::show_progress;
 use common_rs::util::{real_show_progress, string_to_ptr_fail_to_null};
+use common_rs::{ProgressFn, show_progress_macro};
 use crab_nbt::{Nbt, NbtCompound, NbtTag};
-use crab_nbt_ext::{GetWithError, convert_nbt_to_vec, get_palette_from_nbt_tag, nbt_create_real};
+use crab_nbt_ext::{
+    GetWithError, convert_nbt_to_vec, get_palette_from_nbt_tag, gettext_text, nbt_create_real,
+};
 use formatx::formatx;
 use std::collections::HashMap;
 use std::error::Error;
@@ -251,26 +255,24 @@ fn region_create_from_bytes_internal(
     let mut j = 0;
     let mut start = Instant::now();
     for block in block_compound {
-        if unsafe { cancel_flag_is_cancelled(cancel_flag) } == 1 {
-            return Err(Box::from(MyError {
-                msg: String::from(i18n("Reading blocks is cancelled!")),
-            }));
-        }
         let internal_block = get_internal_block(block)?;
-        let string = i18n("Processing blocks: {} / {}.");
-        let real_string = formatx!(string, j, block_num)?;
 
-        real_show_progress(
+        show_progress_macro!(
             &mut start,
             &mut sys,
             progress_fn,
             main_klass,
             (j * 100 / block_num) as c_int,
-            &real_string,
-            "",
             elapsed_millisecs,
             free_memory,
-        )?;
+            &formatx!(
+                gettext_text(i18n("Processing blocks: {} / {}.")),
+                j,
+                block_num
+            )?,
+            cancel_flag,
+            i18n("Reading blocks is cancelled!")
+        );
 
         let pos = internal_block.get_list_with_err("pos")?;
         let block_pos = get_size(pos)?;
@@ -292,6 +294,7 @@ fn region_create_from_bytes_internal(
                 let real_entity = BlockEntity {
                     pos,
                     entity: block_entity,
+                    index: j,
                 };
                 block_entities.push(real_entity);
             }
@@ -309,6 +312,7 @@ fn region_create_from_bytes_internal(
     region.block_entity_array = block_entities;
     region.block_array = blocks;
     region.entity_array = entities;
+    region.sort_block_entity_array();
     Ok(Box::into_raw(region))
 }
 

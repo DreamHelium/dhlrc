@@ -1,6 +1,6 @@
+use crate::tree_value::TreeValue;
 use std::error::Error;
 use time::{Duration, UtcDateTime};
-use crate::tree_value::TreeValue;
 
 pub struct BaseData {
     /** Default: time of generated */
@@ -74,6 +74,7 @@ pub struct Palette {
 pub struct BlockEntity {
     pub pos: (i32, i32, i32),
     pub entity: Vec<(String, TreeValue)>,
+    pub index: usize,
 }
 
 pub struct Region {
@@ -106,5 +107,8 @@ impl Region {
     pub fn get_size(&self) {}
     pub fn get_palette_len(&self) -> usize {
         self.palette_array.len()
+    }
+    pub fn sort_block_entity_array(&mut self) {
+        self.block_entity_array.sort_by_key(|entity| entity.index)
     }
 }

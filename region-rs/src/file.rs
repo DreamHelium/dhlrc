@@ -2,6 +2,8 @@ use crate::{ProgressFn, cstr_to_str};
 use common_rs::cancel_flag::cancel_flag_is_cancelled;
 use common_rs::i18n::i18n;
 use common_rs::my_error::MyError;
+use common_rs::show_progress_macro;
+use common_rs::util::finish_oom;
 use common_rs::util::{real_show_progress, show_progress};
 use flate2::{Compress, Compression, Decompress, FlushCompress, FlushDecompress, Status};
 use std::error::Error;
@@ -30,23 +32,18 @@ fn file_try_uncompress_real(
         let mut temp_data = vec![0; 100];
         let file_pos = file.try_clone()?.seek(SeekFrom::Current(0))?;
 
-        real_show_progress(
+        show_progress_macro!(
             &mut start,
             &mut sys,
             progress_fn,
             main_klass,
             (file_pos * 100 / file_size) as c_int,
-            i18n("Loading file."),
-            "",
             elapsed_millisecs,
             free_memory,
-        )?;
-
-        if cancel_flag_is_cancelled(cancel_flag) == 1 {
-            return Err(Box::new(MyError {
-                msg: i18n("The loading operation is cancelled.").to_string(),
-            }));
-        }
+            i18n("Loading file."),
+            cancel_flag,
+            i18n("The loading operation is cancelled.")
+        );
 
         let len = file.read(&mut temp_data)?;
         if len == 0 {
@@ -72,23 +69,18 @@ fn file_try_uncompress_real(
 
     let data_size = file_data.len();
     loop {
-        real_show_progress(
+        show_progress_macro!(
             &mut start,
             &mut sys,
             progress_fn,
             main_klass,
             (pos * 100 / data_size) as c_int,
-            i18n("Uncompressing data."),
-            "",
             elapsed_millisecs,
             free_memory,
-        )?;
-
-        if cancel_flag_is_cancelled(cancel_flag) == 1 {
-            return Err(Box::new(MyError {
-                msg: i18n("The uncompressing operation is cancelled.").to_string(),
-            }));
-        }
+            i18n("Uncompressing data."),
+            cancel_flag,
+            i18n("The uncompressing operation is cancelled.")
+        );
 
         let decompress_result =
             decoder.decompress_vec(&file_data[pos..], &mut ret, FlushDecompress::None)?;

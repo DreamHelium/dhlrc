@@ -3,6 +3,8 @@
 #include "ui_blockreaderui.h"
 #include <QMessageBox>
 // #include <blockshowui.h>
+#include "regionmodifyui.h"
+
 #include <blocklistui.h>
 #include <blockshowui.h>
 #include <generalchoosedialog.h>
@@ -25,8 +27,8 @@ set_func (void *klass, int value)
 
 BlockReaderUI::BlockReaderUI (int index, ManageRegionUI *mr, QWidget *parent)
     : QWidget (parent), ui (new Ui::BlockReaderUI),
-      region (mr->getRegions ()[index]->get_region ()),
-      locker (*mr->getRegions ()[index])
+      region (ManageRegionUI::getRegions ()[index]->get_region ()),
+      locker (*ManageRegionUI::getRegions ()[index])
 {
   ui->setupUi (this);
   // auto version = dh::getVersion (region->data_version);
@@ -70,6 +72,13 @@ BlockReaderUI::BlockReaderUI (int index, ManageRegionUI *mr, QWidget *parent)
                    nrui->show ();
                  }
              });
+  connect (ui->modifyBtn, &QPushButton::clicked, this,
+           [&]
+             {
+               if (!rmui)
+                 rmui = new RegionModifyUI (region);
+               MainWindow::addWidgetToTab (rmui, _ ("Region Modifier"));
+             });
 
   ui->entityBtn->setEnabled (false);
   ui->propertyBtn->setEnabled (false);
@@ -80,6 +89,7 @@ BlockReaderUI::BlockReaderUI (int index, ManageRegionUI *mr, QWidget *parent)
 
 BlockReaderUI::~BlockReaderUI ()
 {
+  delete rmui;
   delete ui;
   // delete bsui;
   // dh_info_reader_unlock (DH_TYPE_REGION, uuid.toUtf8 ());

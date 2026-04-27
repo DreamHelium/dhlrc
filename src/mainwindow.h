@@ -21,7 +21,8 @@ public:
   ~MainWindow () override;
   ManageRegionUI *mrui = new ManageRegionUI (this);
   DhConfigDialog *dialog = nullptr;
-  void addWidgetToToolBar (QWidget *widget);
+  static void addWidgetToToolBar (QWidget *widget);
+  static void addWidgetToTab (QWidget *widget, const QString &title);
 
 private:
   QScrollArea *scrollArea;

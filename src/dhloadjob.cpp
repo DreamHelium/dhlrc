@@ -24,8 +24,9 @@ DhLoadJob::start ()
 {
   auto realfunc = [&]
     {
-      using LoadObjectFunc = const char *(*)(void *, ProgressFunc, void *,
-                                             const void *, void **);
+      using LoadObjectFunc
+          = const char *(*)(void *, ProgressFunc, void *, const void *,
+                            void **, quint64, quint64);
       using ObjFreeFunc = void (*) (void *);
       auto setFunc
           = [] (void *main_klass, int value, const char *text, const char *arg)
@@ -57,13 +58,15 @@ DhLoadJob::start ()
         };
       auto multiFuncProcessFunc
           = [&] (QLibrary *lib, LoadObjectFunc loadObjectFn,
-                 ObjFreeFunc objFree, const char *&msg, void *data)
+                 ObjFreeFunc objFree, const char *&msg, void *data, auto start)
         {
           void *o_object = nullptr;
           /* First we load object */
           if (loadObjectFn)
             err_msg_handle_func (msg, loadObjectFn, data, setFunc, this,
-                                 cancel_flag, &o_object);
+                                 cancel_flag, &o_object,
+                                 quint64 (DhConfig::elapsedMilliseconds ()),
+                                 quint64 (DhConfig::memoryLimit ()));
           std::unique_ptr<void, void (*) (void *)> object{ o_object, objFree };
           typedef int32_t (*numFunc) (void *);
           auto numFn = reinterpret_cast<numFunc> (lib->resolve ("region_num"));
@@ -83,6 +86,7 @@ DhLoadJob::start ()
                 }
               Q_EMIT infoMessage (this, _ ("Please click `Continue` to choose "
                                            "region(s)."));
+              auto stopTime = std::chrono::system_clock::now ();
               /* Emit the stop signal to stop, and use loop to
                * stop the process. */
               Q_EMIT selfSuspended (this);
@@ -90,6 +94,7 @@ DhLoadJob::start ()
               cv.wait (lock);
               /* Continue */
               Q_EMIT selfResumed (this);
+              auto secondStartTime = std::chrono::system_clock::now ();
               typedef const char *(*LoadFunc) (void *, ProgressFunc, void **,
                                                void *, const void *, int32_t,
                                                quint64, quint64);
@@ -110,6 +115,10 @@ DhLoadJob::start ()
                   string_free (name);
                 }
               regionIndexes.clear ();
+              auto secondEndTime = std::chrono::system_clock::now ();
+              auto times
+                  = secondEndTime - secondStartTime + (stopTime - start);
+              durationTime = std::chrono::duration<double> (times).count ();
               return true;
             }
           return false;
@@ -130,7 +139,9 @@ DhLoadJob::start ()
           if (loadObjectFn)
             {
               err_msg_handle_func (msg, loadObjectFn, data, setFunc, this,
-                                   cancel_flag, &o_object);
+                                   cancel_flag, &o_object,
+                                   quint64 (DhConfig::elapsedMilliseconds ()),
+                                   quint64 (DhConfig::memoryLimit ()));
               object = { o_object, objFree };
             }
           if (func)
@@ -169,6 +180,7 @@ DhLoadJob::start ()
           Q_EMIT emitResult ();
           return;
         }
+      auto start = std::chrono::system_clock::now ();
       int failed = 0;
       void *o_data = file_try_uncompress (
           filename.toUtf8 (), setFunc, this, &failed, cancel_flag,
@@ -226,7 +238,7 @@ DhLoadJob::start ()
               if (multiFn ())
                 {
                   if (multiFuncProcessFunc (lib, loadObjectFn, objFree, msg,
-                                            data.get ()))
+                                            data.get (), start))
                     break;
                   tryErrorFunc (name, msg, realStr, j != moduleNum - 1);
                 }
@@ -252,6 +264,7 @@ DhLoadJob::start ()
               setErrorText (realMsg);
             }
         }
+      qDebug () << durationTime;
       Q_EMIT emitResult ();
     };
   std::thread trd (realfunc);
@@ -275,6 +288,12 @@ DhLoadJob::forceResume ()
   cv.notify_one ();
 }
 
+QString
+DhLoadJob::getFilename ()
+{
+  return filename;
+}
+
 DhAllLoadJob::DhAllLoadJob (QStringList list, QMainWindow *mainWindow,
                             ManageRegionUI *mrui, QObject *parent)
     : KCompositeJob (parent), cancel_flag (cancel_flag_new ()),
@@ -289,7 +308,7 @@ DhAllLoadJob::DhAllLoadJob (QStringList list, QMainWindow *mainWindow,
   QString text = _ ("Finish processing %1 of %2 (%3%).");
   text = text.arg (this->finishedJobs).arg (this->jobNums).arg (percent ());
   messageWidget->setText (text);
-  realWindow->addWidgetToToolBar (messageWidget);
+  MainWindow::addWidgetToToolBar (messageWidget);
   connect (this, &DhAllLoadJob::percentChanged, this,
            [&]
              {
@@ -317,8 +336,7 @@ DhAllLoadJob::DhAllLoadJob (QStringList list, QMainWindow *mainWindow,
                        connect (failedWidget,
                                 &KMessageWidget::hideAnimationFinished,
                                 failedWidget, &KMessageWidget::deleteLater);
-                       qobject_cast<MainWindow *> (this->mainWindow)
-                           ->addWidgetToToolBar (failedWidget);
+                       MainWindow::addWidgetToToolBar (failedWidget);
                        failedWidget->setMessageType (KMessageWidget::Error);
                        failedWidget->setText (failedText);
                        failedWidget->setTextFormat (Qt::MarkdownText);
@@ -337,16 +355,17 @@ DhAllLoadJob::DhAllLoadJob (QStringList list, QMainWindow *mainWindow,
       job->messageWidget->setCloseButtonVisible (false);
       connect (job->messageWidget, &KMessageWidget::hideAnimationFinished,
                job->messageWidget, &KMessageWidget::deleteLater);
-      realWindow->addWidgetToToolBar (job->messageWidget);
-      connect (
-          job, &DhLoadJob::infoMessage, this,
-          [&, i] (KJob *realjob, const QString &str)
-            {
-              QString realStr = "%1: %2 (%3%)";
-              realStr = realStr.arg (i).arg (str).arg (realjob->percent ());
-              qobject_cast<DhLoadJob *> (realjob)->messageWidget->setText (
-                  realStr);
-            });
+      MainWindow::addWidgetToToolBar (job->messageWidget);
+      connect (job, &DhLoadJob::infoMessage, this,
+               [&, i] (KJob *realjob, const QString &str)
+                 {
+                   auto castedJob = qobject_cast<DhLoadJob *> (realjob);
+                   QString realStr = "%1: %2 (%3%)";
+                   realStr = realStr.arg (castedJob->getFilename ())
+                                 .arg (str)
+                                 .arg (realjob->percent ());
+                   castedJob->messageWidget->setText (realStr);
+                 });
       connect (job, &DhLoadJob::result, job->messageWidget,
                &KMessageWidget::animatedHide);
       connect (job, &DhLoadJob::selfSuspended, this,

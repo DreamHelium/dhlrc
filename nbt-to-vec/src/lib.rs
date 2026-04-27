@@ -125,7 +125,14 @@ pub extern "C" fn file_to_nbt_vec(
         }
         null_mut()
     } else {
-        match nbt_create_real(vector, progress_fn, main_klass, null()) {
+        match nbt_create_real(
+            vector,
+            progress_fn,
+            main_klass,
+            null(),
+            elapsed_millisecs as u128,
+            free_memory,
+        ) {
             Ok(nbt) => {
                 unsafe { vec_free(vector) };
                 let mid_val = convert_nbt_to_vec(&nbt.root_tag);
@@ -146,7 +153,9 @@ pub extern "C" fn file_to_nbt_vec(
                         );
 
                         if !fail_message.is_null() {
-                            unsafe { *fail_message = string_to_ptr_fail_to_null(&err_msg.to_string()) }
+                            unsafe {
+                                *fail_message = string_to_ptr_fail_to_null(&err_msg.to_string())
+                            }
                         }
                         null_mut()
                     }

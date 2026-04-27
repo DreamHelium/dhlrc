@@ -1,6 +1,7 @@
 #include "saveregionui.h"
 
 #include "region.h"
+#include "settings.h"
 
 #include <QDir>
 #include <QMessageBox>
@@ -94,14 +95,12 @@ SaveRegionUI::process ()
             break;
           Q_EMIT refreshFullProgress ((i + 1) * 100 / list.size ());
           QString realLabel = "[%1/%2] %3";
-          realLabel = realLabel.arg (i + 1)
-                          .arg (list.size ())
-                          .arg (st->get_name ());
+          realLabel
+              = realLabel.arg (i + 1).arg (list.size ()).arg (st->get_name ());
           Q_EMIT refreshFullLabel (realLabel);
           i++;
           /* Processing stuff */
-          QString realDir
-              = outputDir + QDir::separator () + st->get_name ();
+          QString realDir = outputDir + QDir::separator () + st->get_name ();
           Q_EMIT refreshFullLabel (
               _ ("Please click `Continue` to choose options."));
           /* Emit the stop signal to stop, and use loop to
@@ -110,8 +109,10 @@ SaveRegionUI::process ()
           std::unique_lock lock (mutex);
           cv.wait (lock);
           if (!cancel_flag_is_cancelled (cancel_flag))
-            func (st->get_region (), realDir.toUtf8 (), configObject,
-                  full_set, this, cancel_flag);
+            func (st->get_region (), realDir.toUtf8 (), configObject, full_set,
+                  this, cancel_flag,
+                  quint64 (DhConfig::elapsedMilliseconds ()),
+                  quint64 (DhConfig::memoryLimit ()));
         }
       Q_EMIT refreshFullProgress (100);
       cv.notify_one ();

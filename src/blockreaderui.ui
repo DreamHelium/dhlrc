@@ -176,13 +176,6 @@
          </property>
         </widget>
        </item>
-       <item>
-        <widget class="QPushButton" name="closeBtn">
-         <property name="text">
-          <string>&amp;Close</string>
-         </property>
-        </widget>
-       </item>
       </layout>
      </item>
     </layout>
@@ -190,22 +183,5 @@
   </layout>
  </widget>
  <resources/>
- <connections>
-  <connection>
-   <sender>closeBtn</sender>
-   <signal>clicked()</signal>
-   <receiver>BlockReaderUI</receiver>
-   <slot>close()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>443</x>
-     <y>306</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>250</x>
-     <y>169</y>
-    </hint>
-   </hints>
-  </connection>
- </connections>
+ <connections/>
 </ui>

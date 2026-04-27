@@ -20,15 +20,66 @@
 #include <libintl.h>
 #define _(str) gettext (str)
 
+class RegionClass;
+class ItemFrame;
 static QString emptyString{};
 using multiTransFunc = const char *(*)(void *, size_t, const char *);
-using singleTransFunc = const char *(*)(void *, const char *, void *,
-                                        ProgressFunc, void *, const void *);
+using singleTransFunc
+    = const char *(*)(void *, const char *, void *, ProgressFunc, void *,
+                      const void *, quint64, quint64);
+class ManageRegionUI : public QWidget
+{
+  Q_OBJECT
+public:
+  explicit ManageRegionUI (QWidget *mainWindow, QWidget *parent = nullptr);
+  ~ManageRegionUI () override;
+  static void
+  notify_func (void *main_klass)
+  {
+    auto mr = static_cast<ManageRegionUI *> (main_klass);
+    mr->refresh_triggered ();
+  }
+  static qsizetype moduleNum ();
+  static QLibrary *getModule (qsizetype i);
+  static void appendRegion (void *region, const QString &name);
+  static qsizetype regionNum ();
+  static std::vector<std::shared_ptr<RegionClass>> &getRegions ();
+  static void notify ();
+  void save (const QList<int> &list);
+  bool selectButtonIsDown ();
+
+private:
+  DhPushButton *selectButton;
+  QPushButton *addButton;
+  QVBoxLayout *layout;
+  QHBoxLayout *btnLayout;
+  QVBoxLayout *frameLayout;
+  QScrollArea *scrollArea;
+  QWidget *scrollAreaWidget;
+  QMainWindow *mainWindow;
+
+  QList<ItemFrame *> itemFrames;
+  KMessageWidget *messageWidget;
+
+  QStringList supportList;
+  QList<multiTransFunc> multiFuncList;
+  QList<singleTransFunc> singleFuncList;
+  QList<QLibrary *> libraries;
+
+public Q_SLOTS:
+  void refresh_triggered ();
+};
+
+struct NotifyStruct
+{
+  using NotifyFunc = void (*) (void *);
+  NotifyFunc notify_func;
+  void *main_klass;
+};
 
 class RegionClass
 {
 private:
-  using NotifyFunc = void (*) (void *);
   std::unique_ptr<void, void (*) (void *)> region;
   QString name;
   QString uuid;
@@ -39,12 +90,6 @@ private:
     std::atomic_bool locked{ false };
   };
   std::unique_ptr<InternalLock> internalLock;
-  struct NotifyStruct
-  {
-    NotifyFunc notify_func;
-    void *main_klass;
-  };
-  std::vector<NotifyStruct> notifyStructs{};
 
 public:
   explicit RegionClass (void *region, const QString &name, const QString &uuid,
@@ -91,35 +136,10 @@ public:
     return region.get ();
   }
   void
-  notify ()
-  {
-    for (auto &notifyInternal : notifyStructs)
-      {
-        notifyInternal.notify_func (notifyInternal.main_klass);
-      }
-  }
-  void
-  add_notifier (NotifyFunc func, void *main_klass)
-  {
-    notifyStructs.emplace_back (func, main_klass);
-  }
-  void
-  remove_notifier (void *main_klass)
-  {
-    for (auto i = 0; i < notifyStructs.size (); i++)
-      {
-        if (notifyStructs[i].main_klass == main_klass)
-          notifyStructs.erase (notifyStructs.begin () + i);
-      }
-  }
-  void
   setName (const QString &newName)
   {
     if (!get_lock_status ())
-      {
-        name = newName;
-        notify ();
-      }
+      name = newName;
   }
 };
 
@@ -136,13 +156,13 @@ public:
         region_class (region_class_)
   {
     region_class.change_lock_status (true);
-    region_class.notify ();
+    ManageRegionUI::notify ();
   }
 
   ~AutoLocker ()
   {
     region_class.change_lock_status (false);
-    region_class.notify ();
+    ManageRegionUI::notify ();
   }
 };
 
@@ -154,54 +174,7 @@ using Region = struct Region
   QDateTime dateTime;
 };
 
-using NameAndLocked = struct NameAndLocked
-{
-  QString name;
-  bool unlocked;
-};
-
 class ItemFrame;
-class ManageRegionUI : public QWidget
-{
-  Q_OBJECT
-public:
-  explicit ManageRegionUI (QWidget *mainWindow, QWidget *parent = nullptr);
-  ~ManageRegionUI () override;
-  static void
-  notify_func (void *main_klass)
-  {
-    auto mr = static_cast<ManageRegionUI *> (main_klass);
-    mr->refresh_triggered ();
-  }
-  static qsizetype moduleNum ();
-  static QLibrary *getModule (qsizetype i);
-  static void appendRegion (void *region, const QString &name);
-  static qsizetype regionNum ();
-  static std::vector<std::shared_ptr<RegionClass>> &getRegions ();
-  void save (const QList<int> &list);
-  bool selectButtonIsDown ();
-
-private:
-  DhPushButton *selectButton;
-  QPushButton *addButton;
-  QVBoxLayout *layout;
-  QHBoxLayout *btnLayout;
-  QVBoxLayout *frameLayout;
-  QScrollArea *scrollArea;
-  QWidget *scrollAreaWidget;
-  QMainWindow *mainWindow;
-
-  QList<ItemFrame *> itemFrames;
-  KMessageWidget *messageWidget;
-
-  QStringList supportList;
-  QList<multiTransFunc> multiFuncList;
-  QList<singleTransFunc> singleFuncList;
-  QList<QLibrary *> libraries;
-
-public Q_SLOTS:
-  void refresh_triggered ();
-};
 
 class ItemFrame : public QFrame
 {

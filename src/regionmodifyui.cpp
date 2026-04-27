@@ -23,8 +23,6 @@ RegionModifyUI::RegionModifyUI (void* region, QWidget *parent)
   ui->setupUi (this);
   connect (ui->spinBox, &QSpinBox::valueChanged, this,
            &RegionModifyUI::versionUpdate);
-  connect (ui->pushButton_2, &QPushButton::clicked, this,
-           &RegionModifyUI::close);
   connect (ui->pushButton, &QPushButton::clicked, this,
            &RegionModifyUI::okBtn_clicked);
   initData ();
