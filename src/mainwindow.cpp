@@ -141,7 +141,13 @@ MainWindow::MainWindow (QWidget *parent) : QMainWindow (parent)
                  }
              });
   connect (tabWidget, &QTabWidget::tabCloseRequested, this,
-           [&] (int index) { delete tabWidget->widget (index); });
+           [&] (int index)
+           {
+             if (tabWidget->widget (index) != mrui)
+              delete tabWidget->widget (index);
+             else
+               tabWidget->removeTab (index);
+           });
 }
 
 MainWindow::~MainWindow ()

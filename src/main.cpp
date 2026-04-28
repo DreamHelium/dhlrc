@@ -6,10 +6,12 @@
 #include <QTranslator>
 #include <QWidget>
 #include <qcoreapplication.h>
+#include <KIconTheme>
 
 int
 main (int argc, char *argv[])
 {
+  KIconTheme::initTheme ();
   QApplication a (argc, argv);
 
 #ifdef Q_OS_WIN
@@ -23,7 +25,7 @@ main (int argc, char *argv[])
   bindtextdomain ("dhlrc", dir.toUtf8 ().constData ());
   bind_textdomain_codeset ("dhlrc", "UTF-8");
   textdomain ("dhlrc");
-
+  QApplication::setStyle ("breeze");
   KLocalizedString::setApplicationDomain ("dhlrc");
   KLocalizedString::addDomainLocaleDir ("dhlrc", dir);
   QApplication::setApplicationName ("dhlrc");

@@ -14,6 +14,7 @@ public:
 
 protected:
   void mousePressEvent (QMouseEvent *event) override;
+  void keyPressEvent(QKeyEvent *event) override;
 };
 
 #endif // DHLRC_DHPUSHBUTTON_H

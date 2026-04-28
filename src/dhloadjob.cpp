@@ -7,7 +7,7 @@
 #include "region.h"
 #include "settings.h"
 #include "utility.h"
-
+#undef asprintf
 #include <QTimer>
 #include <future>
 #include <qfileinfo.h>
