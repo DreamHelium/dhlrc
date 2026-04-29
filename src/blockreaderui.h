@@ -4,7 +4,7 @@
 #include "blockshowui.h"
 #include "manageregionui.h"
 #include "regionmodifyui.h"
-
+#include <QPointer>
 #include <QWidget>
 
 // #include "blockshowui.h"
@@ -26,7 +26,7 @@ public:
 
 private:
   Ui::BlockReaderUI *ui;
-  RegionModifyUI* rmui = nullptr;
+  QPointer<RegionModifyUI> rmui = nullptr;
   void *region;
   //   QString uuid = {};
   void setText ();

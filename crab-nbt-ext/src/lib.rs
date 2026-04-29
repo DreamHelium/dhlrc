@@ -20,6 +20,20 @@ use std::sync::atomic::{AtomicBool, Ordering};
 use std::time::Instant;
 use sysinfo::System;
 
+#[macro_export]
+macro_rules! get_compound {
+    ($output_symbol : ident, $tag : ident, $err_msg : expr) => {
+        let $output_symbol = match $tag {
+            NbtTag::Compound(c) => c,
+            _ => {
+                return Err(Box::from(MyError {
+                    msg: String::from($err_msg),
+                }));
+            }
+        };
+    };
+}
+
 pub fn init_translation_internal(path: *const c_char) -> Result<(), Box<dyn Error>> {
     gettextrs::bindtextdomain("dhlrc", cstr_to_str(path)?)?;
     gettextrs::textdomain("dhlrc")?;

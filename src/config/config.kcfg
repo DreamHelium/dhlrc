@@ -14,11 +14,14 @@
             <tooltip>The elapsed milliseconds for the progress bar, if set too small will affect the speed.</tooltip>
             <default>500</default>
         </entry>
-        <entry name="GeneralConfigForInput" type="Bool">
-            <label>General Config for Input</label>
-            <tooltip>If you choose this, the input config will not be asked, and you need to configure in the configure
-                interface.
-            </tooltip>
+        <entry name="SelectAllRegionsInLoading" type="Bool">
+            <label>Select All Regions In Loading</label>
+            <tooltip>If you check this, all regions will be loaded in the loading progress.</tooltip>
+            <default>false</default>
+        </entry>
+        <entry name="LoadingFileByExtension" type="Bool">
+            <label>Loading File by File Extension</label>
+            <tooltip>If you check this, the file will be loaded by the file extension name.</tooltip>
             <default>true</default>
         </entry>
     </group>

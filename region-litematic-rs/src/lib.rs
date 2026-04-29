@@ -7,10 +7,7 @@ use common_rs::util::show_progress;
 use common_rs::util::{real_show_progress, string_to_ptr_fail_to_null};
 use common_rs::{ProgressFn, show_progress_macro};
 use crab_nbt::{Nbt, NbtTag};
-use crab_nbt_ext::{
-    GetWithError, convert_nbt_tag_to_tree_value, convert_nbt_to_vec, get_palette_from_nbt_tag,
-    gettext_text,
-};
+use crab_nbt_ext::{GetWithError, convert_nbt_tag_to_tree_value, convert_nbt_to_vec, get_palette_from_nbt_tag, gettext_text, get_compound};
 use formatx::formatx;
 use std::error::Error;
 use std::ffi::{c_char, c_int, c_void};
@@ -49,6 +46,16 @@ pub extern "C" fn region_type() -> *const c_char {
 #[unsafe(no_mangle)]
 pub extern "C" fn region_is_multi() -> i32 {
     1
+}
+
+#[unsafe(no_mangle)]
+pub extern "C" fn region_file_suffix() -> *const c_char {
+    string_to_ptr_fail_to_null("litematic")
+}
+
+#[unsafe(no_mangle)]
+pub extern "C" fn region_base_type() -> *const c_char {
+    string_to_ptr_fail_to_null("JavaNBT")
 }
 
 #[unsafe(no_mangle)]
@@ -276,14 +283,7 @@ fn region_create_from_bytes_internal(
                 msg: String::from(i18n("Reading entities is cancelled!")),
             }));
         }
-        let internal_entity = match entity {
-            NbtTag::Compound(c) => c,
-            _ => {
-                return Err(Box::from(MyError {
-                    msg: String::from(i18n("Wrong type of entity!")),
-                }));
-            }
-        };
+        get_compound!(internal_entity, entity, i18n("Wrong type of entity!"));
         let value = convert_nbt_to_vec(internal_entity);
         entities_vec.push(value);
     }
@@ -298,6 +298,7 @@ fn region_create_from_bytes_internal(
     region.base_data.set_description(description);
     region.base_data.set_author(author);
     region.base_data.set_region_name(region_name);
+    region.entity_array = entities_vec;
     region.block_entity_array = tile_entities_vec;
     region.sort_block_entity_array();
     region.set_data_time(create_time, modify_time)?;

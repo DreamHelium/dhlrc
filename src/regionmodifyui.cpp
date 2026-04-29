@@ -72,7 +72,7 @@ RegionModifyUI::okBtn_clicked ()
   region_set_offset (region, ui->xBox->value (), ui->yBox->value (),
                      ui->zBox->value ());
   region_set_data_version (region, ui->spinBox->value ());
-  close ();
+  deleteLater ();
 }
 
 void

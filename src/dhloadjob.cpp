@@ -44,10 +44,8 @@ DhLoadJob::start ()
       auto pushRegionFunc
           = [&] (const QString &dir, const QString &name, void *region)
         {
-          auto realName = QFileInfo (dir).fileName ();
-          auto lastDot = realName.lastIndexOf ('.');
-          if (lastDot != -1)
-            realName = realName.left (lastDot);
+          auto realName = QFileInfo (dir).completeBaseName ();
+
           if (!name.isEmpty ())
             {
               realName += " - ";
@@ -56,23 +54,35 @@ DhLoadJob::start ()
 
           ManageRegionUI::appendRegion (region, realName);
         };
-      auto multiFuncProcessFunc
-          = [&] (QLibrary *lib, LoadObjectFunc loadObjectFn,
-                 ObjFreeFunc objFree, const char *&msg, void *data, auto start)
+      auto multiFuncProcessFunc =
+          [&] (QLibrary *lib, LoadObjectFunc loadObjectFn, ObjFreeFunc objFree,
+               const char *&msg, void *data, const QString &baseTypeName)
         {
-          void *o_object = nullptr;
+          void *realObject = nullptr;
+          for (const auto &i : objects)
+            {
+              if (i.first == baseTypeName)
+                realObject = i.second.get ();
+            }
           /* First we load object */
-          if (loadObjectFn)
-            err_msg_handle_func (msg, loadObjectFn, data, setFunc, this,
-                                 cancel_flag, &o_object,
-                                 quint64 (DhConfig::elapsedMilliseconds ()),
-                                 quint64 (DhConfig::memoryLimit ()));
-          std::unique_ptr<void, void (*) (void *)> object{ o_object, objFree };
+          if (loadObjectFn && !realObject)
+            {
+              void *o_object = nullptr;
+              std::unique_ptr<void, void (*) (void *)> object{ nullptr,
+                                                               nullptr };
+              err_msg_handle_func (msg, loadObjectFn, data, setFunc, this,
+                                   cancel_flag, &o_object,
+                                   quint64 (DhConfig::elapsedMilliseconds ()),
+                                   quint64 (DhConfig::memoryLimit ()));
+              object = { o_object, objFree };
+              realObject = o_object;
+              objects.emplace_back (baseTypeName, std::move (object));
+            }
           typedef int32_t (*numFunc) (void *);
           auto numFn = reinterpret_cast<numFunc> (lib->resolve ("region_num"));
           int32_t nums = 0;
           /* We need the region_num function to check whether it's nullptr */
-          if ((nums = numFn (object.get ())))
+          if ((nums = numFn (realObject)))
             {
               auto indexFn
                   = reinterpret_cast<const char *(*)(void *, qint32)> (
@@ -80,21 +90,29 @@ DhLoadJob::start ()
               regionList.clear ();
               for (int k = 0; k < nums; k++)
                 {
-                  auto name = indexFn (object.get (), k);
+                  auto name = indexFn (realObject, k);
                   regionList.append (name);
                   string_free (name);
                 }
-              Q_EMIT infoMessage (this, _ ("Please click `Continue` to choose "
-                                           "region(s)."));
-              auto stopTime = std::chrono::system_clock::now ();
-              /* Emit the stop signal to stop, and use loop to
-               * stop the process. */
-              Q_EMIT selfSuspended (this);
-              std::unique_lock lock (mutex);
-              cv.wait (lock);
-              /* Continue */
-              Q_EMIT selfResumed (this);
-              auto secondStartTime = std::chrono::system_clock::now ();
+
+              if (DhConfig::selectAllRegionsInLoading ())
+                {
+                  for (auto i = 0; i < regionList.size (); i++)
+                    regionIndexes << i;
+                }
+              else
+                {
+                  Q_EMIT infoMessage (this,
+                                      _ ("Please click `Continue` to choose "
+                                         "region(s)."));
+                  /* Emit the stop signal to stop, and use loop to
+                   * stop the process. */
+                  Q_EMIT selfSuspended (this);
+                  std::unique_lock lock (mutex);
+                  cv.wait (lock);
+                  /* Continue */
+                  Q_EMIT selfResumed (this);
+                }
               typedef const char *(*LoadFunc) (void *, ProgressFunc, void **,
                                                void *, const void *, int32_t,
                                                quint64, quint64);
@@ -105,7 +123,7 @@ DhLoadJob::start ()
                   void *singleRegion = nullptr;
                   if (func)
                     err_msg_handle_func (
-                        msg, func, object.get (), setFunc, &singleRegion, this,
+                        msg, func, realObject, setFunc, &singleRegion, this,
                         cancel_flag, index,
                         quint64 (DhConfig::elapsedMilliseconds ()),
                         quint64 (DhConfig::memoryLimit ()));
@@ -115,20 +133,21 @@ DhLoadJob::start ()
                   string_free (name);
                 }
               regionIndexes.clear ();
-              auto secondEndTime = std::chrono::system_clock::now ();
-              auto times
-                  = secondEndTime - secondStartTime + (stopTime - start);
-              durationTime = std::chrono::duration<double> (times).count ();
+
               return true;
             }
           return false;
         };
-      auto singleFuncProcessFunc
-          = [&] (QLibrary *lib, LoadObjectFunc loadObjectFn,
-                 ObjFreeFunc objFree, const char *&msg, void *data)
+      auto singleFuncProcessFunc =
+          [&] (QLibrary *lib, LoadObjectFunc loadObjectFn, ObjFreeFunc objFree,
+               const char *&msg, void *data, const QString &baseTypeName)
         {
-          void *o_object = nullptr;
-          std::unique_ptr<void, void (*) (void *)> object{ nullptr, nullptr };
+          void *realObject = nullptr;
+          for (const auto &i : objects)
+            {
+              if (i.first == baseTypeName)
+                realObject = i.second.get ();
+            }
           void *region = nullptr;
           typedef const char *(*LoadFunc) (void *, ProgressFunc, void **,
                                            void *, const void *, quint64,
@@ -136,17 +155,22 @@ DhLoadJob::start ()
           auto func = reinterpret_cast<LoadFunc> (
               lib->resolve ("region_create_from_file"));
 
-          if (loadObjectFn)
+          if (loadObjectFn && !realObject)
             {
+              void *o_object = nullptr;
+              std::unique_ptr<void, void (*) (void *)> object{ nullptr,
+                                                               nullptr };
               err_msg_handle_func (msg, loadObjectFn, data, setFunc, this,
                                    cancel_flag, &o_object,
                                    quint64 (DhConfig::elapsedMilliseconds ()),
                                    quint64 (DhConfig::memoryLimit ()));
               object = { o_object, objFree };
+              realObject = o_object;
+              objects.emplace_back (baseTypeName, std::move (object));
             }
           if (func)
-            err_msg_handle_func (msg, func, object.get (), setFunc, &region,
-                                 this, cancel_flag,
+            err_msg_handle_func (msg, func, realObject, setFunc, &region, this,
+                                 cancel_flag,
                                  quint64 (DhConfig::elapsedMilliseconds ()),
                                  quint64 (DhConfig::memoryLimit ()));
 
@@ -174,13 +198,13 @@ DhLoadJob::start ()
             realStr += "\n\n";
         };
 
+      /* Start */
       if (cancel_flag_is_cancelled (cancel_flag))
         {
           setErrorText (_ ("Cancelled."));
           Q_EMIT emitResult ();
           return;
         }
-      auto start = std::chrono::system_clock::now ();
       int failed = 0;
       void *o_data = file_try_uncompress (
           filename.toUtf8 (), setFunc, this, &failed, cancel_flag,
@@ -218,8 +242,13 @@ DhLoadJob::start ()
               lib->resolve ("init_translation"));
           auto nameFn = reinterpret_cast<const char *(*)()> (
               lib->resolve ("region_type"));
+          auto baseTypeFn = reinterpret_cast<const char *(*)()> (
+              lib->resolve ("region_base_type"));
+          auto suffixFn = reinterpret_cast<const char *(*)()> (
+              lib->resolve ("region_file_suffix"));
 
           QString name;
+          QString baseTypeName;
           if (nameFn)
             {
               auto typeName = nameFn ();
@@ -227,6 +256,29 @@ DhLoadJob::start ()
                 name = typeName;
               string_free (typeName);
             }
+          if (baseTypeFn)
+            {
+              auto baseType = baseTypeFn ();
+              if (baseType)
+                baseTypeName = baseType;
+              string_free (baseType);
+            }
+          if (suffixFn)
+            {
+              auto suffix = suffixFn ();
+              if (suffix)
+                typeName = suffix;
+              string_free (suffix);
+            }
+
+          QString realSuffix = QFileInfo (filename).suffix ();
+
+          /* Loaded by file extension name */
+
+          if (DhConfig::loadingFileByExtension () && !realSuffix.isEmpty ())
+            if (realSuffix != typeName)
+              continue;
+
           if (name.isEmpty ())
             name = _ ("unknown");
 
@@ -238,14 +290,14 @@ DhLoadJob::start ()
               if (multiFn ())
                 {
                   if (multiFuncProcessFunc (lib, loadObjectFn, objFree, msg,
-                                            data.get (), start))
+                                            data.get (), baseTypeName))
                     break;
                   tryErrorFunc (name, msg, realStr, j != moduleNum - 1);
                 }
               else
                 {
                   if (singleFuncProcessFunc (lib, loadObjectFn, objFree, msg,
-                                             data.get ()))
+                                             data.get (), baseTypeName))
                     break;
                   tryErrorFunc (name, msg, realStr, j != moduleNum - 1);
                 }
@@ -264,7 +316,6 @@ DhLoadJob::start ()
               setErrorText (realMsg);
             }
         }
-      qDebug () << durationTime;
       Q_EMIT emitResult ();
     };
   std::thread trd (realfunc);
@@ -294,6 +345,12 @@ DhLoadJob::getFilename ()
   return filename;
 }
 
+QString
+DhLoadJob::getTypeName ()
+{
+  return typeName;
+}
+
 DhAllLoadJob::DhAllLoadJob (QStringList list, QMainWindow *mainWindow,
                             ManageRegionUI *mrui, QObject *parent)
     : KCompositeJob (parent), cancel_flag (cancel_flag_new ()),
@@ -312,7 +369,7 @@ DhAllLoadJob::DhAllLoadJob (QStringList list, QMainWindow *mainWindow,
   connect (this, &DhAllLoadJob::percentChanged, this,
            [&]
              {
-               QString textb = _ ("Fininsh processing %1 of %2 (%3%).");
+               QString textb = _ ("Finish processing %1 of %2 (%3%).");
                textb = textb.arg (this->finishedJobs)
                            .arg (this->jobNums)
                            .arg (percent ());
@@ -361,7 +418,12 @@ DhAllLoadJob::DhAllLoadJob (QStringList list, QMainWindow *mainWindow,
                  {
                    auto castedJob = qobject_cast<DhLoadJob *> (realjob);
                    QString realStr = "%1: %2 (%3%)";
-                   realStr = realStr.arg (castedJob->getFilename ())
+                   QString realFilename = castedJob->getFilename ();
+                   QString realPrefix = realFilename;
+                   if (!castedJob->getTypeName ().isEmpty ())
+                     realPrefix
+                         = realPrefix + " (" + castedJob->getTypeName () + ")";
+                   realStr = realStr.arg (realPrefix)
                                  .arg (str)
                                  .arg (realjob->percent ());
                    castedJob->messageWidget->setText (realStr);

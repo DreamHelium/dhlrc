@@ -11,7 +11,8 @@ use common_rs::util::{real_show_progress, string_to_ptr_fail_to_null};
 use common_rs::{ProgressFn, show_progress_macro};
 use crab_nbt::{Nbt, NbtCompound, NbtTag};
 use crab_nbt_ext::{
-    GetWithError, convert_nbt_to_vec, get_palette_from_nbt_tag, gettext_text, nbt_create_real,
+    GetWithError, convert_nbt_to_vec, get_compound, get_palette_from_nbt_tag, gettext_text,
+    nbt_create_real,
 };
 use formatx::formatx;
 use std::collections::HashMap;
@@ -73,6 +74,16 @@ pub extern "C" fn region_is_multi() -> i32 {
     0
 }
 
+#[unsafe(no_mangle)]
+pub extern "C" fn region_file_suffix() -> *const c_char {
+    string_to_ptr_fail_to_null("nbt")
+}
+
+#[unsafe(no_mangle)]
+pub extern "C" fn region_base_type() -> *const c_char {
+    string_to_ptr_fail_to_null("JavaNBT")
+}
+
 fn get_int_from_nbt_tag(nbt: &NbtTag) -> Result<i32, MyError> {
     match nbt {
         NbtTag::Int(x) => Ok(*x),
@@ -128,14 +139,7 @@ fn region_get_entity_internal(
             }));
         }
 
-        let internal_entity = match entity {
-            NbtTag::Compound(c) => c,
-            _ => {
-                return Err(Box::from(MyError {
-                    msg: String::from(i18n("Wrong type of entity!")),
-                }));
-            }
-        };
+        get_compound!(internal_entity, entity, i18n("Wrong type of entity!"));
         /* Then we need to process the nbt */
         let real_nbt = internal_entity.get_compound_with_err("nbt")?;
         let block_pos = internal_entity.get_list_with_err("pos")?;

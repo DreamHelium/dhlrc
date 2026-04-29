@@ -20,7 +20,8 @@ public:
   bool doResume () override;
   void forceResume ();
   KMessageWidget *messageWidget = nullptr;
-  QString getFilename();
+  QString getFilename ();
+  QString getTypeName ();
 
 Q_SIGNALS:
   void selfSuspended (KJob *job);
@@ -28,12 +29,14 @@ Q_SIGNALS:
 
 private:
   QString filename;
+  QString typeName;
   const void *cancel_flag;
   std::mutex mutex;
   std::condition_variable cv;
   QStringList regionList;
   QList<int> regionIndexes;
-  double durationTime = 0;
+  std::vector<std::pair<QString, std::unique_ptr<void, void (*) (void *)>>>
+      objects;
 };
 
 class DhAllLoadJob : public KCompositeJob

@@ -89,7 +89,8 @@ BlockReaderUI::BlockReaderUI (int index, ManageRegionUI *mr, QWidget *parent)
 
 BlockReaderUI::~BlockReaderUI ()
 {
-  delete rmui;
+  if (rmui)
+    rmui->deleteLater ();
   delete ui;
   // delete bsui;
   // dh_info_reader_unlock (DH_TYPE_REGION, uuid.toUtf8 ());

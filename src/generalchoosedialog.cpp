@@ -12,10 +12,18 @@ GeneralChooseDialog::GeneralChooseDialog (const QString &title,
                                           bool needMulti, QWidget *parent)
     : QDialog (parent)
 {
+  allLayout = new QVBoxLayout (this);
+  widget = new QWidget ();
+  scrollArea = new QScrollArea (this);
+  scrollArea->setWidgetResizable (true);
+  scrollArea->setWidget (widget);
+  scrollArea->setFrameShape (QFrame::NoFrame);
+  allLayout->addWidget (scrollArea);
   setWindowTitle (title);
-  layout = new QVBoxLayout (this);
+  layout = new QVBoxLayout ();
   QLabel *contentLabel = new QLabel (label);
   layout->addWidget (contentLabel);
+  widget->setLayout (layout);
   group = new QButtonGroup (this);
   int index = 0;
   if (needMulti)
@@ -68,7 +76,7 @@ GeneralChooseDialog::GeneralChooseDialog (const QString &title,
   btnLayout->addWidget (okBtn);
   btnLayout->addWidget (cancelBtn);
 
-  layout->addLayout (btnLayout);
+  allLayout->addLayout (btnLayout);
 
   QObject::connect (okBtn, &QAbstractButton::clicked, this,
                     &GeneralChooseDialog::accept);
