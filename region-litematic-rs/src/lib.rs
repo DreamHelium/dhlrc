@@ -7,7 +7,10 @@ use common_rs::util::show_progress;
 use common_rs::util::{real_show_progress, string_to_ptr_fail_to_null};
 use common_rs::{ProgressFn, show_progress_macro};
 use crab_nbt::{Nbt, NbtTag};
-use crab_nbt_ext::{GetWithError, convert_nbt_tag_to_tree_value, convert_nbt_to_vec, get_palette_from_nbt_tag, gettext_text, get_compound};
+use crab_nbt_ext::{
+    GetWithError, convert_nbt_tag_to_tree_value, convert_nbt_to_vec, get_compound,
+    get_palette_from_nbt_tag, gettext_text,
+};
 use formatx::formatx;
 use std::error::Error;
 use std::ffi::{c_char, c_int, c_void};
@@ -62,13 +65,14 @@ pub extern "C" fn region_base_type() -> *const c_char {
 pub extern "C" fn region_num(region: *mut Nbt) -> i32 {
     if !region.is_null() {
         let real_nbt = unsafe { Box::from_raw(region) };
-        let clone_nbt = real_nbt.clone();
-        let _ = Box::into_raw(real_nbt);
-        let region_nbt = clone_nbt.get_compound_with_err("Regions");
+        let region_nbt = real_nbt.get_compound_with_err("Regions");
+        let ret;
         match region_nbt {
-            Ok(r) => r.child_tags.len() as i32,
-            Err(_) => 0,
+            Ok(r) => ret = r.child_tags.len() as i32,
+            Err(_) => ret = 0,
         }
+        let _ = Box::into_raw(real_nbt);
+        ret
     } else {
         0
     }
@@ -77,10 +81,11 @@ pub extern "C" fn region_num(region: *mut Nbt) -> i32 {
 #[unsafe(no_mangle)]
 pub extern "C" fn region_name_index(region: *mut Nbt, index: i32) -> *const c_char {
     let real_nbt = unsafe { Box::from_raw(region) };
-    let clone_nbt = real_nbt.clone();
+    let region_name = &real_nbt.get_compound("Regions").unwrap().child_tags[index as usize]
+        .0
+        .clone();
     let _ = Box::into_raw(real_nbt);
-    let region_nbt = clone_nbt.get_compound("Regions").unwrap();
-    string_to_ptr_fail_to_null(&region_nbt.child_tags[index as usize].0)
+    string_to_ptr_fail_to_null(&region_name)
 }
 
 fn get_bits(num: usize) -> u32 {
@@ -177,7 +182,7 @@ fn region_create_from_bytes_internal(
     elapsed_millisecs: u128,
     free_memory: u64,
 ) -> Result<*mut Region, Box<dyn Error>> {
-    let nbt = unsafe { (*o_nbt).clone() };
+    let nbt = unsafe { &*o_nbt };
     let data_version = nbt.get_int_with_err("MinecraftDataVersion")?;
     let metadata = nbt.get_compound_with_err("Metadata")?;
     let create_time = metadata.get_long_with_err("TimeCreated")?;

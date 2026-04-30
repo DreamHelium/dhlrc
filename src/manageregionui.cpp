@@ -204,8 +204,8 @@ ManageRegionUI::getRegions ()
 void
 ManageRegionUI::notify ()
 {
-  for (const auto &notifier : notifiers)
-    notifier.notify_func (notifier.main_klass);
+  for (const auto &[notify_func, main_klass] : notifiers)
+    notify_func (main_klass);
 }
 
 void

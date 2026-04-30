@@ -218,20 +218,38 @@ DhLoadJob::start ()
           return;
         }
       std::unique_ptr<void, void (*) (void *)> data{ o_data, vec_free };
-      auto moduleNum = ManageRegionUI::moduleNum ();
       const char *msg = nullptr;
-      int j = 0;
+
       failed = false;
       QString realStr;
-      for (; j < moduleNum; j++)
+
+      QList<QLibrary *> libraries;
+      for (auto i = 0; i < ManageRegionUI::moduleNum (); i++)
+        libraries.append (ManageRegionUI::getModule (i));
+
+      QLibrary *realLib = nullptr;
+      if (DhConfig::loadingFileByExtension ())
+        for (const auto &i : libraries)
+          {
+            auto suffixFn = reinterpret_cast<const char *(*)()> (
+                i->resolve ("region_file_suffix"));
+            if (suffixFn)
+              {
+                auto suffix = suffixFn ();
+                if (QFileInfo (filename).suffix () == QString (suffix))
+                  realLib = i;
+                string_free (suffix);
+              }
+          }
+      auto realLoadProcess
+          = [&] (QLibrary *lib, bool lastOne) -> std::optional<Reason>
         {
           if (cancel_flag_is_cancelled (cancel_flag))
             {
               failed = true;
-              break;
+              return CANCELLED;
             }
 
-          auto lib = ManageRegionUI::getModule (j);
           auto multiFn = reinterpret_cast<qint32 (*) ()> (
               lib->resolve ("region_is_multi"));
           auto objFree
@@ -251,10 +269,10 @@ DhLoadJob::start ()
           QString baseTypeName;
           if (nameFn)
             {
-              auto typeName = nameFn ();
-              if (typeName)
-                name = typeName;
-              string_free (typeName);
+              auto tname = nameFn ();
+              if (tname)
+                name = tname;
+              string_free (tname);
             }
           if (baseTypeFn)
             {
@@ -276,8 +294,8 @@ DhLoadJob::start ()
           /* Loaded by file extension name */
 
           if (DhConfig::loadingFileByExtension () && !realSuffix.isEmpty ())
-            if (realSuffix != typeName)
-              continue;
+            if (realSuffix != typeName && !DhConfig::failThenRetry ())
+              return NOT_MATCHED;
 
           if (name.isEmpty ())
             name = _ ("unknown");
@@ -289,32 +307,69 @@ DhLoadJob::start ()
             {
               if (multiFn ())
                 {
-                  if (multiFuncProcessFunc (lib, loadObjectFn, objFree, msg,
-                                            data.get (), baseTypeName))
-                    break;
-                  tryErrorFunc (name, msg, realStr, j != moduleNum - 1);
+                  if (!multiFuncProcessFunc (lib, loadObjectFn, objFree, msg,
+                                             data.get (), baseTypeName))
+                    {
+                      tryErrorFunc (name, msg, realStr, !lastOne);
+                      return FAILED;
+                    }
                 }
               else
                 {
-                  if (singleFuncProcessFunc (lib, loadObjectFn, objFree, msg,
-                                             data.get (), baseTypeName))
-                    break;
-                  tryErrorFunc (name, msg, realStr, j != moduleNum - 1);
+                  if (!singleFuncProcessFunc (lib, loadObjectFn, objFree, msg,
+                                              data.get (), baseTypeName))
+                    {
+                      tryErrorFunc (name, msg, realStr, !lastOne);
+                      return FAILED;
+                    }
                 }
             }
-          if (j == moduleNum - 1)
-            failed = true;
-        }
-      if (failed)
+          return std::nullopt;
+        };
+
+      if (realLib)
         {
-          if (realStr.isEmpty ())
-            pushMsgFunc (msg);
-          else
+          auto ret = realLoadProcess (realLib, false);
+          if (!ret.has_value () || ret == CANCELLED)
             {
-              QString realMsg = "**%1**:\n\n%2";
-              realMsg = realMsg.arg (filename).arg (realStr);
-              setErrorText (realMsg);
+              /* Success or cancelled */
+              Q_EMIT emitResult ();
+              return;
             }
+          else
+            libraries.removeOne (realLib);
+        }
+      for (auto i = 0; i < libraries.size (); i++)
+        {
+          auto ret
+              = realLoadProcess (libraries[i], i == libraries.size () - 1);
+          if (!ret.has_value ())
+            {
+              if (DhConfig::failThenRetry ())
+                {
+                  auto suffixFn = reinterpret_cast<const char *(*)()> (
+                      libraries[i]->resolve ("region_file_suffix"));
+                  auto suffix = suffixFn ();
+                  setErrorText (QString ("**%1**: %2")
+                                    .arg (filename)
+                                    .arg (_ ("Detected wrong file extension, "
+                                             "expected %1, received %2."))
+                                    .arg (suffix)
+                                    .arg (QFileInfo (filename).suffix ()));
+                  string_free (suffix);
+                }
+              Q_EMIT emitResult ();
+              return;
+            }
+        }
+
+      if (realStr.isEmpty () && msg)
+        pushMsgFunc (msg);
+      else
+        {
+          QString realMsg = "**%1**:\n\n%2";
+          realMsg = realMsg.arg (filename).arg (realStr);
+          setErrorText (realMsg);
         }
       Q_EMIT emitResult ();
     };

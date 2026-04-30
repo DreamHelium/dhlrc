@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-04-29 22:12+0800\n"
+"POT-Creation-Date: 2026-05-01 00:10+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -118,8 +118,8 @@ msgstr ""
 msgid "Setting options:"
 msgstr ""
 
-#: ../../src/configobjectui.cpp:87 ../../src/lrchooseui.cpp:79 rc.cpp:176
-#: rc.cpp:236
+#: ../../src/configobjectui.cpp:87 ../../src/lrchooseui.cpp:79 rc.cpp:182
+#: rc.cpp:242
 msgid "&OK"
 msgstr ""
 
@@ -151,24 +151,28 @@ msgstr ""
 msgid "Cancelled."
 msgstr ""
 
-#: ../../src/dhloadjob.cpp:283 ../../src/loadregionui.cpp:304
+#: ../../src/dhloadjob.cpp:301 ../../src/loadregionui.cpp:304
 msgid "unknown"
 msgstr ""
 
-#: ../../src/dhloadjob.cpp:329 ../../src/loadregionui.cpp:75
+#: ../../src/dhloadjob.cpp:355
+msgid "Detected wrong file extension, expected %1, received %2."
+msgstr ""
+
+#: ../../src/dhloadjob.cpp:384 ../../src/loadregionui.cpp:75
 msgid "Select a Region"
 msgstr ""
 
-#: ../../src/dhloadjob.cpp:329 ../../src/loadregionui.cpp:75
+#: ../../src/dhloadjob.cpp:384 ../../src/loadregionui.cpp:75
 #: ../../src/utility.cpp:33
 msgid "Please select a region."
 msgstr ""
 
-#: ../../src/dhloadjob.cpp:365 ../../src/dhloadjob.cpp:372
+#: ../../src/dhloadjob.cpp:420 ../../src/dhloadjob.cpp:427
 msgid "Finish processing %1 of %2 (%3%)."
 msgstr ""
 
-#: ../../src/dhloadjob.cpp:437
+#: ../../src/dhloadjob.cpp:492
 msgid "Continue"
 msgstr ""
 
@@ -241,7 +245,7 @@ msgstr ""
 msgid "Enter description here."
 msgstr ""
 
-#: ../../src/lrchooseui.cpp:80 rc.cpp:12 rc.cpp:164
+#: ../../src/lrchooseui.cpp:80 rc.cpp:12 rc.cpp:170
 msgid "&Close"
 msgstr ""
 
@@ -277,7 +281,7 @@ msgstr ""
 msgid "&Select"
 msgstr ""
 
-#: ../../src/manageregionui.cpp:111 rc.cpp:170
+#: ../../src/manageregionui.cpp:111 rc.cpp:176
 msgid "&Add"
 msgstr ""
 
@@ -419,59 +423,67 @@ msgstr ""
 msgid "If you check this, the file will be loaded by the file extension name."
 msgstr ""
 
-#: ../../build/src/settings.cpp:57 rc.cpp:130 ../../region-rs/src/default.rs:58
+#: ../../build/src/settings.cpp:55 rc.cpp:96
+msgid "Retry Loading File when Failed"
+msgstr ""
+
+#: ../../build/src/settings.cpp:56 rc.cpp:99
+msgid "When failed, the file will try to be loaded by other modules."
+msgstr ""
+
+#: ../../build/src/settings.cpp:61 rc.cpp:136 ../../region-rs/src/default.rs:58
 msgid "Converted"
 msgstr ""
 
-#: ../../build/src/settings.cpp:58 rc.cpp:96
+#: ../../build/src/settings.cpp:62 rc.cpp:102
 msgid "Region Base Name"
 msgstr ""
 
-#: ../../build/src/settings.cpp:59 rc.cpp:99
+#: ../../build/src/settings.cpp:63 rc.cpp:105
 msgid "The default base name for the region."
 msgstr ""
 
-#: ../../build/src/settings.cpp:61 rc.cpp:131 ../../region-rs/src/default.rs:60
+#: ../../build/src/settings.cpp:65 rc.cpp:137 ../../region-rs/src/default.rs:60
 msgid "Unnamed"
 msgstr ""
 
-#: ../../build/src/settings.cpp:62 rc.cpp:102 rc.cpp:227
+#: ../../build/src/settings.cpp:66 rc.cpp:108 rc.cpp:233
 msgid "Region Name"
 msgstr ""
 
-#: ../../build/src/settings.cpp:63 rc.cpp:105
+#: ../../build/src/settings.cpp:67 rc.cpp:111
 msgid "The default name for the region."
 msgstr ""
 
-#: ../../build/src/settings.cpp:66 rc.cpp:108
+#: ../../build/src/settings.cpp:70 rc.cpp:114
 msgid "Region Description"
 msgstr ""
 
-#: ../../build/src/settings.cpp:67 rc.cpp:111
+#: ../../build/src/settings.cpp:71 rc.cpp:117
 msgid "The default description for the region."
 msgstr ""
 
-#: ../../build/src/settings.cpp:70 rc.cpp:114
+#: ../../build/src/settings.cpp:74 rc.cpp:120
 msgid "Region Author"
 msgstr ""
 
-#: ../../build/src/settings.cpp:71 rc.cpp:117
+#: ../../build/src/settings.cpp:75 rc.cpp:123
 msgid "The default author for the region."
 msgstr ""
 
-#: ../../build/src/settings.cpp:77 rc.cpp:120
+#: ../../build/src/settings.cpp:81 rc.cpp:126
 msgid "Override Settings"
 msgstr ""
 
-#: ../../build/src/settings.cpp:78 rc.cpp:123
+#: ../../build/src/settings.cpp:82 rc.cpp:129
 msgid "Whether to override setting or not."
 msgstr ""
 
-#: ../../build/src/settings.cpp:81 rc.cpp:126
+#: ../../build/src/settings.cpp:85 rc.cpp:132
 msgid "Override Version"
 msgstr ""
 
-#: ../../build/src/settings.cpp:82 rc.cpp:129
+#: ../../build/src/settings.cpp:86 rc.cpp:135
 msgid "The version to override in translation stage."
 msgstr ""
 
@@ -527,7 +539,7 @@ msgstr ""
 msgid "&List blocks"
 msgstr ""
 
-#: rc.cpp:54 rc.cpp:182
+#: rc.cpp:54 rc.cpp:188
 msgid "&Show blocks"
 msgstr ""
 
@@ -547,115 +559,115 @@ msgstr ""
 msgid "Modify &Block"
 msgstr ""
 
-#: rc.cpp:134
+#: rc.cpp:140
 msgid "What happened in this step?"
 msgstr ""
 
-#: rc.cpp:137
+#: rc.cpp:143
 msgid "Details"
 msgstr ""
 
-#: rc.cpp:140
+#: rc.cpp:146
 msgid "&Continue"
 msgstr ""
 
-#: rc.cpp:143
+#: rc.cpp:149
 msgid "C&ancel"
 msgstr ""
 
-#: rc.cpp:146
+#: rc.cpp:152
 msgid "Form"
 msgstr ""
 
-#: rc.cpp:149
+#: rc.cpp:155
 msgid "Type:"
 msgstr ""
 
-#: rc.cpp:152
+#: rc.cpp:158
 msgid "Key:"
 msgstr ""
 
-#: rc.cpp:155
+#: rc.cpp:161
 msgid "Value:"
 msgstr ""
 
-#: rc.cpp:158
+#: rc.cpp:164
 msgid "&Export"
 msgstr ""
 
-#: rc.cpp:161
+#: rc.cpp:167
 msgid "PushButton"
 msgstr ""
 
-#: rc.cpp:167
+#: rc.cpp:173
 msgid "PaletteAddUI"
 msgstr ""
 
-#: rc.cpp:173
+#: rc.cpp:179
 msgid "&Remove"
 msgstr ""
 
-#: rc.cpp:179
+#: rc.cpp:185
 msgid "PaletteListUI"
 msgstr ""
 
-#: rc.cpp:185
+#: rc.cpp:191
 msgid "Modify Property of Block(s)"
 msgstr ""
 
-#: rc.cpp:188
+#: rc.cpp:194
 msgid "Modify the property of the block in:"
 msgstr ""
 
-#: rc.cpp:191
+#: rc.cpp:197
 msgid "With the block that is the same property"
 msgstr ""
 
-#: rc.cpp:194
+#: rc.cpp:200
 msgid "Properties:"
 msgstr ""
 
-#: rc.cpp:197
+#: rc.cpp:203
 msgid "RegionModifyUI"
 msgstr ""
 
-#: rc.cpp:200
+#: rc.cpp:206
 msgid "Modify the infomation of the Region."
 msgstr ""
 
-#: rc.cpp:203
+#: rc.cpp:209
 msgid "Create Time"
 msgstr ""
 
-#: rc.cpp:206 rc.cpp:212
+#: rc.cpp:212 rc.cpp:218
 msgid "yyyy/MM/dd HH:mm:ss.zzz"
 msgstr ""
 
-#: rc.cpp:209
+#: rc.cpp:215
 msgid "Modify Time"
 msgstr ""
 
-#: rc.cpp:215
+#: rc.cpp:221
 msgid "Description"
 msgstr ""
 
-#: rc.cpp:218
+#: rc.cpp:224
 msgid "Offset"
 msgstr ""
 
-#: rc.cpp:221
+#: rc.cpp:227
 msgid "Author"
 msgstr ""
 
-#: rc.cpp:224
+#: rc.cpp:230
 msgid "Base Name"
 msgstr ""
 
-#: rc.cpp:230
+#: rc.cpp:236
 msgid "Data Version"
 msgstr ""
 
-#: rc.cpp:233
+#: rc.cpp:239
 msgid "Version"
 msgstr ""
 
@@ -711,95 +723,95 @@ msgstr ""
 msgid "Null pointer detected"
 msgstr ""
 
-#: ../../crab-nbt-ext/src/lib.rs:71 ../../region-litematic-rs/src/lib.rs:340
-#: ../../region-nbt-rs/src/lib.rs:352
+#: ../../crab-nbt-ext/src/lib.rs:72 ../../region-litematic-rs/src/lib.rs:345
+#: ../../region-nbt-rs/src/lib.rs:353
 msgid "Region value not provided"
 msgstr ""
 
-#: ../../crab-nbt-ext/src/lib.rs:96
+#: ../../crab-nbt-ext/src/lib.rs:97
 #, rust-format
 msgid "Couldn't get compound of {}."
 msgstr ""
 
-#: ../../crab-nbt-ext/src/lib.rs:107
+#: ../../crab-nbt-ext/src/lib.rs:108
 #, rust-format
 msgid "Couldn't get int of {}."
 msgstr ""
 
-#: ../../crab-nbt-ext/src/lib.rs:118
+#: ../../crab-nbt-ext/src/lib.rs:119
 #, rust-format
 msgid "Couldn't get list of {}."
 msgstr ""
 
-#: ../../crab-nbt-ext/src/lib.rs:129
+#: ../../crab-nbt-ext/src/lib.rs:130
 #, rust-format
 msgid "Couldn't get string of {}."
 msgstr ""
 
-#: ../../crab-nbt-ext/src/lib.rs:140
+#: ../../crab-nbt-ext/src/lib.rs:141
 #, rust-format
 msgid "Couldn't get long of {}."
 msgstr ""
 
-#: ../../crab-nbt-ext/src/lib.rs:151
+#: ../../crab-nbt-ext/src/lib.rs:152
 #, rust-format
 msgid "Couldn't get long array of {}."
 msgstr ""
 
-#: ../../crab-nbt-ext/src/lib.rs:184
+#: ../../crab-nbt-ext/src/lib.rs:185
 msgid "Reading NBT finish."
 msgstr ""
 
-#: ../../crab-nbt-ext/src/lib.rs:320
+#: ../../crab-nbt-ext/src/lib.rs:321
 msgid "Reading palette is cancelled!"
 msgstr ""
 
-#: ../../crab-nbt-ext/src/lib.rs:327
+#: ../../crab-nbt-ext/src/lib.rs:328
 msgid "Wrong type of palette!"
 msgstr ""
 
-#: ../../crab-nbt-ext/src/lib.rs:342
+#: ../../crab-nbt-ext/src/lib.rs:343
 msgid "Wrong type of property!"
 msgstr ""
 
-#: ../../crab-nbt-ext/src/lib.rs:426 ../../crab-nbt-ext/src/lib.rs:474
+#: ../../crab-nbt-ext/src/lib.rs:427 ../../crab-nbt-ext/src/lib.rs:473
 msgid "Reading NBT."
 msgstr ""
 
-#: ../../crab-nbt-ext/src/lib.rs:428 ../../crab-nbt-ext/src/lib.rs:476
+#: ../../crab-nbt-ext/src/lib.rs:429 ../../crab-nbt-ext/src/lib.rs:475
 msgid "The parsing operation is cancelled."
 msgstr ""
 
-#: ../../region-litematic-rs/src/lib.rs:123
+#: ../../region-litematic-rs/src/lib.rs:128
 #, rust-format
 msgid "Reading block id: {} / {}."
 msgstr ""
 
-#: ../../region-litematic-rs/src/lib.rs:128
+#: ../../region-litematic-rs/src/lib.rs:133
 msgid "Cancelled when reading blocks"
 msgstr ""
 
-#: ../../region-litematic-rs/src/lib.rs:144
+#: ../../region-litematic-rs/src/lib.rs:149
 msgid "Out of range!"
 msgstr ""
 
-#: ../../region-litematic-rs/src/lib.rs:160
+#: ../../region-litematic-rs/src/lib.rs:165
 msgid "Reading block finished!"
 msgstr ""
 
-#: ../../region-litematic-rs/src/lib.rs:196
+#: ../../region-litematic-rs/src/lib.rs:201
 msgid "Wrong type of region."
 msgstr ""
 
-#: ../../region-litematic-rs/src/lib.rs:242
+#: ../../region-litematic-rs/src/lib.rs:247
 msgid "Wrong type of tile entity."
 msgstr ""
 
-#: ../../region-litematic-rs/src/lib.rs:283 ../../region-nbt-rs/src/lib.rs:138
+#: ../../region-litematic-rs/src/lib.rs:288 ../../region-nbt-rs/src/lib.rs:138
 msgid "Reading entities is cancelled!"
 msgstr ""
 
-#: ../../region-litematic-rs/src/lib.rs:286 ../../region-nbt-rs/src/lib.rs:142
+#: ../../region-litematic-rs/src/lib.rs:291 ../../region-nbt-rs/src/lib.rs:142
 msgid "Wrong type of entity!"
 msgstr ""
 
@@ -831,15 +843,15 @@ msgstr ""
 msgid "Wrong size count!"
 msgstr ""
 
-#: ../../region-nbt-rs/src/lib.rs:233
+#: ../../region-nbt-rs/src/lib.rs:234
 msgid "Wrong type of block!"
 msgstr ""
 
-#: ../../region-nbt-rs/src/lib.rs:241 ../../region-nbt-rs/src/lib.rs:278
+#: ../../region-nbt-rs/src/lib.rs:242 ../../region-nbt-rs/src/lib.rs:279
 msgid "Reading blocks is cancelled!"
 msgstr ""
 
-#: ../../region-nbt-rs/src/lib.rs:273
+#: ../../region-nbt-rs/src/lib.rs:274
 #, rust-format
 msgid "Processing blocks: {} / {}."
 msgstr ""

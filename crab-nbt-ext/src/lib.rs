@@ -164,7 +164,7 @@ pub fn nbt_create_real(
     elapsed_millisecs: u128,
     free_memory: u64,
 ) -> Result<Nbt, Box<dyn Error>> {
-    let uncompressed_bytes = unsafe { (*bytes).clone() };
+    let uncompressed_bytes = unsafe { &*bytes };
 
     let mut bytes = Cursor::new(uncompressed_bytes);
 
@@ -380,20 +380,20 @@ pub fn nbt_read_with_progress(
     let mut instant = Instant::now();
     let mut sys = System::new_all();
 
-    Ok(Nbt {
-        name: get_nbt_string(bytes)?,
-        root_tag: compound_deserialize_content(
-            bytes,
-            progress_fn,
-            main_klass,
-            cancel_flag,
-            size,
-            elapsed_millisecs,
-            free_memory,
-            &mut instant,
-            &mut sys,
-        )?,
-    })
+    let name = get_nbt_string(bytes)?;
+    let root_tag = compound_deserialize_content(
+        bytes,
+        progress_fn,
+        main_klass,
+        cancel_flag,
+        size,
+        elapsed_millisecs,
+        free_memory,
+        &mut instant,
+        &mut sys,
+    )?;
+
+    Ok(Nbt { name, root_tag })
 }
 
 fn compound_deserialize_content(
@@ -407,8 +407,8 @@ fn compound_deserialize_content(
     instant: &mut Instant,
     sys: &mut System,
 ) -> Result<NbtCompound, Box<dyn Error>> {
-    let mut compound = NbtCompound::new();
-
+    // let mut compound = NbtCompound::new();
+    let mut vec = vec![];
     while bytes.has_remaining() {
         let tag_id = bytes.get_u8();
         if tag_id == 0 {
@@ -430,7 +430,7 @@ fn compound_deserialize_content(
 
         let name = get_nbt_string(bytes)?;
 
-        if let Ok(tag) = deserialize_data(
+        let tag = deserialize_data(
             bytes,
             tag_id,
             progress_fn,
@@ -441,14 +441,12 @@ fn compound_deserialize_content(
             free_memory,
             instant,
             sys,
-        ) {
-            compound.put(name, tag);
-        } else {
-            break;
-        }
+        )?;
+        let value = (name, tag);
+        vec.push(value);
     }
 
-    Ok(compound)
+    Ok(NbtCompound { child_tags: vec })
 }
 
 pub fn deserialize_data(

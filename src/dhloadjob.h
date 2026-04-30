@@ -15,6 +15,12 @@ public:
       : KJob (parent), filename (filename), cancel_flag (cancel_flag)
   {
   }
+  enum Reason
+  {
+    CANCELLED,
+    NOT_MATCHED,
+    FAILED
+  };
   ~DhLoadJob () override = default;
   void start () override;
   bool doResume () override;

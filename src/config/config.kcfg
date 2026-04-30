@@ -24,6 +24,11 @@
             <tooltip>If you check this, the file will be loaded by the file extension name.</tooltip>
             <default>true</default>
         </entry>
+        <entry name="FailThenRetry" type="Bool">
+            <label>Retry Loading File when Failed</label>
+            <tooltip>When failed, the file will try to be loaded by other modules.</tooltip>
+            <default>false</default>
+        </entry>
     </group>
     <group name="Default">
         <entry name="BaseName" type="String">

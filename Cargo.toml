@@ -3,3 +3,8 @@
 #
 [workspace]
 members = ["region-rs", "region-nbt-rs", "region-litematic-rs", "nbt-to-vec"]
+
+[profile.release]
+debug = false
+strip = true
+panic = "abort"

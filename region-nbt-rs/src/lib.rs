@@ -190,7 +190,7 @@ fn region_create_from_bytes_internal(
     elapsed_millisecs: u128,
     free_memory: u64,
 ) -> Result<*mut Region, Box<dyn Error>> {
-    let nbt = unsafe { (*o_nbt).clone() };
+    let nbt = unsafe { &*o_nbt };
     let data_version = nbt.get_int_with_err("DataVersion")?;
     let size_compound = nbt.get_list_with_err("size")?;
     let size_compound_size = size_compound.len();
@@ -210,6 +210,7 @@ fn region_create_from_bytes_internal(
     for palette in &palette_vec {
         if palette.id_name.eq("minecraft:air") {
             air_palette = i;
+            break;
         }
         i += 1;
     }
