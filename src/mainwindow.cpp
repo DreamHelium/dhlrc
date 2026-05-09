@@ -19,7 +19,7 @@ static MainWindow *mainWindow = nullptr;
 MainWindow::MainWindow (QWidget *parent) : QMainWindow (parent)
 {
   mainWindow = this;
-  resize (400, 400);
+  resize (800, 800);
 
   scrollArea = new QScrollArea ();
   scrollArea->setWidgetResizable (true);
@@ -142,12 +142,12 @@ MainWindow::MainWindow (QWidget *parent) : QMainWindow (parent)
              });
   connect (tabWidget, &QTabWidget::tabCloseRequested, this,
            [&] (int index)
-           {
-             if (tabWidget->widget (index) != mrui)
-              delete tabWidget->widget (index);
-             else
-               tabWidget->removeTab (index);
-           });
+             {
+               if (tabWidget->widget (index) != mrui)
+                 delete tabWidget->widget (index);
+               else
+                 tabWidget->removeTab (index);
+             });
 }
 
 MainWindow::~MainWindow ()
@@ -166,9 +166,10 @@ MainWindow::addWidgetToToolBar (QWidget *widget)
 {
   if (mainWindow)
     {
-      if (mainWindow->allSplitter->sizes ()[0] == 0)
-        mainWindow->allSplitter->setSizes ({ 50, mainWindow->height () - 50 });
       mainWindow->topLayout->addWidget (widget);
+      auto layoutHeight = mainWindow->topLayout->sizeHint ().height ();
+      mainWindow->allSplitter->setSizes (
+          { layoutHeight, mainWindow->height () - layoutHeight });
     }
 }
 

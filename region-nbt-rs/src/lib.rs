@@ -84,6 +84,11 @@ pub extern "C" fn region_base_type() -> *const c_char {
     string_to_ptr_fail_to_null("JavaNBT")
 }
 
+#[unsafe(no_mangle)]
+pub extern "C" fn region_file_type() -> *const c_char {
+    string_to_ptr_fail_to_null(&gettext_text(i18n("NBT File (*.nbt)")))
+}
+
 fn get_int_from_nbt_tag(nbt: &NbtTag) -> Result<i32, MyError> {
     match nbt {
         NbtTag::Int(x) => Ok(*x),

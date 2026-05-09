@@ -8,373 +8,42 @@
 #include "settings.h"
 #include "utility.h"
 #undef asprintf
+#include <QFinalState>
+#include <QStateMachine>
 #include <QTimer>
 #include <future>
 #include <qfileinfo.h>
-
-#define err_msg_handle_func(msg, func, ...)                                   \
-  if (msg)                                                                    \
-    return false;                                                             \
-  msg = func (__VA_ARGS__);                                                   \
-  if (msg)                                                                    \
-    return false;
+#include <qtconcurrentrun.h>
 
 void
 DhLoadJob::start ()
 {
-  auto realfunc = [&]
-    {
-      using LoadObjectFunc
-          = const char *(*)(void *, ProgressFunc, void *, const void *,
-                            void **, quint64, quint64);
-      using ObjFreeFunc = void (*) (void *);
-      auto setFunc
-          = [] (void *main_klass, int value, const char *text, const char *arg)
-        {
-          auto real_klass = static_cast<DhLoadJob *> (main_klass);
-          real_klass->setPercent (value);
-          if (!arg)
-            Q_EMIT real_klass->infoMessage (real_klass, gettext (text));
-          else
-            {
-              auto msg = QString::asprintf (gettext (text), arg);
-              Q_EMIT real_klass->infoMessage (real_klass, gettext (text));
-            }
-        };
-      auto pushRegionFunc
-          = [&] (const QString &dir, const QString &name, void *region)
-        {
-          auto realName = QFileInfo (dir).completeBaseName ();
+  auto loadFile = new QState ();
+  auto loadObject = new QState ();
+  auto loadRegion = new QState ();
+  auto errorState = new QFinalState ();
+  auto finalState = new QFinalState ();
 
-          if (!name.isEmpty ())
-            {
-              realName += " - ";
-              realName += name;
-            }
+  loadFile->addTransition (this, &DhLoadJob::error, errorState);
+  loadFile->addTransition (this, &DhLoadJob::loadFileSuccess, loadObject);
+  loadObject->addTransition (this, &DhLoadJob::error, errorState);
+  loadObject->addTransition (this, &DhLoadJob::loadObjectSuccess, loadRegion);
+  loadRegion->addTransition (this, &DhLoadJob::error, errorState);
+  loadRegion->addTransition (this, &DhLoadJob::loadRegionSuccess, finalState);
 
-          ManageRegionUI::appendRegion (region, realName);
-        };
-      auto multiFuncProcessFunc =
-          [&] (QLibrary *lib, LoadObjectFunc loadObjectFn, ObjFreeFunc objFree,
-               const char *&msg, void *data, const QString &baseTypeName)
-        {
-          void *realObject = nullptr;
-          for (const auto &i : objects)
-            {
-              if (i.first == baseTypeName)
-                realObject = i.second.get ();
-            }
-          /* First we load object */
-          if (loadObjectFn && !realObject)
-            {
-              void *o_object = nullptr;
-              std::unique_ptr<void, void (*) (void *)> object{ nullptr,
-                                                               nullptr };
-              err_msg_handle_func (msg, loadObjectFn, data, setFunc, this,
-                                   cancel_flag, &o_object,
-                                   quint64 (DhConfig::elapsedMilliseconds ()),
-                                   quint64 (DhConfig::memoryLimit ()));
-              object = { o_object, objFree };
-              realObject = o_object;
-              objects.emplace_back (baseTypeName, std::move (object));
-            }
-          typedef int32_t (*numFunc) (void *);
-          auto numFn = reinterpret_cast<numFunc> (lib->resolve ("region_num"));
-          int32_t nums = 0;
-          /* We need the region_num function to check whether it's nullptr */
-          if ((nums = numFn (realObject)))
-            {
-              auto indexFn
-                  = reinterpret_cast<const char *(*)(void *, qint32)> (
-                      lib->resolve ("region_name_index"));
-              regionList.clear ();
-              for (int k = 0; k < nums; k++)
-                {
-                  auto name = indexFn (realObject, k);
-                  regionList.append (name);
-                  string_free (name);
-                }
+  machine.addState (loadFile);
+  machine.addState (loadObject);
+  machine.addState (loadRegion);
+  machine.addState (errorState);
+  machine.addState (finalState);
+  machine.setInitialState (loadFile);
 
-              if (DhConfig::selectAllRegionsInLoading ())
-                {
-                  for (auto i = 0; i < regionList.size (); i++)
-                    regionIndexes << i;
-                }
-              else
-                {
-                  Q_EMIT infoMessage (this,
-                                      _ ("Please click `Continue` to choose "
-                                         "region(s)."));
-                  /* Emit the stop signal to stop, and use loop to
-                   * stop the process. */
-                  Q_EMIT selfSuspended (this);
-                  std::unique_lock lock (mutex);
-                  cv.wait (lock);
-                  /* Continue */
-                  Q_EMIT selfResumed (this);
-                }
-              typedef const char *(*LoadFunc) (void *, ProgressFunc, void **,
-                                               void *, const void *, int32_t,
-                                               quint64, quint64);
-              auto func = reinterpret_cast<LoadFunc> (
-                  lib->resolve ("region_create_from_file_as_index"));
-              for (auto index : regionIndexes)
-                {
-                  void *singleRegion = nullptr;
-                  if (func)
-                    err_msg_handle_func (
-                        msg, func, realObject, setFunc, &singleRegion, this,
-                        cancel_flag, index,
-                        quint64 (DhConfig::elapsedMilliseconds ()),
-                        quint64 (DhConfig::memoryLimit ()));
-
-                  auto name = region_get_region_name (singleRegion);
-                  pushRegionFunc (filename, name, singleRegion);
-                  string_free (name);
-                }
-              regionIndexes.clear ();
-
-              return true;
-            }
-          return false;
-        };
-      auto singleFuncProcessFunc =
-          [&] (QLibrary *lib, LoadObjectFunc loadObjectFn, ObjFreeFunc objFree,
-               const char *&msg, void *data, const QString &baseTypeName)
-        {
-          void *realObject = nullptr;
-          for (const auto &i : objects)
-            {
-              if (i.first == baseTypeName)
-                realObject = i.second.get ();
-            }
-          void *region = nullptr;
-          typedef const char *(*LoadFunc) (void *, ProgressFunc, void **,
-                                           void *, const void *, quint64,
-                                           quint64);
-          auto func = reinterpret_cast<LoadFunc> (
-              lib->resolve ("region_create_from_file"));
-
-          if (loadObjectFn && !realObject)
-            {
-              void *o_object = nullptr;
-              std::unique_ptr<void, void (*) (void *)> object{ nullptr,
-                                                               nullptr };
-              err_msg_handle_func (msg, loadObjectFn, data, setFunc, this,
-                                   cancel_flag, &o_object,
-                                   quint64 (DhConfig::elapsedMilliseconds ()),
-                                   quint64 (DhConfig::memoryLimit ()));
-              object = { o_object, objFree };
-              realObject = o_object;
-              objects.emplace_back (baseTypeName, std::move (object));
-            }
-          if (func)
-            err_msg_handle_func (msg, func, realObject, setFunc, &region, this,
-                                 cancel_flag,
-                                 quint64 (DhConfig::elapsedMilliseconds ()),
-                                 quint64 (DhConfig::memoryLimit ()));
-
-          pushRegionFunc (filename, {}, region);
-          return true;
-        };
-      auto pushMsgFunc = [&] (const char *msg)
-        {
-          QString realMsg = "**%1**:\n\n%2";
-          realMsg = realMsg.arg (filename).arg (msg);
-          setErrorText (realMsg);
-          string_free (msg);
-        };
-      auto tryErrorFunc = [&] (const QString &name, const char *msg,
-                               QString &realStr, bool addEnter)
-        {
-          QString realMsg = msg;
-          if (!msg)
-            realMsg = _ ("No region found in this type.");
-          QString ret = _ ("%1 try's fail message: %2");
-          ret = ret.arg (name).arg (realMsg);
-          realStr += ret;
-          string_free (msg);
-          if (addEnter)
-            realStr += "\n\n";
-        };
-
-      /* Start */
-      if (cancel_flag_is_cancelled (cancel_flag))
-        {
-          setErrorText (_ ("Cancelled."));
-          Q_EMIT emitResult ();
-          return;
-        }
-      int failed = 0;
-      void *o_data = file_try_uncompress (
-          filename.toUtf8 (), setFunc, this, &failed, cancel_flag,
-          quint64 (DhConfig::elapsedMilliseconds ()),
-          quint64 (DhConfig::memoryLimit ()));
-      if (failed)
-        {
-          auto err_msg = vec_to_cstr (o_data);
-          pushMsgFunc (err_msg);
-          Q_EMIT emitResult ();
-          return;
-        }
-      std::unique_ptr<void, void (*) (void *)> data{ o_data, vec_free };
-      const char *msg = nullptr;
-
-      failed = false;
-      QString realStr;
-
-      QList<QLibrary *> libraries;
-      for (auto i = 0; i < ManageRegionUI::moduleNum (); i++)
-        libraries.append (ManageRegionUI::getModule (i));
-
-      QLibrary *realLib = nullptr;
-      if (DhConfig::loadingFileByExtension ())
-        for (const auto &i : libraries)
-          {
-            auto suffixFn = reinterpret_cast<const char *(*)()> (
-                i->resolve ("region_file_suffix"));
-            if (suffixFn)
-              {
-                auto suffix = suffixFn ();
-                if (QFileInfo (filename).suffix () == QString (suffix))
-                  realLib = i;
-                string_free (suffix);
-              }
-          }
-      auto realLoadProcess
-          = [&] (QLibrary *lib, bool lastOne) -> std::optional<Reason>
-        {
-          if (cancel_flag_is_cancelled (cancel_flag))
-            {
-              failed = true;
-              return CANCELLED;
-            }
-
-          auto multiFn = reinterpret_cast<qint32 (*) ()> (
-              lib->resolve ("region_is_multi"));
-          auto objFree
-              = reinterpret_cast<ObjFreeFunc> (lib->resolve ("object_free"));
-          auto loadObjectFn = reinterpret_cast<LoadObjectFunc> (
-              lib->resolve ("region_get_object"));
-          auto transFn = reinterpret_cast<const char *(*)(const char *)> (
-              lib->resolve ("init_translation"));
-          auto nameFn = reinterpret_cast<const char *(*)()> (
-              lib->resolve ("region_type"));
-          auto baseTypeFn = reinterpret_cast<const char *(*)()> (
-              lib->resolve ("region_base_type"));
-          auto suffixFn = reinterpret_cast<const char *(*)()> (
-              lib->resolve ("region_file_suffix"));
-
-          QString name;
-          QString baseTypeName;
-          if (nameFn)
-            {
-              auto tname = nameFn ();
-              if (tname)
-                name = tname;
-              string_free (tname);
-            }
-          if (baseTypeFn)
-            {
-              auto baseType = baseTypeFn ();
-              if (baseType)
-                baseTypeName = baseType;
-              string_free (baseType);
-            }
-          if (suffixFn)
-            {
-              auto suffix = suffixFn ();
-              if (suffix)
-                typeName = suffix;
-              string_free (suffix);
-            }
-
-          QString realSuffix = QFileInfo (filename).suffix ();
-
-          /* Loaded by file extension name */
-
-          if (DhConfig::loadingFileByExtension () && !realSuffix.isEmpty ())
-            if (realSuffix != typeName && !DhConfig::failThenRetry ())
-              return NOT_MATCHED;
-
-          if (name.isEmpty ())
-            name = _ ("unknown");
-
-          if (transFn)
-            msg = transFn (dh::getTranslationDir ().toUtf8 ());
-
-          if (multiFn)
-            {
-              if (multiFn ())
-                {
-                  if (!multiFuncProcessFunc (lib, loadObjectFn, objFree, msg,
-                                             data.get (), baseTypeName))
-                    {
-                      tryErrorFunc (name, msg, realStr, !lastOne);
-                      return FAILED;
-                    }
-                }
-              else
-                {
-                  if (!singleFuncProcessFunc (lib, loadObjectFn, objFree, msg,
-                                              data.get (), baseTypeName))
-                    {
-                      tryErrorFunc (name, msg, realStr, !lastOne);
-                      return FAILED;
-                    }
-                }
-            }
-          return std::nullopt;
-        };
-
-      if (realLib)
-        {
-          auto ret = realLoadProcess (realLib, false);
-          if (!ret.has_value () || ret == CANCELLED)
-            {
-              /* Success or cancelled */
-              Q_EMIT emitResult ();
-              return;
-            }
-          else
-            libraries.removeOne (realLib);
-        }
-      for (auto i = 0; i < libraries.size (); i++)
-        {
-          auto ret
-              = realLoadProcess (libraries[i], i == libraries.size () - 1);
-          if (!ret.has_value ())
-            {
-              if (DhConfig::failThenRetry ())
-                {
-                  auto suffixFn = reinterpret_cast<const char *(*)()> (
-                      libraries[i]->resolve ("region_file_suffix"));
-                  auto suffix = suffixFn ();
-                  setErrorText (QString ("**%1**: %2")
-                                    .arg (filename)
-                                    .arg (_ ("Detected wrong file extension, "
-                                             "expected %1, received %2."))
-                                    .arg (suffix)
-                                    .arg (QFileInfo (filename).suffix ()));
-                  string_free (suffix);
-                }
-              Q_EMIT emitResult ();
-              return;
-            }
-        }
-
-      if (realStr.isEmpty () && msg)
-        pushMsgFunc (msg);
-      else
-        {
-          QString realMsg = "**%1**:\n\n%2";
-          realMsg = realMsg.arg (filename).arg (realStr);
-          setErrorText (realMsg);
-        }
-      Q_EMIT emitResult ();
-    };
-  std::thread trd (realfunc);
-  trd.detach ();
+  connect (&machine, &QStateMachine::started, this, &DhLoadJob::loadFile);
+  connect (errorState, &QFinalState::entered, this, &DhLoadJob::doFail);
+  connect (loadObject, &QState::entered, this, &DhLoadJob::loadObject);
+  connect (loadRegion, &QState::entered, this, &DhLoadJob::loadRegion);
+  connect (finalState, &QFinalState::entered, this, &DhLoadJob::emitResult);
+  machine.start ();
 }
 
 bool
@@ -406,12 +75,240 @@ DhLoadJob::getTypeName ()
   return typeName;
 }
 
-DhAllLoadJob::DhAllLoadJob (QStringList list, QMainWindow *mainWindow,
-                            ManageRegionUI *mrui, QObject *parent)
-    : KCompositeJob (parent), cancel_flag (cancel_flag_new ()),
-      mainWindow (mainWindow), mrui (mrui)
+void
+DhLoadJob::setFunc (void *main_klass, int value, const char *text,
+                    const char *arg)
 {
-  auto realWindow = qobject_cast<MainWindow *> (this->mainWindow);
+  auto real_klass = static_cast<DhLoadJob *> (main_klass);
+  real_klass->setPercent (value);
+  if (!arg)
+    Q_EMIT real_klass->infoMessage (real_klass, gettext (text));
+  else
+    {
+      auto msg = QString::asprintf (gettext (text), arg);
+      Q_EMIT real_klass->infoMessage (real_klass, msg);
+    }
+}
+
+bool
+DhLoadJob::loadMultiRegion (ModuleBase *base)
+{
+  auto multiBase = dynamic_cast<MultiModuleBase *> (base);
+  if (!multiBase)
+    {
+      Q_EMIT error ();
+      return false;
+    }
+  auto num = multiBase->numFunc (tempObject.second.get ());
+  for (int j = 0; j < num; j++)
+    {
+      auto name = multiBase->nameFunc (tempObject.second.get (), j);
+      regionList.append (name);
+      string_free (name);
+    }
+  if (!DhConfig::selectAllRegionsInLoading ())
+    {
+
+      Q_EMIT infoMessage (this,
+                          _ ("Please click `Continue` to choose region(s)."));
+      /* Emit the stop signal to stop, and use loop to
+       * stop the process. */
+      Q_EMIT selfSuspended (this);
+      std::unique_lock lock (mutex);
+      cv.wait (lock);
+      /* Continue */
+      Q_EMIT selfResumed (this);
+    }
+  else
+    {
+      for (int j = 0; j < num; j++)
+        regionIndexes << j;
+    }
+  for (const auto &index : regionIndexes)
+    {
+      void *singleRegion = nullptr;
+      auto msg = multiBase->loadFunc (
+          tempObject.second.get (), setFunc, &singleRegion, this, cancel_flag,
+          index, quint64 (DhConfig::elapsedMilliseconds ()),
+          quint64 (DhConfig::memoryLimit ()));
+      if (msg)
+        {
+          failMsgs.append ({ multiBase->type, msg });
+          string_free (msg);
+          return false;
+        }
+      auto name = region_get_region_name (singleRegion);
+      auto fileBaseName = QFileInfo (filename).completeBaseName ();
+      ManageRegionUI::appendRegion (singleRegion, fileBaseName + " - " + name);
+      string_free (name);
+    }
+  if (regionList.isEmpty ())
+    return false;
+  Q_EMIT loadRegionSuccess ();
+  return true;
+}
+
+void
+DhLoadJob::loadFile ()
+{
+  QThreadPool::globalInstance ()->start (
+      [&]
+        {
+          int failed = false;
+          auto tempVec = file_try_uncompress (
+              filename.toUtf8 (), setFunc, this, &failed, cancel_flag,
+              quint64 (DhConfig::elapsedMilliseconds ()),
+              quint64 (DhConfig::memoryLimit ()));
+          if (failed)
+            {
+              auto msg = vec_to_cstr (tempVec);
+              failMsgs.append ({ QString (_ ("Load file")), msg });
+              string_free (msg);
+              Q_EMIT error ();
+              return;
+            }
+          vec = { tempVec, vec_free };
+          Q_EMIT loadFileSuccess ();
+        });
+}
+
+void
+DhLoadJob::loadObject ()
+{
+  QThreadPool::globalInstance ()->start (
+      [&]
+        {
+          auto objectList = ManageRegionUI::getLoadObjectList ();
+          for (const auto &load : objectList)
+            {
+              void *object = nullptr;
+              auto msg = load.loadObjectFunc (
+                  vec.get (), setFunc, this, cancel_flag, &object,
+                  quint64 (DhConfig::elapsedMilliseconds ()),
+                  quint64 (DhConfig::memoryLimit ()));
+              if (msg)
+                {
+                  failMsgs.append ({ load.baseType, msg });
+                  string_free (msg);
+                  continue;
+                }
+              tempObject = std::make_pair (
+                  load.baseType, std::unique_ptr<void, void (*) (void *)>{
+                                     object, load.objFreeFunc });
+              Q_EMIT loadObjectSuccess ();
+              return;
+            }
+          Q_EMIT error ();
+        });
+}
+
+void
+DhLoadJob::loadRegion ()
+{
+  QThreadPool::globalInstance ()->start (
+      [&]
+        {
+          auto baseList = ManageRegionUI::getModules ();
+          for (const auto &i : baseList)
+            {
+              auto base = i;
+              if (base->baseType == tempObject.first)
+                typeList.append ({ base->type, base->fileSuffix });
+            }
+          if (DhConfig::loadingFileByExtension ())
+            {
+              auto extension = QFileInfo (filename).suffix ();
+              std::pair<QString, QString> realItem;
+              for (const auto &item : typeList)
+                {
+                  if (item.second == extension)
+                    realItem = item;
+                }
+              if (!DhConfig::failThenRetry ())
+                {
+                  if (!realItem.first.isEmpty ())
+                    {
+                      typeList.clear ();
+                      typeList.append (realItem);
+                    }
+                }
+              else
+                {
+                  if (typeList[0] != realItem)
+                    typeList.swapItemsAt (0, typeList.indexOf (realItem));
+                }
+            }
+          for (const auto &pair : typeList)
+            {
+              auto type = pair.first;
+              ModuleBase *base = nullptr;
+              for (const auto &i : baseList)
+                {
+                  if (i->type == type)
+                    {
+                      base = i;
+                      break;
+                    }
+                }
+              if (base)
+                {
+                  if (base->multiSupport)
+                    {
+                      if (loadMultiRegion (base))
+                        return;
+                    }
+                  else
+                    {
+                      auto singleBase
+                          = dynamic_cast<SingleModuleBase *> (base);
+                      void *region = nullptr;
+                      auto msg = singleBase->loadFunc (
+                          tempObject.second.get (), setFunc, &region, this,
+                          cancel_flag,
+                          quint64 (DhConfig::elapsedMilliseconds ()),
+                          quint64 (DhConfig::memoryLimit ()));
+                      if (msg)
+                        {
+                          failMsgs.append ({ singleBase->type, msg });
+                          string_free (msg);
+                          continue;
+                        }
+                      auto fileBaseName
+                          = QFileInfo (filename).completeBaseName ();
+                      ManageRegionUI::appendRegion (region, fileBaseName);
+                      Q_EMIT loadRegionSuccess ();
+                      return;
+                    }
+                }
+            }
+          Q_EMIT error ();
+        });
+}
+
+void
+DhLoadJob::doFail ()
+{
+  if (!failMsgs.isEmpty ())
+    {
+      QString realFailMsg;
+      for (auto i = 0; i < failMsgs.length (); i++)
+        {
+          QString msg = _ ("**%1** try's fail message: %2");
+          msg = msg.arg (failMsgs[i].first).arg (failMsgs[i].second);
+          if (i != failMsgs.length () - 1)
+            msg += "\n\n";
+          realFailMsg += msg;
+        }
+      QString realMsg = "**%1**:\n\n%2";
+      realMsg = realMsg.arg (filename).arg (realFailMsg);
+      setErrorText (realMsg);
+    }
+  Q_EMIT emitResult ();
+}
+
+DhAllLoadJob::DhAllLoadJob (QStringList list, QObject *parent)
+    : KCompositeJob (parent), cancel_flag (cancel_flag_new ())
+{
   connect (this, &DhAllLoadJob::cancel, this,
            [&] { cancel_flag_cancel (this->cancel_flag); });
   jobNums = list.length ();
@@ -456,7 +353,7 @@ DhAllLoadJob::DhAllLoadJob (QStringList list, QMainWindow *mainWindow,
                                            &KMessageWidget::deleteLater);
                      }
                    removeSubjob (finishedJob);
-                   this->mrui->refresh_triggered ();
+                   ManageRegionUI::notify ();
                    if (!hasSubjobs ())
                      {
                        this->messageWidget->deleteLater ();

@@ -12,7 +12,7 @@
 #undef asprintf
 
 SaveRegionUI::SaveRegionUI (const QList<std::shared_ptr<RegionClass>> &list,
-                            const QString &outputDir, singleTransFunc func,
+                            const QString &outputDir, SingleTransFunc func,
                             QLibrary *library, QWidget *parent)
     : LoadObjectUI (parent), list (list), outputDir (outputDir), func (func),
       cancel_flag (cancel_flag_new ()), library (library)

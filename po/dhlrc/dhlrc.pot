@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-05-01 00:10+0800\n"
+"POT-Creation-Date: 2026-05-09 21:20+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -103,10 +103,9 @@ msgstr ""
 msgid "Description: %10"
 msgstr ""
 
-#: ../../src/blockreaderui.cpp:239 ../../src/loadregionui.cpp:62
-#: ../../src/manageregionui.cpp:133 ../../src/regionmodifyui.cpp:15
-#: ../../src/saveregionui.cpp:52 ../../src/utility.cpp:24
-#: ../../src/utility.cpp:41 ../../src/utility.cpp:49
+#: ../../src/blockreaderui.cpp:239 ../../src/manageregionui.cpp:160
+#: ../../src/regionmodifyui.cpp:15 ../../src/saveregionui.cpp:52
+#: ../../src/utility.cpp:24 ../../src/utility.cpp:41 ../../src/utility.cpp:49
 msgid "Error!"
 msgstr ""
 
@@ -134,45 +133,31 @@ msgid ""
 "![test_svg](:/cn/dh/dhlrc/show.svg)"
 msgstr ""
 
-#: ../../src/dhloadjob.cpp:106 ../../src/loadregionui.cpp:198
-msgid "Please click `Continue` to choose region(s)."
-msgstr ""
-
-#: ../../src/dhloadjob.cpp:192 ../../src/loadregionui.cpp:236
-msgid "No region found in this type."
-msgstr ""
-
-#: ../../src/dhloadjob.cpp:193 ../../src/loadregionui.cpp:237
-msgid "%1 try's fail message: %2"
-msgstr ""
-
-#: ../../src/dhloadjob.cpp:204 ../../src/loadregionui.cpp:47
-#: ../../src/saveregionui.cpp:37
-msgid "Cancelled."
-msgstr ""
-
-#: ../../src/dhloadjob.cpp:301 ../../src/loadregionui.cpp:304
-msgid "unknown"
-msgstr ""
-
-#: ../../src/dhloadjob.cpp:355
-msgid "Detected wrong file extension, expected %1, received %2."
-msgstr ""
-
-#: ../../src/dhloadjob.cpp:384 ../../src/loadregionui.cpp:75
+#: ../../src/dhloadjob.cpp:53
 msgid "Select a Region"
 msgstr ""
 
-#: ../../src/dhloadjob.cpp:384 ../../src/loadregionui.cpp:75
-#: ../../src/utility.cpp:33
+#: ../../src/dhloadjob.cpp:53 ../../src/utility.cpp:33
 msgid "Please select a region."
 msgstr ""
 
-#: ../../src/dhloadjob.cpp:420 ../../src/dhloadjob.cpp:427
+#: ../../src/dhloadjob.cpp:113
+msgid "Please click `Continue` to choose region(s)."
+msgstr ""
+
+#: ../../src/dhloadjob.cpp:165
+msgid "Load file"
+msgstr ""
+
+#: ../../src/dhloadjob.cpp:296
+msgid "**%1** try's fail message: %2"
+msgstr ""
+
+#: ../../src/dhloadjob.cpp:317 ../../src/dhloadjob.cpp:324
 msgid "Finish processing %1 of %2 (%3%)."
 msgstr ""
 
-#: ../../src/dhloadjob.cpp:492
+#: ../../src/dhloadjob.cpp:389
 msgid "Continue"
 msgstr ""
 
@@ -206,24 +191,6 @@ msgstr ""
 
 #: ../../src/loadobjectui.cpp:64
 msgid "Finish!"
-msgstr ""
-
-#: ../../src/loadregionui.cpp:32
-msgid "Loading file(s) to Region(s)."
-msgstr ""
-
-#: ../../src/loadregionui.cpp:40
-msgid "Please wait..."
-msgstr ""
-
-#: ../../src/loadregionui.cpp:52 ../../src/saveregionui.cpp:42
-msgid ""
-"The following files are not added:\n"
-"\n"
-msgstr ""
-
-#: ../../src/loadregionui.cpp:257
-msgid "Parsing NBT"
 msgstr ""
 
 #: ../../src/lrchooseui.cpp:30
@@ -277,51 +244,51 @@ msgstr ""
 msgid "Block Reader/Modifier"
 msgstr ""
 
-#: ../../src/manageregionui.cpp:107
+#: ../../src/manageregionui.cpp:133
 msgid "&Select"
 msgstr ""
 
-#: ../../src/manageregionui.cpp:111 rc.cpp:176
+#: ../../src/manageregionui.cpp:137 rc.cpp:176
 msgid "&Add"
 msgstr ""
 
-#: ../../src/manageregionui.cpp:131
+#: ../../src/manageregionui.cpp:157
 msgid "Select Files"
 msgstr ""
 
-#: ../../src/manageregionui.cpp:134
+#: ../../src/manageregionui.cpp:161
 msgid "No file selected!"
 msgstr ""
 
-#: ../../src/manageregionui.cpp:215
+#: ../../src/manageregionui.cpp:237
 msgid "Choose Save Option"
 msgstr ""
 
-#: ../../src/manageregionui.cpp:216
+#: ../../src/manageregionui.cpp:238
 msgid "Choose whether format you want to save to."
 msgstr ""
 
-#: ../../src/manageregionui.cpp:222
+#: ../../src/manageregionui.cpp:244
 msgid "Use MultiFunc?"
 msgstr ""
 
-#: ../../src/manageregionui.cpp:223
+#: ../../src/manageregionui.cpp:245
 msgid "This type supports regions to save as one file, do you want to use it?"
 msgstr ""
 
-#: ../../src/manageregionui.cpp:235
+#: ../../src/manageregionui.cpp:257
 msgid "Select Directory"
 msgstr ""
 
-#: ../../src/manageregionui.cpp:293
+#: ../../src/manageregionui.cpp:336
 msgid "Locked!"
 msgstr ""
 
-#: ../../src/manageregionui.cpp:333
+#: ../../src/manageregionui.cpp:376
 msgid "Input a New Name"
 msgstr ""
 
-#: ../../src/manageregionui.cpp:334
+#: ../../src/manageregionui.cpp:377
 msgid "Please input a new name for the region."
 msgstr ""
 
@@ -363,6 +330,16 @@ msgstr ""
 
 #: ../../src/regionmodifyui.cpp:85
 msgid "Unknown!"
+msgstr ""
+
+#: ../../src/saveregionui.cpp:37
+msgid "Cancelled."
+msgstr ""
+
+#: ../../src/saveregionui.cpp:42
+msgid ""
+"The following files are not added:\n"
+"\n"
 msgstr ""
 
 #: ../../src/saveregionui.cpp:105
@@ -723,95 +700,99 @@ msgstr ""
 msgid "Null pointer detected"
 msgstr ""
 
-#: ../../crab-nbt-ext/src/lib.rs:72 ../../region-litematic-rs/src/lib.rs:345
-#: ../../region-nbt-rs/src/lib.rs:353
+#: ../../crab-nbt-ext/src/lib.rs:70 ../../region-litematic-rs/src/lib.rs:350
+#: ../../region-nbt-rs/src/lib.rs:358
 msgid "Region value not provided"
 msgstr ""
 
-#: ../../crab-nbt-ext/src/lib.rs:97
+#: ../../crab-nbt-ext/src/lib.rs:95
 #, rust-format
 msgid "Couldn't get compound of {}."
 msgstr ""
 
-#: ../../crab-nbt-ext/src/lib.rs:108
+#: ../../crab-nbt-ext/src/lib.rs:106
 #, rust-format
 msgid "Couldn't get int of {}."
 msgstr ""
 
-#: ../../crab-nbt-ext/src/lib.rs:119
+#: ../../crab-nbt-ext/src/lib.rs:117
 #, rust-format
 msgid "Couldn't get list of {}."
 msgstr ""
 
-#: ../../crab-nbt-ext/src/lib.rs:130
+#: ../../crab-nbt-ext/src/lib.rs:128
 #, rust-format
 msgid "Couldn't get string of {}."
 msgstr ""
 
-#: ../../crab-nbt-ext/src/lib.rs:141
+#: ../../crab-nbt-ext/src/lib.rs:139
 #, rust-format
 msgid "Couldn't get long of {}."
 msgstr ""
 
-#: ../../crab-nbt-ext/src/lib.rs:152
+#: ../../crab-nbt-ext/src/lib.rs:150
 #, rust-format
 msgid "Couldn't get long array of {}."
 msgstr ""
 
-#: ../../crab-nbt-ext/src/lib.rs:185
+#: ../../crab-nbt-ext/src/lib.rs:183
 msgid "Reading NBT finish."
 msgstr ""
 
-#: ../../crab-nbt-ext/src/lib.rs:321
+#: ../../crab-nbt-ext/src/lib.rs:319
 msgid "Reading palette is cancelled!"
 msgstr ""
 
-#: ../../crab-nbt-ext/src/lib.rs:328
+#: ../../crab-nbt-ext/src/lib.rs:326
 msgid "Wrong type of palette!"
 msgstr ""
 
-#: ../../crab-nbt-ext/src/lib.rs:343
+#: ../../crab-nbt-ext/src/lib.rs:341
 msgid "Wrong type of property!"
 msgstr ""
 
-#: ../../crab-nbt-ext/src/lib.rs:427 ../../crab-nbt-ext/src/lib.rs:473
+#: ../../crab-nbt-ext/src/lib.rs:425 ../../crab-nbt-ext/src/lib.rs:471
 msgid "Reading NBT."
 msgstr ""
 
-#: ../../crab-nbt-ext/src/lib.rs:429 ../../crab-nbt-ext/src/lib.rs:475
+#: ../../crab-nbt-ext/src/lib.rs:427 ../../crab-nbt-ext/src/lib.rs:473
 msgid "The parsing operation is cancelled."
 msgstr ""
 
-#: ../../region-litematic-rs/src/lib.rs:128
+#: ../../region-litematic-rs/src/lib.rs:66
+msgid "Litematic File (*.litematic)"
+msgstr ""
+
+#: ../../region-litematic-rs/src/lib.rs:133
 #, rust-format
 msgid "Reading block id: {} / {}."
 msgstr ""
 
-#: ../../region-litematic-rs/src/lib.rs:133
+#: ../../region-litematic-rs/src/lib.rs:138
 msgid "Cancelled when reading blocks"
 msgstr ""
 
-#: ../../region-litematic-rs/src/lib.rs:149
+#: ../../region-litematic-rs/src/lib.rs:154
 msgid "Out of range!"
 msgstr ""
 
-#: ../../region-litematic-rs/src/lib.rs:165
+#: ../../region-litematic-rs/src/lib.rs:170
 msgid "Reading block finished!"
 msgstr ""
 
-#: ../../region-litematic-rs/src/lib.rs:201
+#: ../../region-litematic-rs/src/lib.rs:206
 msgid "Wrong type of region."
 msgstr ""
 
-#: ../../region-litematic-rs/src/lib.rs:247
+#: ../../region-litematic-rs/src/lib.rs:252
 msgid "Wrong type of tile entity."
 msgstr ""
 
-#: ../../region-litematic-rs/src/lib.rs:288 ../../region-nbt-rs/src/lib.rs:138
+#: ../../region-litematic-rs/src/lib.rs:293 ../../region-nbt-rs/src/lib.rs:143
 msgid "Reading entities is cancelled!"
 msgstr ""
 
-#: ../../region-litematic-rs/src/lib.rs:291 ../../region-nbt-rs/src/lib.rs:142
+#: ../../region-litematic-rs/src/lib.rs:296 ../../region-nbt-rs/src/lib.rs:147
 msgid "Wrong type of entity!"
 msgstr ""
 
@@ -823,35 +804,39 @@ msgstr ""
 msgid "There will be no air block in the output structure"
 msgstr ""
 
-#: ../../region-nbt-rs/src/lib.rs:91 ../../region-nbt-rs/src/lib.rs:100
+#: ../../region-nbt-rs/src/lib.rs:89
+msgid "NBT File (*.nbt)"
+msgstr ""
+
+#: ../../region-nbt-rs/src/lib.rs:96 ../../region-nbt-rs/src/lib.rs:105
 msgid "Wrong type of size!"
 msgstr ""
 
-#: ../../region-nbt-rs/src/lib.rs:108 ../../region-nbt-rs/src/lib.rs:120
+#: ../../region-nbt-rs/src/lib.rs:113 ../../region-nbt-rs/src/lib.rs:125
 msgid "The length of the size is wrong."
 msgstr ""
 
-#: ../../region-nbt-rs/src/lib.rs:161
+#: ../../region-nbt-rs/src/lib.rs:166
 msgid "Not a double value"
 msgstr ""
 
-#: ../../region-nbt-rs/src/lib.rs:173
+#: ../../region-nbt-rs/src/lib.rs:178
 msgid "Wrong type of entity's pos!"
 msgstr ""
 
-#: ../../region-nbt-rs/src/lib.rs:199
+#: ../../region-nbt-rs/src/lib.rs:204
 msgid "Wrong size count!"
 msgstr ""
 
-#: ../../region-nbt-rs/src/lib.rs:234
+#: ../../region-nbt-rs/src/lib.rs:239
 msgid "Wrong type of block!"
 msgstr ""
 
-#: ../../region-nbt-rs/src/lib.rs:242 ../../region-nbt-rs/src/lib.rs:279
+#: ../../region-nbt-rs/src/lib.rs:247 ../../region-nbt-rs/src/lib.rs:284
 msgid "Reading blocks is cancelled!"
 msgstr ""
 
-#: ../../region-nbt-rs/src/lib.rs:274
+#: ../../region-nbt-rs/src/lib.rs:279
 #, rust-format
 msgid "Processing blocks: {} / {}."
 msgstr ""

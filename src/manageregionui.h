@@ -14,19 +14,65 @@
 #include <QMainWindow>
 #include <QReadWriteLock>
 #include <QScrollArea>
-#include <QUuid>
 #include <QVBoxLayout>
 #include <QWidget>
 #include <libintl.h>
+#include <mutex>
 #define _(str) gettext (str)
 
 class RegionClass;
 class ItemFrame;
 static QString emptyString{};
-using multiTransFunc = const char *(*)(void *, size_t, const char *);
-using singleTransFunc
+using MultiTransFunc = const char *(*)(void *, size_t, const char *);
+using SingleTransFunc
     = const char *(*)(void *, const char *, void *, ProgressFunc, void *,
                       const void *, quint64, quint64);
+using LoadObjectFunc
+    = const char *(*)(void *, ProgressFunc, void *, const void *, void **,
+                      quint64, quint64);
+using ObjFreeFunc = void (*) (void *);
+
+using LoadObjectBase = struct LoadObjectBase
+{
+  QString baseType;
+  LoadObjectFunc loadObjectFunc;
+  ObjFreeFunc objFreeFunc;
+};
+
+class ModuleBase
+{
+public:
+  QLibrary *module = nullptr;
+  QString type;
+  QString fileSuffix;
+  QString baseType;
+  QString filter;
+  bool multiSupport = false;
+  virtual ~ModuleBase () { delete module; }
+};
+
+class SingleModuleBase : public ModuleBase
+{
+public:
+  using LoadFunc = const char *(*)(void *, ProgressFunc, void **, void *,
+                                   const void *, quint64, quint64);
+  SingleTransFunc singleTransFunc;
+  LoadFunc loadFunc;
+};
+
+class MultiModuleBase : public ModuleBase
+{
+public:
+  using NumFunc = int32_t (*) (void *);
+  using NameFunc = const char *(*)(void *, qint32);
+  using LoadFunc = const char *(*)(void *, ProgressFunc, void **, void *,
+                                   const void *, int32_t, quint64, quint64);
+  MultiTransFunc multiTransFunc;
+  NumFunc numFunc;
+  NameFunc nameFunc;
+  LoadFunc loadFunc;
+};
+
 class ManageRegionUI : public QWidget
 {
   Q_OBJECT
@@ -39,14 +85,19 @@ public:
     auto mr = static_cast<ManageRegionUI *> (main_klass);
     mr->refresh_triggered ();
   }
-  static qsizetype moduleNum ();
-  static QLibrary *getModule (qsizetype i);
+
+  static std::vector<ModuleBase *> getModules ();
+  static QList<LoadObjectBase> getLoadObjectList ();
   static void appendRegion (void *region, const QString &name);
   static qsizetype regionNum ();
   static std::vector<std::shared_ptr<RegionClass>> &getRegions ();
   static void notify ();
   void save (const QList<int> &list);
   bool selectButtonIsDown ();
+
+protected:
+  void dragEnterEvent (QDragEnterEvent *event) override;
+  void dropEvent (QDropEvent *event) override;
 
 private:
   DhPushButton *selectButton;
@@ -62,8 +113,8 @@ private:
   KMessageWidget *messageWidget;
 
   QStringList supportList;
-  QList<multiTransFunc> multiFuncList;
-  QList<singleTransFunc> singleFuncList;
+  QList<MultiTransFunc> multiFuncList;
+  QList<SingleTransFunc> singleFuncList;
   QList<QLibrary *> libraries;
 
 public Q_SLOTS:

@@ -24,8 +24,8 @@ set(CMAKE_MODULE_PATH ${ECM_MODULE_PATH})
 #include(KDECompilerSettings)
 #include(KDECMakeSettings)
 find_package(KF6 REQUIRED COMPONENTS ColorScheme ConfigWidgets I18n WidgetsAddons CoreAddons IconThemes)
-find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets Svg Concurrent)
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets Svg Concurrent)
+find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets Svg Concurrent StateMachine)
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets Svg Concurrent StateMachine)
 
 add_definitions(-DQT_NO_SIGNALS_SLOTS_KEYWORDS)
 
@@ -45,7 +45,6 @@ set(TEMP_PROJECT_SOURCES
         loadobjectui.cpp loadobjectui.h
         dhtableview.cpp dhtableview.h
         dhlinklikebutton.cpp dhlinklikebutton.h
-        loadregionui.cpp loadregionui.h
         ../resources/dhlrc.qrc
         generalchoosedialog.cpp generalchoosedialog.h
         blockreaderui.cpp blockreaderui.h
@@ -102,7 +101,7 @@ endif ()
 
 target_link_libraries(dhlrc_qt PRIVATE Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::Svg KF6::ColorScheme
 	KF6::ConfigWidgets KF6::I18n KF6::I18nLocaleData region_rs Qt6::Concurrent nbt_to_vec ${Intl_LIBRARIES}
-    dhconfigdialog KF6::WidgetsAddons KF6::CoreAddons KF6::IconThemes)
+    dhconfigdialog KF6::WidgetsAddons KF6::CoreAddons KF6::IconThemes Qt6::StateMachine)
 target_link_directories(dhlrc_qt PRIVATE ${CMAKE_BINARY_DIR})
 target_include_directories(dhlrc_qt PUBLIC
         "${PROJECT_BINARY_DIR}" "${PROJECT_SOURCE_DIR}"

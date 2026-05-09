@@ -2,7 +2,6 @@
 
 #include "dhloadjob.h"
 #include "generalchoosedialog.h"
-#include "loadregionui.h"
 #include "mainwindow.h"
 #include "saveregionui.h"
 
@@ -13,88 +12,115 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QPushButton>
+#include <qevent.h>
+#include <qmimedata.h>
 
-static QList<QLibrary *> modules = {};
+static std::vector<ModuleBase *> moduleBaseList = {};
+static QList<LoadObjectBase> loadObjectList = {};
 static std::vector<std::shared_ptr<RegionClass>> regions = {};
 static std::vector<NotifyStruct> notifiers = {};
+
+#define get_name_and_put_into_module_base(base, member, fn)                   \
+  if (fn)                                                                     \
+    {                                                                         \
+      auto name = fn ();                                                      \
+      base->member = name;                                                    \
+      string_free (name);                                                     \
+    }
 
 ManageRegionUI::ManageRegionUI (QWidget *mainWindow, QWidget *parent)
     : QWidget (parent), mainWindow (qobject_cast<QMainWindow *> (mainWindow))
 {
+  setAcceptDrops (true);
   notifiers.emplace_back (notify_func, this);
   auto moduleDir = QApplication::applicationDirPath ();
   moduleDir += QDir::toNativeSeparators ("/");
   moduleDir += "region_module";
 
+  using GetNameFn = const char *(*)();
   auto moduleList = QDir (moduleDir).entryList (QDir::Files);
   for (const auto &module : moduleList)
     {
       QString realDir = moduleDir + QDir::toNativeSeparators ("/") + module;
       auto library = new QLibrary (realDir);
-      if (library->load ())
-        modules.append (library);
-      else
+      if (!library->load ())
         {
           delete library;
           library = nullptr;
         }
+
       if (library)
         {
-          auto nameFn = reinterpret_cast<const char *(*)()> (
-              library->resolve ("region_type"));
-          auto name = nameFn ();
-          auto multiFn = reinterpret_cast<int (*) ()> (
-              library->resolve ("region_is_multi"));
-          if (multiFn && multiFn ())
+          auto typeFn
+              = reinterpret_cast<GetNameFn> (library->resolve ("region_type"));
+          auto suffixFn = reinterpret_cast<GetNameFn> (
+              library->resolve ("region_file_suffix"));
+          auto baseTypeFn = reinterpret_cast<GetNameFn> (
+              library->resolve ("region_base_type"));
+          auto fileTypeFn = reinterpret_cast<GetNameFn> (
+              library->resolve ("region_file_type"));
+          bool isMulti = reinterpret_cast<int32_t (*) ()> (
+              library->resolve ("region_is_multi")) ();
+          ModuleBase *moduleBase = nullptr;
+          if (isMulti)
             {
-              auto transMultiFn = reinterpret_cast<multiTransFunc> (
-                  library->resolve ("region_save_into_multi"));
-              auto singleTransFn = reinterpret_cast<singleTransFunc> (
-                  library->resolve ("region_save"));
-              if (singleTransFn)
+              moduleBase = new MultiModuleBase;
+              moduleBase->multiSupport = true;
+              auto multiModuleBase
+                  = dynamic_cast<MultiModuleBase *> (moduleBase);
+              if (multiModuleBase)
                 {
-                  supportList << name;
-                  libraries << library;
-                  singleFuncList << singleTransFn;
+                  multiModuleBase->multiTransFunc
+                      = reinterpret_cast<MultiTransFunc> (
+                          library->resolve ("region_save_into_multi"));
+                  multiModuleBase->numFunc
+                      = reinterpret_cast<MultiModuleBase::NumFunc> (
+                          library->resolve ("region_num"));
+                  multiModuleBase->nameFunc
+                      = reinterpret_cast<MultiModuleBase::NameFunc> (
+                          library->resolve ("region_name_index"));
+                  multiModuleBase->loadFunc
+                      = reinterpret_cast<MultiModuleBase::LoadFunc> (
+                          library->resolve (
+                              "region_create_from_file_as_index"));
                 }
-              if (transMultiFn)
-                multiFuncList << transMultiFn;
-              else
-                multiFuncList << nullptr;
             }
           else
             {
-              auto transFn = reinterpret_cast<singleTransFunc> (
-                  library->resolve ("region_save"));
-              if (transFn)
+              moduleBase = new SingleModuleBase;
+              auto singleModuleBase
+                  = dynamic_cast<SingleModuleBase *> (moduleBase);
+              if (singleModuleBase)
                 {
-                  supportList << name;
-                  libraries << library;
-                  singleFuncList << transFn;
-                  multiFuncList << nullptr;
+                  singleModuleBase->singleTransFunc
+                      = reinterpret_cast<SingleTransFunc> (
+                          library->resolve ("region_save"));
+                  singleModuleBase->loadFunc
+                      = reinterpret_cast<SingleModuleBase::LoadFunc> (
+                          library->resolve ("region_create_from_file"));
                 }
             }
-          string_free (name);
-        }
 
-      // if (library)
-      //   {
-      //     auto configFn = reinterpret_cast<void *(*)()> (
-      //         library->resolve ("input_config_new"));
-      //     auto freeFn = reinterpret_cast<void (*) (void *)> (
-      //         library->resolve ("input_config_free"));
-      //     if (configFn && freeFn)
-      //       {
-      //         auto newConfig = configFn ();
-      //         inputConfigs.emplace_back (
-      //             std::unique_ptr<void, void (*) (void *)>{ newConfig,
-      //                                                       freeFn });
-      //       }
-      //     else
-      //       inputConfigs.emplace_back (
-      //           std::unique_ptr<void, void (*) (void *)>{ nullptr, nullptr
-      //           });
-      //   }
+          get_name_and_put_into_module_base (moduleBase, type, typeFn);
+          get_name_and_put_into_module_base (moduleBase, fileSuffix, suffixFn);
+          get_name_and_put_into_module_base (moduleBase, baseType, baseTypeFn);
+          get_name_and_put_into_module_base (moduleBase, filter, fileTypeFn);
+
+          bool hasThisLoad = false;
+          for (const auto &load : loadObjectList)
+            if (load.baseType == moduleBase->baseType)
+              hasThisLoad = true;
+          if (!hasThisLoad)
+            {
+              auto objFreeFn = reinterpret_cast<ObjFreeFunc> (
+                  library->resolve ("object_free"));
+              auto loadObjectFn = reinterpret_cast<LoadObjectFunc> (
+                  library->resolve ("region_get_object"));
+              loadObjectList.emplace_back (moduleBase->baseType, loadObjectFn,
+                                           objFreeFn);
+            }
+          moduleBaseList.emplace_back (moduleBase);
+        }
     }
 
   layout = new QVBoxLayout (this);
@@ -128,15 +154,14 @@ ManageRegionUI::ManageRegionUI (QWidget *mainWindow, QWidget *parent)
            [&]
              {
                auto dirs = QFileDialog::getOpenFileNames (
-                   this, _ ("Select Files"), nullptr, nullptr);
+                   this, _ ("Select Files"), nullptr,
+                   "(*.nbt);;(*.litematic)");
                if (dirs.isEmpty ())
                  QMessageBox::critical (this, _ ("Error!"),
                                         _ ("No file selected!"));
                else
                  {
-                   auto job = new DhAllLoadJob (
-                       dirs, qobject_cast<QMainWindow *> (this->mainWindow),
-                       this);
+                   auto job = new DhAllLoadJob (dirs);
                    job->start ();
                    // auto lrui = new LoadRegionUI (dirs, this);
                    // lrui->setAttribute (Qt::WA_DeleteOnClose);
@@ -162,23 +187,20 @@ ManageRegionUI::~ManageRegionUI ()
   for (auto &widget : itemFrames)
     delete widget;
   itemFrames.clear ();
-  for (auto &library : modules)
-    delete library;
+  for (auto &module : moduleBaseList)
+    delete module;
 }
 
-qsizetype
-ManageRegionUI::moduleNum ()
+std::vector<ModuleBase *>
+ManageRegionUI::getModules ()
 {
-  return modules.count ();
+  return moduleBaseList;
 }
 
-QLibrary *
-ManageRegionUI::getModule (qsizetype i)
+QList<LoadObjectBase>
+ManageRegionUI::getLoadObjectList ()
 {
-  if (i < modules.count ())
-    return modules.at (i);
-  else
-    return nullptr;
+  return loadObjectList;
 }
 
 void
@@ -252,6 +274,27 @@ bool
 ManageRegionUI::selectButtonIsDown ()
 {
   return selectButton->isDown ();
+}
+
+void
+ManageRegionUI::dragEnterEvent (QDragEnterEvent *event)
+{
+  event->acceptProposedAction ();
+}
+
+void
+ManageRegionUI::dropEvent (QDropEvent *event)
+{
+  auto urls = event->mimeData ()->urls ();
+  QStringList filenames;
+  for (const auto &url : urls)
+    {
+      if (url.isLocalFile ())
+        filenames << url.toLocalFile ();
+    }
+  auto jobs = new DhAllLoadJob (filenames);
+  jobs->start ();
+  event->acceptProposedAction ();
 }
 
 void
