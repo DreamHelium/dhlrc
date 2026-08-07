@@ -12,6 +12,7 @@
 #include <nbtreaderui.h>
 #include <qlineedit.h>
 #include <qnamespace.h>
+#include <qobject.h>
 #include <qpushbutton.h>
 #include <qvalidator.h>
 #include <region.h>
@@ -124,50 +125,12 @@ BlockReaderUI::textChanged_cb ()
         {
           int index = region_get_index (region, xText.toInt (), yText.toInt (),
                                         zText.toInt ());
-
+          infos = getBlockInfo (region, index);
           const char *transName = nullptr;
-          auto id = region_get_block_id_by_index (region, index);
-          auto name = region_get_palette_id_name (region, id);
-          // if (large_version && ui->progressBar->value () == 100)
-          // transName = mctr (name, large_version);
-          auto palette_len = region_get_palette_property_len (region, id);
 
-          if (transName)
-            infos = QString (_ ("Name: %1\n"
-                                "Translation name: %2\n"
-                                "Index: %3\n"
-                                "Palette: %4\n"
-                                "Properties:\n"))
-                        .arg (name)
-                        .arg (transName)
-                        .arg (index)
-                        .arg (id);
-          else
-            infos = QString (_ ("Name: %1\n"
-                                "Index: %2\n"
-                                "Palette: %3\n"
-                                "Properties:\n"))
-                        .arg (name)
-                        .arg (index)
-                        .arg (id);
-          string_free (name);
-          if (palette_len)
-            {
-              for (int i = 0; i < palette_len; i++)
-                {
-                  auto propertyName
-                      = region_get_palette_property_name (region, id, i);
-                  infos += propertyName;
-                  string_free (propertyName);
-                  infos += ": ";
-                  auto propertyData
-                      = region_get_palette_property_data (region, id, i);
-                  infos += propertyData;
-                  string_free (propertyData);
-                  infos += "\n";
-                }
-              ui->propertyBtn->setEnabled (true);
-            }
+          if (region_get_palette_property_len (
+                  region, region_get_block_id_by_index (region, index)))
+            ui->propertyBtn->setEnabled (true);
           else
             ui->propertyBtn->setEnabled (false);
           auto be = region_get_block_entity (region, index);
@@ -183,6 +146,38 @@ BlockReaderUI::textChanged_cb ()
         infos = _ ("Not valid!");
       ui->infoLabel->setText (infos);
     }
+}
+
+QString
+BlockReaderUI::getBlockInfo (void *region, quint32 index)
+{
+  auto id = region_get_block_id_by_index (region, index);
+  auto name = region_get_palette_id_name (region, id);
+  auto palette_len = region_get_palette_property_len (region, id);
+
+  QString infos = QString (_ ("Name: %1\n"
+                              "Index: %2\n"
+                              "Palette: %3\n"
+                              "Properties:\n"))
+                      .arg (name)
+                      .arg (index)
+                      .arg (id);
+  string_free (name);
+  if (palette_len)
+    {
+      for (int i = 0; i < palette_len; i++)
+        {
+          auto propertyName = region_get_palette_property_name (region, id, i);
+          infos += propertyName;
+          string_free (propertyName);
+          infos += ": ";
+          auto propertyData = region_get_palette_property_data (region, id, i);
+          infos += propertyData;
+          string_free (propertyData);
+          infos += "\n";
+        }
+    }
+  return infos;
 }
 
 void
@@ -248,6 +243,7 @@ void
 BlockReaderUI::entityBtn_clicked ()
 {
   auto nrui = new NbtReaderUI (nbt, false);
+  connect (this, &BlockReaderUI::closeWin, nrui, &NbtReaderUI::close);
   nrui->setAttribute (Qt::WA_DeleteOnClose);
   nrui->show ();
 }

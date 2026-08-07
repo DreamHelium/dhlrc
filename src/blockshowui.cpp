@@ -1,8 +1,22 @@
 #include "blockshowui.h"
+#include "blockreaderui.h"
+#include "nbtreaderui.h"
+#include "settings.h"
 #include "ui_blockshowui.h"
 #include <QProgressBar>
 #include <QProgressDialog>
 #include <palettelistui.h>
+#include <qabstractitemmodel.h>
+#include <qboxlayout.h>
+#include <qdialog.h>
+#include <qdialogbuttonbox.h>
+#include <qevent.h>
+#include <qlabel.h>
+#include <qmessagebox.h>
+#include <qnamespace.h>
+#include <qobject.h>
+#include <qprogressbar.h>
+#include <qpushbutton.h>
 #include <region.h>
 #define _(str) gettext (str)
 
@@ -12,34 +26,22 @@ BlockShowUI::BlockShowUI (void *region, char *&large_version, QWidget *parent)
 {
   ui->setupUi (this);
   ui->modeBtn->setText ("x/z");
+  model = new QStandardItemModel (this);
+  delegate = new DhButtonDelegate (ui->tableView);
+  ui->tableView->setItemDelegate (delegate);
   initUI ();
-  // QObject::connect (ui->spinBox, &QSpinBox::valueChanged, this,
-  // &BlockShowUI::updateUI);
+
+  QObject::connect (ui->spinBox, &QSpinBox::valueChanged, this,
+                    &BlockShowUI::updateUI);
   QObject::connect (ui->modeBtn, &QPushButton::clicked, this,
                     [&]
                       {
                         modeSwitch = !modeSwitch;
-                        inited = false;
                         if (modeSwitch)
                           ui->modeBtn->setText ("z/x");
                         else
                           ui->modeBtn->setText ("x/z");
-                        for (const auto &i : group->buttons ())
-                          group->removeButton (i);
-                        auto clearUI = [&]
-                          {
-                            QLayoutItem *item;
-                            while ((item = layout->takeAt (0)) != nullptr)
-                              {
-                                layout->removeWidget (item->widget ());
-                                item->widget ()->setParent (nullptr);
-                                delete item->widget ();
-                                delete item;
-                              }
-                            btns.clear ();
-                          };
-                        clearUI ();
-                        // updateUI ();
+                        updateUI ();
                       });
   QObject::connect (ui->lpBtn, &QPushButton::clicked, this,
                     [&]
@@ -49,13 +51,69 @@ BlockShowUI::BlockShowUI (void *region, char *&large_version, QWidget *parent)
                         plui->setAttribute (Qt::WA_DeleteOnClose);
                         plui->exec ();
                       });
+  connect (
+      delegate, &DhButtonDelegate::clickedIndex, this,
+      [&] (const QModelIndex &index)
+        {
+          auto dialog = new QDialog (this);
+          connect (this, &BlockShowUI::closeWin, dialog, &QDialog::close);
+          auto buttonBox = new QDialogButtonBox (dialog);
+          auto x = this->modeSwitch ? index.column () : index.row ();
+          auto y = this->ui->spinBox->value ();
+          auto z = this->modeSwitch ? index.row () : index.column ();
+          auto blockIndex = region_get_index (this->region, x, y, z);
+          auto id = region_get_block_id_by_index (this->region, blockIndex);
+          auto str
+              = QString (_ ("The block is in (%1, %2, %3), information is:\n"))
+                    .arg (x)
+                    .arg (y)
+                    .arg (z);
+          str += BlockReaderUI::getBlockInfo (this->region, blockIndex);
+          auto nbt = region_get_block_entity (this->region, blockIndex);
+          auto label = new QLabel (str);
+          auto layout = new QVBoxLayout (dialog);
+          layout->addWidget (label);
+          layout->addWidget (buttonBox);
+          auto okBtn
+              = buttonBox->addButton (_ ("&OK"), QDialogButtonBox::YesRole);
+          connect (okBtn, &QPushButton::clicked, dialog, &QDialog::close);
+          auto showBtn = buttonBox->addButton (_ ("&Show Entity NBT"),
+                                               QDialogButtonBox::NoRole);
+          if (!nbt)
+            showBtn->setEnabled (false);
+          connect (showBtn, &QPushButton::clicked, dialog,
+                   [dialog, nbt]
+                     {
+                       auto nrui = new NbtReaderUI (nbt, false);
+                       nrui->setAttribute (Qt::WA_DeleteOnClose);
+                       nrui->exec ();
+                     });
+          auto modifyBtn = buttonBox->addButton (_ ("&Modify Property"),
+                                                 QDialogButtonBox::NoRole);
+
+          connect (modifyBtn, &QPushButton::clicked, dialog,
+                   [dialog]
+                     {
+                       QMessageBox::warning (
+                           dialog, _ ("Warning!"),
+                           _ ("This function is not implemented yet!"));
+                     });
+          dialog->exec ();
+        });
 }
 
 BlockShowUI::~BlockShowUI ()
 {
   delete ui;
-  for (auto i : btns)
-    delete i;
+  delete model;
+  delete delegate;
+}
+
+void
+BlockShowUI::closeEvent (QCloseEvent *event)
+{
+  Q_EMIT closeWin ();
+  QWidget::closeEvent (event);
 }
 
 void
@@ -63,97 +121,84 @@ BlockShowUI::initUI ()
 {
   ui->spinBox->setMinimum (0);
   ui->spinBox->setMaximum (region_get_y (region) - 1);
-  widget = new QWidget ();
-  layout = new QGridLayout (widget);
-  ui->scrollArea->setWidget (widget);
-
-  group = new QButtonGroup ();
-  group->setExclusive (false);
-  // updateUI ();
+  updateUI ();
 }
 
-// void
-// BlockShowUI::updateUI ()
-// {
-//   int fullsize = region->region_size->x * region->region_size->z;
-//   if (btns.empty ())
-//     {
-//       for (int i = 0; i < fullsize; i++)
-//         {
-//           auto btn = new QPushButton ();
-//           btn->setCheckable (true);
-//           btns.append (btn);
-//         }
-//     }
-//
-//   if (!progressDialog)
-//     progressDialog = new QProgressDialog (_ ("Loading"), _ ("Cancel"), 0,
-//                                           fullsize - 1, this);
-//   if (!inited)
-//     progressDialog->show ();
-//
-//   QObject::connect (this, &BlockShowUI::changeVal, progressDialog,
-//                     &QProgressDialog::setValue);
-//
-//   auto getString = [&] (Palette *palette) -> QString
-//     {
-//       QString str = _ ("Block name: %1\n"
-//                        "Palette: \n%2");
-//       if (large_version)
-//         str = str.arg (mctr (palette->id_name, large_version));
-//       else
-//         str = str.arg (palette->id_name);
-//
-//       QString line = "%1: %2\n";
-//       QString paletteStr{};
-//       if (palette->property_name)
-//         for (int i = 0; i < palette->property_name->num; i++)
-//           {
-//             paletteStr += line.arg (gettext
-//             (palette->property_name->val[i]))
-//                               .arg (gettext
-//                               (palette->property_data->val[i]));
-//           }
-//       str = str.arg (paletteStr);
-//       return str;
-//     };
-//
-//   auto realUpdateUI = [&] ()
-//     {
-//       for (auto i : group->buttons ())
-//         group->removeButton (i);
-//       for (int x = 0; x < region->region_size->x; x++)
-//         {
-//           for (int z = 0; z < region->region_size->z; z++)
-//             {
-//               int p = 0;
-//               if (!modeSwitch)
-//                 p = x * region->region_size->z + z;
-//               else
-//                 p = z * region->region_size->x + x;
-//               int index
-//                   = region_get_index (region, x, ui->spinBox->value (), z);
-//               auto palette_num = region_get_block_palette (region, index);
-//               auto palette = region_get_palette (region, palette_num);
-//               auto btn = btns[p];
-//               btn->setText (QString::number (palette_num));
-//
-//               btn->setToolTip (getString (palette));
-//               if (!inited)
-//                 {
-//                   group->addButton (btn, index);
-//                   if (!modeSwitch)
-//                     layout->addWidget (btn, x, z);
-//                   else
-//                     layout->addWidget (btn, z, x);
-//                   emit changeVal (p);
-//                 }
-//             }
-//         }
-//
-//       inited = true;
-//       firstInited = true;
-//     };
-//
-//   realUpdateUI ();
-// }
+void
+BlockShowUI::updateUI ()
+{
+  model->clear ();
+  int fullsize = region_get_x (region) * region_get_z (region);
+
+  QObject::connect (this, &BlockShowUI::changeVal, ui->progressBar,
+                    &QProgressBar::setValue);
+
+  auto realUpdateUI = [&]
+    {
+      if (!modeSwitch)
+        {
+          model->setRowCount (region_get_x (region));
+          model->setColumnCount (region_get_z (region));
+        }
+      else
+        {
+          model->setRowCount (region_get_z (region));
+          model->setColumnCount (region_get_x (region));
+        }
+      for (int x = 0; x < region_get_x (region); x++)
+        {
+          for (int z = 0; z < region_get_z (region); z++)
+            {
+              int p = 0;
+              if (!modeSwitch)
+                p = x * region_get_z (region) + z;
+              else
+                p = z * region_get_x (region) + x;
+              int index
+                  = region_get_index (region, x, ui->spinBox->value (), z);
+              auto palette_num = region_get_block_id_by_index (region, index);
+              auto palette = region_get_palette_id_name (region, palette_num);
+              auto palette_str = QString (palette);
+              string_free (palette);
+              if (!modeSwitch)
+                {
+                  if (DhConfig::defaultShowOption () == 0)
+                    {
+                      model->setData (model->index (x, z), palette_num,
+                                      Qt::DisplayRole);
+                      model->setData (model->index (x, z), palette_str,
+                                      Qt::ToolTipRole);
+                    }
+                  else
+                    {
+                      model->setData (model->index (x, z), palette_str,
+                                      Qt::DisplayRole);
+                      model->setData (model->index (x, z), palette_num,
+                                      Qt::ToolTipRole);
+                    }
+                }
+              else
+                {
+                  if (DhConfig::defaultShowOption () == 0)
+                    {
+                      model->setData (model->index (z, x), palette_num,
+                                      Qt::DisplayRole);
+                      model->setData (model->index (z, x), palette_str,
+                                      Qt::ToolTipRole);
+                    }
+                  else
+                    {
+                      model->setData (model->index (z, x), palette_str,
+                                      Qt::DisplayRole);
+                      model->setData (model->index (z, x), palette_num,
+                                      Qt::ToolTipRole);
+                    }
+                }
+              emit changeVal (p);
+            }
+        }
+      ui->tableView->setModel (model);
+    };
+
+  realUpdateUI ();
+}

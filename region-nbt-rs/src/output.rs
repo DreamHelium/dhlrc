@@ -17,6 +17,7 @@ use common_rs::util::string_to_ptr_fail_to_null;
 use common_rs::{ProgressFn, show_progress_macro};
 use crab_nbt::{Nbt, NbtCompound, NbtTag};
 use crab_nbt_ext::convert_vec_to_nbt;
+use crab_nbt_ext::gettext_text;
 use formatx::formatx;
 use std::error::Error;
 use std::ffi::{CStr, CString, c_char, c_int, c_void};
@@ -131,9 +132,9 @@ impl NbtCreate for NbtTag {
         let mut y = 0;
         let mut z = 0;
         fn size_change(
-            mut x: &mut i32,
-            mut y: &mut i32,
-            mut z: &mut i32,
+            x: &mut i32,
+            y: &mut i32,
+            z: &mut i32,
             region_x: i32,
             region_y: i32,
             region_z: i32,
@@ -160,7 +161,11 @@ impl NbtCreate for NbtTag {
                 (((i + 1) * 100) / states.len()) as c_int,
                 elapsed_millisecs,
                 free_memory,
-                &formatx!(i18n("Adding blocks to NBT: {} / {}."), i, states.len())?,
+                &formatx!(
+                    gettext_text(i18n("Adding blocks to NBT: {} / {}.")),
+                    i,
+                    states.len()
+                )?,
                 cancel_flag,
                 i18n("Adding blocks is cancelled.")
             );

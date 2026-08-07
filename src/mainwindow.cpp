@@ -1,13 +1,18 @@
 #include "mainwindow.h"
+#include "dhconfigdialog/src/dhconfigdialog.h"
+#include <kcoreconfigskeleton.h>
 #include <libintl.h>
+#include <memory>
+#include <qcombobox.h>
+#include <qobject.h>
 #define _(str) gettext (str)
 #include "blockreaderui.h"
+#include "dhconfigdialog/src/dhconfigtemplates.h"
 #include "dhgameconfigui.h"
 #include "externalnbtreaderui.h"
 #include "settings.h"
 #include "utility.h"
-
-#include "dhconfigdialog/src/dhconfigtemplates.h"
+#include <QComboBox>
 #include <QLineEdit>
 #include <QResizeEvent>
 #include <QSortFilterProxyModel>
@@ -15,6 +20,76 @@
 #include <QToolBar>
 
 static MainWindow *mainWindow = nullptr;
+
+class DhEnumConfigTemplate : public DhConfigTemplate
+{
+
+public:
+  DhEnumConfigTemplate (KConfigSkeletonItem *item, QVBoxLayout *layout,
+                        DhConfigDialog *dialog)
+      : DhConfigTemplate (item, layout, dialog)
+  {
+    DhEnumConfigTemplate::initWidget (layout, dialog);
+  };
+
+  void
+  initWidget (QVBoxLayout *layout, DhConfigDialog *dialog) override
+  {
+    auto realItem = dynamic_cast<KCoreConfigSkeleton::ItemEnum *> (item);
+    auto choices = realItem->choices ();
+    auto value = realItem->value ();
+
+    QString label = item->label ();
+    QString toolTip = item->toolTip ();
+    QLabel *labelWidget = new QLabel (label);
+    QComboBox *comboBox = new QComboBox ();
+    comboBox->setToolTip (toolTip);
+
+    for (auto choice : choices)
+      comboBox->addItem (choice.label);
+    comboBox->setCurrentIndex (value);
+
+    QHBoxLayout *hlayout = new QHBoxLayout;
+    hlayout->addWidget (labelWidget);
+    hlayout->addWidget (comboBox);
+    layout->addLayout (hlayout);
+    widget = comboBox;
+    QObject::connect (comboBox, &QComboBox::currentTextChanged, dialog,
+                      [dialog] { dialog->detect (); });
+  }
+
+  void
+  applyChange () const override
+  {
+    auto value = qobject_cast<QComboBox *> (widget)->currentIndex ();
+    item->setProperty (value);
+  }
+
+  [[nodiscard]] bool
+  detect () const override
+  {
+    auto spinBox = qobject_cast<QComboBox *> (widget);
+    auto boxValue = spinBox->currentIndex ();
+    auto itemValue = item->property ().toInt ();
+    if (boxValue != itemValue)
+      return true;
+    return false;
+  }
+
+  void
+  setDefault () const override
+  {
+    int value = item->getDefault ().toInt ();
+    qobject_cast<QComboBox *> (widget)->setCurrentIndex (value);
+  }
+
+  void
+  changeConfig () const override
+  {
+    int value = item->property ().toInt ();
+    qobject_cast<QComboBox *> (widget)->setCurrentIndex (value);
+  }
+};
 
 MainWindow::MainWindow (QWidget *parent) : QMainWindow (parent)
 {
@@ -90,6 +165,13 @@ MainWindow::MainWindow (QWidget *parent) : QMainWindow (parent)
   listView->setModel (proxyModel);
 
   dialog = new DhConfigDialog (DhConfig::self (), "dhlrcrc", true, this);
+  dialog->addTemplateByItem (
+      DhConfig::self ()->defaultShowOptionItem (),
+      [] (KConfigSkeletonItem *item, QVBoxLayout *layout,
+          DhConfigDialog *dialog)
+        {
+          return std::make_unique<DhEnumConfigTemplate> (item, layout, dialog);
+        });
   dialog->addAssistant (std::make_unique<DhSetConfigAssistant> ());
   dialog->addLongTextItems ("Description");
 
@@ -124,7 +206,7 @@ MainWindow::MainWindow (QWidget *parent) : QMainWindow (parent)
                        {
                          auto brui = new BlockReaderUI (region, mrui);
                          auto tabIndex = tabWidget->addTab (
-                             brui, _ ("Block Reader/Modifier"));
+                             brui, _ ("Region Reader/Modifier"));
                          tabWidget->setCurrentIndex (tabIndex);
                        }
                      break;
@@ -144,7 +226,11 @@ MainWindow::MainWindow (QWidget *parent) : QMainWindow (parent)
            [&] (int index)
              {
                if (tabWidget->widget (index) != mrui)
-                 delete tabWidget->widget (index);
+                 {
+                   auto widget = tabWidget->widget (index);
+                   widget->close ();
+                   delete tabWidget->widget (index);
+                 }
                else
                  tabWidget->removeTab (index);
              });
@@ -155,7 +241,11 @@ MainWindow::~MainWindow ()
   for (int i = tabWidget->count () - 1; i >= 0; i--)
     {
       if (tabWidget->widget (i) != mrui)
-        delete tabWidget->widget (i);
+        {
+          auto widget = tabWidget->widget (i);
+          widget->close ();
+          delete tabWidget->widget (i);
+        }
     }
   delete mrui;
   delete dialog;

@@ -22,7 +22,7 @@ We can also use the optional region **base type** to get the base type of the fi
 const char* region_base_type();
 ```
 
-We can also use the optional region **file type** to get the filter of the file:
+We can also use the optional region **file type** to get the *filter* of the file:
 
 ```c++
 const char* region_file_type();

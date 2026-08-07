@@ -64,4 +64,19 @@
     <group name="Manage">
 
     </group>
+    <group name="Reader">
+        <entry name="DefaultShowOption" type="Enum">
+            <label>Default Show Option</label>
+            <tooltip>The default option of showing block information.</tooltip>
+            <choices>
+                <choice name="Palette">
+                    <label>Palette</label>
+                </choice>
+                <choice name="Name">
+                    <label>Name</label>
+                </choice>
+            </choices>
+            <default>0</default>
+        </entry>
+    </group>
 </kcfg>

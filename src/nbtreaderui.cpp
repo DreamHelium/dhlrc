@@ -4,11 +4,12 @@
 #include <QFileDialog>
 #include <libintl.h>
 #include <nbtvec.h>
+#include <qdialog.h>
 #include <region.h>
 #define _(str) gettext (str)
 
 NbtReaderUI::NbtReaderUI (const void *nbt, bool fromFile, QWidget *parent)
-    : QWidget (parent), ui (new Ui::NbtReaderUI), nbt (nbt),
+    : QDialog (parent), ui (new Ui::NbtReaderUI), nbt (nbt),
       fromFile (fromFile)
 {
   ui->setupUi (this);

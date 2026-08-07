@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-05-09 21:20+0800\n"
+"POT-Creation-Date: 2026-08-07 20:57+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,69 +17,65 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: ../../src/blocklistui.cpp:26
+#: ../../src/blocklistui.cpp:27
 msgid "Ignore Air?"
 msgstr ""
 
-#: ../../src/blocklistui.cpp:27
+#: ../../src/blocklistui.cpp:28
 msgid "Do you want to ignore air?"
 msgstr ""
 
-#: ../../src/blocklistui.cpp:58 ../../src/blocklistui.cpp:61
+#: ../../src/blocklistui.cpp:59 ../../src/blocklistui.cpp:62
 msgid "id"
 msgstr ""
 
-#: ../../src/blocklistui.cpp:58 ../../src/blocklistui.cpp:61
+#: ../../src/blocklistui.cpp:59 ../../src/blocklistui.cpp:62
 msgid "id Name"
 msgstr ""
 
-#: ../../src/blocklistui.cpp:58
+#: ../../src/blocklistui.cpp:59
 msgid "Block Name"
 msgstr ""
 
-#: ../../src/blocklistui.cpp:58 ../../src/blocklistui.cpp:61 rc.cpp:27
+#: ../../src/blocklistui.cpp:59 ../../src/blocklistui.cpp:62 rc.cpp:27
 msgid "x"
 msgstr ""
 
-#: ../../src/blocklistui.cpp:59 ../../src/blocklistui.cpp:61 rc.cpp:30
+#: ../../src/blocklistui.cpp:60 ../../src/blocklistui.cpp:62 rc.cpp:30
 #: rc.cpp:60
 msgid "y"
 msgstr ""
 
-#: ../../src/blocklistui.cpp:59 ../../src/blocklistui.cpp:61 rc.cpp:33
+#: ../../src/blocklistui.cpp:60 ../../src/blocklistui.cpp:62 rc.cpp:33
 msgid "z"
 msgstr ""
 
-#: ../../src/blocklistui.cpp:59 ../../src/blocklistui.cpp:62
+#: ../../src/blocklistui.cpp:60 ../../src/blocklistui.cpp:63
+#: ../../build/src/settings.cpp:95 rc.cpp:144
 msgid "Palette"
 msgstr ""
 
-#: ../../src/blockreaderui.cpp:65
+#: ../../src/blockreaderui.cpp:66
 msgid "Choose an Index"
 msgstr ""
 
-#: ../../src/blockreaderui.cpp:65
+#: ../../src/blockreaderui.cpp:66
 msgid "Please choose an index."
 msgstr ""
 
-#: ../../src/blockreaderui.cpp:80
+#: ../../src/blockreaderui.cpp:81
 msgid "Region Modifier"
 msgstr ""
 
-#: ../../src/blockreaderui.cpp:85
+#: ../../src/blockreaderui.cpp:86
 msgid "Lack the translation module, will not try to get translation!"
 msgstr ""
 
-#: ../../src/blockreaderui.cpp:136
-msgid ""
-"Name: %1\n"
-"Translation name: %2\n"
-"Index: %3\n"
-"Palette: %4\n"
-"Properties:\n"
+#: ../../src/blockreaderui.cpp:146
+msgid "Not valid!"
 msgstr ""
 
-#: ../../src/blockreaderui.cpp:146
+#: ../../src/blockreaderui.cpp:158
 msgid ""
 "Name: %1\n"
 "Index: %2\n"
@@ -87,39 +83,55 @@ msgid ""
 "Properties:\n"
 msgstr ""
 
-#: ../../src/blockreaderui.cpp:183
-msgid "Not valid!"
-msgstr ""
-
-#: ../../src/blockreaderui.cpp:201
+#: ../../src/blockreaderui.cpp:196
 msgid "With DataVersion %4, version %5."
 msgstr ""
 
-#: ../../src/blockreaderui.cpp:203
+#: ../../src/blockreaderui.cpp:198
 msgid "Created time: %6, Modified time: %7, Author: %8, Name: %9"
 msgstr ""
 
-#: ../../src/blockreaderui.cpp:205
+#: ../../src/blockreaderui.cpp:200
 msgid "Description: %10"
 msgstr ""
 
-#: ../../src/blockreaderui.cpp:239 ../../src/manageregionui.cpp:160
+#: ../../src/blockreaderui.cpp:234 ../../src/manageregionui.cpp:182
 #: ../../src/regionmodifyui.cpp:15 ../../src/saveregionui.cpp:52
 #: ../../src/utility.cpp:24 ../../src/utility.cpp:41 ../../src/utility.cpp:49
 msgid "Error!"
 msgstr ""
 
-#: ../../src/blockreaderui.cpp:240 ../../common-rs/src/util.rs:45
+#: ../../src/blockreaderui.cpp:235 ../../common-rs/src/util.rs:44
 msgid "Out of memory!"
+msgstr ""
+
+#: ../../src/blockshowui.cpp:67
+msgid "The block is in (%1, %2, %3), information is:\n"
+msgstr ""
+
+#: ../../src/blockshowui.cpp:78 ../../src/configobjectui.cpp:87
+#: ../../src/lrchooseui.cpp:79 rc.cpp:194 rc.cpp:254
+msgid "&OK"
+msgstr ""
+
+#: ../../src/blockshowui.cpp:80 rc.cpp:48
+msgid "&Show Entity NBT"
+msgstr ""
+
+#: ../../src/blockshowui.cpp:91 rc.cpp:45
+msgid "&Modify Property"
+msgstr ""
+
+#: ../../src/blockshowui.cpp:98
+msgid "Warning!"
+msgstr ""
+
+#: ../../src/blockshowui.cpp:99
+msgid "This function is not implemented yet!"
 msgstr ""
 
 #: ../../src/configobjectui.cpp:63
 msgid "Setting options:"
-msgstr ""
-
-#: ../../src/configobjectui.cpp:87 ../../src/lrchooseui.cpp:79 rc.cpp:182
-#: rc.cpp:242
-msgid "&OK"
 msgstr ""
 
 #: ../../src/configobjectui.cpp:88
@@ -161,7 +173,7 @@ msgstr ""
 msgid "Continue"
 msgstr ""
 
-#: ../../src/externalnbtreaderui.cpp:15 ../../src/mainwindow.cpp:108
+#: ../../src/externalnbtreaderui.cpp:15 ../../src/mainwindow.cpp:190
 msgid "NBT Reader"
 msgstr ""
 
@@ -212,7 +224,7 @@ msgstr ""
 msgid "Enter description here."
 msgstr ""
 
-#: ../../src/lrchooseui.cpp:80 rc.cpp:12 rc.cpp:170
+#: ../../src/lrchooseui.cpp:80 rc.cpp:12 rc.cpp:182
 msgid "&Close"
 msgstr ""
 
@@ -220,79 +232,75 @@ msgstr ""
 msgid "Minecraft Structure Modifier"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:46
+#: ../../src/mainwindow.cpp:121
 msgid "Search..."
 msgstr ""
 
-#: ../../src/mainwindow.cpp:74
+#: ../../src/mainwindow.cpp:149
 msgid "NBT File Reader"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:75 ../../src/mainwindow.cpp:116
+#: ../../src/mainwindow.cpp:150 ../../src/mainwindow.cpp:198
 msgid "Manage Region"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:76
+#: ../../src/mainwindow.cpp:151 ../../src/mainwindow.cpp:209
 msgid "Region Reader/Modifier"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:77
+#: ../../src/mainwindow.cpp:152
 msgid "Settings"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:127
-msgid "Block Reader/Modifier"
-msgstr ""
-
-#: ../../src/manageregionui.cpp:133
+#: ../../src/manageregionui.cpp:149
 msgid "&Select"
 msgstr ""
 
-#: ../../src/manageregionui.cpp:137 rc.cpp:176
+#: ../../src/manageregionui.cpp:153 rc.cpp:188
 msgid "&Add"
 msgstr ""
 
-#: ../../src/manageregionui.cpp:157
+#: ../../src/manageregionui.cpp:180
 msgid "Select Files"
 msgstr ""
 
-#: ../../src/manageregionui.cpp:161
+#: ../../src/manageregionui.cpp:183
 msgid "No file selected!"
 msgstr ""
 
-#: ../../src/manageregionui.cpp:237
+#: ../../src/manageregionui.cpp:259
 msgid "Choose Save Option"
 msgstr ""
 
-#: ../../src/manageregionui.cpp:238
+#: ../../src/manageregionui.cpp:260
 msgid "Choose whether format you want to save to."
 msgstr ""
 
-#: ../../src/manageregionui.cpp:244
+#: ../../src/manageregionui.cpp:279
 msgid "Use MultiFunc?"
 msgstr ""
 
-#: ../../src/manageregionui.cpp:245
+#: ../../src/manageregionui.cpp:280
 msgid "This type supports regions to save as one file, do you want to use it?"
 msgstr ""
 
-#: ../../src/manageregionui.cpp:257
+#: ../../src/manageregionui.cpp:293
 msgid "Select Directory"
 msgstr ""
 
-#: ../../src/manageregionui.cpp:336
+#: ../../src/manageregionui.cpp:373
 msgid "Locked!"
 msgstr ""
 
-#: ../../src/manageregionui.cpp:376
+#: ../../src/manageregionui.cpp:413
 msgid "Input a New Name"
 msgstr ""
 
-#: ../../src/manageregionui.cpp:377
+#: ../../src/manageregionui.cpp:414
 msgid "Please input a new name for the region."
 msgstr ""
 
-#: ../../src/nbtreaderui.cpp:49
+#: ../../src/nbtreaderui.cpp:50
 msgid "Export NBT To ..."
 msgstr ""
 
@@ -320,7 +328,7 @@ msgstr ""
 msgid "Please enter a data."
 msgstr ""
 
-#: ../../src/paletteaddui.cpp:68
+#: ../../src/paletteaddui.cpp:68 ../../build/src/settings.cpp:101 rc.cpp:147
 msgid "Name"
 msgstr ""
 
@@ -408,7 +416,7 @@ msgstr ""
 msgid "When failed, the file will try to be loaded by other modules."
 msgstr ""
 
-#: ../../build/src/settings.cpp:61 rc.cpp:136 ../../region-rs/src/default.rs:58
+#: ../../build/src/settings.cpp:61 rc.cpp:148 ../../region-rs/src/default.rs:58
 msgid "Converted"
 msgstr ""
 
@@ -420,11 +428,11 @@ msgstr ""
 msgid "The default base name for the region."
 msgstr ""
 
-#: ../../build/src/settings.cpp:65 rc.cpp:137 ../../region-rs/src/default.rs:60
+#: ../../build/src/settings.cpp:65 rc.cpp:149 ../../region-rs/src/default.rs:60
 msgid "Unnamed"
 msgstr ""
 
-#: ../../build/src/settings.cpp:66 rc.cpp:108 rc.cpp:233
+#: ../../build/src/settings.cpp:66 rc.cpp:108 rc.cpp:245
 msgid "Region Name"
 msgstr ""
 
@@ -462,6 +470,14 @@ msgstr ""
 
 #: ../../build/src/settings.cpp:86 rc.cpp:135
 msgid "The version to override in translation stage."
+msgstr ""
+
+#: ../../build/src/settings.cpp:105 rc.cpp:138
+msgid "Default Show Option"
+msgstr ""
+
+#: ../../build/src/settings.cpp:106 rc.cpp:141
+msgid "The default option of showing block information."
 msgstr ""
 
 #: rc.cpp:3
@@ -504,19 +520,11 @@ msgstr ""
 msgid "Show &All Entities"
 msgstr ""
 
-#: rc.cpp:45
-msgid "&Modify Property"
-msgstr ""
-
-#: rc.cpp:48
-msgid "&Show Entity NBT"
-msgstr ""
-
 #: rc.cpp:51
 msgid "&List blocks"
 msgstr ""
 
-#: rc.cpp:54 rc.cpp:188
+#: rc.cpp:54 rc.cpp:200
 msgid "&Show blocks"
 msgstr ""
 
@@ -536,115 +544,115 @@ msgstr ""
 msgid "Modify &Block"
 msgstr ""
 
-#: rc.cpp:140
+#: rc.cpp:152
 msgid "What happened in this step?"
 msgstr ""
 
-#: rc.cpp:143
+#: rc.cpp:155
 msgid "Details"
 msgstr ""
 
-#: rc.cpp:146
+#: rc.cpp:158
 msgid "&Continue"
 msgstr ""
 
-#: rc.cpp:149
+#: rc.cpp:161
 msgid "C&ancel"
 msgstr ""
 
-#: rc.cpp:152
+#: rc.cpp:164
 msgid "Form"
 msgstr ""
 
-#: rc.cpp:155
+#: rc.cpp:167
 msgid "Type:"
 msgstr ""
 
-#: rc.cpp:158
+#: rc.cpp:170
 msgid "Key:"
 msgstr ""
 
-#: rc.cpp:161
+#: rc.cpp:173
 msgid "Value:"
 msgstr ""
 
-#: rc.cpp:164
+#: rc.cpp:176
 msgid "&Export"
 msgstr ""
 
-#: rc.cpp:167
+#: rc.cpp:179
 msgid "PushButton"
 msgstr ""
 
-#: rc.cpp:173
+#: rc.cpp:185
 msgid "PaletteAddUI"
 msgstr ""
 
-#: rc.cpp:179
+#: rc.cpp:191
 msgid "&Remove"
 msgstr ""
 
-#: rc.cpp:185
+#: rc.cpp:197
 msgid "PaletteListUI"
 msgstr ""
 
-#: rc.cpp:191
+#: rc.cpp:203
 msgid "Modify Property of Block(s)"
 msgstr ""
 
-#: rc.cpp:194
+#: rc.cpp:206
 msgid "Modify the property of the block in:"
 msgstr ""
 
-#: rc.cpp:197
+#: rc.cpp:209
 msgid "With the block that is the same property"
 msgstr ""
 
-#: rc.cpp:200
+#: rc.cpp:212
 msgid "Properties:"
 msgstr ""
 
-#: rc.cpp:203
+#: rc.cpp:215
 msgid "RegionModifyUI"
 msgstr ""
 
-#: rc.cpp:206
+#: rc.cpp:218
 msgid "Modify the infomation of the Region."
 msgstr ""
 
-#: rc.cpp:209
+#: rc.cpp:221
 msgid "Create Time"
 msgstr ""
 
-#: rc.cpp:212 rc.cpp:218
+#: rc.cpp:224 rc.cpp:230
 msgid "yyyy/MM/dd HH:mm:ss.zzz"
 msgstr ""
 
-#: rc.cpp:215
+#: rc.cpp:227
 msgid "Modify Time"
 msgstr ""
 
-#: rc.cpp:221
+#: rc.cpp:233
 msgid "Description"
 msgstr ""
 
-#: rc.cpp:224
+#: rc.cpp:236
 msgid "Offset"
 msgstr ""
 
-#: rc.cpp:227
+#: rc.cpp:239
 msgid "Author"
 msgstr ""
 
-#: rc.cpp:230
+#: rc.cpp:242
 msgid "Base Name"
 msgstr ""
 
-#: rc.cpp:236
+#: rc.cpp:248
 msgid "Data Version"
 msgstr ""
 
-#: rc.cpp:239
+#: rc.cpp:251
 msgid "Version"
 msgstr ""
 
@@ -696,7 +704,7 @@ msgstr ""
 msgid "Compound"
 msgstr ""
 
-#: ../../common-rs/src/util.rs:80
+#: ../../common-rs/src/util.rs:79
 msgid "Null pointer detected"
 msgstr ""
 
@@ -841,20 +849,20 @@ msgstr ""
 msgid "Processing blocks: {} / {}."
 msgstr ""
 
-#: ../../region-nbt-rs/src/output.rs:78 ../../region-nbt-rs/src/output.rs:275
+#: ../../region-nbt-rs/src/output.rs:79 ../../region-nbt-rs/src/output.rs:280
 msgid "Nullptr detected!"
 msgstr ""
 
-#: ../../region-nbt-rs/src/output.rs:163
+#: ../../region-nbt-rs/src/output.rs:165
 #, rust-format
 msgid "Adding blocks to NBT: {} / {}."
 msgstr ""
 
-#: ../../region-nbt-rs/src/output.rs:165
+#: ../../region-nbt-rs/src/output.rs:170
 msgid "Adding blocks is cancelled."
 msgstr ""
 
-#: ../../region-nbt-rs/src/output.rs:303
+#: ../../region-nbt-rs/src/output.rs:308
 msgid "Pushing index."
 msgstr ""
 

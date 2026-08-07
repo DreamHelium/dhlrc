@@ -72,35 +72,37 @@ set(TEMP_PROJECT_SOURCES
         dhpushbutton.h
         dhloadjob.cpp
         dhloadjob.h
+        dhbuttondelegate.cpp
+        dhbuttondelegate.h
 )
 
 ki18n_wrap_ui(TEMP_PROJECT_SOURCES ${ui_files})
 
 if (${QT_VERSION_MAJOR} GREATER_EQUAL 6)
-    qt_add_executable(dhlrc_qt
+  qt_add_executable(dhlrc_qt
             MANUAL_FINALIZATION
             ${TEMP_PROJECT_SOURCES}
     )
-    # Define target properties for Android with Qt 6 as:
-    #    set_property(TARGET dhlrc_qt APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR
-    #                 ${CMAKE_CURRENT_SOURCE_DIR}/android)
-    # For more information, see https://doc.qt.io/qt-6/qt-add-executable.html#target-creation
+  # Define target properties for Android with Qt 6 as:
+  #    set_property(TARGET dhlrc_qt APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR
+  #                 ${CMAKE_CURRENT_SOURCE_DIR}/android)
+  # For more information, see https://doc.qt.io/qt-6/qt-add-executable.html#target-creation
 else ()
-    if (ANDROID)
-        add_library(dhlrc_qt SHARED
+  if (ANDROID)
+    add_library(dhlrc_qt SHARED
                 ${TEMP_PROJECT_SOURCES}
         )
-        # Define properties for Android with Qt 5 after find_package() calls as:
-        #    set(ANDROID_PACKAGE_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/android")
-    else ()
-        add_executable(dhlrc_qt
+    # Define properties for Android with Qt 5 after find_package() calls as:
+    #    set(ANDROID_PACKAGE_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/android")
+  else ()
+    add_executable(dhlrc_qt
                 ${TEMP_PROJECT_SOURCES}
         )
-    endif ()
+  endif ()
 endif ()
 
 target_link_libraries(dhlrc_qt PRIVATE Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::Svg KF6::ColorScheme
-	KF6::ConfigWidgets KF6::I18n KF6::I18nLocaleData region_rs Qt6::Concurrent nbt_to_vec ${Intl_LIBRARIES}
+ KF6::ConfigWidgets KF6::I18n KF6::I18nLocaleData region_rs Qt6::Concurrent nbt_to_vec ${Intl_LIBRARIES}
     dhconfigdialog KF6::WidgetsAddons KF6::CoreAddons KF6::IconThemes Qt6::StateMachine)
 target_link_directories(dhlrc_qt PRIVATE ${CMAKE_BINARY_DIR})
 target_include_directories(dhlrc_qt PUBLIC
@@ -115,7 +117,7 @@ kconfig_add_kcfg_files(dhlrc_qt config/settings.kcfgc)
 # If you are developing for iOS or macOS you should consider setting an
 # explicit, fixed bundle identifier manually though.
 if (${QT_VERSION} VERSION_LESS 6.1.0)
-    set(BUNDLE_ID_OPTION MACOSX_BUNDLE_GUI_IDENTIFIER com.example.dhlrc_qt)
+  set(BUNDLE_ID_OPTION MACOSX_BUNDLE_GUI_IDENTIFIER com.example.dhlrc_qt)
 endif ()
 set_target_properties(dhlrc_qt PROPERTIES
         ${BUNDLE_ID_OPTION}
@@ -126,5 +128,5 @@ set_target_properties(dhlrc_qt PROPERTIES
 include(GNUInstallDirs)
 
 if (QT_VERSION_MAJOR EQUAL 6)
-    qt_finalize_executable(dhlrc_qt)
+  qt_finalize_executable(dhlrc_qt)
 endif ()

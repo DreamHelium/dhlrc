@@ -6,6 +6,8 @@
 #include "regionmodifyui.h"
 #include <QPointer>
 #include <QWidget>
+#include <qobject.h>
+#include <qtypes.h>
 
 // #include "blockshowui.h"
 
@@ -23,6 +25,7 @@ class BlockReaderUI : public QWidget
 public:
   BlockReaderUI (int index, ManageRegionUI *mr, QWidget *parent = nullptr);
   ~BlockReaderUI ();
+  static QString getBlockInfo (void *region, quint32 index);
 
 private:
   Ui::BlockReaderUI *ui;
@@ -41,7 +44,6 @@ private:
 Q_SIGNALS:
   void changeVal (int value);
   void closeWin ();
-  ;
 
 private Q_SLOTS:
   void textChanged_cb ();

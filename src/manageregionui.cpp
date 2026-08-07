@@ -3,6 +3,7 @@
 #include "dhloadjob.h"
 #include "generalchoosedialog.h"
 #include "mainwindow.h"
+#include "region.h"
 #include "saveregionui.h"
 
 #include <QInputDialog>
@@ -12,6 +13,7 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QPushButton>
+#include <libintl.h>
 #include <qevent.h>
 #include <qmimedata.h>
 
@@ -73,6 +75,12 @@ ManageRegionUI::ManageRegionUI (QWidget *mainWindow, QWidget *parent)
                   multiModuleBase->multiTransFunc
                       = reinterpret_cast<MultiTransFunc> (
                           library->resolve ("region_save_into_multi"));
+                  if (multiModuleBase->multiTransFunc)
+                    {
+                      auto name = typeFn ();
+                      supportList << name;
+                      string_free (name);
+                    }
                   multiModuleBase->numFunc
                       = reinterpret_cast<MultiModuleBase::NumFunc> (
                           library->resolve ("region_num"));
@@ -95,6 +103,12 @@ ManageRegionUI::ManageRegionUI (QWidget *mainWindow, QWidget *parent)
                   singleModuleBase->singleTransFunc
                       = reinterpret_cast<SingleTransFunc> (
                           library->resolve ("region_save"));
+                  if (singleModuleBase->singleTransFunc)
+                    {
+                      auto name = typeFn ();
+                      supportList << name;
+                      string_free (name);
+                    }
                   singleModuleBase->loadFunc
                       = reinterpret_cast<SingleModuleBase::LoadFunc> (
                           library->resolve ("region_create_from_file"));
@@ -106,6 +120,7 @@ ManageRegionUI::ManageRegionUI (QWidget *mainWindow, QWidget *parent)
           get_name_and_put_into_module_base (moduleBase, baseType, baseTypeFn);
           get_name_and_put_into_module_base (moduleBase, filter, fileTypeFn);
 
+          /* Has this load method */
           bool hasThisLoad = false;
           for (const auto &load : loadObjectList)
             if (load.baseType == moduleBase->baseType)
@@ -119,6 +134,7 @@ ManageRegionUI::ManageRegionUI (QWidget *mainWindow, QWidget *parent)
               loadObjectList.emplace_back (moduleBase->baseType, loadObjectFn,
                                            objFreeFn);
             }
+          moduleBase->module = library;
           moduleBaseList.emplace_back (moduleBase);
         }
     }
@@ -153,9 +169,15 @@ ManageRegionUI::ManageRegionUI (QWidget *mainWindow, QWidget *parent)
   connect (addButton, &QPushButton::clicked, this,
            [&]
              {
+               QString filter;
+               for (auto module : moduleBaseList)
+                 {
+                   filter += gettext (module->filter.toUtf8 ());
+                   if (module != moduleBaseList[moduleBaseList.size () - 1])
+                     filter += ";;";
+                 }
                auto dirs = QFileDialog::getOpenFileNames (
-                   this, _ ("Select Files"), nullptr,
-                   "(*.nbt);;(*.litematic)");
+                   this, _ ("Select Files"), nullptr, filter);
                if (dirs.isEmpty ())
                  QMessageBox::critical (this, _ ("Error!"),
                                         _ ("No file selected!"));
@@ -239,14 +261,28 @@ ManageRegionUI::save (const QList<int> &list)
   if (saveIndex != -1)
     {
       bool useMulti = false;
-      if (multiFuncList[saveIndex] != nullptr)
+      auto name = supportList[saveIndex];
+      ModuleBase *module = nullptr;
+      for (auto i : moduleBaseList)
         {
-          auto btn = QMessageBox::question (this, _ ("Use MultiFunc?"),
-                                            _ ("This type supports regions to "
-                                               "save as one file, do you want "
-                                               "to use it?"));
-          if (btn == QMessageBox::Ok)
-            useMulti = true;
+          if (i->type == name)
+            {
+              module = i;
+              break;
+            }
+        }
+      if (module->multiSupport)
+        {
+          if (dynamic_cast<MultiModuleBase *> (module)->multiTransFunc)
+            {
+              auto btn
+                  = QMessageBox::question (this, _ ("Use MultiFunc?"),
+                                           _ ("This type supports regions to "
+                                              "save as one file, do you want "
+                                              "to use it?"));
+              if (btn == QMessageBox::Ok)
+                useMulti = true;
+            }
         }
       if (useMulti)
         { /* TODO */
@@ -260,9 +296,10 @@ ManageRegionUI::save (const QList<int> &list)
               QList<std::shared_ptr<RegionClass>> transRegions;
               for (auto index : list)
                 transRegions << regions[index];
-              auto srui = new SaveRegionUI (transRegions, dir,
-                                            singleFuncList[saveIndex],
-                                            libraries[saveIndex]);
+              auto srui = new SaveRegionUI (
+                  transRegions, dir,
+                  dynamic_cast<SingleModuleBase *> (module)->singleTransFunc,
+                  module->module);
               srui->setAttribute (Qt::WA_DeleteOnClose);
               srui->show ();
             }

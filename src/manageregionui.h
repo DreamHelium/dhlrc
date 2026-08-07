@@ -113,9 +113,6 @@ private:
   KMessageWidget *messageWidget;
 
   QStringList supportList;
-  QList<MultiTransFunc> multiFuncList;
-  QList<SingleTransFunc> singleFuncList;
-  QList<QLibrary *> libraries;
 
 public Q_SLOTS:
   void refresh_triggered ();

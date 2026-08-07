@@ -3,6 +3,7 @@
 #include <QStandardItemModel>
 #include <QWidget>
 #include <dhtreefilter.h>
+#include <qdialog.h>
 
 QT_BEGIN_NAMESPACE
 namespace Ui
@@ -11,7 +12,7 @@ class NbtReaderUI;
 }
 QT_END_NAMESPACE
 
-class NbtReaderUI : public QWidget
+class NbtReaderUI : public QDialog
 {
   Q_OBJECT
 

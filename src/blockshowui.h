@@ -5,11 +5,15 @@
 #ifndef BLOCKSHOWUI_H
 #define BLOCKSHOWUI_H
 
+#include "dhbuttondelegate.h"
 #include <QButtonGroup>
 #include <QGridLayout>
 #include <QProgressDialog>
 #include <QPushButton>
+#include <QStandardItemModel>
+#include <QTableView>
 #include <QWidget>
+#include <qevent.h>
 
 QT_BEGIN_NAMESPACE
 namespace Ui
@@ -29,25 +33,25 @@ public:
 
 Q_SIGNALS:
   void changeVal (int val);
+  void closeWin ();
 
 private:
   bool modeSwitch = false;
-  bool firstInited = false;
   void initUI ();
-  QProgressDialog *progressDialog = nullptr;
+  DhButtonDelegate *delegate = nullptr;
 
-public:
+protected:
+  void closeEvent (QCloseEvent *event) override;
+
+private:
   QWidget *widget;
   Ui::BlockShowUI *ui;
-  QList<QPushButton *> btns;
-  QButtonGroup *group;
-  QGridLayout *layout;
   void *region;
   char *&large_version;
-  bool inited = false;
+  QStandardItemModel *model = nullptr;
 
 private Q_SLOTS:
-  // void updateUI ();
+  void updateUI ();
 };
 
 #endif // BLOCKSHOWUI_H

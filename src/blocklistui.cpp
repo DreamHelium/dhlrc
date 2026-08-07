@@ -1,4 +1,5 @@
 #include "blocklistui.h"
+#include <qnamespace.h>
 #define _(str) gettext (str)
 #include "ui_blocklistui.h"
 #include <QFuture>
@@ -6,7 +7,6 @@
 #include <QList>
 #include <QTimer>
 #include <QtConcurrentRun>
-#include <future>
 #include <qlineedit.h>
 #include <qmessagebox.h>
 #include <qsortfilterproxymodel.h>
@@ -92,13 +92,15 @@ BlockListUI::updateBlockList ()
               y++;
             }
         };
+
       void *system_info = get_system_info_object ();
       clock_t start = clock ();
       for (int i = 0; i < size; i++)
         {
           clock_t end = clock ();
-          if ((end - start) % 1000 == 0)
+          if ((end - start) > 1000)
             {
+              start = clock ();
               Q_EMIT setValue ((i + 1) * 100 / size);
               if (get_free_memory (system_info) < 500 * 1024 * 1024)
                 {
@@ -113,10 +115,11 @@ BlockListUI::updateBlockList ()
           if (!strcmp (id_name, "minecraft:air") && ignoreAir)
             {
               string_free (id_name);
-              addIndexFunc();
+              addIndexFunc ();
               continue;
             }
           QStandardItem *item2 = nullptr;
+
           QStandardItem *item0 = new QStandardItem (QString::number (i));
           QStandardItem *item1 = new QStandardItem (id_name);
 
@@ -143,7 +146,6 @@ BlockListUI::updateBlockList ()
                     str += "\n";
                 }
             }
-
           item6->setToolTip (str);
           QList<QStandardItem *> itemList;
           if (item2)
