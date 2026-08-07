@@ -234,7 +234,7 @@ DhLoadJob::loadRegion ()
                 }
               else
                 {
-                  if (typeList[0] != realItem)
+                  if (typeList[0] != realItem && !realItem.second.isEmpty ())
                     typeList.swapItemsAt (0, typeList.indexOf (realItem));
                 }
             }
