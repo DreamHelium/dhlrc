@@ -1,5 +1,6 @@
 #include "blockreaderui.h"
 // #include "blocklistui.h"
+#include "resourcegetter.h"
 #include "ui_blockreaderui.h"
 #include <QMessageBox>
 // #include <blockshowui.h>
@@ -32,24 +33,35 @@ BlockReaderUI::BlockReaderUI (int index, ManageRegionUI *mr, QWidget *parent)
       locker (*ManageRegionUI::getRegions ()[index])
 {
   ui->setupUi (this);
-  // auto version = dh::getVersion (region->data_version);
+  version = region_get_data_version (region);
+  connect (this, &BlockReaderUI::start, this,
+           [&] () -> QCoro::Task<>
+             {
+               this->objectPath
+                   = co_await download_object (this->downloader, this->version,
+                                               "minecraft/lang/zh_cn.json");
+               Q_EMIT this->finishLoadingTranslation ();
+               Q_EMIT this->changeVal (100);
+             });
+  Q_EMIT start ();
   setText ();
-  QObject::connect (ui->xEdit, &QLineEdit::textChanged, this,
-                    &BlockReaderUI::textChanged_cb);
-  QObject::connect (ui->yEdit, &QLineEdit::textChanged, this,
-                    &BlockReaderUI::textChanged_cb);
-  QObject::connect (ui->zEdit, &QLineEdit::textChanged, this,
-                    &BlockReaderUI::textChanged_cb);
-  QObject::connect (ui->listBtn, &QPushButton::clicked, this,
-                    &BlockReaderUI::listBtn_clicked);
-  QObject::connect (ui->entityBtn, &QPushButton::clicked, this,
-                    &BlockReaderUI::entityBtn_clicked);
-  QObject::connect (this, &BlockReaderUI::changeVal, ui->progressBar,
-                    &QProgressBar::setValue);
-  QObject::connect (ui->propertyBtn, &QPushButton::clicked, this,
-                    &BlockReaderUI::propertyBtn_clicked);
-  QObject::connect (ui->showBtn, &QPushButton::clicked, this,
-                    &BlockReaderUI::showBtn_clicked);
+  // download_manifest ();
+  connect (ui->xEdit, &QLineEdit::textChanged, this,
+           &BlockReaderUI::textChanged_cb);
+  connect (ui->yEdit, &QLineEdit::textChanged, this,
+           &BlockReaderUI::textChanged_cb);
+  connect (ui->zEdit, &QLineEdit::textChanged, this,
+           &BlockReaderUI::textChanged_cb);
+  connect (ui->listBtn, &QPushButton::clicked, this,
+           &BlockReaderUI::listBtn_clicked);
+  connect (ui->entityBtn, &QPushButton::clicked, this,
+           &BlockReaderUI::entityBtn_clicked);
+  connect (this, &BlockReaderUI::changeVal, ui->progressBar,
+           &QProgressBar::setValue);
+  connect (ui->propertyBtn, &QPushButton::clicked, this,
+           &BlockReaderUI::propertyBtn_clicked);
+  connect (ui->showBtn, &QPushButton::clicked, this,
+           &BlockReaderUI::showBtn_clicked);
   connect (ui->entityBtn_2, &QPushButton::clicked, this,
            [&]
              {
@@ -80,12 +92,13 @@ BlockReaderUI::BlockReaderUI (int index, ManageRegionUI *mr, QWidget *parent)
                  rmui = new RegionModifyUI (region);
                MainWindow::addWidgetToTab (rmui, _ ("Region Modifier"));
              });
-
   ui->entityBtn->setEnabled (false);
   ui->propertyBtn->setEnabled (false);
-  ui->label_7->setText (_ ("Lack the translation module, will not "
-                           "try to get translation!"));
-  ui->progressBar->hide ();
+  // ui->label_7->setText (_ ("Lack the translation module, will not "
+  //                          "try to get translation!"));
+  // ui->progressBar->hide ();
+  connect (&downloader, &DhDownloader::progress, this,
+           [&] (int value) { Q_EMIT this->changeVal (value); });
 }
 
 BlockReaderUI::~BlockReaderUI ()
@@ -125,7 +138,7 @@ BlockReaderUI::textChanged_cb ()
         {
           int index = region_get_index (region, xText.toInt (), yText.toInt (),
                                         zText.toInt ());
-          infos = getBlockInfo (region, index);
+          infos = getBlockInfo (region, index, objectPath);
           const char *transName = nullptr;
 
           if (region_get_palette_property_len (
@@ -149,20 +162,37 @@ BlockReaderUI::textChanged_cb ()
 }
 
 QString
-BlockReaderUI::getBlockInfo (void *region, quint32 index)
+BlockReaderUI::getBlockInfo (void *region, quint32 index, const QString &path)
 {
   auto id = region_get_block_id_by_index (region, index);
   auto name = region_get_palette_id_name (region, id);
   auto palette_len = region_get_palette_property_len (region, id);
+  QString infos;
 
-  QString infos = QString (_ ("Name: %1\n"
-                              "Index: %2\n"
-                              "Palette: %3\n"
-                              "Properties:\n"))
-                      .arg (name)
-                      .arg (index)
-                      .arg (id);
-  string_free (name);
+  if (!path.isEmpty ())
+    {
+      infos = QString (_ ("Name: %1\n"
+                          "Translation Name: %2\n"
+                          "Index: %3\n"
+                          "Palette: %4\n"
+                          "Properties:\n"))
+                  .arg (name)
+                  .arg (get_translation_from_object (path, name))
+                  .arg (index)
+                  .arg (id);
+      string_free (name);
+    }
+  else
+    {
+      infos = QString (_ ("Name: %1\n"
+                          "Index: %2\n"
+                          "Palette: %3\n"
+                          "Properties:\n"))
+                  .arg (name)
+                  .arg (index)
+                  .arg (id);
+      string_free (name);
+    }
   if (palette_len)
     {
       for (int i = 0; i < palette_len; i++)
@@ -199,11 +229,19 @@ BlockReaderUI::setText ()
   str += '\n';
   str += _ ("Description: %10");
 
+  auto list = get_version_list ();
+  QString data_name;
+  for (const auto &[name, version] : list)
+    {
+      if (version == data_version)
+        data_name = name;
+    }
+
   QString sizeStr = str.arg (x)
                         .arg (y)
                         .arg (z)
                         .arg (data_version)
-                        .arg ("Unknown")
+                        .arg (data_name.isEmpty () ? _ ("Unknown") : data_name)
                         .arg (dh::getDateTimeFromTimeStamp (create_timestamp)
                                   .toString ("yyyy/MM/dd HH:mm:ss.zzz"))
                         .arg (dh::getDateTimeFromTimeStamp (modify_timestamp)
@@ -291,8 +329,10 @@ BlockReaderUI::showBtn_clicked ()
 {
   if (!bsui)
     {
-      bsui = new BlockShowUI (region, large_version);
+      bsui = new BlockShowUI (region, objectPath);
       connect (this, &BlockReaderUI::closeWin, bsui, &BlockShowUI::close);
+      connect (this, &BlockReaderUI::finishLoadingTranslation, bsui,
+               &BlockShowUI::updateUI);
     }
   bsui->show ();
 }

@@ -14,6 +14,7 @@
 #include <QTableView>
 #include <QWidget>
 #include <qevent.h>
+#include <qobject.h>
 
 QT_BEGIN_NAMESPACE
 namespace Ui
@@ -27,7 +28,7 @@ class BlockShowUI : public QWidget
   Q_OBJECT
 
 public:
-  explicit BlockShowUI (void *region, char *&large_version,
+  explicit BlockShowUI (void *region, const QString &large_version,
                         QWidget *parent = nullptr);
   ~BlockShowUI () override;
 
@@ -47,10 +48,10 @@ private:
   QWidget *widget;
   Ui::BlockShowUI *ui;
   void *region;
-  char *&large_version;
+  const QString &large_version;
   QStandardItemModel *model = nullptr;
 
-private Q_SLOTS:
+public Q_SLOTS:
   void updateUI ();
 };
 

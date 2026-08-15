@@ -2,9 +2,10 @@
 
 #include "ui_palettelistui.h"
 
+#include <qobject.h>
 #include <region.h>
 
-PaletteListUI::PaletteListUI (void *region, char *&large_version,
+PaletteListUI::PaletteListUI (void *region, const QString &large_version,
                               QWidget *parent)
     : QDialog (parent), ui (new Ui::PaletteListUI),
       large_version (large_version), region (region)
@@ -35,7 +36,7 @@ void
 PaletteListUI::drawList ()
 {
   QStringList stringlist;
-  if (large_version)
+  if (!large_version.isEmpty ())
     stringlist << "Id" << "Name" << "Translation name" << "Properties";
   else
     stringlist << "Id" << "Name" << "Properties";

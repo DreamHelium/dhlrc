@@ -8,6 +8,7 @@
 #include <QDialog>
 #include <QSortFilterProxyModel>
 #include <QStandardItemModel>
+#include <qobject.h>
 
 QT_BEGIN_NAMESPACE
 namespace Ui
@@ -21,13 +22,13 @@ class PaletteListUI : public QDialog
   Q_OBJECT
 
 public:
-  explicit PaletteListUI (void *region, char *&large_version,
+  explicit PaletteListUI (void *region, const QString &large_version,
                           QWidget *parent = nullptr);
   ~PaletteListUI () override;
 
 private:
   Ui::PaletteListUI *ui;
-  char *&large_version;
+  const QString &large_version;
   void *region;
   QStandardItemModel *model;
   QSortFilterProxyModel *proxyModel;

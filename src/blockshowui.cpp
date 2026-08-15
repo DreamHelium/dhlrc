@@ -1,6 +1,7 @@
 #include "blockshowui.h"
 #include "blockreaderui.h"
 #include "nbtreaderui.h"
+#include "resourcegetter.h"
 #include "settings.h"
 #include "ui_blockshowui.h"
 #include <QProgressBar>
@@ -20,7 +21,8 @@
 #include <region.h>
 #define _(str) gettext (str)
 
-BlockShowUI::BlockShowUI (void *region, char *&large_version, QWidget *parent)
+BlockShowUI::BlockShowUI (void *region, const QString &large_version,
+                          QWidget *parent)
     : QWidget (parent), ui (new Ui::BlockShowUI),
       large_version (large_version), region (region)
 {
@@ -68,7 +70,8 @@ BlockShowUI::BlockShowUI (void *region, char *&large_version, QWidget *parent)
                     .arg (x)
                     .arg (y)
                     .arg (z);
-          str += BlockReaderUI::getBlockInfo (this->region, blockIndex);
+          str += BlockReaderUI::getBlockInfo (this->region, blockIndex,
+                                              large_version);
           auto nbt = region_get_block_entity (this->region, blockIndex);
           auto label = new QLabel (str);
           auto layout = new QVBoxLayout (dialog);
@@ -160,6 +163,10 @@ BlockShowUI::updateUI ()
               auto palette = region_get_palette_id_name (region, palette_num);
               auto palette_str = QString (palette);
               string_free (palette);
+              auto trans_str
+                  = get_translation_from_object (large_version, palette_str);
+              if (!trans_str.isEmpty ())
+                palette_str = trans_str;
               if (!modeSwitch)
                 {
                   if (DhConfig::defaultShowOption () == 0)

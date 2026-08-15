@@ -5,11 +5,11 @@ option(INSTALL_NOW OFF)
 option(CARGO_RELEASE OFF)
 
 if (CARGO_RELEASE)
-    message("ON")
-    set(CARGO_RELEASE_ARG "--release")
-    set(CARGO_TYPE "release")
+  message("ON")
+  set(CARGO_RELEASE_ARG "--release")
+  set(CARGO_TYPE "release")
 else ()
-    set(CARGO_TYPE "debug")
+  set(CARGO_TYPE "debug")
 endif ()
 
 find_program(CARGO_EXECUTABLE cargo)
@@ -19,22 +19,22 @@ add_custom_target(dhlrc_cargo_build ALL
 )
 
 if (UNIX)
-    if (NOT APPLE)
-        set(DHLRC_BUILD_LIBRARIES
+  if (NOT APPLE)
+    set(DHLRC_BUILD_LIBRARIES
                 ${CMAKE_CURRENT_SOURCE_DIR}/target/${CARGO_TYPE}/libregion_rs.so
                 ${CMAKE_CURRENT_SOURCE_DIR}/target/${CARGO_TYPE}/libnbt_to_vec.so)
-        set(DHLRC_MODULE_LIBRARIES
+    set(DHLRC_MODULE_LIBRARIES
                 ${CMAKE_CURRENT_SOURCE_DIR}/target/${CARGO_TYPE}/libregion_nbt_rs.so
                 ${CMAKE_CURRENT_SOURCE_DIR}/target/${CARGO_TYPE}/libregion_litematic_rs.so
         )
-    endif ()
+  endif ()
 endif ()
 
 if (WIN32)
-    set(DHLRC_BUILD_LIBRARIES
+  set(DHLRC_BUILD_LIBRARIES
             ${CMAKE_CURRENT_SOURCE_DIR}\\target\\${CARGO_TYPE}\\region_rs.dll
             ${CMAKE_CURRENT_SOURCE_DIR}\\target\\${CARGO_TYPE}\\nbt_to_vec.dll)
-    set(DHLRC_MODULE_LIBRARIES
+  set(DHLRC_MODULE_LIBRARIES
             ${CMAKE_CURRENT_SOURCE_DIR}\\target\\${CARGO_TYPE}\\region_nbt_rs.dll
             ${CMAKE_CURRENT_SOURCE_DIR}\\target\\${CARGO_TYPE}\\region_litematic_rs.dll
     )
@@ -70,11 +70,11 @@ find_package(PkgConfig)
 set(DH_ENABLE_TRANSLATION true)
 
 if (NOT GETTEXT_FOUND)
-    set(DH_ENABLE_TRANSLATION false)
+  set(DH_ENABLE_TRANSLATION false)
 endif ()
 
 if (NOT DH_ENABLE_TRANSLATION)
-    add_definitions(-DDH_DISABLE_TRANSLATION)
+  add_definitions(-DDH_DISABLE_TRANSLATION)
 endif ()
 
 #add_definitions(-DDH_DEBUG_IN_IDE)
@@ -86,7 +86,7 @@ add_subdirectory(src)
 
 #add_subdirectory(resources)
 if (DH_ENABLE_TRANSLATION)
-    add_subdirectory(po)
+  add_subdirectory(po)
 endif ()
 
 #install(FILES "${CMAKE_CURRENT_BINARY_DIR}/locale/zh_CN/LC_MESSAGES/dhlrc.mo" DESTINATION

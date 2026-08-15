@@ -4,6 +4,7 @@
 #include "blockshowui.h"
 #include "manageregionui.h"
 #include "regionmodifyui.h"
+#include "resourcegetter.h"
 #include <QPointer>
 #include <QWidget>
 #include <qobject.h>
@@ -25,7 +26,8 @@ class BlockReaderUI : public QWidget
 public:
   BlockReaderUI (int index, ManageRegionUI *mr, QWidget *parent = nullptr);
   ~BlockReaderUI ();
-  static QString getBlockInfo (void *region, quint32 index);
+  static QString getBlockInfo (void *region, quint32 index,
+                               const QString &path = QString{});
 
 private:
   Ui::BlockReaderUI *ui;
@@ -40,10 +42,15 @@ private:
   BlockShowUI *bsui = nullptr;
   const void *nbt = nullptr;
   AutoLocker locker;
+  QString objectPath;
+  DhDownloader downloader;
+  int version;
 
 Q_SIGNALS:
   void changeVal (int value);
   void closeWin ();
+  void start ();
+  void finishLoadingTranslation ();
 
 private Q_SLOTS:
   void textChanged_cb ();

@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-07 20:56+0800\n"
+"POT-Creation-Date: 2026-08-15 20:03+0800\n"
 "PO-Revision-Date: 2024-11-30 07:00+0800\n"
 "Last-Translator: dream_he <48383878+DreamHelium@users.noreply.github.com>\n"
 "Language-Team: Chinese <kde-i18n-doc@kde.org>\n"
@@ -22,65 +22,70 @@ msgstr ""
 "X-Language: zh_CN\n"
 "X-Source-Language: _CN\n"
 
-#: ../../src/blocklistui.cpp:27
+#: ../../src/blocklistui.cpp:26
 msgid "Ignore Air?"
 msgstr "忽略空气？"
 
-#: ../../src/blocklistui.cpp:28
+#: ../../src/blocklistui.cpp:27
 msgid "Do you want to ignore air?"
 msgstr "您想要忽略空气吗？"
 
-#: ../../src/blocklistui.cpp:59 ../../src/blocklistui.cpp:62
+#: ../../src/blocklistui.cpp:58 ../../src/blocklistui.cpp:61
 msgid "id"
 msgstr "索引"
 
-#: ../../src/blocklistui.cpp:59 ../../src/blocklistui.cpp:62
+#: ../../src/blocklistui.cpp:58 ../../src/blocklistui.cpp:61
 msgid "id Name"
 msgstr "id名称"
 
-#: ../../src/blocklistui.cpp:59
+#: ../../src/blocklistui.cpp:58
 msgid "Block Name"
 msgstr "方块名称"
 
-#: ../../src/blocklistui.cpp:59 ../../src/blocklistui.cpp:62 rc.cpp:27
+#: ../../src/blocklistui.cpp:58 ../../src/blocklistui.cpp:61 rc.cpp:27
 msgid "x"
 msgstr "x"
 
-#: ../../src/blocklistui.cpp:60 ../../src/blocklistui.cpp:62 rc.cpp:30
+#: ../../src/blocklistui.cpp:59 ../../src/blocklistui.cpp:61 rc.cpp:30
 #: rc.cpp:60
 msgid "y"
 msgstr "y"
 
-#: ../../src/blocklistui.cpp:60 ../../src/blocklistui.cpp:62 rc.cpp:33
+#: ../../src/blocklistui.cpp:59 ../../src/blocklistui.cpp:61 rc.cpp:33
 msgid "z"
 msgstr "z"
 
-#: ../../src/blocklistui.cpp:60 ../../src/blocklistui.cpp:63
+#: ../../src/blocklistui.cpp:59 ../../src/blocklistui.cpp:62
 #: ../../build/src/settings.cpp:95 rc.cpp:144
 msgid "Palette"
 msgstr "偏移码"
 
-#: ../../src/blockreaderui.cpp:66
+#: ../../src/blockreaderui.cpp:78
 msgid "Choose an Index"
 msgstr "选择一个索引"
 
-#: ../../src/blockreaderui.cpp:66
+#: ../../src/blockreaderui.cpp:78
 msgid "Please choose an index."
 msgstr "请选择一个索引。"
 
-#: ../../src/blockreaderui.cpp:81
+#: ../../src/blockreaderui.cpp:93
 msgid "Region Modifier"
 msgstr "区域修改器"
 
-#: ../../src/blockreaderui.cpp:86
-msgid "Lack the translation module, will not try to get translation!"
-msgstr "缺少翻译模块，将不会尝试获取翻译！"
-
-#: ../../src/blockreaderui.cpp:146
+#: ../../src/blockreaderui.cpp:159
 msgid "Not valid!"
 msgstr "无效！"
 
-#: ../../src/blockreaderui.cpp:158
+#: ../../src/blockreaderui.cpp:174
+msgid ""
+"Name: %1\n"
+"Translation Name: %2\n"
+"Index: %3\n"
+"Palette: %4\n"
+"Properties:\n"
+msgstr ""
+
+#: ../../src/blockreaderui.cpp:187
 msgid ""
 "Name: %1\n"
 "Index: %2\n"
@@ -92,50 +97,54 @@ msgstr ""
 "偏移量：%3\n"
 "属性：\n"
 
-#: ../../src/blockreaderui.cpp:196
+#: ../../src/blockreaderui.cpp:226
 msgid "With DataVersion %4, version %5."
 msgstr "数据版本%4，版本%5。"
 
-#: ../../src/blockreaderui.cpp:198
+#: ../../src/blockreaderui.cpp:228
 msgid "Created time: %6, Modified time: %7, Author: %8, Name: %9"
 msgstr "创建时间：%6，修改时间：%7，作者：%8，名字：%9"
 
-#: ../../src/blockreaderui.cpp:200
+#: ../../src/blockreaderui.cpp:230
 msgid "Description: %10"
 msgstr "描述：%10"
 
-#: ../../src/blockreaderui.cpp:234 ../../src/manageregionui.cpp:182
+#: ../../src/blockreaderui.cpp:244
+msgid "Unknown"
+msgstr ""
+
+#: ../../src/blockreaderui.cpp:272 ../../src/manageregionui.cpp:182
 #: ../../src/regionmodifyui.cpp:15 ../../src/saveregionui.cpp:52
 #: ../../src/utility.cpp:24 ../../src/utility.cpp:41 ../../src/utility.cpp:49
 msgid "Error!"
 msgstr "错误！"
 
-#: ../../src/blockreaderui.cpp:235 ../../common-rs/src/util.rs:44
+#: ../../src/blockreaderui.cpp:273 ../../common-rs/src/util.rs:44
 msgid "Out of memory!"
 msgstr "内存不足！"
 
-#: ../../src/blockshowui.cpp:67
+#: ../../src/blockshowui.cpp:69
 msgid "The block is in (%1, %2, %3), information is:\n"
 msgstr "方块在(%1, %2, %3)，信息是：\n"
 
-#: ../../src/blockshowui.cpp:78 ../../src/configobjectui.cpp:87
+#: ../../src/blockshowui.cpp:81 ../../src/configobjectui.cpp:87
 #: ../../src/lrchooseui.cpp:79 rc.cpp:194 rc.cpp:254
 msgid "&OK"
 msgstr "确定(&O)"
 
-#: ../../src/blockshowui.cpp:80 rc.cpp:48
+#: ../../src/blockshowui.cpp:83 rc.cpp:48
 msgid "&Show Entity NBT"
 msgstr "展示实体NBT(&S)"
 
-#: ../../src/blockshowui.cpp:91 rc.cpp:45
+#: ../../src/blockshowui.cpp:94 rc.cpp:45
 msgid "&Modify Property"
 msgstr "修改属性(&M)"
 
-#: ../../src/blockshowui.cpp:98
+#: ../../src/blockshowui.cpp:101
 msgid "Warning!"
 msgstr "警告！"
 
-#: ../../src/blockshowui.cpp:99
+#: ../../src/blockshowui.cpp:102
 msgid "This function is not implemented yet!"
 msgstr "此功能尚未实现！"
 
@@ -182,7 +191,7 @@ msgstr "已结束处理了%2个中的%1个（%3%）。"
 msgid "Continue"
 msgstr "继续"
 
-#: ../../src/externalnbtreaderui.cpp:15 ../../src/mainwindow.cpp:190
+#: ../../src/externalnbtreaderui.cpp:15 ../../src/mainwindow.cpp:205
 msgid "NBT Reader"
 msgstr "NBT阅读器"
 
@@ -243,23 +252,23 @@ msgstr "关闭(&C)"
 msgid "Minecraft Structure Modifier"
 msgstr "Minecraft结构修改器"
 
-#: ../../src/mainwindow.cpp:121
+#: ../../src/mainwindow.cpp:133
 msgid "Search..."
 msgstr "搜索……"
 
-#: ../../src/mainwindow.cpp:149
+#: ../../src/mainwindow.cpp:161
 msgid "NBT File Reader"
 msgstr "NBT文件阅读器"
 
-#: ../../src/mainwindow.cpp:150 ../../src/mainwindow.cpp:198
+#: ../../src/mainwindow.cpp:162 ../../src/mainwindow.cpp:213
 msgid "Manage Region"
 msgstr "管理Region"
 
-#: ../../src/mainwindow.cpp:151 ../../src/mainwindow.cpp:209
+#: ../../src/mainwindow.cpp:163 ../../src/mainwindow.cpp:224
 msgid "Region Reader/Modifier"
 msgstr "区域阅读器及修改器"
 
-#: ../../src/mainwindow.cpp:152
+#: ../../src/mainwindow.cpp:164
 msgid "Settings"
 msgstr "设置"
 
@@ -350,6 +359,14 @@ msgstr "数据"
 #: ../../src/regionmodifyui.cpp:85
 msgid "Unknown!"
 msgstr "未知！"
+
+#: ../../src/resourcegetter.cpp:51
+msgid "A download process is running."
+msgstr ""
+
+#: ../../src/resourcegetter.cpp:61
+msgid "Couldn't create directory!"
+msgstr ""
 
 #: ../../src/saveregionui.cpp:37
 msgid "Cancelled."
@@ -918,6 +935,9 @@ msgstr "默认"
 #: ../../src/dhgameconfigui.h:15
 msgid "Game"
 msgstr "游戏"
+
+#~ msgid "Lack the translation module, will not try to get translation!"
+#~ msgstr "缺少翻译模块，将不会尝试获取翻译！"
 
 #, qt-format
 #~ msgid ""

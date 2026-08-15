@@ -1,10 +1,19 @@
 #include "mainwindow.h"
 #include "dhconfigdialog/src/dhconfigdialog.h"
+#include "resourcegetter.h"
 #include <kcoreconfigskeleton.h>
 #include <libintl.h>
 #include <memory>
+#include <qboxlayout.h>
 #include <qcombobox.h>
+#include <qdialog.h>
+#include <qnamespace.h>
 #include <qobject.h>
+#include <qprogressbar.h>
+#include <qpushbutton.h>
+#include <qstandarditemmodel.h>
+#include <qtmetamacros.h>
+#include <qwidget.h>
 #define _(str) gettext (str)
 #include "blockreaderui.h"
 #include "dhconfigdialog/src/dhconfigtemplates.h"
@@ -18,6 +27,9 @@
 #include <QSortFilterProxyModel>
 #include <QTabBar>
 #include <QToolBar>
+#ifdef DH_DEBUG_IN_IDE
+#include "dhdebugwidget.h"
+#endif
 
 static MainWindow *mainWindow = nullptr;
 
@@ -150,6 +162,9 @@ MainWindow::MainWindow (QWidget *parent) : QMainWindow (parent)
   model->appendRow (new QStandardItem (_ ("Manage Region")));
   model->appendRow (new QStandardItem (_ ("Region Reader/Modifier")));
   model->appendRow (new QStandardItem (_ ("Settings")));
+#ifdef DH_DEBUG_IN_IDE
+  model->appendRow (new QStandardItem ("Debug"));
+#endif
   auto maxLen = 0;
   auto rows = model->rowCount ();
   for (int i = 0; i < rows; i++)
@@ -218,6 +233,14 @@ MainWindow::MainWindow (QWidget *parent) : QMainWindow (parent)
                      dialog->show ();
                      break;
                    }
+#ifdef DH_DEBUG_IN_IDE
+                 case 4:
+                   {
+                     auto widget = new DhDebugWidget;
+                     widget->setAttribute (Qt::WA_DeleteOnClose);
+                     widget->show ();
+                   }
+#endif
                  default:
                    break;
                  }

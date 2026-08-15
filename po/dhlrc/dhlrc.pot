@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-07 20:57+0800\n"
+"POT-Creation-Date: 2026-08-15 20:08+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,65 +17,70 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: ../../src/blocklistui.cpp:27
+#: ../../src/blocklistui.cpp:26
 msgid "Ignore Air?"
 msgstr ""
 
-#: ../../src/blocklistui.cpp:28
+#: ../../src/blocklistui.cpp:27
 msgid "Do you want to ignore air?"
 msgstr ""
 
-#: ../../src/blocklistui.cpp:59 ../../src/blocklistui.cpp:62
+#: ../../src/blocklistui.cpp:58 ../../src/blocklistui.cpp:61
 msgid "id"
 msgstr ""
 
-#: ../../src/blocklistui.cpp:59 ../../src/blocklistui.cpp:62
+#: ../../src/blocklistui.cpp:58 ../../src/blocklistui.cpp:61
 msgid "id Name"
 msgstr ""
 
-#: ../../src/blocklistui.cpp:59
+#: ../../src/blocklistui.cpp:58
 msgid "Block Name"
 msgstr ""
 
-#: ../../src/blocklistui.cpp:59 ../../src/blocklistui.cpp:62 rc.cpp:27
+#: ../../src/blocklistui.cpp:58 ../../src/blocklistui.cpp:61 rc.cpp:27
 msgid "x"
 msgstr ""
 
-#: ../../src/blocklistui.cpp:60 ../../src/blocklistui.cpp:62 rc.cpp:30
+#: ../../src/blocklistui.cpp:59 ../../src/blocklistui.cpp:61 rc.cpp:30
 #: rc.cpp:60
 msgid "y"
 msgstr ""
 
-#: ../../src/blocklistui.cpp:60 ../../src/blocklistui.cpp:62 rc.cpp:33
+#: ../../src/blocklistui.cpp:59 ../../src/blocklistui.cpp:61 rc.cpp:33
 msgid "z"
 msgstr ""
 
-#: ../../src/blocklistui.cpp:60 ../../src/blocklistui.cpp:63
+#: ../../src/blocklistui.cpp:59 ../../src/blocklistui.cpp:62
 #: ../../build/src/settings.cpp:95 rc.cpp:144
 msgid "Palette"
 msgstr ""
 
-#: ../../src/blockreaderui.cpp:66
+#: ../../src/blockreaderui.cpp:78
 msgid "Choose an Index"
 msgstr ""
 
-#: ../../src/blockreaderui.cpp:66
+#: ../../src/blockreaderui.cpp:78
 msgid "Please choose an index."
 msgstr ""
 
-#: ../../src/blockreaderui.cpp:81
+#: ../../src/blockreaderui.cpp:93
 msgid "Region Modifier"
 msgstr ""
 
-#: ../../src/blockreaderui.cpp:86
-msgid "Lack the translation module, will not try to get translation!"
-msgstr ""
-
-#: ../../src/blockreaderui.cpp:146
+#: ../../src/blockreaderui.cpp:159
 msgid "Not valid!"
 msgstr ""
 
-#: ../../src/blockreaderui.cpp:158
+#: ../../src/blockreaderui.cpp:174
+msgid ""
+"Name: %1\n"
+"Translation Name: %2\n"
+"Index: %3\n"
+"Palette: %4\n"
+"Properties:\n"
+msgstr ""
+
+#: ../../src/blockreaderui.cpp:187
 msgid ""
 "Name: %1\n"
 "Index: %2\n"
@@ -83,50 +88,54 @@ msgid ""
 "Properties:\n"
 msgstr ""
 
-#: ../../src/blockreaderui.cpp:196
+#: ../../src/blockreaderui.cpp:226
 msgid "With DataVersion %4, version %5."
 msgstr ""
 
-#: ../../src/blockreaderui.cpp:198
+#: ../../src/blockreaderui.cpp:228
 msgid "Created time: %6, Modified time: %7, Author: %8, Name: %9"
 msgstr ""
 
-#: ../../src/blockreaderui.cpp:200
+#: ../../src/blockreaderui.cpp:230
 msgid "Description: %10"
 msgstr ""
 
-#: ../../src/blockreaderui.cpp:234 ../../src/manageregionui.cpp:182
+#: ../../src/blockreaderui.cpp:244
+msgid "Unknown"
+msgstr ""
+
+#: ../../src/blockreaderui.cpp:272 ../../src/manageregionui.cpp:182
 #: ../../src/regionmodifyui.cpp:15 ../../src/saveregionui.cpp:52
 #: ../../src/utility.cpp:24 ../../src/utility.cpp:41 ../../src/utility.cpp:49
 msgid "Error!"
 msgstr ""
 
-#: ../../src/blockreaderui.cpp:235 ../../common-rs/src/util.rs:44
+#: ../../src/blockreaderui.cpp:273 ../../common-rs/src/util.rs:44
 msgid "Out of memory!"
 msgstr ""
 
-#: ../../src/blockshowui.cpp:67
+#: ../../src/blockshowui.cpp:69
 msgid "The block is in (%1, %2, %3), information is:\n"
 msgstr ""
 
-#: ../../src/blockshowui.cpp:78 ../../src/configobjectui.cpp:87
+#: ../../src/blockshowui.cpp:81 ../../src/configobjectui.cpp:87
 #: ../../src/lrchooseui.cpp:79 rc.cpp:194 rc.cpp:254
 msgid "&OK"
 msgstr ""
 
-#: ../../src/blockshowui.cpp:80 rc.cpp:48
+#: ../../src/blockshowui.cpp:83 rc.cpp:48
 msgid "&Show Entity NBT"
 msgstr ""
 
-#: ../../src/blockshowui.cpp:91 rc.cpp:45
+#: ../../src/blockshowui.cpp:94 rc.cpp:45
 msgid "&Modify Property"
 msgstr ""
 
-#: ../../src/blockshowui.cpp:98
+#: ../../src/blockshowui.cpp:101
 msgid "Warning!"
 msgstr ""
 
-#: ../../src/blockshowui.cpp:99
+#: ../../src/blockshowui.cpp:102
 msgid "This function is not implemented yet!"
 msgstr ""
 
@@ -173,7 +182,7 @@ msgstr ""
 msgid "Continue"
 msgstr ""
 
-#: ../../src/externalnbtreaderui.cpp:15 ../../src/mainwindow.cpp:190
+#: ../../src/externalnbtreaderui.cpp:15 ../../src/mainwindow.cpp:205
 msgid "NBT Reader"
 msgstr ""
 
@@ -232,23 +241,23 @@ msgstr ""
 msgid "Minecraft Structure Modifier"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:121
+#: ../../src/mainwindow.cpp:133
 msgid "Search..."
 msgstr ""
 
-#: ../../src/mainwindow.cpp:149
+#: ../../src/mainwindow.cpp:161
 msgid "NBT File Reader"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:150 ../../src/mainwindow.cpp:198
+#: ../../src/mainwindow.cpp:162 ../../src/mainwindow.cpp:213
 msgid "Manage Region"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:151 ../../src/mainwindow.cpp:209
+#: ../../src/mainwindow.cpp:163 ../../src/mainwindow.cpp:224
 msgid "Region Reader/Modifier"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:152
+#: ../../src/mainwindow.cpp:164
 msgid "Settings"
 msgstr ""
 
@@ -338,6 +347,14 @@ msgstr ""
 
 #: ../../src/regionmodifyui.cpp:85
 msgid "Unknown!"
+msgstr ""
+
+#: ../../src/resourcegetter.cpp:51
+msgid "A download process is running."
+msgstr ""
+
+#: ../../src/resourcegetter.cpp:61
+msgid "Couldn't create directory!"
 msgstr ""
 
 #: ../../src/saveregionui.cpp:37
