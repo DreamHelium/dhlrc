@@ -5,7 +5,6 @@ project(dhlrc_qt LANGUAGES CXX)
 add_subdirectory(dhconfigdialog)
 
 find_package(Intl)
-find_package(CURL)
 
 add_definitions(-DDHLRC_VERSION="${dhlrc_qt_VERSION}")
 string(TIMESTAMP CURRENT_DAY %Y%m%d)
@@ -80,9 +79,14 @@ set(TEMP_PROJECT_SOURCES
         dhbuttondelegate.h
         resourcegetter.h
         resourcegetter.cpp
-        dhdebugwidget.h
-        dhdebugwidget.cpp
 )
+
+if(DH_ENABLE_DEBUG)
+  set(TEMP_PROJECT_SOURCES
+    ${TEMP_PROJECT_SOURCES}
+    dhdebugwidget.h
+    dhdebugwidget.cpp)
+endif()
 
 ki18n_wrap_ui(TEMP_PROJECT_SOURCES ${ui_files})
 
@@ -110,10 +114,10 @@ else ()
 endif ()
 
 target_link_libraries(dhlrc_qt PRIVATE Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::Svg
- KF6::ColorScheme ${CURL_LIBRARIES} QCoro::Core QCoro::Network
+ KF6::ColorScheme QCoro::Core QCoro::Network
  KF6::ConfigWidgets KF6::I18n KF6::I18nLocaleData region_rs Qt6::Concurrent nbt_to_vec ${Intl_LIBRARIES}
  dhconfigdialog KF6::WidgetsAddons KF6::CoreAddons KF6::IconThemes Qt6::StateMachine)
-target_link_directories(dhlrc_qt PRIVATE ${CMAKE_BINARY_DIR})
+target_link_directories(dhlrc_qt PRIVATE ${CMAKE_BINARY_DIR} /usr/local/lib)
 target_include_directories(dhlrc_qt PUBLIC
         "${PROJECT_BINARY_DIR}" "${PROJECT_SOURCE_DIR}"
 )

@@ -6,6 +6,51 @@
 #include <KCompositeJob>
 #include <QStateMachine>
 #include <condition_variable>
+#include <qexception.h>
+#include <qfuture.h>
+
+class DhLoadError : public QException
+{
+public:
+  explicit DhLoadError (const QString &reason, const QString &state)
+      : error (reason), state (state)
+  {
+  }
+  QString error;
+  QString state;
+  void
+  raise () const override
+  {
+    throw *this;
+  }
+  QException *
+  clone () const override
+  {
+    return new DhLoadError (*this);
+  }
+};
+
+class DhMultiLoadError : public QException
+{
+public:
+  explicit DhMultiLoadError () {}
+  QList<DhLoadError> errors;
+  void
+  appendError (const QString &reason, const QString &state)
+  {
+    errors.emplace_back (reason, state);
+  }
+  void
+  raise () const override
+  {
+    throw *this;
+  }
+  QException *
+  clone () const override
+  {
+    return new DhMultiLoadError (*this);
+  }
+};
 
 class DhLoadJob : public KJob
 {
@@ -13,10 +58,7 @@ class DhLoadJob : public KJob
 public:
   explicit DhLoadJob (QString &filename, const void *cancel_flag,
                       QObject *parent = nullptr)
-      : KJob (parent), filename (filename), cancel_flag (cancel_flag),
-        tempObject (std::make_pair (
-            QString (),
-            std::unique_ptr<void, void (*) (void *)>{ nullptr, nullptr }))
+      : KJob (parent), filename (filename), cancel_flag (cancel_flag)
   {
   }
   enum Reason
@@ -36,6 +78,7 @@ public:
 Q_SIGNALS:
   void selfSuspended (KJob *job);
   void selfResumed (KJob *job);
+  void selfCancel ();
   void error ();
   void loadFileSuccess ();
   void loadObjectSuccess ();
@@ -49,20 +92,12 @@ private:
   std::condition_variable cv;
   QStringList regionList;
   QList<int> regionIndexes;
-  QList<std::pair<QString, QString>> failMsgs;
   static void setFunc (void *main_klass, int value, const char *text,
                        const char *arg);
-  std::pair<QString, std::unique_ptr<void, void (*) (void *)>> tempObject;
-  std::unique_ptr<void, void (*) (void *)> vec{ nullptr, nullptr };
-  QStateMachine machine;
-  QList<std::pair<QString, QString>> typeList;
-  bool loadMultiRegion (ModuleBase *base);
+  QFuture<void> future;
 
 private Q_SLOTS:
-  void loadFile ();
-  void loadObject ();
-  void loadRegion ();
-  void doFail ();
+  bool loadMultiRegion (ModuleBase *base, void *object, DhMultiLoadError &err);
 };
 
 class DhAllLoadJob : public KCompositeJob

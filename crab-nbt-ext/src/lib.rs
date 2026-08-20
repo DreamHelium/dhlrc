@@ -5,10 +5,10 @@ use common_rs::i18n::i18n;
 use common_rs::my_error::MyError;
 use common_rs::region::Palette;
 use common_rs::tree_value::TreeValue;
-use common_rs::util::{cstr_to_str, show_progress, string_to_ptr_fail_to_null};
 use common_rs::util::finish_oom;
-use common_rs::{show_progress_macro, ProgressFn};
-use crab_nbt::{error, Nbt, NbtCompound, NbtTag};
+use common_rs::util::{cstr_to_str, show_progress, string_to_ptr_fail_to_null};
+use common_rs::{ProgressFn, show_progress_macro};
+use crab_nbt::{Nbt, NbtCompound, NbtTag, error};
 use formatx::formatx;
 use gettextrs::gettext;
 use std::error::Error;
@@ -227,6 +227,63 @@ pub fn convert_nbt_tag_to_tree_value(nbt_tag: &NbtTag) -> TreeValue {
     }
 }
 
+pub fn convert_nbt_tag_to_tree_value_with_freemem_check(
+    nbt_tag: &NbtTag,
+    cancel_flag: *const AtomicBool,
+    instant: &mut Instant,
+    sys: &mut System,
+    elapsed_millisecs: u128,
+    free_memory: u64,
+) -> Result<TreeValue, Box<dyn Error>> {
+    if instant.elapsed().as_millis() >= elapsed_millisecs {
+        finish_oom(sys, free_memory)?;
+        *instant = Instant::now();
+    }
+    if cancel_flag_is_cancelled(cancel_flag) == 1 {
+        return Err(Box::new(MyError {
+            msg: "Canceled".to_string(),
+        }));
+    }
+    match nbt_tag {
+        NbtTag::End => Err(Box::new(MyError {
+            msg: "error".to_string(),
+        })),
+        NbtTag::Byte(b) => Ok(TreeValue::Byte(*b)),
+        NbtTag::Int(i) => Ok(TreeValue::Int(*i)),
+        NbtTag::Short(s) => Ok(TreeValue::Short(*s)),
+        NbtTag::Long(l) => Ok(TreeValue::Long(*l)),
+        NbtTag::ByteArray(ba) => Ok(TreeValue::ByteArray(vec_u8_to_i8_safest(ba.to_vec()))),
+        NbtTag::LongArray(la) => Ok(TreeValue::LongArray(la.clone())),
+        NbtTag::String(str) => Ok(TreeValue::String(str.clone())),
+        NbtTag::Float(f) => Ok(TreeValue::Float(*f)),
+        NbtTag::Double(d) => Ok(TreeValue::Double(*d)),
+        NbtTag::IntArray(ia) => Ok(TreeValue::IntArray(ia.clone())),
+        NbtTag::List(l) => {
+            let mut list: Vec<TreeValue> = vec![];
+            for tag in l {
+                let new_tag = convert_nbt_tag_to_tree_value_with_freemem_check(
+                    tag,
+                    cancel_flag,
+                    instant,
+                    sys,
+                    elapsed_millisecs,
+                    free_memory,
+                )?;
+                list.push(new_tag);
+            }
+            Ok(TreeValue::List(list))
+        }
+        NbtTag::Compound(c) => Ok(TreeValue::Compound(convert_nbt_to_vec_with_freemem_check(
+            &c,
+            cancel_flag,
+            instant,
+            sys,
+            elapsed_millisecs,
+            free_memory,
+        )?)),
+    }
+}
+
 pub fn convert_nbt_to_vec(nbt: &NbtCompound) -> Vec<(String, TreeValue)> {
     let child = &nbt.child_tags;
     let mut ret: Vec<(String, TreeValue)> = vec![];
@@ -235,6 +292,39 @@ pub fn convert_nbt_to_vec(nbt: &NbtCompound) -> Vec<(String, TreeValue)> {
         ret.push((child_node.0.clone(), tree_value));
     }
     ret
+}
+
+pub fn convert_nbt_to_vec_with_freemem_check(
+    nbt: &NbtCompound,
+    cancel_flag: *const AtomicBool,
+    instant: &mut Instant,
+    sys: &mut System,
+    elapsed_millisecs: u128,
+    free_memory: u64,
+) -> Result<Vec<(String, TreeValue)>, Box<dyn Error>> {
+    if instant.elapsed().as_millis() >= elapsed_millisecs {
+        finish_oom(sys, free_memory)?;
+        *instant = Instant::now();
+    }
+    if cancel_flag_is_cancelled(cancel_flag) == 1 {
+        return Err(Box::new(MyError {
+            msg: "Canceled".to_string(),
+        }));
+    }
+    let child = &nbt.child_tags;
+    let mut ret: Vec<(String, TreeValue)> = vec![];
+    for child_node in child {
+        let tree_value = convert_nbt_tag_to_tree_value_with_freemem_check(
+            &child_node.1,
+            cancel_flag,
+            instant,
+            sys,
+            elapsed_millisecs,
+            free_memory,
+        )?;
+        ret.push((child_node.0.clone(), tree_value));
+    }
+    Ok(ret)
 }
 
 fn convert_tree_value_to_nbt_tag(tree_value: &TreeValue, str: &str) -> NbtTag {

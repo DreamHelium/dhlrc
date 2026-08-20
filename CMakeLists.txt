@@ -77,7 +77,10 @@ if (NOT DH_ENABLE_TRANSLATION)
   add_definitions(-DDH_DISABLE_TRANSLATION)
 endif ()
 
-#add_definitions(-DDH_DEBUG_IN_IDE)
+set(DH_ENABLE_DEBUG OFF)
+if(DH_ENABLE_DEBUG)
+  add_definitions(-DDH_DEBUG_IN_IDE)
+endif()
 
 add_subdirectory(src)
 

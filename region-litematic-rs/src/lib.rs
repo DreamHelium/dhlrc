@@ -8,8 +8,8 @@ use common_rs::util::{real_show_progress, string_to_ptr_fail_to_null};
 use common_rs::{ProgressFn, show_progress_macro};
 use crab_nbt::{Nbt, NbtTag};
 use crab_nbt_ext::{
-    GetWithError, convert_nbt_tag_to_tree_value, convert_nbt_to_vec, get_compound,
-    get_palette_from_nbt_tag, gettext_text,
+    GetWithError, convert_nbt_tag_to_tree_value, convert_nbt_tag_to_tree_value_with_freemem_check,
+    convert_nbt_to_vec, get_compound, get_palette_from_nbt_tag, gettext_text,
 };
 use formatx::formatx;
 use std::error::Error;
@@ -244,6 +244,7 @@ fn region_create_from_bytes_internal(
     let blocks = block_ids;
     let mut tile_entities_vec = vec![];
     let tile_entities_list = real_region_nbt.get_list_with_err("TileEntities")?;
+    let mut instant = Instant::now();
     for tile_entity in tile_entities_list {
         let real_tile_entity = match tile_entity {
             NbtTag::Compound(c) => c,
@@ -272,7 +273,14 @@ fn region_create_from_bytes_internal(
             if str == "x" || str == "y" || str == "z" {
                 continue;
             }
-            let tree_value = convert_nbt_tag_to_tree_value(val);
+            let tree_value = convert_nbt_tag_to_tree_value_with_freemem_check(
+                val,
+                cancel_flag,
+                &mut instant,
+                &mut sys,
+                elapsed_millisecs,
+                free_memory,
+            )?;
             single_entity_vec.push((str.to_string(), tree_value));
         }
         if !has_id {

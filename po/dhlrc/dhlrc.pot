@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-15 20:08+0800\n"
+"POT-Creation-Date: 2026-08-20 21:19+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -154,31 +154,52 @@ msgid ""
 "![test_svg](:/cn/dh/dhlrc/show.svg)"
 msgstr ""
 
-#: ../../src/dhloadjob.cpp:53
+#: ../../src/dhloadjob.cpp:38
+msgid "Loading File"
+msgstr ""
+
+#: ../../src/dhloadjob.cpp:58
+msgid "Loading Object %1"
+msgstr ""
+
+#: ../../src/dhloadjob.cpp:161 ../../src/dhloadjob.cpp:174
+#: ../../src/dhloadjob.cpp:321
+msgid "Loading region type %1"
+msgstr ""
+
+#: ../../src/dhloadjob.cpp:177
+msgid "Loading progress is successful, but the file type should be %1."
+msgstr ""
+
+#: ../../src/dhloadjob.cpp:191 ../../src/dhloadjob.cpp:204
+msgid "Failed when %1: %2"
+msgstr ""
+
+#: ../../src/dhloadjob.cpp:236
 msgid "Select a Region"
 msgstr ""
 
-#: ../../src/dhloadjob.cpp:53 ../../src/utility.cpp:33
+#: ../../src/dhloadjob.cpp:236 ../../src/utility.cpp:33
 msgid "Please select a region."
 msgstr ""
 
-#: ../../src/dhloadjob.cpp:113
+#: ../../src/dhloadjob.cpp:283
+msgid "Not a valid multi-region module"
+msgstr ""
+
+#: ../../src/dhloadjob.cpp:284
+msgid "Loading Region"
+msgstr ""
+
+#: ../../src/dhloadjob.cpp:298
 msgid "Please click `Continue` to choose region(s)."
 msgstr ""
 
-#: ../../src/dhloadjob.cpp:165
-msgid "Load file"
-msgstr ""
-
-#: ../../src/dhloadjob.cpp:296
-msgid "**%1** try's fail message: %2"
-msgstr ""
-
-#: ../../src/dhloadjob.cpp:317 ../../src/dhloadjob.cpp:324
+#: ../../src/dhloadjob.cpp:351 ../../src/dhloadjob.cpp:358
 msgid "Finish processing %1 of %2 (%3%)."
 msgstr ""
 
-#: ../../src/dhloadjob.cpp:389
+#: ../../src/dhloadjob.cpp:423
 msgid "Continue"
 msgstr ""
 
@@ -725,7 +746,7 @@ msgstr ""
 msgid "Null pointer detected"
 msgstr ""
 
-#: ../../crab-nbt-ext/src/lib.rs:70 ../../region-litematic-rs/src/lib.rs:350
+#: ../../crab-nbt-ext/src/lib.rs:70 ../../region-litematic-rs/src/lib.rs:358
 #: ../../region-nbt-rs/src/lib.rs:358
 msgid "Region value not provided"
 msgstr ""
@@ -764,23 +785,23 @@ msgstr ""
 msgid "Reading NBT finish."
 msgstr ""
 
-#: ../../crab-nbt-ext/src/lib.rs:319
+#: ../../crab-nbt-ext/src/lib.rs:409
 msgid "Reading palette is cancelled!"
 msgstr ""
 
-#: ../../crab-nbt-ext/src/lib.rs:326
+#: ../../crab-nbt-ext/src/lib.rs:416
 msgid "Wrong type of palette!"
 msgstr ""
 
-#: ../../crab-nbt-ext/src/lib.rs:341
+#: ../../crab-nbt-ext/src/lib.rs:431
 msgid "Wrong type of property!"
 msgstr ""
 
-#: ../../crab-nbt-ext/src/lib.rs:425 ../../crab-nbt-ext/src/lib.rs:471
+#: ../../crab-nbt-ext/src/lib.rs:515 ../../crab-nbt-ext/src/lib.rs:561
 msgid "Reading NBT."
 msgstr ""
 
-#: ../../crab-nbt-ext/src/lib.rs:427 ../../crab-nbt-ext/src/lib.rs:473
+#: ../../crab-nbt-ext/src/lib.rs:517 ../../crab-nbt-ext/src/lib.rs:563
 msgid "The parsing operation is cancelled."
 msgstr ""
 
@@ -809,15 +830,15 @@ msgstr ""
 msgid "Wrong type of region."
 msgstr ""
 
-#: ../../region-litematic-rs/src/lib.rs:252
+#: ../../region-litematic-rs/src/lib.rs:253
 msgid "Wrong type of tile entity."
 msgstr ""
 
-#: ../../region-litematic-rs/src/lib.rs:293 ../../region-nbt-rs/src/lib.rs:143
+#: ../../region-litematic-rs/src/lib.rs:301 ../../region-nbt-rs/src/lib.rs:143
 msgid "Reading entities is cancelled!"
 msgstr ""
 
-#: ../../region-litematic-rs/src/lib.rs:296 ../../region-nbt-rs/src/lib.rs:147
+#: ../../region-litematic-rs/src/lib.rs:304 ../../region-nbt-rs/src/lib.rs:147
 msgid "Wrong type of entity!"
 msgstr ""
 

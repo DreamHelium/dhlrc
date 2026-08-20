@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-15 20:03+0800\n"
+"POT-Creation-Date: 2026-08-20 21:19+0800\n"
 "PO-Revision-Date: 2024-11-30 07:00+0800\n"
 "Last-Translator: dream_he <48383878+DreamHelium@users.noreply.github.com>\n"
 "Language-Team: Chinese <kde-i18n-doc@kde.org>\n"
@@ -163,31 +163,52 @@ msgid ""
 "![test_svg](:/cn/dh/dhlrc/show.svg)"
 msgstr ""
 
-#: ../../src/dhloadjob.cpp:53
+#: ../../src/dhloadjob.cpp:38
+msgid "Loading File"
+msgstr ""
+
+#: ../../src/dhloadjob.cpp:58
+msgid "Loading Object %1"
+msgstr ""
+
+#: ../../src/dhloadjob.cpp:161 ../../src/dhloadjob.cpp:174
+#: ../../src/dhloadjob.cpp:321
+msgid "Loading region type %1"
+msgstr ""
+
+#: ../../src/dhloadjob.cpp:177
+msgid "Loading progress is successful, but the file type should be %1."
+msgstr ""
+
+#: ../../src/dhloadjob.cpp:191 ../../src/dhloadjob.cpp:204
+msgid "Failed when %1: %2"
+msgstr ""
+
+#: ../../src/dhloadjob.cpp:236
 msgid "Select a Region"
 msgstr "选择一个区域"
 
-#: ../../src/dhloadjob.cpp:53 ../../src/utility.cpp:33
+#: ../../src/dhloadjob.cpp:236 ../../src/utility.cpp:33
 msgid "Please select a region."
 msgstr "请选择一个区域。"
 
-#: ../../src/dhloadjob.cpp:113
+#: ../../src/dhloadjob.cpp:283
+msgid "Not a valid multi-region module"
+msgstr ""
+
+#: ../../src/dhloadjob.cpp:284
+msgid "Loading Region"
+msgstr ""
+
+#: ../../src/dhloadjob.cpp:298
 msgid "Please click `Continue` to choose region(s)."
 msgstr "请点击`继续`选择区域。"
 
-#: ../../src/dhloadjob.cpp:165
-msgid "Load file"
-msgstr "加载文件"
-
-#: ../../src/dhloadjob.cpp:296
-msgid "**%1** try's fail message: %2"
-msgstr "**%1**尝试的错误信息：%2"
-
-#: ../../src/dhloadjob.cpp:317 ../../src/dhloadjob.cpp:324
+#: ../../src/dhloadjob.cpp:351 ../../src/dhloadjob.cpp:358
 msgid "Finish processing %1 of %2 (%3%)."
 msgstr "已结束处理了%2个中的%1个（%3%）。"
 
-#: ../../src/dhloadjob.cpp:389
+#: ../../src/dhloadjob.cpp:423
 msgid "Continue"
 msgstr "继续"
 
@@ -738,7 +759,7 @@ msgstr "集合"
 msgid "Null pointer detected"
 msgstr "检测到空指针"
 
-#: ../../crab-nbt-ext/src/lib.rs:70 ../../region-litematic-rs/src/lib.rs:350
+#: ../../crab-nbt-ext/src/lib.rs:70 ../../region-litematic-rs/src/lib.rs:358
 #: ../../region-nbt-rs/src/lib.rs:358
 msgid "Region value not provided"
 msgstr "结构值未提供"
@@ -777,23 +798,23 @@ msgstr "无法获取到{}的长整型数组。"
 msgid "Reading NBT finish."
 msgstr "结束读取NBT。"
 
-#: ../../crab-nbt-ext/src/lib.rs:319
+#: ../../crab-nbt-ext/src/lib.rs:409
 msgid "Reading palette is cancelled!"
 msgstr ""
 
-#: ../../crab-nbt-ext/src/lib.rs:326
+#: ../../crab-nbt-ext/src/lib.rs:416
 msgid "Wrong type of palette!"
 msgstr ""
 
-#: ../../crab-nbt-ext/src/lib.rs:341
+#: ../../crab-nbt-ext/src/lib.rs:431
 msgid "Wrong type of property!"
 msgstr ""
 
-#: ../../crab-nbt-ext/src/lib.rs:425 ../../crab-nbt-ext/src/lib.rs:471
+#: ../../crab-nbt-ext/src/lib.rs:515 ../../crab-nbt-ext/src/lib.rs:561
 msgid "Reading NBT."
 msgstr "读取NBT。"
 
-#: ../../crab-nbt-ext/src/lib.rs:427 ../../crab-nbt-ext/src/lib.rs:473
+#: ../../crab-nbt-ext/src/lib.rs:517 ../../crab-nbt-ext/src/lib.rs:563
 msgid "The parsing operation is cancelled."
 msgstr "传递操作被取消。"
 
@@ -822,15 +843,15 @@ msgstr ""
 msgid "Wrong type of region."
 msgstr ""
 
-#: ../../region-litematic-rs/src/lib.rs:252
+#: ../../region-litematic-rs/src/lib.rs:253
 msgid "Wrong type of tile entity."
 msgstr ""
 
-#: ../../region-litematic-rs/src/lib.rs:293 ../../region-nbt-rs/src/lib.rs:143
+#: ../../region-litematic-rs/src/lib.rs:301 ../../region-nbt-rs/src/lib.rs:143
 msgid "Reading entities is cancelled!"
 msgstr ""
 
-#: ../../region-litematic-rs/src/lib.rs:296 ../../region-nbt-rs/src/lib.rs:147
+#: ../../region-litematic-rs/src/lib.rs:304 ../../region-nbt-rs/src/lib.rs:147
 msgid "Wrong type of entity!"
 msgstr ""
 
@@ -935,6 +956,12 @@ msgstr "默认"
 #: ../../src/dhgameconfigui.h:15
 msgid "Game"
 msgstr "游戏"
+
+#~ msgid "**%1** try's fail message: %2"
+#~ msgstr "**%1**尝试的错误信息：%2"
+
+#~ msgid "Load file"
+#~ msgstr "加载文件"
 
 #~ msgid "Lack the translation module, will not try to get translation!"
 #~ msgstr "缺少翻译模块，将不会尝试获取翻译！"
