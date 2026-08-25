@@ -10,6 +10,7 @@
 #include <blockshowui.h>
 #include <generalchoosedialog.h>
 #include <mainwindow.h>
+#include <memory>
 #include <nbtreaderui.h>
 #include <qlineedit.h>
 #include <qnamespace.h>
@@ -27,8 +28,10 @@ set_func (void *klass, int value)
   emit brui->changeVal (value);
 }
 
-BlockReaderUI::BlockReaderUI (int index, ManageRegionUI *mr, QWidget *parent)
-    : QWidget (parent), ui (new Ui::BlockReaderUI),
+BlockReaderUI::BlockReaderUI (int index,
+                              std::shared_ptr<DhDownloader> downloader,
+                              QWidget *parent)
+    : QWidget (parent), ui (new Ui::BlockReaderUI), downloader (downloader),
       region (ManageRegionUI::getRegions ()[index]->get_region ()),
       locker (*ManageRegionUI::getRegions ()[index])
 {
@@ -37,11 +40,18 @@ BlockReaderUI::BlockReaderUI (int index, ManageRegionUI *mr, QWidget *parent)
   connect (this, &BlockReaderUI::start, this,
            [&] () -> QCoro::Task<>
              {
-               this->objectPath
-                   = co_await download_object (this->downloader, this->version,
-                                               "minecraft/lang/zh_cn.json");
-               Q_EMIT this->finishLoadingTranslation ();
-               Q_EMIT this->changeVal (100);
+               QPointer<BlockReaderUI> pointer = this;
+               auto selfDownloader = downloader;
+               auto realVersion = this->version;
+               co_await download_manifest (*selfDownloader);
+               auto path = co_await download_object (
+                   *selfDownloader, realVersion, "minecraft/lang/zh_cn.json");
+               if (!pointer.isNull ())
+                 {
+                   pointer->objectPath = path;
+                   Q_EMIT pointer->finishLoadingTranslation ();
+                   Q_EMIT pointer->changeVal (100);
+                 }
              });
   Q_EMIT start ();
   setText ();
@@ -97,8 +107,11 @@ BlockReaderUI::BlockReaderUI (int index, ManageRegionUI *mr, QWidget *parent)
   // ui->label_7->setText (_ ("Lack the translation module, will not "
   //                          "try to get translation!"));
   // ui->progressBar->hide ();
-  connect (&downloader, &DhDownloader::progress, this,
+  connect (downloader.get (), &DhDownloader::progress, this,
            [&] (int value) { Q_EMIT this->changeVal (value); });
+  connect (downloader.get (), &DhDownloader::info, this,
+           [&] (const QString &info)
+             { this->ui->progressLabel->setText (info); });
 }
 
 BlockReaderUI::~BlockReaderUI ()
@@ -114,7 +127,7 @@ BlockReaderUI::~BlockReaderUI ()
 void
 BlockReaderUI::closeEvent (QCloseEvent *event)
 {
-  emit closeWin ();
+  emit closeWin (this);
   QWidget::closeEvent (event);
 }
 

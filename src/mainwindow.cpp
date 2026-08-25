@@ -7,6 +7,7 @@
 #include <qboxlayout.h>
 #include <qcombobox.h>
 #include <qdialog.h>
+#include <qglobalstatic.h>
 #include <qnamespace.h>
 #include <qobject.h>
 #include <qprogressbar.h>
@@ -31,11 +32,13 @@
 #include "dhdebugwidget.h"
 #endif
 
+using DownloaderList
+    = QList<std::pair<QWidget *, std::shared_ptr<DhDownloader>>>;
 static MainWindow *mainWindow = nullptr;
+Q_GLOBAL_STATIC (DownloaderList, downloaderList)
 
 class DhEnumConfigTemplate : public DhConfigTemplate
 {
-
 public:
   DhEnumConfigTemplate (KConfigSkeletonItem *item, QVBoxLayout *layout,
                         DhConfigDialog *dialog)
@@ -219,10 +222,25 @@ MainWindow::MainWindow (QWidget *parent) : QMainWindow (parent)
                      auto region = dh::getRegion (this, mrui, false);
                      if (region != -1)
                        {
-                         auto brui = new BlockReaderUI (region, mrui);
+                         auto downloader = std::make_shared<DhDownloader> ();
+                         auto brui = new BlockReaderUI (region, downloader);
+                         downloaderList->emplace_back (
+                             qobject_cast<QWidget *> (brui), downloader);
                          auto tabIndex = tabWidget->addTab (
                              brui, _ ("Region Reader/Modifier"));
                          tabWidget->setCurrentIndex (tabIndex);
+                         connect (brui, &BlockReaderUI::closeWin, this,
+                                  [] (QWidget *win)
+                                    {
+                                      for (const auto &i : *downloaderList)
+                                        {
+                                          if (i.first == win)
+                                            {
+                                              i.second->finish ();
+                                              downloaderList->removeOne (i);
+                                            }
+                                        }
+                                    });
                        }
                      break;
                    }

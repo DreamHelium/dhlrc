@@ -6,6 +6,7 @@
 #include <QNetworkAccessManager>
 #include <QString>
 #include <libintl.h>
+#include <optional>
 #include <qcoroiodevice.h>
 #include <qcorotask.h>
 #include <qcorotimer.h>
@@ -34,33 +35,32 @@ Q_GLOBAL_STATIC (CacheList, jsonCache)
 
 DhDownloader::DhDownloader (QObject *object) : QObject (object) {}
 
-QCoro::Task<>
-DhDownloader::download (const QString &url, const QString &dest)
+DhDownloader::~DhDownloader () { finish (); }
+
+QCoro::Task<std::optional<QString>>
+DhDownloader::download (const QString &url, const QString &dest,
+                        const QString &infoSend)
 {
   auto newer = co_await sourceNewer (url, dest);
-  co_await download (url, dest, newer);
+  co_return co_await download (url, dest, newer, infoSend);
 }
 
-QCoro::Task<>
+QCoro::Task<std::optional<QString>>
 DhDownloader::download (const QString &url, const QString &dest,
-                        bool overwrite)
+                        bool overwrite, const QString &infoSend)
 {
+  if (finished)
+    co_return _ ("Finished!");
   /* Someone is running */
   if (reply)
-    {
-      Q_EMIT error (_ ("A download process is running."));
-      co_return;
-    }
+    co_return _ ("A download process is running.");
   /* Reuse */
   stopped = false;
   QDir d (dest);
   if (!d.exists ())
     {
       if (!d.mkpath (dest))
-        {
-          Q_EMIT error (_ ("Couldn't create directory!"));
-          co_return;
-        }
+        co_return _ ("Couldn't create directory!");
     }
   QNetworkAccessManager nam;
   QUrl urlVar (url);
@@ -68,7 +68,7 @@ DhDownloader::download (const QString &url, const QString &dest,
   auto realDir = dest + QDir::separator () + filename;
   QFile f (realDir);
   if (f.exists () && !overwrite)
-    co_return;
+    co_return _ ("No overwrite!");
   auto tempFilename = filename + ".dhtmpf";
   auto tempFilenameDir
       = QStandardPaths::writableLocation (QStandardPaths::TempLocation)
@@ -80,10 +80,7 @@ DhDownloader::download (const QString &url, const QString &dest,
     {
       tempExists = true;
       if (!tempF.open (QIODeviceBase::Append))
-        {
-          Q_EMIT error (tempF.errorString ());
-          co_return;
-        }
+        co_return tempF.errorString ();
       offset = tempF.size ();
     }
 
@@ -98,11 +95,11 @@ DhDownloader::download (const QString &url, const QString &dest,
     {
       if (!tempF.open (QIODeviceBase::NewOnly | QIODeviceBase::WriteOnly))
         {
-          Q_EMIT error (tempF.errorString ());
-          co_return;
+          co_return tempF.errorString ();
         }
     }
 
+  Q_EMIT info (infoSend);
   reply = nam.get (req);
 
   auto listener
@@ -124,10 +121,10 @@ DhDownloader::download (const QString &url, const QString &dest,
               if (!tempF.open (QIODeviceBase::NewOnly
                                | QIODeviceBase::WriteOnly))
                 {
-                  Q_EMIT error (tempF.errorString ());
+                  auto err = tempF.errorString ();
                   reply->deleteLater ();
                   reply = nullptr;
-                  co_return;
+                  co_return err;
                 }
             }
         }
@@ -142,10 +139,10 @@ DhDownloader::download (const QString &url, const QString &dest,
     }
   if (reply->error ())
     {
-      Q_EMIT error (reply->errorString ());
+      auto err = reply->errorString ();
       reply->deleteLater ();
       reply = nullptr;
-      co_return;
+      co_return err;
     }
   auto data = reply->readAll ();
   tempF.write (data);
@@ -195,12 +192,26 @@ DhDownloader::stop ()
   stopped = true;
 }
 
+void
+DhDownloader::finish ()
+{
+  stop ();
+  finished = true;
+}
+
+bool
+DhDownloader::isFinished ()
+{
+  return finished;
+}
+
 QCoro::Task<>
 download_manifest (DhDownloader &downloader)
 {
   co_await downloader.download (
       "https://launchermeta.mojang.com/mc/game/version_manifest.json",
-      QStandardPaths::writableLocation (QStandardPaths::CacheLocation));
+      QStandardPaths::writableLocation (QStandardPaths::CacheLocation),
+      QString (_ ("Downloading manifest.")));
 }
 
 QList<std::pair<QString, int>>
@@ -308,7 +319,8 @@ download_manifest_index_json (DhDownloader &downloader, int version)
   auto url = get_manifest_url (version);
   auto dest = QStandardPaths::writableLocation (QStandardPaths::CacheLocation)
               + QDir::separator () + "index_json";
-  co_await downloader.download (url, dest);
+  co_await downloader.download (
+      url, dest, QString (_ ("Downloading index json of this version.")));
   QUrl urlVar (url);
   co_return dest + QDir::separator () + urlVar.fileName ();
 }
@@ -325,7 +337,8 @@ download_asset_index (DhDownloader &downloader, int version)
   auto url = realJson["assetIndex"].toObject ()["url"].toString ();
   auto dest = QStandardPaths::writableLocation (QStandardPaths::CacheLocation)
               + QDir::separator () + "asset_json";
-  co_await downloader.download (url, dest);
+  co_await downloader.download (
+      url, dest, QString (_ ("Downloading asset index of this version.")));
   QUrl urlVar (url);
   co_return dest + QDir::separator () + urlVar.fileName ();
 }
@@ -348,7 +361,9 @@ download_object (DhDownloader &downloader, int version, const QString &object)
       = "https://resources.download.minecraft.net/" + hashBefore + "/" + hash;
   auto dest = QStandardPaths::writableLocation (QStandardPaths::CacheLocation)
               + QDir::separator () + "object";
-  co_await downloader.download (url, dest);
+  co_await downloader.download (url, dest,
+                                QString (_ ("Downloading object.")));
+  Q_EMIT downloader.info (_ ("Downloading finished!"));
   co_return dest + QDir::separator () + hash;
 }
 

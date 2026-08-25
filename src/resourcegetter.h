@@ -2,6 +2,7 @@
 #define RESOURCEGETTER_H
 
 #include <curl/curl.h>
+#include <optional>
 #include <qcorotask.h>
 #include <qnetworkreply.h>
 #include <qobject.h>
@@ -11,21 +12,32 @@ class DhDownloader : public QObject
   Q_OBJECT
 public:
   explicit DhDownloader (QObject *object = nullptr);
+  ~DhDownloader ();
 
 Q_SIGNALS:
   void progress (int value);
   void error (const QString &);
+  void info (const QString &);
 
 public Q_SLOTS:
-  QCoro::Task<> download (const QString &url, const QString &dest,
-                          bool overwrite);
-  QCoro::Task<> download (const QString &url, const QString &dest);
+  QCoro::Task<std::optional<QString>> download (const QString &url,
+                                                const QString &dest,
+                                                const QString &infoSend = {});
+  QCoro::Task<std::optional<QString>> download (const QString &url,
+                                                const QString &dest,
+                                                bool overwrite,
+                                                const QString &infoSend = {});
   void stop ();
+  /* One should use this to terminate the usage of the Downloader and delete
+   * it. */
+  void finish ();
   QCoro::Task<bool> sourceNewer (const QString &url, const QString &dest);
+  bool isFinished ();
 
 private:
   QNetworkReply *reply = nullptr;
   bool stopped = false;
+  bool finished = false;
 };
 
 QCoro::Task<> download_manifest (DhDownloader &downloader);

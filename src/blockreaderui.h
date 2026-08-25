@@ -7,6 +7,7 @@
 #include "resourcegetter.h"
 #include <QPointer>
 #include <QWidget>
+#include <memory>
 #include <qobject.h>
 #include <qtypes.h>
 
@@ -24,7 +25,8 @@ class BlockReaderUI : public QWidget
   Q_OBJECT
 
 public:
-  BlockReaderUI (int index, ManageRegionUI *mr, QWidget *parent = nullptr);
+  BlockReaderUI (int index, std::shared_ptr<DhDownloader> downloader,
+                 QWidget *parent = nullptr);
   ~BlockReaderUI ();
   static QString getBlockInfo (void *region, quint32 index,
                                const QString &path = QString{});
@@ -43,12 +45,12 @@ private:
   const void *nbt = nullptr;
   AutoLocker locker;
   QString objectPath;
-  DhDownloader downloader;
+  std::shared_ptr<DhDownloader> downloader;
   int version;
 
 Q_SIGNALS:
   void changeVal (int value);
-  void closeWin ();
+  void closeWin (QWidget *win);
   void start ();
   void finishLoadingTranslation ();
 
