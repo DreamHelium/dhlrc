@@ -6,7 +6,6 @@ add_subdirectory(dhconfigdialog)
 
 find_package(Intl)
 
-add_definitions(-DDHLRC_VERSION="${dhlrc_qt_VERSION}")
 string(TIMESTAMP CURRENT_DAY %Y%m%d)
 add_definitions(-DDHLRC_COMPILE_DATE=${CURRENT_DAY})
 
@@ -117,9 +116,10 @@ target_link_libraries(dhlrc_qt PRIVATE Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VER
  KF6::ColorScheme QCoro::Core QCoro::Network
  KF6::ConfigWidgets KF6::I18n KF6::I18nLocaleData region_rs Qt6::Concurrent nbt_to_vec ${Intl_LIBRARIES}
  dhconfigdialog KF6::WidgetsAddons KF6::CoreAddons KF6::IconThemes Qt6::StateMachine)
-target_link_directories(dhlrc_qt PRIVATE ${CMAKE_BINARY_DIR} /usr/local/lib)
+target_link_directories(dhlrc_qt PRIVATE ${CMAKE_BINARY_DIR})
 target_include_directories(dhlrc_qt PUBLIC
-        "${PROJECT_BINARY_DIR}" "${PROJECT_SOURCE_DIR}"
+        "${CMAKE_CURRENT_BINARY_DIR}"
+        "${CMAKE_CURRENT_SOURCE_DIR}"
 )
 
 add_dependencies(dhlrc_qt dhlrc_cargo_build)

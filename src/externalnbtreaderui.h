@@ -1,13 +1,13 @@
 #ifndef DHLRC_EXTERNALNBTREADERUI_H
 #define DHLRC_EXTERNALNBTREADERUI_H
 
+#include "nbtreaderui.h"
 #include <KMessageWidget>
 #include <QLabel>
 #include <QProgressBar>
 #include <QPushButton>
 #include <QVBoxLayout>
 #include <QWidget>
-#include <nbtreaderui.h>
 
 class ExternalNbtReaderUI : public QWidget
 {

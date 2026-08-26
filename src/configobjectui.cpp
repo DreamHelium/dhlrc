@@ -1,9 +1,9 @@
 #include "configobjectui.h"
 
+#include "region.h"
 #include <QCheckBox>
 #include <QPushButton>
 #include <libintl.h>
-#include <region.h>
 #define _(str) gettext (str)
 
 using getFunc = qsizetype (*) ();

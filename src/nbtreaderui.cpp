@@ -1,11 +1,11 @@
 #include "nbtreaderui.h"
 #include "ui_nbtreaderui.h"
 
+#include "nbtvec.h"
+#include "region.h"
 #include <QFileDialog>
 #include <libintl.h>
-#include <nbtvec.h>
 #include <qdialog.h>
-#include <region.h>
 #define _(str) gettext (str)
 
 NbtReaderUI::NbtReaderUI (const void *nbt, bool fromFile, QWidget *parent)

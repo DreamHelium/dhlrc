@@ -1,12 +1,13 @@
 #include "blockshowui.h"
 #include "blockreaderui.h"
 #include "nbtreaderui.h"
+#include "palettelistui.h"
+#include "region.h"
 #include "resourcegetter.h"
 #include "settings.h"
 #include "ui_blockshowui.h"
 #include <QProgressBar>
 #include <QProgressDialog>
-#include <palettelistui.h>
 #include <qabstractitemmodel.h>
 #include <qboxlayout.h>
 #include <qdialog.h>
@@ -18,7 +19,6 @@
 #include <qobject.h>
 #include <qprogressbar.h>
 #include <qpushbutton.h>
-#include <region.h>
 #define _(str) gettext (str)
 
 BlockShowUI::BlockShowUI (void *region, const QString &large_version,

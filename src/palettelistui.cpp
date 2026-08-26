@@ -2,8 +2,8 @@
 
 #include "ui_palettelistui.h"
 
+#include "region.h"
 #include <qobject.h>
-#include <region.h>
 
 PaletteListUI::PaletteListUI (void *region, const QString &large_version,
                               QWidget *parent)

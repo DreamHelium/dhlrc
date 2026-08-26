@@ -6,21 +6,21 @@
 // #include <blockshowui.h>
 #include "regionmodifyui.h"
 
-#include <blocklistui.h>
-#include <blockshowui.h>
-#include <generalchoosedialog.h>
+#include "blocklistui.h"
+#include "blockshowui.h"
+#include "generalchoosedialog.h"
+#include "mainwindow.h"
+#include "nbtreaderui.h"
+#include "region.h"
+#include "utility.h"
 #include <kmessagewidget.h>
-#include <mainwindow.h>
 #include <memory>
-#include <nbtreaderui.h>
 #include <qlineedit.h>
 #include <qnamespace.h>
 #include <qobject.h>
 #include <qpushbutton.h>
 #include <qtimer.h>
 #include <qvalidator.h>
-#include <region.h>
-#include <utility.h>
 #define _(str) gettext (str)
 
 static void

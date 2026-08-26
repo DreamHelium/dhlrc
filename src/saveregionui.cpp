@@ -3,9 +3,9 @@
 #include "region.h"
 #include "settings.h"
 
+#include "configobjectui.h"
 #include <QDir>
 #include <QMessageBox>
-#include <configobjectui.h>
 #include <libintl.h>
 #include <thread>
 #define _(str) gettext (str)

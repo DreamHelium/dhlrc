@@ -1,8 +1,8 @@
 #ifndef DHLRC_NBTREADERUI_H
 #define DHLRC_NBTREADERUI_H
+#include "dhtreefilter.h"
 #include <QStandardItemModel>
 #include <QWidget>
-#include <dhtreefilter.h>
 #include <qdialog.h>
 
 QT_BEGIN_NAMESPACE
