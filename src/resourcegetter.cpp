@@ -1,12 +1,13 @@
 #include "resourcegetter.h"
+#include "settings.h"
 #include <QCoroAsyncGenerator>
 #include <QCoroNetworkReply>
 #include <QCoroSignal>
 #include <QDir>
 #include <QNetworkAccessManager>
 #include <QString>
+#include <expected>
 #include <libintl.h>
-#include <optional>
 #include <qcoroiodevice.h>
 #include <qcorotask.h>
 #include <qcorotimer.h>
@@ -20,6 +21,7 @@
 #include <qjsonobject.h>
 #include <qjsonparseerror.h>
 #include <qlogging.h>
+#include <qmap.h>
 #include <qnetworkaccessmanager.h>
 #include <qnetworkreply.h>
 #include <qnetworkrequest.h>
@@ -27,40 +29,52 @@
 #include <qstandardpaths.h>
 #include <qurl.h>
 #include <tuple>
-#include <utility>
 #define _(str) gettext (str)
 
-using CacheList = QList<std::pair<QString, QJsonDocument>>;
+using CacheList = QMap<QString, QJsonDocument>;
+using UrlMap = QMap<QString, QString>;
 Q_GLOBAL_STATIC (CacheList, jsonCache)
+Q_GLOBAL_STATIC (VersionMap, versionMap)
+Q_GLOBAL_STATIC (UrlMap, urlMap)
+
+static auto getDirectory = [] (const QString &childPath)
+  {
+    if (childPath.isEmpty ())
+      return DhConfig::cacheDirectory ();
+    else
+      return DhConfig::cacheDirectory () + QDir::separator () + childPath;
+  };
 
 DhDownloader::DhDownloader (QObject *object) : QObject (object) {}
 
 DhDownloader::~DhDownloader () { finish (); }
 
-QCoro::Task<std::optional<QString>>
+QCoro::Task<std::expected<QString, QString>>
 DhDownloader::download (const QString &url, const QString &dest,
-                        const QString &infoSend)
+                        const QString &infoSend, bool *isOverwritten)
 {
   auto newer = co_await sourceNewer (url, dest);
+  if (isOverwritten)
+    *isOverwritten = newer;
   co_return co_await download (url, dest, newer, infoSend);
 }
 
-QCoro::Task<std::optional<QString>>
+QCoro::Task<std::expected<QString, QString>>
 DhDownloader::download (const QString &url, const QString &dest,
                         bool overwrite, const QString &infoSend)
 {
   if (finished)
-    co_return _ ("Finished!");
+    co_return std::unexpected (_ ("Finished!"));
   /* Someone is running */
   if (reply)
-    co_return _ ("A download process is running.");
+    co_return std::unexpected (_ ("A download process is running."));
   /* Reuse */
   stopped = false;
   QDir d (dest);
   if (!d.exists ())
     {
       if (!d.mkpath (dest))
-        co_return _ ("Couldn't create directory!");
+        co_return std::unexpected (_ ("Couldn't create directory!"));
     }
   QNetworkAccessManager nam;
   QUrl urlVar (url);
@@ -68,7 +82,8 @@ DhDownloader::download (const QString &url, const QString &dest,
   auto realDir = dest + QDir::separator () + filename;
   QFile f (realDir);
   if (f.exists () && !overwrite)
-    co_return _ ("No overwrite!");
+    /* It can be determined as not an error. */
+    co_return realDir;
   auto tempFilename = filename + ".dhtmpf";
   auto tempFilenameDir
       = QStandardPaths::writableLocation (QStandardPaths::TempLocation)
@@ -80,7 +95,7 @@ DhDownloader::download (const QString &url, const QString &dest,
     {
       tempExists = true;
       if (!tempF.open (QIODeviceBase::Append))
-        co_return tempF.errorString ();
+        co_return std::unexpected (tempF.errorString ());
       offset = tempF.size ();
     }
 
@@ -94,9 +109,7 @@ DhDownloader::download (const QString &url, const QString &dest,
   if (!tempF.exists ())
     {
       if (!tempF.open (QIODeviceBase::NewOnly | QIODeviceBase::WriteOnly))
-        {
-          co_return tempF.errorString ();
-        }
+        co_return std::unexpected (tempF.errorString ());
     }
 
   Q_EMIT info (infoSend);
@@ -124,7 +137,7 @@ DhDownloader::download (const QString &url, const QString &dest,
                   auto err = tempF.errorString ();
                   reply->deleteLater ();
                   reply = nullptr;
-                  co_return err;
+                  co_return std::unexpected (err);
                 }
             }
         }
@@ -139,10 +152,13 @@ DhDownloader::download (const QString &url, const QString &dest,
     }
   if (reply->error ())
     {
+      /* Use cache file, no error emitted. */
+      if (f.exists () && DhConfig::failDownloadUseCache ())
+        co_return realDir;
       auto err = reply->errorString ();
       reply->deleteLater ();
       reply = nullptr;
-      co_return err;
+      co_return std::unexpected (err);
     }
   auto data = reply->readAll ();
   tempF.write (data);
@@ -158,6 +174,7 @@ DhDownloader::download (const QString &url, const QString &dest,
 
   reply->deleteLater ();
   reply = nullptr;
+  co_return realDir;
 }
 
 QCoro::Task<bool>
@@ -172,6 +189,15 @@ DhDownloader::sourceNewer (const QString &url, const QString &dest)
   auto value = reply->headers ()
                    .value (QHttpHeaders::WellKnownHeader::LastModified)
                    .toByteArray ();
+  /* Force a fail */
+  if (value.isEmpty ())
+    {
+      reply->deleteLater ();
+      if (DhConfig::failDownloadUseCache ())
+        co_return false;
+      else
+        co_return true;
+    }
   auto sourceDateTime
       = QDateTime::fromString (value, "ddd, dd MMM yyyy hh:mm:ss t");
   reply->deleteLater ();
@@ -205,149 +231,138 @@ DhDownloader::isFinished ()
   return finished;
 }
 
-QCoro::Task<>
-download_manifest (DhDownloader &downloader)
+QCoro::Task<std::expected<QString, QString>>
+download_manifest (DhDownloader &downloader, bool *isOverwrittern)
 {
-  co_await downloader.download (
+  co_return co_await downloader.download (
       "https://launchermeta.mojang.com/mc/game/version_manifest.json",
-      QStandardPaths::writableLocation (QStandardPaths::CacheLocation),
-      QString (_ ("Downloading manifest.")));
+      getDirectory ({}), QString (_ ("Downloading manifest.")),
+      isOverwrittern);
 }
 
-QList<std::pair<QString, int>>
+const VersionMap *
 get_version_list ()
 {
-  QList<std::pair<QString, int>> list;
-  QFile f (":/cn/dh/dhlrc/data_version.csv");
-  if (!f.open (QIODeviceBase::ReadOnly))
-    return list;
-  auto data = f.readAll ();
-  auto lines = data.split ('\n');
-  for (const auto &line : lines)
+  if (versionMap->isEmpty ())
     {
-      auto trimmed = line.trimmed ();
-      if (trimmed.isEmpty ())
-        continue;
-      auto comma = trimmed.indexOf (',');
-      if (comma <= 0)
-        continue;
+      QFile f (":/cn/dh/dhlrc/data_version.csv");
+      if (!f.open (QIODeviceBase::ReadOnly))
+        return nullptr;
+      auto data = f.readAll ();
+      auto lines = data.split ('\n');
+      for (const auto &line : lines)
+        {
+          auto trimmed = line.trimmed ();
+          if (trimmed.isEmpty ())
+            continue;
+          auto comma = trimmed.indexOf (',');
+          if (comma <= 0)
+            continue;
 
-      auto name = trimmed.left (comma).trimmed ();
-      bool ok = false;
-      auto analysedVersion = trimmed.mid (comma + 1).trimmed ().toInt (&ok);
+          auto name = trimmed.left (comma).trimmed ();
+          bool ok = false;
+          auto analysedVersion
+              = trimmed.mid (comma + 1).trimmed ().toInt (&ok);
 
-      if (!ok)
-        continue;
-      list.append ({ name, analysedVersion });
+          if (!ok)
+            continue;
+          versionMap->insert (analysedVersion, name);
+        }
     }
-  return list;
+  return versionMap;
 }
 
-QList<std::pair<QString, QString>>
-get_manifest_url_list ()
+QCoro::Task<std::optional<QString>>
+get_manifest_url_list (DhDownloader &downloader)
 {
-  QList<std::pair<QString, QString>> list;
-  auto filename
-      = QStandardPaths::writableLocation (QStandardPaths::CacheLocation)
-        + QDir::separator () + "version_manifest.json";
+  bool overwritten = false;
+  auto ret = co_await download_manifest (downloader, &overwritten);
+  if (!ret.has_value ())
+    co_return ret.error ();
+
+  auto filename = ret.value ();
   QFile f (filename);
   if (!f.exists () || !f.open (QIODeviceBase::ReadOnly))
-    return list;
+    co_return f.errorString ();
   auto data = f.readAll ();
   f.close ();
 
-  QJsonParseError error;
-  auto json = QJsonDocument::fromJson (data, &error);
-  if (error.error)
+  if (overwritten || urlMap->isEmpty ())
     {
-      qDebug () << error.errorString ();
-      return list;
+      QJsonParseError error;
+      auto json = QJsonDocument::fromJson (data, &error);
+      if (error.error)
+        {
+          qDebug () << error.errorString ();
+          co_return error.errorString ();
+        }
+      auto array = json["versions"].toArray ();
+      for (const auto &i : array)
+        {
+          auto id = i.toObject ()["id"].toString ();
+          auto url = i.toObject ()["url"].toString ();
+          urlMap->insert (id, url);
+        }
     }
-  auto array = json["versions"].toArray ();
-  for (const auto &i : array)
-    {
-      std::pair<QString, QString> valuePair
-          = { i.toObject ()["id"].toString (),
-              i.toObject ()["url"].toString () };
-      list << valuePair;
-    }
-  return list;
+  co_return std::nullopt;
 }
 
-QString
-get_manifest_url (const QString &id)
+QCoro::Task<std::expected<QString, QString>>
+get_manifest_url (const QString &id, DhDownloader &downloader)
 {
-  auto list = get_manifest_url_list ();
-  for (const auto &i : list)
-    if (i.first == id)
-      return i.second;
-  return QString{};
+  auto list = co_await get_manifest_url_list (downloader);
+  if (list.has_value ())
+    co_return std::unexpected (list.value ());
+  if (urlMap->keys ().contains (id))
+    co_return urlMap->value (id);
+  co_return std::unexpected (
+      _ ("No matching index json found, file corrupted?"));
 }
 
-QString
-get_manifest_url (int version)
+QCoro::Task<std::expected<QString, QString>>
+get_manifest_url (int version, DhDownloader &downloader)
 {
-  QFile f (":/cn/dh/dhlrc/data_version.csv");
-  if (!f.open (QIODeviceBase::ReadOnly))
-    return QString{};
-  auto data = f.readAll ();
-  auto lines = data.split ('\n');
-  for (const auto &line : lines)
-    {
-      auto trimmed = line.trimmed ();
-      if (trimmed.isEmpty ())
-        continue;
-      auto comma = trimmed.indexOf (',');
-      if (comma <= 0)
-        continue;
-
-      auto name = trimmed.left (comma).trimmed ();
-      bool ok = false;
-      auto analysedVersion = trimmed.mid (comma + 1).trimmed ().toInt (&ok);
-
-      if (!ok)
-        continue;
-      if (analysedVersion == version)
-        return get_manifest_url (name);
-    }
-  return QString{};
+  get_version_list ();
+  co_return co_await get_manifest_url (versionMap->value (version),
+                                       downloader);
 }
 
-QCoro::Task<QString>
+QCoro::Task<std::expected<QString, QString>>
 download_manifest_index_json (DhDownloader &downloader, int version)
 {
-  auto url = get_manifest_url (version);
-  auto dest = QStandardPaths::writableLocation (QStandardPaths::CacheLocation)
-              + QDir::separator () + "index_json";
-  co_await downloader.download (
-      url, dest, QString (_ ("Downloading index json of this version.")));
-  QUrl urlVar (url);
-  co_return dest + QDir::separator () + urlVar.fileName ();
+  auto url = co_await get_manifest_url (version, downloader);
+  if (!url.has_value ())
+    co_return url;
+  auto dest = getDirectory ("index_json");
+  co_return co_await downloader.download (
+      url.value (), dest,
+      QString (_ ("Downloading index json of this version.")));
 }
 
-QCoro::Task<QString>
+QCoro::Task<std::expected<QString, QString>>
 download_asset_index (DhDownloader &downloader, int version)
 {
   auto json = co_await download_manifest_index_json (downloader, version);
-  QFile f (json);
+  if (!json.has_value ())
+    co_return json;
+  QFile f (json.value ());
   if (!f.open (QIODeviceBase::ReadOnly))
-    co_return {};
+    co_return std::unexpected (f.errorString ());
   auto data = co_await qCoro (f).readAll ();
   auto realJson = QJsonDocument::fromJson (data);
   auto url = realJson["assetIndex"].toObject ()["url"].toString ();
-  auto dest = QStandardPaths::writableLocation (QStandardPaths::CacheLocation)
-              + QDir::separator () + "asset_json";
-  co_await downloader.download (
+  auto dest = getDirectory ("asset_json");
+  co_return co_await downloader.download (
       url, dest, QString (_ ("Downloading asset index of this version.")));
-  QUrl urlVar (url);
-  co_return dest + QDir::separator () + urlVar.fileName ();
 }
 
-QCoro::Task<QString>
+QCoro::Task<std::expected<QString, QString>>
 download_object (DhDownloader &downloader, int version, const QString &object)
 {
   auto asset = co_await download_asset_index (downloader, version);
-  QFile f (asset);
+  if (!asset.has_value ())
+    co_return asset;
+  QFile f (asset.value ());
   if (!f.open (QIODeviceBase::ReadOnly))
     co_return {};
   auto data = co_await qCoro (f).readAll ();
@@ -359,12 +374,11 @@ download_object (DhDownloader &downloader, int version, const QString &object)
   QString hashBefore = QString (hash[0]) + hash[1];
   QString url
       = "https://resources.download.minecraft.net/" + hashBefore + "/" + hash;
-  auto dest = QStandardPaths::writableLocation (QStandardPaths::CacheLocation)
-              + QDir::separator () + "object";
-  co_await downloader.download (url, dest,
-                                QString (_ ("Downloading object.")));
+  auto dest = getDirectory ("object");
+  auto ret = co_await downloader.download (
+      url, dest, QString (_ ("Downloading object.")));
   Q_EMIT downloader.info (_ ("Downloading finished!"));
-  co_return dest + QDir::separator () + hash;
+  co_return ret;
 }
 
 QString
@@ -387,16 +401,13 @@ get_translation_from_object (const QString &path, const QString &name)
         return itemTrans;
       return QString{};
     };
-  for (const auto &[cachePath, object] : *jsonCache)
-    {
-      if (cachePath == path)
-        return realGetFunc (object, name);
-    }
+  if (jsonCache->keys ().contains (path))
+    return realGetFunc (jsonCache->value (path), name);
   QFile f (path);
   if (!f.open (QIODeviceBase::ReadOnly))
     return {};
   auto data = f.readAll ();
   auto realJson = QJsonDocument::fromJson (data);
-  jsonCache->append ({ path, realJson });
+  jsonCache->insert (path, realJson);
   return realGetFunc (realJson, name);
 }

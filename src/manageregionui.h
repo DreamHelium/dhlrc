@@ -100,7 +100,7 @@ protected:
   void dropEvent (QDropEvent *event) override;
 
 private:
-  DhPushButton *selectButton;
+  QCheckBox *selectButton;
   QPushButton *addButton;
   QVBoxLayout *layout;
   QHBoxLayout *btnLayout;

@@ -14,6 +14,7 @@
 #include <QMessageBox>
 #include <QPushButton>
 #include <libintl.h>
+#include <qcheckbox.h>
 #include <qevent.h>
 #include <qmimedata.h>
 
@@ -146,7 +147,7 @@ ManageRegionUI::ManageRegionUI (QWidget *mainWindow, QWidget *parent)
 
   btnLayout = new QHBoxLayout ();
 
-  selectButton = new DhPushButton (_ ("&Select"));
+  selectButton = new QCheckBox (_ ("&Select"));
   selectButton->setIcon (QIcon::fromTheme ("edit-select"));
 
   btnLayout->addWidget (selectButton);
@@ -185,20 +186,17 @@ ManageRegionUI::ManageRegionUI (QWidget *mainWindow, QWidget *parent)
                  {
                    auto job = new DhAllLoadJob (dirs);
                    job->start ();
-                   // auto lrui = new LoadRegionUI (dirs, this);
-                   // lrui->setAttribute (Qt::WA_DeleteOnClose);
-                   // lrui->show ();
                  }
              });
-  connect (selectButton, &DhPushButton::clicked, this,
+  connect (selectButton, &QCheckBox::clicked, this,
            [&]
              {
+               addButton->setEnabled (!selectButton->isChecked ());
                for (auto &widget : itemFrames)
                  {
-                   widget->setCheckBoxVisible (!selectButton->isDown ());
-                   widget->setButtonEnable (selectButton->isDown ());
+                   widget->setCheckBoxVisible (selectButton->isChecked ());
+                   widget->setButtonEnable (!selectButton->isChecked ());
                  }
-               selectButton->setDown (!selectButton->isDown ());
              });
 }
 

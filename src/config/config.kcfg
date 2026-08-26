@@ -1,8 +1,10 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<kcfg xmlns="http://www.kde.org/standards/kcfg/1.0"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xsi:schemaLocation="http://www.kde.org/standards/kcfg/1.0
-                          http://www.kde.org/standards/kcfg/1.0/kcfg.xsd">
+<?xml version="1.0" encoding="UTF-8" ?>
+<kcfg
+    xmlns="http://www.kde.org/standards/kcfg/1.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.kde.org/standards/kcfg/1.0
+                          http://www.kde.org/standards/kcfg/1.0/kcfg.xsd"
+>
     <group name="General">
         <entry name="MemoryLimit" type="Int">
             <label>Application Memory Limit</label>
@@ -11,22 +13,38 @@
         </entry>
         <entry name="ElapsedMilliseconds" type="Int">
             <label>Elapsed Milliseconds</label>
-            <tooltip>The elapsed milliseconds for the progress bar, if set too small will affect the speed.</tooltip>
+            <tooltip
+            >The elapsed milliseconds for the progress bar, if set too small will affect the speed.</tooltip>
             <default>500</default>
         </entry>
         <entry name="SelectAllRegionsInLoading" type="Bool">
             <label>Select All Regions In Loading</label>
-            <tooltip>If you check this, all regions will be loaded in the loading progress.</tooltip>
+            <tooltip
+            >If you check this, all regions will be loaded in the loading progress.</tooltip>
             <default>false</default>
         </entry>
         <entry name="LoadingFileByExtension" type="Bool">
             <label>Loading File by File Extension</label>
-            <tooltip>If you check this, the file will be loaded by the file extension name.</tooltip>
+            <tooltip
+            >If you check this, the file will be loaded by the file extension name.</tooltip>
             <default>true</default>
         </entry>
         <entry name="FailThenRetry" type="Bool">
             <label>Retry Loading File when Failed</label>
-            <tooltip>When failed, the file will try to be loaded by other modules.</tooltip>
+            <tooltip
+            >When failed, the file will try to be loaded by other modules.</tooltip>
+            <default>false</default>
+        </entry>
+        <entry name="CacheDirectory" type="Path">
+            <label>Cache Directory</label>
+            <tooltip>The directory to store cache files.</tooltip>
+            <default
+                code="true"
+            >QStandardPaths::writableLocation (QStandardPaths::CacheLocation)</default>
+        </entry>
+        <entry name="FailDownloadUseCache" type="Bool">
+            <label>Use Cached File when Downloading Failed</label>
+            <tooltip>When downloading failed, use the cached file.</tooltip>
             <default>false</default>
         </entry>
     </group>

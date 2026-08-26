@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-20 21:19+0800\n"
+"POT-Creation-Date: 2026-08-26 17:29+0800\n"
 "PO-Revision-Date: 2024-11-30 07:00+0800\n"
 "Last-Translator: dream_he <48383878+DreamHelium@users.noreply.github.com>\n"
 "Language-Team: Chinese <kde-i18n-doc@kde.org>\n"
@@ -56,27 +56,27 @@ msgid "z"
 msgstr "z"
 
 #: ../../src/blocklistui.cpp:59 ../../src/blocklistui.cpp:62
-#: ../../build/src/settings.cpp:95 rc.cpp:144
+#: ../../build/src/settings.cpp:103 rc.cpp:144
 msgid "Palette"
 msgstr "偏移码"
 
-#: ../../src/blockreaderui.cpp:78
+#: ../../src/blockreaderui.cpp:103
 msgid "Choose an Index"
 msgstr "选择一个索引"
 
-#: ../../src/blockreaderui.cpp:78
+#: ../../src/blockreaderui.cpp:103
 msgid "Please choose an index."
 msgstr "请选择一个索引。"
 
-#: ../../src/blockreaderui.cpp:93
+#: ../../src/blockreaderui.cpp:118
 msgid "Region Modifier"
 msgstr "区域修改器"
 
-#: ../../src/blockreaderui.cpp:159
+#: ../../src/blockreaderui.cpp:187
 msgid "Not valid!"
 msgstr "无效！"
 
-#: ../../src/blockreaderui.cpp:174
+#: ../../src/blockreaderui.cpp:202
 msgid ""
 "Name: %1\n"
 "Translation Name: %2\n"
@@ -84,8 +84,13 @@ msgid ""
 "Palette: %4\n"
 "Properties:\n"
 msgstr ""
+"名称：%1\n"
+"翻译名称：%2\n"
+"索引：%3\n"
+"调色板：%4\n"
+"属性：\n"
 
-#: ../../src/blockreaderui.cpp:187
+#: ../../src/blockreaderui.cpp:215
 msgid ""
 "Name: %1\n"
 "Index: %2\n"
@@ -97,29 +102,29 @@ msgstr ""
 "偏移量：%3\n"
 "属性：\n"
 
-#: ../../src/blockreaderui.cpp:226
+#: ../../src/blockreaderui.cpp:254
 msgid "With DataVersion %4, version %5."
 msgstr "数据版本%4，版本%5。"
 
-#: ../../src/blockreaderui.cpp:228
+#: ../../src/blockreaderui.cpp:256
 msgid "Created time: %6, Modified time: %7, Author: %8, Name: %9"
 msgstr "创建时间：%6，修改时间：%7，作者：%8，名字：%9"
 
-#: ../../src/blockreaderui.cpp:230
+#: ../../src/blockreaderui.cpp:258
 msgid "Description: %10"
 msgstr "描述：%10"
 
-#: ../../src/blockreaderui.cpp:244
+#: ../../src/blockreaderui.cpp:261 ../../src/regionmodifyui.cpp:82
 msgid "Unknown"
-msgstr ""
+msgstr "未知"
 
-#: ../../src/blockreaderui.cpp:272 ../../src/manageregionui.cpp:182
-#: ../../src/regionmodifyui.cpp:15 ../../src/saveregionui.cpp:52
+#: ../../src/blockreaderui.cpp:295 ../../src/manageregionui.cpp:183
+#: ../../src/regionmodifyui.cpp:16 ../../src/saveregionui.cpp:52
 #: ../../src/utility.cpp:24 ../../src/utility.cpp:41 ../../src/utility.cpp:49
 msgid "Error!"
 msgstr "错误！"
 
-#: ../../src/blockreaderui.cpp:273 ../../common-rs/src/util.rs:44
+#: ../../src/blockreaderui.cpp:296 ../../common-rs/src/util.rs:44
 msgid "Out of memory!"
 msgstr "内存不足！"
 
@@ -128,7 +133,7 @@ msgid "The block is in (%1, %2, %3), information is:\n"
 msgstr "方块在(%1, %2, %3)，信息是：\n"
 
 #: ../../src/blockshowui.cpp:81 ../../src/configobjectui.cpp:87
-#: ../../src/lrchooseui.cpp:79 rc.cpp:194 rc.cpp:254
+#: ../../src/lrchooseui.cpp:79 rc.cpp:195 rc.cpp:255
 msgid "&OK"
 msgstr "确定(&O)"
 
@@ -212,7 +217,7 @@ msgstr "已结束处理了%2个中的%1个（%3%）。"
 msgid "Continue"
 msgstr "继续"
 
-#: ../../src/externalnbtreaderui.cpp:15 ../../src/mainwindow.cpp:205
+#: ../../src/externalnbtreaderui.cpp:15 ../../src/mainwindow.cpp:249
 msgid "NBT Reader"
 msgstr "NBT阅读器"
 
@@ -265,7 +270,7 @@ msgstr ""
 msgid "Enter description here."
 msgstr "在此输入描述。"
 
-#: ../../src/lrchooseui.cpp:80 rc.cpp:12 rc.cpp:182
+#: ../../src/lrchooseui.cpp:80 rc.cpp:12 rc.cpp:183
 msgid "&Close"
 msgstr "关闭(&C)"
 
@@ -273,71 +278,75 @@ msgstr "关闭(&C)"
 msgid "Minecraft Structure Modifier"
 msgstr "Minecraft结构修改器"
 
-#: ../../src/mainwindow.cpp:133
+#: ../../src/mainwindow.cpp:138
+msgid "Select Cache Directory"
+msgstr ""
+
+#: ../../src/mainwindow.cpp:180
 msgid "Search..."
 msgstr "搜索……"
 
-#: ../../src/mainwindow.cpp:161
+#: ../../src/mainwindow.cpp:208
 msgid "NBT File Reader"
 msgstr "NBT文件阅读器"
 
-#: ../../src/mainwindow.cpp:162 ../../src/mainwindow.cpp:213
+#: ../../src/mainwindow.cpp:209 ../../src/mainwindow.cpp:257
 msgid "Manage Region"
 msgstr "管理Region"
 
-#: ../../src/mainwindow.cpp:163 ../../src/mainwindow.cpp:224
+#: ../../src/mainwindow.cpp:210 ../../src/mainwindow.cpp:271
 msgid "Region Reader/Modifier"
 msgstr "区域阅读器及修改器"
 
-#: ../../src/mainwindow.cpp:164
+#: ../../src/mainwindow.cpp:211
 msgid "Settings"
 msgstr "设置"
 
-#: ../../src/manageregionui.cpp:149
+#: ../../src/manageregionui.cpp:150
 msgid "&Select"
 msgstr "选择(&S)"
 
-#: ../../src/manageregionui.cpp:153 rc.cpp:188
+#: ../../src/manageregionui.cpp:154 rc.cpp:189
 msgid "&Add"
 msgstr "添加(&A)"
 
-#: ../../src/manageregionui.cpp:180
+#: ../../src/manageregionui.cpp:181
 msgid "Select Files"
 msgstr "选择文件"
 
-#: ../../src/manageregionui.cpp:183
+#: ../../src/manageregionui.cpp:184
 msgid "No file selected!"
 msgstr "没有文件被选中！"
 
-#: ../../src/manageregionui.cpp:259
+#: ../../src/manageregionui.cpp:257
 msgid "Choose Save Option"
 msgstr "选择保存选项"
 
-#: ../../src/manageregionui.cpp:260
+#: ../../src/manageregionui.cpp:258
 msgid "Choose whether format you want to save to."
 msgstr "选择你想保存的格式。"
 
-#: ../../src/manageregionui.cpp:279
+#: ../../src/manageregionui.cpp:277
 msgid "Use MultiFunc?"
 msgstr ""
 
-#: ../../src/manageregionui.cpp:280
+#: ../../src/manageregionui.cpp:278
 msgid "This type supports regions to save as one file, do you want to use it?"
 msgstr ""
 
-#: ../../src/manageregionui.cpp:293
+#: ../../src/manageregionui.cpp:291
 msgid "Select Directory"
 msgstr ""
 
-#: ../../src/manageregionui.cpp:373
+#: ../../src/manageregionui.cpp:371
 msgid "Locked!"
 msgstr "已锁定！"
 
-#: ../../src/manageregionui.cpp:413
+#: ../../src/manageregionui.cpp:411
 msgid "Input a New Name"
 msgstr ""
 
-#: ../../src/manageregionui.cpp:414
+#: ../../src/manageregionui.cpp:412
 msgid "Please input a new name for the region."
 msgstr ""
 
@@ -369,7 +378,7 @@ msgstr ""
 msgid "Please enter a data."
 msgstr ""
 
-#: ../../src/paletteaddui.cpp:68 ../../build/src/settings.cpp:101 rc.cpp:147
+#: ../../src/paletteaddui.cpp:68 ../../build/src/settings.cpp:109 rc.cpp:147
 msgid "Name"
 msgstr "名称"
 
@@ -377,16 +386,40 @@ msgstr "名称"
 msgid "Data"
 msgstr "数据"
 
-#: ../../src/regionmodifyui.cpp:85
-msgid "Unknown!"
-msgstr "未知！"
+#: ../../src/resourcegetter.cpp:67
+msgid "Finished!"
+msgstr ""
 
-#: ../../src/resourcegetter.cpp:51
+#: ../../src/resourcegetter.cpp:70
 msgid "A download process is running."
 msgstr ""
 
-#: ../../src/resourcegetter.cpp:61
+#: ../../src/resourcegetter.cpp:77
 msgid "Couldn't create directory!"
+msgstr ""
+
+#: ../../src/resourcegetter.cpp:239
+msgid "Downloading manifest."
+msgstr ""
+
+#: ../../src/resourcegetter.cpp:319
+msgid "No matching index json found, file corrupted?"
+msgstr ""
+
+#: ../../src/resourcegetter.cpp:339
+msgid "Downloading index json of this version."
+msgstr ""
+
+#: ../../src/resourcegetter.cpp:356
+msgid "Downloading asset index of this version."
+msgstr ""
+
+#: ../../src/resourcegetter.cpp:379
+msgid "Downloading object."
+msgstr ""
+
+#: ../../src/resourcegetter.cpp:380
+msgid "Downloading finished!"
 msgstr ""
 
 #: ../../src/saveregionui.cpp:37
@@ -437,97 +470,113 @@ msgstr "应用限制内存（以字节计）。"
 msgid "Elapsed Milliseconds"
 msgstr "持续毫秒"
 
-#: ../../build/src/settings.cpp:44 rc.cpp:81
+#: ../../build/src/settings.cpp:44
 msgid ""
 "The elapsed milliseconds for the progress bar, if set too small will affect "
 "the speed."
 msgstr "进度条的持续毫秒，如果设置太小将会影响速度。"
 
-#: ../../build/src/settings.cpp:47 rc.cpp:84
+#: ../../build/src/settings.cpp:47 rc.cpp:81
 msgid "Select All Regions In Loading"
-msgstr ""
+msgstr "在加载时选择所有区域"
 
-#: ../../build/src/settings.cpp:48 rc.cpp:87
+#: ../../build/src/settings.cpp:48
 msgid "If you check this, all regions will be loaded in the loading progress."
-msgstr ""
+msgstr "如果你选择此项，所有区域将在加载时载入。"
 
-#: ../../build/src/settings.cpp:51 rc.cpp:90
+#: ../../build/src/settings.cpp:51 rc.cpp:84
 msgid "Loading File by File Extension"
-msgstr ""
+msgstr "使用文件扩展名加载文件"
 
-#: ../../build/src/settings.cpp:52 rc.cpp:93
+#: ../../build/src/settings.cpp:52
 msgid "If you check this, the file will be loaded by the file extension name."
-msgstr ""
+msgstr "如果你选择此项，文件将会依靠文件扩展名加载。"
 
-#: ../../build/src/settings.cpp:55 rc.cpp:96
+#: ../../build/src/settings.cpp:55 rc.cpp:87
 msgid "Retry Loading File when Failed"
-msgstr ""
+msgstr "在失败时重试加载文件"
 
-#: ../../build/src/settings.cpp:56 rc.cpp:99
+#: ../../build/src/settings.cpp:56
 msgid "When failed, the file will try to be loaded by other modules."
-msgstr ""
+msgstr "当失败时，此文件将会尝试使用其它模组加载。"
 
-#: ../../build/src/settings.cpp:61 rc.cpp:148 ../../region-rs/src/default.rs:58
+#: ../../build/src/settings.cpp:59 rc.cpp:90
+msgid "Cache Directory"
+msgstr "缓存目录"
+
+#: ../../build/src/settings.cpp:60 rc.cpp:93
+msgid "The directory to store cache files."
+msgstr "存放缓存文件的目录。"
+
+#: ../../build/src/settings.cpp:63 rc.cpp:96
+msgid "Use Cached File when Downloading Failed"
+msgstr "在下载失败时使用缓存文件"
+
+#: ../../build/src/settings.cpp:64 rc.cpp:99
+msgid "When downloading failed, use the cached file."
+msgstr "当下载失败时，用缓存文件。"
+
+#: ../../build/src/settings.cpp:69 rc.cpp:149 ../../region-rs/src/default.rs:58
 msgid "Converted"
 msgstr "已转换"
 
-#: ../../build/src/settings.cpp:62 rc.cpp:102
+#: ../../build/src/settings.cpp:70 rc.cpp:102
 msgid "Region Base Name"
 msgstr "区域基础名字"
 
-#: ../../build/src/settings.cpp:63 rc.cpp:105
+#: ../../build/src/settings.cpp:71 rc.cpp:105
 msgid "The default base name for the region."
 msgstr "默认的区域基础名字"
 
-#: ../../build/src/settings.cpp:65 rc.cpp:149 ../../region-rs/src/default.rs:60
+#: ../../build/src/settings.cpp:73 rc.cpp:150 ../../region-rs/src/default.rs:60
 msgid "Unnamed"
 msgstr "未命名"
 
-#: ../../build/src/settings.cpp:66 rc.cpp:108 rc.cpp:245
+#: ../../build/src/settings.cpp:74 rc.cpp:108 rc.cpp:246
 msgid "Region Name"
 msgstr "区域名称"
 
-#: ../../build/src/settings.cpp:67 rc.cpp:111
+#: ../../build/src/settings.cpp:75 rc.cpp:111
 msgid "The default name for the region."
 msgstr "默认的区域名字"
 
-#: ../../build/src/settings.cpp:70 rc.cpp:114
+#: ../../build/src/settings.cpp:78 rc.cpp:114
 msgid "Region Description"
 msgstr "区域描述"
 
-#: ../../build/src/settings.cpp:71 rc.cpp:117
+#: ../../build/src/settings.cpp:79 rc.cpp:117
 msgid "The default description for the region."
 msgstr "默认的区域描述"
 
-#: ../../build/src/settings.cpp:74 rc.cpp:120
+#: ../../build/src/settings.cpp:82 rc.cpp:120
 msgid "Region Author"
 msgstr "区域作者"
 
-#: ../../build/src/settings.cpp:75 rc.cpp:123
+#: ../../build/src/settings.cpp:83 rc.cpp:123
 msgid "The default author for the region."
 msgstr "默认的区域作者"
 
-#: ../../build/src/settings.cpp:81 rc.cpp:126
+#: ../../build/src/settings.cpp:89 rc.cpp:126
 msgid "Override Settings"
 msgstr "覆盖设置"
 
-#: ../../build/src/settings.cpp:82 rc.cpp:129
+#: ../../build/src/settings.cpp:90 rc.cpp:129
 msgid "Whether to override setting or not."
 msgstr "是否覆盖设置。"
 
-#: ../../build/src/settings.cpp:85 rc.cpp:132
+#: ../../build/src/settings.cpp:93 rc.cpp:132
 msgid "Override Version"
 msgstr "覆盖版本"
 
-#: ../../build/src/settings.cpp:86 rc.cpp:135
+#: ../../build/src/settings.cpp:94 rc.cpp:135
 msgid "The version to override in translation stage."
 msgstr "在翻译阶段覆盖的版本。"
 
-#: ../../build/src/settings.cpp:105 rc.cpp:138
+#: ../../build/src/settings.cpp:113 rc.cpp:138
 msgid "Default Show Option"
 msgstr "默认展示选项"
 
-#: ../../build/src/settings.cpp:106 rc.cpp:141
+#: ../../build/src/settings.cpp:114 rc.cpp:141
 msgid "The default option of showing block information."
 msgstr "展示方块信息的默认选项。"
 
@@ -575,7 +624,7 @@ msgstr "展示所有实体(&A)"
 msgid "&List blocks"
 msgstr "列出方块(&L)"
 
-#: rc.cpp:54 rc.cpp:200
+#: rc.cpp:54 rc.cpp:201
 msgid "&Show blocks"
 msgstr "展示方块 (&S)"
 
@@ -595,115 +644,115 @@ msgstr "列出/修改调色板(&L)"
 msgid "Modify &Block"
 msgstr "修改方块(&B)"
 
-#: rc.cpp:152
+#: rc.cpp:153
 msgid "What happened in this step?"
 msgstr "在此步发生了什么？"
 
-#: rc.cpp:155
+#: rc.cpp:156
 msgid "Details"
 msgstr "细节"
 
-#: rc.cpp:158
+#: rc.cpp:159
 msgid "&Continue"
 msgstr "继续(&C)"
 
-#: rc.cpp:161
+#: rc.cpp:162
 msgid "C&ancel"
 msgstr "取消(&C)"
 
-#: rc.cpp:164
+#: rc.cpp:165
 msgid "Form"
 msgstr ""
 
-#: rc.cpp:167
+#: rc.cpp:168
 msgid "Type:"
 msgstr "类型："
 
-#: rc.cpp:170
+#: rc.cpp:171
 msgid "Key:"
 msgstr "键："
 
-#: rc.cpp:173
+#: rc.cpp:174
 msgid "Value:"
 msgstr "值："
 
-#: rc.cpp:176
+#: rc.cpp:177
 msgid "&Export"
 msgstr "导出(&E)"
 
-#: rc.cpp:179
+#: rc.cpp:180
 msgid "PushButton"
 msgstr ""
 
-#: rc.cpp:185
+#: rc.cpp:186
 msgid "PaletteAddUI"
 msgstr ""
 
-#: rc.cpp:191
+#: rc.cpp:192
 msgid "&Remove"
 msgstr "移除(&R)"
 
-#: rc.cpp:197
+#: rc.cpp:198
 msgid "PaletteListUI"
 msgstr ""
 
-#: rc.cpp:203
+#: rc.cpp:204
 msgid "Modify Property of Block(s)"
 msgstr ""
 
-#: rc.cpp:206
+#: rc.cpp:207
 msgid "Modify the property of the block in:"
 msgstr "更改在此的方块属性："
 
-#: rc.cpp:209
+#: rc.cpp:210
 msgid "With the block that is the same property"
 msgstr "以及同属性的方块"
 
-#: rc.cpp:212
+#: rc.cpp:213
 msgid "Properties:"
 msgstr ""
 
-#: rc.cpp:215
+#: rc.cpp:216
 msgid "RegionModifyUI"
 msgstr ""
 
-#: rc.cpp:218
+#: rc.cpp:219
 msgid "Modify the infomation of the Region."
 msgstr ""
 
-#: rc.cpp:221
+#: rc.cpp:222
 msgid "Create Time"
 msgstr "创建时间"
 
-#: rc.cpp:224 rc.cpp:230
+#: rc.cpp:225 rc.cpp:231
 msgid "yyyy/MM/dd HH:mm:ss.zzz"
 msgstr ""
 
-#: rc.cpp:227
+#: rc.cpp:228
 msgid "Modify Time"
 msgstr "修改时间"
 
-#: rc.cpp:233
+#: rc.cpp:234
 msgid "Description"
 msgstr "描述"
 
-#: rc.cpp:236
+#: rc.cpp:237
 msgid "Offset"
 msgstr "偏移"
 
-#: rc.cpp:239
+#: rc.cpp:240
 msgid "Author"
 msgstr "作者"
 
-#: rc.cpp:242
+#: rc.cpp:243
 msgid "Base Name"
 msgstr "基础名称"
 
-#: rc.cpp:248
+#: rc.cpp:249
 msgid "Data Version"
 msgstr "数据版本"
 
-#: rc.cpp:251
+#: rc.cpp:252
 msgid "Version"
 msgstr "版本"
 
@@ -957,6 +1006,10 @@ msgstr "默认"
 msgid "Game"
 msgstr "游戏"
 
+#~ msgid "Unknown!"
+#~ msgstr "未知！"
+
+#, qt-format
 #~ msgid "**%1** try's fail message: %2"
 #~ msgstr "**%1**尝试的错误信息：%2"
 
@@ -1297,9 +1350,6 @@ msgstr "游戏"
 
 #~ msgid "Config settings"
 #~ msgstr "配置设置"
-
-#~ msgid "Cache Directory"
-#~ msgstr "缓存目录"
 
 #~ msgid "Override Language"
 #~ msgstr "覆盖语言"

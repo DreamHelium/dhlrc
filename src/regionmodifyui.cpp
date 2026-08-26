@@ -1,6 +1,7 @@
 #include "regionmodifyui.h"
 
 #include "manageregionui.h"
+#include "resourcegetter.h"
 #include "ui_regionmodifyui.h"
 #include "utility.h"
 #include <QLineEdit>
@@ -16,9 +17,8 @@
       close ();                                                               \
     }
 
-RegionModifyUI::RegionModifyUI (void* region, QWidget *parent)
-    : QWidget (parent), ui (new Ui::RegionModifyUI),
-      region (region)
+RegionModifyUI::RegionModifyUI (void *region, QWidget *parent)
+    : QWidget (parent), ui (new Ui::RegionModifyUI), region (region)
 {
   ui->setupUi (this);
   connect (ui->spinBox, &QSpinBox::valueChanged, this,
@@ -78,9 +78,7 @@ RegionModifyUI::okBtn_clicked ()
 void
 RegionModifyUI::versionUpdate ()
 {
-  // QString str = dh::getVersion (ui->lineEdit_3->text ().toInt ());
-  // if (!str.isEmpty ())
-  //   ui->versionLabel->setText (str);
-  // else
-  ui->versionLabel->setText (_ ("Unknown!"));
+  auto list = get_version_list ();
+  QString str = list->value (ui->spinBox->text ().toInt (), _ ("Unknown"));
+  ui->versionLabel->setText (str);
 }

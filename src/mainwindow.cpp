@@ -6,7 +6,9 @@
 #include <memory>
 #include <qboxlayout.h>
 #include <qcombobox.h>
+#include <qdesktopservices.h>
 #include <qdialog.h>
+#include <qfiledialog.h>
 #include <qglobalstatic.h>
 #include <qnamespace.h>
 #include <qobject.h>
@@ -23,6 +25,7 @@
 #include "settings.h"
 #include "utility.h"
 #include <QComboBox>
+#include <QDesktopServices>
 #include <QLineEdit>
 #include <QResizeEvent>
 #include <QSortFilterProxyModel>
@@ -106,6 +109,47 @@ public:
   }
 };
 
+class DhDirectoryConfigTemplate : public DhStringConfigTemplate
+{
+public:
+  explicit DhDirectoryConfigTemplate (KConfigSkeletonItem *item,
+                                      QVBoxLayout *layout,
+                                      DhConfigDialog *dialog)
+      : DhStringConfigTemplate (item, layout, dialog)
+  {
+    auto openBtn = new QPushButton ();
+    openBtn->setIcon (QIcon::fromTheme ("folder-open"));
+    auto selectBtn = new QPushButton ();
+    selectBtn->setIcon (QIcon::fromTheme ("edit-select"));
+
+    hLayout->addWidget (openBtn);
+    hLayout->addWidget (selectBtn);
+    QObject::connect (openBtn, &QPushButton::clicked,
+                      [item]
+                        {
+                          auto dir = item->property ().toString ();
+                          QDesktopServices::openUrl (dir);
+                        });
+    QObject::connect (selectBtn, &QPushButton::clicked,
+                      [item, dialog]
+                        {
+                          auto oldDir = item->property ().toString ();
+                          auto dir = QFileDialog::getExistingDirectory (
+                              dialog, _ ("Select Cache Directory"), oldDir);
+                          if (!dir.isEmpty ())
+                            {
+                              item->setProperty (dir);
+                              DhConfig::self ()->save ();
+                            }
+                        });
+  };
+};
+
+template <typename T>
+auto genTemplate =
+    [] (KConfigSkeletonItem *item, QVBoxLayout *layout, DhConfigDialog *dialog)
+  { return std::make_unique<T> (item, layout, dialog); };
+
 MainWindow::MainWindow (QWidget *parent) : QMainWindow (parent)
 {
   mainWindow = this;
@@ -183,13 +227,10 @@ MainWindow::MainWindow (QWidget *parent) : QMainWindow (parent)
   listView->setModel (proxyModel);
 
   dialog = new DhConfigDialog (DhConfig::self (), "dhlrcrc", true, this);
-  dialog->addTemplateByItem (
-      DhConfig::self ()->defaultShowOptionItem (),
-      [] (KConfigSkeletonItem *item, QVBoxLayout *layout,
-          DhConfigDialog *dialog)
-        {
-          return std::make_unique<DhEnumConfigTemplate> (item, layout, dialog);
-        });
+  dialog->addTemplateByItem (DhConfig::self ()->defaultShowOptionItem (),
+                             genTemplate<DhEnumConfigTemplate>);
+  dialog->addTemplateByItem (DhConfig::self ()->cacheDirectoryItem (),
+                             genTemplate<DhDirectoryConfigTemplate>);
   dialog->addAssistant (std::make_unique<DhSetConfigAssistant> ());
   dialog->addLongTextItems ("Description");
 

@@ -9,6 +9,7 @@
 #include <blocklistui.h>
 #include <blockshowui.h>
 #include <generalchoosedialog.h>
+#include <kmessagewidget.h>
 #include <mainwindow.h>
 #include <memory>
 #include <nbtreaderui.h>
@@ -16,6 +17,7 @@
 #include <qnamespace.h>
 #include <qobject.h>
 #include <qpushbutton.h>
+#include <qtimer.h>
 #include <qvalidator.h>
 #include <region.h>
 #include <utility.h>
@@ -43,14 +45,27 @@ BlockReaderUI::BlockReaderUI (int index,
                QPointer<BlockReaderUI> pointer = this;
                auto selfDownloader = downloader;
                auto realVersion = this->version;
-               co_await download_manifest (*selfDownloader);
                auto path = co_await download_object (
                    *selfDownloader, realVersion, "minecraft/lang/zh_cn.json");
                if (!pointer.isNull ())
                  {
-                   pointer->objectPath = path;
-                   Q_EMIT pointer->finishLoadingTranslation ();
-                   Q_EMIT pointer->changeVal (100);
+                   if (path.has_value ())
+                     {
+                       pointer->objectPath = path.value ();
+                       Q_EMIT pointer->finishLoadingTranslation ();
+                       Q_EMIT pointer->changeVal (100);
+                     }
+                   else
+                     {
+                       auto message = new KMessageWidget (path.error ());
+                       message->setMessageType (KMessageWidget::Error);
+                       pointer->ui->verticalLayout->insertWidget (0, message);
+                       connect (message,
+                                &KMessageWidget::hideAnimationFinished,
+                                message, &KMessageWidget::deleteLater);
+                       QTimer::singleShot (5000, message,
+                                           &KMessageWidget::animatedHide);
+                     }
                  }
              });
   Q_EMIT start ();
@@ -243,18 +258,13 @@ BlockReaderUI::setText ()
   str += _ ("Description: %10");
 
   auto list = get_version_list ();
-  QString data_name;
-  for (const auto &[name, version] : list)
-    {
-      if (version == data_version)
-        data_name = name;
-    }
+  QString data_name = list->value (version, _ ("Unknown"));
 
   QString sizeStr = str.arg (x)
                         .arg (y)
                         .arg (z)
                         .arg (data_version)
-                        .arg (data_name.isEmpty () ? _ ("Unknown") : data_name)
+                        .arg (data_name)
                         .arg (dh::getDateTimeFromTimeStamp (create_timestamp)
                                   .toString ("yyyy/MM/dd HH:mm:ss.zzz"))
                         .arg (dh::getDateTimeFromTimeStamp (modify_timestamp)

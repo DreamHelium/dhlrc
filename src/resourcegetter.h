@@ -2,11 +2,13 @@
 #define RESOURCEGETTER_H
 
 #include <curl/curl.h>
+#include <expected>
 #include <optional>
 #include <qcorotask.h>
 #include <qnetworkreply.h>
 #include <qobject.h>
 
+using VersionMap = QMap<int, QString>;
 class DhDownloader : public QObject
 {
   Q_OBJECT
@@ -20,13 +22,12 @@ Q_SIGNALS:
   void info (const QString &);
 
 public Q_SLOTS:
-  QCoro::Task<std::optional<QString>> download (const QString &url,
-                                                const QString &dest,
-                                                const QString &infoSend = {});
-  QCoro::Task<std::optional<QString>> download (const QString &url,
-                                                const QString &dest,
-                                                bool overwrite,
-                                                const QString &infoSend = {});
+  QCoro::Task<std::expected<QString, QString>>
+  download (const QString &url, const QString &dest,
+            const QString &infoSend = {}, bool *isOverwrittern = nullptr);
+  QCoro::Task<std::expected<QString, QString>>
+  download (const QString &url, const QString &dest, bool overwrite,
+            const QString &infoSend = {});
   void stop ();
   /* One should use this to terminate the usage of the Downloader and delete
    * it. */
@@ -40,17 +41,22 @@ private:
   bool finished = false;
 };
 
-QCoro::Task<> download_manifest (DhDownloader &downloader);
-QList<std::pair<QString, int>> get_version_list ();
-QList<std::pair<QString, QString>> get_manifest_url_list ();
-QString get_manifest_url (const QString &id);
-QString get_manifest_url (int version);
-QCoro::Task<QString> download_manifest_index_json (DhDownloader &downloader,
-                                                   int version);
-QCoro::Task<QString> download_asset_index (DhDownloader &downloader,
-                                           int version);
-QCoro::Task<QString> download_object (DhDownloader &downloader, int version,
-                                      const QString &object);
+QCoro::Task<std::expected<QString, QString>>
+download_manifest (DhDownloader &downloader, bool *isOverwrittern = nullptr);
+const VersionMap *get_version_list ();
+/** If there's no error, nothing returned. */
+QCoro::Task<std::optional<QString>>
+get_manifest_url_list (DhDownloader &downloader);
+QCoro::Task<std::expected<QString, QString>>
+get_manifest_url (const QString &id, DhDownloader &downloader);
+QCoro::Task<std::expected<QString, QString>>
+get_manifest_url (int version, DhDownloader &downloader);
+QCoro::Task<std::expected<QString, QString>>
+download_manifest_index_json (DhDownloader &downloader, int version);
+QCoro::Task<std::expected<QString, QString>>
+download_asset_index (DhDownloader &downloader, int version);
+QCoro::Task<std::expected<QString, QString>>
+download_object (DhDownloader &downloader, int version, const QString &object);
 QString get_translation_from_object (const QString &path, const QString &name);
 
 #endif /* RESOURCEGETTER_H */

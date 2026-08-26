@@ -384,7 +384,7 @@ DhAllLoadJob::DhAllLoadJob (QStringList list, QObject *parent)
                        failedWidget->setText (failedText);
                        failedWidget->setTextFormat (Qt::MarkdownText);
                        QTimer::singleShot (5000, failedWidget,
-                                           &KMessageWidget::deleteLater);
+                                           &KMessageWidget::animatedHide);
                      }
                    removeSubjob (finishedJob);
                    ManageRegionUI::notify ();
