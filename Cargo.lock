@@ -254,12 +254,23 @@ dependencies = [
 ]
 
 [[package]]
+name = "nbt-component"
+version = "0.1.0"
+dependencies = [
+ "cesu8",
+ "common-rs",
+ "gettext-rs",
+ "sysinfo",
+ "zuri_nbt 0.5.0",
+]
+
+[[package]]
 name = "nbt-to-vec"
 version = "0.1.0"
 dependencies = [
  "common-rs",
  "crab-nbt-ext",
- "zuri_nbt",
+ "zuri_nbt 0.4.0",
 ]
 
 [[package]]
@@ -828,6 +839,17 @@ name = "zuri_nbt"
 version = "0.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "393fc1bce87b20139f1310a3846998795124b1e48476a7f53e9e672c5f276166"
+dependencies = [
+ "strum",
+ "strum_macros",
+ "thiserror 1.0.69",
+]
+
+[[package]]
+name = "zuri_nbt"
+version = "0.5.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9b79cc49a617e57f1b1a964ab4d8ca82e01b7f1ed637be96bb3c300860252637"
 dependencies = [
  "strum",
  "strum_macros",

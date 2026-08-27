@@ -35,6 +35,8 @@ add_custom_target(dhlrc_cargo_build ALL
 set(DHLRC_BUILD_LIBRARIES
   ${CARGO_TARGET_DIR}/${CARGO_TYPE}/${CARGO_LIB_PREFIX}region_rs${CARGO_LIB_SUFFIX}
   ${CARGO_TARGET_DIR}/${CARGO_TYPE}/${CARGO_LIB_PREFIX}nbt_to_vec${CARGO_LIB_SUFFIX})
+set(DHLRC_LOAD_LIBRARIES
+  ${CARGO_TARGET_DIR}/${CARGO_TYPE}/${CARGO_LIB_PREFIX}nbt_component${CARGO_LIB_SUFFIX})
 set(DHLRC_MODULE_LIBRARIES
   ${CARGO_TARGET_DIR}/${CARGO_TYPE}/${CARGO_LIB_PREFIX}region_nbt_rs${CARGO_LIB_SUFFIX}
   ${CARGO_TARGET_DIR}/${CARGO_TYPE}/${CARGO_LIB_PREFIX}region_litematic_rs${CARGO_LIB_SUFFIX})
@@ -45,6 +47,14 @@ add_custom_command(
 )
 add_custom_command(
   COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_BINARY_DIR}/region_module
+  TARGET dhlrc_cargo_build POST_BUILD
+)
+add_custom_command(
+  COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_BINARY_DIR}/load_module
+  TARGET dhlrc_cargo_build POST_BUILD
+)
+add_custom_command(
+  COMMAND ${CMAKE_COMMAND} -E copy ${DHLRC_LOAD_LIBRARIES} ${CMAKE_BINARY_DIR}/load_module
   TARGET dhlrc_cargo_build POST_BUILD
 )
 add_custom_command(
@@ -64,7 +74,7 @@ find_package(PkgConfig)
 
 #pkg_search_module(LUA REQUIRED lua)
 
-set(DH_ENABLE_DEBUG OFF)
+set(DH_ENABLE_DEBUG ON)
 if(DH_ENABLE_DEBUG)
   add_definitions(-DDH_DEBUG_IN_IDE)
 endif()

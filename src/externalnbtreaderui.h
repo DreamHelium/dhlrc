@@ -8,6 +8,7 @@
 #include <QPushButton>
 #include <QVBoxLayout>
 #include <QWidget>
+#include <qlibrary.h>
 
 class ExternalNbtReaderUI : public QWidget
 {
@@ -37,6 +38,7 @@ private:
   QHBoxLayout *hLayout;
   QLabel *label;
   KMessageWidget *messageWidget;
+  QLibrary *library;
 };
 
 #endif // DHLRC_EXTERNALNBTREADERUI_H

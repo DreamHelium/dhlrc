@@ -6,6 +6,7 @@
 #include <QMessageBox>
 #include <libintl.h>
 #include <qevent.h>
+#include <qlibrary.h>
 #include <qmimedata.h>
 #define _(str) gettext (str)
 #undef asprintf
@@ -16,6 +17,7 @@ ExternalNbtReaderUI::ExternalNbtReaderUI (QWidget *parent) : QWidget (parent)
   resize (500, 500);
   setAcceptDrops (true);
   layout = new QVBoxLayout (this);
+  library = new QLibrary ("./load_module/libnbt_component.so");
 
   messageWidget = new KMessageWidget ();
   messageWidget->setIcon (QIcon::fromTheme ("dialog-warning"));
@@ -94,9 +96,12 @@ ExternalNbtReaderUI::dropEvent (QDropEvent *event)
     }
   filename = filelist.at (0);
   char *failMessage = nullptr;
-  nbt = file_to_nbt_vec (filename.toUtf8 ().constData (), progressFn, this,
-                         &failMessage, DhConfig::elapsedMilliseconds (),
-                         DhConfig::memoryLimit ());
+  using Func = void *(*)(const char *filename, ProgressFunc progress_func,
+                         void *main_klass, char **error_message,
+                         uint64_t elapsed_millisecs, uint64_t free_memory);
+  auto func = reinterpret_cast<Func> (library->resolve ("file_to_nbt_vec"));
+  nbt = func (filename.toUtf8 ().constData (), progressFn, this, &failMessage,
+              DhConfig::elapsedMilliseconds (), DhConfig::memoryLimit ());
   QString realFailMessage = failMessage;
   string_free (failMessage);
   if (nbt)

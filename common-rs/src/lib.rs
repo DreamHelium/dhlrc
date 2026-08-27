@@ -1,11 +1,11 @@
 use std::ffi::{c_char, c_int, c_void};
 
-pub mod tree_value;
 pub mod cancel_flag;
-pub mod util;
 pub mod i18n;
 pub mod my_error;
 pub mod region;
+pub mod tree_value;
+pub mod util;
 
 pub type ProgressFn = Option<
     extern "C" fn(

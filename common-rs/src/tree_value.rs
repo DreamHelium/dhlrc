@@ -1,10 +1,10 @@
+use crate::i18n::i18n;
+use crate::util::string_to_ptr_fail_to_null;
 use std::ffi::c_char;
 use std::ptr;
 use std::ptr::null;
-use crate::i18n::i18n;
-use crate::util::string_to_ptr_fail_to_null;
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 #[repr(i32)]
 pub enum TreeValue {
     Byte(i8) = 1,

@@ -105,8 +105,8 @@ pub fn real_show_progress(
 
 #[macro_export]
 macro_rules! show_progress_macro {
-    ($time : expr, $sys : expr, $progress_fn : ident, $main_klass : ident, $percentage : expr,
-     $elapsed_ms : ident, $free_memory : ident, $str : expr, $cancel_flag : ident, $err_msg : expr ) => {
+    ($time : expr, $sys : expr, $progress_fn : expr, $main_klass : expr, $percentage : expr,
+     $elapsed_ms : expr, $free_memory : expr, $str : expr, $cancel_flag : expr, $err_msg : expr ) => {
         if $time.elapsed().as_millis() >= $elapsed_ms {
             if unsafe { cancel_flag_is_cancelled($cancel_flag) == 1 } {
                 return Err(Box::new(MyError {
