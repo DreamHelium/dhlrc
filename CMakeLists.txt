@@ -74,7 +74,7 @@ find_package(PkgConfig)
 
 #pkg_search_module(LUA REQUIRED lua)
 
-set(DH_ENABLE_DEBUG ON)
+set(DH_ENABLE_DEBUG OFF)
 if(DH_ENABLE_DEBUG)
   add_definitions(-DDH_DEBUG_IN_IDE)
 endif()
