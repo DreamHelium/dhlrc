@@ -60,7 +60,6 @@ set(TEMP_PROJECT_SOURCES
         dhtreefilter.cpp dhtreefilter.h
         externalnbtreaderui.cpp
         externalnbtreaderui.h
-        nbtvec.h
         dhgameconfigui.h
         saveregionui.h saveregionui.cpp
         configobjectui.cpp
@@ -114,7 +113,7 @@ endif ()
 
 target_link_libraries(dhlrc_qt PRIVATE Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::Svg
  KF6::ColorScheme QCoro::Core QCoro::Network
- KF6::ConfigWidgets KF6::I18n KF6::I18nLocaleData region_rs Qt6::Concurrent nbt_to_vec ${Intl_LIBRARIES}
+ KF6::ConfigWidgets KF6::I18n KF6::I18nLocaleData region_rs Qt6::Concurrent ${Intl_LIBRARIES}
  dhconfigdialog KF6::WidgetsAddons KF6::CoreAddons KF6::IconThemes Qt6::StateMachine)
 target_link_directories(dhlrc_qt PRIVATE ${CMAKE_BINARY_DIR})
 target_include_directories(dhlrc_qt PUBLIC

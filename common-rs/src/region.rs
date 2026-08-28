@@ -1,6 +1,6 @@
-use crate::tree_value::TreeValue;
 use std::error::Error;
 use time::{Duration, UtcDateTime};
+use zuri_nbt::tag::Compound;
 
 pub struct BaseData {
     /** Default: time of generated */
@@ -73,7 +73,7 @@ pub struct Palette {
 
 pub struct BlockEntity {
     pub pos: (i32, i32, i32),
-    pub entity: Vec<(String, TreeValue)>,
+    pub entity: Compound,
     pub index: usize,
 }
 
@@ -89,8 +89,8 @@ pub struct Region {
     pub block_array: Vec<u32>,
     /** The block entity array */
     pub block_entity_array: Vec<BlockEntity>,
-    /** Entity array, use TreeValue::Compound */
-    pub entity_array: Vec<Vec<(String, TreeValue)>>,
+    /** Entity array, use Compound */
+    pub entity_array: Vec<Compound>,
     /** The Palette info array*/
     pub palette_array: Vec<Palette>,
 }

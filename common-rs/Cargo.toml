@@ -6,3 +6,4 @@ edition = "2024"
 [dependencies]
 sysinfo = "0.38.1"
 time = "0.3.44"
+zuri_nbt = "0.5.0"

@@ -5,8 +5,6 @@ edition = "2024"
 #links = "region_rs"
 
 [dependencies]
-crab_nbt = "0.2.11"
-crab-nbt-ext = { path = "../crab-nbt-ext" }
 formatx = "0.2.4"
 common-rs = { path = "../common-rs" }
 sysinfo = "0.38.1"

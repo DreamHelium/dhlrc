@@ -1,5 +1,5 @@
+use crate::cancel_flag::cancel_flag_is_cancelled;
 use crate::{ProgressFn, cstr_to_str};
-use common_rs::cancel_flag::cancel_flag_is_cancelled;
 use common_rs::i18n::i18n;
 use common_rs::my_error::MyError;
 use common_rs::show_progress_macro;

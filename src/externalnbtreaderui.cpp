@@ -1,6 +1,5 @@
 #include "externalnbtreaderui.h"
-#include "../src-qml/region.h"
-#include "nbtvec.h"
+#include "region.h"
 #include "settings.h"
 
 #include <QMessageBox>
@@ -18,7 +17,11 @@ ExternalNbtReaderUI::ExternalNbtReaderUI (QWidget *parent) : QWidget (parent)
   setAcceptDrops (true);
   layout = new QVBoxLayout (this);
   library = new QLibrary ("./load_module/libnbt_component.so");
-
+  qDebug () << reinterpret_cast<void *> (
+      library->resolve ("region_get_object"));
+  qDebug () << reinterpret_cast<void *> (
+      QLibrary ("./libnbt_to_vec.so").resolve ("region_get_object"));
+  // qDebug () << reinterpret_cast<void *> (&region_get_object);
   messageWidget = new KMessageWidget ();
   messageWidget->setIcon (QIcon::fromTheme ("dialog-warning"));
   messageWidget->setMessageType (KMessageWidget::Warning);
@@ -53,7 +56,7 @@ ExternalNbtReaderUI::ExternalNbtReaderUI (QWidget *parent) : QWidget (parent)
 
 ExternalNbtReaderUI::~ExternalNbtReaderUI ()
 {
-  nbt_vec_free (nbt);
+  // nbt_vec_free (nbt);
   delete nrui;
 }
 
@@ -92,7 +95,7 @@ ExternalNbtReaderUI::dropEvent (QDropEvent *event)
     {
       delete nrui;
       nrui = nullptr;
-      nbt_vec_free (nbt);
+      // nbt_vec_free (nbt);
     }
   filename = filelist.at (0);
   char *failMessage = nullptr;

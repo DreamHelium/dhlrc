@@ -65,25 +65,14 @@ extern "C"
   void cancel_flag_cancel (const void *cancel_flag);
   void cancel_flag_destroy (const void *cancel_flag);
   const void *cancel_flag_clone (const void *cancel_flag);
+  void *helper_struct_new (ProgressFunc progress_func, void *main_klass,
+                           const void *cancel_flag, uint64_t elapsed_millisecs,
+                           uint64_t free_memory);
+  void helper_struct_free (void *helper_struct);
   void *get_system_info_object ();
   uint64_t get_free_memory (void *system);
   void system_info_object_free (void *system);
   const void *region_get_block_entity (void *region, uint32_t index);
-  size_t nbt_vec_get_len (const void *nbt);
-  const char *nbt_vec_get_key (const void *nbt, size_t index);
-  const char *nbt_vec_get_value_type (const void *nbt, size_t index);
-  const char *nbt_vec_get_value_string (const void *nbt, size_t index);
-  int32_t nbt_vec_get_value_type_int (const void *nbt, size_t index);
-  const void *nbt_vec_get_value_to_child (const void *nbt, size_t index);
-  const void *nbt_vec_get_value_list_to_child (const void *nbt, size_t index);
-  const char *nbt_tree_value_get_value_string (const void *tree_value);
-  const char *nbt_tree_value_get_type_string (const void *tree_value);
-  int32_t nbt_tree_value_get_type_int (const void *tree_value);
-  const void *nbt_vec_tree_value_get_tree_value (const void *vec,
-                                                 size_t index);
-  size_t nbt_vec_tree_value_get_len (const void *vec);
-  const void *nbt_tree_value_get_value_to_child (const void *tree_value);
-  const void *nbt_tree_value_get_value_list_to_child (const void *tree_value);
   size_t region_get_entity_len (void *region);
   const void *region_get_entity (void *region, size_t index);
   const char *region_get_entity_id (void *region, size_t index);

@@ -1,8 +1,10 @@
+use zuri_nbt::NBTTag;
+use zuri_nbt::tag::Compound;
+
 use crate::{Region, string_to_ptr_fail_to_null};
-use common_rs::tree_value::TreeValue;
 use std::ffi::c_char;
 use std::ptr;
-use std::ptr::{null, null_mut};
+use std::ptr::null;
 
 #[unsafe(no_mangle)]
 pub extern "C" fn region_get_palette_len(region: *mut Region) -> usize {
@@ -10,10 +12,7 @@ pub extern "C" fn region_get_palette_len(region: *mut Region) -> usize {
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn region_get_block_entity(
-    region: *mut Region,
-    index: u32,
-) -> *const Vec<(String, TreeValue)> {
+pub extern "C" fn region_get_block_entity(region: *mut Region, index: u32) -> *const Compound {
     let r = unsafe { &*region };
     for entity in &r.block_entity_array {
         let entity_index = region_get_index(region, entity.pos.0, entity.pos.1, entity.pos.2);
@@ -32,22 +31,18 @@ pub extern "C" fn region_get_entity_len(region: *mut Region) -> usize {
 #[unsafe(no_mangle)]
 pub extern "C" fn region_get_entity_id(region: *mut Region, index: usize) -> *const c_char {
     let entity = unsafe { &(&*region).entity_array[index] };
-    for (str, val) in entity {
-        if str == "id" {
-            return match val {
-                TreeValue::String(s) => string_to_ptr_fail_to_null(&s),
-                _ => null(),
-            };
-        }
+    let ret = entity.get_key_value("id");
+    if ret.is_some() {
+        return match ret.unwrap().1 {
+            NBTTag::String(s) => string_to_ptr_fail_to_null(s),
+            _ => null(),
+        };
     }
     null()
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn region_get_entity(
-    region: *mut Region,
-    index: usize,
-) -> *const Vec<(String, TreeValue)> {
+pub extern "C" fn region_get_entity(region: *mut Region, index: usize) -> *const Compound {
     let r = unsafe { &*region };
     ptr::from_ref(&r.entity_array[index])
 }
@@ -60,21 +55,6 @@ pub extern "C" fn region_get_palette_id_name(region: *mut Region, id: usize) -> 
     }
     let palette = &palette_array[id];
     string_to_ptr_fail_to_null(&palette.id_name)
-}
-
-/* This will create a new vector */
-#[unsafe(no_mangle)]
-pub extern "C" fn region_get_palette_property(
-    region: *mut Region,
-    index: usize,
-) -> *mut Vec<(String, String)> {
-    let palette_array = unsafe { &(*region).palette_array };
-    if palette_array.len() < index {
-        return null_mut();
-    }
-    let vec = palette_array[index].property.clone();
-    let ret = Box::new(vec);
-    Box::into_raw(ret)
 }
 
 /* It might be complicated... */

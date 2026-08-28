@@ -39,7 +39,6 @@ pub fn show_progress(
 pub fn finish_oom(system: &mut System, free_memory: u64) -> Result<(), MyError> {
     system.refresh_all();
     if system.available_memory() < free_memory {
-        println!("{}", system.free_memory());
         return Err(MyError {
             msg: i18n("Out of memory!").to_string(),
         });
@@ -107,12 +106,12 @@ pub fn real_show_progress(
 macro_rules! show_progress_macro {
     ($time : expr, $sys : expr, $progress_fn : expr, $main_klass : expr, $percentage : expr,
      $elapsed_ms : expr, $free_memory : expr, $str : expr, $cancel_flag : expr, $err_msg : expr ) => {
+        if cancel_flag_is_cancelled($cancel_flag) == 1 {
+            return Err(Box::new(MyError {
+                msg: $err_msg.to_string(),
+            }));
+        }
         if $time.elapsed().as_millis() >= $elapsed_ms {
-            if unsafe { cancel_flag_is_cancelled($cancel_flag) == 1 } {
-                return Err(Box::new(MyError {
-                    msg: $err_msg.to_string(),
-                }));
-            }
             finish_oom($sys, $free_memory)?;
             show_progress($progress_fn, $main_klass, $percentage, $str, "");
             *$time = Instant::now();
