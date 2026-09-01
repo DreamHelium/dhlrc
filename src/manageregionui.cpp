@@ -16,6 +16,7 @@
 #include <libintl.h>
 #include <qcheckbox.h>
 #include <qevent.h>
+#include <qlibrary.h>
 #include <qmimedata.h>
 
 static std::vector<ModuleBase *> moduleBaseList = {};
@@ -42,6 +43,14 @@ ManageRegionUI::ManageRegionUI (QWidget *mainWindow, QWidget *parent)
 
   using GetNameFn = const char *(*)();
   auto moduleList = QDir (moduleDir).entryList (QDir::Files);
+
+  auto loadLibrary = new QLibrary ("./load_module/libnbt_component.so");
+  auto objFreeFn
+      = reinterpret_cast<ObjFreeFunc> (loadLibrary->resolve ("object_free"));
+  auto loadObjectFn = reinterpret_cast<LoadObjectFunc> (
+      loadLibrary->resolve ("region_get_object"));
+  loadObjectList.emplace_back ("JavaNBT", loadObjectFn, objFreeFn);
+
   for (const auto &module : moduleList)
     {
       QString realDir = moduleDir + QDir::toNativeSeparators ("/") + module;
@@ -121,20 +130,6 @@ ManageRegionUI::ManageRegionUI (QWidget *mainWindow, QWidget *parent)
           get_name_and_put_into_module_base (moduleBase, baseType, baseTypeFn);
           get_name_and_put_into_module_base (moduleBase, filter, fileTypeFn);
 
-          /* Has this load method */
-          bool hasThisLoad = false;
-          for (const auto &load : loadObjectList)
-            if (load.baseType == moduleBase->baseType)
-              hasThisLoad = true;
-          if (!hasThisLoad)
-            {
-              auto objFreeFn = reinterpret_cast<ObjFreeFunc> (
-                  library->resolve ("object_free"));
-              auto loadObjectFn = reinterpret_cast<LoadObjectFunc> (
-                  library->resolve ("region_get_object"));
-              loadObjectList.emplace_back (moduleBase->baseType, loadObjectFn,
-                                           objFreeFn);
-            }
           moduleBase->module = library;
           moduleBaseList.emplace_back (moduleBase);
         }

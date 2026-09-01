@@ -1,28 +1,22 @@
+use common_rs::helper_struct::HelperStruct;
 use common_rs::i18n::i18n;
 use common_rs::my_error::MyError;
 use common_rs::region::{BlockEntity, Palette, Region};
-use common_rs::tree_value::TreeValue;
-use common_rs::util::finish_oom;
+use common_rs::util::cstr_to_str;
 use common_rs::util::show_progress;
-use common_rs::util::{real_show_progress, string_to_ptr_fail_to_null};
-use common_rs::{ProgressFn, show_progress_macro};
-use crab_nbt::{Nbt, NbtTag};
-use crab_nbt_ext::{
-    GetWithError, convert_nbt_tag_to_tree_value, convert_nbt_tag_to_tree_value_with_freemem_check,
-    convert_nbt_to_vec, get_compound, get_palette_from_nbt_tag, gettext_text,
-};
+use common_rs::util::string_to_ptr_fail_to_null;
 use formatx::formatx;
+use gettextrs::gettext;
 use std::error::Error;
-use std::ffi::{c_char, c_int, c_void};
+use std::ffi::{c_char, c_int};
 use std::ops::{Shl, Shr};
 use std::ptr::{null, null_mut};
-use std::sync::atomic::AtomicBool;
 use std::time::Instant;
 use sysinfo::System;
+use zuri_nbt::{NBTRoot, NBTTag};
 
 #[link(name = "region_rs")]
 unsafe extern "C" {
-    fn cancel_flag_is_cancelled(ptr: *const AtomicBool) -> c_int;
     fn region_new() -> *mut Region;
 }
 
@@ -61,36 +55,68 @@ pub extern "C" fn region_base_type() -> *const c_char {
     string_to_ptr_fail_to_null("JavaNBT")
 }
 
+fn init_translation_internal(path: *const c_char) -> Result<(), Box<dyn Error>> {
+    gettextrs::bindtextdomain("dhlrc", cstr_to_str(path)?)?;
+    gettextrs::textdomain("dhlrc")?;
+    Ok(())
+}
+
+#[unsafe(no_mangle)]
+pub extern "C" fn init_translation(path: *const c_char) -> *const c_char {
+    match init_translation_internal(path) {
+        Ok(_) => null(),
+        Err(e) => string_to_ptr_fail_to_null(&e.to_string()),
+    }
+}
+
+pub fn gettext_text(str: &str) -> String {
+    gettext(str)
+}
+
 #[unsafe(no_mangle)]
 pub extern "C" fn region_file_type() -> *const c_char {
     string_to_ptr_fail_to_null(&gettext_text(i18n("Litematic File (*.litematic)")))
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn region_num(region: *mut Nbt) -> i32 {
+pub extern "C" fn region_num(region: *mut NBTRoot) -> i32 {
     if !region.is_null() {
-        let real_nbt = unsafe { Box::from_raw(region) };
-        let region_nbt = real_nbt.get_compound_with_err("Regions");
+        let real_nbt = unsafe { &*region };
+        let region_nbt = real_nbt.data.view().at("Regions").compound();
         let ret;
         match region_nbt {
-            Ok(r) => ret = r.child_tags.len() as i32,
+            Ok(r) => ret = r.len() as i32,
             Err(_) => ret = 0,
         }
-        let _ = Box::into_raw(real_nbt);
         ret
     } else {
         0
     }
 }
 
+fn region_name_index_real(region: *mut NBTRoot, index: i32) -> Result<String, Box<dyn Error>> {
+    let real_nbt = unsafe { &*region };
+    let region_name = real_nbt
+        .data
+        .view()
+        .compound()?
+        .get_key_value("Regions")
+        .unwrap()
+        .1;
+    Ok(region_name
+        .view()
+        .compound()?
+        .keys()
+        .collect::<Vec<&String>>()[index as usize]
+        .clone())
+}
+
 #[unsafe(no_mangle)]
-pub extern "C" fn region_name_index(region: *mut Nbt, index: i32) -> *const c_char {
-    let real_nbt = unsafe { Box::from_raw(region) };
-    let region_name = &real_nbt.get_compound("Regions").unwrap().child_tags[index as usize]
-        .0
-        .clone();
-    let _ = Box::into_raw(real_nbt);
-    string_to_ptr_fail_to_null(&region_name)
+pub extern "C" fn region_name_index(region: *mut NBTRoot, index: i32) -> *const c_char {
+    match region_name_index_real(region, index) {
+        Ok(key) => string_to_ptr_fail_to_null(&key),
+        _ => null(),
+    }
 }
 
 fn get_bits(num: usize) -> u32 {
@@ -110,33 +136,24 @@ fn get_block_id(
     states: &Vec<i64>,
     block_num: i32,
     move_bit: u32,
-    progress_fn: ProgressFn,
-    main_klass: *mut c_void,
-    cancel_flag: *const AtomicBool,
+    helper_struct: &HelperStruct,
     sys: &mut System,
-    elapsed_millisecs: u128,
-    free_memory: u64,
+    instant: &mut Instant,
 ) -> Result<Vec<u32>, Box<dyn Error>> {
-    let mut time = Instant::now();
     let mut i = 0;
     let mut buf = vec![0; block_num as usize];
     loop {
-        show_progress_macro!(
-            &mut time,
+        helper_struct.progress(
             sys,
-            progress_fn,
-            main_klass,
+            instant,
             (i as u64 * 100 / block_num as u64) as c_int,
-            elapsed_millisecs,
-            free_memory,
             &formatx!(
                 gettext_text(i18n("Reading block id: {} / {}.")),
                 i,
                 block_num
             )?,
-            cancel_flag,
-            i18n("Cancelled when reading blocks")
-        );
+            i18n("Cancelled when reading blocks"),
+        )?;
 
         let start_bit = i as u32 * move_bit;
         let start_state = start_bit / 64;
@@ -161,46 +178,117 @@ fn get_block_id(
         buf[i] = id as u32;
         i += 1;
         if i == block_num as usize {
-            real_show_progress(
-                &mut Instant::now(),
-                &mut System::new_all(),
-                progress_fn,
-                main_klass,
+            show_progress(
+                helper_struct.progress_fn,
+                helper_struct.main_klass,
                 100,
                 i18n("Reading block finished!"),
                 "",
-                elapsed_millisecs,
-                free_memory,
-            )?;
+            );
             break;
         }
     }
     Ok(buf)
 }
 
-fn region_create_from_bytes_internal(
-    o_nbt: *mut Nbt,
-    progress_fn: ProgressFn,
-    main_klass: *mut c_void,
-    cancel_flag: *const AtomicBool,
-    index: i32,
-    elapsed_millisecs: u128,
-    free_memory: u64,
-) -> Result<*mut Region, Box<dyn Error>> {
-    let nbt = unsafe { &*o_nbt };
-    let data_version = nbt.get_int_with_err("MinecraftDataVersion")?;
-    let metadata = nbt.get_compound_with_err("Metadata")?;
-    let create_time = metadata.get_long_with_err("TimeCreated")?;
-    let modify_time = metadata.get_long_with_err("TimeModified")?;
-    let description = metadata.get_string_with_err("Description")?;
-    let author = metadata.get_string_with_err("Author")?;
-    let name = metadata.get_string_with_err("Name")?;
+macro_rules! get_value_err_return {
+    ($compound : ident, $key : expr) => {{
+        let mid_val = $compound.get_key_value($key);
+        if mid_val.is_none() {
+            return Err(Box::new(MyError {
+                msg: format!("Get key {} failed!", $key),
+            }));
+        }
+        mid_val.unwrap().1
+    }};
+}
 
-    let region_parent_nbt = nbt.get_compound_with_err("Regions")?;
-    let region_name = &region_parent_nbt.child_tags[index as usize].0;
-    let region_nbt = &region_parent_nbt.child_tags[index as usize].1;
+pub fn get_palette_from_nbt_tag(
+    palette_list: &Vec<NBTTag>,
+    helper_struct: &HelperStruct,
+    sys: &mut System,
+    instant: &mut Instant,
+) -> Result<Vec<Palette>, Box<dyn Error>> {
+    let mut palette_vec = vec![];
+    let mut i = 0;
+    let length = palette_list.len();
+    for palette in palette_list {
+        helper_struct.progress(
+            sys,
+            instant,
+            (i * 100 / length) as c_int,
+            i18n("Getting Palette."),
+            "Reading palette is cancelled!",
+        )?;
+        let internal_compound = match palette {
+            NBTTag::Compound(c) => c,
+            _ => {
+                return Err(Box::from(MyError {
+                    msg: String::from(i18n("Wrong type of palette!")),
+                }));
+            }
+        };
+        let internal_string = get_value_err_return!(internal_compound, "Name")
+            .view()
+            .string()?;
+        let properties_compound_option = internal_compound.get_key_value("Properties");
+        let mut has_option = true;
+        if properties_compound_option.is_none() {
+            has_option = false;
+        }
+        let mut ret = vec![];
+        if has_option {
+            let child = &properties_compound_option.unwrap().1.view().compound()?.0;
+
+            for (name, data) in child {
+                let real_data = match data {
+                    NBTTag::String(x) => x.0.clone(),
+                    _ => {
+                        return Err(Box::from(MyError {
+                            msg: String::from(i18n("Wrong type of property!")),
+                        }));
+                    }
+                };
+                ret.push((name.clone(), real_data.clone()));
+            }
+        }
+        palette_vec.push(Palette {
+            id_name: internal_string.to_string(),
+            property: ret,
+        });
+        i += 1;
+    }
+    Ok(palette_vec)
+}
+
+fn region_create_from_bytes_internal(
+    o_nbt: *mut NBTRoot,
+    index: i32,
+    helper_struct: &HelperStruct,
+) -> Result<*mut Region, Box<dyn Error>> {
+    let nbt = &unsafe { &*o_nbt }.data;
+    let data_version = nbt.view().at("MinecraftDataVersion").int()?;
+    let metadata = nbt.view().at("Metadata").compound()?;
+    let create_time = get_value_err_return!(metadata, "TimeCreated")
+        .view()
+        .long()?;
+    let modify_time = get_value_err_return!(metadata, "TimeModified")
+        .view()
+        .long()?;
+    let description = get_value_err_return!(metadata, "Description")
+        .view()
+        .string()?;
+    let author = get_value_err_return!(metadata, "Author").view().string()?;
+    let name = get_value_err_return!(metadata, "Name").view().string()?;
+
+    let region_parent_nbt = nbt.view().at("Regions").compound()?;
+    let region_real_vec = region_parent_nbt
+        .iter()
+        .collect::<Vec<(&String, &NBTTag)>>();
+    let region_name = region_real_vec[index as usize].0;
+    let region_nbt = region_real_vec[index as usize].1;
     let real_region_nbt = match region_nbt {
-        NbtTag::Compound(c) => c,
+        NBTTag::Compound(c) => c,
         _ => {
             return Err(Box::new(MyError {
                 msg: i18n("Wrong type of region.").to_string(),
@@ -208,102 +296,129 @@ fn region_create_from_bytes_internal(
         }
     };
 
-    let size_nbt = real_region_nbt.get_compound_with_err("Size")?;
-    let region_x = size_nbt.get_int_with_err("x")?.abs();
-    let region_y = size_nbt.get_int_with_err("y")?.abs();
-    let region_z = size_nbt.get_int_with_err("z")?.abs();
+    let size_nbt = get_value_err_return!(real_region_nbt, "Size")
+        .view()
+        .compound()?;
+    let region_x = get_value_err_return!(size_nbt, "x").view().int()?.abs();
+    let region_y = get_value_err_return!(size_nbt, "y").view().int()?.abs();
+    let region_z = get_value_err_return!(size_nbt, "z").view().int()?.abs();
 
-    let offset_nbt = real_region_nbt.get_compound_with_err("Position")?;
-    let offset_x = offset_nbt.get_int_with_err("x")?;
-    let offset_y = offset_nbt.get_int_with_err("y")?;
-    let offset_z = offset_nbt.get_int_with_err("z")?;
+    let offset_nbt = get_value_err_return!(real_region_nbt, "Position")
+        .view()
+        .compound()?;
+    let offset_x = get_value_err_return!(offset_nbt, "x").view().int()?;
+    let offset_y = get_value_err_return!(offset_nbt, "y").view().int()?;
+    let offset_z = get_value_err_return!(offset_nbt, "z").view().int()?;
 
-    let block_states = real_region_nbt.get_long_array_with_err("BlockStates")?;
+    let block_states = match get_value_err_return!(real_region_nbt, "BlockStates") {
+        NBTTag::LongArray(l) => l,
+        _ => {
+            return Err(Box::new(MyError {
+                msg: "Failed to get BlockStates".to_string(),
+            }));
+        }
+    };
 
-    let palette_list = real_region_nbt.get_list_with_err("BlockStatePalette")?;
-    let palette_vec: Vec<Palette> = get_palette_from_nbt_tag(palette_list, cancel_flag)?;
+    let palette_list = match get_value_err_return!(real_region_nbt, "BlockStatePalette") {
+        NBTTag::List(l) => &l.0,
+        _ => {
+            return Err(Box::new(MyError {
+                msg: "Failed to get BlockStatePalette".to_string(),
+            }));
+        }
+    };
+
+    let mut sys = System::new_all();
+    let mut instant = Instant::now();
+
+    let palette_vec: Vec<Palette> =
+        get_palette_from_nbt_tag(palette_list, helper_struct, &mut sys, &mut instant)?;
 
     let block_num = region_x * region_y * region_z;
     let palette_num = palette_vec.len();
     let move_bit = get_bits(palette_num - 1);
     let real_move_bit = if move_bit <= 2 { 2 } else { move_bit };
 
-    let mut sys = System::new_all();
-
     let block_ids = get_block_id(
         block_states,
         block_num,
         real_move_bit,
-        progress_fn,
-        main_klass,
-        cancel_flag,
+        helper_struct,
         &mut sys,
-        elapsed_millisecs,
-        free_memory,
+        &mut instant,
     )?;
     let blocks = block_ids;
     let mut tile_entities_vec = vec![];
-    let tile_entities_list = real_region_nbt.get_list_with_err("TileEntities")?;
-    let mut instant = Instant::now();
+    let tile_entities_list = match get_value_err_return!(real_region_nbt, "TileEntities") {
+        NBTTag::List(l) => &l.0,
+        _ => {
+            return Err(Box::new(MyError {
+                msg: i18n("Failed to get TileEntities.").to_string(),
+            }));
+        }
+    };
+
     for tile_entity in tile_entities_list {
         let real_tile_entity = match tile_entity {
-            NbtTag::Compound(c) => c,
+            NBTTag::Compound(c) => c,
             _ => {
                 return Err(Box::new(MyError {
                     msg: i18n("Wrong type of tile entity.").to_string(),
                 }));
             }
         };
-        let entity_x = real_tile_entity.get_int_with_err("x")?;
-        let entity_y = real_tile_entity.get_int_with_err("y")?;
-        let entity_z = real_tile_entity.get_int_with_err("z")?;
+        let entity_x = get_value_err_return!(real_tile_entity, "x").view().int()?;
+        let entity_y = get_value_err_return!(real_tile_entity, "y").view().int()?;
+        let entity_z = get_value_err_return!(real_tile_entity, "z").view().int()?;
         let entity_index = region_x * region_z * entity_y + region_x * entity_z + entity_x;
         let entity_id = blocks[entity_index as usize];
-        let id = real_tile_entity.get_string("id");
+        let id = real_tile_entity.get_key_value("id");
         let mut has_id: bool = true;
         let real_id = match id {
-            Some(s) => s,
+            Some(s) => s.1.view().string()?,
             None => {
                 has_id = false;
                 &palette_vec[entity_id as usize].id_name
             }
         };
-        let mut single_entity_vec = vec![];
-        for (str, val) in &real_tile_entity.child_tags {
-            if str == "x" || str == "y" || str == "z" {
-                continue;
-            }
-            let tree_value = convert_nbt_tag_to_tree_value_with_freemem_check(
-                val,
-                cancel_flag,
-                &mut instant,
-                &mut sys,
-                elapsed_millisecs,
-                free_memory,
-            )?;
-            single_entity_vec.push((str.to_string(), tree_value));
-        }
+        let mut clone_real_tile_entity = real_tile_entity.clone();
+        clone_real_tile_entity.0.remove("x");
+        clone_real_tile_entity.0.remove("y");
+        clone_real_tile_entity.0.remove("z");
+
         if !has_id {
-            single_entity_vec.push(("id".to_string(), TreeValue::String(real_id.to_string())));
+            clone_real_tile_entity.insert(
+                "id".to_string(),
+                NBTTag::String(zuri_nbt::tag::String(real_id.to_string())),
+            );
         }
         let block_entity = BlockEntity {
             pos: (entity_x, entity_y, entity_z),
-            entity: single_entity_vec,
+            entity: clone_real_tile_entity,
             index: entity_index as usize,
         };
         tile_entities_vec.push(block_entity);
     }
     let mut entities_vec = vec![];
-    let entities_list = real_region_nbt.get_list_with_err("Entities")?;
-    for entity in entities_list {
-        if unsafe { cancel_flag_is_cancelled(cancel_flag) } == 1 {
-            return Err(Box::from(MyError {
-                msg: String::from(i18n("Reading entities is cancelled!")),
+    let entities_list = match get_value_err_return!(real_region_nbt, "Entities") {
+        NBTTag::List(l) => &l.0,
+        _ => {
+            return Err(Box::new(MyError {
+                msg: i18n("Failed to get Entities.").to_string(),
             }));
         }
-        get_compound!(internal_entity, entity, i18n("Wrong type of entity!"));
-        let value = convert_nbt_to_vec(internal_entity);
-        entities_vec.push(value);
+    };
+    for entity in entities_list {
+        let internal_entity = match entity {
+            NBTTag::Compound(c) => c,
+            _ => {
+                return Err(Box::new(MyError {
+                    msg: i18n("Failed to get internal Entity.").to_string(),
+                }));
+            }
+        }
+        .clone();
+        entities_vec.push(internal_entity);
     }
 
     let mut region = unsafe { Box::from_raw(region_new()) };
@@ -326,27 +441,15 @@ fn region_create_from_bytes_internal(
 
 #[unsafe(no_mangle)]
 pub extern "C" fn region_create_from_file_as_index(
-    nbt: *mut Nbt,
-    progress_fn: ProgressFn,
+    nbt: *mut NBTRoot,
     region: *mut *mut Region,
-    main_klass: *mut c_void,
-    cancel_flag: *const AtomicBool,
     index: i32,
-    elapsed_millisecs: u64,
-    free_memory: u64,
+    helper_struct: *mut HelperStruct,
 ) -> *const c_char {
     let mut err_string: String = String::new();
     if !region.is_null() {
         unsafe {
-            *region = match region_create_from_bytes_internal(
-                nbt,
-                progress_fn,
-                main_klass,
-                cancel_flag,
-                index,
-                elapsed_millisecs as u128,
-                free_memory,
-            ) {
+            *region = match region_create_from_bytes_internal(nbt, index, &*helper_struct) {
                 Ok(ret) => ret,
                 Err(err) => {
                     err_string = err.to_string();
@@ -362,9 +465,4 @@ pub extern "C" fn region_create_from_file_as_index(
     } else {
         null()
     }
-}
-
-#[unsafe(no_mangle)]
-pub extern "C" fn object_free(object: *mut Nbt) {
-    drop(unsafe { Box::from_raw(object) });
 }

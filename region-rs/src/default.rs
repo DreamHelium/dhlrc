@@ -61,9 +61,3 @@ pub extern "C" fn init_default_strings(
     *LazyLock::force(&DEFAULT_DESCRIPTION).lock().unwrap() =
         cstr_to_str(new_description).unwrap_or_else(|_err| "".to_string());
 }
-
-#[unsafe(no_mangle)]
-pub extern "C" fn reset_default_description(new_description: *const c_char) {
-    let mut real_s = DEFAULT_DESCRIPTION.lock().unwrap();
-    *real_s = cstr_to_str(new_description).unwrap_or_else(|_err| "".to_string());
-}

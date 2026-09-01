@@ -27,9 +27,7 @@ using MultiTransFunc = const char *(*)(void *, size_t, const char *);
 using SingleTransFunc
     = const char *(*)(void *, const char *, void *, ProgressFunc, void *,
                       const void *, quint64, quint64);
-using LoadObjectFunc
-    = const char *(*)(void *, ProgressFunc, void *, const void *, void **,
-                      quint64, quint64);
+using LoadObjectFunc = const char *(*)(VecU8 *, void **, HelperStruct *);
 using ObjFreeFunc = void (*) (void *);
 
 using LoadObjectBase = struct LoadObjectBase
@@ -65,8 +63,7 @@ class MultiModuleBase : public ModuleBase
 public:
   using NumFunc = int32_t (*) (void *);
   using NameFunc = const char *(*)(void *, qint32);
-  using LoadFunc = const char *(*)(void *, ProgressFunc, void **, void *,
-                                   const void *, int32_t, quint64, quint64);
+  using LoadFunc = const char *(*)(void *, void **, int32_t, HelperStruct *);
   MultiTransFunc multiTransFunc;
   NumFunc numFunc;
   NameFunc nameFunc;

@@ -7,6 +7,8 @@ edition = "2024"
 formatx = "0.2.4"
 sysinfo = "0.38.1"
 common-rs = { path = "../common-rs" }
+gettext-rs = {version = "0.7.7", features = ["gettext-system"]}
+zuri_nbt = "0.5.0"
 
 [lib]
 crate-type = ["cdylib"]

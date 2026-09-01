@@ -5,6 +5,8 @@
 #include <QFileDialog>
 #include <libintl.h>
 #include <qdialog.h>
+#include <qnamespace.h>
+#include <qstandarditemmodel.h>
 #define _(str) gettext (str)
 
 NbtReaderUI::NbtReaderUI (const void *nbt, bool fromFile, QWidget *parent)
@@ -76,69 +78,86 @@ NbtReaderUI::initModel ()
 void
 NbtReaderUI::addModelTree (const void *currentNbt, QStandardItem *iroot)
 {
-  // auto len = nbt_vec_get_len (currentNbt);
-  // for (int i = 0; i < len; i++)
-  //   {
-  // auto key = nbt_vec_get_key (currentNbt, i);
-  // auto type = nbt_vec_get_value_type_int (currentNbt, i);
-  // auto valueStr = nbt_vec_get_value_string (currentNbt, i);
-  // auto typeStr = nbt_vec_get_value_type (currentNbt, i);
+  if (fromFile)
+    {
+      auto currentRoot = const_cast<NBTRoot *> (currentNbt);
+      auto item = new QStandardItem ();
+      item->setEditable (false);
+      auto key = nbt_root_get_string (currentRoot);
+      auto nextCurrent = nbt_root_to_compound (currentRoot);
+      item->setData (key, Qt::DisplayRole);
+      item->setData ("Compound", Qt::UserRole + 2);
+      item->setData ("", Qt::UserRole + 3);
+      string_free (key);
+      fromFile = false;
+      addModelTree (nextCurrent, item);
+      iroot->appendRow (item);
+      return;
+    }
+  auto len = nbt_compound_len (currentNbt);
+  for (int i = 0; i < len; i++)
+    {
+      auto key = nbt_compound_index_key (currentNbt, i);
+      auto tag = nbt_compound_index_tag (currentNbt, i);
+      auto type = nbt_tag_type_int (tag);
+      auto valueStr = nbt_tag_value (tag);
+      auto typeStr = nbt_tag_type_string (tag);
 
-  // auto item = new QStandardItem ();
-  // item->setEditable (false);
-  // item->setData (key ? key : "(NULL)", Qt::DisplayRole);
-  // item->setData (typeStr, Qt::UserRole + 2);
-  // item->setData (valueStr ? valueStr : "", Qt::UserRole + 3);
+      auto item = new QStandardItem ();
+      item->setEditable (false);
+      item->setData (key ? key : "(NULL)", Qt::DisplayRole);
+      item->setData (typeStr, Qt::UserRole + 2);
+      item->setData (valueStr ? valueStr : "", Qt::UserRole + 3);
 
-  // string_free (key);
-  // string_free (valueStr);
-  // string_free (typeStr);
+      string_free (key);
+      string_free (valueStr);
+      string_free (typeStr);
 
-  // if (type == 12)
-  //   {
-  //     auto new_nbt = nbt_vec_get_value_to_child (currentNbt, i);
-  //     addModelTree (new_nbt, item);
-  //   }
-  // if (type == 11)
-  //   {
-  //     auto list = nbt_vec_get_value_list_to_child (currentNbt, i);
-  //     addModelTreeFromList (list, item);
-  //   }
-  // iroot->appendRow (item);
-  // }
+      if (type == 8)
+        {
+          auto new_nbt = nbt_tag_compound_to_compound (tag);
+          addModelTree (new_nbt, item);
+        }
+      if (type == 9)
+        {
+          auto list = nbt_tag_list_to_list (tag);
+          addModelTreeFromList (list, item);
+        }
+      iroot->appendRow (item);
+    }
 }
 
 void
 NbtReaderUI::addModelTreeFromList (const void *list, QStandardItem *iroot)
 {
-  // auto len = nbt_vec_tree_value_get_len (list);
-  // for (int i = 0; i < len; i++)
-  //   {
-  //     auto item = nbt_vec_tree_value_get_tree_value (list, i);
-  //     /* No key */
-  //     auto key = "";
-  //     auto type = nbt_tree_value_get_type_int (item);
-  //     auto typeStr = nbt_tree_value_get_type_string (item);
-  //     auto valueStr = nbt_tree_value_get_value_string (item);
+  auto len = nbt_list_len (list);
+  for (int i = 0; i < len; i++)
+    {
+      auto tag = nbt_list_index_tag (list, i);
+      /* No key */
+      auto key = "";
+      auto type = nbt_tag_type_int (tag);
+      auto valueStr = nbt_tag_value (tag);
+      auto typeStr = nbt_tag_type_string (tag);
 
-  //     auto standardItem = new QStandardItem ();
-  //     standardItem->setData (key, Qt::DisplayRole);
-  //     standardItem->setData (typeStr, Qt::UserRole + 2);
-  //     standardItem->setData (valueStr, Qt::UserRole + 3);
+      auto item = new QStandardItem ();
+      item->setData (key, Qt::DisplayRole);
+      item->setData (typeStr, Qt::UserRole + 2);
+      item->setData (valueStr, Qt::UserRole + 3);
 
-  //     string_free (valueStr);
-  //     string_free (typeStr);
+      string_free (valueStr);
+      string_free (typeStr);
 
-  //     if (type == 12)
-  //       {
-  //         auto new_nbt = nbt_tree_value_get_value_to_child (item);
-  //         addModelTree (new_nbt, standardItem);
-  //       }
-  //     if (type == 11)
-  //       {
-  //         auto new_list = nbt_tree_value_get_value_list_to_child (item);
-  //         addModelTreeFromList (new_list, standardItem);
-  //       }
-  //     iroot->appendRow (standardItem);
-  //   }
+      if (type == 8)
+        {
+          auto new_nbt = nbt_tag_compound_to_compound (tag);
+          addModelTree (new_nbt, item);
+        }
+      if (type == 9)
+        {
+          auto list = nbt_tag_list_to_list (tag);
+          addModelTreeFromList (list, item);
+        }
+      iroot->appendRow (item);
+    }
 }

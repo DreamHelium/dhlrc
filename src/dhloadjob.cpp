@@ -27,9 +27,7 @@ DhLoadJob::start ()
                 /* Loading File */
                 int failed = false;
                 auto tempVec = file_try_uncompress (
-                    filename.toUtf8 (), setFunc, this, &failed, cancel_flag,
-                    quint64 (DhConfig::elapsedMilliseconds ()),
-                    quint64 (DhConfig::memoryLimit ()));
+                    filename.toUtf8 (), helper_struct.get (), &failed);
                 if (failed)
                   {
                     auto msg = vec_to_cstr (tempVec);
@@ -37,8 +35,8 @@ DhLoadJob::start ()
                     string_free (msg);
                     throw DhLoadError (failMsg, _ ("Loading File"));
                   }
-                return std::unique_ptr<void, void (*) (void *)> (tempVec,
-                                                                 vec_free);
+                return std::unique_ptr<VecU8, void (*) (VecU8 *)> (tempVec,
+                                                                   vec_free);
               })
             .then (
                 [&] (std::unique_ptr<void, void (*) (void *)> ptr)
@@ -49,10 +47,8 @@ DhLoadJob::start ()
                     for (const auto &load : objectList)
                       {
                         void *object = nullptr;
-                        auto msg = load.loadObjectFunc (
-                            ptr.get (), setFunc, this, cancel_flag, &object,
-                            quint64 (DhConfig::elapsedMilliseconds ()),
-                            quint64 (DhConfig::memoryLimit ()));
+                        auto msg = load.loadObjectFunc (ptr.get (), &object,
+                                                        helper_struct.get ());
                         if (msg)
                           {
                             QString typeWithPrefix = _ ("Loading Object %1");
@@ -312,10 +308,8 @@ DhLoadJob::loadMultiRegion (ModuleBase *base, void *object,
   for (const auto &index : regionIndexes)
     {
       void *singleRegion = nullptr;
-      auto msg = multiBase->loadFunc (
-          object, setFunc, &singleRegion, this, cancel_flag, index,
-          quint64 (DhConfig::elapsedMilliseconds ()),
-          quint64 (DhConfig::memoryLimit ()));
+      auto msg = multiBase->loadFunc (object, &singleRegion, index,
+                                      helper_struct.get ());
       if (msg)
         {
           QString prefix = _ ("Loading region type %1");

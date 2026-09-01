@@ -2,6 +2,7 @@
 #define DHLRC_EXTERNALNBTREADERUI_H
 
 #include "nbtreaderui.h"
+#include "region.h"
 #include <KMessageWidget>
 #include <QLabel>
 #include <QProgressBar>
@@ -39,6 +40,12 @@ private:
   QLabel *label;
   KMessageWidget *messageWidget;
   QLibrary *library;
+  using GetFunc = const char *(*)(VecU8 *, NBTRoot **, HelperStruct *);
+  using FreeFunc = void (*) (NBTRoot *);
+  GetFunc getFn = nullptr;
+  FreeFunc freeFn = nullptr;
+  void freeNBT (NBTRoot *);
+  HelperStruct *helperStruct;
 };
 
 #endif // DHLRC_EXTERNALNBTREADERUI_H

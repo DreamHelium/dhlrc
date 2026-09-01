@@ -3,9 +3,11 @@
 
 #include "manageregionui.h"
 #include "region.h"
+#include "settings.h"
 #include <KCompositeJob>
 #include <QStateMachine>
 #include <condition_variable>
+#include <memory>
 #include <qexception.h>
 #include <qfuture.h>
 
@@ -58,7 +60,11 @@ class DhLoadJob : public KJob
 public:
   explicit DhLoadJob (QString &filename, const void *cancel_flag,
                       QObject *parent = nullptr)
-      : KJob (parent), filename (filename), cancel_flag (cancel_flag)
+      : KJob (parent), filename (filename), cancel_flag (cancel_flag),
+        helper_struct (helper_struct_new (setFunc, this, cancel_flag,
+                                          DhConfig::elapsedMilliseconds (),
+                                          DhConfig::memoryLimit ()),
+                       helper_struct_free)
   {
   }
   enum Reason
@@ -94,6 +100,7 @@ private:
   QList<int> regionIndexes;
   static void setFunc (void *main_klass, int value, const char *text,
                        const char *arg);
+  std::unique_ptr<HelperStruct, void (*) (HelperStruct *)> helper_struct;
   QFuture<void> future;
 
 private Q_SLOTS:

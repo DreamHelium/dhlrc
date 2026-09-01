@@ -54,21 +54,22 @@ extern "C"
                                                          const char *data);
 
   typedef void (*ProgressFunc) (void *, int, const char *, const char *);
-  void *file_try_uncompress (const char *filename, ProgressFunc progress_func,
-                             void *main_klass, int *failed,
-                             const void *cancel_flag,
-                             uint64_t elapsed_millisecs, uint64_t free_memory);
-  void vec_free (void *vec);
+  typedef void HelperStruct;
+  typedef void VecU8;
+  VecU8 *file_try_uncompress (const char *filename,
+                              HelperStruct *helper_struct, int *failed);
+  void vec_free (VecU8 *vec);
   char *vec_to_cstr (void *vec);
   const void *cancel_flag_new ();
   int cancel_flag_is_cancelled (const void *cancel_flag);
   void cancel_flag_cancel (const void *cancel_flag);
   void cancel_flag_destroy (const void *cancel_flag);
   const void *cancel_flag_clone (const void *cancel_flag);
-  void *helper_struct_new (ProgressFunc progress_func, void *main_klass,
-                           const void *cancel_flag, uint64_t elapsed_millisecs,
-                           uint64_t free_memory);
-  void helper_struct_free (void *helper_struct);
+  HelperStruct *helper_struct_new (ProgressFunc progress_func,
+                                   void *main_klass, const void *cancel_flag,
+                                   uint64_t elapsed_millisecs,
+                                   uint64_t free_memory);
+  void helper_struct_free (HelperStruct *helper_struct);
   void *get_system_info_object ();
   uint64_t get_free_memory (void *system);
   void system_info_object_free (void *system);
@@ -80,7 +81,26 @@ extern "C"
   void init_default_strings (const char *new_author, const char *new_base_name,
                              const char *new_region_name,
                              const char *new_description);
-  void reset_default_description (const char *new_description);
+
+  typedef void NBTTag;
+  typedef void NBTRoot;
+  typedef void Compound;
+  typedef void List;
+
+  const char *nbt_root_get_string (NBTRoot *root);
+  const Compound *nbt_root_to_compound (NBTRoot *root);
+  uint32_t nbt_compound_len (const Compound *compound);
+  const NBTTag *nbt_compound_index_tag (const Compound *compound,
+                                        uint32_t index);
+  const char *nbt_compound_index_key (const Compound *compound,
+                                      uint32_t index);
+  int nbt_tag_type_int (const NBTTag *tag);
+  const char *nbt_tag_type_string (const NBTTag *tag);
+  const char *nbt_tag_value (const NBTTag *tag);
+  const List *nbt_tag_list_to_list (const NBTTag *tag);
+  const Compound *nbt_tag_compound_to_compound (const NBTTag *tag);
+  uint32_t nbt_list_len (const List *list);
+  const NBTTag *nbt_list_index_tag (const List *list, uint32_t index);
 
 #ifdef __cplusplus
 }

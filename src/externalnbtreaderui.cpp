@@ -12,16 +12,27 @@
 
 ExternalNbtReaderUI::ExternalNbtReaderUI (QWidget *parent) : QWidget (parent)
 {
+  auto progressFn
+      = [] (void *main_klass, int value, const char *text, const char *arg)
+    {
+      auto klass = static_cast<ExternalNbtReaderUI *> (main_klass);
+      Q_EMIT klass->setValue (value);
+      if (!arg)
+        Q_EMIT klass->setLabel (gettext (text));
+      else
+        {
+          auto msg = QString::asprintf (gettext (text), arg);
+          Q_EMIT klass->setLabel (msg);
+        }
+    };
   setWindowTitle (_ ("NBT Reader"));
   resize (500, 500);
   setAcceptDrops (true);
   layout = new QVBoxLayout (this);
   library = new QLibrary ("./load_module/libnbt_component.so");
-  qDebug () << reinterpret_cast<void *> (
-      library->resolve ("region_get_object"));
-  qDebug () << reinterpret_cast<void *> (
-      QLibrary ("./libnbt_to_vec.so").resolve ("region_get_object"));
-  // qDebug () << reinterpret_cast<void *> (&region_get_object);
+  getFn = reinterpret_cast<GetFunc> (library->resolve ("region_get_object"));
+  freeFn = reinterpret_cast<FreeFunc> (library->resolve ("object_free"));
+
   messageWidget = new KMessageWidget ();
   messageWidget->setIcon (QIcon::fromTheme ("dialog-warning"));
   messageWidget->setMessageType (KMessageWidget::Warning);
@@ -52,11 +63,23 @@ ExternalNbtReaderUI::ExternalNbtReaderUI (QWidget *parent) : QWidget (parent)
            &QProgressBar::setValue);
   connect (this, &ExternalNbtReaderUI::setLabel, progressLabel,
            &QLabel::setText);
+  helperStruct = helper_struct_new (progressFn, this, nullptr,
+                                    DhConfig::elapsedMilliseconds (),
+                                    DhConfig::memoryLimit ());
+}
+
+void
+ExternalNbtReaderUI::freeNBT (NBTRoot *root)
+{
+  if (freeFn && nbt)
+    freeFn (root);
 }
 
 ExternalNbtReaderUI::~ExternalNbtReaderUI ()
 {
-  // nbt_vec_free (nbt);
+  freeNBT (nbt);
+  helper_struct_free (helperStruct);
+  delete messageWidget;
   delete nrui;
 }
 
@@ -69,19 +92,7 @@ ExternalNbtReaderUI::dragEnterEvent (QDragEnterEvent *event)
 void
 ExternalNbtReaderUI::dropEvent (QDropEvent *event)
 {
-  auto progressFn
-      = [] (void *main_klass, int value, const char *text, const char *arg)
-    {
-      auto klass = static_cast<ExternalNbtReaderUI *> (main_klass);
-      Q_EMIT klass->setValue (value);
-      if (!arg)
-        Q_EMIT klass->setLabel (gettext (text));
-      else
-        {
-          auto msg = QString::asprintf (gettext (text), arg);
-          Q_EMIT klass->setLabel (msg);
-        }
-    };
+
   auto urls = event->mimeData ()->urls ();
   if (urls.size () > 1)
     {
@@ -98,13 +109,22 @@ ExternalNbtReaderUI::dropEvent (QDropEvent *event)
       // nbt_vec_free (nbt);
     }
   filename = filelist.at (0);
-  char *failMessage = nullptr;
-  using Func = void *(*)(const char *filename, ProgressFunc progress_func,
-                         void *main_klass, char **error_message,
-                         uint64_t elapsed_millisecs, uint64_t free_memory);
-  auto func = reinterpret_cast<Func> (library->resolve ("file_to_nbt_vec"));
-  nbt = func (filename.toUtf8 ().constData (), progressFn, this, &failMessage,
-              DhConfig::elapsedMilliseconds (), DhConfig::memoryLimit ());
+  const char *failMessage = nullptr;
+  int failed = false;
+
+  auto vec = file_try_uncompress (filename.toUtf8 (), helperStruct, &failed);
+  if (!failed)
+    {
+      failMessage = getFn (vec, &nbt, helperStruct);
+    }
+  else
+    {
+      failMessage = vec_to_cstr (vec);
+      QString realFailMessage = failMessage;
+      string_free (failMessage);
+      messageWidget->setText (realFailMessage);
+      messageWidget->setVisible (true);
+    }
   QString realFailMessage = failMessage;
   string_free (failMessage);
   if (nbt)

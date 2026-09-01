@@ -1,18 +1,16 @@
 use cesu8::from_java_cesu8;
 use common_rs::{
-    ProgressFn,
-    helper_struct::{self, HelperStruct},
+    helper_struct::HelperStruct,
     i18n::i18n,
-    util::{cstr_to_str, finish_oom, show_progress, string_free, string_to_ptr_fail_to_null},
+    util::{cstr_to_str, show_progress, string_to_ptr_fail_to_null},
 };
 use gettextrs::gettext;
 use std::{
     any::Any,
     error::Error,
-    ffi::{CString, c_char, c_int, c_void},
+    ffi::{c_char, c_int},
     io::prelude::Read,
-    ptr::{null, null_mut},
-    sync::atomic::AtomicBool,
+    ptr::null,
     time::Instant,
 };
 use sysinfo::System;
@@ -21,23 +19,7 @@ use zuri_nbt::{
     encoding::{BigEndian, LittleEndian, NetworkLittleEndian},
     err::{NBTError, PathPart, ReadError},
     reader::{Reader, Res},
-    tag::Compound,
 };
-
-#[link(name = "region_rs")]
-unsafe extern "C" {
-    fn cancel_flag_is_cancelled(ptr: *const AtomicBool) -> c_int;
-    fn file_try_uncompress(
-        filename: *const c_char,
-        progress_fn: ProgressFn,
-        main_klass: *mut c_void,
-        failed: *mut c_int,
-        cancel_flag: *const AtomicBool,
-        elapsed_millisecs: u64,
-        free_memory: u64,
-    ) -> *mut Vec<u8>;
-    fn vec_free(vec: *mut Vec<u8>);
-}
 
 struct ReadStruct<R: Reader> {
     real_reader: R,

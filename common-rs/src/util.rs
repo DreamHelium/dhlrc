@@ -1,19 +1,21 @@
 use crate::ProgressFn;
+use crate::helper_struct::HelperStruct;
 use crate::i18n::i18n;
 use crate::my_error::MyError;
+use flate2::{Compress, Compression, FlushCompress, Status};
 use std::error::Error;
 use std::ffi::{CStr, CString, c_char, c_int, c_void};
 use std::ptr::null_mut;
 use std::time::Instant;
 use sysinfo::System;
 
-#[unsafe(no_mangle)]
-pub extern "C" fn string_free(string: *mut c_char) {
+pub fn string_free(string: *mut c_char) {
     if string.is_null() {
         return;
     }
     drop(unsafe { CString::from_raw(string) });
 }
+
 pub fn show_progress(
     progress_fn: ProgressFn,
     main_klass: *mut c_void,
@@ -44,23 +46,6 @@ pub fn finish_oom(system: &mut System, free_memory: u64) -> Result<(), MyError> 
         });
     }
     Ok(())
-}
-
-#[unsafe(no_mangle)]
-pub extern "C" fn get_system_info_object() -> *mut System {
-    Box::into_raw(Box::new(System::new_all()))
-}
-
-#[unsafe(no_mangle)]
-pub extern "C" fn get_free_memory(system: *mut System) -> u64 {
-    let sys = unsafe { &mut *system };
-    sys.refresh_memory();
-    sys.available_memory()
-}
-
-#[unsafe(no_mangle)]
-pub extern "C" fn system_info_object_free(system: *mut System) {
-    drop(unsafe { Box::from_raw(system) })
 }
 
 pub fn string_to_ptr_fail_to_null(string: &str) -> *mut c_char {
@@ -117,4 +102,56 @@ macro_rules! show_progress_macro {
             *$time = Instant::now();
         }
     };
+}
+
+pub fn vec_try_compress_real(
+    vec: *mut Vec<u8>,
+    helper_struct: &HelperStruct,
+    zlib: bool,
+) -> Result<Vec<u8>, Box<dyn Error>> {
+    let real_vec = unsafe { Box::from_raw(vec) };
+    let mut compressor;
+    if zlib {
+        compressor = Compress::new(Compression::default(), true);
+    } else {
+        compressor = Compress::new_gzip(Compression::default(), 15);
+    }
+    let mut start = Instant::now();
+    let mut pos: usize = 0;
+    let vec_size = real_vec.len();
+    let mut sys = System::new_all();
+    let mut ret = vec![];
+    loop {
+        helper_struct.progress(
+            &mut sys,
+            &mut start,
+            (pos * 100 / vec_size) as c_int,
+            i18n("Uncompressing data."),
+            i18n("The compressing operation is cancelled."),
+        )?;
+
+        let result;
+        if pos != vec_size {
+            result = compressor.compress_vec(&real_vec[pos..], &mut ret, FlushCompress::None)?;
+        } else {
+            result = compressor.compress_vec(&real_vec[pos..], &mut ret, FlushCompress::Finish)?;
+        }
+        match result {
+            Status::Ok => {}
+            Status::BufError => {
+                ret.reserve(100);
+            }
+            Status::StreamEnd => {
+                show_progress(
+                    helper_struct.progress_fn,
+                    helper_struct.main_klass,
+                    100,
+                    i18n("Uncompress finish!"),
+                    &String::new(),
+                );
+                return Ok(ret);
+            }
+        }
+        pos = compressor.total_in() as usize;
+    }
 }
