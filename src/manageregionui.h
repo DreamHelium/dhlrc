@@ -1,6 +1,7 @@
 #ifndef DHLRC_MANAGEREGIONUI_H
 #define DHLRC_MANAGEREGIONUI_H
 
+#include "dhwidget.h"
 #include "region.h"
 #include <KColorButton>
 #include <KMessageWidget>
@@ -68,7 +69,7 @@ public:
   LoadFunc loadFunc;
 };
 
-class ManageRegionUI : public QWidget
+class ManageRegionUI : public DhWidget
 {
   Q_OBJECT
 public:
@@ -86,9 +87,10 @@ public:
   static void appendRegion (void *region, const QString &name);
   static qsizetype regionNum ();
   static std::vector<std::shared_ptr<RegionClass>> &getRegions ();
-  static void notify ();
   void save (const QList<int> &list);
   bool selectButtonIsDown ();
+
+  Q_SIGNAL void regionChanged ();
 
 protected:
   void dragEnterEvent (QDragEnterEvent *event) override;
@@ -198,13 +200,13 @@ public:
         region_class (region_class_)
   {
     region_class.change_lock_status (true);
-    ManageRegionUI::notify ();
+    Q_EMIT ManageRegionUI::instance ()->regionChanged ();
   }
 
   ~AutoLocker ()
   {
     region_class.change_lock_status (false);
-    ManageRegionUI::notify ();
+    Q_EMIT ManageRegionUI::instance ()->regionChanged ();
   }
 };
 

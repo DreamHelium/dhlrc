@@ -20,7 +20,7 @@ class BlockReaderUI;
 }
 QT_END_NAMESPACE
 
-class BlockReaderUI : public QWidget
+class BlockReaderUI : public DhWidget
 {
   Q_OBJECT
 
@@ -40,7 +40,6 @@ private:
   char *large_version = nullptr;
   bool readerIsUnlocked = false;
   void *instance = nullptr;
-  void closeEvent (QCloseEvent *event) override;
   BlockShowUI *bsui = nullptr;
   const void *nbt = nullptr;
   AutoLocker locker;
@@ -50,7 +49,6 @@ private:
 
 Q_SIGNALS:
   void changeVal (int value);
-  void closeWin (QWidget *win);
   void start ();
   void finishLoadingTranslation ();
 

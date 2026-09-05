@@ -1,4 +1,5 @@
 #include "externalnbtreaderui.h"
+#include "dhwidget.h"
 #include "region.h"
 #include "settings.h"
 
@@ -10,7 +11,7 @@
 #define _(str) gettext (str)
 #undef asprintf
 
-ExternalNbtReaderUI::ExternalNbtReaderUI (QWidget *parent) : QWidget (parent)
+ExternalNbtReaderUI::ExternalNbtReaderUI (QWidget *parent) : DhWidget (parent)
 {
   auto progressFn
       = [] (void *main_klass, int value, const char *text, const char *arg)

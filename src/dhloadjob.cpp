@@ -378,7 +378,7 @@ DhAllLoadJob::DhAllLoadJob (QStringList list, QObject *parent)
                                            &KMessageWidget::animatedHide);
                      }
                    removeSubjob (finishedJob);
-                   ManageRegionUI::notify ();
+                   Q_EMIT ManageRegionUI::instance ()->regionChanged ();
                    if (!hasSubjobs ())
                      {
                        this->messageWidget->deleteLater ();

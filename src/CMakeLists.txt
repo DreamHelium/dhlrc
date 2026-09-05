@@ -75,6 +75,7 @@ set(TEMP_PROJECT_SOURCES
         dhbuttondelegate.h
         resourcegetter.h
         resourcegetter.cpp
+        dhwidget.h dhwidget.cpp
 )
 
 if(DH_ENABLE_DEBUG)

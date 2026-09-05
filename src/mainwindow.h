@@ -9,6 +9,7 @@
 #include <QTabWidget>
 #include <QVBoxLayout>
 #include <QWidget>
+#include <qevent.h>
 #include <qscrollarea.h>
 
 class MainWindow : public QMainWindow
@@ -20,6 +21,9 @@ public:
   static void addWidgetToToolBar (QWidget *widget);
   static void addWidgetToTab (QWidget *widget, const QString &title);
   static MainWindow *instance ();
+
+Q_SIGNALS:
+  void windowClosed ();
 
 private:
   QScrollArea *scrollArea;
@@ -41,6 +45,9 @@ public Q_SLOTS:
 
 public:
   bool eventFilter (QObject *object, QEvent *event) override;
+
+protected:
+  void closeEvent (QCloseEvent *event) override;
 };
 
 #endif // DHLRC_DEBUGLOADINGUI_H

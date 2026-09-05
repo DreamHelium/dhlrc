@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include "dhconfigdialog/src/dhconfigdialog.h"
+#include "dhwidget.h"
 #include "manageregionui.h"
 #include "resourcegetter.h"
 #include <kcoreconfigskeleton.h>
@@ -11,6 +12,7 @@
 #include <qdialog.h>
 #include <qfiledialog.h>
 #include <qglobalstatic.h>
+#include <qmainwindow.h>
 #include <qnamespace.h>
 #include <qobject.h>
 #include <qprogressbar.h>
@@ -277,7 +279,7 @@ MainWindow::MainWindow (QWidget *parent) : QMainWindow (parent)
                          auto tabIndex = tabWidget->addTab (
                              brui, _ ("Region Reader/Modifier"));
                          tabWidget->setCurrentIndex (tabIndex);
-                         connect (brui, &BlockReaderUI::closeWin, this,
+                         connect (brui, &BlockReaderUI::windowClosed, this,
                                   [] (QWidget *win)
                                     {
                                       for (const auto &i : *downloaderList)
@@ -328,6 +330,9 @@ MainWindow::MainWindow (QWidget *parent) : QMainWindow (parent)
            [this] (int index)
              {
                auto widget = tabWidget->widget (index);
+               connect (this, &MainWindow::windowClosed, widget,
+                        &QWidget::close);
+
                if (widget != ManageRegionUI::instance ())
                  widget->setAttribute (Qt::WA_DeleteOnClose);
                widget->setParent (nullptr);
@@ -335,6 +340,8 @@ MainWindow::MainWindow (QWidget *parent) : QMainWindow (parent)
 
                // tabWidget->removeTab (index);
              });
+  connect (this, &MainWindow::windowClosed, ManageRegionUI::instance (),
+           &ManageRegionUI::deleteLater);
 }
 
 MainWindow::~MainWindow ()
@@ -394,4 +401,11 @@ MainWindow::instance ()
     return mainWindow;
   else
     return nullptr;
+}
+
+void
+MainWindow::closeEvent (QCloseEvent *event)
+{
+  Q_EMIT windowClosed ();
+  QMainWindow::closeEvent (event);
 }

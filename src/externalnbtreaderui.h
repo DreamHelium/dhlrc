@@ -1,6 +1,7 @@
 #ifndef DHLRC_EXTERNALNBTREADERUI_H
 #define DHLRC_EXTERNALNBTREADERUI_H
 
+#include "dhwidget.h"
 #include "nbtreaderui.h"
 #include "region.h"
 #include <KMessageWidget>
@@ -11,7 +12,7 @@
 #include <QWidget>
 #include <qlibrary.h>
 
-class ExternalNbtReaderUI : public QWidget
+class ExternalNbtReaderUI : public DhWidget
 {
   Q_OBJECT
 public:

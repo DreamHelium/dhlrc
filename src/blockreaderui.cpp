@@ -1,5 +1,6 @@
 #include "blockreaderui.h"
 // #include "blocklistui.h"
+#include "dhwidget.h"
 #include "resourcegetter.h"
 #include "ui_blockreaderui.h"
 #include <QMessageBox>
@@ -33,7 +34,7 @@ set_func (void *klass, int value)
 BlockReaderUI::BlockReaderUI (int index,
                               std::shared_ptr<DhDownloader> downloader,
                               QWidget *parent)
-    : QWidget (parent), ui (new Ui::BlockReaderUI), downloader (downloader),
+    : DhWidget (parent), ui (new Ui::BlockReaderUI), downloader (downloader),
       region (ManageRegionUI::getRegions ()[index]->get_region ()),
       locker (*ManageRegionUI::getRegions ()[index])
 {
@@ -137,13 +138,6 @@ BlockReaderUI::~BlockReaderUI ()
   // delete bsui;
   // dh_info_reader_unlock (DH_TYPE_REGION, uuid.toUtf8 ());
   // g_free (large_version);
-}
-
-void
-BlockReaderUI::closeEvent (QCloseEvent *event)
-{
-  emit closeWin (this);
-  QWidget::closeEvent (event);
 }
 
 void
@@ -304,7 +298,7 @@ void
 BlockReaderUI::entityBtn_clicked ()
 {
   auto nrui = new NbtReaderUI (nbt, false);
-  connect (this, &BlockReaderUI::closeWin, nrui, &NbtReaderUI::close);
+  connect (this, &BlockReaderUI::windowClosed, nrui, &NbtReaderUI::close);
   nrui->setAttribute (Qt::WA_DeleteOnClose);
   nrui->show ();
 }
@@ -353,7 +347,7 @@ BlockReaderUI::showBtn_clicked ()
   if (!bsui)
     {
       bsui = new BlockShowUI (region, objectPath);
-      connect (this, &BlockReaderUI::closeWin, bsui, &BlockShowUI::close);
+      connect (this, &BlockReaderUI::windowClosed, bsui, &BlockShowUI::close);
       connect (this, &BlockReaderUI::finishLoadingTranslation, bsui,
                &BlockShowUI::updateUI);
     }

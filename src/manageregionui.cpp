@@ -8,6 +8,7 @@
 #include <QFileDialog>
 #include <QInputDialog>
 #include <QMessageBox>
+#include <QPointer>
 #include <QPushButton>
 #include <libintl.h>
 #include <qcheckbox.h>
@@ -17,12 +18,12 @@
 #include <qguiapplication.h>
 #include <qlibrary.h>
 #include <qmimedata.h>
+#include <stdexcept>
 
 static std::vector<ModuleBase *> moduleBaseList = {};
 static QList<LoadObjectBase> loadObjectList = {};
 static std::vector<std::shared_ptr<RegionClass>> regions = {};
-static std::vector<NotifyStruct> notifiers = {};
-static ManageRegionUI *mrui = nullptr;
+static QPointer<ManageRegionUI> mrui = nullptr;
 
 #define get_name_and_put_into_module_base(base, member, fn)                   \
   if (fn)                                                                     \
@@ -32,10 +33,11 @@ static ManageRegionUI *mrui = nullptr;
       string_free (name);                                                     \
     }
 
-ManageRegionUI::ManageRegionUI (QWidget *parent) : QWidget (parent)
+ManageRegionUI::ManageRegionUI (QWidget *parent) : DhWidget (parent)
 {
   setAcceptDrops (true);
-  notifiers.emplace_back (notify_func, this);
+  connect (this, &ManageRegionUI::regionChanged, this,
+           &ManageRegionUI::refresh_triggered);
   auto moduleDir = QApplication::applicationDirPath ();
   moduleDir += QDir::separator ();
   moduleDir += "region_module";
@@ -209,12 +211,10 @@ ManageRegionUI *
 ManageRegionUI::instance ()
 {
   if (!mrui)
-    {
-      mrui = new ManageRegionUI ();
-      connect (qApp, &QCoreApplication::aboutToQuit, mrui,
-               [] { delete mrui; });
-    }
-  return mrui;
+    mrui = new ManageRegionUI ();
+  if (!mrui.isNull ())
+    return mrui;
+  throw std::logic_error ("ManageRegionUI is NULL.");
 }
 
 std::vector<ModuleBase *>
@@ -247,13 +247,6 @@ std::vector<std::shared_ptr<RegionClass>> &
 ManageRegionUI::getRegions ()
 {
   return regions;
-}
-
-void
-ManageRegionUI::notify ()
-{
-  for (const auto &[notify_func, main_klass] : notifiers)
-    notify_func (main_klass);
 }
 
 void
@@ -341,7 +334,8 @@ ManageRegionUI::dropEvent (QDropEvent *event)
 void
 ManageRegionUI::refresh_triggered ()
 {
-  qDebug () << this;
+  if (mrui.isNull ())
+    return;
   for (auto &widget : frameLayout->children ())
     frameLayout->removeWidget (qobject_cast<QWidget *> (widget));
   for (auto &widget : itemFrames)
@@ -422,7 +416,7 @@ ItemFrame::ItemFrame (RegionClass *region, int index, ManageRegionUI *mrui,
                if (!newName.isEmpty ())
                  {
                    ManageRegionUI::getRegions ()[index]->setName (newName);
-                   ManageRegionUI::notify ();
+                   Q_EMIT ManageRegionUI::instance ()->regionChanged ();
                  }
              });
   connect (removeBtn, &QPushButton::clicked, this,
@@ -431,7 +425,7 @@ ItemFrame::ItemFrame (RegionClass *region, int index, ManageRegionUI *mrui,
                if (!ManageRegionUI::getRegions ()[index]->get_lock_status ())
                  ManageRegionUI::getRegions ().erase (
                      ManageRegionUI::getRegions ().begin () + index);
-               ManageRegionUI::notify ();
+               Q_EMIT ManageRegionUI::instance ()->regionChanged ();
              });
   connect (saveBtn, &QPushButton::clicked, this,
            [&, mrui, index] { mrui->save ({ index }); });
