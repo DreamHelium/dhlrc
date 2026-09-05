@@ -5,7 +5,6 @@
 #include "region.h"
 #include "settings.h"
 #include <KCompositeJob>
-#include <QStateMachine>
 #include <condition_variable>
 #include <memory>
 #include <qexception.h>

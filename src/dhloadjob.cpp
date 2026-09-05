@@ -1,6 +1,5 @@
 #include "dhloadjob.h"
 #include <QFuture>
-#include <exception>
 #include <libintl.h>
 #include <memory>
 #include <qobject.h>
@@ -11,8 +10,6 @@
 #include "region.h"
 #include "settings.h"
 #undef asprintf
-#include <QFinalState>
-#include <QStateMachine>
 #include <QTimer>
 #include <qfileinfo.h>
 #include <qtconcurrentrun.h>

@@ -1,7 +1,6 @@
 #ifndef RESOURCEGETTER_H
 #define RESOURCEGETTER_H
 
-#include <curl/curl.h>
 #include <expected>
 #include <optional>
 #include <qcorotask.h>

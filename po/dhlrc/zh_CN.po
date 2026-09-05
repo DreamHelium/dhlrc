@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-26 17:29+0800\n"
+"POT-Creation-Date: 2026-09-05 21:47+0800\n"
 "PO-Revision-Date: 2024-11-30 07:00+0800\n"
 "Last-Translator: dream_he <48383878+DreamHelium@users.noreply.github.com>\n"
 "Language-Team: Chinese <kde-i18n-doc@kde.org>\n"
@@ -118,13 +118,13 @@ msgstr "描述：%10"
 msgid "Unknown"
 msgstr "未知"
 
-#: ../../src/blockreaderui.cpp:295 ../../src/manageregionui.cpp:183
+#: ../../src/blockreaderui.cpp:295 ../../src/manageregionui.cpp:177
 #: ../../src/regionmodifyui.cpp:16 ../../src/saveregionui.cpp:52
 #: ../../src/utility.cpp:24 ../../src/utility.cpp:41 ../../src/utility.cpp:49
 msgid "Error!"
 msgstr "错误！"
 
-#: ../../src/blockreaderui.cpp:296 ../../common-rs/src/util.rs:44
+#: ../../src/blockreaderui.cpp:296 ../../common-rs/src/util.rs:45
 msgid "Out of memory!"
 msgstr "内存不足！"
 
@@ -168,68 +168,68 @@ msgid ""
 "![test_svg](:/cn/dh/dhlrc/show.svg)"
 msgstr ""
 
-#: ../../src/dhloadjob.cpp:38
+#: ../../src/dhloadjob.cpp:33
 msgid "Loading File"
 msgstr ""
 
-#: ../../src/dhloadjob.cpp:58
+#: ../../src/dhloadjob.cpp:51
 msgid "Loading Object %1"
 msgstr ""
 
-#: ../../src/dhloadjob.cpp:161 ../../src/dhloadjob.cpp:174
-#: ../../src/dhloadjob.cpp:321
+#: ../../src/dhloadjob.cpp:154 ../../src/dhloadjob.cpp:167
+#: ../../src/dhloadjob.cpp:312
 msgid "Loading region type %1"
 msgstr ""
 
-#: ../../src/dhloadjob.cpp:177
+#: ../../src/dhloadjob.cpp:170
 msgid "Loading progress is successful, but the file type should be %1."
 msgstr ""
 
-#: ../../src/dhloadjob.cpp:191 ../../src/dhloadjob.cpp:204
+#: ../../src/dhloadjob.cpp:184 ../../src/dhloadjob.cpp:197
 msgid "Failed when %1: %2"
 msgstr ""
 
-#: ../../src/dhloadjob.cpp:236
+#: ../../src/dhloadjob.cpp:229
 msgid "Select a Region"
 msgstr "选择一个区域"
 
-#: ../../src/dhloadjob.cpp:236 ../../src/utility.cpp:33
+#: ../../src/dhloadjob.cpp:229 ../../src/utility.cpp:33
 msgid "Please select a region."
 msgstr "请选择一个区域。"
 
-#: ../../src/dhloadjob.cpp:283
+#: ../../src/dhloadjob.cpp:276
 msgid "Not a valid multi-region module"
 msgstr ""
 
-#: ../../src/dhloadjob.cpp:284
+#: ../../src/dhloadjob.cpp:277
 msgid "Loading Region"
 msgstr ""
 
-#: ../../src/dhloadjob.cpp:298
+#: ../../src/dhloadjob.cpp:291
 msgid "Please click `Continue` to choose region(s)."
 msgstr "请点击`继续`选择区域。"
 
-#: ../../src/dhloadjob.cpp:351 ../../src/dhloadjob.cpp:358
+#: ../../src/dhloadjob.cpp:342 ../../src/dhloadjob.cpp:349
 msgid "Finish processing %1 of %2 (%3%)."
 msgstr "已结束处理了%2个中的%1个（%3%）。"
 
-#: ../../src/dhloadjob.cpp:423
+#: ../../src/dhloadjob.cpp:414
 msgid "Continue"
 msgstr "继续"
 
-#: ../../src/externalnbtreaderui.cpp:15 ../../src/mainwindow.cpp:249
+#: ../../src/externalnbtreaderui.cpp:28 ../../src/mainwindow.cpp:253
 msgid "NBT Reader"
 msgstr "NBT阅读器"
 
-#: ../../src/externalnbtreaderui.cpp:39
+#: ../../src/externalnbtreaderui.cpp:55
 msgid "Drag file to read NBT."
 msgstr "拖动文件以阅读NBT。"
 
-#: ../../src/externalnbtreaderui.cpp:83
+#: ../../src/externalnbtreaderui.cpp:99
 msgid "Error"
 msgstr "错误"
 
-#: ../../src/externalnbtreaderui.cpp:83
+#: ../../src/externalnbtreaderui.cpp:99
 msgid "Multiple files dropped!"
 msgstr "多个文件被拖入！"
 
@@ -278,80 +278,76 @@ msgstr "关闭(&C)"
 msgid "Minecraft Structure Modifier"
 msgstr "Minecraft结构修改器"
 
-#: ../../src/mainwindow.cpp:138
+#: ../../src/mainwindow.cpp:141
 msgid "Select Cache Directory"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:180
+#: ../../src/mainwindow.cpp:183
 msgid "Search..."
 msgstr "搜索……"
 
-#: ../../src/mainwindow.cpp:208
+#: ../../src/mainwindow.cpp:211
 msgid "NBT File Reader"
 msgstr "NBT文件阅读器"
 
-#: ../../src/mainwindow.cpp:209 ../../src/mainwindow.cpp:257
+#: ../../src/mainwindow.cpp:212 ../../src/mainwindow.cpp:263
 msgid "Manage Region"
 msgstr "管理Region"
 
-#: ../../src/mainwindow.cpp:210 ../../src/mainwindow.cpp:271
+#: ../../src/mainwindow.cpp:213 ../../src/mainwindow.cpp:278
 msgid "Region Reader/Modifier"
 msgstr "区域阅读器及修改器"
 
-#: ../../src/mainwindow.cpp:211
+#: ../../src/mainwindow.cpp:214
 msgid "Settings"
 msgstr "设置"
 
-#: ../../src/manageregionui.cpp:150
+#: ../../src/manageregionui.cpp:144
 msgid "&Select"
 msgstr "选择(&S)"
 
-#: ../../src/manageregionui.cpp:154 rc.cpp:189
+#: ../../src/manageregionui.cpp:148 rc.cpp:189
 msgid "&Add"
 msgstr "添加(&A)"
 
-#: ../../src/manageregionui.cpp:181
+#: ../../src/manageregionui.cpp:175
 msgid "Select Files"
 msgstr "选择文件"
 
-#: ../../src/manageregionui.cpp:184
+#: ../../src/manageregionui.cpp:178
 msgid "No file selected!"
 msgstr "没有文件被选中！"
 
-#: ../../src/manageregionui.cpp:257
+#: ../../src/manageregionui.cpp:263
 msgid "Choose Save Option"
 msgstr "选择保存选项"
 
-#: ../../src/manageregionui.cpp:258
+#: ../../src/manageregionui.cpp:264
 msgid "Choose whether format you want to save to."
 msgstr "选择你想保存的格式。"
 
-#: ../../src/manageregionui.cpp:277
+#: ../../src/manageregionui.cpp:283
 msgid "Use MultiFunc?"
 msgstr ""
 
-#: ../../src/manageregionui.cpp:278
+#: ../../src/manageregionui.cpp:284
 msgid "This type supports regions to save as one file, do you want to use it?"
 msgstr ""
 
-#: ../../src/manageregionui.cpp:291
+#: ../../src/manageregionui.cpp:297
 msgid "Select Directory"
 msgstr ""
 
-#: ../../src/manageregionui.cpp:371
+#: ../../src/manageregionui.cpp:378
 msgid "Locked!"
 msgstr "已锁定！"
 
-#: ../../src/manageregionui.cpp:411
+#: ../../src/manageregionui.cpp:418
 msgid "Input a New Name"
 msgstr ""
 
-#: ../../src/manageregionui.cpp:412
+#: ../../src/manageregionui.cpp:419
 msgid "Please input a new name for the region."
-msgstr ""
-
-#: ../../src/nbtreaderui.cpp:50
-msgid "Export NBT To ..."
 msgstr ""
 
 #: ../../src/paletteaddui.cpp:19
@@ -756,152 +752,102 @@ msgstr "数据版本"
 msgid "Version"
 msgstr "版本"
 
-#: ../../common-rs/src/tree_value.rs:36
-msgid "Byte"
-msgstr "字节"
-
-#: ../../common-rs/src/tree_value.rs:37
-msgid "Int"
-msgstr "整形"
-
-#: ../../common-rs/src/tree_value.rs:38
-msgid "Short"
-msgstr "短整形"
-
-#: ../../common-rs/src/tree_value.rs:39
-msgid "Long"
-msgstr "长整形"
-
-#: ../../common-rs/src/tree_value.rs:40
-msgid "Byte Array"
-msgstr "字节数组"
-
-#: ../../common-rs/src/tree_value.rs:41
-msgid "Long Array"
-msgstr "长数组"
-
-#: ../../common-rs/src/tree_value.rs:42
-msgid "String"
-msgstr "字符串"
-
-#: ../../common-rs/src/tree_value.rs:43
-msgid "Float"
-msgstr "浮点型"
-
-#: ../../common-rs/src/tree_value.rs:44
-msgid "Double"
-msgstr "双浮点型"
-
-#: ../../common-rs/src/tree_value.rs:45
-msgid "Int Array"
-msgstr "整形数组"
-
-#: ../../common-rs/src/tree_value.rs:46
-msgid "List"
-msgstr "列表"
-
-#: ../../common-rs/src/tree_value.rs:47
-msgid "Compound"
-msgstr "集合"
-
-#: ../../common-rs/src/util.rs:79
+#: ../../common-rs/src/util.rs:63
 msgid "Null pointer detected"
 msgstr "检测到空指针"
 
-#: ../../crab-nbt-ext/src/lib.rs:70 ../../region-litematic-rs/src/lib.rs:358
+#: ../../common-rs/src/util.rs:129 ../../region-rs/src/file.rs:63
+msgid "Uncompressing data."
+msgstr "解压数据中。"
+
+#: ../../common-rs/src/util.rs:130
+msgid "The compressing operation is cancelled."
+msgstr ""
+
+#: ../../common-rs/src/util.rs:149 ../../region-rs/src/file.rs:79
+msgid "Uncompress finish!"
+msgstr "解压完成！"
+
+#: ../../nbt-component/src/lib.rs:51
+msgid "Loading NBT"
+msgstr ""
+
+#: ../../nbt-component/src/lib.rs:52
+msgid "Operation canceled!"
+msgstr ""
+
+#: ../../nbt-component/src/lib.rs:132 ../../region-litematic-rs/src/lib.rs:461
 #: ../../region-nbt-rs/src/lib.rs:358
 msgid "Region value not provided"
 msgstr "结构值未提供"
 
-#: ../../crab-nbt-ext/src/lib.rs:95
-#, rust-format
-msgid "Couldn't get compound of {}."
-msgstr "无法获取到{}的集合。"
+#: ../../nbt-component/src/lib.rs:192
+msgid "BigEndian Try's Error Message: "
+msgstr ""
 
-#: ../../crab-nbt-ext/src/lib.rs:106
-#, rust-format
-msgid "Couldn't get int of {}."
-msgstr "无法获取到{}的整形。"
+#: ../../nbt-component/src/lib.rs:198
+msgid "LittleEndian Try's Error Message: "
+msgstr ""
 
-#: ../../crab-nbt-ext/src/lib.rs:117
-#, rust-format
-msgid "Couldn't get list of {}."
-msgstr "无法获取到{}的列表。"
+#: ../../nbt-component/src/lib.rs:205
+msgid "NetworkLittleEndian Try's Error Message: "
+msgstr ""
 
-#: ../../crab-nbt-ext/src/lib.rs:128
-#, rust-format
-msgid "Couldn't get string of {}."
-msgstr "无法获取到{}的字符串。"
-
-#: ../../crab-nbt-ext/src/lib.rs:139
-#, rust-format
-msgid "Couldn't get long of {}."
-msgstr "无法获取到{}的长整型。"
-
-#: ../../crab-nbt-ext/src/lib.rs:150
-#, rust-format
-msgid "Couldn't get long array of {}."
-msgstr "无法获取到{}的长整型数组。"
-
-#: ../../crab-nbt-ext/src/lib.rs:183
+#: ../../nbt-component/src/lib.rs:228
 msgid "Reading NBT finish."
 msgstr "结束读取NBT。"
 
-#: ../../crab-nbt-ext/src/lib.rs:409
-msgid "Reading palette is cancelled!"
-msgstr ""
-
-#: ../../crab-nbt-ext/src/lib.rs:416
-msgid "Wrong type of palette!"
-msgstr ""
-
-#: ../../crab-nbt-ext/src/lib.rs:431
-msgid "Wrong type of property!"
-msgstr ""
-
-#: ../../crab-nbt-ext/src/lib.rs:515 ../../crab-nbt-ext/src/lib.rs:561
-msgid "Reading NBT."
-msgstr "读取NBT。"
-
-#: ../../crab-nbt-ext/src/lib.rs:517 ../../crab-nbt-ext/src/lib.rs:563
-msgid "The parsing operation is cancelled."
-msgstr "传递操作被取消。"
-
-#: ../../region-litematic-rs/src/lib.rs:66
+#: ../../region-litematic-rs/src/lib.rs:78
 msgid "Litematic File (*.litematic)"
 msgstr "投影文件 (*.litematic)"
 
-#: ../../region-litematic-rs/src/lib.rs:133
+#: ../../region-litematic-rs/src/lib.rs:151
 #, rust-format
 msgid "Reading block id: {} / {}."
 msgstr "阅读方块索引：{} / {}。"
 
-#: ../../region-litematic-rs/src/lib.rs:138
+#: ../../region-litematic-rs/src/lib.rs:155
 msgid "Cancelled when reading blocks"
 msgstr "在阅读方块时取消"
 
-#: ../../region-litematic-rs/src/lib.rs:154
+#: ../../region-litematic-rs/src/lib.rs:171
 msgid "Out of range!"
 msgstr ""
 
-#: ../../region-litematic-rs/src/lib.rs:170
+#: ../../region-litematic-rs/src/lib.rs:185
 msgid "Reading block finished!"
 msgstr ""
 
-#: ../../region-litematic-rs/src/lib.rs:206
+#: ../../region-litematic-rs/src/lib.rs:220
+msgid "Getting Palette."
+msgstr ""
+
+#: ../../region-litematic-rs/src/lib.rs:227
+msgid "Wrong type of palette!"
+msgstr ""
+
+#: ../../region-litematic-rs/src/lib.rs:248
+msgid "Wrong type of property!"
+msgstr ""
+
+#: ../../region-litematic-rs/src/lib.rs:294
 msgid "Wrong type of region."
 msgstr ""
 
-#: ../../region-litematic-rs/src/lib.rs:253
+#: ../../region-litematic-rs/src/lib.rs:356
+msgid "Failed to get TileEntities."
+msgstr ""
+
+#: ../../region-litematic-rs/src/lib.rs:366
 msgid "Wrong type of tile entity."
 msgstr ""
 
-#: ../../region-litematic-rs/src/lib.rs:301 ../../region-nbt-rs/src/lib.rs:143
-msgid "Reading entities is cancelled!"
+#: ../../region-litematic-rs/src/lib.rs:407
+msgid "Failed to get Entities."
 msgstr ""
 
-#: ../../region-litematic-rs/src/lib.rs:304 ../../region-nbt-rs/src/lib.rs:147
-msgid "Wrong type of entity!"
+#: ../../region-litematic-rs/src/lib.rs:416
+msgid "Failed to get internal Entity."
 msgstr ""
 
 #: ../../region-nbt-rs/src/config.rs:48
@@ -922,6 +868,14 @@ msgstr ""
 
 #: ../../region-nbt-rs/src/lib.rs:113 ../../region-nbt-rs/src/lib.rs:125
 msgid "The length of the size is wrong."
+msgstr ""
+
+#: ../../region-nbt-rs/src/lib.rs:143
+msgid "Reading entities is cancelled!"
+msgstr ""
+
+#: ../../region-nbt-rs/src/lib.rs:147
+msgid "Wrong type of entity!"
 msgstr ""
 
 #: ../../region-nbt-rs/src/lib.rs:166
@@ -966,31 +920,19 @@ msgstr ""
 msgid "Pushing index."
 msgstr ""
 
-#: ../../region-rs/src/file.rs:43
+#: ../../region-rs/src/file.rs:31
 msgid "Loading file."
 msgstr "加载文件中。"
 
-#: ../../region-rs/src/file.rs:45
+#: ../../region-rs/src/file.rs:32
 msgid "The loading operation is cancelled."
 msgstr "加载操作被取消。"
 
-#: ../../region-rs/src/file.rs:80 ../../region-rs/src/file.rs:164
-msgid "Uncompressing data."
-msgstr "解压数据中。"
-
-#: ../../region-rs/src/file.rs:82
+#: ../../region-rs/src/file.rs:64
 msgid "The uncompressing operation is cancelled."
 msgstr "解压操作被取消。"
 
-#: ../../region-rs/src/file.rs:97 ../../region-rs/src/file.rs:191
-msgid "Uncompress finish!"
-msgstr "解压完成！"
-
-#: ../../region-rs/src/file.rs:172
-msgid "The compressing operation is cancelled."
-msgstr ""
-
-#: ../../region-rs/src/lib.rs:177 ../../region-rs/src/lib.rs:181
+#: ../../region-rs/src/lib.rs:162 ../../region-rs/src/lib.rs:166
 msgid "The index is out of range."
 msgstr ""
 
@@ -1005,6 +947,72 @@ msgstr "默认"
 #: ../../src/dhgameconfigui.h:15
 msgid "Game"
 msgstr "游戏"
+
+#~ msgid "Byte"
+#~ msgstr "字节"
+
+#~ msgid "Int"
+#~ msgstr "整形"
+
+#~ msgid "Short"
+#~ msgstr "短整形"
+
+#~ msgid "Long"
+#~ msgstr "长整形"
+
+#~ msgid "Byte Array"
+#~ msgstr "字节数组"
+
+#~ msgid "Long Array"
+#~ msgstr "长数组"
+
+#~ msgid "String"
+#~ msgstr "字符串"
+
+#~ msgid "Float"
+#~ msgstr "浮点型"
+
+#~ msgid "Double"
+#~ msgstr "双浮点型"
+
+#~ msgid "Int Array"
+#~ msgstr "整形数组"
+
+#~ msgid "List"
+#~ msgstr "列表"
+
+#~ msgid "Compound"
+#~ msgstr "集合"
+
+#, rust-format
+#~ msgid "Couldn't get compound of {}."
+#~ msgstr "无法获取到{}的集合。"
+
+#, rust-format
+#~ msgid "Couldn't get int of {}."
+#~ msgstr "无法获取到{}的整形。"
+
+#, rust-format
+#~ msgid "Couldn't get list of {}."
+#~ msgstr "无法获取到{}的列表。"
+
+#, rust-format
+#~ msgid "Couldn't get string of {}."
+#~ msgstr "无法获取到{}的字符串。"
+
+#, rust-format
+#~ msgid "Couldn't get long of {}."
+#~ msgstr "无法获取到{}的长整型。"
+
+#, rust-format
+#~ msgid "Couldn't get long array of {}."
+#~ msgstr "无法获取到{}的长整型数组。"
+
+#~ msgid "Reading NBT."
+#~ msgstr "读取NBT。"
+
+#~ msgid "The parsing operation is cancelled."
+#~ msgstr "传递操作被取消。"
 
 #~ msgid "Unknown!"
 #~ msgstr "未知！"

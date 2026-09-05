@@ -1,9 +1,7 @@
 #ifndef DHLRC_MANAGEREGIONUI_H
 #define DHLRC_MANAGEREGIONUI_H
 
-#include "dhpushbutton.h"
 #include "region.h"
-
 #include <KColorButton>
 #include <KMessageWidget>
 #include <QCheckBox>
@@ -74,7 +72,7 @@ class ManageRegionUI : public QWidget
 {
   Q_OBJECT
 public:
-  explicit ManageRegionUI (QWidget *mainWindow, QWidget *parent = nullptr);
+  explicit ManageRegionUI (QWidget *parent = nullptr);
   ~ManageRegionUI () override;
   static void
   notify_func (void *main_klass)
@@ -82,7 +80,7 @@ public:
     auto mr = static_cast<ManageRegionUI *> (main_klass);
     mr->refresh_triggered ();
   }
-
+  static ManageRegionUI *instance ();
   static std::vector<ModuleBase *> getModules ();
   static QList<LoadObjectBase> getLoadObjectList ();
   static void appendRegion (void *region, const QString &name);
@@ -104,7 +102,6 @@ private:
   QVBoxLayout *frameLayout;
   QScrollArea *scrollArea;
   QWidget *scrollAreaWidget;
-  QMainWindow *mainWindow;
 
   QList<ItemFrame *> itemFrames;
   KMessageWidget *messageWidget;

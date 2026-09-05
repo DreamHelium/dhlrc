@@ -33,12 +33,11 @@ add_custom_target(dhlrc_cargo_build ALL
 )
 
 set(DHLRC_BUILD_LIBRARIES
-  ${CARGO_TARGET_DIR}/${CARGO_TYPE}/${CARGO_LIB_PREFIX}region_rs${CARGO_LIB_SUFFIX}
-  ${CARGO_TARGET_DIR}/${CARGO_TYPE}/${CARGO_LIB_PREFIX}nbt_to_vec${CARGO_LIB_SUFFIX})
+  ${CARGO_TARGET_DIR}/${CARGO_TYPE}/${CARGO_LIB_PREFIX}region_rs${CARGO_LIB_SUFFIX})
 set(DHLRC_LOAD_LIBRARIES
   ${CARGO_TARGET_DIR}/${CARGO_TYPE}/${CARGO_LIB_PREFIX}nbt_component${CARGO_LIB_SUFFIX})
 set(DHLRC_MODULE_LIBRARIES
-  ${CARGO_TARGET_DIR}/${CARGO_TYPE}/${CARGO_LIB_PREFIX}region_nbt_rs${CARGO_LIB_SUFFIX}
+  #${CARGO_TARGET_DIR}/${CARGO_TYPE}/${CARGO_LIB_PREFIX}region_nbt_rs${CARGO_LIB_SUFFIX}
   ${CARGO_TARGET_DIR}/${CARGO_TYPE}/${CARGO_LIB_PREFIX}region_litematic_rs${CARGO_LIB_SUFFIX})
 
 add_custom_command(
@@ -80,6 +79,7 @@ if(DH_ENABLE_DEBUG)
 endif()
 
 add_subdirectory(src)
+add_subdirectory(po)
 
 # Reserved for future?
 #add_subdirectory(src-qml)

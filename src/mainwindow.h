@@ -1,9 +1,6 @@
 #ifndef DHLRC_DEBUGLOADINGUI_H
 #define DHLRC_DEBUGLOADINGUI_H
 
-#include "dhconfigdialog/src/dhconfigdialog.h"
-#include "manageregionui.h"
-
 #include <QListView>
 #include <QMainWindow>
 #include <QSortFilterProxyModel>
@@ -12,6 +9,7 @@
 #include <QTabWidget>
 #include <QVBoxLayout>
 #include <QWidget>
+#include <qscrollarea.h>
 
 class MainWindow : public QMainWindow
 {
@@ -19,10 +17,9 @@ class MainWindow : public QMainWindow
 public:
   explicit MainWindow (QWidget *parent = nullptr);
   ~MainWindow () override;
-  ManageRegionUI *mrui = new ManageRegionUI (this);
-  DhConfigDialog *dialog = nullptr;
   static void addWidgetToToolBar (QWidget *widget);
   static void addWidgetToTab (QWidget *widget, const QString &title);
+  static MainWindow *instance ();
 
 private:
   QScrollArea *scrollArea;

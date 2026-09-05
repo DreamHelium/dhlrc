@@ -1,21 +1,20 @@
 #include "manageregionui.h"
-
 #include "dhloadjob.h"
 #include "generalchoosedialog.h"
-#include "mainwindow.h"
 #include "region.h"
 #include "saveregionui.h"
-
-#include <QInputDialog>
-
 #include <QApplication>
 #include <QCheckBox>
 #include <QFileDialog>
+#include <QInputDialog>
 #include <QMessageBox>
 #include <QPushButton>
 #include <libintl.h>
 #include <qcheckbox.h>
+#include <qcoreapplication.h>
 #include <qevent.h>
+#include <qglobalstatic.h>
+#include <qguiapplication.h>
 #include <qlibrary.h>
 #include <qmimedata.h>
 
@@ -23,6 +22,7 @@ static std::vector<ModuleBase *> moduleBaseList = {};
 static QList<LoadObjectBase> loadObjectList = {};
 static std::vector<std::shared_ptr<RegionClass>> regions = {};
 static std::vector<NotifyStruct> notifiers = {};
+static ManageRegionUI *mrui = nullptr;
 
 #define get_name_and_put_into_module_base(base, member, fn)                   \
   if (fn)                                                                     \
@@ -32,13 +32,12 @@ static std::vector<NotifyStruct> notifiers = {};
       string_free (name);                                                     \
     }
 
-ManageRegionUI::ManageRegionUI (QWidget *mainWindow, QWidget *parent)
-    : QWidget (parent), mainWindow (qobject_cast<QMainWindow *> (mainWindow))
+ManageRegionUI::ManageRegionUI (QWidget *parent) : QWidget (parent)
 {
   setAcceptDrops (true);
   notifiers.emplace_back (notify_func, this);
   auto moduleDir = QApplication::applicationDirPath ();
-  moduleDir += QDir::toNativeSeparators ("/");
+  moduleDir += QDir::separator ();
   moduleDir += "region_module";
 
   using GetNameFn = const char *(*)();
@@ -53,7 +52,7 @@ ManageRegionUI::ManageRegionUI (QWidget *mainWindow, QWidget *parent)
 
   for (const auto &module : moduleList)
     {
-      QString realDir = moduleDir + QDir::toNativeSeparators ("/") + module;
+      QString realDir = moduleDir + QDir::separator () + module;
       auto library = new QLibrary (realDir);
       if (!library->load ())
         {
@@ -206,6 +205,18 @@ ManageRegionUI::~ManageRegionUI ()
     delete module;
 }
 
+ManageRegionUI *
+ManageRegionUI::instance ()
+{
+  if (!mrui)
+    {
+      mrui = new ManageRegionUI ();
+      connect (qApp, &QCoreApplication::aboutToQuit, mrui,
+               [] { delete mrui; });
+    }
+  return mrui;
+}
+
 std::vector<ModuleBase *>
 ManageRegionUI::getModules ()
 {
@@ -330,6 +341,7 @@ ManageRegionUI::dropEvent (QDropEvent *event)
 void
 ManageRegionUI::refresh_triggered ()
 {
+  qDebug () << this;
   for (auto &widget : frameLayout->children ())
     frameLayout->removeWidget (qobject_cast<QWidget *> (widget));
   for (auto &widget : itemFrames)

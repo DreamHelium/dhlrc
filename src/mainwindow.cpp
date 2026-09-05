@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include "dhconfigdialog/src/dhconfigdialog.h"
+#include "manageregionui.h"
 #include "resourcegetter.h"
 #include <kcoreconfigskeleton.h>
 #include <libintl.h>
@@ -15,6 +16,8 @@
 #include <qprogressbar.h>
 #include <qpushbutton.h>
 #include <qstandarditemmodel.h>
+#include <qstyle.h>
+#include <qtabwidget.h>
 #include <qtmetamacros.h>
 #include <qwidget.h>
 #define _(str) gettext (str)
@@ -226,7 +229,8 @@ MainWindow::MainWindow (QWidget *parent) : QMainWindow (parent)
   proxyModel->setSourceModel (model);
   listView->setModel (proxyModel);
 
-  dialog = new DhConfigDialog (DhConfig::self (), "dhlrcrc", true, this);
+  DhConfigDialog::initDialog (DhConfig::self (), {}, true, this);
+  auto dialog = DhConfigDialog::instance ();
   dialog->addTemplateByItem (DhConfig::self ()->defaultShowOptionItem (),
                              genTemplate<DhEnumConfigTemplate>);
   dialog->addTemplateByItem (DhConfig::self ()->cacheDirectoryItem (),
@@ -252,15 +256,18 @@ MainWindow::MainWindow (QWidget *parent) : QMainWindow (parent)
                    }
                  case 1:
                    {
-                     auto uiIndex = tabWidget->indexOf (mrui);
+                     auto uiIndex
+                         = tabWidget->indexOf (ManageRegionUI::instance ());
                      if (uiIndex == -1)
-                       uiIndex = tabWidget->addTab (mrui, _ ("Manage Region"));
+                       uiIndex = tabWidget->addTab (
+                           ManageRegionUI::instance (), _ ("Manage Region"));
                      tabWidget->setCurrentIndex (uiIndex);
                      break;
                    }
                  case 2:
                    {
-                     auto region = dh::getRegion (this, mrui, false);
+                     auto region = dh::getRegion (
+                         this, ManageRegionUI::instance (), false);
                      if (region != -1)
                        {
                          auto downloader = std::make_shared<DhDownloader> ();
@@ -287,6 +294,7 @@ MainWindow::MainWindow (QWidget *parent) : QMainWindow (parent)
                    }
                  case 3:
                    {
+                     auto dialog = DhConfigDialog::instance ();
                      dialog->raise ();
                      dialog->activateWindow ();
                      dialog->show ();
@@ -307,7 +315,7 @@ MainWindow::MainWindow (QWidget *parent) : QMainWindow (parent)
   connect (tabWidget, &QTabWidget::tabCloseRequested, this,
            [&] (int index)
              {
-               if (tabWidget->widget (index) != mrui)
+               if (tabWidget->widget (index) != ManageRegionUI::instance ())
                  {
                    auto widget = tabWidget->widget (index);
                    widget->close ();
@@ -316,21 +324,30 @@ MainWindow::MainWindow (QWidget *parent) : QMainWindow (parent)
                else
                  tabWidget->removeTab (index);
              });
+  connect (tabWidget, &QTabWidget::tabBarDoubleClicked, this,
+           [this] (int index)
+             {
+               auto widget = tabWidget->widget (index);
+               if (widget != ManageRegionUI::instance ())
+                 widget->setAttribute (Qt::WA_DeleteOnClose);
+               widget->setParent (nullptr);
+               widget->show ();
+
+               // tabWidget->removeTab (index);
+             });
 }
 
 MainWindow::~MainWindow ()
 {
   for (int i = tabWidget->count () - 1; i >= 0; i--)
     {
-      if (tabWidget->widget (i) != mrui)
+      if (tabWidget->widget (i) != ManageRegionUI::instance ())
         {
           auto widget = tabWidget->widget (i);
           widget->close ();
           delete tabWidget->widget (i);
         }
     }
-  delete mrui;
-  delete dialog;
 }
 
 void
@@ -368,4 +385,13 @@ MainWindow::eventFilter (QObject *object, QEvent *event)
   if (object == topWidget && event->type () == QEvent::ChildRemoved)
     tryShrinkTopWidget ();
   return QMainWindow::eventFilter (object, event);
+}
+
+MainWindow *
+MainWindow::instance ()
+{
+  if (mainWindow)
+    return mainWindow;
+  else
+    return nullptr;
 }
