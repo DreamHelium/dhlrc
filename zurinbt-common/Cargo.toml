@@ -1,0 +1,10 @@
+[package]
+name = "zurinbt-common"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+gettext-rs = {version = "0.7.7", features = ["gettext-system"]}
+zuri_nbt = "0.5.0"
+common-rs = { path = "../common-rs" }
+sysinfo = "0.38.1"

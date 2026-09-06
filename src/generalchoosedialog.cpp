@@ -4,13 +4,14 @@
 #include <QPushButton>
 #include <QRadioButton>
 #include <libintl.h>
+#include <qcontainerfwd.h>
 #define _(str) gettext (str)
 
 GeneralChooseDialog::GeneralChooseDialog (const QString &title,
                                           const QString &label,
                                           const QList<QString> &list,
                                           bool needMulti, QWidget *parent)
-    : QDialog (parent)
+    : QDialog (parent), needMulti (needMulti)
 {
   allLayout = new QVBoxLayout (this);
   widget = new QWidget ();
@@ -40,6 +41,25 @@ GeneralChooseDialog::GeneralChooseDialog (const QString &title,
                      i->setChecked (checked);
                  });
     }
+  paintButtons (list, index);
+  QPushButton *okBtn = new QPushButton (_ ("OK"));
+  QPushButton *cancelBtn = new QPushButton (_ ("Cancel"));
+  btnLayout = new QHBoxLayout ();
+  btnLayout->addStretch ();
+  btnLayout->addWidget (okBtn);
+  btnLayout->addWidget (cancelBtn);
+
+  allLayout->addLayout (btnLayout);
+
+  QObject::connect (okBtn, &QAbstractButton::clicked, this,
+                    &GeneralChooseDialog::accept);
+  QObject::connect (cancelBtn, &QAbstractButton::clicked, this,
+                    &GeneralChooseDialog::reject);
+}
+
+void
+GeneralChooseDialog::paintButtons (const QStringList &list, int index)
+{
   for (auto i : list)
     {
       QAbstractButton *btn = nullptr;
@@ -68,20 +88,6 @@ GeneralChooseDialog::GeneralChooseDialog (const QString &title,
       group->addButton (btn, index++);
       layout->addWidget (btn);
     }
-
-  QPushButton *okBtn = new QPushButton (_ ("OK"));
-  QPushButton *cancelBtn = new QPushButton (_ ("Cancel"));
-  btnLayout = new QHBoxLayout ();
-  btnLayout->addStretch ();
-  btnLayout->addWidget (okBtn);
-  btnLayout->addWidget (cancelBtn);
-
-  allLayout->addLayout (btnLayout);
-
-  QObject::connect (okBtn, &QAbstractButton::clicked, this,
-                    &GeneralChooseDialog::accept);
-  QObject::connect (cancelBtn, &QAbstractButton::clicked, this,
-                    &GeneralChooseDialog::reject);
 }
 
 GeneralChooseDialog::~GeneralChooseDialog () {}
@@ -128,4 +134,21 @@ GeneralChooseDialog::getIndexes (const QString &title, const QString &label,
       delete gcd;
       return {};
     }
+}
+
+void
+GeneralChooseDialog::repaint (const QStringList &list)
+{
+  int index = 0;
+  auto btns = group->buttons ();
+  if (needMulti)
+    {
+      for (int i = 1; i < btns.length (); i++)
+        delete btns[i];
+      index = 1;
+    }
+  else
+    for (const auto &i : btns)
+      delete i;
+  paintButtons (list, index);
 }

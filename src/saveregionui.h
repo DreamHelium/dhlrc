@@ -3,26 +3,15 @@
 
 #include "loadobjectui.h"
 #include "manageregionui.h"
+#include "region.h"
 
 #include <QWidget>
 #include <condition_variable>
 #include <qeventloop.h>
 
-/*
-* pub extern "C" fn region_save(
-    region: *mut c_void,
-    filename: *const c_char,
-    output_config: *mut OutputConfig,
-    progress_fn: ProgressFn,
-    main_klass: *mut c_void,
-    cancel_flag: *const c_void,
-) -> *const c_char
- */
-
 using MultiTransFunc = const char *(*)(void *, size_t, const char *);
 using SingleTransFunc
-    = const char *(*)(void *, const char *, void *, ProgressFunc, void *,
-                      const void *, quint64, quint64);
+    = const char *(*)(void *, const char *, void *, HelperStruct *);
 
 class SaveRegionUI : public LoadObjectUI
 {
@@ -34,6 +23,8 @@ public:
                          QLibrary *library, QWidget *parent = nullptr);
   ~SaveRegionUI () override;
   char *description = nullptr;
+  static void setFunc (void *main_klass, int value, const char *text,
+                       const char *arg);
 
 Q_SIGNALS:
   void getConfigObject ();
@@ -52,6 +43,7 @@ private:
   QLibrary *library = nullptr;
   void *configObject = nullptr;
   std::vector<std::unique_ptr<AutoLocker>> locks;
+  std::unique_ptr<HelperStruct, void (*) (HelperStruct *)> helper_struct;
 
 public Q_SLOTS:
   void process ();

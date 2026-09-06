@@ -2,11 +2,9 @@ use common_rs::helper_struct::HelperStruct;
 use common_rs::i18n::i18n;
 use common_rs::my_error::MyError;
 use common_rs::region::{BlockEntity, Palette, Region};
-use common_rs::util::cstr_to_str;
 use common_rs::util::show_progress;
 use common_rs::util::string_to_ptr_fail_to_null;
 use formatx::formatx;
-use gettextrs::gettext;
 use std::error::Error;
 use std::ffi::{c_char, c_int};
 use std::ops::{Shl, Shr};
@@ -14,6 +12,10 @@ use std::ptr::{null, null_mut};
 use std::time::Instant;
 use sysinfo::System;
 use zuri_nbt::{NBTRoot, NBTTag};
+use zurinbt_common::{
+    get_compound_value_err_return, get_palette_from_nbt_tag, get_type_from_compound,
+    get_type_from_tag, gettext_text,
+};
 
 #[link(name = "region_rs")]
 unsafe extern "C" {
@@ -53,24 +55,6 @@ pub extern "C" fn region_file_suffix() -> *const c_char {
 #[unsafe(no_mangle)]
 pub extern "C" fn region_base_type() -> *const c_char {
     string_to_ptr_fail_to_null("JavaNBT")
-}
-
-fn init_translation_internal(path: *const c_char) -> Result<(), Box<dyn Error>> {
-    gettextrs::bindtextdomain("dhlrc", cstr_to_str(path)?)?;
-    gettextrs::textdomain("dhlrc")?;
-    Ok(())
-}
-
-#[unsafe(no_mangle)]
-pub extern "C" fn init_translation(path: *const c_char) -> *const c_char {
-    match init_translation_internal(path) {
-        Ok(_) => null(),
-        Err(e) => string_to_ptr_fail_to_null(&e.to_string()),
-    }
-}
-
-pub fn gettext_text(str: &str) -> String {
-    gettext(str)
 }
 
 #[unsafe(no_mangle)]
@@ -191,76 +175,6 @@ fn get_block_id(
     Ok(buf)
 }
 
-macro_rules! get_value_err_return {
-    ($compound : ident, $key : expr) => {{
-        let mid_val = $compound.get_key_value($key);
-        if mid_val.is_none() {
-            return Err(Box::new(MyError {
-                msg: format!("Get key {} failed!", $key),
-            }));
-        }
-        mid_val.unwrap().1
-    }};
-}
-
-pub fn get_palette_from_nbt_tag(
-    palette_list: &Vec<NBTTag>,
-    helper_struct: &HelperStruct,
-    sys: &mut System,
-    instant: &mut Instant,
-) -> Result<Vec<Palette>, Box<dyn Error>> {
-    let mut palette_vec = vec![];
-    let mut i = 0;
-    let length = palette_list.len();
-    for palette in palette_list {
-        helper_struct.progress(
-            sys,
-            instant,
-            (i * 100 / length) as c_int,
-            i18n("Getting Palette."),
-            "Reading palette is cancelled!",
-        )?;
-        let internal_compound = match palette {
-            NBTTag::Compound(c) => c,
-            _ => {
-                return Err(Box::from(MyError {
-                    msg: String::from(i18n("Wrong type of palette!")),
-                }));
-            }
-        };
-        let internal_string = get_value_err_return!(internal_compound, "Name")
-            .view()
-            .string()?;
-        let properties_compound_option = internal_compound.get_key_value("Properties");
-        let mut has_option = true;
-        if properties_compound_option.is_none() {
-            has_option = false;
-        }
-        let mut ret = vec![];
-        if has_option {
-            let child = &properties_compound_option.unwrap().1.view().compound()?.0;
-
-            for (name, data) in child {
-                let real_data = match data {
-                    NBTTag::String(x) => x.0.clone(),
-                    _ => {
-                        return Err(Box::from(MyError {
-                            msg: String::from(i18n("Wrong type of property!")),
-                        }));
-                    }
-                };
-                ret.push((name.clone(), real_data.clone()));
-            }
-        }
-        palette_vec.push(Palette {
-            id_name: internal_string.to_string(),
-            property: ret,
-        });
-        i += 1;
-    }
-    Ok(palette_vec)
-}
-
 fn region_create_from_bytes_internal(
     o_nbt: *mut NBTRoot,
     index: i32,
@@ -269,17 +183,21 @@ fn region_create_from_bytes_internal(
     let nbt = &unsafe { &*o_nbt }.data;
     let data_version = nbt.view().at("MinecraftDataVersion").int()?;
     let metadata = nbt.view().at("Metadata").compound()?;
-    let create_time = get_value_err_return!(metadata, "TimeCreated")
+    let create_time = get_compound_value_err_return!(metadata, "TimeCreated")
         .view()
         .long()?;
-    let modify_time = get_value_err_return!(metadata, "TimeModified")
+    let modify_time = get_compound_value_err_return!(metadata, "TimeModified")
         .view()
         .long()?;
-    let description = get_value_err_return!(metadata, "Description")
+    let description = get_compound_value_err_return!(metadata, "Description")
         .view()
         .string()?;
-    let author = get_value_err_return!(metadata, "Author").view().string()?;
-    let name = get_value_err_return!(metadata, "Name").view().string()?;
+    let author = get_compound_value_err_return!(metadata, "Author")
+        .view()
+        .string()?;
+    let name = get_compound_value_err_return!(metadata, "Name")
+        .view()
+        .string()?;
 
     let region_parent_nbt = nbt.view().at("Regions").compound()?;
     let region_real_vec = region_parent_nbt
@@ -296,37 +214,38 @@ fn region_create_from_bytes_internal(
         }
     };
 
-    let size_nbt = get_value_err_return!(real_region_nbt, "Size")
+    let size_nbt = get_compound_value_err_return!(real_region_nbt, "Size")
         .view()
         .compound()?;
-    let region_x = get_value_err_return!(size_nbt, "x").view().int()?.abs();
-    let region_y = get_value_err_return!(size_nbt, "y").view().int()?.abs();
-    let region_z = get_value_err_return!(size_nbt, "z").view().int()?.abs();
+    let region_x = get_compound_value_err_return!(size_nbt, "x")
+        .view()
+        .int()?
+        .abs();
+    let region_y = get_compound_value_err_return!(size_nbt, "y")
+        .view()
+        .int()?
+        .abs();
+    let region_z = get_compound_value_err_return!(size_nbt, "z")
+        .view()
+        .int()?
+        .abs();
 
-    let offset_nbt = get_value_err_return!(real_region_nbt, "Position")
+    let offset_nbt = get_compound_value_err_return!(real_region_nbt, "Position")
         .view()
         .compound()?;
-    let offset_x = get_value_err_return!(offset_nbt, "x").view().int()?;
-    let offset_y = get_value_err_return!(offset_nbt, "y").view().int()?;
-    let offset_z = get_value_err_return!(offset_nbt, "z").view().int()?;
+    let offset_x = get_compound_value_err_return!(offset_nbt, "x")
+        .view()
+        .int()?;
+    let offset_y = get_compound_value_err_return!(offset_nbt, "y")
+        .view()
+        .int()?;
+    let offset_z = get_compound_value_err_return!(offset_nbt, "z")
+        .view()
+        .int()?;
 
-    let block_states = match get_value_err_return!(real_region_nbt, "BlockStates") {
-        NBTTag::LongArray(l) => l,
-        _ => {
-            return Err(Box::new(MyError {
-                msg: "Failed to get BlockStates".to_string(),
-            }));
-        }
-    };
+    let block_states = get_type_from_compound!(real_region_nbt, "BlockStates", LongArray);
 
-    let palette_list = match get_value_err_return!(real_region_nbt, "BlockStatePalette") {
-        NBTTag::List(l) => &l.0,
-        _ => {
-            return Err(Box::new(MyError {
-                msg: "Failed to get BlockStatePalette".to_string(),
-            }));
-        }
-    };
+    let palette_list = get_type_from_compound!(real_region_nbt, "BlockStatePalette", List);
 
     let mut sys = System::new_all();
     let mut instant = Instant::now();
@@ -349,27 +268,19 @@ fn region_create_from_bytes_internal(
     )?;
     let blocks = block_ids;
     let mut tile_entities_vec = vec![];
-    let tile_entities_list = match get_value_err_return!(real_region_nbt, "TileEntities") {
-        NBTTag::List(l) => &l.0,
-        _ => {
-            return Err(Box::new(MyError {
-                msg: i18n("Failed to get TileEntities.").to_string(),
-            }));
-        }
-    };
+    let tile_entities_list = &get_type_from_compound!(real_region_nbt, "TileEntities", List).0;
 
     for tile_entity in tile_entities_list {
-        let real_tile_entity = match tile_entity {
-            NBTTag::Compound(c) => c,
-            _ => {
-                return Err(Box::new(MyError {
-                    msg: i18n("Wrong type of tile entity.").to_string(),
-                }));
-            }
-        };
-        let entity_x = get_value_err_return!(real_tile_entity, "x").view().int()?;
-        let entity_y = get_value_err_return!(real_tile_entity, "y").view().int()?;
-        let entity_z = get_value_err_return!(real_tile_entity, "z").view().int()?;
+        let real_tile_entity = get_type_from_tag!(tile_entity, Compound, "Tile Entity");
+        let entity_x = get_compound_value_err_return!(real_tile_entity, "x")
+            .view()
+            .int()?;
+        let entity_y = get_compound_value_err_return!(real_tile_entity, "y")
+            .view()
+            .int()?;
+        let entity_z = get_compound_value_err_return!(real_tile_entity, "z")
+            .view()
+            .int()?;
         let entity_index = region_x * region_z * entity_y + region_x * entity_z + entity_x;
         let entity_id = blocks[entity_index as usize];
         let id = real_tile_entity.get_key_value("id");
@@ -400,24 +311,9 @@ fn region_create_from_bytes_internal(
         tile_entities_vec.push(block_entity);
     }
     let mut entities_vec = vec![];
-    let entities_list = match get_value_err_return!(real_region_nbt, "Entities") {
-        NBTTag::List(l) => &l.0,
-        _ => {
-            return Err(Box::new(MyError {
-                msg: i18n("Failed to get Entities.").to_string(),
-            }));
-        }
-    };
+    let entities_list = &get_type_from_compound!(real_region_nbt, "Entities", List).0;
     for entity in entities_list {
-        let internal_entity = match entity {
-            NBTTag::Compound(c) => c,
-            _ => {
-                return Err(Box::new(MyError {
-                    msg: i18n("Failed to get internal Entity.").to_string(),
-                }));
-            }
-        }
-        .clone();
+        let internal_entity = get_type_from_tag!(entity, Compound, "internal entity").clone();
         entities_vec.push(internal_entity);
     }
 

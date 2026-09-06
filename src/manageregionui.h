@@ -24,8 +24,7 @@ class ItemFrame;
 static QString emptyString{};
 using MultiTransFunc = const char *(*)(void *, size_t, const char *);
 using SingleTransFunc
-    = const char *(*)(void *, const char *, void *, ProgressFunc, void *,
-                      const void *, quint64, quint64);
+    = const char *(*)(void *, const char *, void *, HelperStruct *);
 using LoadObjectFunc = const char *(*)(VecU8 *, void **, HelperStruct *);
 using ObjFreeFunc = void (*) (void *);
 
@@ -51,8 +50,7 @@ public:
 class SingleModuleBase : public ModuleBase
 {
 public:
-  using LoadFunc = const char *(*)(void *, ProgressFunc, void **, void *,
-                                   const void *, quint64, quint64);
+  using LoadFunc = const char *(*)(void *, void **, HelperStruct *);
   SingleTransFunc singleTransFunc;
   LoadFunc loadFunc;
 };
@@ -87,6 +85,7 @@ public:
   static void appendRegion (void *region, const QString &name);
   static qsizetype regionNum ();
   static std::vector<std::shared_ptr<RegionClass>> &getRegions ();
+  static QStringList getRegionNames ();
   void save (const QList<int> &list);
   bool selectButtonIsDown ();
 

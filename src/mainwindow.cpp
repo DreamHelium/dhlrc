@@ -340,8 +340,6 @@ MainWindow::MainWindow (QWidget *parent) : QMainWindow (parent)
 
                // tabWidget->removeTab (index);
              });
-  connect (this, &MainWindow::windowClosed, ManageRegionUI::instance (),
-           &ManageRegionUI::deleteLater);
 }
 
 MainWindow::~MainWindow ()

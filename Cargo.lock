@@ -345,6 +345,19 @@ dependencies = [
  "gettext-rs",
  "sysinfo",
  "zuri_nbt",
+ "zurinbt-common",
+]
+
+[[package]]
+name = "region-nbt-rs"
+version = "0.1.0"
+dependencies = [
+ "common-rs",
+ "formatx",
+ "gettext-rs",
+ "sysinfo",
+ "zuri_nbt",
+ "zurinbt-common",
 ]
 
 [[package]]
@@ -739,4 +752,14 @@ dependencies = [
  "strum",
  "strum_macros",
  "thiserror",
+]
+
+[[package]]
+name = "zurinbt-common"
+version = "0.1.0"
+dependencies = [
+ "common-rs",
+ "gettext-rs",
+ "sysinfo",
+ "zuri_nbt",
 ]

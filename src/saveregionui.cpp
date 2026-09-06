@@ -15,7 +15,11 @@ SaveRegionUI::SaveRegionUI (const QList<std::shared_ptr<RegionClass>> &list,
                             const QString &outputDir, SingleTransFunc func,
                             QLibrary *library, QWidget *parent)
     : LoadObjectUI (parent), list (list), outputDir (outputDir), func (func),
-      cancel_flag (cancel_flag_new ()), library (library)
+      cancel_flag (cancel_flag_new ()), library (library),
+      helper_struct (helper_struct_new (setFunc, this, cancel_flag,
+                                        DhConfig::elapsedMilliseconds (),
+                                        DhConfig::memoryLimit ()),
+                     helper_struct_free)
 {
   for (const auto &i : list)
     locks.emplace_back (std::make_unique<AutoLocker> (*i));
@@ -67,25 +71,27 @@ SaveRegionUI::SaveRegionUI (const QList<std::shared_ptr<RegionClass>> &list,
   process ();
 }
 
+void
+SaveRegionUI::setFunc (void *main_klass, int value, const char *text,
+                       const char *arg)
+{
+  auto klass = static_cast<SaveRegionUI *> (main_klass);
+  klass->refreshSubProgress (value);
+  if (!arg)
+    klass->refreshSubLabel (gettext (text));
+  else
+    {
+      auto msg = QString::asprintf (gettext (text), arg);
+      klass->refreshSubLabel (msg);
+    }
+}
+
 SaveRegionUI::~SaveRegionUI () { cancel_flag_destroy (cancel_flag); }
 
 void
 SaveRegionUI::process ()
 {
-  auto full_set
-      = [] (void *main_klass, int value, const char *text, const char *arg)
-    {
-      auto klass = static_cast<SaveRegionUI *> (main_klass);
-      klass->refreshSubProgress (value);
-      if (!arg)
-        klass->refreshSubLabel (gettext (text));
-      else
-        {
-          auto msg = QString::asprintf (gettext (text), arg);
-          klass->refreshSubLabel (msg);
-        }
-    };
-  auto real_task = [&, full_set]
+  auto real_task = [&]
     {
       int i = 0;
       for (auto st : list)
@@ -109,10 +115,8 @@ SaveRegionUI::process ()
           std::unique_lock lock (mutex);
           cv.wait (lock);
           if (!cancel_flag_is_cancelled (cancel_flag))
-            func (st->get_region (), realDir.toUtf8 (), configObject, full_set,
-                  this, cancel_flag,
-                  quint64 (DhConfig::elapsedMilliseconds ()),
-                  quint64 (DhConfig::memoryLimit ()));
+            func (st->get_region (), realDir.toUtf8 (), configObject,
+                  helper_struct.get ());
         }
       Q_EMIT refreshFullProgress (100);
       cv.notify_one ();

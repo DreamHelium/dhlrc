@@ -1,133 +1,107 @@
-use crate::cancel_flag_is_cancelled;
 use crate::config::OutputConfig;
-use crate::finish_oom;
-use crate::show_progress;
-use crate::{
-    get_size_double, real_show_progress, region_get_block_entity, region_get_block_id_by_index,
-    region_get_data_version, region_get_entity, region_get_entity_len, region_get_palette_id_name,
-    region_get_palette_len, region_get_palette_property_data, region_get_palette_property_len,
-    region_get_palette_property_name, region_get_x, region_get_y, region_get_z, string_free,
-    vec_try_compress,
-};
+use crate::get_size_double;
+use common_rs::helper_struct::HelperStruct;
 use common_rs::i18n::i18n;
 use common_rs::my_error::MyError;
 use common_rs::region::Region;
-use common_rs::tree_value::TreeValue;
-use common_rs::util::string_to_ptr_fail_to_null;
+use common_rs::util::{string_free, string_to_ptr_fail_to_null, vec_try_compress_real};
 use common_rs::{ProgressFn, show_progress_macro};
-use crab_nbt::{Nbt, NbtCompound, NbtTag};
-use crab_nbt_ext::convert_vec_to_nbt;
-use crab_nbt_ext::gettext_text;
 use formatx::formatx;
+use std::collections::HashMap;
 use std::error::Error;
 use std::ffi::{CStr, CString, c_char, c_int, c_void};
 use std::fs::File;
+use std::hash::Hash;
 use std::io::Write;
 use std::ptr::null;
 use std::sync::atomic::AtomicBool;
 use std::time::Instant;
 use sysinfo::System;
+use zuri_nbt::encoding::BigEndian;
+use zuri_nbt::tag::{Compound, Double, Int, List};
+use zuri_nbt::{NBTRoot, NBTTag};
+use zurinbt_common::{get_type_from_tag, gettext_text};
 
 trait NbtCreate {
     fn create_size(x: i32, y: i32, z: i32) -> Self;
-    fn create_entities(entities: &Vec<Vec<(String, TreeValue)>>) -> Result<Self, MyError>
+    fn create_entities(entities: &Vec<Compound>) -> Result<Self, Box<dyn Error>>
     where
         Self: Sized;
     fn create_data_version(data_version: i32) -> Self;
     fn create_blocks(
-        region: *mut c_void,
+        region: &Region,
         states: &Vec<u32>,
         ignore_air: bool,
         instant: &mut Instant,
         system: &mut System,
-        progress_fn: ProgressFn,
-        main_klass: *mut c_void,
-        cancel_flag: *const AtomicBool,
-        elapsed_millisecs: u128,
-        free_memory: u64,
+        helper_struct: &HelperStruct,
     ) -> Result<Self, Box<dyn Error>>
     where
         Self: Sized;
-    fn create_palette(region: *mut c_void) -> Result<Self, Box<dyn Error>>
+    fn create_palette(region: &Region) -> Result<Self, Box<dyn Error>>
     where
         Self: Sized;
 }
 
-impl NbtCreate for NbtTag {
+impl NbtCreate for NBTTag {
     fn create_size(x: i32, y: i32, z: i32) -> Self {
-        let x_pos = NbtTag::Int(x);
-        let y_pos = NbtTag::Int(y);
-        let z_pos = NbtTag::Int(z);
+        let x_pos = NBTTag::Int(x.into());
+        let y_pos = NBTTag::Int(y.into());
+        let z_pos = NBTTag::Int(z.into());
         let size_vec = vec![x_pos, y_pos, z_pos];
-        NbtTag::List(size_vec)
+        NBTTag::List(size_vec.into())
     }
 
-    fn create_entities(entities: &Vec<Vec<(String, TreeValue)>>) -> Result<Self, MyError> {
+    fn create_entities(entities: &Vec<Compound>) -> Result<Self, Box<dyn Error>> {
         let mut vec = vec![];
         for entity in entities {
-            let nbt = convert_vec_to_nbt(entity, "", false).root_tag;
-            let child_nbt = &nbt.child_tags;
             let mut pos_x = 0.0;
             let mut pos_y = 0.0;
             let mut pos_z = 0.0;
-            for (str, tag) in child_nbt {
+            for (str, tag) in &entity.0 {
                 if str == "Pos" {
-                    let real_tag = match tag {
-                        NbtTag::List(l) => l,
-                        _ => {
-                            return Err(MyError {
-                                msg: i18n("Nullptr detected!").to_string(),
-                            });
-                        }
-                    };
+                    let real_tag = get_type_from_tag!(tag, List, "Pos");
                     let size = get_size_double(real_tag)?;
                     pos_x = size.0;
                     pos_y = size.1;
                     pos_z = size.2;
                 }
             }
-            let block_pos_x = NbtTag::Int(pos_x as i32);
-            let block_pos_y = NbtTag::Int(pos_y as i32);
-            let block_pos_z = NbtTag::Int(pos_z as i32);
-            let block_pos = NbtTag::List(vec![block_pos_x, block_pos_y, block_pos_z]);
-            let pos = NbtTag::List(vec![
-                NbtTag::Double(pos_x),
-                NbtTag::Double(pos_y),
-                NbtTag::Double(pos_z),
-            ]);
-            let tag = NbtTag::Compound(nbt);
-            let real_tag = NbtTag::Compound(NbtCompound {
-                child_tags: vec![
-                    ("nbt".to_string(), tag),
-                    ("blockPos".to_string(), block_pos),
-                    ("pos".to_string(), pos),
-                ],
-            });
+            let block_pos_x = NBTTag::Int(Int(pos_x as i32));
+            let block_pos_y = NBTTag::Int(Int(pos_y as i32));
+            let block_pos_z = NBTTag::Int(Int(pos_z as i32));
+            let block_pos = NBTTag::List(List(vec![block_pos_x, block_pos_y, block_pos_z]));
+            let pos = NBTTag::List(List(vec![
+                NBTTag::Double(pos_x.into()),
+                NBTTag::Double(pos_y.into()),
+                NBTTag::Double(pos_z.into()),
+            ]));
+            let tag = NBTTag::Compound(entity.clone());
+            let mut hashmap = HashMap::new();
+            hashmap.insert("nbt".to_string(), tag);
+            hashmap.insert("blockPos".to_string(), block_pos);
+            hashmap.insert("pos".to_string(), pos);
+            let real_tag = NBTTag::Compound(Compound(hashmap));
             vec.push(real_tag);
         }
-        Ok(NbtTag::List(vec))
+        Ok(NBTTag::List(List(vec)))
     }
 
     fn create_data_version(data_version: i32) -> Self {
-        NbtTag::Int(data_version)
+        NBTTag::Int(data_version.into())
     }
 
     fn create_blocks(
-        region: *mut c_void,
+        region: &Region,
         states: &Vec<u32>,
         ignore_air: bool,
         instant: &mut Instant,
         system: &mut System,
-        progress_fn: ProgressFn,
-        main_klass: *mut c_void,
-        cancel_flag: *const AtomicBool,
-        elapsed_millisecs: u128,
-        free_memory: u64,
+        helper_struct: &HelperStruct,
     ) -> Result<Self, Box<dyn Error>> {
-        let real_region = region as *mut Region;
-        let region_x = unsafe { region_get_x(region) };
-        let region_y = unsafe { region_get_y(region) };
-        let region_z = unsafe { region_get_z(region) };
+        let region_x = region.region_size.0;
+        let region_y = region.region_size.1;
+        let region_z = region.region_size.2;
         let mut x = 0;
         let mut y = 0;
         let mut z = 0;
@@ -153,103 +127,86 @@ impl NbtCreate for NbtTag {
         let mut i = 0;
         let mut block_vec = vec![];
         for state in states {
-            show_progress_macro!(
-                instant,
-                system,
-                progress_fn,
-                main_klass,
-                (((i + 1) * 100) / states.len()) as c_int,
-                elapsed_millisecs,
-                free_memory,
-                &formatx!(
-                    gettext_text(i18n("Adding blocks to NBT: {} / {}.")),
-                    i,
-                    states.len()
-                )?,
-                cancel_flag,
-                i18n("Adding blocks is cancelled.")
-            );
+            helper_struct.get_cancel_error(i18n("Adding blocks is cancelled."));
+            if instant.elapsed().as_millis() >= helper_struct.elapsed_millisecs as u128 {
+                helper_struct.instant_progress(
+                    system,
+                    instant,
+                    (((i + 1) * 100) / states.len()) as c_int,
+                    &formatx!(
+                        gettext_text(i18n("Adding blocks to NBT: {} / {}.")),
+                        i,
+                        states.len()
+                    )?,
+                )?
+            }
 
-            let mut single_block_vec = vec![];
+            let mut single_block_vec = HashMap::new();
             if ignore_air && *state == 0 {
                 size_change(&mut x, &mut y, &mut z, region_x, region_y, region_z);
                 i += 1;
                 continue;
             }
-            let pos = NbtTag::create_size(x, y, z);
-            let state = NbtTag::Int(*state as i32);
+            let pos = NBTTag::create_size(x, y, z);
+            let state = NBTTag::Int((*state as i32).into());
 
-            let nbt: Option<&Vec<(String, TreeValue)>> = unsafe {
-                match &(*real_region)
-                    .block_entity_array
-                    .binary_search_by_key(&i, |entity| entity.index)
-                {
-                    Ok(pos) => Some(&((&*real_region).block_entity_array[*pos].entity)),
-                    Err(_) => None,
-                }
+            let nbt: Option<&Compound> = match region
+                .block_entity_array
+                .binary_search_by_key(&i, |entity| entity.index)
+            {
+                Ok(pos) => Some(&(region.block_entity_array[pos].entity)),
+                Err(_) => None,
             };
 
-            // let nbt = unsafe { region_get_block_entity(region, i) };
-            let mut nbt_nbt: Option<NbtTag> = None;
-
-            if nbt.is_some() {
-                let real_nbt = convert_vec_to_nbt(nbt.unwrap(), "", false).root_tag;
-                nbt_nbt = Some(NbtTag::Compound(real_nbt));
-            }
-            single_block_vec.push(("pos".to_string(), pos));
-            single_block_vec.push(("state".to_string(), state));
-            match nbt_nbt {
-                Some(nbt) => single_block_vec.push(("nbt".to_string(), nbt)),
+            single_block_vec.insert("pos".to_string(), pos);
+            single_block_vec.insert("state".to_string(), state);
+            match nbt {
+                Some(nbt) => {
+                    single_block_vec.insert("nbt".to_string(), NBTTag::Compound(nbt.clone()));
+                    ()
+                }
                 None => {}
             }
-            let compound = NbtTag::Compound(NbtCompound {
-                child_tags: single_block_vec,
-            });
+            let compound = NBTTag::Compound(Compound(single_block_vec));
             block_vec.push(compound);
             size_change(&mut x, &mut y, &mut z, region_x, region_y, region_z);
             i += 1;
         }
-        Ok(NbtTag::List(block_vec))
+        Ok(NBTTag::List(block_vec.into()))
     }
 
-    fn create_palette(region: *mut c_void) -> Result<Self, Box<dyn Error>> {
-        let len = unsafe { region_get_palette_len(region) };
+    fn create_palette(region: &Region) -> Result<Self, Box<dyn Error>> {
+        let len = region.palette_array.len();
         let mut i = 0;
         let mut palette_vec = vec![];
         while i < len {
-            let mut real_palette_vec = vec![];
-            let mut property_vec = vec![];
-            let property_len = unsafe { region_get_palette_property_len(region, i) };
-            let name = unsafe { region_get_palette_id_name(region, i) };
-            let real_name = cstring_to_str(name as *mut c_char)?;
-            let name_tag = NbtTag::String(real_name);
+            let mut real_palette_vec = HashMap::new();
+            let mut property_vec = HashMap::new();
+            let palette = &region.palette_array[i];
+            let property_len = palette.property.len();
+            let name = palette.id_name.clone();
+            let name_tag = NBTTag::String(name.into());
 
             let mut j = 0;
             while j < property_len {
-                let property_name = unsafe { region_get_palette_property_name(region, i, j) };
-                let property_data = unsafe { region_get_palette_property_data(region, i, j) };
-                let real_property_name = cstring_to_str(property_name as *mut c_char)?;
-                let real_property_data = cstring_to_str(property_data as *mut c_char)?;
-                let tag = NbtTag::String(real_property_data);
-                property_vec.push((real_property_name, tag));
+                let property_name = palette.property[j].0.clone();
+                let property_data = palette.property[j].1.clone();
+                let tag = NBTTag::String(property_data.into());
+                property_vec.insert(property_name, tag);
                 j += 1;
             }
-            let mut property_tag: Option<NbtTag> = None;
+            let mut property_tag: Option<NBTTag> = None;
             if property_len > 0 {
-                property_tag = Some(NbtTag::Compound(NbtCompound {
-                    child_tags: property_vec,
-                }));
+                property_tag = Some(NBTTag::Compound(property_vec.into()));
             }
-            real_palette_vec.push(("Name".to_string(), name_tag));
+            real_palette_vec.insert("Name".to_string(), name_tag);
             if property_tag.is_some() {
-                real_palette_vec.push(("Properties".to_string(), property_tag.unwrap()));
+                real_palette_vec.insert("Properties".to_string(), property_tag.unwrap());
             }
-            palette_vec.push(NbtTag::Compound(NbtCompound {
-                child_tags: real_palette_vec,
-            }));
+            palette_vec.push(NBTTag::Compound(real_palette_vec.into()));
             i += 1;
         }
-        Ok(NbtTag::List(palette_vec))
+        Ok(NBTTag::List(palette_vec.into()))
     }
 }
 
@@ -266,51 +223,39 @@ fn cstring_to_str(string: *mut c_char) -> Result<String, MyError> {
 }
 
 fn region_save_internal(
-    region: *mut c_void,
+    region: *mut Region,
     filename: *const c_char,
     output_config: *mut OutputConfig,
-    progress_fn: ProgressFn,
-    main_klass: *mut c_void,
-    cancel_flag: *const c_void,
-    elapsed_millisecs: u128,
-    free_memory: u64,
+    helper_struct: &HelperStruct,
 ) -> Result<(), Box<dyn Error>> {
     if region.is_null() || filename.is_null() {
         return Err(Box::new(MyError {
             msg: i18n("Nullptr detected!").to_string(),
         }));
     }
-    let mut i = 0;
-    let mut entity_vec = vec![];
-    while i < unsafe { region_get_entity_len(region) } {
-        let entity = unsafe { region_get_entity(region, i) };
-        let real_entity = unsafe { (&*entity).clone() };
-        entity_vec.push(real_entity);
-        i += 1;
-    }
-    let region_x = unsafe { region_get_x(region) };
-    let region_y = unsafe { region_get_y(region) };
-    let region_z = unsafe { region_get_z(region) };
-    let entity_nbt = NbtTag::create_entities(&entity_vec);
-    let size_nbt = NbtTag::create_size(region_x, region_y, region_z);
+    let real_region = unsafe { &*region };
+    let entity_vec = real_region.entity_array.clone();
+
+    let region_x = real_region.region_size.0;
+    let region_y = real_region.region_size.1;
+    let region_z = real_region.region_size.2;
+    let entity_nbt = NBTTag::create_entities(&entity_vec)?;
+    let size_nbt = NBTTag::create_size(region_x, region_y, region_z);
     let mut id = vec![];
     let mut i = 0;
     let size = region_x * region_y * region_z;
     let mut start = Instant::now();
     let mut sys = System::new_all();
     while i < size {
-        real_show_progress(
-            &mut start,
+        helper_struct.progress(
             &mut sys,
-            progress_fn,
-            main_klass,
+            &mut start,
             (((i + 1) as usize * 100) / size as usize) as c_int,
             i18n("Pushing index."),
-            "",
-            elapsed_millisecs,
-            free_memory,
+            i18n("Pushing index is cancelled!"),
         )?;
-        unsafe { id.push(region_get_block_id_by_index(region, i as usize)) };
+
+        id.push(real_region.block_array[i as usize]);
         i += 1;
     }
     let ignore_air;
@@ -319,84 +264,44 @@ fn region_save_internal(
     } else {
         ignore_air = false;
     }
-    let blocks_nbt = NbtTag::create_blocks(
-        region,
+    let blocks_nbt = NBTTag::create_blocks(
+        real_region,
         &id,
         ignore_air,
         &mut start,
         &mut sys,
-        progress_fn,
-        main_klass,
-        cancel_flag as *const AtomicBool,
-        elapsed_millisecs,
-        free_memory,
-    );
-    let palette_nbt = NbtTag::create_palette(region);
-    let data_version_nbt =
-        unsafe { NbtTag::create_data_version(region_get_data_version(region) as i32) };
-    let compound_vec = vec![
-        ("size".to_string(), size_nbt),
-        ("entities".to_string(), entity_nbt?),
-        ("blocks".to_string(), blocks_nbt?),
-        ("palette".to_string(), palette_nbt?),
-        ("DataVersion".to_string(), data_version_nbt),
-    ];
-    let nbt = Nbt {
-        name: "".to_string(),
-        root_tag: NbtCompound {
-            child_tags: compound_vec,
-        },
+        helper_struct,
+    )?;
+    let palette_nbt = NBTTag::create_palette(real_region)?;
+    let data_version_nbt = NBTTag::create_data_version(real_region.data_version as i32);
+    let mut compound_vec = HashMap::new();
+    compound_vec.insert("size".to_string(), size_nbt);
+    compound_vec.insert("entities".to_string(), entity_nbt);
+    compound_vec.insert("blocks".to_string(), blocks_nbt);
+    compound_vec.insert("palette".to_string(), palette_nbt);
+    compound_vec.insert("DataVersion".to_string(), data_version_nbt);
+    let nbt = NBTRoot {
+        tag_name: "".to_string(),
+        data: NBTTag::Compound(compound_vec.into()),
     };
-
-    let bytes = nbt.write().to_vec();
-    let mut failed: c_int = 0;
-    let ret = unsafe {
-        vec_try_compress(
-            Box::into_raw(Box::new(bytes)),
-            progress_fn,
-            main_klass,
-            &mut failed as *mut c_int,
-            false,
-            cancel_flag as *const AtomicBool,
-            elapsed_millisecs as u64,
-            free_memory,
-        )
-    };
-    let real_ret;
-    if failed == 1 {
-        return Err(Box::new(MyError {
-            msg: unsafe { String::from_utf8(*Box::from_raw(ret))? },
-        }));
-    } else {
-        real_ret = unsafe { Box::from_raw(ret) };
-    }
+    let mut buf = vec![];
+    let be = BigEndian::default();
+    nbt.write(&mut buf, be)?;
+    let ret = vec_try_compress_real(Box::into_raw(Box::new(buf)), helper_struct, false)?;
 
     let file = File::create(unsafe { CStr::from_ptr(filename) }.to_str()?);
-    file?.write_all(&real_ret)?;
+    file?.write_all(&ret)?;
     Ok(())
 }
 
 #[unsafe(no_mangle)]
 pub extern "C" fn region_save(
-    region: *mut c_void,
+    region: *mut Region,
     filename: *const c_char,
     output_config: *mut OutputConfig,
-    progress_fn: ProgressFn,
-    main_klass: *mut c_void,
-    cancel_flag: *const c_void,
-    elapsed_millisecs: u64,
-    free_memory: u64,
+    helper_struct: *mut HelperStruct,
 ) -> *const c_char {
-    match region_save_internal(
-        region,
-        filename,
-        output_config,
-        progress_fn,
-        main_klass,
-        cancel_flag,
-        elapsed_millisecs as u128,
-        free_memory,
-    ) {
+    match region_save_internal(region, filename, output_config, unsafe { &*helper_struct }) {
         Ok(()) => null(),
         Err(e) => string_to_ptr_fail_to_null(&e.to_string()),
     }

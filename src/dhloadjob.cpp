@@ -144,10 +144,8 @@ DhLoadJob::start ()
                                     = dynamic_cast<SingleModuleBase *> (base);
                                 void *region = nullptr;
                                 auto msg = singleBase->loadFunc (
-                                    tempObject.second.get (), setFunc, &region,
-                                    this, cancel_flag,
-                                    quint64 (DhConfig::elapsedMilliseconds ()),
-                                    quint64 (DhConfig::memoryLimit ()));
+                                    tempObject.second.get (), &region,
+                                    helper_struct.get ());
                                 if (msg)
                                   {
                                     QString prefix

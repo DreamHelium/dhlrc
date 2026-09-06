@@ -10,9 +10,8 @@
 QString
 dh::getTranslationDir ()
 {
-  auto dir = QApplication::applicationDirPath ();
-  dir += QDir::toNativeSeparators ("/");
-  dir += "locale";
+  auto dir
+      = QApplication::applicationDirPath () + QDir::separator () + "locale";
   return dir;
 }
 
@@ -25,12 +24,20 @@ dh::getRegion (QWidget *widget, ManageRegionUI *mr, bool write)
                              _ ("Manage Region window is not initialized"));
       return -1;
     }
-  auto realList = mr->getRegions ();
-  QStringList nameList;
-  for (const auto &i : realList)
-    nameList.append (i->get_lock_status () ? _ ("Locked") : i->get_name ());
-  int ret = GeneralChooseDialog::getIndex (
-      _ ("Select Region"), _ ("Please select a region."), nameList);
+  auto realList = ManageRegionUI::getRegions ();
+  auto nameList = ManageRegionUI::getRegionNames ();
+  auto dialog = new GeneralChooseDialog (
+      _ ("Select Region"), _ ("Please select a region."), nameList, false);
+  QObject::connect (ManageRegionUI::instance (),
+                    &ManageRegionUI::regionChanged, dialog,
+                    [dialog]
+                      {
+                        auto list = ManageRegionUI::getRegionNames ();
+                        dialog->repaint (list);
+                      });
+  int stat = dialog->exec ();
+  int ret = (stat == QDialog::Accepted) ? dialog->group->checkedId () : -1;
+  delete dialog;
 
   if (ret != -1)
     {

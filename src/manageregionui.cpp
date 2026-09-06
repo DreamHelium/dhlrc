@@ -12,6 +12,7 @@
 #include <QPushButton>
 #include <libintl.h>
 #include <qcheckbox.h>
+#include <qcontainerfwd.h>
 #include <qcoreapplication.h>
 #include <qevent.h>
 #include <qglobalstatic.h>
@@ -214,6 +215,8 @@ ManageRegionUI::instance ()
     mrui = new ManageRegionUI ();
   if (!mrui.isNull ())
     return mrui;
+  connect (qApp, &QCoreApplication::aboutToQuit, mrui,
+           &ManageRegionUI::deleteLater);
   throw std::logic_error ("ManageRegionUI is NULL.");
 }
 
@@ -227,6 +230,15 @@ QList<LoadObjectBase>
 ManageRegionUI::getLoadObjectList ()
 {
   return loadObjectList;
+}
+
+QStringList
+ManageRegionUI::getRegionNames ()
+{
+  QStringList nameList;
+  for (const auto &i : regions)
+    nameList.append (i->get_lock_status () ? _ ("Locked") : i->get_name ());
+  return nameList;
 }
 
 void
@@ -334,8 +346,6 @@ ManageRegionUI::dropEvent (QDropEvent *event)
 void
 ManageRegionUI::refresh_triggered ()
 {
-  if (mrui.isNull ())
-    return;
   for (auto &widget : frameLayout->children ())
     frameLayout->removeWidget (qobject_cast<QWidget *> (widget));
   for (auto &widget : itemFrames)

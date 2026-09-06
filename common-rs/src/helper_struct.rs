@@ -17,7 +17,7 @@ pub struct HelperStruct {
     pub progress_fn: ProgressFn,
     pub main_klass: *mut c_void,
     cancel_flag: *const AtomicBool,
-    elapsed_millisecs: u64,
+    pub elapsed_millisecs: u64,
     free_memory: u64,
 }
 
@@ -56,18 +56,32 @@ impl HelperStruct {
         str: &str,
         cancel_msg: &str,
     ) -> Result<(), Box<dyn Error>> {
-        show_progress_macro!(
-            instant,
-            sys,
-            self.progress_fn,
-            self.main_klass,
-            percentage,
-            (self.elapsed_millisecs) as u128,
-            self.free_memory,
-            str,
-            self.cancel_flag,
-            cancel_msg
-        );
+        self.get_cancel_error(cancel_msg)?;
+        if instant.elapsed().as_millis() >= self.elapsed_millisecs as u128 {
+            self.instant_progress(sys, instant, percentage, str)?
+        };
+        Ok(())
+    }
+
+    pub fn instant_progress(
+        &self,
+        sys: &mut System,
+        instant: &mut Instant,
+        percentage: c_int,
+        str: &str,
+    ) -> Result<(), Box<dyn Error>> {
+        finish_oom(sys, self.free_memory)?;
+        show_progress(self.progress_fn, self.main_klass, percentage, str, "");
+        *instant = Instant::now();
+        Ok(())
+    }
+
+    pub fn get_cancel_error(&self, cancel_msg: &str) -> Result<(), Box<dyn Error>> {
+        if cancel_flag_is_cancelled((self.cancel_flag)) == 1 {
+            return Err(Box::new(MyError {
+                msg: cancel_msg.to_string(),
+            }));
+        }
         Ok(())
     }
 }

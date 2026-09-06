@@ -37,14 +37,17 @@ public:
     QStringList names = { args... };
     return getIndexes (title, label, names, parent);
   }
+  Q_SLOT void repaint (const QStringList &list);
+  QButtonGroup *group;
 
 private:
   QVBoxLayout *allLayout;
   QScrollArea *scrollArea;
   QWidget *widget;
-  QButtonGroup *group;
   QVBoxLayout *layout;
   QHBoxLayout *btnLayout;
+  bool needMulti;
+  void paintButtons (const QStringList &list, int index);
 };
 
 #endif // DHLRC_GENERALCHOOSEDIALOG_H
