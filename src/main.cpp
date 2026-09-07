@@ -1,12 +1,12 @@
 #include "mainwindow.h"
 #include "utility.h"
+#include <KIconTheme>
 #include <KLocalizedString>
 #include <QApplication>
 #include <QDir>
 #include <QTranslator>
 #include <QWidget>
 #include <qcoreapplication.h>
-#include <KIconTheme>
 
 int
 main (int argc, char *argv[])

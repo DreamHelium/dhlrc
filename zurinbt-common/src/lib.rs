@@ -5,6 +5,7 @@ use common_rs::{
     region::Palette,
     util::{cstr_to_str, string_to_ptr_fail_to_null},
 };
+use formatx::formatx;
 use gettextrs::gettext;
 use std::{
     error::Error,
@@ -84,14 +85,7 @@ pub fn get_palette_from_nbt_tag(
             i18n("Getting Palette."),
             "Reading palette is cancelled!",
         )?;
-        let internal_compound = match palette {
-            NBTTag::Compound(c) => c,
-            _ => {
-                return Err(Box::from(MyError {
-                    msg: String::from(i18n("Wrong type of palette!")),
-                }));
-            }
-        };
+        let internal_compound = get_type_from_tag!(palette, Compound, "Palette");
         let internal_string = get_compound_value_err_return!(internal_compound, "Name")
             .view()
             .string()?;
@@ -105,14 +99,7 @@ pub fn get_palette_from_nbt_tag(
             let child = &properties_compound_option.unwrap().1.view().compound()?.0;
 
             for (name, data) in child {
-                let real_data = match data {
-                    NBTTag::String(x) => x.0.clone(),
-                    _ => {
-                        return Err(Box::from(MyError {
-                            msg: String::from(i18n("Wrong type of property!")),
-                        }));
-                    }
-                };
+                let real_data = &get_type_from_tag!(data, String, "Property").0;
                 ret.push((name.clone(), real_data.clone()));
             }
         }

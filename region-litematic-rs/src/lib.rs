@@ -127,17 +127,19 @@ fn get_block_id(
     let mut i = 0;
     let mut buf = vec![0; block_num as usize];
     loop {
-        helper_struct.progress(
-            sys,
-            instant,
-            (i as u64 * 100 / block_num as u64) as c_int,
-            &formatx!(
-                gettext_text(i18n("Reading block id: {} / {}.")),
-                i,
-                block_num
-            )?,
-            i18n("Cancelled when reading blocks"),
-        )?;
+        helper_struct.get_cancel_error(i18n("Cancelled when reading blocks"))?;
+        if instant.elapsed().as_millis() >= helper_struct.elapsed_millisecs as u128 {
+            helper_struct.instant_progress(
+                sys,
+                instant,
+                (i as u64 * 100 / block_num as u64) as c_int,
+                &formatx!(
+                    gettext_text(i18n("Reading block id: {} / {}.")),
+                    i,
+                    block_num
+                )?,
+            )?
+        }
 
         let start_bit = i as u32 * move_bit;
         let start_state = start_bit / 64;

@@ -11,6 +11,19 @@
             <tooltip>The limit memory(bytes) for application.</tooltip>
             <default>524288000</default>
         </entry>
+        <entry name="LimitUnit" type="Enum">
+            <!-- This will not render -->
+            <choices>
+                <choice name="GiB">
+                </choice>
+                <choice name="MiB">
+                </choice>
+                <choice name="KiB">
+                </choice>
+                <choice name="Bytes">
+                </choice>
+            </choices>
+        </entry>
         <entry name="ElapsedMilliseconds" type="Int">
             <label>Elapsed Milliseconds</label>
             <tooltip

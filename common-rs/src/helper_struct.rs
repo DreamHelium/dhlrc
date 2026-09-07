@@ -1,6 +1,4 @@
-use crate::{
-    ProgressFn, my_error::MyError, show_progress_macro, util::finish_oom, util::show_progress,
-};
+use crate::{ProgressFn, my_error::MyError, util::finish_oom, util::show_progress};
 use std::{
     error::Error,
     ffi::{c_int, c_void},

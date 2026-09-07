@@ -3,7 +3,9 @@
 #include "dhwidget.h"
 #include "manageregionui.h"
 #include "resourcegetter.h"
+#include <kcolorschememenu.h>
 #include <kcoreconfigskeleton.h>
+#include <kicontheme.h>
 #include <libintl.h>
 #include <memory>
 #include <qboxlayout.h>
@@ -12,7 +14,11 @@
 #include <qdialog.h>
 #include <qfiledialog.h>
 #include <qglobalstatic.h>
+#include <qlabel.h>
+#include <qlineedit.h>
+#include <qlogging.h>
 #include <qmainwindow.h>
+#include <qmenu.h>
 #include <qnamespace.h>
 #include <qobject.h>
 #include <qprogressbar.h>
@@ -21,6 +27,7 @@
 #include <qstyle.h>
 #include <qtabwidget.h>
 #include <qtmetamacros.h>
+#include <qtoolbar.h>
 #include <qwidget.h>
 #define _(str) gettext (str)
 #include "blockreaderui.h"
@@ -39,6 +46,10 @@
 #ifdef DH_DEBUG_IN_IDE
 #include "dhdebugwidget.h"
 #endif
+#include <KActionMenu>
+#include <KColorSchemeManager>
+#include <KColorSchemeMenu>
+#include <QMenuBar>
 
 using DownloaderList
     = QList<std::pair<QWidget *, std::shared_ptr<DhDownloader>>>;
@@ -150,6 +161,169 @@ public:
   };
 };
 
+class DhMemoryConfigTemplate : public DhConfigTemplate
+{
+
+public:
+  explicit DhMemoryConfigTemplate (KConfigSkeletonItem *item,
+                                   QVBoxLayout *layout, DhConfigDialog *dialog)
+      : DhConfigTemplate (item, layout, dialog)
+  {
+    DhMemoryConfigTemplate::initWidget (layout, dialog);
+  }
+
+  void
+  initWidget (QVBoxLayout *layout, DhConfigDialog *dialog) override
+  {
+    auto memoryItem = DhConfig::self ()->limitUnitItem ();
+    auto choices = memoryItem->choices ();
+
+    hLayout = new QHBoxLayout ();
+    layout->addLayout (hLayout);
+    hLayout->addWidget (new QLabel (item->label ()));
+
+    auto lineedit = new QLineEdit (QString::number (getValue (
+        item->property ().toInt (),
+        static_cast<DhConfig::EnumLimitUnit::type> (DhConfig::limitUnit ()))));
+    lineedit->setToolTip (item->toolTip ());
+    hLayout->addWidget (lineedit);
+
+    auto combobox = new QComboBox ();
+    for (const auto &i : choices)
+      combobox->addItem (i.name);
+    combobox->setCurrentIndex (DhConfig::limitUnit ());
+    hLayout->addWidget (combobox);
+
+    QObject::connect (combobox, &QComboBox::currentIndexChanged, dialog,
+                      &DhConfigDialog::detect);
+    QObject::connect (lineedit, &QLineEdit::textChanged, dialog,
+                      &DhConfigDialog::detect);
+    widget = lineedit;
+    comboBox = combobox;
+  }
+
+  void
+  applyChange () const override
+  {
+    auto value = qobject_cast<QLineEdit *> (widget)->text ().toDouble ();
+    auto unit = comboBox->currentIndex ();
+    item->setProperty (getSaveValue (
+        value, static_cast<DhConfig::EnumLimitUnit::type> (unit)));
+    DhConfig::self ()->limitUnitItem ()->setProperty (unit);
+  }
+
+  [[nodiscard]] bool
+  detect () const override
+  {
+    auto unit = comboBox->currentIndex ();
+    auto unitValue = DhConfig::self ()->limitUnit ();
+
+    if (unit != unitValue)
+      return true;
+    auto value = qobject_cast<QLineEdit *> (widget)->text ().toDouble ();
+    auto originalValue = item->property ().toInt ();
+    auto returnedValue = getSaveValue (
+        value, static_cast<DhConfig::EnumLimitUnit::type> (unit));
+
+    if (originalValue != returnedValue)
+      return true;
+    return false;
+  }
+
+  void
+  setDefault () const override
+  {
+    auto unit = DhConfig::self ()->limitUnitItem ()->getDefault ().toInt ();
+    comboBox->setCurrentIndex (unit);
+    auto value = item->getDefault ().toInt ();
+    qobject_cast<QLineEdit *> (widget)->setText (QString::number (
+        getValue (value, static_cast<DhConfig::EnumLimitUnit::type> (unit))));
+  }
+
+  void
+  changeConfig () const override
+  {
+    auto unit = DhConfig::self ()->limitUnit ();
+    comboBox->setCurrentIndex (unit);
+    auto value = item->property ().toInt ();
+    qobject_cast<QLineEdit *> (widget)->setText (QString::number (
+        getValue (value, static_cast<DhConfig::EnumLimitUnit::type> (unit))));
+  }
+
+private:
+  double
+  getValue (int value, DhConfig::EnumLimitUnit::type unit) const
+  {
+    switch (unit)
+      {
+      case DhConfig::EnumLimitUnit::GiB:
+        return (double)value / 1024 / 1024 / 1024;
+      case DhConfig::EnumLimitUnit::MiB:
+        return (double)value / 1024 / 1024;
+      case DhConfig::EnumLimitUnit::KiB:
+        return (double)value / 1024;
+      case DhConfig::EnumLimitUnit::Bytes:
+        return (double)value;
+      default:
+        return 0;
+      }
+  }
+  int
+  getSaveValue (double value, DhConfig::EnumLimitUnit::type unit) const
+  {
+    switch (unit)
+      {
+      case DhConfig::EnumLimitUnit::GiB:
+        return value * 1024 * 1024 * 1024;
+      case DhConfig::EnumLimitUnit::MiB:
+        return value * 1024 * 1024;
+      case DhConfig::EnumLimitUnit::KiB:
+        return value * 1024;
+      case DhConfig::EnumLimitUnit::Bytes:
+        return value;
+      default:
+        return 0;
+      }
+  }
+  QComboBox *comboBox;
+};
+
+class DhEmptyConfigTemplate : public DhConfigTemplate
+{
+
+public:
+  explicit DhEmptyConfigTemplate (KConfigSkeletonItem *item,
+                                  QVBoxLayout *layout, DhConfigDialog *dialog)
+      : DhConfigTemplate (item, layout, dialog)
+  {
+  }
+  void
+  initWidget (QVBoxLayout *layout, DhConfigDialog *dialog) override
+  {
+  }
+
+  void
+  applyChange () const override
+  {
+  }
+
+  [[nodiscard]] bool
+  detect () const override
+  {
+    return false;
+  }
+
+  void
+  setDefault () const override
+  {
+  }
+
+  void
+  changeConfig () const override
+  {
+  }
+};
+
 template <typename T>
 auto genTemplate =
     [] (KConfigSkeletonItem *item, QVBoxLayout *layout, DhConfigDialog *dialog)
@@ -159,6 +333,24 @@ MainWindow::MainWindow (QWidget *parent) : QMainWindow (parent)
 {
   mainWindow = this;
   resize (800, 800);
+  auto menu = new QMenu (_ ("Config"));
+  auto iconMenu = new QMenu (_ ("Icon Theme"));
+  menu->addAction (
+      KColorSchemeMenu::createMenu (KColorSchemeManager::instance ()));
+  menu->addMenu (iconMenu);
+  for (const auto &i : KIconTheme::list ())
+    {
+      auto action = new QAction (i);
+      iconMenu->addAction (action);
+      connect (action, &QAction::triggered, action,
+               [action]
+                 {
+                   auto str = action->text ();
+                   QIcon::setThemeName (str);
+                 });
+    }
+
+  menuBar ()->addMenu (menu);
 
   scrollArea = new QScrollArea ();
   scrollArea->setWidgetResizable (true);
@@ -237,83 +429,87 @@ MainWindow::MainWindow (QWidget *parent) : QMainWindow (parent)
                              genTemplate<DhEnumConfigTemplate>);
   dialog->addTemplateByItem (DhConfig::self ()->cacheDirectoryItem (),
                              genTemplate<DhDirectoryConfigTemplate>);
+  dialog->addTemplateByItem (DhConfig::self ()->memoryLimitItem (),
+                             genTemplate<DhMemoryConfigTemplate>);
+  dialog->addTemplateByItem (DhConfig::self ()->limitUnitItem (),
+                             genTemplate<DhEmptyConfigTemplate>);
   dialog->addAssistant (std::make_unique<DhSetConfigAssistant> ());
   dialog->addLongTextItems ("Description");
 
   connect (lineEdit, &QLineEdit::textChanged, this,
            [&] (const QString &pattern)
              { proxyModel->setFilterRegularExpression (pattern); });
-  connect (listView, &QListView::doubleClicked, this,
-           [&] (const QModelIndex &index)
-             {
-               switch (index.row ())
-                 {
-                 case 0:
-                   {
-                     auto enui = new ExternalNbtReaderUI ();
-                     auto tabIndex
-                         = tabWidget->addTab (enui, _ ("NBT Reader"));
-                     tabWidget->setCurrentIndex (tabIndex);
-                     break;
-                   }
-                 case 1:
-                   {
-                     auto uiIndex
-                         = tabWidget->indexOf (ManageRegionUI::instance ());
-                     if (uiIndex == -1)
-                       uiIndex = tabWidget->addTab (
-                           ManageRegionUI::instance (), _ ("Manage Region"));
-                     tabWidget->setCurrentIndex (uiIndex);
-                     break;
-                   }
-                 case 2:
-                   {
-                     auto region = dh::getRegion (
-                         this, ManageRegionUI::instance (), false);
-                     if (region != -1)
-                       {
-                         auto downloader = std::make_shared<DhDownloader> ();
-                         auto brui = new BlockReaderUI (region, downloader);
-                         downloaderList->emplace_back (
-                             qobject_cast<QWidget *> (brui), downloader);
-                         auto tabIndex = tabWidget->addTab (
-                             brui, _ ("Region Reader/Modifier"));
-                         tabWidget->setCurrentIndex (tabIndex);
-                         connect (brui, &BlockReaderUI::windowClosed, this,
-                                  [] (QWidget *win)
-                                    {
-                                      for (const auto &i : *downloaderList)
-                                        {
-                                          if (i.first == win)
-                                            {
-                                              i.second->finish ();
-                                              downloaderList->removeOne (i);
-                                            }
-                                        }
-                                    });
-                       }
-                     break;
-                   }
-                 case 3:
-                   {
-                     auto dialog = DhConfigDialog::instance ();
-                     dialog->raise ();
-                     dialog->activateWindow ();
-                     dialog->show ();
-                     break;
-                   }
+  connect (
+      listView, &QListView::doubleClicked, this,
+      [&] (const QModelIndex &index)
+        {
+          switch (index.row ())
+            {
+            case 0:
+              {
+                auto enui = new ExternalNbtReaderUI ();
+                auto tabIndex = tabWidget->addTab (enui, _ ("NBT Reader"));
+                tabWidget->setCurrentIndex (tabIndex);
+                break;
+              }
+            case 1:
+              {
+                auto uiIndex
+                    = tabWidget->indexOf (ManageRegionUI::instance ());
+                if (uiIndex == -1)
+                  uiIndex = tabWidget->addTab (ManageRegionUI::instance (),
+                                               _ ("Manage Region"));
+                tabWidget->setCurrentIndex (uiIndex);
+                break;
+              }
+            case 2:
+              {
+                auto region
+                    = dh::getRegion (this, ManageRegionUI::instance (), false);
+                if (region != -1)
+                  {
+                    auto downloader = std::make_shared<DhDownloader> ();
+                    auto brui = new BlockReaderUI (region, downloader);
+                    downloaderList->emplace_back (
+                        qobject_cast<QWidget *> (brui), downloader);
+                    auto tabIndex = tabWidget->addTab (
+                        brui, _ ("Region Reader/Modifier"));
+                    tabWidget->setCurrentIndex (tabIndex);
+                    connect (brui, &BlockReaderUI::windowClosed, this,
+                             [] (QWidget *win)
+                               {
+                                 for (const auto &i : *downloaderList)
+                                   {
+                                     if (i.first == win)
+                                       {
+                                         i.second->finish ();
+                                         downloaderList->removeOne (i);
+                                       }
+                                   }
+                               });
+                  }
+                break;
+              }
+            case 3:
+              {
+                auto dialog = DhConfigDialog::instance ();
+                dialog->raise ();
+                dialog->activateWindow ();
+                dialog->show ();
+                break;
+              }
 #ifdef DH_DEBUG_IN_IDE
-                 case 4:
-                   {
-                     auto widget = new DhDebugWidget;
-                     widget->setAttribute (Qt::WA_DeleteOnClose);
-                     widget->show ();
-                   }
+            case 4:
+              {
+                auto widget = new DhDebugWidget;
+                widget->setAttribute (Qt::WA_DeleteOnClose);
+                widget->show ();
+              }
 #endif
-                 default:
-                   break;
-                 }
-             });
+            default:
+              break;
+            }
+        });
   connect (tabWidget, &QTabWidget::tabCloseRequested, this,
            [&] (int index)
              {
@@ -356,7 +552,7 @@ MainWindow::~MainWindow ()
 }
 
 void
-MainWindow::addWidgetToToolBar (QWidget *widget)
+MainWindow::addWidgetToTopArea (QWidget *widget)
 {
   if (mainWindow)
     {

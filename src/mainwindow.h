@@ -18,7 +18,7 @@ class MainWindow : public QMainWindow
 public:
   explicit MainWindow (QWidget *parent = nullptr);
   ~MainWindow () override;
-  static void addWidgetToToolBar (QWidget *widget);
+  static void addWidgetToTopArea (QWidget *widget);
   static void addWidgetToTab (QWidget *widget, const QString &title);
   static MainWindow *instance ();
 

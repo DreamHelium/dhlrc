@@ -127,7 +127,7 @@ impl NbtCreate for NBTTag {
         let mut i = 0;
         let mut block_vec = vec![];
         for state in states {
-            helper_struct.get_cancel_error(i18n("Adding blocks is cancelled."));
+            helper_struct.get_cancel_error(i18n("Adding blocks is cancelled."))?;
             if instant.elapsed().as_millis() >= helper_struct.elapsed_millisecs as u128 {
                 helper_struct.instant_progress(
                     system,
@@ -207,18 +207,6 @@ impl NbtCreate for NBTTag {
             i += 1;
         }
         Ok(NBTTag::List(palette_vec.into()))
-    }
-}
-
-fn cstring_to_str(string: *mut c_char) -> Result<String, MyError> {
-    unsafe {
-        match CString::from_raw(string).into_string() {
-            Ok(str) => Ok(str),
-            Err(e) => {
-                string_free(string);
-                Err(MyError::new(e.to_string()))
-            }
-        }
     }
 }
 

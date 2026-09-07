@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-06 23:48+0800\n"
+"POT-Creation-Date: 2026-09-07 22:54+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -51,7 +51,7 @@ msgid "z"
 msgstr ""
 
 #: ../../src/blocklistui.cpp:59 ../../src/blocklistui.cpp:62
-#: ../../build/src/settings.cpp:103 rc.cpp:144
+#: ../../build/src/settings.cpp:127 rc.cpp:144
 msgid "Palette"
 msgstr ""
 
@@ -203,7 +203,7 @@ msgstr ""
 msgid "Continue"
 msgstr ""
 
-#: ../../src/externalnbtreaderui.cpp:29 ../../src/mainwindow.cpp:255
+#: ../../src/externalnbtreaderui.cpp:29 ../../src/mainwindow.cpp:451
 msgid "NBT Reader"
 msgstr ""
 
@@ -262,27 +262,35 @@ msgstr ""
 msgid "Minecraft Structure Modifier"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:143
+#: ../../src/mainwindow.cpp:154
 msgid "Select Cache Directory"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:185
+#: ../../src/mainwindow.cpp:336
+msgid "Config"
+msgstr ""
+
+#: ../../src/mainwindow.cpp:337
+msgid "Icon Theme"
+msgstr ""
+
+#: ../../src/mainwindow.cpp:377
 msgid "Search..."
 msgstr ""
 
-#: ../../src/mainwindow.cpp:213
+#: ../../src/mainwindow.cpp:405
 msgid "NBT File Reader"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:214 ../../src/mainwindow.cpp:265
+#: ../../src/mainwindow.cpp:406 ../../src/mainwindow.cpp:461
 msgid "Manage Region"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:215 ../../src/mainwindow.cpp:280
+#: ../../src/mainwindow.cpp:407 ../../src/mainwindow.cpp:476
 msgid "Region Reader/Modifier"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:216
+#: ../../src/mainwindow.cpp:408
 msgid "Settings"
 msgstr ""
 
@@ -362,7 +370,7 @@ msgstr ""
 msgid "Please enter a data."
 msgstr ""
 
-#: ../../src/paletteaddui.cpp:68 ../../build/src/settings.cpp:109 rc.cpp:147
+#: ../../src/paletteaddui.cpp:68 ../../build/src/settings.cpp:133 rc.cpp:147
 msgid "Name"
 msgstr ""
 
@@ -444,117 +452,121 @@ msgstr ""
 msgid "The limit memory(bytes) for application."
 msgstr ""
 
-#: ../../build/src/settings.cpp:43 rc.cpp:78
+#: ../../build/src/settings.cpp:64
+msgid "LimitUnit"
+msgstr ""
+
+#: ../../build/src/settings.cpp:67 rc.cpp:78
 msgid "Elapsed Milliseconds"
 msgstr ""
 
-#: ../../build/src/settings.cpp:44
+#: ../../build/src/settings.cpp:68
 msgid ""
 "The elapsed milliseconds for the progress bar, if set too small will affect "
 "the speed."
 msgstr ""
 
-#: ../../build/src/settings.cpp:47 rc.cpp:81
+#: ../../build/src/settings.cpp:71 rc.cpp:81
 msgid "Select All Regions In Loading"
 msgstr ""
 
-#: ../../build/src/settings.cpp:48
+#: ../../build/src/settings.cpp:72
 msgid "If you check this, all regions will be loaded in the loading progress."
 msgstr ""
 
-#: ../../build/src/settings.cpp:51 rc.cpp:84
+#: ../../build/src/settings.cpp:75 rc.cpp:84
 msgid "Loading File by File Extension"
 msgstr ""
 
-#: ../../build/src/settings.cpp:52
+#: ../../build/src/settings.cpp:76
 msgid "If you check this, the file will be loaded by the file extension name."
 msgstr ""
 
-#: ../../build/src/settings.cpp:55 rc.cpp:87
+#: ../../build/src/settings.cpp:79 rc.cpp:87
 msgid "Retry Loading File when Failed"
 msgstr ""
 
-#: ../../build/src/settings.cpp:56
+#: ../../build/src/settings.cpp:80
 msgid "When failed, the file will try to be loaded by other modules."
 msgstr ""
 
-#: ../../build/src/settings.cpp:59 rc.cpp:90
+#: ../../build/src/settings.cpp:83 rc.cpp:90
 msgid "Cache Directory"
 msgstr ""
 
-#: ../../build/src/settings.cpp:60 rc.cpp:93
+#: ../../build/src/settings.cpp:84 rc.cpp:93
 msgid "The directory to store cache files."
 msgstr ""
 
-#: ../../build/src/settings.cpp:63 rc.cpp:96
+#: ../../build/src/settings.cpp:87 rc.cpp:96
 msgid "Use Cached File when Downloading Failed"
 msgstr ""
 
-#: ../../build/src/settings.cpp:64 rc.cpp:99
+#: ../../build/src/settings.cpp:88 rc.cpp:99
 msgid "When downloading failed, use the cached file."
 msgstr ""
 
-#: ../../build/src/settings.cpp:69 rc.cpp:149 ../../region-rs/src/default.rs:58
+#: ../../build/src/settings.cpp:93 rc.cpp:149 ../../region-rs/src/default.rs:58
 msgid "Converted"
 msgstr ""
 
-#: ../../build/src/settings.cpp:70 rc.cpp:102
+#: ../../build/src/settings.cpp:94 rc.cpp:102
 msgid "Region Base Name"
 msgstr ""
 
-#: ../../build/src/settings.cpp:71 rc.cpp:105
+#: ../../build/src/settings.cpp:95 rc.cpp:105
 msgid "The default base name for the region."
 msgstr ""
 
-#: ../../build/src/settings.cpp:73 rc.cpp:150 ../../region-rs/src/default.rs:60
+#: ../../build/src/settings.cpp:97 rc.cpp:150 ../../region-rs/src/default.rs:60
 msgid "Unnamed"
 msgstr ""
 
-#: ../../build/src/settings.cpp:74 rc.cpp:108 rc.cpp:246
+#: ../../build/src/settings.cpp:98 rc.cpp:108 rc.cpp:246
 msgid "Region Name"
 msgstr ""
 
-#: ../../build/src/settings.cpp:75 rc.cpp:111
+#: ../../build/src/settings.cpp:99 rc.cpp:111
 msgid "The default name for the region."
 msgstr ""
 
-#: ../../build/src/settings.cpp:78 rc.cpp:114
+#: ../../build/src/settings.cpp:102 rc.cpp:114
 msgid "Region Description"
 msgstr ""
 
-#: ../../build/src/settings.cpp:79 rc.cpp:117
+#: ../../build/src/settings.cpp:103 rc.cpp:117
 msgid "The default description for the region."
 msgstr ""
 
-#: ../../build/src/settings.cpp:82 rc.cpp:120
+#: ../../build/src/settings.cpp:106 rc.cpp:120
 msgid "Region Author"
 msgstr ""
 
-#: ../../build/src/settings.cpp:83 rc.cpp:123
+#: ../../build/src/settings.cpp:107 rc.cpp:123
 msgid "The default author for the region."
 msgstr ""
 
-#: ../../build/src/settings.cpp:89 rc.cpp:126
+#: ../../build/src/settings.cpp:113 rc.cpp:126
 msgid "Override Settings"
 msgstr ""
 
-#: ../../build/src/settings.cpp:90 rc.cpp:129
+#: ../../build/src/settings.cpp:114 rc.cpp:129
 msgid "Whether to override setting or not."
 msgstr ""
 
-#: ../../build/src/settings.cpp:93 rc.cpp:132
+#: ../../build/src/settings.cpp:117 rc.cpp:132
 msgid "Override Version"
 msgstr ""
 
-#: ../../build/src/settings.cpp:94 rc.cpp:135
+#: ../../build/src/settings.cpp:118 rc.cpp:135
 msgid "The version to override in translation stage."
 msgstr ""
 
-#: ../../build/src/settings.cpp:113 rc.cpp:138
+#: ../../build/src/settings.cpp:137 rc.cpp:138
 msgid "Default Show Option"
 msgstr ""
 
-#: ../../build/src/settings.cpp:114 rc.cpp:141
+#: ../../build/src/settings.cpp:138 rc.cpp:141
 msgid "The default option of showing block information."
 msgstr ""
 
@@ -758,7 +770,7 @@ msgstr ""
 msgid "Operation canceled!"
 msgstr ""
 
-#: ../../nbt-component/src/lib.rs:132 ../../region-litematic-rs/src/lib.rs:357
+#: ../../nbt-component/src/lib.rs:132 ../../region-litematic-rs/src/lib.rs:359
 #: ../../region-nbt-rs/src/lib.rs:273
 msgid "Region value not provided"
 msgstr ""
@@ -783,24 +795,24 @@ msgstr ""
 msgid "Litematic File (*.litematic)"
 msgstr ""
 
-#: ../../region-litematic-rs/src/lib.rs:135
+#: ../../region-litematic-rs/src/lib.rs:130
+msgid "Cancelled when reading blocks"
+msgstr ""
+
+#: ../../region-litematic-rs/src/lib.rs:137
 #, rust-format
 msgid "Reading block id: {} / {}."
 msgstr ""
 
-#: ../../region-litematic-rs/src/lib.rs:139
-msgid "Cancelled when reading blocks"
-msgstr ""
-
-#: ../../region-litematic-rs/src/lib.rs:155
+#: ../../region-litematic-rs/src/lib.rs:157
 msgid "Out of range!"
 msgstr ""
 
-#: ../../region-litematic-rs/src/lib.rs:169
+#: ../../region-litematic-rs/src/lib.rs:171
 msgid "Reading block finished!"
 msgstr ""
 
-#: ../../region-litematic-rs/src/lib.rs:212
+#: ../../region-litematic-rs/src/lib.rs:214
 msgid "Wrong type of region."
 msgstr ""
 
@@ -850,15 +862,15 @@ msgstr ""
 msgid "Adding blocks to NBT: {} / {}."
 msgstr ""
 
-#: ../../region-nbt-rs/src/output.rs:233
+#: ../../region-nbt-rs/src/output.rs:221
 msgid "Nullptr detected!"
 msgstr ""
 
-#: ../../region-nbt-rs/src/output.rs:254
+#: ../../region-nbt-rs/src/output.rs:242
 msgid "Pushing index."
 msgstr ""
 
-#: ../../region-nbt-rs/src/output.rs:255
+#: ../../region-nbt-rs/src/output.rs:243
 msgid "Pushing index is cancelled!"
 msgstr ""
 
@@ -878,16 +890,8 @@ msgstr ""
 msgid "The index is out of range."
 msgstr ""
 
-#: ../../zurinbt-common/src/lib.rs:84
+#: ../../zurinbt-common/src/lib.rs:85
 msgid "Getting Palette."
-msgstr ""
-
-#: ../../zurinbt-common/src/lib.rs:91
-msgid "Wrong type of palette!"
-msgstr ""
-
-#: ../../zurinbt-common/src/lib.rs:112
-msgid "Wrong type of property!"
 msgstr ""
 
 #: ../../src/dhgameconfigui.h:15

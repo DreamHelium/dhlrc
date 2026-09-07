@@ -163,11 +163,11 @@ DhLoadJob::start ()
                                   {
                                     QString prefix
                                         = _ ("Loading region type %1");
-                                    prefix = prefix.arg (pair.first);
+                                    prefix = prefix.arg (typeList[0].second);
                                     QString message = _ (
                                         "Loading progress is successful, but "
                                         "the file type should be %1.");
-                                    message = message.arg (typeList[0].second);
+                                    message = message.arg (pair.first);
                                     err.appendError (message, prefix);
                                   }
                                 break;
@@ -340,7 +340,7 @@ DhAllLoadJob::DhAllLoadJob (QStringList list, QObject *parent)
   QString text = _ ("Finish processing %1 of %2 (%3%).");
   text = text.arg (this->finishedJobs).arg (this->jobNums).arg (percent ());
   messageWidget->setText (text);
-  MainWindow::addWidgetToToolBar (messageWidget);
+  MainWindow::addWidgetToTopArea (messageWidget);
   connect (this, &DhAllLoadJob::percentChanged, this,
            [&]
              {
@@ -368,7 +368,7 @@ DhAllLoadJob::DhAllLoadJob (QStringList list, QObject *parent)
                        connect (failedWidget,
                                 &KMessageWidget::hideAnimationFinished,
                                 failedWidget, &KMessageWidget::deleteLater);
-                       MainWindow::addWidgetToToolBar (failedWidget);
+                       MainWindow::addWidgetToTopArea (failedWidget);
                        failedWidget->setMessageType (KMessageWidget::Error);
                        failedWidget->setText (failedText);
                        failedWidget->setTextFormat (Qt::MarkdownText);
@@ -387,7 +387,7 @@ DhAllLoadJob::DhAllLoadJob (QStringList list, QObject *parent)
       job->messageWidget->setCloseButtonVisible (false);
       connect (job->messageWidget, &KMessageWidget::hideAnimationFinished,
                job->messageWidget, &KMessageWidget::deleteLater);
-      MainWindow::addWidgetToToolBar (job->messageWidget);
+      MainWindow::addWidgetToTopArea (job->messageWidget);
       connect (job, &DhLoadJob::infoMessage, this,
                [&, i] (KJob *realjob, const QString &str)
                  {
