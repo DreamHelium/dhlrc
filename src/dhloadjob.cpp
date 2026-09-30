@@ -9,10 +9,25 @@
 #include "manageregionui.h"
 #include "region.h"
 #include "settings.h"
+#include "utility.h"
 #undef asprintf
 #include <QTimer>
 #include <qfileinfo.h>
 #include <qtconcurrentrun.h>
+
+/* Shared message helpers, so the same wording is not spelled out repeatedly.
+ */
+static QString
+loadingTypePrefix (const QString &type)
+{
+  return QString (_ ("Loading region type %1")).arg (type);
+}
+
+static QString
+failedMessage (const QString &state, const QString &error)
+{
+  return QString (_ ("Failed when %1: %2")).arg (state).arg (error);
+}
 
 void
 DhLoadJob::start ()
@@ -73,11 +88,11 @@ DhLoadJob::start ()
                      * [type, fileSuffix]
                      */
                     QList<std::pair<QString, QString>> typeList;
-                    for (const auto &i : baseList)
+                    for (const auto &base : baseList)
                       {
-                        auto base = i;
-                        if (base->baseType == tempObject.first)
-                          typeList.append ({ base->type, base->fileSuffix });
+                        if (base->baseType () == tempObject.first)
+                          typeList.append (
+                              { base->type (), base->fileSuffix () });
                       }
                     /* try */
                     /* Temporary strategy:
@@ -120,58 +135,49 @@ DhLoadJob::start ()
                     DhMultiLoadError err;
                     for (const auto &pair : typeList)
                       {
-                        auto type = pair.first;
-                        ModuleBase *base = nullptr;
-                        for (const auto &i : baseList)
+                        auto *base = ManageRegionUI::getModule (pair.first);
+                        if (!base)
+                          continue;
+                        if (auto *multi = base->multi ())
                           {
-                            if (i->type == type)
+                            if (loadMultiRegion (
+                                    multi, tempObject.second.get (), err))
                               {
-                                base = i;
+                                typeName = base->type ();
                                 break;
                               }
                           }
-                        if (base)
+                        else if (auto *single = base->single ())
                           {
-                            if (base->multiSupport)
+                            void *region = nullptr;
+                            auto msg = single->loadFunc (
+                                tempObject.second.get (), &region,
+                                helper_struct.get ());
+                            if (msg)
                               {
-                                if (loadMultiRegion (
-                                        base, tempObject.second.get (), err))
-                                  break;
+                                err.appendError (
+                                    msg, loadingTypePrefix (base->type ()));
+                                string_free (msg);
+                                continue;
                               }
-                            else
+                            /* GUI label: the file name without the
+                             * extension. The region's own name comes from the
+                             * file itself. */
+                            auto displayName
+                                = QFileInfo (filename).completeBaseName ();
+                            ManageRegionUI::appendRegion (region, displayName);
+                            if (pair != typeList[0])
                               {
-                                auto singleBase
-                                    = dynamic_cast<SingleModuleBase *> (base);
-                                void *region = nullptr;
-                                auto msg = singleBase->loadFunc (
-                                    tempObject.second.get (), &region,
-                                    helper_struct.get ());
-                                if (msg)
-                                  {
-                                    QString prefix
-                                        = _ ("Loading region type %1");
-                                    prefix = prefix.arg (singleBase->type);
-                                    err.appendError (msg, prefix);
-                                    string_free (msg);
-                                    continue;
-                                  }
-                                auto fileBaseName
-                                    = QFileInfo (filename).completeBaseName ();
-                                ManageRegionUI::appendRegion (region,
-                                                              fileBaseName);
-                                if (pair != typeList[0])
-                                  {
-                                    QString prefix
-                                        = _ ("Loading region type %1");
-                                    prefix = prefix.arg (typeList[0].second);
-                                    QString message = _ (
-                                        "Loading progress is successful, but "
-                                        "the file type should be %1.");
-                                    message = message.arg (pair.first);
-                                    err.appendError (message, prefix);
-                                  }
-                                break;
+                                QString message
+                                    = _ ("Loading progress is successful, but "
+                                         "the file type should be %1.");
+                                message = message.arg (pair.first);
+                                err.appendError (
+                                    message,
+                                    loadingTypePrefix (typeList[0].second));
                               }
+                            typeName = base->type ();
+                            break;
                           }
                       }
                     throw err;
@@ -179,31 +185,27 @@ DhLoadJob::start ()
             .onFailed (
                 [&] (const DhLoadError &err)
                   {
-                    QString msg = _ ("Failed when %1: %2");
-                    msg = msg.arg (err.state).arg (err.error);
                     QString realMsg = "**%1**:\n\n%2";
-                    realMsg = realMsg.arg (filename).arg (msg);
+                    realMsg = realMsg.arg (filename).arg (
+                        failedMessage (err.state, err.error));
                     setErrorText (realMsg);
                     Q_EMIT emitResult ();
                   })
             .onFailed (
                 [&] (const DhMultiLoadError &err)
                   {
-                    QString realFailMsg;
-                    for (auto i = 0; i < err.errors.length (); i++)
+                    QStringList messages;
+                    for (const auto &loadError : err.errors)
                       {
-                        QString msg = _ ("Failed when %1: %2");
-                        msg = msg.arg (err.errors[i].state)
-                                  .arg (err.errors[i].error);
-                        if (i != err.errors.length () - 1)
-                          msg += "\n\n";
-                        realFailMsg += msg;
+                        messages << failedMessage (loadError.state,
+                                                   loadError.error);
                       }
                     QString realMsg;
-                    if (!realFailMsg.isEmpty ())
+                    if (!messages.isEmpty ())
                       {
                         realMsg = "**%1**:\n\n%2";
-                        realMsg = realMsg.arg (filename).arg (realFailMsg);
+                        realMsg = realMsg.arg (filename).arg (
+                            messages.join ("\n\n"));
                       }
                     setErrorText (realMsg);
                     Q_EMIT emitResult ();
@@ -215,16 +217,13 @@ DhLoadJob::start ()
                     Q_EMIT emitResult ();
                   })
             .onCanceled ([&] { Q_EMIT emitResult (); });
-  /* It seems that we don't need this. */
-  connect (this, &DhLoadJob::selfCancel, this,
-           [&] { /*this->future.cancelChain ();*/ });
 }
 
 bool
 DhLoadJob::doResume ()
 {
   auto indexes = GeneralChooseDialog::getIndexes (
-      _ ("Select a Region"), _ ("Please select a region."), regionList);
+      _ ("Select Region(s)"), _ ("Please select region(s)."), regionList);
   if (!indexes.isEmpty ())
     regionIndexes = indexes;
   cv.notify_one ();
@@ -265,28 +264,27 @@ DhLoadJob::setFunc (void *main_klass, int value, const char *text,
 }
 
 bool
-DhLoadJob::loadMultiRegion (ModuleBase *base, void *object,
+DhLoadJob::loadMultiRegion (MultiModuleBase *multiBase, void *object,
                             DhMultiLoadError &err)
 {
-  auto multiBase = dynamic_cast<MultiModuleBase *> (base);
-  if (!multiBase)
-    {
-      err.appendError (_ ("Not a valid multi-region module"),
-                       _ ("Loading Region"));
-      return false;
-    }
+  /* A previous attempt in the retry loop may have filled these; start clean so
+   * the region list is not duplicated. */
+  regionList.clear ();
+  regionIndexes.clear ();
+
   auto num = multiBase->numFunc (object);
   for (int j = 0; j < num; j++)
     {
       auto name = multiBase->nameFunc (object, j);
-      regionList.append (name);
+      if (name)
+        regionList.append (name);
       string_free (name);
     }
   if (!DhConfig::selectAllRegionsInLoading ())
     {
 
-      Q_EMIT infoMessage (this,
-                          _ ("Please click `Continue` to choose region(s)."));
+      Q_EMIT infoMessage (this, _ ("Please click `Continue` to choose "
+                                   "the region(s) to load."));
       /* Emit the stop signal to stop, and use loop to
        * stop the process. */
       Q_EMIT selfSuspended (this);
@@ -308,15 +306,24 @@ DhLoadJob::loadMultiRegion (ModuleBase *base, void *object,
       if (msg)
         {
           QString prefix = _ ("Loading region type %1");
-          prefix = prefix.arg (multiBase->type);
+          prefix = prefix.arg (multiBase->type ());
           err.appendError (msg, prefix);
           string_free (msg);
           return false;
         }
-      auto name = region_get_region_name (singleRegion);
+      const char *rawName = region_get_region_name (singleRegion);
+      QString name = rawName ? QString::fromUtf8 (rawName) : QString ();
+      /* File name without the extension, so the pattern shows "house" rather
+       * than "house.litematic". */
       auto fileBaseName = QFileInfo (filename).completeBaseName ();
-      ManageRegionUI::appendRegion (singleRegion, fileBaseName + " - " + name);
-      string_free (name);
+      /* GUI label for the region list, built from the configured pattern. If
+       * it expands to nothing, fall back to a plain "file - region". */
+      auto displayName = dh::expandRegionNamePattern (
+          DhConfig::multiRegionNamePattern (), fileBaseName, name);
+      if (displayName.trimmed ().isEmpty ())
+        displayName = QStringLiteral ("%1 - %2").arg (fileBaseName).arg (name);
+      string_free (rawName);
+      ManageRegionUI::appendRegion (singleRegion, displayName);
     }
   if (regionList.isEmpty ())
     return false;
@@ -330,7 +337,7 @@ DhAllLoadJob::DhAllLoadJob (QStringList list, QObject *parent)
   connect (this, &DhAllLoadJob::cancel, this,
            [&]
              {
-               cancel_flag_cancel (this->cancel_flag);
+               cancel_flag_cancel (cancel_flag);
                for (const auto &job : this->subjobs ())
                  Q_EMIT qobject_cast<DhLoadJob *> (job)->selfCancel ();
              });
@@ -360,7 +367,8 @@ DhAllLoadJob::DhAllLoadJob (QStringList list, QObject *parent)
                [&] (KJob *finishedJob)
                  {
                    this->finishedJobs += 1;
-                   setPercent (this->finishedJobs * 100 / this->jobNums);
+                   if (this->jobNums > 0)
+                     setPercent (this->finishedJobs * 100 / this->jobNums);
                    auto failedText = finishedJob->errorText ();
                    if (!failedText.isEmpty ())
                      {
@@ -430,6 +438,8 @@ DhAllLoadJob::start ()
   for (const auto &job : subjobs ())
     job->start ();
 }
+
+DhAllLoadJob::~DhAllLoadJob () { cancel_flag_destroy (cancel_flag); }
 
 bool
 DhAllLoadJob::eventFilter (QObject *watched, QEvent *event)

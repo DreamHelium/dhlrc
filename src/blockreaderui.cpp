@@ -35,11 +35,10 @@ BlockReaderUI::BlockReaderUI (int index,
                               std::shared_ptr<DhDownloader> downloader,
                               QWidget *parent)
     : DhWidget (parent), ui (new Ui::BlockReaderUI), downloader (downloader),
-      region (ManageRegionUI::getRegions ()[index]->get_region ()),
-      locker (*ManageRegionUI::getRegions ()[index])
+      regionClass (ManageRegionUI::getRegion (index)), locker (*regionClass)
 {
   ui->setupUi (this);
-  version = region_get_data_version (region);
+  version = regionClass->dataVersion ();
   connect (this, &BlockReaderUI::start, this,
            [&] () -> QCoro::Task<>
              {
@@ -91,22 +90,25 @@ BlockReaderUI::BlockReaderUI (int index,
   connect (ui->entityBtn_2, &QPushButton::clicked, this,
            [&]
              {
-               auto len = region_get_entity_len (region);
+               auto raw = regionClass->locked_region ();
+               auto len = region_get_entity_len (raw);
                QStringList list;
                for (int i = 0; i < len; i++)
                  {
-                   auto id = region_get_entity_id (region, i);
+                   auto id = region_get_entity_id (raw, i);
                    list << (id ? id : "(NULL)");
                    string_free (id);
                  }
 
                auto entityIndex = GeneralChooseDialog::getIndex (
-                   _ ("Choose an Index"), _ ("Please choose an index."), list,
+                   _ ("Select an Index"), _ ("Please select an index."), list,
                    this);
                if (entityIndex != -1)
                  {
                    auto nrui = new NbtReaderUI (
-                       region_get_entity (region, entityIndex), false);
+                       region_get_entity (regionClass->locked_region (),
+                                          entityIndex),
+                       false);
                    nrui->setAttribute (Qt::WA_DeleteOnClose);
                    nrui->show ();
                  }
@@ -115,7 +117,7 @@ BlockReaderUI::BlockReaderUI (int index,
            [&]
              {
                if (!rmui)
-                 rmui = new RegionModifyUI (region);
+                 rmui = new RegionModifyUI (*regionClass);
                MainWindow::addWidgetToTab (rmui, _ ("Region Modifier"));
              });
   ui->entityBtn->setEnabled (false);
@@ -158,17 +160,19 @@ BlockReaderUI::textChanged_cb ()
           && ui->zEdit->validator ()->validate (zText, pos)
                  == QValidator::Acceptable)
         {
-          int index = region_get_index (region, xText.toInt (), yText.toInt (),
-                                        zText.toInt ());
-          infos = getBlockInfo (region, index, objectPath);
+          int index = regionClass->index (xText.toInt (), yText.toInt (),
+                                          zText.toInt ());
+          infos = getBlockInfo (regionClass->locked_region (), index,
+                                objectPath);
           const char *transName = nullptr;
 
-          if (region_get_palette_property_len (
-                  region, region_get_block_id_by_index (region, index)))
+          if (region_get_palette_property_len (regionClass->locked_region (),
+                                               regionClass->blockId (index)))
             ui->propertyBtn->setEnabled (true);
           else
             ui->propertyBtn->setEnabled (false);
-          auto be = region_get_block_entity (region, index);
+          auto be
+              = region_get_block_entity (regionClass->locked_region (), index);
           if (be)
             {
               ui->entityBtn->setEnabled (true);
@@ -235,15 +239,15 @@ BlockReaderUI::getBlockInfo (void *region, quint32 index, const QString &path)
 void
 BlockReaderUI::setText ()
 {
-  auto x = region_get_x (region);
-  auto y = region_get_y (region);
-  auto z = region_get_z (region);
-  auto data_version = region_get_data_version (region);
-  auto create_timestamp = region_get_create_timestamp (region);
-  auto modify_timestamp = region_get_modify_timestamp (region);
-  auto author = region_get_author (region);
-  auto name = region_get_name (region);
-  auto description = region_get_description (region);
+  auto x = regionClass->x ();
+  auto y = regionClass->y ();
+  auto z = regionClass->z ();
+  auto data_version = regionClass->dataVersion ();
+  auto create_timestamp = regionClass->createTime ().toMSecsSinceEpoch ();
+  auto modify_timestamp = regionClass->modifyTime ().toMSecsSinceEpoch ();
+  auto author = regionClass->author ();
+  auto name = regionClass->name ();
+  auto description = regionClass->description ();
   QString str = "(%1, %2, %3) ";
   str += _ ("With DataVersion %4, version %5.");
   str += '\n';
@@ -271,15 +275,12 @@ BlockReaderUI::setText ()
   ui->xEdit->setValidator (new QIntValidator (0, x - 1));
   ui->yEdit->setValidator (new QIntValidator (0, y - 1));
   ui->zEdit->setValidator (new QIntValidator (0, z - 1));
-  string_free (author);
-  string_free (name);
-  string_free (description);
 }
 
 void
 BlockReaderUI::listBtn_clicked ()
 {
-  auto blui = new BlockListUI (region, large_version);
+  auto blui = new BlockListUI (regionClass->locked_region (), large_version);
   blui->updateBlockList ();
   blui->setAttribute (Qt::WA_DeleteOnClose);
   blui->show ();
@@ -346,7 +347,7 @@ BlockReaderUI::showBtn_clicked ()
 {
   if (!bsui)
     {
-      bsui = new BlockShowUI (region, objectPath);
+      bsui = new BlockShowUI (regionClass->locked_region (), objectPath);
       connect (this, &BlockReaderUI::windowClosed, bsui, &BlockShowUI::close);
       connect (this, &BlockReaderUI::finishLoadingTranslation, bsui,
                &BlockShowUI::updateUI);

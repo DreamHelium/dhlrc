@@ -38,13 +38,11 @@ set(ui_files
         regionmodifyui.ui
         palettelistui.ui
         #        paletteaddui.ui
-        loadobjectui.ui
         nbtreaderui.ui
 )
 
 set(TEMP_PROJECT_SOURCES
         main.cpp
-        loadobjectui.cpp loadobjectui.h
         dhtableview.cpp dhtableview.h
         dhlinklikebutton.cpp dhlinklikebutton.h
         ../resources/dhlrc.qrc
@@ -61,7 +59,7 @@ set(TEMP_PROJECT_SOURCES
         externalnbtreaderui.cpp
         externalnbtreaderui.h
         dhgameconfigui.h
-        saveregionui.h saveregionui.cpp
+        saveregionjob.h saveregionjob.cpp
         configobjectui.cpp
         configobjectui.h
         dhhelpui.cpp

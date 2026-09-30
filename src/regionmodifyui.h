@@ -2,7 +2,6 @@
 #define REGIONMODIFYUI_H
 
 #include "manageregionui.h"
-#include "region.h"
 #include <QWidget>
 
 #include <qreadwritelock.h>
@@ -19,12 +18,12 @@ class RegionModifyUI : public QWidget
   Q_OBJECT
 
 public:
-  explicit RegionModifyUI (void *region, QWidget *parent = nullptr);
+  explicit RegionModifyUI (RegionClass &region, QWidget *parent = nullptr);
   ~RegionModifyUI () override;
 
 private:
   Ui::RegionModifyUI *ui;
-  void *region = nullptr;
+  RegionClass &region;
   void initData ();
 
 private Q_SLOTS:

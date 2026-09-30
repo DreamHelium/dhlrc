@@ -76,7 +76,7 @@ fn file_try_uncompress_real(
                     helper_struct.progress_fn,
                     helper_struct.main_klass,
                     100,
-                    i18n("Uncompress finish!"),
+                    i18n("Uncompress finished."),
                     &String::new(),
                 );
                 return Ok(ret);

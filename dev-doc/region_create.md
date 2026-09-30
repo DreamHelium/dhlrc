@@ -1,88 +1,114 @@
 # Create Region
 
-To create a region, we need to get the base information of the region.
+To create a region we need the file itself, an object decoded from it, and the region plugin that understands the
+format. The whole pipeline lives in `DhLoadJob::start()` in `src/dhloadjob.cpp`.
 
-## Region type
+## 1. Read and decompress the file
 
-We need to get the region type first. The original function type is like:
-
-```c++
-const char* region_type();
-```
-
-The return value must get from `CString` from Rust, and should use `string_free` to free.
-
-## Multiple region support
-
-If a region type support multiple regions, a value of `1` could be got as the following function:
+The file may (or may not) be compressed with `GZip` or `ZLib`. `region-rs` reads and transparently decompresses it
+into a byte vector. The vector type is opaque to C/C++, so it is passed around as `VecU8 *`.
 
 ```c++
-int32_t region_is_multi();
-```
-
-Based on the result, we have different type of functions to support the region creation.
-
-## Loading file to object
-
-Since the original NBT file (or might not) uses the `GZip` or `ZLib` compression method, we need to load the file into a
-vector. But the type is not used by C/C++, so we use a `void*` to store.
-
-```c++
-/* This is from the `region.h` as the output symbol of `region-rs` */
-VecU8 *file_try_uncompress (const char *filename, HelperStruct* helper_struct,
+/* This is from `region.h`, provided by `region-rs` */
+VecU8 *file_try_uncompress(const char *filename, HelperStruct *helper_struct,
                            int *failed);
 ```
 
-After using, we need to free it using:
+On failure, `failed` is set to a non-zero value and the returned vector contains the error message; read it with
+`vec_to_cstr()` and free the result with `string_free()`. Otherwise free the vector with:
 
 ```c++
-/* This is from the `region.h` as the output symbol of `region-rs` */
-void vec_free (VecU8 *vec);
+void vec_free(VecU8 *vec);
 ```
 
-So now we get a `void *vec` to store a vector of the original file. We can also use a `unique_ptr` to temporarily store
-it. Then we need to convert the vector to the object (Basically a `NBT Object` or a `JSON Object`).
+Because `vec_free` has the signature `void(VecU8 *)`, the vector is normally wrapped in a
+`std::unique_ptr<VecU8, void (*)(VecU8 *)>` so it is released on every exit path, including exceptions.
+
+## 2. Decode the bytes into an object
+
+The raw bytes are turned into an object (an NBT tree, a JSON document, …). The object type is also opaque, so it is
+passed as `void *`.
 
 ```c++
+/* Provided by `load_module/libnbt_component.so` */
 const char* region_get_object(VecU8 *bytes, void **object,
                               HelperStruct *helper_struct);
 ```
 
-Also we need to free it by:
+The codec tries the supported NBT encodings itself (big endian, little endian, network little endian) and keeps the
+first one that parses, so the caller does not have to know or declare the endianness, nor which Minecraft edition
+produced the file.
+
+Notice that `region_get_object()` **takes ownership of `bytes`** — do not call `vec_free()` on the vector afterwards.
+
+The object is released with the matching free function, which is published as a symbol rather than linked directly:
 
 ```c++
 void object_free(void *object);
 ```
 
-## Real loading
+dhlrc binds `region_get_object` / `object_free` once, at startup, and keeps them in a `LoadObjectBase`
+(`baseType`, `loadObjectFunc`, `objFreeFunc`). The pair is looked up by the module's `region_base_type()`.
 
-### For single region type
+## 3. Build the region
 
-Just use this function, and you will get a new region struct:
+### Single-region formats
+
+The module is a `SingleModuleBase`; call its `loadFunc` (`region_create_from_file`) to obtain a `void *region`:
 
 ```c++
-const char* region_create_from_file(void *object,
-    ProgressFunc progress_fn, void **region, void *main_klass, const void *cancel_flag,
-    uint64_t elapsed_millisecs, uint64_t free_memory);
+const char* region_create_from_file(void *object, void **region,
+                                    HelperStruct *helper_struct);
 ```
 
-### For multiple region type
+### Multi-region formats
 
-You need to get region number by this:
-
-```c++
-int32_t region_num(void *object);
-```
-
-Then get region name by this:
+The module is a `MultiModuleBase`. First list the regions inside the object, then create the chosen ones:
 
 ```c++
+int32_t     region_num(void *object);
 const char* region_name_index(void *object, int32_t index);
-```
-
-Finally, we can get region by:
-
-```c++
 const char* region_create_from_file_as_index(void *object, void **region,
-                                             int32_t index, HelperStruct* helper_struct);
+                                             int32_t index,
+                                             HelperStruct *helper_struct);
 ```
+
+`region_num()` / `region_name_index()` feed the selection dialog unless
+`DhConfig::selectAllRegionsInLoading()` is enabled, in which case every index is used.
+
+Each region that comes back is registered under a **display name** built from
+`DhConfig::multiRegionNamePattern()`, which uses named placeholders:
+
+- `${file}` — the file name without its extension (`house` for `house.litematic`)
+- `${region}` — the region name reported by `region_name_index()`
+
+The default is `${file} - ${region}`, so `house.litematic` holding a region called `main` shows up as
+`house - main`. Because the placeholders are named, they can be used in any order and repeated freely; a placeholder
+that is not one of the two above is left untouched, so a typo stays visible instead of silently producing a wrong
+name. The pattern can be changed under _Settings → Default → Multi-Region Display Name_ by pressing **Preview...**,
+which opens a dialog with a live preview, a description of the placeholders, buttons to insert them, and two editable
+sample values (`NamePatternSampleFile` / `NamePatternSampleRegion`, default `house` and `main`) so the preview can be
+checked against a realistic name. An empty pattern falls back to `${file} - ${region}`.
+
+The display name is only the label used in the region list. The region's own name — the `name` field of its base data,
+returned by `region_get_name()` — is never derived from the file name and is left exactly as the plugin produced it.
+
+## 4. Hand the region to the application
+
+Every function above returns `nullptr` on success, or a `CString` error message that must be released with
+`string_free()`. Once a region has been created successfully, wrap it with
+`ManageRegionUI::appendRegion(region, name)`; `RegionClass` takes ownership and frees it with `region_free()`.
+
+`region_get_region_name()` is used to build the display name for multi-region files, so it must be readable
+immediately after creation.
+
+## Choosing which plugin to try
+
+The loader collects the modules whose `baseType()` matches the object codec that succeeded, then decides the order
+using `DhConfig`:
+
+- `loadingFileByExtension()` matches the file suffix against each module's `fileSuffix()`.
+- `failThenRetry()` decides whether to fall back to the remaining candidates after the preferred one fails.
+
+`HelperStruct` (progress callback, cancel flag, elapsed time, memory limit) is shared by all of these calls and is
+created once per job with `helper_struct_new()`.

@@ -29,7 +29,7 @@ GeneralChooseDialog::GeneralChooseDialog (const QString &title,
   int index = 0;
   if (needMulti)
     {
-      QCheckBox *checkBox = new QCheckBox (_ ("All"));
+      QCheckBox *checkBox = new QCheckBox (_ ("&All"));
       group->setExclusive (false);
       group->addButton (checkBox, index++);
       layout->addWidget (checkBox);
@@ -42,8 +42,8 @@ GeneralChooseDialog::GeneralChooseDialog (const QString &title,
                  });
     }
   paintButtons (list, index);
-  QPushButton *okBtn = new QPushButton (_ ("OK"));
-  QPushButton *cancelBtn = new QPushButton (_ ("Cancel"));
+  QPushButton *okBtn = new QPushButton (_ ("&OK"));
+  QPushButton *cancelBtn = new QPushButton (_ ("&Cancel"));
   btnLayout = new QHBoxLayout ();
   btnLayout->addStretch ();
   btnLayout->addWidget (okBtn);

@@ -81,7 +81,7 @@ fn region_get_entity_internal(
     let entity_nbt = &get_type_from_compound!(nbt, "entities", List).0;
     let mut ret = vec![];
     for entity in entity_nbt {
-        helper_struct.get_cancel_error(i18n("Reading entities is cancelled!"))?;
+        helper_struct.get_cancel_error(i18n("Reading entities is cancelled."))?;
 
         let internal_entity = get_type_from_tag!(entity, Compound, "Entity");
 
@@ -173,7 +173,7 @@ fn region_create_from_bytes_internal(
             &mut instant,
             0,
             "Get Block Total.",
-            i18n("Reading blocks is cancelled!"),
+            i18n("Reading blocks is cancelled."),
         )?;
         let internal_block = get_type_from_tag!(block, Compound, "block");
         let pos = get_type_from_compound!(internal_block, "pos", List);
@@ -194,7 +194,7 @@ fn region_create_from_bytes_internal(
 
     for block in block_compound {
         let internal_block = get_type_from_tag!(block, Compound, "block");
-        helper_struct.get_cancel_error(i18n("Reading blocks is cancelled!"))?;
+        helper_struct.get_cancel_error(i18n("Reading blocks is cancelled."))?;
         if instant.elapsed().as_millis() >= helper_struct.elapsed_millisecs as u128 {
             helper_struct.instant_progress(
                 &mut sys,
@@ -270,7 +270,7 @@ pub extern "C" fn region_create_from_file(
             }
         }
     } else {
-        err_string = String::from(i18n("Region value not provided"));
+        err_string = String::from(i18n("The region value is not provided."));
     }
     if !err_string.is_empty() {
         string_to_ptr_fail_to_null(&err_string)

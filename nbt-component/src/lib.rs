@@ -49,7 +49,7 @@ impl<T: Reader> ReadStruct<T> {
                 &mut self.instant,
                 (self.bytes_read * 100 / self.original_bytes) as c_int,
                 i18n("Loading NBT"),
-                i18n("Operation canceled!"),
+                i18n("The loading operation is cancelled."),
             )
             .or_else(|e| Err(NBTError::new(ReadError::Custom(e.to_string()))))
     }
@@ -129,9 +129,11 @@ pub extern "C" fn region_get_object(
     helper_struct: *mut HelperStruct,
 ) -> *const c_char {
     if object.is_null() {
-        return string_to_ptr_fail_to_null(i18n("Region value not provided"));
+        return string_to_ptr_fail_to_null(i18n("The region value is not provided."));
     }
-    /* We try triple times */
+
+    /* The encoding is not declared by the caller, so we try the candidate
+     * encodings one by one until one parses successfully. */
     let mut error_string = vec![];
 
     unsafe {
@@ -184,6 +186,8 @@ pub fn gettext_text(str: &str) -> String {
     gettext(str)
 }
 
+/* Reports every failed attempt, so the user can tell which encodings were tried
+ * and why each of them was rejected. */
 fn get_final_error(vec: Vec<String>) -> String {
     let mut str = String::new();
     let mut i = 0;
@@ -200,7 +204,7 @@ fn get_final_error(vec: Vec<String>) -> String {
             str.push_str(&temp_str);
             str.push_str(&vec[1]);
         }
-        if i == 1 {
+        if i == 2 {
             let temp_enter = "\n";
             let temp_str = gettext_text(i18n("NetworkLittleEndian Try's Error Message: "));
             str.push_str(temp_enter);
@@ -225,7 +229,7 @@ fn nbt_create_real<R: Reader + 'static>(
         helper_struct.progress_fn,
         helper_struct.main_klass,
         100,
-        i18n("Reading NBT finish."),
+        i18n("Reading NBT finished."),
         &String::new(),
     );
     Ok(nbt)

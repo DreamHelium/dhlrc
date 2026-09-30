@@ -27,7 +27,7 @@ dh::getRegion (QWidget *widget, ManageRegionUI *mr, bool write)
   auto realList = ManageRegionUI::getRegions ();
   auto nameList = ManageRegionUI::getRegionNames ();
   auto dialog = new GeneralChooseDialog (
-      _ ("Select Region"), _ ("Please select a region."), nameList, false);
+      _ ("Select Region(s)"), _ ("Please select region(s)."), nameList, false);
   QObject::connect (ManageRegionUI::instance (),
                     &ManageRegionUI::regionChanged, dialog,
                     [dialog]
@@ -41,7 +41,7 @@ dh::getRegion (QWidget *widget, ManageRegionUI *mr, bool write)
 
   if (ret != -1)
     {
-      if (!realList[ret]->get_lock_status ())
+      if (!realList[ret]->locked ())
         return ret;
       else
         {
@@ -63,4 +63,17 @@ QDateTime
 dh::getDateTimeFromTimeStamp (qint64 timeStamp)
 {
   return QDateTime::fromMSecsSinceEpoch (timeStamp);
+}
+
+QString
+dh::expandRegionNamePattern (const QString &pattern, const QString &fileName,
+                             const QString &regionName)
+{
+  if (pattern.isEmpty ())
+    return {};
+
+  QString result = pattern;
+  result.replace (QString::fromUtf8 (fileNamePlaceholder), fileName);
+  result.replace (QString::fromUtf8 (regionNamePlaceholder), regionName);
+  return result;
 }

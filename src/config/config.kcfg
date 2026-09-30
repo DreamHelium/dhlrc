@@ -72,6 +72,24 @@
             <tooltip>The default name for the region.</tooltip>
             <default code="true">i18n("Unnamed")</default>
         </entry>
+        <entry name="MultiRegionNamePattern" type="String">
+            <label>Multi-Region Display Name</label>
+            <tooltip
+            >The display name used for a region that comes from a multi-region file. Use ${file} for the file name and ${region} for the region name inside the file.</tooltip>
+            <default code="true">i18n("${file} - ${region}")</default>
+        </entry>
+        <entry name="NamePatternSampleFile" type="String">
+            <label>Sample File Name</label>
+            <tooltip
+            >The sample file name used by the preview of the multi-region display name. It should not include a file extension.</tooltip>
+            <default>house</default>
+        </entry>
+        <entry name="NamePatternSampleRegion" type="String">
+            <label>Sample Region Name</label>
+            <tooltip
+            >The sample region name used by the preview of the multi-region display name.</tooltip>
+            <default>main</default>
+        </entry>
         <entry name="Description" type="String">
             <label>Region Description</label>
             <tooltip>The default description for the region.</tooltip>

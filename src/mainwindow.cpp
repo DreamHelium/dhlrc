@@ -12,6 +12,7 @@
 #include <qcombobox.h>
 #include <qdesktopservices.h>
 #include <qdialog.h>
+#include <qdialogbuttonbox.h>
 #include <qfiledialog.h>
 #include <qglobalstatic.h>
 #include <qlabel.h>
@@ -159,6 +160,176 @@ public:
                             }
                         });
   };
+};
+
+/* Dialog for editing the multi-region name pattern.
+ *
+ * Shows the pattern, a live preview built from sample values, a grey legend
+ * for the supported placeholders, and buttons that insert a placeholder at the
+ * cursor. The sample values are configurable from the dialog itself.
+ *
+ * The pattern is written back to the passed line edit, so the config template
+ * stays the single owner of the value. The samples are stored directly on the
+ * config items, as they are only used by this preview. */
+class DhNamePatternDialog : public QDialog
+{
+public:
+  DhNamePatternDialog (QLineEdit *edit, QWidget *parent)
+      : QDialog (parent), edit (edit),
+        sampleFileItem (DhConfig::self ()->namePatternSampleFileItem ()),
+        sampleRegionItem (DhConfig::self ()->namePatternSampleRegionItem ())
+  {
+    setWindowTitle (_ ("Multi-Region Display Name"));
+    resize (520, 340);
+
+    auto *layout = new QVBoxLayout (this);
+
+    layout->addWidget (new QLabel (_ ("Name pattern:")));
+    patternEdit = new QLineEdit (edit->text ());
+    layout->addWidget (patternEdit);
+
+    layout->addWidget (new QLabel (_ ("Insert a placeholder:")));
+    auto *buttonLayout = new QHBoxLayout ();
+    addPlaceholderButton (buttonLayout, "${file}", _ ("File name"));
+    addPlaceholderButton (buttonLayout, "${region}", _ ("Region name"));
+    buttonLayout->addStretch ();
+    layout->addLayout (buttonLayout);
+
+    layout->addWidget (new QLabel (_ ("Preview with these sample values:")));
+    auto *sampleLayout = new QHBoxLayout ();
+    sampleFileEdit
+        = addSampleEdit (sampleLayout, sampleFileItem, _ ("Sample file name"));
+    sampleRegionEdit = addSampleEdit (sampleLayout, sampleRegionItem,
+                                      _ ("Sample region name"));
+    layout->addLayout (sampleLayout);
+
+    previewLabel = new QLabel ();
+    previewLabel->setWordWrap (true);
+    previewLabel->setTextInteractionFlags (Qt::TextSelectableByMouse);
+    layout->addWidget (previewLabel);
+
+    auto *help = new QLabel (
+        _ ("${file} is replaced with the file name, ${region} with the region "
+           "name inside the file. They can be used in any order and repeated. "
+           "Anything else is kept as written."));
+    help->setWordWrap (true);
+    help->setStyleSheet ("color:gray;");
+    layout->addWidget (help);
+
+    layout->addStretch ();
+
+    auto *buttonBox = new QDialogButtonBox (QDialogButtonBox::Ok
+                                            | QDialogButtonBox::Cancel);
+    layout->addWidget (buttonBox);
+    connect (buttonBox, &QDialogButtonBox::accepted, this, &QDialog::accept);
+    connect (buttonBox, &QDialogButtonBox::rejected, this, &QDialog::reject);
+
+    connect (patternEdit, &QLineEdit::textChanged, this,
+             [this] { updatePreview (); });
+    updatePreview ();
+  }
+
+  /* Writes the edited values back to the config. */
+  void
+  apply ()
+  {
+    edit->setText (patternEdit->text ());
+    sampleFileItem->setProperty (sampleFileEdit->text ());
+    sampleRegionItem->setProperty (sampleRegionEdit->text ());
+  }
+
+private:
+  /* Falls back to a plain name when a sample is left empty, so the preview
+   * always shows something readable. */
+  QString
+  sampleFile () const
+  {
+    return sampleFileEdit->text ().isEmpty ()
+               ? QString::fromUtf8 (dh::defaultSampleFile)
+               : sampleFileEdit->text ();
+  }
+
+  QString
+  sampleRegion () const
+  {
+    return sampleRegionEdit->text ().isEmpty ()
+               ? QString::fromUtf8 (dh::defaultSampleRegion)
+               : sampleRegionEdit->text ();
+  }
+
+  QLineEdit *
+  addSampleEdit (QHBoxLayout *layout, KConfigSkeletonItem *item,
+                 const QString &label)
+  {
+    auto *editWidget = new QLineEdit (item->property ().toString ());
+    editWidget->setPlaceholderText (label);
+    editWidget->setToolTip (label);
+    layout->addWidget (editWidget);
+    connect (editWidget, &QLineEdit::textChanged, this,
+             [this] { updatePreview (); });
+    return editWidget;
+  }
+
+  void
+  addPlaceholderButton (QHBoxLayout *layout, const QString &placeholder,
+                        const QString &label)
+  {
+    auto *button = new QPushButton (placeholder);
+    button->setToolTip (label);
+    connect (button, &QPushButton::clicked, this,
+             [this, placeholder]
+               {
+                 /* Insert at the cursor and keep the caret after it. */
+                 auto text = patternEdit->text ();
+                 auto pos = patternEdit->cursorPosition ();
+                 patternEdit->setText (text.insert (pos, placeholder));
+                 patternEdit->setCursorPosition (pos + placeholder.size ());
+               });
+    layout->addWidget (button);
+  }
+
+  void
+  updatePreview ()
+  {
+    auto preview = dh::expandRegionNamePattern (
+        patternEdit->text (), sampleFile (), sampleRegion ());
+    if (preview.trimmed ().isEmpty ())
+      preview = QStringLiteral ("%1 - %2")
+                    .arg (sampleFile ())
+                    .arg (sampleRegion ());
+    previewLabel->setText (preview);
+  }
+
+  QLineEdit *edit = nullptr;
+  QLineEdit *patternEdit = nullptr;
+  QLineEdit *sampleFileEdit = nullptr;
+  QLineEdit *sampleRegionEdit = nullptr;
+  KConfigSkeletonItem *sampleFileItem = nullptr;
+  KConfigSkeletonItem *sampleRegionItem = nullptr;
+  QLabel *previewLabel = nullptr;
+};
+
+/* String entry for the multi-region name pattern; offers the dialog above so
+ * the preview and placeholder help do not take up room in the config page. */
+class DhNamePatternConfigTemplate : public DhStringConfigTemplate
+{
+public:
+  DhNamePatternConfigTemplate (KConfigSkeletonItem *item, QVBoxLayout *layout,
+                               DhConfigDialog *dialog)
+      : DhStringConfigTemplate (item, layout, dialog)
+  {
+    auto *edit = qobject_cast<QLineEdit *> (widget);
+    auto *previewBtn = new QPushButton (_ ("Pre&view..."));
+    previewBtn->setIcon (QIcon::fromTheme ("document-preview"));
+    hLayout->addWidget (previewBtn);
+    QObject::connect (previewBtn, &QPushButton::clicked, edit,
+                      [edit, dialog]
+                        {
+                          DhNamePatternDialog patternDialog (edit, dialog);
+                          if (patternDialog.exec () == QDialog::Accepted)
+                            patternDialog.apply ();
+                        });
+  }
 };
 
 class DhMemoryConfigTemplate : public DhConfigTemplate
@@ -432,6 +603,14 @@ MainWindow::MainWindow (QWidget *parent) : QMainWindow (parent)
   dialog->addTemplateByItem (DhConfig::self ()->memoryLimitItem (),
                              genTemplate<DhMemoryConfigTemplate>);
   dialog->addTemplateByItem (DhConfig::self ()->limitUnitItem (),
+                             genTemplate<DhEmptyConfigTemplate>);
+  dialog->addTemplateByItem (DhConfig::self ()->multiRegionNamePatternItem (),
+                             genTemplate<DhNamePatternConfigTemplate>);
+  /* These two only feed the preview inside the pattern dialog, so hide them
+   * from the settings page. */
+  dialog->addTemplateByItem (DhConfig::self ()->namePatternSampleFileItem (),
+                             genTemplate<DhEmptyConfigTemplate>);
+  dialog->addTemplateByItem (DhConfig::self ()->namePatternSampleRegionItem (),
                              genTemplate<DhEmptyConfigTemplate>);
   dialog->addAssistant (std::make_unique<DhSetConfigAssistant> ());
   dialog->addLongTextItems ("Description");

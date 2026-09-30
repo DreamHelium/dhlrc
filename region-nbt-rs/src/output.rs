@@ -240,7 +240,7 @@ fn region_save_internal(
             &mut start,
             (((i + 1) as usize * 100) / size as usize) as c_int,
             i18n("Pushing index."),
-            i18n("Pushing index is cancelled!"),
+            i18n("Pushing index is cancelled."),
         )?;
 
         id.push(real_region.block_array[i as usize]);

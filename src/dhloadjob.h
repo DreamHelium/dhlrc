@@ -103,7 +103,8 @@ private:
   QFuture<void> future;
 
 private Q_SLOTS:
-  bool loadMultiRegion (ModuleBase *base, void *object, DhMultiLoadError &err);
+  bool loadMultiRegion (MultiModuleBase *multiBase, void *object,
+                        DhMultiLoadError &err);
 };
 
 class DhAllLoadJob : public KCompositeJob
@@ -111,7 +112,7 @@ class DhAllLoadJob : public KCompositeJob
   Q_OBJECT
 public:
   explicit DhAllLoadJob (QStringList list, QObject *parent = nullptr);
-  ~DhAllLoadJob () override = default;
+  ~DhAllLoadJob () override;
   void start () override;
   bool eventFilter (QObject *watched, QEvent *event) override;
 

@@ -34,7 +34,7 @@ public:
 private:
   Ui::BlockReaderUI *ui;
   QPointer<RegionModifyUI> rmui = nullptr;
-  void *region;
+  std::shared_ptr<RegionClass> regionClass;
   //   QString uuid = {};
   void setText ();
   char *large_version = nullptr;

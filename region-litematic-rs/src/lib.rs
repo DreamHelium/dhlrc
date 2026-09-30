@@ -127,7 +127,7 @@ fn get_block_id(
     let mut i = 0;
     let mut buf = vec![0; block_num as usize];
     loop {
-        helper_struct.get_cancel_error(i18n("Cancelled when reading blocks"))?;
+        helper_struct.get_cancel_error(i18n("Reading blocks is cancelled."))?;
         if instant.elapsed().as_millis() >= helper_struct.elapsed_millisecs as u128 {
             helper_struct.instant_progress(
                 sys,
@@ -168,7 +168,7 @@ fn get_block_id(
                 helper_struct.progress_fn,
                 helper_struct.main_klass,
                 100,
-                i18n("Reading block finished!"),
+                i18n("Reading blocks finished."),
                 "",
             );
             break;
@@ -356,7 +356,7 @@ pub extern "C" fn region_create_from_file_as_index(
             }
         }
     } else {
-        err_string = String::from(i18n("Region value not provided"));
+        err_string = String::from(i18n("The region value is not provided."));
     }
     if !err_string.is_empty() {
         string_to_ptr_fail_to_null(&err_string)

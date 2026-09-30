@@ -97,7 +97,8 @@ ExternalNbtReaderUI::dropEvent (QDropEvent *event)
   auto urls = event->mimeData ()->urls ();
   if (urls.size () > 1)
     {
-      QMessageBox::critical (this, _ ("Error"), _ ("Multiple files dropped!"));
+      QMessageBox::critical (this, _ ("Error!"),
+                             _ ("Multiple files dropped!"));
       return;
     }
   QStringList filelist;
