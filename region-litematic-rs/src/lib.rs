@@ -23,6 +23,7 @@ unsafe extern "C" {
 }
 
 mod config;
+mod output;
 pub use config::InputConfig;
 
 #[unsafe(no_mangle)]

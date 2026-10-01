@@ -43,8 +43,10 @@
 #include <QDesktopServices>
 #include <QLineEdit>
 #include <QResizeEvent>
+#include <QScrollBar>
 #include <QSortFilterProxyModel>
 #include <QTabBar>
+#include <QTimer>
 #include <QToolBar>
 #ifdef DH_DEBUG_IN_IDE
 #include "dhdebugwidget.h"
@@ -759,10 +761,23 @@ MainWindow::addWidgetToTopArea (QWidget *widget)
   if (mainWindow)
     {
       mainWindow->topLayout->addWidget (widget);
-      auto layoutHeight = mainWindow->topLayout->sizeHint ().height ();
-      mainWindow->allSplitter->setSizes (
-          { layoutHeight, mainWindow->height () - layoutHeight });
+      /* The top area is resized to fit, but only after the layout has settled:
+       * `sizeHint ()` read straight after `addWidget ()` is computed before
+       * the new row has been laid out, so it under-reports and the rows below
+       * get clipped out of view. Deferring to the next event-loop pass lets
+       * the geometry be up to date. */
+      QTimer::singleShot (0, mainWindow, &MainWindow::fitTopArea);
     }
+}
+
+void
+MainWindow::fitTopArea ()
+{
+  if (!mainWindow)
+    return;
+  auto layoutHeight = mainWindow->topLayout->sizeHint ().height ();
+  mainWindow->allSplitter->setSizes (
+      { layoutHeight, mainWindow->height () - layoutHeight });
 }
 
 void

@@ -29,20 +29,39 @@ pub struct ConfigItem {
     pub label: &'static str,
     /// One-line explanation, shown as a tooltip.
     pub description: &'static str,
+    /// Inclusive bounds of an [`ConfigKind::Int`] option. Ignored otherwise.
+    pub minimum: i32,
+    pub maximum: i32,
+    /// What the option starts as, and what it falls back to when the host has
+    /// never saved a value. It is advertised to the host so a first run uses
+    /// the plugin's own default instead of some value the host picked.
+    /// Unused for bools, whose default is `false`.
+    pub default: i32,
 }
 
 impl ConfigItem {
     /// Renders the `"<key>:<kind>"` form the host parses.
+    ///
+    /// An int also carries its bounds and its default as
+    /// `"<key>:int:<min>,<max>,<default>"`, so the host can bound the widget it
+    /// builds and start it at the plugin's own default, never offering a value
+    /// the plugin's setter would refuse. Bools need none of that.
     #[must_use]
     pub fn spec(&self) -> String {
-        format!("{}:{}", self.key, self.kind.as_str())
+        match self.kind {
+            ConfigKind::Int => format!(
+                "{}:int:{},{},{}",
+                self.key, self.minimum, self.maximum, self.default
+            ),
+            other => format!("{}:{}", self.key, other.as_str()),
+        }
     }
 }
 
-/// Value types an option may have.
+/// The value types an option may have.
 ///
-/// Only [`ConfigKind::Bool`] is handled by the host today; the others exist so
-/// the wire format does not have to change when they are added.
+/// `Bool` and `Int` are the ones the host can render today; the string form
+/// exists so the wire format does not have to change when `String` is added.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum ConfigKind {
     Bool,
@@ -75,6 +94,17 @@ pub trait ConfigObject: Default + Sized {
     /// Reads a boolean option, or `None` when it is out of range / a different
     /// type.
     fn get_bool(&self, index: usize) -> Option<bool>;
+
+    /// Writes an integer option. Defaults to refusing, so a plugin with only
+    /// booleans does not have to implement it.
+    fn set_int(&mut self, _index: usize, _value: i32) -> bool {
+        false
+    }
+
+    /// Reads an integer option. Defaults to refusing, like [`Self::set_int`].
+    fn get_int(&self, _index: usize) -> Option<i32> {
+        None
+    }
 }
 
 /// Boxes a fresh, default-valued config object.
@@ -168,5 +198,34 @@ pub mod ffi {
             Some(value) => c_int::from(value),
             None => 0,
         }
+    }
+
+    /// Applies an integer option. Out-of-range or wrongly-typed indexes are
+    /// ignored, and a null object is a no-op.
+    ///
+    /// # Safety
+    /// `config` must come from [`super::config_new`] and be alive.
+    pub unsafe fn item_set_int<T: ConfigObject>(config: *mut T, index: usize, value: c_int) {
+        if config.is_null() {
+            return;
+        }
+        // SAFETY: the caller guarantees `config` is a live, exclusive pointer.
+        let real = unsafe { &mut *config };
+        real.set_int(index, value);
+    }
+
+    /// Reads an integer option. Returns `0` for out-of-range, wrongly-typed or
+    /// null inputs.
+    ///
+    /// # Safety
+    /// `config` must come from [`super::config_new`] and be alive.
+    #[must_use]
+    pub unsafe fn item_get_int<T: ConfigObject>(config: *const T, index: usize) -> c_int {
+        if config.is_null() {
+            return 0;
+        }
+        // SAFETY: the caller guarantees `config` is a live pointer.
+        let real = unsafe { &*config };
+        real.get_int(index).unwrap_or(0)
     }
 }

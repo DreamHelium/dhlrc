@@ -44,6 +44,9 @@ private:
 
 public Q_SLOTS:
   void tryShrinkTopWidget ();
+  /* Resizes the top area to fit its rows. Run from `addWidgetToTopArea ()` on
+   * the next event-loop pass, once the new row has been laid out. */
+  void fitTopArea ();
 
 public:
   bool eventFilter (QObject *object, QEvent *event) override;

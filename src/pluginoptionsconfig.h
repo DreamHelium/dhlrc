@@ -62,12 +62,14 @@ public:
   [[nodiscard]] bool hasOptions (const QString &type,
                                  ConfigObjectItems::Kind kind) const;
 
-  /* Whether `type` follows the global configuration, i.e. its switch is on.
+  /* Whether `type` follows the global configuration for `kind`, i.e. that
+   * direction's switch is on.
    *
    * On: the saved values are used. Off: they are ignored and the caller asks
-   * instead. This is the only condition, and it is what makes the switch the
-   * thing that decides between the two sources. */
-  [[nodiscard]] bool useConfigured (const QString &type) const;
+   * instead. The two directions are independent, so a plugin may follow the
+   * configuration when reading and be asked about when writing. */
+  [[nodiscard]] bool useConfigured (const QString &type,
+                                    ConfigObjectItems::Kind kind) const;
 
   /* Writes the saved values of `type` into a plugin object the caller owns.
    *
@@ -78,8 +80,8 @@ public:
   void apply (const QString &type, ConfigObjectItems::Kind kind,
               void *object) const;
 
-  /* Greys the options of every plugin out, or restores them, according to its
-   * switch. Called once per plugin after the pages are built. */
+  /* Greys the options of every plugin out, or restores them, according to the
+   * switches. Called once after the pages are built. */
   void refreshStates ();
 
   /* The page every plugin option lives on. */
@@ -88,10 +90,18 @@ public:
 private:
   /* One registered item. The bound variable lives on the heap because a
    * `KConfigSkeletonItem` keeps a pointer to it, so its address must not
-   * change; `unique_ptr` guarantees that without a manual new/delete. */
+   * change; `unique_ptr` guarantees that without a manual new/delete.
+   *
+   * A bool and an int option differ in type, so the storage is held as a
+   * variant. `std::get` on the wrong alternative is a bug, so the kind is
+   * recorded too and every read goes through `boolValue ()` / `intValue ()`.
+   */
   struct Entry
   {
-    std::unique_ptr<bool> storage;
+    std::unique_ptr<bool> boolStorage;
+    std::unique_ptr<int> intStorage;
+    ConfigObjectItems::Option::Type type
+        = ConfigObjectItems::Option::Type::Bool;
     KConfigSkeletonItem *item = nullptr;
   };
 
@@ -99,30 +109,36 @@ private:
   struct PluginOptions
   {
     QLibrary *library = nullptr;
-    /* The switch item, and the boxes the dialog built for the switch and the
-     * options. The boxes are filled in once the pages exist. */
-    KConfigSkeletonItem *switchItem = nullptr;
-    QPointer<QCheckBox> switchBox;
-    /* One entry per option: every widget of that option's row, so the whole
-     * row can be greyed out or folded as a unit. */
-    QList<QList<QPointer<QWidget>>> optionRows;
+    /* One switch per direction, so reading and writing are configured
+     * separately. A direction the plugin offers nothing for has none. */
+    std::map<ConfigObjectItems::Kind, KConfigSkeletonItem *> switchItems;
+    /* The options of each direction, in registration order. Each entry holds
+     * every widget of that option's row, so a row can be greyed out or folded
+     * as a unit. */
+    std::map<ConfigObjectItems::Kind, QList<QList<QPointer<QWidget>>>>
+        rowsByKind;
     /* Whether the plugin actually offered anything, per direction. Recorded at
      * registration so a caller can tell "no options" (nothing to ask about)
      * from "the object was not built". */
     bool hasInput = false;
     bool hasOutput = false;
   };
-  /* `direction` only picks the wording ("loading" / "saving"); the switch
-   * itself is one per plugin, shared by its input and output options. */
+  /* Writes the switch of one direction, keeping the key per direction so the
+   * two cannot overwrite each other. */
   KConfigSkeletonItem *addSwitch (const QString &type,
-                                  ConfigObjectItems::Kind direction);
+                                  ConfigObjectItems::Kind kind);
   KConfigSkeletonItem *addOption (const QString &type,
                                   ConfigObjectItems::Kind kind,
                                   const ConfigObjectItems::Option &option);
 
-  /* Greys the options of `type` out, or restores them, according to its
-   * switch. */
-  void applyEnabledState (const QString &type);
+  /* The stored value of an entry, whichever kind it is. */
+  [[nodiscard]] bool boolValue (const Entry &entry) const;
+  [[nodiscard]] qint32 intValue (const Entry &entry) const;
+
+  /* Greys the options of `type` in `kind` out, or restores them, according to
+   * that direction's switch. The other direction is left alone: its options
+   * are configured separately. */
+  void applyEnabledState (const QString &type, ConfigObjectItems::Kind kind);
 
   [[nodiscard]] bool value (const QString &type, ConfigObjectItems::Kind kind,
                             const QString &key) const;
@@ -137,6 +153,11 @@ private:
 
   std::map<std::string, Entry> entries;
   std::map<std::string, PluginOptions> plugins;
+  /* The control built for each direction's switch, so its options can be
+   * greyed out as the user toggles it. Keyed by plugin type, then direction.
+   */
+  std::map<std::string, std::map<ConfigObjectItems::Kind, QPointer<QCheckBox>>>
+      switchBoxes;
   /* Set by `init ()`; the pages are built lazily, so this only has to be valid
    * once the dialog is shown. */
   DhConfigDialog *dialog = nullptr;

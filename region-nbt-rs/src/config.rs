@@ -22,6 +22,9 @@ impl ConfigObject for OutputConfig {
         kind: ConfigKind::Bool,
         label: i18n("Ignore Air"),
         description: i18n("There will be no air block in the output structure"),
+        minimum: 0,
+        maximum: 0,
+        default: 0,
     }];
 
     fn set_bool(&mut self, index: usize, value: bool) -> bool {

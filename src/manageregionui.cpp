@@ -434,6 +434,11 @@ ModuleBase::initialize ()
       auto *multiBase = asMulti ();
       multiBase->multiSaveFunc = reinterpret_cast<MultiTransFunc> (
           module->resolve ("region_save_into_multi"));
+      /* Optional: a multi-region format may still be able to write one region
+       * to its own file, which is what lets a single selected region be saved.
+       */
+      multiBase->saveFunc = reinterpret_cast<SingleTransFunc> (
+          module->resolve ("region_save"));
       multiBase->numFunc = reinterpret_cast<MultiModuleBase::NumFunc> (
           module->resolve ("region_num"));
       multiBase->nameFunc = reinterpret_cast<MultiModuleBase::NameFunc> (
@@ -809,58 +814,107 @@ ManageRegionUI::save (const QList<int> &list)
   auto saveIndex = GeneralChooseDialog::getIndex (
       _ ("Select Save Format"), _ ("Please select the format to save to."),
       supportList, this);
-  if (saveIndex != -1)
+  if (saveIndex == -1)
+    return;
+
+  auto *module = getModule (supportList[saveIndex]);
+  if (!module)
+    return;
+
+  /* A module may be able to write one file per region, all of them into one
+   * file, or both.
+   *
+   * With a single region selected the answer is obvious: one region is one
+   * file, so the single-file writer is used without asking. Multi-file export
+   * only has something to choose when there is more than one region to put in
+   * it. */
+  bool useMulti = false;
+  if (list.size () > 1)
     {
-      bool useMulti = false;
-      auto *module = getModule (supportList[saveIndex]);
-      if (!module)
-        return;
-      auto *multi = module->multi ();
-      if (multi && multi->multiSaveFunc)
+      if (auto *multi = module->multi (); multi && multi->multiSaveFunc)
         {
+          /* The buttons are named explicitly. `question ()` defaults to
+           * `Yes | No`, not `Ok | Cancel`, so testing the answer against
+           * `Ok` never matched and choosing "yes" fell through to the
+           * one-file-per-region path as if it had been declined. */
           auto btn = QMessageBox::question (
               this, _ ("Use MultiFunc?"),
               _ ("This type supports regions to save as one file, do you want "
-                 "to use it?"));
-          if (btn == QMessageBox::Ok)
+                 "to use it?"),
+              QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
+          if (btn == QMessageBox::Yes)
             useMulti = true;
         }
-      if (useMulti)
-        { /* TODO */
-        }
-      else
-        {
-          auto *single = module->single ();
-          if (!single || !single->saveFunc)
-            {
-              QMessageBox::critical (this, _ ("Error!"),
-                                     _ ("This type cannot save a single "
-                                        "region."));
-              return;
-            }
-          auto dir = QFileDialog::getExistingDirectory (
-              this, _ ("Select Directory"));
-          if (!dir.isEmpty ())
-            {
-              QList<std::shared_ptr<RegionClass>> transRegions;
-              for (auto index : list)
-                transRegions << regions[index];
-              auto *job = new SaveAllRegionJob ();
-              /* Constructing the jobs locks the regions, which emits
-               * `regionChanged` and rebuilds the item frames. Defer past the
-               * current click handler so the button that started this is not
-               * destroyed while in use. */
-              QTimer::singleShot (0, job,
-                                  [job, transRegions, dir, single, module]
-                                    {
-                                      job->addSave (
-                                          transRegions, dir, single->saveFunc,
-                                          module->library (), module->type ());
-                                      job->start ();
-                                    });
-            }
-        }
     }
+
+  if (useMulti)
+    {
+      /* Everything goes into a single file, so a directory would be the wrong
+       * question; ask for the file itself. The filter is the module's own, and
+       * the suffix is also appended afterwards in case the user typed none. */
+      auto filter = module->filter ();
+      if (filter.isEmpty () && !module->fileSuffix ().isEmpty ())
+        filter = QStringLiteral ("*.%1").arg (module->fileSuffix ());
+      auto filename = QFileDialog::getSaveFileName (this, _ ("Select File"),
+                                                    nullptr, filter);
+      if (filename.isEmpty ())
+        return;
+
+      QList<std::shared_ptr<RegionClass>> transRegions;
+      for (auto index : list)
+        transRegions << regions[index];
+      auto *job = new SaveAllRegionJob ();
+      /* Deferred past the current click handler: constructing the jobs locks
+       * the regions, which emits `regionChanged` and rebuilds the item frames,
+       * and doing that while the button that started it is still in use would
+       * destroy it under our feet. */
+      QTimer::singleShot (0, job,
+                          [job, transRegions, filename, module]
+                            {
+                              job->addSaveIntoMulti (transRegions, filename,
+                                                     module->fileSuffix (),
+                                                     module->library (),
+                                                     module->type ());
+                              job->start ();
+                            });
+      return;
+    }
+
+  /* One file per region. A single-region module offers this through its own
+   * class; a multi-region one through the `region_save` it may also export,
+   * since a multi-region format can still hold a single region. */
+  SingleTransFunc saveFunc = nullptr;
+  if (auto *single = module->single ())
+    saveFunc = single->saveFunc;
+  else if (auto *multi = module->multi ())
+    saveFunc = multi->saveFunc;
+  if (!saveFunc)
+    {
+      QMessageBox::critical (this, _ ("Error!"),
+                             _ ("This type cannot save a single "
+                                "region."));
+      return;
+    }
+
+  auto dir = QFileDialog::getExistingDirectory (this, _ ("Select Directory"));
+  if (dir.isEmpty ())
+    return;
+
+  QList<std::shared_ptr<RegionClass>> transRegions;
+  for (auto index : list)
+    transRegions << regions[index];
+  auto *job = new SaveAllRegionJob ();
+  /* Constructing the jobs locks the regions, which emits `regionChanged` and
+   * rebuilds the item frames. Defer past the current click handler so the
+   * button that started this is not destroyed while in use. */
+  QTimer::singleShot (0, job,
+                      [job, transRegions, dir, saveFunc, module]
+                        {
+                          job->addSave (transRegions, dir,
+                                        module->fileSuffix (), saveFunc,
+                                        module->type (), module->library ());
+                          job->start ();
+                        });
 }
 
 bool

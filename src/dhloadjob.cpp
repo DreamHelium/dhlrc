@@ -343,6 +343,14 @@ DhLoadJob::loadMultiRegion (MultiModuleBase *multiBase, void *object,
       cv.wait (lock);
       /* Continue */
       Q_EMIT selfResumed (this);
+
+      /* Woken by closing the row rather than by choosing regions: the file was
+       * called off, so nothing is read from it. `doResume ()` is the only path
+       * that fills `regionIndexes`, so an empty list here means a cancel. */
+      if (cancel_flag_is_cancelled (cancel_flag) != 0)
+        {
+          return false;
+        }
     }
   else
     {
@@ -434,8 +442,17 @@ DhAllLoadJob::DhAllLoadJob (QStringList list, QObject *parent)
        *
        * Objects are keyed by type and shared, so a batch that mixes formats —
        * or holds ten files of one format — resolves each plugin's options
-       * once. */
-      registerInputConfigs ();
+       * once.
+       *
+       * A dismissal aborts the whole batch: the user said no to the settings
+       * the load would run with, so nothing should be read. */
+      if (!registerInputConfigs ())
+        {
+          freeInputConfig ();
+          this->messageWidget->deleteLater ();
+          deleteLater ();
+          return;
+        }
 
       auto job = new DhLoadJob (filename, fileFlag, inputConfigs);
       job->setAutoDelete (true);
@@ -503,7 +520,10 @@ DhAllLoadJob::DhAllLoadJob (QStringList list, QObject *parent)
                    realStr = realStr.arg (realPrefix)
                                  .arg (str)
                                  .arg (realjob->percent ());
-                   castedJob->messageWidget->setText (realStr);
+                   /* The row may already be gone: a cancel deletes it while
+                    * the job is still finishing up. */
+                   if (castedJob->messageWidget)
+                     castedJob->messageWidget->setText (realStr);
                  });
       connect (job, &DhLoadJob::result, job->messageWidget,
                &KMessageWidget::animatedHide);
@@ -511,6 +531,8 @@ DhAllLoadJob::DhAllLoadJob (QStringList list, QObject *parent)
                [&] (KJob *realJob)
                  {
                    auto castedJob = qobject_cast<DhLoadJob *> (realJob);
+                   if (!castedJob->messageWidget)
+                     return;
                    QAction *action = new QAction (_ ("Continue"));
                    connect (action, &QAction::triggered, castedJob,
                             &DhLoadJob::doResume);
@@ -520,7 +542,11 @@ DhAllLoadJob::DhAllLoadJob (QStringList list, QObject *parent)
                [&] (KJob *realJob)
                  {
                    auto castedJob = qobject_cast<DhLoadJob *> (realJob);
-                   castedJob->messageWidget->clearActions ();
+                   /* Null when the row was closed to cancel this file: the
+                    * worker is woken to unwind, not to carry on, and there is
+                    * no row left to clear. */
+                   if (castedJob->messageWidget)
+                     castedJob->messageWidget->clearActions ();
                  });
       i++;
     }
@@ -533,7 +559,7 @@ DhAllLoadJob::start ()
     job->start ();
 }
 
-void
+bool
 DhAllLoadJob::registerInputConfigs ()
 {
   /* Every plugin, not every candidate for one file: the batch may hold several
@@ -541,12 +567,21 @@ DhAllLoadJob::registerInputConfigs ()
    * the only point where the set is known. Resolving a plugin that never ends
    * up being used costs nothing beyond a settings lookup. */
   for (auto *module : ManageRegionUI::getModules ())
-    acquireInputConfig (module->type ());
+    {
+      bool dismissed = false;
+      acquireInputConfig (module->type (), &dismissed);
+      if (dismissed)
+        return false;
+    }
+  return true;
 }
 
 void *
-DhAllLoadJob::acquireInputConfig (const QString &type)
+DhAllLoadJob::acquireInputConfig (const QString &type, bool *dismissed)
 {
+  if (dismissed)
+    *dismissed = false;
+
   /* One object per plugin type, reused for every file of that type in this
    * batch. That is what keeps a mixed batch working (each type gets its own)
    * while still asking only once per plugin. */
@@ -560,7 +595,7 @@ DhAllLoadJob::acquireInputConfig (const QString &type)
   if (module && config
       && config->hasOptions (type, ConfigObjectItems::Kind::Input))
     {
-      if (config->useConfigured (type))
+      if (config->useConfigured (type, ConfigObjectItems::Kind::Input))
         {
           /* Follows the global configuration: the saved values are used and
            * nothing is asked. */
@@ -572,9 +607,20 @@ DhAllLoadJob::acquireInputConfig (const QString &type)
         {
           /* Asked here rather than in the job: this runs on the GUI thread,
            * while the reading happens on a worker, and a modal dialog from
-           * there would be undefined behaviour. */
-          object
-              = ConfigObjectUI::getObject (module->library (), CONFIG_INPUT);
+           * there would be undefined behaviour. A dismissal means the user
+           * does not want the load to happen with these settings, so it is
+           * reported back and cuts the whole batch short. */
+          bool wasDismissed = false;
+          object = ConfigObjectUI::getObject (module->library (), CONFIG_INPUT,
+                                              true, &wasDismissed);
+          if (wasDismissed)
+            {
+              ConfigObjectItems::freeObject (ConfigObjectItems::Kind::Input,
+                                             module->library (), object);
+              if (dismissed)
+                *dismissed = true;
+              return nullptr;
+            }
         }
     }
 

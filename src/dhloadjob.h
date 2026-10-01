@@ -5,10 +5,13 @@
 #include "region.h"
 #include "settings.h"
 #include <KCompositeJob>
+#include <QPointer>
 #include <condition_variable>
 #include <memory>
 #include <qexception.h>
 #include <qfuture.h>
+
+class KMessageWidget;
 
 class DhLoadError : public QException
 {
@@ -78,7 +81,11 @@ public:
   void start () override;
   bool doResume () override;
   void forceResume ();
-  KMessageWidget *messageWidget = nullptr;
+  /* The row reporting this file. A `QPointer` because the row is deleted as
+   * soon as it is hidden, while the job may still emit signals afterwards
+   * (`selfResumed`, in particular) — a raw pointer would then dangle and the
+   * `clearActions ()` below would crash. */
+  QPointer<KMessageWidget> messageWidget = nullptr;
   QString getFilename ();
   QString getTypeName ();
 
@@ -131,12 +138,14 @@ Q_SIGNALS:
 private:
   /* Builds the reading options for `type` from the settings, or asks for them.
    * Runs on the GUI thread, so it may show a dialog. Returns nullptr when the
-   * plugin offers nothing to configure. */
-  void *acquireInputConfig (const QString &type);
+   * plugin offers nothing to configure, or when the user dismissed the window;
+   * `dismissed` tells the two apart so the caller can abort the batch. */
+  void *acquireInputConfig (const QString &type, bool *dismissed = nullptr);
   /* Resolves the options of every loaded plugin once, on the GUI thread, so
    * the jobs can pick the entry matching whichever plugin reads their file.
-   * Called before the jobs are created. */
-  void registerInputConfigs ();
+   * Called before the jobs are created. Returns false when the user dismissed
+   * an options window, which aborts the whole batch. */
+  bool registerInputConfigs ();
   /* Releases the options of the whole batch, once the last job is done. */
   void freeInputConfig ();
 

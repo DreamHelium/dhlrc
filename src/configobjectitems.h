@@ -31,9 +31,21 @@ struct Option
   QString label;
   QString description;
   /* Position in the plugin's own table. Only meaningful to the plugin, and
-   * what
-   * `*_config_item_set_bool` takes. */
+   * what the `*_config_item_set_*` functions take. */
   qsizetype index = 0;
+  /* What the option stores. Only these two are understood by the host;
+   * anything else the plugin advertises is left out rather than mis-rendered.
+   */
+  enum class Type
+  {
+    Bool,
+    Int,
+  };
+  Type type = Type::Bool;
+  /* The value range of an int option, inclusive. Ignored for bools. */
+  qint32 minimum = 0;
+  qint32 maximum = 0;
+  qint32 defaultValue = 0;
 };
 
 /* Reads the options `library` offers for `kind`. Returns an empty list when
@@ -56,6 +68,10 @@ void freeObject (Kind kind, QLibrary *library, void *object);
  * wrongly-typed index is ignored by the plugin. */
 void setBool (Kind kind, QLibrary *library, void *object, qsizetype index,
               bool value);
+
+/* Writes an int option, addressed the same way. */
+void setInt (Kind kind, QLibrary *library, void *object, qsizetype index,
+             qint32 value);
 }
 
 #endif // DHLRC_CONFIGOBJECTITEMS_H

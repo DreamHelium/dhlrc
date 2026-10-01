@@ -22,7 +22,8 @@
 
 class RegionClass;
 class ItemFrame;
-using MultiTransFunc = const char *(*) (void *, size_t, const char *);
+using MultiTransFunc
+    = const char *(*) (void **, size_t, const char *, void *, HelperStruct *);
 using SingleTransFunc
     = const char *(*) (void *, const char *, void *, HelperStruct *);
 using LoadObjectFunc = const char *(*) (VecU8 *, void **, HelperStruct *);
@@ -182,6 +183,13 @@ public:
   /* Exports several regions into one file; optional (see
    * `region_save_into_multi`). */
   MultiTransFunc multiSaveFunc = nullptr;
+  /* Exports one region to its own file; optional (see `region_save`).
+   *
+   * A multi-region format can still write a file holding a single region, so a
+   * multi module may offer this too. It is what makes saving one selected
+   * region possible for such a format; without it only the "all of them in one
+   * file" path is available. */
+  SingleTransFunc saveFunc = nullptr;
   /* Number of regions inside a loaded object. */
   NumFunc numFunc = nullptr;
   /* Name of the region at `index`. */
