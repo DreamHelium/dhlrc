@@ -32,6 +32,8 @@
 #include <qwidget.h>
 #define _(str) gettext (str)
 #include "blockreaderui.h"
+#include "configobjectitems.h"
+#include "dhaboutui.h"
 #include "dhconfigdialog/src/dhconfigtemplates.h"
 #include "dhgameconfigui.h"
 #include "externalnbtreaderui.h"
@@ -523,6 +525,14 @@ MainWindow::MainWindow (QWidget *parent) : QMainWindow (parent)
 
   menuBar ()->addMenu (menu);
 
+  auto *helpMenu = new QMenu (_ ("Help"));
+  auto *aboutAction = new QAction (_ ("&About"), this);
+  aboutAction->setIcon (QIcon::fromTheme ("help-about"));
+  connect (aboutAction, &QAction::triggered, this,
+           [this] { DhAboutUI::showAbout (this); });
+  helpMenu->addAction (aboutAction);
+  menuBar ()->addMenu (helpMenu);
+
   scrollArea = new QScrollArea ();
   scrollArea->setWidgetResizable (true);
   topWidget = new QWidget ();
@@ -596,6 +606,19 @@ MainWindow::MainWindow (QWidget *parent) : QMainWindow (parent)
 
   DhConfigDialog::initDialog (DhConfig::self (), {}, true, this);
   auto dialog = DhConfigDialog::instance ();
+
+  /* The plugin options must be registered before the pages are built, so the
+   * module list has to exist first. `ManageRegionUI::instance ()` loads the
+   * plugins on first use; without this the list would still be empty here and
+   * no plugin option would ever reach the settings. */
+  ManageRegionUI::instance ();
+
+  /* Register every plugin's options into the skeleton, so `DhConfigDialog`
+   * renders them like any other setting. Has to run before the pages are
+   * built; the lazy loading above defers that until the dialog is first shown.
+   */
+  PluginOptionsConfig::init (dialog);
+
   dialog->addTemplateByItem (DhConfig::self ()->defaultShowOptionItem (),
                              genTemplate<DhEnumConfigTemplate>);
   dialog->addTemplateByItem (DhConfig::self ()->cacheDirectoryItem (),

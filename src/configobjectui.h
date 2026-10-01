@@ -7,7 +7,11 @@
 #include <QVBoxLayout>
 #include <QWidget>
 
-using ConfigType = enum ConfigType { CONFIG_INPUT, CONFIG_OUTPUT };
+using ConfigType = enum ConfigType
+{
+  CONFIG_INPUT,
+  CONFIG_OUTPUT
+};
 
 class ConfigObjectUI : public QDialog
 {

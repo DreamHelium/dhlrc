@@ -62,6 +62,14 @@ set(TEMP_PROJECT_SOURCES
         saveregionjob.h saveregionjob.cpp
         configobjectui.cpp
         configobjectui.h
+        configobjectitems.cpp
+        configobjectitems.h
+        dhaboutui.cpp
+        dhaboutui.h
+        version.cpp
+        version.h
+        pluginoptionsconfig.cpp
+        pluginoptionsconfig.h
         dhhelpui.cpp
         dhhelpui.h
         manageregionui.cpp

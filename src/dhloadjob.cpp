@@ -1,4 +1,7 @@
 #include "dhloadjob.h"
+#include "configobjectitems.h"
+#include "configobjectui.h"
+#include "pluginoptionsconfig.h"
 #include <QFuture>
 #include <libintl.h>
 #include <memory>
@@ -29,6 +32,83 @@ failedMessage (const QString &state, const QString &error)
   return QString (_ ("Failed when %1: %2")).arg (state).arg (error);
 }
 
+/* The plugin types that can read a file, most likely first.
+ *
+ * Every candidate shares the object codec that was used to decode the file, so
+ * the order only says which of them to try first. It is decided by the suffix:
+ *
+ * - a suffix that names a plugin puts that plugin first;
+ * - a missing or unknown suffix puts nothing first, and the order is then just
+ *   the module order, which is arbitrary but stable.
+ *
+ * Callers must not treat the first entry as authoritative: with no suffix
+ * there is no "expected" type, so `matched` reports whether the suffix
+ * actually identified one. That is what the warning about "the file type
+ * should be X" must key off, rather than whichever entry happens to be first.
+ */
+struct PluginCandidates
+{
+  QList<QString> types;
+  bool matched = false;
+};
+
+static PluginCandidates
+candidatesFor (const QString &filename, const QString &baseType)
+{
+  /* Every plugin that understands the codec this file decoded to. */
+  QList<QString> all;
+  for (auto *module : ManageRegionUI::getModules ())
+    {
+      if (module->baseType () == baseType)
+        all << module->type ();
+    }
+
+  PluginCandidates result;
+
+  /* Only look at the suffix when the user asked for that; ignoring it is the
+   * whole point of turning the option off. */
+  if (!DhConfig::loadingFileByExtension ())
+    {
+      result.types = all;
+      return result;
+    }
+
+  auto extension = QFileInfo (filename).suffix ();
+  QString matchedType;
+  for (auto *module : ManageRegionUI::getModules ())
+    {
+      if (module->baseType () != baseType || extension.isEmpty ())
+        continue;
+      if (module->fileSuffix () == extension)
+        {
+          matchedType = module->type ();
+          break;
+        }
+    }
+
+  if (matchedType.isEmpty ())
+    {
+      /* No suffix, or one no plugin claims. There is no expected type, so the
+       * order is the module order and every candidate is worth trying. */
+      result.types = all;
+      return result;
+    }
+
+  /* The suffix named a plugin, so it goes first. Whether the others are tried
+   * after it failing is what the retry option decides. */
+  result.matched = true;
+  result.types << matchedType;
+  if (DhConfig::failThenRetry ())
+    {
+      for (const auto &type : all)
+        {
+          if (type != matchedType)
+            result.types << type;
+        }
+    }
+  return result;
+}
+
 void
 DhLoadJob::start ()
 {
@@ -53,6 +133,10 @@ DhLoadJob::start ()
             .then (
                 [&] (std::unique_ptr<void, void (*) (void *)> ptr)
                   {
+                    /* This file was cancelled: stop before decoding it. */
+                    if (cancel_flag_is_cancelled (cancel_flag))
+                      throw DhLoadError (_ ("Cancelled."), _ ("Loading File"));
+
                     /* Loading Object */
                     auto objectList = ManageRegionUI::getLoadObjectList ();
                     DhMultiLoadError errors;
@@ -83,80 +167,37 @@ DhLoadJob::start ()
                          tempObject)
                   {
                     /* Loading Region */
-                    auto baseList = ManageRegionUI::getModules ();
-                    /* Get available type list
-                     * [type, fileSuffix]
-                     */
-                    QList<std::pair<QString, QString>> typeList;
-                    for (const auto &base : baseList)
-                      {
-                        if (base->baseType () == tempObject.first)
-                          typeList.append (
-                              { base->type (), base->fileSuffix () });
-                      }
-                    /* try */
-                    /* Temporary strategy:
-                     * 1. If loading file by extension without retry, we just
-                     * load.
-                     * 2. If retry, we use the type list before and try one by
-                     * one.
-                     */
-                    if (DhConfig::loadingFileByExtension ())
-                      {
-                        auto extension = QFileInfo (filename).suffix ();
-                        /* Store the real item */
-                        std::pair<QString, QString> realItem;
-                        for (const auto &[type, fileSuffix] : typeList)
-                          {
-                            if (fileSuffix == extension)
-                              {
-                                realItem = { type, fileSuffix };
-                                break;
-                              }
-                          }
-                        if (!DhConfig::failThenRetry ())
-                          {
-                            /* We need to load just once, so first we clear. */
-                            typeList.clear ();
-                            if (!realItem.first.isEmpty ())
-                              typeList.append (realItem);
-                          }
-                        else
-                          {
-                            /* If no file extension, it will get error if
-                             * realItem is empty. So we need to determine.
-                             */
-                            if (typeList[0] != realItem
-                                && !realItem.first.isEmpty ())
-                              typeList.swapItemsAt (
-                                  0, typeList.indexOf (realItem));
-                          }
-                      }
+                    auto candidates
+                        = candidatesFor (filename, tempObject.first);
                     DhMultiLoadError err;
-                    for (const auto &pair : typeList)
+                    for (const auto &type : candidates.types)
                       {
-                        auto *base = ManageRegionUI::getModule (pair.first);
+                        auto *base = ManageRegionUI::getModule (type);
                         if (!base)
                           continue;
+                        /* The plugin's own options, if the batch resolved any
+                         * for it. Looking them up by type is what makes a
+                         * fallback safe: each entry was built by that plugin's
+                         * own `*_config_new ()`, so no plugin ever receives
+                         * another one's struct. */
+                        auto configEntry = inputConfigs.find (type);
+                        auto *config = configEntry == inputConfigs.end ()
+                                           ? nullptr
+                                           : configEntry->second;
+                        bool loaded = false;
                         if (auto *multi = base->multi ())
-                          {
-                            if (loadMultiRegion (
-                                    multi, tempObject.second.get (), err))
-                              {
-                                typeName = base->type ();
-                                break;
-                              }
-                          }
+                          loaded = loadMultiRegion (
+                              multi, tempObject.second.get (), err, config);
                         else if (auto *single = base->single ())
                           {
                             void *region = nullptr;
                             auto msg = single->loadFunc (
                                 tempObject.second.get (), &region,
-                                helper_struct.get ());
+                                helper_struct.get (), config);
                             if (msg)
                               {
-                                err.appendError (
-                                    msg, loadingTypePrefix (base->type ()));
+                                err.appendError (msg,
+                                                 loadingTypePrefix (type));
                                 string_free (msg);
                                 continue;
                               }
@@ -166,19 +207,27 @@ DhLoadJob::start ()
                             auto displayName
                                 = QFileInfo (filename).completeBaseName ();
                             ManageRegionUI::appendRegion (region, displayName);
-                            if (pair != typeList[0])
-                              {
-                                QString message
-                                    = _ ("Loading progress is successful, but "
-                                         "the file type should be %1.");
-                                message = message.arg (pair.first);
-                                err.appendError (
-                                    message,
-                                    loadingTypePrefix (typeList[0].second));
-                              }
-                            typeName = base->type ();
-                            break;
+                            loaded = true;
                           }
+                        if (!loaded)
+                          continue;
+
+                        /* The suffix named a plugin and a different one had to
+                         * be used: worth saying, since the file is then not
+                         * quite what its name says. With no suffix there was
+                         * never an expectation, so nothing is reported. */
+                        if (candidates.matched
+                            && type != candidates.types.first ())
+                          {
+                            QString message
+                                = _ ("Loading progress is successful, but the "
+                                     "file type should be %1.");
+                            message = message.arg (candidates.types.first ());
+                            err.appendError (message,
+                                             loadingTypePrefix (type));
+                          }
+                        typeName = type;
+                        break;
                       }
                     throw err;
                   })
@@ -242,6 +291,8 @@ DhLoadJob::getFilename ()
   return filename;
 }
 
+DhLoadJob::~DhLoadJob () = default;
+
 QString
 DhLoadJob::getTypeName ()
 {
@@ -265,7 +316,7 @@ DhLoadJob::setFunc (void *main_klass, int value, const char *text,
 
 bool
 DhLoadJob::loadMultiRegion (MultiModuleBase *multiBase, void *object,
-                            DhMultiLoadError &err)
+                            DhMultiLoadError &err, void *inputConfig)
 {
   /* A previous attempt in the retry loop may have filled these; start clean so
    * the region list is not duplicated. */
@@ -302,7 +353,7 @@ DhLoadJob::loadMultiRegion (MultiModuleBase *multiBase, void *object,
     {
       void *singleRegion = nullptr;
       auto msg = multiBase->loadFunc (object, &singleRegion, index,
-                                      helper_struct.get ());
+                                      helper_struct.get (), inputConfig);
       if (msg)
         {
           QString prefix = _ ("Loading region type %1");
@@ -332,14 +383,16 @@ DhLoadJob::loadMultiRegion (MultiModuleBase *multiBase, void *object,
 }
 
 DhAllLoadJob::DhAllLoadJob (QStringList list, QObject *parent)
-    : KCompositeJob (parent), cancel_flag (cancel_flag_new ())
+    : KCompositeJob (parent)
 {
   connect (this, &DhAllLoadJob::cancel, this,
            [&]
              {
-               cancel_flag_cancel (cancel_flag);
+               /* Cancel every file, including the ones already queued. */
+               for (const auto &flag : cancelFlags)
+                 cancel_flag_cancel (flag.get ());
                for (const auto &job : this->subjobs ())
-                 Q_EMIT qobject_cast<DhLoadJob *> (job)->selfCancel ();
+                 qobject_cast<DhLoadJob *> (job)->forceResume ();
              });
   jobNums = list.length ();
   messageWidget = new KMessageWidget ();
@@ -360,7 +413,31 @@ DhAllLoadJob::DhAllLoadJob (QStringList list, QObject *parent)
   int i = 0;
   for (auto filename : list)
     {
-      auto job = new DhLoadJob (filename, cancel_flag);
+      /* Each file gets its own cancel flag, so one can be aborted without
+       * touching the others. It is owned by `cancelFlags` below. */
+      const void *fileFlag = cancel_flag_new ();
+      cancelFlags.emplace_back (fileFlag, cancel_flag_destroy);
+
+      /* The plugin that will read the file is not known until it has been
+       * decoded, so the options cannot wait for it. Instead every candidate
+       * plugin gets its own object, resolved on the GUI thread (the dialog
+       * cannot be shown from the worker that does the reading):
+       *
+       * - a plugin that follows the configuration has one built from the saved
+       *   values;
+       * - one that does not is asked about;
+       * - one that offers no options has none, and is not asked about.
+       *
+       * A missing suffix is therefore no longer special: there is simply no
+       * preferred candidate, and each plugin the file might belong to already
+       * has the settings the user chose for it.
+       *
+       * Objects are keyed by type and shared, so a batch that mixes formats —
+       * or holds ten files of one format — resolves each plugin's options
+       * once. */
+      registerInputConfigs ();
+
+      auto job = new DhLoadJob (filename, fileFlag, inputConfigs);
       job->setAutoDelete (true);
       KCompositeJob::addSubjob (job);
       connect (job, &DhLoadJob::result, this,
@@ -387,15 +464,32 @@ DhAllLoadJob::DhAllLoadJob (QStringList list, QObject *parent)
                    Q_EMIT ManageRegionUI::instance ()->regionChanged ();
                    if (!hasSubjobs ())
                      {
+                       freeInputConfig ();
                        this->messageWidget->deleteLater ();
                        deleteLater ();
                      }
                  });
       job->messageWidget = new KMessageWidget ();
-      job->messageWidget->setCloseButtonVisible (false);
       connect (job->messageWidget, &KMessageWidget::hideAnimationFinished,
                job->messageWidget, &KMessageWidget::deleteLater);
       MainWindow::addWidgetToTopArea (job->messageWidget);
+      /* KMessageWidget already ships a close button that calls
+       * `animatedHide ()`. Closing this row means "abort this file", which
+       * also has to unblock a job suspended waiting for an answer. The same
+       * signal fires when we hide the row on completion, so only treat it as a
+       * cancel while the job is still running. */
+      auto running = std::make_shared<bool> (true);
+      connect (job->messageWidget, &KMessageWidget::hideAnimationFinished, job,
+               [fileFlag, job, running]
+                 {
+                   if (!*running)
+                     return;
+                   cancel_flag_cancel (fileFlag);
+                   Q_EMIT job->forceResumeRequested ();
+                 });
+      connect (job, &DhLoadJob::result, job, [running] { *running = false; });
+      connect (job, &DhLoadJob::forceResumeRequested, job,
+               [job] { job->forceResume (); });
       connect (job, &DhLoadJob::infoMessage, this,
                [&, i] (KJob *realjob, const QString &str)
                  {
@@ -439,7 +533,78 @@ DhAllLoadJob::start ()
     job->start ();
 }
 
-DhAllLoadJob::~DhAllLoadJob () { cancel_flag_destroy (cancel_flag); }
+void
+DhAllLoadJob::registerInputConfigs ()
+{
+  /* Every plugin, not every candidate for one file: the batch may hold several
+   * formats and the codec is unknown until each file is decoded, so this is
+   * the only point where the set is known. Resolving a plugin that never ends
+   * up being used costs nothing beyond a settings lookup. */
+  for (auto *module : ManageRegionUI::getModules ())
+    acquireInputConfig (module->type ());
+}
+
+void *
+DhAllLoadJob::acquireInputConfig (const QString &type)
+{
+  /* One object per plugin type, reused for every file of that type in this
+   * batch. That is what keeps a mixed batch working (each type gets its own)
+   * while still asking only once per plugin. */
+  auto known = inputConfigs.find (type);
+  if (known != inputConfigs.end ())
+    return known->second;
+
+  void *object = nullptr;
+  auto *module = ManageRegionUI::getModule (type);
+  auto *config = PluginOptionsConfig::instance ();
+  if (module && config
+      && config->hasOptions (type, ConfigObjectItems::Kind::Input))
+    {
+      if (config->useConfigured (type))
+        {
+          /* Follows the global configuration: the saved values are used and
+           * nothing is asked. */
+          object = ConfigObjectItems::createObject (
+              ConfigObjectItems::Kind::Input, module->library ());
+          config->apply (type, ConfigObjectItems::Kind::Input, object);
+        }
+      else
+        {
+          /* Asked here rather than in the job: this runs on the GUI thread,
+           * while the reading happens on a worker, and a modal dialog from
+           * there would be undefined behaviour. */
+          object
+              = ConfigObjectUI::getObject (module->library (), CONFIG_INPUT);
+        }
+    }
+
+  inputConfigs[type] = object;
+  if (!object)
+    {
+      /* Nothing to release later, so it does not need an entry. */
+      inputConfigs.erase (type);
+    }
+  return object;
+}
+
+void
+DhAllLoadJob::freeInputConfig ()
+{
+  /* Every object this batch built, once the last job is done and no plugin can
+   * still be holding one. */
+  for (const auto &[type, object] : inputConfigs)
+    {
+      if (!object)
+        continue;
+      auto *module = ManageRegionUI::getModule (type);
+      ConfigObjectItems::freeObject (ConfigObjectItems::Kind::Input,
+                                     module ? module->library () : nullptr,
+                                     object);
+    }
+  inputConfigs.clear ();
+}
+
+DhAllLoadJob::~DhAllLoadJob () = default;
 
 bool
 DhAllLoadJob::eventFilter (QObject *watched, QEvent *event)

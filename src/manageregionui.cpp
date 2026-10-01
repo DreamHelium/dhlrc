@@ -1,16 +1,23 @@
 #include "manageregionui.h"
+#include "configobjectitems.h"
+#include "configobjectui.h"
 #include "dhloadjob.h"
 #include "generalchoosedialog.h"
+#include "pluginoptionsconfig.h"
 #include "region.h"
 #include "saveregionjob.h"
+#include "utility.h"
 #include <QApplication>
 #include <QCheckBox>
 #include <QFileDialog>
+#include <QFontDatabase>
 #include <QInputDialog>
 #include <QMessageBox>
 #include <QPointer>
 #include <QPushButton>
 #include <QTimer>
+#include <algorithm>
+#include <functional>
 #include <libintl.h>
 #include <qcheckbox.h>
 #include <qcontainerfwd.h>
@@ -22,10 +29,11 @@
 #include <qmimedata.h>
 #include <stdexcept>
 
-static std::vector<ModuleBase *> moduleBaseList = {};
-static QList<LoadObjectBase> loadObjectList = {};
-static std::vector<std::shared_ptr<RegionClass>> regions = {};
-static QPointer<ManageRegionUI> mrui = nullptr;
+/* Application-wide state, defined here and declared in the header. */
+std::vector<ModuleBase *> ManageRegionUI::moduleBaseList = {};
+QList<LoadObjectBase> ManageRegionUI::loadObjectList = {};
+std::vector<std::shared_ptr<RegionClass>> ManageRegionUI::regions = {};
+QPointer<ManageRegionUI> ManageRegionUI::mrui = nullptr;
 
 /* RAII guard returned by RegionClass::locked_region (); it keeps the region
  * locked until the pointer it handed out is no longer used. */
@@ -44,15 +52,16 @@ private:
 bool
 RegionClass::isLocked (qsizetype index)
 {
-  if (index < 0 || static_cast<qsizetype> (regions.size ()) <= index)
+  const auto &all = ManageRegionUI::getRegions ();
+  if (index < 0 || static_cast<qsizetype> (all.size ()) <= index)
     return false;
-  return regions[index]->locked ();
+  return all[index]->locked ();
 }
 
 bool
 RegionClass::hasLocked ()
 {
-  for (const auto &i : regions)
+  for (const auto &i : ManageRegionUI::getRegions ())
     {
       if (i->locked ())
         return true;
@@ -358,15 +367,13 @@ RegionClass::paletteLen () const
 AutoLocker::AutoLocker (RegionClass &region_class_)
     : region_class (region_class_)
 {
+  /* `RegionClass::lock ()` emits `lockedChanged` only on a false→true
+   * transition, and `ManageRegionUI` listens to every region. That keeps
+   * starting many jobs at once from rebuilding the list once per job. */
   region_class.lock ();
-  Q_EMIT ManageRegionUI::instance ()->regionChanged ();
 }
 
-AutoLocker::~AutoLocker ()
-{
-  region_class.unlock ();
-  Q_EMIT ManageRegionUI::instance ()->regionChanged ();
-}
+AutoLocker::~AutoLocker () { region_class.unlock (); }
 
 ModuleBase::~ModuleBase () = default;
 
@@ -486,6 +493,117 @@ ManageRegionUI::ManageRegionUI (QWidget *parent) : DhWidget (parent)
   setAcceptDrops (true);
   connect (this, &ManageRegionUI::regionChanged, this,
            &ManageRegionUI::refresh_triggered);
+
+  loadModules ();
+
+  layout = new QVBoxLayout (this);
+  messageWidget = new KMessageWidget ();
+  messageWidget->setVisible (false);
+  layout->addWidget (messageWidget);
+
+  btnLayout = new QHBoxLayout ();
+
+  selectButton = new QCheckBox (_ ("&Select"));
+  selectButton->setIcon (QIcon::fromTheme ("edit-select"));
+
+  btnLayout->addWidget (selectButton);
+  addButton = new QPushButton (_ ("&Add"));
+  addButton->setIcon (QIcon::fromTheme ("list-add"));
+  btnLayout->addStretch ();
+  btnLayout->addWidget (addButton);
+
+  layout->addLayout (btnLayout);
+
+  /* Selection toolbar, hidden until "Select" is checked. Acting on many rows
+   * at once happens here rather than on every row. */
+  selectionWidget = new QWidget ();
+  auto *selectionLayout = new QHBoxLayout (selectionWidget);
+  selectionLayout->setContentsMargins (0, 0, 0, 0);
+
+  selectAllButton = new QPushButton (_ ("Select &All"));
+  selectionLayout->addWidget (selectAllButton);
+
+  selectionLabel = new QLabel ();
+  selectionLayout->addWidget (selectionLabel);
+  selectionLayout->addStretch ();
+
+  removeSelectedButton = new QPushButton (_ ("&Remove Selected"));
+  removeSelectedButton->setIcon (QIcon::fromTheme ("list-remove"));
+  selectionLayout->addWidget (removeSelectedButton);
+
+  saveSelectedButton = new QPushButton (_ ("&Save Selected"));
+  saveSelectedButton->setIcon (QIcon::fromTheme ("document-save"));
+  selectionLayout->addWidget (saveSelectedButton);
+
+  selectionWidget->setVisible (false);
+  layout->addWidget (selectionWidget);
+
+  scrollArea = new QScrollArea ();
+  scrollAreaWidget = new QWidget ();
+  frameLayout = new QVBoxLayout ();
+  scrollAreaWidget->setLayout (frameLayout);
+  scrollArea->setWidget (scrollAreaWidget);
+  scrollArea->setWidgetResizable (true);
+
+  layout->addWidget (scrollArea);
+
+  connect (addButton, &QPushButton::clicked, this,
+           [&]
+             {
+               QStringList filters;
+               for (auto *module : moduleBaseList)
+                 {
+                   auto filter = module->filter ();
+                   if (!filter.isEmpty ())
+                     filters << filter;
+                 }
+               auto dirs = QFileDialog::getOpenFileNames (
+                   this, _ ("Select Files"), nullptr, filters.join (";;"));
+               if (dirs.isEmpty ())
+                 QMessageBox::critical (this, _ ("Error!"),
+                                        _ ("No file selected!"));
+               else
+                 {
+                   auto job = new DhAllLoadJob (dirs);
+                   job->start ();
+                 }
+             });
+  connect (selectButton, &QCheckBox::clicked, this,
+           [this] { setSelectionMode (selectButton->isChecked ()); });
+  connect (selectAllButton, &QPushButton::clicked, this,
+           [this]
+             {
+               /* If everything is already ticked, clear instead. */
+               bool allChecked = !itemFrames.isEmpty ();
+               for (auto *frame : itemFrames)
+                 {
+                   if (!frame->isChecked ())
+                     allChecked = false;
+                 }
+               for (auto *frame : itemFrames)
+                 frame->setChecked (!allChecked);
+               updateSelectionActions ();
+             });
+  connect (removeSelectedButton, &QPushButton::clicked, this,
+           [this]
+             {
+               auto indexes = checkedIndexes ();
+               if (indexes.isEmpty ())
+                 return;
+               auto removed = removeRegions (indexes);
+               if (removed != indexes.size ())
+                 {
+                   QMessageBox::warning (this, _ ("Warning!"),
+                                         _ ("Locked regions were kept."));
+                 }
+             });
+  connect (saveSelectedButton, &QPushButton::clicked, this,
+           [this] { save (checkedIndexes ()); });
+}
+
+void
+ManageRegionUI::loadModules ()
+{
   auto moduleDir = QApplication::applicationDirPath ();
   moduleDir += QDir::separator ();
   moduleDir += "region_module";
@@ -529,65 +647,75 @@ ManageRegionUI::ManageRegionUI (QWidget *parent) : DhWidget (parent)
 
       moduleBaseList.emplace_back (moduleBase.release ());
     }
+}
 
-  layout = new QVBoxLayout (this);
-  messageWidget = new KMessageWidget ();
-  messageWidget->setVisible (false);
-  layout->addWidget (messageWidget);
+/* Removes the rows in `indexes`, keeping locked ones. Returns how many went.
+ */
+qsizetype
+ManageRegionUI::removeRegions (const QList<int> &indexes)
+{
+  /* Delete from the end so the earlier indexes stay valid. */
+  auto sorted = indexes;
+  std::sort (sorted.begin (), sorted.end (), std::greater<int> ());
 
-  btnLayout = new QHBoxLayout ();
+  qsizetype removed = 0;
+  for (auto index : sorted)
+    {
+      auto region = getRegion (index);
+      if (!region || region->locked ())
+        continue;
+      regions.erase (regions.begin () + index);
+      removed++;
+    }
+  if (removed > 0)
+    Q_EMIT regionChanged ();
+  return removed;
+}
 
-  selectButton = new QCheckBox (_ ("&Select"));
-  selectButton->setIcon (QIcon::fromTheme ("edit-select"));
+QList<int>
+ManageRegionUI::checkedIndexes () const
+{
+  QList<int> indexes;
+  for (auto *frame : itemFrames)
+    {
+      if (frame->isChecked ())
+        indexes << frame->regionIndex ();
+    }
+  return indexes;
+}
 
-  btnLayout->addWidget (selectButton);
-  addButton = new QPushButton (_ ("&Add"));
-  addButton->setIcon (QIcon::fromTheme ("list-add"));
-  btnLayout->addStretch ();
-  btnLayout->addWidget (addButton);
+void
+ManageRegionUI::setSelectionMode (bool enabled)
+{
+  addButton->setEnabled (!enabled);
+  selectionWidget->setVisible (enabled);
+  for (auto *frame : itemFrames)
+    {
+      frame->setCheckBoxVisible (enabled);
+      if (!enabled)
+        frame->setChecked (false);
+      /* Locked rows keep their buttons disabled; only unlock rows whose
+       * region is not locked. */
+      frame->setButtonEnable (!enabled && !frame->isRegionLocked ());
+    }
+  updateSelectionActions ();
+}
 
-  layout->addLayout (btnLayout);
+void
+ManageRegionUI::updateSelectionActions ()
+{
+  /* Setting the checkbox also emits, so guard against re-entry from the
+   * update while the list is being rebuilt. */
+  if (updatingSelection)
+    return;
+  updatingSelection = true;
 
-  scrollArea = new QScrollArea ();
-  scrollAreaWidget = new QWidget ();
-  frameLayout = new QVBoxLayout ();
-  scrollAreaWidget->setLayout (frameLayout);
-  scrollArea->setWidget (scrollAreaWidget);
-  scrollArea->setWidgetResizable (true);
+  auto count = checkedIndexes ().size ();
+  removeSelectedButton->setEnabled (count > 0);
+  saveSelectedButton->setEnabled (count > 0);
+  selectionLabel->setText (QString (_ ("%1 region(s) selected")).arg (count));
 
-  layout->addWidget (scrollArea);
-
-  connect (addButton, &QPushButton::clicked, this,
-           [&]
-             {
-               QStringList filters;
-               for (auto *module : moduleBaseList)
-                 {
-                   auto filter = module->filter ();
-                   if (!filter.isEmpty ())
-                     filters << filter;
-                 }
-               auto dirs = QFileDialog::getOpenFileNames (
-                   this, _ ("Select Files"), nullptr, filters.join (";;"));
-               if (dirs.isEmpty ())
-                 QMessageBox::critical (this, _ ("Error!"),
-                                        _ ("No file selected!"));
-               else
-                 {
-                   auto job = new DhAllLoadJob (dirs);
-                   job->start ();
-                 }
-             });
-  connect (selectButton, &QCheckBox::clicked, this,
-           [&]
-             {
-               addButton->setEnabled (!selectButton->isChecked ());
-               for (auto &widget : itemFrames)
-                 {
-                   widget->setCheckBoxVisible (selectButton->isChecked ());
-                   widget->setButtonEnable (!selectButton->isChecked ());
-                 }
-             });
+  updatingSelection = false;
 }
 
 ManageRegionUI::~ManageRegionUI ()
@@ -718,15 +846,16 @@ ManageRegionUI::save (const QList<int> &list)
               for (auto index : list)
                 transRegions << regions[index];
               auto *job = new SaveAllRegionJob ();
-              /* Locking the regions emits `regionChanged`, which rebuilds the
-               * item frames. Defer past the current click handler so the
-               * button that started this is not destroyed while in use. */
+              /* Constructing the jobs locks the regions, which emits
+               * `regionChanged` and rebuilds the item frames. Defer past the
+               * current click handler so the button that started this is not
+               * destroyed while in use. */
               QTimer::singleShot (0, job,
                                   [job, transRegions, dir, single, module]
                                     {
-                                      job->addSave (transRegions, dir,
-                                                    single->saveFunc,
-                                                    module->library ());
+                                      job->addSave (
+                                          transRegions, dir, single->saveFunc,
+                                          module->library (), module->type ());
                                       job->start ();
                                     });
             }
@@ -779,10 +908,25 @@ ManageRegionUI::refresh_triggered ()
           frame->setCheckBoxEnabled (false);
           frame->setButtonEnable (false);
         }
+      else
+        {
+          /* Row buttons are only usable outside selection mode. */
+          frame->setButtonEnable (!selectButton->isChecked ());
+        }
+      frame->setCheckBoxVisible (selectButton->isChecked ());
+      connect (frame, &ItemFrame::checkedChanged, this,
+               &ManageRegionUI::updateSelectionActions);
+      /* A region becoming locked or unlocked must refresh the row (it shows
+       * "Locked!" and disables its buttons). Connecting here, once per region,
+       * avoids the O(n²) refresh churn of doing it per job. */
+      connect (region.get (), &RegionClass::lockedChanged, this,
+               &ManageRegionUI::regionChanged, Qt::UniqueConnection);
       frameLayout->addWidget (frame);
       itemFrames.append (frame);
       i++;
     }
+  /* The list was rebuilt, so the old selection is gone. */
+  updateSelectionActions ();
 }
 
 ItemFrame::ItemFrame (RegionClass *region, int index, ManageRegionUI *mrui,
@@ -796,14 +940,26 @@ ItemFrame::ItemFrame (RegionClass *region, int index, ManageRegionUI *mrui,
   checkBox->setSizePolicy (QSizePolicy::Fixed, QSizePolicy::Fixed);
   checkBox->setVisible (mrui->selectButtonIsDown ());
   layout->addWidget (checkBox);
+  connect (checkBox, &QCheckBox::toggled, this, &ItemFrame::checkedChanged);
 
   QString regionLockedName = _ ("Locked!");
   if (region->locked ())
     nameLabel = new QLabel (regionLockedName);
   else
     nameLabel = new QLabel (region->displayName ());
+  /* The UUID is an implementation detail rather than something the user reads
+   * at a glance, so keep it but in grey and monospace: the fixed-width font
+   * makes individual characters easier to compare. */
   uuidLabel = new QLabel (region->uuid ());
-  timeLabel = new QLabel (region->dateTime ().toString ());
+  uuidLabel->setStyleSheet ("color:gray;");
+  uuidLabel->setFont (QFontDatabase::systemFont (QFontDatabase::FixedFont));
+  uuidLabel->setTextInteractionFlags (Qt::TextSelectableByMouse);
+  uuidLabel->setToolTip (_ ("Region identifier"));
+  /* The load time, not the file's own create/modify time (those are shown in
+   * RegionModifyUI). Prefixed so the number is not mistaken for the latter. */
+  timeLabel = new QLabel (QString (_ ("Added: %1"))
+                              .arg (dh::formatDateTime (region->dateTime ())));
+  timeLabel->setStyleSheet ("color:gray;");
   labelLayout = new QVBoxLayout ();
   labelLayout->addWidget (nameLabel);
   labelLayout->addWidget (uuidLabel);
@@ -850,14 +1006,7 @@ ItemFrame::ItemFrame (RegionClass *region, int index, ManageRegionUI *mrui,
                  }
              });
   connect (removeBtn, &QPushButton::clicked, this,
-           [&, index]
-             {
-               auto regionClass = ManageRegionUI::getRegion (index);
-               if (regionClass && !regionClass->locked ())
-                 ManageRegionUI::getRegions ().erase (
-                     ManageRegionUI::getRegions ().begin () + index);
-               Q_EMIT ManageRegionUI::instance ()->regionChanged ();
-             });
+           [mrui, index] { mrui->removeRegions ({ index }); });
   connect (saveBtn, &QPushButton::clicked, this,
            [&, mrui, index] { mrui->save ({ index }); });
 }
@@ -894,4 +1043,31 @@ void
 ItemFrame::setCheckBoxEnabled (bool enable)
 {
   checkBox->setEnabled (enable);
+}
+
+bool
+ItemFrame::checkBoxEnabled () const
+{
+  return checkBox->isEnabled ();
+}
+
+bool
+ItemFrame::isChecked () const
+{
+  return checkBox->isChecked ();
+}
+
+void
+ItemFrame::setChecked (bool checked)
+{
+  /* Setting a disabled box would tick a locked row, so ignore it. */
+  if (!checkBox->isEnabled ())
+    return;
+  checkBox->setChecked (checked);
+}
+
+bool
+ItemFrame::isRegionLocked () const
+{
+  return region->locked ();
 }

@@ -58,7 +58,8 @@ The module is a `SingleModuleBase`; call its `loadFunc` (`region_create_from_fil
 
 ```c++
 const char* region_create_from_file(void *object, void **region,
-                                    HelperStruct *helper_struct);
+                                    HelperStruct *helper_struct,
+                                    void *input_config);
 ```
 
 ### Multi-region formats
@@ -70,11 +71,16 @@ int32_t     region_num(void *object);
 const char* region_name_index(void *object, int32_t index);
 const char* region_create_from_file_as_index(void *object, void **region,
                                              int32_t index,
-                                             HelperStruct *helper_struct);
+                                             HelperStruct *helper_struct,
+                                             void *input_config);
 ```
 
 `region_num()` / `region_name_index()` feed the selection dialog unless
 `DhConfig::selectAllRegionsInLoading()` is enabled, in which case every index is used.
+
+`input_config` is the reading options resolved for the plugin the loader expected to win (see the table in
+[plugin.md](plugin.md#how-the-host-uses-them)); it is `nullptr` when a different plugin ends up reading the file, so
+the plugin must tolerate that and use its defaults.
 
 Each region that comes back is registered under a **display name** built from
 `DhConfig::multiRegionNamePattern()`, which uses named placeholders:
@@ -112,3 +118,18 @@ using `DhConfig`:
 
 `HelperStruct` (progress callback, cancel flag, elapsed time, memory limit) is shared by all of these calls and is
 created once per job with `helper_struct_new()`.
+
+## Reading options
+
+When the target format is already known, the loader resolves the plugin's reading options for the whole batch before
+any file is touched, so they are asked for at most once:
+
+- `input_config_num()` is called to see whether the plugin offers any option at all. Nothing else happens when it
+  returns `0`.
+- The options are read from the `*_value_*` entries of the plugin's settings page when the _Use the settings below_
+  switch is on, and the plugin's `input_config_new()` defaults are used otherwise.
+- The resulting object is shared by every job of the batch and released with `input_config_free()` when the last one
+  finishes.
+
+Because the file is only matched to a plugin by its suffix, the object is passed to the plugin that ends up reading
+the file and `nullptr` to any other candidate, so a fallback never sees options that were resolved for someone else.

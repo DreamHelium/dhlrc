@@ -16,6 +16,7 @@
 #include <QVBoxLayout>
 #include <QWidget>
 #include <libintl.h>
+#include <map>
 #include <mutex>
 #define _(str) gettext (str)
 
@@ -150,7 +151,7 @@ protected:
 class SingleModuleBase : public ModuleBase
 {
 public:
-  using LoadFunc = const char *(*) (void *, void **, HelperStruct *);
+  using LoadFunc = const char *(*) (void *, void **, HelperStruct *, void *);
 
   [[nodiscard]] SingleModuleBase *
   asSingle () override
@@ -169,7 +170,8 @@ class MultiModuleBase : public ModuleBase
 public:
   using NumFunc = int32_t (*) (void *);
   using NameFunc = const char *(*) (void *, int32_t);
-  using LoadFunc = const char *(*) (void *, void **, int32_t, HelperStruct *);
+  using LoadFunc
+      = const char *(*) (void *, void **, int32_t, HelperStruct *, void *);
 
   [[nodiscard]] MultiModuleBase *
   asMulti () override
@@ -214,6 +216,9 @@ public:
   static QStringList getRegionNames ();
   void save (const QList<int> &list);
   bool selectButtonIsDown ();
+  /* Removes every region whose index is in `indexes`, skipping locked ones,
+   * and refreshes the list. Returns how many were removed. */
+  qsizetype removeRegions (const QList<int> &indexes);
 
   Q_SIGNAL void regionChanged ();
 
@@ -222,6 +227,13 @@ protected:
   void dropEvent (QDropEvent *event) override;
 
 private:
+  /* Loads the plugins from `region_module/` and the shared object codec. */
+  void loadModules ();
+  /* Indexes of the rows whose checkbox is ticked, in list order. */
+  [[nodiscard]] QList<int> checkedIndexes () const;
+  /* Enables/disables the selection toolbar and resets the row buttons. */
+  void setSelectionMode (bool enabled);
+
   QCheckBox *selectButton;
   QPushButton *addButton;
   QVBoxLayout *layout;
@@ -230,13 +242,31 @@ private:
   QScrollArea *scrollArea;
   QWidget *scrollAreaWidget;
 
+  /* Selection toolbar, only visible while the "Select" box is checked. */
+  QWidget *selectionWidget;
+  QPushButton *selectAllButton;
+  QPushButton *removeSelectedButton;
+  QPushButton *saveSelectedButton;
+  QLabel *selectionLabel;
+
   QList<ItemFrame *> itemFrames;
   KMessageWidget *messageWidget;
 
   QStringList supportList;
+  /* Guards against re-entrant toolbar updates while the list is rebuilt. */
+  bool updatingSelection = false;
+
+  /* Application-wide state. It lives here rather than in file-scope globals so
+   * its ownership and lifetime are visible from the header. */
+  static std::vector<ModuleBase *> moduleBaseList;
+  static QList<LoadObjectBase> loadObjectList;
+  static std::vector<std::shared_ptr<RegionClass>> regions;
+  static QPointer<ManageRegionUI> mrui;
 
 public Q_SLOTS:
   void refresh_triggered ();
+  /* Recomputes the selection count and enables/disables the bulk actions. */
+  void updateSelectionActions ();
 };
 
 struct NotifyStruct
@@ -390,6 +420,19 @@ public:
   void setCheckBoxVisible (bool visible);
   bool checkBoxVisible ();
   void setCheckBoxEnabled (bool enable);
+  [[nodiscard]] bool checkBoxEnabled () const;
+  [[nodiscard]] bool isChecked () const;
+  void setChecked (bool checked);
+  /* The row's position in the region list. */
+  [[nodiscard]] int
+  regionIndex () const
+  {
+    return index;
+  }
+  [[nodiscard]] bool isRegionLocked () const;
+  /* Emitted whenever the row checkbox is toggled, so the toolbar can update.
+   */
+  Q_SIGNAL void checkedChanged ();
 
 private:
   ManageRegionUI *mrui;

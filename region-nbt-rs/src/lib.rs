@@ -1,6 +1,8 @@
 mod config;
 mod output;
 
+use config::InputConfig;
+
 use common_rs::helper_struct::HelperStruct;
 use common_rs::i18n::i18n;
 use common_rs::my_error::MyError;
@@ -129,6 +131,7 @@ fn region_get_entity_internal(
 fn region_create_from_bytes_internal(
     o_nbt: *mut NBTRoot,
     helper_struct: &HelperStruct,
+    _input_config: Option<&InputConfig>,
 ) -> Result<*mut Region, Box<dyn Error>> {
     let nbt = &unsafe { &*o_nbt }.data;
     let compound = nbt.view().compound()?;
@@ -257,11 +260,13 @@ pub extern "C" fn region_create_from_file(
     nbt: *mut NBTRoot,
     region: *mut *mut Region,
     helper_struct: *mut HelperStruct,
+    input_config: *mut InputConfig,
 ) -> *const c_char {
     let mut err_string: String = String::new();
+    let config = unsafe { input_config.as_ref() };
     if !region.is_null() {
         unsafe {
-            *region = match region_create_from_bytes_internal(nbt, &*helper_struct) {
+            *region = match region_create_from_bytes_internal(nbt, &*helper_struct, config) {
                 Ok(ret) => ret,
                 Err(err) => {
                     err_string = err.to_string();

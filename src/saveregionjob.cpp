@@ -1,5 +1,6 @@
 #include "saveregionjob.h"
 
+#include "configobjectitems.h"
 #include "configobjectui.h"
 #include "mainwindow.h"
 #include "manageregionui.h"
@@ -14,24 +15,30 @@
 #define _(str) gettext (str)
 #undef asprintf
 
-SaveRegionJob::SaveRegionJob (const QList<std::shared_ptr<RegionClass>> &list,
+SaveRegionJob::SaveRegionJob (std::shared_ptr<RegionClass> region,
                               const QString &outputDir, SingleTransFunc func,
-                              QLibrary *library, const void *cancel_flag,
+                              void *configObject, const void *cancelFlag,
                               QObject *parent)
-    : KJob (parent), list (list), outputDir (outputDir), func (func),
-      library (library), cancel_flag (cancel_flag),
-      helper_struct (helper_struct_new (progressFunc, this, cancel_flag,
+    : KJob (parent), region (std::move (region)), outputDir (outputDir),
+      displayNameValue (this->region->displayName ()), func (func),
+      configObject (configObject), cancelFlag (cancelFlag),
+      /* Lock for the whole job: nothing may rename, remove or modify a region
+       * while it is being written. */
+      lock (std::make_unique<AutoLocker> (*this->region)),
+      helper_struct (helper_struct_new (progressFunc, this, cancelFlag,
                                         DhConfig::elapsedMilliseconds (),
                                         DhConfig::memoryLimit ()),
                      helper_struct_free)
 {
-  /* Hold every region for the whole job so it cannot be renamed, removed or
-   * modified while it is being written. */
-  for (const auto &region : list)
-    locks.emplace_back (std::make_unique<AutoLocker> (*region));
 }
 
 SaveRegionJob::~SaveRegionJob () = default;
+
+bool
+SaveRegionJob::wasCancelled () const
+{
+  return cancel_flag_is_cancelled (cancelFlag) != 0;
+}
 
 void
 SaveRegionJob::progressFunc (void *main_klass, int value, const char *text,
@@ -46,87 +53,30 @@ SaveRegionJob::progressFunc (void *main_klass, int value, const char *text,
 }
 
 void
-SaveRegionJob::setConfigObject (void *object)
-{
-  std::lock_guard lock (mutex);
-  configObject = object;
-}
-
-void *
-SaveRegionJob::takeConfigObject ()
-{
-  std::lock_guard lock (mutex);
-  return configObject;
-}
-
-bool
-SaveRegionJob::doResume ()
-{
-  {
-    std::lock_guard lock (mutex);
-    resumed = true;
-  }
-  cv.notify_one ();
-  return true;
-}
-
-void
-SaveRegionJob::forceResume ()
-{
-  /* Used when the whole export is cancelled: unblock the worker so it can
-   * observe the cancel flag and finish. */
-  {
-    std::lock_guard lock (mutex);
-    resumed = true;
-  }
-  cv.notify_one ();
-}
-
-void
 SaveRegionJob::start ()
 {
   auto realTask = [this]
     {
-      const auto total = list.size ();
-      int i = 0;
-      for (const auto &region : list)
+      /* The flag can already be set when the user pressed Cancel while the job
+       * was queued. */
+      if (!wasCancelled ())
         {
-          if (cancel_flag_is_cancelled (cancel_flag))
-            break;
-
-          current = region->displayName ();
-          if (total > 0)
-            setPercent (i * 100 / total);
-          Q_EMIT infoMessage (this, _ ("Please click `Continue` to choose "
-                                       "the output options."));
-
-          /* Suspend until the owner has collected the output options. The
-           * predicate makes sure a `doResume ()` that lands before we reach
-           * `wait ()` is not lost. */
-          Q_EMIT configureRequested (this);
-          std::unique_lock lock (mutex);
-          cv.wait (lock, [this] { return resumed; });
-          resumed = false;
-          lock.unlock ();
-
-          if (cancel_flag_is_cancelled (cancel_flag))
-            break;
-
           // NOLINTNEXTLINE(bugprone-unused-return-value)
-          const auto *msg
-              = func (region->get_region (),
-                      (outputDir + QDir::separator () + current).toUtf8 (),
-                      takeConfigObject (), helper_struct.get ());
+          const auto *msg = func (
+              region->get_region (),
+              (outputDir + QDir::separator () + displayNameValue).toUtf8 (),
+              configObject, helper_struct.get ());
           if (msg)
             {
-              failedList.append (current);
-              failedReason.append (msg);
+              failure = QString::fromUtf8 (msg);
               string_free (msg);
             }
-          i++;
-          if (total > 0)
-            setPercent (i * 100 / total);
+          else
+            {
+              setPercent (100);
+            }
         }
+
       /* Emit from the job's own (GUI) thread: with auto-delete enabled the job
        * must not be destroyed from inside the worker before this lambda
        * returns. */
@@ -137,121 +87,133 @@ SaveRegionJob::start ()
   future = QtConcurrent::run (std::move (realTask));
 }
 
-SaveAllRegionJob::SaveAllRegionJob (QObject *parent)
-    : KCompositeJob (parent), cancel_flag (cancel_flag_new ())
+SaveAllRegionJob::SaveAllRegionJob (QObject *parent) : KCompositeJob (parent)
 {
-  connect (this, &SaveAllRegionJob::cancelRequested, this,
-           [&]
-             {
-               cancel_flag_cancel (this->cancel_flag);
-               for (const auto &job : this->subjobs ())
-                 qobject_cast<SaveRegionJob *> (job)->forceResume ();
-             });
 }
 
-SaveAllRegionJob::~SaveAllRegionJob () { cancel_flag_destroy (cancel_flag); }
+SaveAllRegionJob::~SaveAllRegionJob () = default;
 
-SaveRegionJob *
+void
 SaveAllRegionJob::addSave (const QList<std::shared_ptr<RegionClass>> &list,
                            const QString &outputDir, SingleTransFunc func,
-                           QLibrary *library)
+                           QLibrary *library, const QString &type,
+                           PluginOptionsConfig *pluginOptions)
 {
-  auto *job = new SaveRegionJob (list, outputDir, func, library, cancel_flag);
-  KCompositeJob::addSubjob (job);
-  job->setAutoDelete (true);
+  /* The output options belong to the plugin, not to a single region, so the
+   * batch builds one object and hands the same pointer to every job.
+   *
+   * One rule picks the source:
+   *
+   * - the switch is on -> this plugin follows the global configuration, so the
+   *   saved values are used and nothing is asked;
+   * - the switch is off -> the settings are ignored and the user is asked.
+   *
+   * Only one of the two runs, so the dialog cannot be shown behind an object
+   * that was built and then dropped. The batch owns whatever comes back and
+   * releases it in `freeConfigObject ()`. */
+  configObjectLibrary = library;
+  if (pluginOptions && pluginOptions->useConfigured (type))
+    {
+      configObject = ConfigObjectItems::createObject (
+          ConfigObjectItems::Kind::Output, library);
+      pluginOptions->apply (type, ConfigObjectItems::Kind::Output,
+                            configObject);
+    }
+  else
+    {
+      configObject = ConfigObjectUI::getObject (library, CONFIG_OUTPUT);
+    }
 
-  auto *widget = new KMessageWidget ();
-  /* Give the widget its initial text *before* it is added, so the top area
-   * reserves the right height (an empty KMessageWidget has none). The worker
-   * has not set `currentRegion ()` yet, so start from a generic label. */
-  widget->setText (_ ("Preparing to save..."));
-  /* Closing the widget asks the whole export to stop. The flag avoids
-   * re-cancelling when the widget is hidden on normal completion. */
-  auto finished = std::make_shared<bool> (false);
-  connect (widget, &KMessageWidget::hideAnimationFinished, this,
-           [this, widget, finished]
-             {
-               widget->deleteLater ();
-               if (!*finished)
-                 Q_EMIT this->cancelRequested ();
-             });
-  MainWindow::addWidgetToTopArea (widget);
+  for (const auto &region : list)
+    {
+      const void *flag = cancel_flag_new ();
+      cancelFlags.emplace_back (flag, cancel_flag_destroy);
 
-  connect (job, &SaveRegionJob::percentChanged, widget,
-           [widget, job]
-             {
-               widget->setText (QString (_ ("Saving %1 (%2%)"))
-                                    .arg (job->currentRegion ())
-                                    .arg (job->percent ()));
-             });
-  connect (job, &SaveRegionJob::infoMessage, widget,
-           [widget, job] (KJob *, const QString &text)
-             {
-               widget->setText (QString (_ ("Saving %1 (%2%): %3"))
-                                    .arg (job->currentRegion ())
-                                    .arg (job->percent ())
-                                    .arg (text));
-             });
-  connect (job, &SaveRegionJob::configureRequested, this,
-           [this, widget] (SaveRegionJob *realJob)
-             {
-               QAction *action = new QAction (_ ("Continue"), widget);
-               connect (action, &QAction::triggered, this,
-                        [this, realJob, widget]
-                          {
-                            widget->clearActions ();
-                            realJob->setConfigObject (
-                                ConfigObjectUI::getObject (
-                                    realJob->pluginLibrary (), CONFIG_OUTPUT));
-                            realJob->doResume ();
-                          });
-               widget->addAction (action);
-             });
-  connect (
-      job, &SaveRegionJob::result, this,
-      [this, job, widget, finished] (KJob *finishedJob)
-        {
-          *finished = true;
-          if (finishedJob->error () != 0)
+      auto *job
+          = new SaveRegionJob (region, outputDir, func, configObject, flag);
+      KCompositeJob::addSubjob (job);
+      job->setAutoDelete (true);
+
+      auto *widget = new KMessageWidget ();
+      /* Give the widget its initial text *before* it is added, so the top area
+       * reserves the right height (an empty KMessageWidget has none). */
+      widget->setText (
+          QString (_ ("Saving %1...")).arg (region->displayName ()));
+
+      /* KMessageWidget already ships a close button that calls
+       * `animatedHide ()`. Closing this row means "skip this region", but the
+       * same signal also fires when we hide the row on completion, so only
+       * treat it as a cancel while the job is still running. */
+      auto running = std::make_shared<bool> (true);
+      connect (widget, &KMessageWidget::hideAnimationFinished, job,
+               [flag, running]
+                 {
+                   if (*running)
+                     cancel_flag_cancel (flag);
+                 });
+
+      connect (job, &SaveRegionJob::percentChanged, widget,
+               [widget, job]
+                 {
+                   widget->setText (QString (_ ("Saving %1 (%2%)"))
+                                        .arg (job->displayName ())
+                                        .arg (job->percent ()));
+                 });
+      connect (job, &SaveRegionJob::infoMessage, widget,
+               [widget, job] (KJob *, const QString &text)
+                 {
+                   widget->setText (QString (_ ("Saving %1 (%2%): %3"))
+                                        .arg (job->displayName ())
+                                        .arg (job->percent ())
+                                        .arg (text));
+                 });
+
+      MainWindow::addWidgetToTopArea (widget);
+      connect (job, &SaveRegionJob::result, widget,
+               [running] { *running = false; });
+      connect (job, &SaveRegionJob::result, widget,
+               &KMessageWidget::animatedHide);
+
+      connect (
+          job, &SaveRegionJob::result, this,
+          [this, job] (KJob *finishedJob)
             {
-              auto *failedWidget = new KMessageWidget ();
-              failedWidget->setMessageType (KMessageWidget::Error);
-              failedWidget->setTextFormat (Qt::MarkdownText);
-              failedWidget->setText (finishedJob->errorText ());
-              MainWindow::addWidgetToTopArea (failedWidget);
-              connect (failedWidget, &KMessageWidget::hideAnimationFinished,
-                       failedWidget, &KMessageWidget::deleteLater);
-              QTimer::singleShot (5000, failedWidget,
-                                  &KMessageWidget::animatedHide);
-            }
-          else if (!job->failedRegions ().isEmpty ())
-            {
-              QString text
-                  = _ ("The following regions could not be saved:\n\n");
-              const auto regions = job->failedRegions ();
-              const auto reasons = job->failedReasons ();
-              for (qsizetype i = 0; i < regions.size (); i++)
+              /* A cancelled region is simply skipped: nothing to report. */
+              if (!job->wasCancelled () && !job->failureReason ().isEmpty ())
                 {
-                  text += "**" + regions.at (i) + "**\n\n" + reasons.at (i)
-                          + "\n\n";
+                  auto *failedWidget = new KMessageWidget ();
+                  failedWidget->setMessageType (KMessageWidget::Error);
+                  failedWidget->setTextFormat (Qt::MarkdownText);
+                  failedWidget->setText (
+                      QString (_ ("Region %1 could not be saved:\n\n%2"))
+                          .arg (job->displayName (), job->failureReason ()));
+                  MainWindow::addWidgetToTopArea (failedWidget);
+                  connect (failedWidget,
+                           &KMessageWidget::hideAnimationFinished,
+                           failedWidget, &KMessageWidget::deleteLater);
+                  QTimer::singleShot (5000, failedWidget,
+                                      &KMessageWidget::animatedHide);
                 }
-              auto *failedWidget = new KMessageWidget ();
-              failedWidget->setMessageType (KMessageWidget::Error);
-              failedWidget->setTextFormat (Qt::MarkdownText);
-              failedWidget->setText (text);
-              MainWindow::addWidgetToTopArea (failedWidget);
-              connect (failedWidget, &KMessageWidget::hideAnimationFinished,
-                       failedWidget, &KMessageWidget::deleteLater);
-              QTimer::singleShot (5000, failedWidget,
-                                  &KMessageWidget::animatedHide);
-            }
-          widget->animatedHide ();
-          removeSubjob (finishedJob);
-          if (!hasSubjobs ())
-            deleteLater ();
-        });
 
-  return job;
+              removeSubjob (finishedJob);
+              if (!hasSubjobs ())
+                {
+                  freeConfigObject ();
+                  deleteLater ();
+                }
+            });
+    }
+}
+
+void
+SaveAllRegionJob::freeConfigObject ()
+{
+  if (!configObject)
+    return;
+  ConfigObjectItems::freeObject (ConfigObjectItems::Kind::Output,
+                                 configObjectLibrary, configObject);
+  configObject = nullptr;
+  configObjectLibrary = nullptr;
 }
 
 void

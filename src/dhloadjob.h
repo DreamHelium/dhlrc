@@ -58,8 +58,10 @@ class DhLoadJob : public KJob
   Q_OBJECT
 public:
   explicit DhLoadJob (QString &filename, const void *cancel_flag,
+                      const std::map<QString, void *> &inputConfigs,
                       QObject *parent = nullptr)
       : KJob (parent), filename (filename), cancel_flag (cancel_flag),
+        inputConfigs (inputConfigs),
         helper_struct (helper_struct_new (setFunc, this, cancel_flag,
                                           DhConfig::elapsedMilliseconds (),
                                           DhConfig::memoryLimit ()),
@@ -72,7 +74,7 @@ public:
     NOT_MATCHED,
     FAILED
   };
-  ~DhLoadJob () override = default;
+  ~DhLoadJob () override;
   void start () override;
   bool doResume () override;
   void forceResume ();
@@ -83,16 +85,23 @@ public:
 Q_SIGNALS:
   void selfSuspended (KJob *job);
   void selfResumed (KJob *job);
-  void selfCancel ();
   void error ();
   void loadFileSuccess ();
   void loadObjectSuccess ();
   void loadRegionSuccess ();
+  /* Asks the composite to unblock this job. `forceResume ()` is private
+   * because only the owner should wake a job, and the row widgets are built by
+   * the composite. */
+  void forceResumeRequested ();
 
 private:
   QString filename;
   QString typeName;
   const void *cancel_flag;
+  /* The options of every candidate plugin, borrowed from the batch that owns
+   * them. The job picks the entry for whichever plugin ends up reading the
+   * file, so it does not matter that the winner is unknown at this point. */
+  std::map<QString, void *> inputConfigs;
   std::mutex mutex;
   std::condition_variable cv;
   QStringList regionList;
@@ -104,7 +113,7 @@ private:
 
 private Q_SLOTS:
   bool loadMultiRegion (MultiModuleBase *multiBase, void *object,
-                        DhMultiLoadError &err);
+                        DhMultiLoadError &err, void *inputConfig);
 };
 
 class DhAllLoadJob : public KCompositeJob
@@ -120,10 +129,28 @@ Q_SIGNALS:
   void cancel ();
 
 private:
+  /* Builds the reading options for `type` from the settings, or asks for them.
+   * Runs on the GUI thread, so it may show a dialog. Returns nullptr when the
+   * plugin offers nothing to configure. */
+  void *acquireInputConfig (const QString &type);
+  /* Resolves the options of every loaded plugin once, on the GUI thread, so
+   * the jobs can pick the entry matching whichever plugin reads their file.
+   * Called before the jobs are created. */
+  void registerInputConfigs ();
+  /* Releases the options of the whole batch, once the last job is done. */
+  void freeInputConfig ();
+
   KMessageWidget *messageWidget;
   int jobNums;
   int finishedJobs = 0;
-  const void *cancel_flag;
+  /* One cancel flag per file, so a single file can be aborted on its own.
+   * They must outlive their jobs, hence kept here. */
+  std::vector<std::unique_ptr<const void, void (*) (const void *)>>
+      cancelFlags;
+  /* One options object per plugin type, shared by the files of that type and
+   * owned here: a batch may mix formats, and a job must not free a pointer its
+   * siblings are still using. */
+  std::map<QString, void *> inputConfigs;
 };
 
 #endif // DHLRC_DHLOADJOB_H

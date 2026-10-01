@@ -9,5 +9,5 @@ You need to compile your library as a **dynamic** library (`.so` / `.dll` / `.dy
 
 # Category
 
-- [Plugin reference](plugin.md) — every symbol a plugin may or must export
+- [Plugin reference](plugin.md) — every symbol a plugin may or must export, plus the option sets
 - [Create a region](region_create.md) — how a file is loaded and turned into a region

@@ -4,6 +4,7 @@
 
 #include <QApplication>
 #include <QDir>
+#include <QLocale>
 #include <QMessageBox>
 #define _(str) gettext (str)
 
@@ -25,16 +26,12 @@ dh::getRegion (QWidget *widget, ManageRegionUI *mr, bool write)
       return -1;
     }
   auto realList = ManageRegionUI::getRegions ();
-  auto nameList = ManageRegionUI::getRegionNames ();
+  auto nameList = dh::getRegionChoiceLabels ();
   auto dialog = new GeneralChooseDialog (
       _ ("Select Region(s)"), _ ("Please select region(s)."), nameList, false);
   QObject::connect (ManageRegionUI::instance (),
-                    &ManageRegionUI::regionChanged, dialog,
-                    [dialog]
-                      {
-                        auto list = ManageRegionUI::getRegionNames ();
-                        dialog->repaint (list);
-                      });
+                    &ManageRegionUI::regionChanged, dialog, [dialog]
+                      { dialog->repaint (dh::getRegionChoiceLabels ()); });
   int stat = dialog->exec ();
   int ret = (stat == QDialog::Accepted) ? dialog->group->checkedId () : -1;
   delete dialog;
@@ -63,6 +60,35 @@ QDateTime
 dh::getDateTimeFromTimeStamp (qint64 timeStamp)
 {
   return QDateTime::fromMSecsSinceEpoch (timeStamp);
+}
+
+QString
+dh::formatDateTime (const QDateTime &dateTime)
+{
+  if (!dateTime.isValid ())
+    return {};
+  return QLocale ().toString (dateTime, QLocale::ShortFormat);
+}
+
+QStringList
+dh::getRegionChoiceLabels ()
+{
+  QStringList labels;
+  for (const auto &region : ManageRegionUI::getRegions ())
+    {
+      /* A locked region cannot be picked, so it keeps the plain label. */
+      if (region->locked ())
+        {
+          labels << _ ("Locked");
+          continue;
+        }
+      /* Shorten the UUID so the label stays readable while still being unique
+       * enough to separate two regions with the same name. */
+      labels << QString (_ ("%1 (%2)"))
+                    .arg (region->displayName ())
+                    .arg (region->uuid ().left (8));
+    }
+  return labels;
 }
 
 QString

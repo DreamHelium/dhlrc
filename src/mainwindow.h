@@ -12,6 +12,8 @@
 #include <qevent.h>
 #include <qscrollarea.h>
 
+#include "pluginoptionsconfig.h"
+
 class MainWindow : public QMainWindow
 {
   Q_OBJECT

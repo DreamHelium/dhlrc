@@ -68,7 +68,8 @@ A single-region plugin describes a file that holds exactly one region. It must e
 ```c++
 /* Create one region from a loaded object. */
 const char* region_create_from_file(void *object, void **region,
-                                    HelperStruct *helper_struct);
+                                    HelperStruct *helper_struct,
+                                    void *input_config);
 
 /* Optional: write one region to a file. */
 const char* region_save(void *region, const char *filename,
@@ -77,6 +78,10 @@ const char* region_save(void *region, const char *filename,
 
 `region_create_from_file()` is required. `region_save()` is optional; a plugin without it is still usable for
 importing, but it will not appear in the "save as" list.
+
+`input_config` / `output_config` is the plugin's own options object, built by the plugin from `*_config_new()` — see
+[Plugin options](#plugin-options). It may be `nullptr` (for example while importing, before the target format is known,
+so the loader could not resolve options for this plugin), in which case the plugin must fall back to its defaults.
 
 ## Multi-region plugins
 
@@ -93,7 +98,8 @@ const char* region_name_index(void *object, int32_t index);
 /* Create the region at `index` from a loaded object. */
 const char* region_create_from_file_as_index(void *object, void **region,
                                              int32_t index,
-                                             HelperStruct *helper_struct);
+                                             HelperStruct *helper_struct,
+                                             void *input_config);
 
 /* Optional: write several regions into one file. */
 const char* region_save_into_multi(void *region, size_t size,
@@ -102,6 +108,57 @@ const char* region_save_into_multi(void *region, size_t size,
 
 `region_num()`, `region_name_index()` and `region_create_from_file_as_index()` are all required.
 `region_save_into_multi()` is optional and enables the "save several regions as one file" option.
+
+The shape of the symbol set is the same for both kinds; the only difference is the extra `index` of the multi-region
+variants, which comes right before `helper_struct`.
+
+## Plugin options
+
+Both directions can carry options. A plugin exports them as a second, parallel symbol set, and the host turns them
+into an ordinary settings page:
+
+```c++
+/* Create an options object with default values. The host calls this before the
+ * work starts, or only when the user chose to configure the options. */
+void* input_config_new();
+void  input_config_free(void *input_config);
+
+/* How many options the plugin has. */
+size_t input_config_num();
+
+/* The `<key>:<kind>` spec of one option; only `bool` is understood today. */
+const char* input_config_item(size_t index);
+/* The translated label and explanation of one option. */
+const char* input_config_item_get_name(size_t index);
+const char* input_config_item_get_description(size_t index);
+
+/* Read / write one option. The host only ever uses these two; `new` above
+ * already gives it a default-valued object. */
+void input_config_item_set_bool(void *input_config, size_t index, int value);
+int  input_config_item_get_bool(const void *input_config, size_t index);
+```
+
+The same set exists with the `input_` prefix replaced by `output_`. A plugin only has to export the set for the
+direction it supports; there is no obligation to offer any option, and a plugin that exports no options simply gets no
+settings page.
+
+`index` is always the position in the plugin's own table, so the plugin can dispatch on it directly. Every function is
+allowed to receive an out-of-range index and must treat that as a no-op rather than panicking.
+
+In Rust, `common_rs::config` implements this once: the plugin defines a struct, implements the `ConfigObject` trait
+with a static `ConfigItem` table, and forwards each symbol to `config_new` / `config_free` / `config::ffi`. No macro
+generates the exported functions, so the ABI stays greppable. See `region-nbt-rs/src/config.rs` for a short example.
+
+### How the host uses them
+
+All options of a plugin live on **one generated settings page**, named after `region_type()`, under
+_Settings → Default_. The page starts with a _Use the settings below_ switch; when it is off the host behaves as
+before and asks before each export/import using a dialog built from the same table. The values are stored in the
+normal dhlrc configuration file.
+
+The options a plugin wants for reading depend on the plugin, but the plugin is only known after the file has been
+decoded. dhlrc therefore picks the module whose `region_file_suffix()` matches the file, resolves its input options,
+and passes them to the plugin that actually reads the file — or `nullptr` when that turned out to be a different one.
 
 See [region_create.md](region_create.md) for the full import pipeline, including how the file is decompressed and
 turned into an object.

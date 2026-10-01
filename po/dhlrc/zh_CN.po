@@ -13,7 +13,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-30 23:40+0800\n"
+"POT-Creation-Date: 2026-10-01 17:02+0800\n"
 "PO-Revision-Date: 2026-09-07 22:54+0800\n"
 "Last-Translator: 孟小骇 <48383878+DreamHelium@users.noreply.github.com>\n"
 "Language-Team: Chinese <kde-i18n-doc@kde.org>\n"
@@ -123,9 +123,9 @@ msgid "Unknown"
 msgstr "未知"
 
 #: ../../src/blockreaderui.cpp:290 ../../src/externalnbtreaderui.cpp:100
-#: ../../src/manageregionui.cpp:573 ../../src/manageregionui.cpp:708
-#: ../../src/regionmodifyui.cpp:13 ../../src/utility.cpp:23
-#: ../../src/utility.cpp:48 ../../src/utility.cpp:56
+#: ../../src/manageregionui.cpp:563 ../../src/manageregionui.cpp:836
+#: ../../src/regionmodifyui.cpp:13 ../../src/utility.cpp:24
+#: ../../src/utility.cpp:45 ../../src/utility.cpp:53
 msgid "Error!"
 msgstr "错误！"
 
@@ -150,7 +150,7 @@ msgstr "展示实体NBT(&S)"
 msgid "&Modify Property"
 msgstr "修改属性(&M)"
 
-#: ../../src/blockshowui.cpp:101
+#: ../../src/blockshowui.cpp:101 ../../src/manageregionui.cpp:596
 msgid "Warning!"
 msgstr "警告！"
 
@@ -166,6 +166,22 @@ msgstr "设置选项："
 msgid "&Cancel"
 msgstr "取消(&C)"
 
+#: ../../src/dhaboutui.cpp:30
+msgid "About dhlrc"
+msgstr "关于 dhlrc"
+
+#: ../../src/dhaboutui.cpp:48 ../../src/main.cpp:35
+msgid "Minecraft Structure Modifier"
+msgstr "Minecraft结构修改器"
+
+#: ../../src/dhaboutui.cpp:69
+msgid "Loaded region modules:"
+msgstr "已加载的区域模块："
+
+#: ../../src/dhaboutui.cpp:77
+msgid "None."
+msgstr "无。"
+
 #: ../../src/dhhelpui.cpp:49
 msgid ""
 "test\n"
@@ -173,47 +189,51 @@ msgid ""
 "![test_svg](:/cn/dh/dhlrc/show.svg)"
 msgstr ""
 
-#: ../../src/dhloadjob.cpp:23 ../../src/dhloadjob.cpp:308
+#: ../../src/dhloadjob.cpp:26 ../../src/dhloadjob.cpp:344
 msgid "Loading region type %1"
 msgstr "加载区域类型%1"
 
-#: ../../src/dhloadjob.cpp:29
+#: ../../src/dhloadjob.cpp:32
 msgid "Failed when %1: %2"
 msgstr "当 %1 时失败：%2"
 
-#: ../../src/dhloadjob.cpp:48
+#: ../../src/dhloadjob.cpp:68 ../../src/dhloadjob.cpp:78
 msgid "Loading File"
 msgstr "加载文件"
 
-#: ../../src/dhloadjob.cpp:66
+#: ../../src/dhloadjob.cpp:78
+msgid "Cancelled."
+msgstr "已取消。"
+
+#: ../../src/dhloadjob.cpp:90
 msgid "Loading Object %1"
 msgstr "加载对象%1"
 
-#: ../../src/dhloadjob.cpp:172
+#: ../../src/dhloadjob.cpp:206
 msgid "Loading progress is successful, but the file type should be %1."
 msgstr "加载进程成功，但是文件类型应该是%1。"
 
-#: ../../src/dhloadjob.cpp:226 ../../src/utility.cpp:30
+#: ../../src/dhloadjob.cpp:260 ../../src/utility.cpp:31
 msgid "Select Region(s)"
 msgstr "选择区域"
 
-#: ../../src/dhloadjob.cpp:226 ../../src/utility.cpp:30
+#: ../../src/dhloadjob.cpp:260 ../../src/utility.cpp:31
 msgid "Please select region(s)."
 msgstr "请选择区域。"
 
-#: ../../src/dhloadjob.cpp:286
+#: ../../src/dhloadjob.cpp:322
 msgid "Please click `Continue` to choose the region(s) to load."
 msgstr "请点击`继续`选择要加载的区域。"
 
-#: ../../src/dhloadjob.cpp:347 ../../src/dhloadjob.cpp:354
+#: ../../src/dhloadjob.cpp:385 ../../src/dhloadjob.cpp:392
 msgid "Finish processing %1 of %2 (%3%)."
 msgstr "已结束处理了%2个中的%1个（%3%）。"
 
-#: ../../src/dhloadjob.cpp:420 ../../src/saveregionjob.cpp:198
+#: ../../src/dhloadjob.cpp:501
 msgid "Continue"
 msgstr "继续"
 
-#: ../../src/externalnbtreaderui.cpp:29 ../../src/mainwindow.cpp:630
+#: ../../src/externalnbtreaderui.cpp:29 ../../src/mainwindow.cpp:653
 msgid "NBT Reader"
 msgstr "NBT阅读器"
 
@@ -229,47 +249,43 @@ msgstr "多个文件被拖入！"
 msgid "&All"
 msgstr "全选 (&A)"
 
-#: ../../src/main.cpp:33
-msgid "Minecraft Structure Modifier"
-msgstr "Minecraft结构修改器"
-
-#: ../../src/mainwindow.cpp:155
+#: ../../src/mainwindow.cpp:157
 msgid "Select Cache Directory"
 msgstr "选择缓存目录"
 
-#: ../../src/mainwindow.cpp:182 ../../build/src/settings.cpp:102 rc.cpp:114
+#: ../../src/mainwindow.cpp:184 ../../build/src/settings.cpp:102 rc.cpp:114
 msgid "Multi-Region Display Name"
 msgstr "多区域显示名称"
 
-#: ../../src/mainwindow.cpp:187
+#: ../../src/mainwindow.cpp:189
 msgid "Name pattern:"
 msgstr "名称格式："
 
-#: ../../src/mainwindow.cpp:191
+#: ../../src/mainwindow.cpp:193
 msgid "Insert a placeholder:"
 msgstr "插入占位符："
 
-#: ../../src/mainwindow.cpp:193
+#: ../../src/mainwindow.cpp:195
 msgid "File name"
 msgstr "文件名"
 
-#: ../../src/mainwindow.cpp:194
+#: ../../src/mainwindow.cpp:196
 msgid "Region name"
 msgstr "区域名称"
 
-#: ../../src/mainwindow.cpp:198
+#: ../../src/mainwindow.cpp:200
 msgid "Preview with these sample values:"
 msgstr "使用这些示例值预览："
 
-#: ../../src/mainwindow.cpp:201
+#: ../../src/mainwindow.cpp:203
 msgid "Sample file name"
 msgstr "示例文件名"
 
-#: ../../src/mainwindow.cpp:203
+#: ../../src/mainwindow.cpp:205
 msgid "Sample region name"
 msgstr "示例区域名称"
 
-#: ../../src/mainwindow.cpp:212
+#: ../../src/mainwindow.cpp:214
 msgid ""
 "${file} is replaced with the file name, ${region} with the region name "
 "inside the file. They can be used in any order and repeated. Anything else "
@@ -278,91 +294,127 @@ msgstr ""
 "${file} 将被替换为文件名，${region} 将被替换为文件内的区域名称。它们可以以任"
 "意顺序使用且可重复使用。其它内容将按原样保留。"
 
-#: ../../src/mainwindow.cpp:322
+#: ../../src/mainwindow.cpp:324
 msgid "Pre&view..."
 msgstr "预览(&V)……"
 
-#: ../../src/mainwindow.cpp:507
+#: ../../src/mainwindow.cpp:509
 msgid "Config"
 msgstr "配置"
 
-#: ../../src/mainwindow.cpp:508
+#: ../../src/mainwindow.cpp:510
 msgid "Icon Theme"
 msgstr "图标主题"
 
-#: ../../src/mainwindow.cpp:548
+#: ../../src/mainwindow.cpp:528
+msgid "Help"
+msgstr ""
+
+#: ../../src/mainwindow.cpp:529
+msgid "&About"
+msgstr "关于(&A)"
+
+#: ../../src/mainwindow.cpp:558
 msgid "Search..."
 msgstr "搜索……"
 
-#: ../../src/mainwindow.cpp:576
+#: ../../src/mainwindow.cpp:586
 msgid "NBT File Reader"
 msgstr "NBT文件阅读器"
 
-#: ../../src/mainwindow.cpp:577 ../../src/mainwindow.cpp:640
+#: ../../src/mainwindow.cpp:587 ../../src/mainwindow.cpp:663
 msgid "Manage Region"
 msgstr "管理区域"
 
-#: ../../src/mainwindow.cpp:578 ../../src/mainwindow.cpp:655
+#: ../../src/mainwindow.cpp:588 ../../src/mainwindow.cpp:678
 msgid "Region Reader/Modifier"
 msgstr "区域阅读器及修改器"
 
-#: ../../src/mainwindow.cpp:579
+#: ../../src/mainwindow.cpp:589
 msgid "Settings"
 msgstr "设置"
 
-#: ../../src/manageregionui.cpp:540
+#: ../../src/manageregionui.cpp:506
 msgid "&Select"
 msgstr "选择(&S)"
 
-#: ../../src/manageregionui.cpp:544 rc.cpp:187
+#: ../../src/manageregionui.cpp:510 rc.cpp:187
 msgid "&Add"
 msgstr "添加(&A)"
 
-#: ../../src/manageregionui.cpp:571
+#: ../../src/manageregionui.cpp:523
+msgid "Select &All"
+msgstr "全选(&A)"
+
+#: ../../src/manageregionui.cpp:530
+msgid "&Remove Selected"
+msgstr "移除选中项(&R)"
+
+#: ../../src/manageregionui.cpp:534
+msgid "&Save Selected"
+msgstr "保存选中项(&S)"
+
+#: ../../src/manageregionui.cpp:561
 msgid "Select Files"
 msgstr "选择文件"
 
-#: ../../src/manageregionui.cpp:574
+#: ../../src/manageregionui.cpp:564
 msgid "No file selected!"
 msgstr "没有文件被选中！"
 
-#: ../../src/manageregionui.cpp:645
+#: ../../src/manageregionui.cpp:597
+msgid "Locked regions were kept."
+msgstr "已锁定的区域被保留。"
+
+#: ../../src/manageregionui.cpp:716
+msgid "%1 region(s) selected"
+msgstr "已选中 %1 个区域"
+
+#: ../../src/manageregionui.cpp:773 ../../src/utility.cpp:82
 msgid "Locked"
 msgstr "已锁定"
 
-#: ../../src/manageregionui.cpp:682
+#: ../../src/manageregionui.cpp:810
 msgid "Select Save Format"
 msgstr "选择保存格式"
 
-#: ../../src/manageregionui.cpp:682
+#: ../../src/manageregionui.cpp:810
 msgid "Please select the format to save to."
 msgstr "请选择要保存到的格式。"
 
-#: ../../src/manageregionui.cpp:694
+#: ../../src/manageregionui.cpp:822
 msgid "Use MultiFunc?"
 msgstr "使用多区域功能？"
 
-#: ../../src/manageregionui.cpp:695
+#: ../../src/manageregionui.cpp:823
 msgid "This type supports regions to save as one file, do you want to use it?"
 msgstr "此类型支持将多个区域保存为一个文件，您想要使用它吗？"
 
-#: ../../src/manageregionui.cpp:709
+#: ../../src/manageregionui.cpp:837
 msgid "This type cannot save a single region."
 msgstr "此类型无法保存单个区域。"
 
-#: ../../src/manageregionui.cpp:714
+#: ../../src/manageregionui.cpp:842
 msgid "Select Directory"
 msgstr "选择目录"
 
-#: ../../src/manageregionui.cpp:800
+#: ../../src/manageregionui.cpp:945
 msgid "Locked!"
 msgstr "已锁定！"
 
-#: ../../src/manageregionui.cpp:843
+#: ../../src/manageregionui.cpp:957
+msgid "Region identifier"
+msgstr "区域标识符"
+
+#: ../../src/manageregionui.cpp:960
+msgid "Added: %1"
+msgstr "添加于：%1"
+
+#: ../../src/manageregionui.cpp:999
 msgid "Input a New Name"
 msgstr "输入新名称"
 
-#: ../../src/manageregionui.cpp:844
+#: ../../src/manageregionui.cpp:1000
 msgid "Please input a new name for the region."
 msgstr "请输入此区域的新名称。"
 
@@ -397,6 +449,27 @@ msgstr "名称"
 #: ../../src/paletteaddui.cpp:68
 msgid "Data"
 msgstr "数据"
+
+#: ../../src/pluginoptionsconfig.cpp:182 ../../src/pluginoptionsconfig.cpp:246
+msgid "loading"
+msgstr "加载"
+
+#: ../../src/pluginoptionsconfig.cpp:183 ../../src/pluginoptionsconfig.cpp:247
+msgid "saving"
+msgstr "保存"
+
+#: ../../src/pluginoptionsconfig.cpp:185
+msgid "Options for %1 when %2"
+msgstr "%1 在%2时的选项"
+
+#: ../../src/pluginoptionsconfig.cpp:248
+msgid "Use the settings below when %1"
+msgstr "在%1时使用下面的设置"
+
+#: ../../src/pluginoptionsconfig.cpp:250
+msgid ""
+"Use the options below for every %1 operation, instead of asking each time."
+msgstr "每次%1都使用下面的选项，而不再逐次询问。"
 
 #: ../../src/regionmodifyui.cpp:55
 msgid "Failed to set the base name."
@@ -450,41 +523,51 @@ msgstr "正在下载对象。"
 msgid "Downloading finished!"
 msgstr "下载完成！"
 
-#: ../../src/saveregionjob.cpp:100
-msgid "Please click `Continue` to choose the output options."
-msgstr "请点击`继续`选择输出选项。"
+#: ../../src/saveregionjob.cpp:141
+msgid "Saving %1..."
+msgstr "正在保存%1……"
 
-#: ../../src/saveregionjob.cpp:167
-msgid "Preparing to save..."
-msgstr "正在准备保存……"
-
-#: ../../src/saveregionjob.cpp:183
+#: ../../src/saveregionjob.cpp:158
 msgid "Saving %1 (%2%)"
 msgstr "正在保存%1（%2%）"
 
-#: ../../src/saveregionjob.cpp:190
+#: ../../src/saveregionjob.cpp:165
 msgid "Saving %1 (%2%): %3"
 msgstr "正在保存%1（%2%）：%3"
 
-#: ../../src/saveregionjob.cpp:230
+#: ../../src/saveregionjob.cpp:188
 msgid ""
-"The following regions could not be saved:\n"
+"Region %1 could not be saved:\n"
 "\n"
+"%2"
 msgstr ""
-"以下区域无法保存：\n"
+"区域%1无法保存：\n"
 "\n"
+"%2"
 
-#: ../../src/utility.cpp:24
+#: ../../src/utility.cpp:25
 msgid "Manage Region window is not initialized"
 msgstr "管理区域窗口尚未初始化"
 
-#: ../../src/utility.cpp:49
+#: ../../src/utility.cpp:46
 msgid "Region is locked!"
 msgstr "区域被锁定！"
 
-#: ../../src/utility.cpp:57
+#: ../../src/utility.cpp:54
 msgid "No Region or no Region selected!"
 msgstr "没有区域或没有区域选中！"
+
+#: ../../src/utility.cpp:87
+msgid "%1 (%2)"
+msgstr ""
+
+#: ../../src/version.cpp:15
+msgid ""
+"Open, inspect and modify Minecraft structure files, and convert them between "
+"the formats the installed region modules support."
+msgstr ""
+"打开、查看与修改 Minecraft 结构文件，并在已安装的区域模块所支持的格式之间进行"
+"转换。"
 
 #: ../../build/src/settings.cpp:39 rc.cpp:72
 msgid "Application Memory Limit"
@@ -831,8 +914,8 @@ msgstr "加载NBT中"
 msgid "The loading operation is cancelled."
 msgstr "加载操作被取消。"
 
-#: ../../nbt-component/src/lib.rs:132 ../../region-litematic-rs/src/lib.rs:359
-#: ../../region-nbt-rs/src/lib.rs:273
+#: ../../nbt-component/src/lib.rs:132 ../../region-litematic-rs/src/lib.rs:388
+#: ../../region-nbt-rs/src/lib.rs:278
 msgid "The region value is not provided."
 msgstr "未提供区域值。"
 
@@ -852,61 +935,69 @@ msgstr "网络小端序尝试的错误信息："
 msgid "Reading NBT finished."
 msgstr "阅读NBT完成。"
 
-#: ../../region-litematic-rs/src/lib.rs:62
+#: ../../region-litematic-rs/src/config.rs:25
+msgid "Ignore Base Data"
+msgstr "忽略基础数据"
+
+#: ../../region-litematic-rs/src/config.rs:26
+msgid "Do not read the metadata stored in the file"
+msgstr "不读取文件中所存储的元数据"
+
+#: ../../region-litematic-rs/src/lib.rs:50
 msgid "Litematic File (*.litematic)"
 msgstr "投影文件 (*.litematic)"
 
-#: ../../region-litematic-rs/src/lib.rs:130 ../../region-nbt-rs/src/lib.rs:176
-#: ../../region-nbt-rs/src/lib.rs:197
+#: ../../region-litematic-rs/src/lib.rs:118 ../../region-nbt-rs/src/lib.rs:179
+#: ../../region-nbt-rs/src/lib.rs:200
 msgid "Reading blocks is cancelled."
 msgstr "阅读方块被取消。"
 
-#: ../../region-litematic-rs/src/lib.rs:137
+#: ../../region-litematic-rs/src/lib.rs:125
 #, rust-format
 msgid "Reading block id: {} / {}."
 msgstr "阅读方块索引：{} / {}。"
 
-#: ../../region-litematic-rs/src/lib.rs:157
+#: ../../region-litematic-rs/src/lib.rs:145
 msgid "Out of range!"
 msgstr "超出范围！"
 
-#: ../../region-litematic-rs/src/lib.rs:171
+#: ../../region-litematic-rs/src/lib.rs:159
 msgid "Reading blocks finished."
 msgstr "阅读方块完成。"
 
-#: ../../region-litematic-rs/src/lib.rs:214
+#: ../../region-litematic-rs/src/lib.rs:230
 msgid "Wrong type of region."
 msgstr "错误的区域类型。"
 
-#: ../../region-nbt-rs/src/config.rs:48
+#: ../../region-nbt-rs/src/config.rs:23
 msgid "Ignore Air"
 msgstr "忽略空气"
 
-#: ../../region-nbt-rs/src/config.rs:57
+#: ../../region-nbt-rs/src/config.rs:24
 msgid "There will be no air block in the output structure"
 msgstr "输出结构中不会有空气方块"
 
-#: ../../region-nbt-rs/src/lib.rs:50
+#: ../../region-nbt-rs/src/lib.rs:52
 msgid "NBT File (*.nbt)"
 msgstr "NBT文件 (*.nbt)"
 
-#: ../../region-nbt-rs/src/lib.rs:56 ../../region-nbt-rs/src/lib.rs:68
+#: ../../region-nbt-rs/src/lib.rs:58 ../../region-nbt-rs/src/lib.rs:70
 msgid "The length of the size is wrong."
 msgstr "尺寸长度有误。"
 
-#: ../../region-nbt-rs/src/lib.rs:84
+#: ../../region-nbt-rs/src/lib.rs:86
 msgid "Reading entities is cancelled."
 msgstr "阅读实体被取消。"
 
-#: ../../region-nbt-rs/src/lib.rs:105
+#: ../../region-nbt-rs/src/lib.rs:107
 msgid "Not a double value"
 msgstr "不是双精度浮点值"
 
-#: ../../region-nbt-rs/src/lib.rs:117
+#: ../../region-nbt-rs/src/lib.rs:119
 msgid "Wrong type of entity's pos!"
 msgstr "实体的坐标类型错误！"
 
-#: ../../region-nbt-rs/src/lib.rs:204
+#: ../../region-nbt-rs/src/lib.rs:207
 #, rust-format
 msgid "Processing blocks: {} / {}."
 msgstr "处理方块中：{} / {}。"
@@ -964,6 +1055,25 @@ msgstr "默认"
 msgid "Game"
 msgstr "游戏"
 
+#~ msgid "%1: use the settings below when %2"
+#~ msgstr "%1：在%2时使用下面的设置"
+
+#~ msgid "Cancel"
+#~ msgstr "取消"
+
+#~ msgid "Please click `Continue` to choose the output options."
+#~ msgstr "请点击`继续`选择输出选项。"
+
+#~ msgid "Preparing to save..."
+#~ msgstr "正在准备保存……"
+
+#~ msgid ""
+#~ "The following regions could not be saved:\n"
+#~ "\n"
+#~ msgstr ""
+#~ "以下区域无法保存：\n"
+#~ "\n"
+
 #~ msgid "Finish!"
 #~ msgstr "结束！"
 
@@ -1016,9 +1126,6 @@ msgstr "游戏"
 #~ msgid "OK"
 #~ msgstr "确定"
 
-#~ msgid "Cancel"
-#~ msgstr "取消"
-
 #~ msgid "Please select region(s) of the Litematic"
 #~ msgstr "请选择投影文件的区域"
 
@@ -1038,9 +1145,6 @@ msgstr "游戏"
 
 #~ msgid "Choose whether format you want to save to."
 #~ msgstr "选择你想保存的格式。"
-
-#~ msgid "Cancelled."
-#~ msgstr "已取消。"
 
 #~ msgid ""
 #~ "The following files are not added:\n"
@@ -1196,9 +1300,6 @@ msgstr "游戏"
 
 #~ msgid "&Block reader"
 #~ msgstr "方块阅读器(&B)"
-
-#~ msgid "&About"
-#~ msgstr "关于(&A)"
 
 #~ msgid "&Tools"
 #~ msgstr "工具(&T)"

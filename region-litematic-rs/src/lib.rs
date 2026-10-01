@@ -22,20 +22,8 @@ unsafe extern "C" {
     fn region_new() -> *mut Region;
 }
 
-#[derive(Default)]
-pub struct InputConfig {
-    ignore_base_data: bool,
-}
-
-#[unsafe(no_mangle)]
-pub extern "C" fn input_config_new() -> *mut InputConfig {
-    Box::into_raw(Box::new(InputConfig::default()))
-}
-
-#[unsafe(no_mangle)]
-pub extern "C" fn input_config_free(input_config: *mut InputConfig) {
-    drop(unsafe { Box::from_raw(input_config) })
-}
+mod config;
+pub use config::InputConfig;
 
 #[unsafe(no_mangle)]
 pub extern "C" fn region_type() -> *const c_char {
@@ -181,25 +169,53 @@ fn region_create_from_bytes_internal(
     o_nbt: *mut NBTRoot,
     index: i32,
     helper_struct: &HelperStruct,
+    input_config: Option<&InputConfig>,
 ) -> Result<*mut Region, Box<dyn Error>> {
+    /* The option decides how much of the file's own metadata is taken over.
+     * The geometry is always read: without a size and a position there is no
+     * region to build. */
+    let ignore_base_data = input_config.is_some_and(|config| config.ignore_base_data);
+
     let nbt = &unsafe { &*o_nbt }.data;
     let data_version = nbt.view().at("MinecraftDataVersion").int()?;
-    let metadata = nbt.view().at("Metadata").compound()?;
-    let create_time = get_compound_value_err_return!(metadata, "TimeCreated")
-        .view()
-        .long()?;
-    let modify_time = get_compound_value_err_return!(metadata, "TimeModified")
-        .view()
-        .long()?;
-    let description = get_compound_value_err_return!(metadata, "Description")
-        .view()
-        .string()?;
-    let author = get_compound_value_err_return!(metadata, "Author")
-        .view()
-        .string()?;
-    let name = get_compound_value_err_return!(metadata, "Name")
-        .view()
-        .string()?;
+    /* The metadata carries the timestamps, the description, the author and the
+     * structure name. When it is ignored the region keeps whatever defaults
+     * `region_new ()` gives it, and the region name still comes from the key it
+     * is stored under, since that identifies the region rather than describing
+     * it. */
+    let metadata = nbt.view().at("Metadata").compound();
+    let mut create_time = 0;
+    let mut modify_time = 0;
+    let mut description: Option<String> = None;
+    let mut author: Option<String> = None;
+    let mut name: Option<String> = None;
+    if !ignore_base_data {
+        let metadata = metadata?;
+        create_time = get_compound_value_err_return!(metadata, "TimeCreated")
+            .view()
+            .long()?;
+        modify_time = get_compound_value_err_return!(metadata, "TimeModified")
+            .view()
+            .long()?;
+        description = Some(
+            get_compound_value_err_return!(metadata, "Description")
+                .view()
+                .string()?
+                .to_string(),
+        );
+        author = Some(
+            get_compound_value_err_return!(metadata, "Author")
+                .view()
+                .string()?
+                .to_string(),
+        );
+        name = Some(
+            get_compound_value_err_return!(metadata, "Name")
+                .view()
+                .string()?
+                .to_string(),
+        );
+    }
 
     let region_parent_nbt = nbt.view().at("Regions").compound()?;
     let region_real_vec = region_parent_nbt
@@ -325,14 +341,25 @@ fn region_create_from_bytes_internal(
     region.region_offset = (offset_x, offset_y, offset_z);
     region.palette_array = palette_vec;
     region.block_array = blocks;
-    region.base_data.set_name(name);
-    region.base_data.set_description(description);
-    region.base_data.set_author(author);
+    if let Some(name) = &name {
+        region.base_data.set_name(name);
+    }
+    if let Some(description) = &description {
+        region.base_data.set_description(description);
+    }
+    if let Some(author) = &author {
+        region.base_data.set_author(author);
+    }
     region.base_data.set_region_name(region_name);
     region.entity_array = entities_vec;
     region.block_entity_array = tile_entities_vec;
     region.sort_block_entity_array();
-    region.set_data_time(create_time, modify_time)?;
+    /* With the metadata ignored there is no timestamp to carry over, so the
+     * region keeps the defaults `region_new ()` set rather than being stamped
+     * with the epoch. */
+    if !ignore_base_data {
+        region.set_data_time(create_time, modify_time)?;
+    }
 
     Ok(Box::into_raw(region))
 }
@@ -343,11 +370,13 @@ pub extern "C" fn region_create_from_file_as_index(
     region: *mut *mut Region,
     index: i32,
     helper_struct: *mut HelperStruct,
+    input_config: *mut InputConfig,
 ) -> *const c_char {
     let mut err_string: String = String::new();
+    let config = unsafe { input_config.as_ref() };
     if !region.is_null() {
         unsafe {
-            *region = match region_create_from_bytes_internal(nbt, index, &*helper_struct) {
+            *region = match region_create_from_bytes_internal(nbt, index, &*helper_struct, config) {
                 Ok(ret) => ret,
                 Err(err) => {
                     err_string = err.to_string();
