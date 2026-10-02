@@ -4,7 +4,7 @@
 
 ## License Problem
 
-Since `crabnbt` is licensed under GPL, I had to use GPL license. Sorry for the inconvenience.
+I'm lazy to change the license, sorry for the inconvenience.
 
 ## Introduction
 
@@ -26,8 +26,12 @@ cmake --build build
 
 ## Features
 
-todo.
+- NBT and Litematica support.
+- Modify base data of the region.
+- Old-school GUI.
 
 ## Usage
 
 Just run `dhlrc_qt`, and the Qt backend will start unless you are using Linux tty.
+
+tty support might be planned.

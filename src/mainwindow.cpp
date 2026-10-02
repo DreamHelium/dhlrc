@@ -537,6 +537,9 @@ MainWindow::MainWindow (QWidget *parent) : QMainWindow (parent)
 
   scrollArea = new QScrollArea ();
   scrollArea->setWidgetResizable (true);
+  /* Watched for width changes, so a wrapped row can be re-measured when the
+   * strip gets wider or narrower. */
+  scrollArea->installEventFilter (this);
   topWidget = new QWidget ();
   scrollArea->setWidget (topWidget);
   topLayout = new QVBoxLayout;
@@ -544,14 +547,15 @@ MainWindow::MainWindow (QWidget *parent) : QMainWindow (parent)
   topWidget->setLayout (topLayout);
   splitter = new QSplitter ();
 
-  allSplitter = new QSplitter ();
-  allSplitter->setOrientation (Qt::Vertical);
-  allSplitter->addWidget (scrollArea);
-  allSplitter->addWidget (splitter);
-  allSplitter->setSizes ({ 0, height () });
-  allSplitter->setCollapsible (1, false);
+  topSplitter = new QSplitter ();
+  topSplitter->setOrientation (Qt::Vertical);
+  topSplitter->addWidget (scrollArea);
+  topSplitter->addWidget (splitter);
+  topSplitter->setSizes ({ 0, height () });
+  topSplitter->setCollapsible (1, false);
+  topSplitter->handle (1)->setEnabled (false);
 
-  setCentralWidget (allSplitter);
+  setCentralWidget (topSplitter);
 
   leftWidget = new QWidget ();
   leftLayout = new QVBoxLayout ();
@@ -760,12 +764,35 @@ MainWindow::addWidgetToTopArea (QWidget *widget)
 {
   if (mainWindow)
     {
+      /* The row folds to the width it is given, and reports its height for
+       * that width rather than for the width it would like to have.
+       *
+       * All three parts are needed together:
+       *
+       * - `setWordWrap` — wrapping is off by default;
+       * - `setSizePolicy` — a wrapping widget must be allowed to be *narrower*
+       *   than its text, which is what `Preferred` for the width says, and the
+       *   policy has to declare `heightForWidth` or no layout will ask the
+       *   widget how tall it is at the width it ends up with;
+       * - `setMinimumWidth (0)` — the text's own width would otherwise be a
+       *   floor, so the row could never be narrower than its longest line and
+       *   would push the strip wider instead of folding. */
+      if (auto *message = qobject_cast<KMessageWidget *> (widget))
+        {
+          message->setWordWrap (true);
+          message->setMinimumWidth (0);
+          auto policy = message->sizePolicy ();
+          policy.setHorizontalPolicy (QSizePolicy::Preferred);
+          policy.setHeightForWidth (true);
+          message->setSizePolicy (policy);
+        }
+
+      if (mainWindow->topLayout->count () == 0)
+        mainWindow->topSplitter->handle (1)->setEnabled (true);
       mainWindow->topLayout->addWidget (widget);
-      /* The top area is resized to fit, but only after the layout has settled:
-       * `sizeHint ()` read straight after `addWidget ()` is computed before
-       * the new row has been laid out, so it under-reports and the rows below
-       * get clipped out of view. Deferring to the next event-loop pass lets
-       * the geometry be up to date. */
+
+      /* Deferred: `sizeHint ()` read straight after `addWidget ()` is computed
+       * before the new row has been laid out, so it under-reports. */
       QTimer::singleShot (0, mainWindow, &MainWindow::fitTopArea);
     }
 }
@@ -775,9 +802,110 @@ MainWindow::fitTopArea ()
 {
   if (!mainWindow)
     return;
-  auto layoutHeight = mainWindow->topLayout->sizeHint ().height ();
-  mainWindow->allSplitter->setSizes (
-      { layoutHeight, mainWindow->height () - layoutHeight });
+
+  /* Measured at the width the strip currently has, not at the width the layout
+   * would like.
+   *
+   * `topLayout->sizeHint ()` answers for a height-for-width child using the
+   * child's *preferred* width. A wrapped row is narrower than that, so the
+   * answer is too short and the text gets squeezed. Asking each row how tall
+   * it is at the real width is the only way to get the number that matches
+   * what will be drawn. */
+  const auto height = mainWindow->topAreaContentHeight ();
+  mainWindow->topSplitter->setSizes (
+      { height, mainWindow->height () - height });
+}
+
+int
+MainWindow::topAreaContentHeight () const
+{
+  /* Measured at the width the rows are *actually drawn at* — each row's own
+   * width, not the viewport's.
+   *
+   * Those differ by the scroll area's frame and the layout's margins, and
+   * measuring a row at a width it does not have under-reports its height.
+   *
+   * Before a row has been laid out its width is 0, so the viewport is used as
+   * a fallback for that first pass; the deferred re-fit corrects it. */
+  const auto margins = topLayout->contentsMargins ();
+  auto fallback = 0;
+  if (scrollArea)
+    fallback = scrollArea->viewport ()->width ();
+  if (fallback <= 0)
+    fallback = topWidget->width ();
+  fallback = qMax (1, fallback - margins.left () - margins.right ());
+
+  auto height = 0;
+  auto rows = 0;
+  for (int i = 0; i < topLayout->count (); i++)
+    {
+      auto *item = topLayout->itemAt (i);
+      auto *row = item ? item->widget () : nullptr;
+      if (!row || row->isHidden ())
+        continue;
+      const auto width = row->width () > 0 ? row->width () : fallback;
+      height += row->heightForWidth (width);
+      rows++;
+    }
+
+  if (rows == 0)
+    return 0;
+  return height + margins.top () + margins.bottom ()
+         + topLayout->spacing () * (rows - 1);
+}
+
+void
+MainWindow::applyTopAreaRowHeights ()
+{
+  /* Pins every row to the height it reports for the width it now has.
+   *
+   * `KMessageWidget` answers `heightForWidth` correctly, but does not act on
+   * it: its height stays whatever it was first laid out at, so narrowing the
+   * strip leaves the text with too little room and the last lines are cut off.
+   * The layout will not do this either — a `QBoxLayout` honours
+   * `heightForWidth` only through the child's size policy, which this widget
+   * does not satisfy in practice.
+   *
+   * Setting the height here is what actually makes the row grow. It is applied
+   * only while the row is wrapping and has a width to measure against; a row
+   * that is not laid out yet is left alone until it is. */
+  for (int i = 0; i < topLayout->count (); i++)
+    {
+      auto *item = topLayout->itemAt (i);
+      auto *row = item ? item->widget () : nullptr;
+      if (!row || row->isHidden () || row->width () <= 0)
+        continue;
+      const auto needed = row->heightForWidth (row->width ());
+      if (needed > 0 && row->height () != needed)
+        row->setFixedHeight (needed);
+    }
+}
+
+void
+MainWindow::refreshTopAreaRows ()
+{
+  if (topLayout->count () == 0)
+    return;
+
+  /* The rows are asked to measure themselves again at the width they now have.
+   * Both caches have to go: the row keeps its own size hint, and the layout
+   * keeps one of its own, so invalidating only one leaves the other stale. */
+  for (int i = 0; i < topLayout->count (); i++)
+    {
+      auto *item = topLayout->itemAt (i);
+      if (auto *row = item ? item->widget () : nullptr)
+        row->updateGeometry ();
+    }
+  topLayout->invalidate ();
+
+  /* Then the heights are applied before the strip is measured, so the two
+   * agree: measuring a row that is still at its old height would size the
+   * strip to fit a row that is about to change. */
+  applyTopAreaRowHeights ();
+  fitTopArea ();
+  /* One more pass: applying the heights can change the viewport width (a
+   * scrollbar may come or go), which changes what each row needs. */
+  QTimer::singleShot (0, this, &MainWindow::fitTopArea);
 }
 
 void
@@ -794,7 +922,10 @@ void
 MainWindow::tryShrinkTopWidget ()
 {
   if (topLayout->count () == 0)
-    allSplitter->setSizes ({ 0, height () });
+    {
+      topSplitter->setSizes ({ 0, height () });
+      topSplitter->handle (1)->setEnabled (false);
+    }
 }
 
 bool
@@ -802,6 +933,19 @@ MainWindow::eventFilter (QObject *object, QEvent *event)
 {
   if (object == topWidget && event->type () == QEvent::ChildRemoved)
     tryShrinkTopWidget ();
+
+  /* The strip changing *width* is what leaves a wrapped row's height stale, so
+   * the rows measure themselves again and the strip is resized. Only the width
+   * counts: dragging the handle changes the height, and reacting to that would
+   * undo the drag. Deferred, so the row sees the width it settles at. */
+  if (object == scrollArea && event->type () == QEvent::Resize
+      && topLayout->count () > 0)
+    {
+      auto *resize = static_cast<QResizeEvent *> (event);
+      if (resize->oldSize ().width () != resize->size ().width ())
+        QTimer::singleShot (0, this, &MainWindow::refreshTopAreaRows);
+    }
+
   return QMainWindow::eventFilter (object, event);
 }
 
