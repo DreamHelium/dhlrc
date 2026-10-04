@@ -2,12 +2,12 @@ use cesu8::from_java_cesu8;
 use common_rs::{
     helper_struct::HelperStruct,
     i18n::i18n,
-    util::{cstr_to_str, show_progress, string_to_ptr_fail_to_null},
+    util::{show_progress, string_to_ptr_fail_to_null},
 };
+use formatx::formatx;
 use gettextrs::gettext;
 use std::{
     any::Any,
-    error::Error,
     ffi::{c_char, c_int},
     io::prelude::Read,
     ptr::null,
@@ -15,11 +15,29 @@ use std::{
 };
 use sysinfo::System;
 use zuri_nbt::{
-    NBTRoot, NBTTag,
+    NBTRoot,
     encoding::{BigEndian, LittleEndian, NetworkLittleEndian},
     err::{NBTError, PathPart, ReadError},
     reader::{Reader, Res},
 };
+
+/* The NBT encodings a decode can be pinned to. Kept in sync with the
+ * `ObjectEncoding` values in `src/loadmodule.h`. */
+pub const OBJECT_ENCODING_ANY: c_int = 0;
+pub const OBJECT_ENCODING_BIG_ENDIAN: c_int = 1;
+pub const OBJECT_ENCODING_LITTLE_ENDIAN: c_int = 2;
+pub const OBJECT_ENCODING_NETWORK_LITTLE_ENDIAN: c_int = 3;
+
+/* Optional settings for `region_get_object`. Mirrors `ObjectLoadOptions` in
+ * `src/loadmodule.h`. */
+#[repr(C)]
+pub struct ObjectLoadOptions {
+    /* Non-zero: the file must decode as `encoding`. */
+    pub strict: c_int,
+    /* One of the OBJECT_ENCODING_* values; the encoding `strict` requires and
+     * the one tried first. Read only when `strict`. */
+    pub encoding: c_int,
+}
 
 struct ReadStruct<R: Reader> {
     real_reader: R,
@@ -122,96 +140,156 @@ impl<T: Reader + 'static> Reader for ReadStruct<T> {
     }
 }
 
+/* Runs one encoding over the bytes. `None` means the encoding is not one this
+ * codec knows. */
+fn decode_once(
+    bytes: *mut Vec<u8>,
+    helper_struct: *mut HelperStruct,
+    encoding: c_int,
+) -> Option<Res<NBTRoot>> {
+    unsafe {
+        match encoding {
+            OBJECT_ENCODING_BIG_ENDIAN => Some(nbt_create_real(bytes, &*helper_struct, BigEndian)),
+            OBJECT_ENCODING_LITTLE_ENDIAN => {
+                Some(nbt_create_real(bytes, &*helper_struct, LittleEndian))
+            }
+            OBJECT_ENCODING_NETWORK_LITTLE_ENDIAN => {
+                Some(nbt_create_real(bytes, &*helper_struct, NetworkLittleEndian))
+            }
+            _ => None,
+        }
+    }
+}
+
 #[unsafe(no_mangle)]
 pub extern "C" fn region_get_object(
     bytes: *mut Vec<u8>,
     object: *mut *mut NBTRoot,
     helper_struct: *mut HelperStruct,
+    options: *const ObjectLoadOptions,
 ) -> *const c_char {
     if object.is_null() {
         return string_to_ptr_fail_to_null(i18n("The region value is not provided."));
     }
 
-    /* The encoding is not declared by the caller, so we try the candidate
-     * encodings one by one until one parses successfully. */
-    let mut error_string = vec![];
-
-    unsafe {
-        match nbt_create_real(bytes, &*helper_struct, BigEndian) {
-            Ok(nbt) => {
-                *object = Box::into_raw(Box::new(nbt));
-                null()
-            }
-            Err(e) => {
-                error_string.push(e.to_string());
-                match nbt_create_real(bytes, &*helper_struct, LittleEndian) {
-                    Ok(nbt) => {
-                        *object = Box::into_raw(Box::new(nbt));
-                        string_to_ptr_fail_to_null(&get_final_error(error_string))
-                    }
-                    Err(e) => {
-                        error_string.push(e.to_string());
-                        match nbt_create_real(bytes, &*helper_struct, NetworkLittleEndian) {
-                            Ok(nbt) => {
-                                *object = Box::into_raw(Box::new(nbt));
-                                string_to_ptr_fail_to_null(&get_final_error(error_string))
-                            }
-                            Err(e) => {
-                                error_string.push(e.to_string());
-                                string_to_ptr_fail_to_null(&get_final_error(error_string))
-                            }
-                        }
-                    }
-                }
-            }
+    /* `options` is optional. The encoding is never pinned up front: every
+     * supported one is tried and the first that parses wins, and the encoding
+     * that won is the one the object was read as. A decode that succeeds after
+     * an earlier attempt failed is a plain success: the caller gets `null` and
+     * an object, never an error, or the host would reject a file that was in
+     * fact read. The failed attempts are collected only so that, if nothing
+     * parses, the caller can see what was tried.
+     *
+     * `strict` is checked against the encoding that actually parsed, not by
+     * restricting which ones are tried. The requested encoding is tried first,
+     * so a file that is in it succeeds as before; a file in another encoding is
+     * still read far enough to name the encoding it really is, and the caller is
+     * told both what was found and what was expected. */
+    let all = [
+        OBJECT_ENCODING_BIG_ENDIAN,
+        OBJECT_ENCODING_LITTLE_ENDIAN,
+        OBJECT_ENCODING_NETWORK_LITTLE_ENDIAN,
+    ];
+    let expected = match unsafe { options.as_ref() } {
+        Some(o) if o.strict != 0 => Some(o.encoding),
+        _ => None,
+    };
+    if let Some(want) = expected {
+        if !all.contains(&want) {
+            return string_to_ptr_fail_to_null(i18n("Unknown object encoding."));
         }
     }
-}
 
-fn init_translation_internal(path: *const c_char) -> Result<(), Box<dyn Error>> {
-    gettextrs::bindtextdomain("dhlrc", cstr_to_str(path)?)?;
-    gettextrs::textdomain("dhlrc")?;
-    Ok(())
+    /* The requested encoding goes first, so a file that is in it is accepted
+     * without trying anything else; the rest follow, so a mismatching file can
+     * be named. */
+    let order: Vec<c_int> = match expected {
+        Some(want) => std::iter::once(want)
+            .chain(all.iter().copied().filter(|e| *e != want))
+            .collect(),
+        None => all.to_vec(),
+    };
+
+    let mut failures: Vec<(c_int, String)> = vec![];
+    for encoding in order {
+        match decode_once(bytes, helper_struct, encoding) {
+            Some(Ok(nbt)) => {
+                /* The encoding that parsed, compared to the one that was
+                 * required. */
+                if let Some(want) = expected {
+                    if encoding != want {
+                        return string_to_ptr_fail_to_null(&encoding_mismatch(encoding, want));
+                    }
+                }
+                unsafe {
+                    *object = Box::into_raw(Box::new(nbt));
+                }
+                return null();
+            }
+            Some(Err(e)) => failures.push((encoding, e.to_string())),
+            None => {}
+        }
+    }
+
+    string_to_ptr_fail_to_null(&get_final_error(failures))
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn init_translation(path: *const c_char) -> *const c_char {
-    match init_translation_internal(path) {
-        Ok(_) => null(),
-        Err(e) => string_to_ptr_fail_to_null(&e.to_string()),
-    }
+pub extern "C" fn object_base_type() -> *const c_char {
+    /* The name a region plugin asks for through `region_base_type()`. */
+    string_to_ptr_fail_to_null("NBT")
 }
 
 pub fn gettext_text(str: &str) -> String {
     gettext(str)
 }
 
-/* Reports every failed attempt, so the user can tell which encodings were tried
- * and why each of them was rejected. */
-fn get_final_error(vec: Vec<String>) -> String {
+/* The name of an encoding, matching the labels in `encoding_error_label`. */
+fn encoding_name(encoding: c_int) -> &'static str {
+    match encoding {
+        OBJECT_ENCODING_BIG_ENDIAN => "BigEndian",
+        OBJECT_ENCODING_LITTLE_ENDIAN => "LittleEndian",
+        OBJECT_ENCODING_NETWORK_LITTLE_ENDIAN => "NetworkLittleEndian",
+        _ => "Unknown",
+    }
+}
+
+/* The error for a strict decode: the file parsed as `found`, but `expected` was
+ * the encoding the caller required. */
+fn encoding_mismatch(found: c_int, expected: c_int) -> String {
+    formatx!(
+        gettext_text(i18n(
+            "The file is in the {} encoding, but the {} encoding is required."
+        )),
+        encoding_name(found),
+        encoding_name(expected)
+    )
+    .unwrap_or_default()
+}
+
+/* The label that introduces one failed attempt. The encoding is carried with
+ * each failure, so every attempted encoding is labelled with its own name
+ * instead of always "BigEndian". */
+fn encoding_error_label(encoding: c_int) -> &'static str {
+    match encoding {
+        OBJECT_ENCODING_BIG_ENDIAN => "BigEndian Try's Error Message: ",
+        OBJECT_ENCODING_LITTLE_ENDIAN => "LittleEndian Try's Error Message: ",
+        OBJECT_ENCODING_NETWORK_LITTLE_ENDIAN => "NetworkLittleEndian Try's Error Message: ",
+        _ => "Unknown encoding's Error Message: ",
+    }
+}
+
+/* The message returned only when *no* encoding parsed: it lists why each was
+ * rejected, so the user can see what was tried. A decode that succeeds is a
+ * plain success and never reaches this. */
+fn get_final_error(failures: Vec<(c_int, String)>) -> String {
     let mut str = String::new();
-    let mut i = 0;
-    while i < vec.len() {
-        if i == 0 {
-            let temp_str = gettext_text(i18n("BigEndian Try's Error Message: "));
-            str.push_str(&temp_str);
-            str.push_str(&vec[0]);
+    for (i, (encoding, message)) in failures.iter().enumerate() {
+        if i > 0 {
+            str.push('\n');
         }
-        if i == 1 {
-            let temp_enter = "\n";
-            let temp_str = gettext_text(i18n("LittleEndian Try's Error Message: "));
-            str.push_str(temp_enter);
-            str.push_str(&temp_str);
-            str.push_str(&vec[1]);
-        }
-        if i == 2 {
-            let temp_enter = "\n";
-            let temp_str = gettext_text(i18n("NetworkLittleEndian Try's Error Message: "));
-            str.push_str(temp_enter);
-            str.push_str(&temp_str);
-            str.push_str(&vec[2]);
-        }
-        i += 1;
+        str.push_str(&gettext_text(encoding_error_label(*encoding)));
+        str.push_str(message);
     }
     str
 }
@@ -238,29 +316,4 @@ fn nbt_create_real<R: Reader + 'static>(
 #[unsafe(no_mangle)]
 pub extern "C" fn object_free(object: *mut NBTRoot) {
     drop(Box::from(object));
-}
-
-#[unsafe(no_mangle)]
-pub extern "C" fn tag_free(tag: *mut NBTTag) {
-    drop(Box::from(tag));
-}
-
-#[unsafe(no_mangle)]
-pub extern "C" fn nbt_type_to_int(nbt: *const NBTTag) -> c_int {
-    unsafe {
-        match *nbt {
-            NBTTag::Byte(_) => 1,
-            NBTTag::Short(_) => 2,
-            NBTTag::Int(_) => 3,
-            NBTTag::Long(_) => 4,
-            NBTTag::Float(_) => 5,
-            NBTTag::Double(_) => 6,
-            NBTTag::String(_) => 7,
-            NBTTag::Compound(_) => 12,
-            NBTTag::List(_) => 11,
-            NBTTag::ByteArray(_) => 8,
-            NBTTag::IntArray(_) => 9,
-            NBTTag::LongArray(_) => 10,
-        }
-    }
 }

@@ -209,6 +209,7 @@ version = "0.1.0"
 dependencies = [
  "cesu8",
  "common-rs",
+ "formatx",
  "gettext-rs",
  "sysinfo",
  "zuri_nbt",

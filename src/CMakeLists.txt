@@ -74,6 +74,8 @@ set(TEMP_PROJECT_SOURCES
         dhhelpui.h
         manageregionui.cpp
         manageregionui.h
+        regionclass.cpp regionclass.h
+        loadmodule.cpp loadmodule.h
         mainwindow.h mainwindow.cpp
         dhloadjob.cpp
         dhloadjob.h

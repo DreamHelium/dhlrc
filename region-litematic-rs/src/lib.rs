@@ -43,7 +43,15 @@ pub extern "C" fn region_file_suffix() -> *const c_char {
 
 #[unsafe(no_mangle)]
 pub extern "C" fn region_base_type() -> *const c_char {
-    string_to_ptr_fail_to_null("JavaNBT")
+    string_to_ptr_fail_to_null("NBT")
+}
+
+/* Java Edition NBT is big endian. Declared (as OBJECT_ENCODING_BIG_ENDIAN) so
+ * that strict encoding matching can reject a file that decodes as another
+ * encoding instead of reading it wrongly. */
+#[unsafe(no_mangle)]
+pub extern "C" fn region_nbt_encoding() -> i32 {
+    1
 }
 
 #[unsafe(no_mangle)]

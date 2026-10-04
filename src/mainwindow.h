@@ -3,6 +3,7 @@
 
 #include <QListView>
 #include <QMainWindow>
+#include <QPointer>
 #include <QSortFilterProxyModel>
 #include <QSplitter>
 #include <QStandardItemModel>
@@ -72,6 +73,36 @@ private:
    * that gets narrower keeps its old height and cuts its text off. Nothing
    * else applies it, so it is applied here. */
   void applyTopAreaRowHeights ();
+
+  /* Detaches the tab at `index` into a window of its own. */
+  void tearOffTab (int index);
+  /* Puts a page torn off by `tearOffTab ()` back into the tab stack. */
+  void dockBackPage (QWidget *page);
+  /* Closes and deletes a torn-off page and its window. */
+  void discardFloatingPage (QWidget *page);
+  /* The position of `page` in `floatingPages`, or -1. */
+  [[nodiscard]] qsizetype indexOfFloating (QWidget *page) const;
+  /* Brings `page` to the front, whether it is already a tab or is floating in
+   * its own window. Returns its tab index. */
+  int ensureTab (QWidget *page, const QString &title);
+
+  /* A page torn off into a window of its own.
+   *
+   * The window has no parent, so it is an ordinary top-level window the window
+   * manager can decorate and move, unlike a dock's `Qt::Tool` window. That
+   * also means neither Qt's teardown nor the tab-widget loop reaches it, so it
+   * is taken down by hand (see `~MainWindow`). Its lifetime is managed
+   * explicitly rather than through a `destroyed ()` hook: those fire during
+   * teardown, when this list is already gone. */
+  struct FloatingPage
+  {
+    QPointer<QWidget> page;
+    QPointer<QWidget> window;
+  };
+  QList<FloatingPage> floatingPages;
+  /* Set while the main window is closing, so the floating windows closing with
+   * it are not mistaken for the user's. */
+  bool closing = false;
 
 public:
   bool eventFilter (QObject *object, QEvent *event) override;

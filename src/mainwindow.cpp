@@ -48,6 +48,7 @@
 #include <QTabBar>
 #include <QTimer>
 #include <QToolBar>
+#include <QVariant>
 #ifdef DH_DEBUG_IN_IDE
 #include "dhdebugwidget.h"
 #endif
@@ -580,6 +581,8 @@ MainWindow::MainWindow (QWidget *parent) : QMainWindow (parent)
 
   tabWidget = new QTabWidget (this);
   tabWidget->setTabsClosable (true);
+  /* Tabs can be dragged along the bar to reorder them freely. */
+  tabWidget->setMovable (true);
 
   splitter->addWidget (leftWidget);
   splitter->addWidget (tabWidget);
@@ -661,15 +664,8 @@ MainWindow::MainWindow (QWidget *parent) : QMainWindow (parent)
                 break;
               }
             case 1:
-              {
-                auto uiIndex
-                    = tabWidget->indexOf (ManageRegionUI::instance ());
-                if (uiIndex == -1)
-                  uiIndex = tabWidget->addTab (ManageRegionUI::instance (),
-                                               _ ("Manage Region"));
-                tabWidget->setCurrentIndex (uiIndex);
-                break;
-              }
+              ensureTab (ManageRegionUI::instance (), _ ("Manage Region"));
+              break;
             case 2:
               {
                 auto region
@@ -731,23 +727,36 @@ MainWindow::MainWindow (QWidget *parent) : QMainWindow (parent)
                  tabWidget->removeTab (index);
              });
   connect (tabWidget, &QTabWidget::tabBarDoubleClicked, this,
-           [this] (int index)
-             {
-               auto widget = tabWidget->widget (index);
-               connect (this, &MainWindow::windowClosed, widget,
-                        &QWidget::close);
-
-               if (widget != ManageRegionUI::instance ())
-                 widget->setAttribute (Qt::WA_DeleteOnClose);
-               widget->setParent (nullptr);
-               widget->show ();
-
-               // tabWidget->removeTab (index);
-             });
+           &MainWindow::tearOffTab);
 }
 
 MainWindow::~MainWindow ()
 {
+  /* Torn-off pages live in windows of their own, not in the tab widget, so
+   * neither the loop below nor Qt's own teardown reaches them. Take them down
+   * here, while this object — and `floatingPages` — are still alive. */
+  const auto floating = floatingPages;
+  floatingPages.clear ();
+  for (const auto &entry : floating)
+    {
+      auto *page = entry.page.data ();
+      auto *window = entry.window.data ();
+      if (window)
+        window->removeEventFilter (this);
+      if (page && page != ManageRegionUI::instance ())
+        {
+          /* `WA_DeleteOnClose` first, or `close ()` would schedule a second
+           * delete behind the explicit one. */
+          page->setAttribute (Qt::WA_DeleteOnClose, false);
+          page->close ();
+          delete page;
+        }
+      else if (page)
+        /* The singleton is not ours to delete. */
+        page->setParent (nullptr);
+      delete window;
+    }
+
   for (int i = tabWidget->count () - 1; i >= 0; i--)
     {
       if (tabWidget->widget (i) != ManageRegionUI::instance ())
@@ -764,6 +773,9 @@ MainWindow::addWidgetToTopArea (QWidget *widget)
 {
   if (mainWindow)
     {
+      /* Re-fit the strip when this row shows, hides, or is re-laid out. */
+      widget->installEventFilter (mainWindow);
+
       /* The row folds to the width it is given, and reports its height for
        * that width rather than for the width it would like to have.
        *
@@ -811,9 +823,18 @@ MainWindow::fitTopArea ()
    * answer is too short and the text gets squeezed. Asking each row how tall
    * it is at the real width is the only way to get the number that matches
    * what will be drawn. */
+  /* Pin the rows first: a row that has not been sized yet (a freshly shown
+   * one, an error row especially) is still on `KMessageWidget`'s sizeHint,
+   * which is computed for its narrow preferred width and can be several times
+   * the height it needs at the strip's real width. */
+  mainWindow->applyTopAreaRowHeights ();
+
   const auto height = mainWindow->topAreaContentHeight ();
-  mainWindow->topSplitter->setSizes (
-      { height, mainWindow->height () - height });
+  /* The two sizes have to add up to the splitter's own height, not the
+   * window's: when they overfill it `setSizes ()` scales the pair down, which
+   * leaves the strip a few pixels short of what its rows need. */
+  const auto total = mainWindow->topSplitter->height ();
+  mainWindow->topSplitter->setSizes ({ height, total - height });
 }
 
 int
@@ -844,14 +865,20 @@ MainWindow::topAreaContentHeight () const
       if (!row || row->isHidden ())
         continue;
       const auto width = row->width () > 0 ? row->width () : fallback;
-      height += row->heightForWidth (width);
+      const auto rowHeight = row->heightForWidth (width);
+      /* A row that has not been laid out yet answers -1. Falling back to the
+       * height it has keeps a visible row in the total; dropping it sizes the
+       * strip for fewer rows than are shown, and the last one is clipped. Once
+       * it can answer properly it is pinned and measured exactly. */
+      height += rowHeight > 0 ? rowHeight : row->height ();
       rows++;
     }
 
   if (rows == 0)
     return 0;
-  return height + margins.top () + margins.bottom ()
-         + topLayout->spacing () * (rows - 1);
+  const auto total = height + margins.top () + margins.bottom ()
+                     + topLayout->spacing () * (rows - 1);
+  return total;
 }
 
 void
@@ -876,8 +903,18 @@ MainWindow::applyTopAreaRowHeights ()
       if (!row || row->isHidden () || row->width () <= 0)
         continue;
       const auto needed = row->heightForWidth (row->width ());
-      if (needed > 0 && row->height () != needed)
-        row->setFixedHeight (needed);
+      if (needed <= 0)
+        continue;
+      /* Pinned by the height we recorded, not by `height ()`: a row that is
+       * already at the right height (a short one, laid out by the splitter)
+       * would otherwise be skipped, and its tall minimum size hint would stay
+       * in the layout, holding the strip open below what its rows need.
+       * Comparing against the recorded value also keeps `setFixedHeight ()`
+       * from being called on every pass. */
+      if (row->property ("dhlrcPinnedHeight").toInt () == needed)
+        continue;
+      row->setProperty ("dhlrcPinnedHeight", needed);
+      row->setFixedHeight (needed);
     }
 }
 
@@ -918,6 +955,136 @@ MainWindow::addWidgetToTab (QWidget *widget, const QString &title)
     }
 }
 
+qsizetype
+MainWindow::indexOfFloating (QWidget *page) const
+{
+  for (qsizetype i = 0; i < floatingPages.size (); ++i)
+    {
+      if (floatingPages[i].page == page)
+        return i;
+    }
+  return -1;
+}
+
+int
+MainWindow::ensureTab (QWidget *page, const QString &title)
+{
+  /* If it is floating in its own window, bring it back rather than adding a
+   * second tab for it: `addTab ()` would take it out of that window and leave
+   * the window empty. */
+  if (indexOfFloating (page) >= 0)
+    dockBackPage (page);
+  auto index = tabWidget->indexOf (page);
+  if (index == -1)
+    index = tabWidget->addTab (page, title);
+  tabWidget->setCurrentIndex (index);
+  return index;
+}
+
+void
+MainWindow::tearOffTab (int index)
+{
+  if (index < 0)
+    return;
+  auto *page = tabWidget->widget (index);
+  const auto title = tabWidget->tabText (index);
+  tabWidget->removeTab (index);
+
+  /* A reader with a running download stops it from its close handling, so let
+   * closing the window delete it; the singleton has to survive instead. */
+  if (page != ManageRegionUI::instance ())
+    page->setAttribute (Qt::WA_DeleteOnClose);
+  else
+    page->setAttribute (Qt::WA_DeleteOnClose, false);
+
+  /* A plain top-level window, not a floating `QDockWidget`: the window manager
+   * decorates and moves it like any other window, and the button below brings
+   * it back. A floating dock was a `Qt::Tool` window, which is neither. */
+  auto *window = new QWidget (nullptr, Qt::Window);
+  window->setWindowTitle (title);
+  /* So the close handler can find the page for this window. */
+  window->setProperty ("dhlrcPage", QVariant::fromValue (page));
+  window->installEventFilter (this);
+
+  auto *layout = new QVBoxLayout (window);
+
+  auto *returnButton = new QPushButton (_ ("Return to tabs"), window);
+  returnButton->setIcon (QIcon::fromTheme ("view-restore"));
+  connect (returnButton, &QPushButton::clicked, this,
+           [this, page] { dockBackPage (page); });
+  /* `AlignLeft` keeps the button at its own size on the left, instead of the
+   * layout stretching it across the window. */
+  layout->addWidget (returnButton, 0, Qt::AlignLeft);
+  layout->addWidget (page, 1);
+
+  floatingPages.append (FloatingPage{ page, window });
+
+  /* Closing the main window closes the floating windows with it, so it really
+   * is the last window and the application can quit. */
+  connect (this, &MainWindow::windowClosed, window, &QWidget::close,
+           Qt::UniqueConnection);
+
+  window->resize (QSize (720, 520));
+  window->show ();
+  /* The page was hidden when it left the tab bar, and showing its new window
+   * does not unhide it: it has to be shown itself or the window stays blank.
+   */
+  page->show ();
+}
+
+void
+MainWindow::dockBackPage (QWidget *page)
+{
+  const auto i = indexOfFloating (page);
+  if (i < 0)
+    return;
+  const auto entry = floatingPages.takeAt (i);
+  auto *window = entry.window.data ();
+
+  const auto title = window ? window->windowTitle () : QString ();
+  /* Detach the page before the window goes, or deleting the window would take
+   * the page with it. */
+  if (window)
+    {
+      window->removeEventFilter (this);
+      if (auto *layout = window->layout ())
+        layout->removeWidget (page);
+      page->setParent (nullptr);
+      window->deleteLater ();
+    }
+
+  page->setAttribute (Qt::WA_DeleteOnClose, false);
+  const auto index = tabWidget->addTab (page, title);
+  tabWidget->setCurrentIndex (index);
+  page->show ();
+
+  raise ();
+  activateWindow ();
+}
+
+void
+MainWindow::discardFloatingPage (QWidget *page)
+{
+  const auto i = indexOfFloating (page);
+  if (i < 0)
+    return;
+  const auto entry = floatingPages.takeAt (i);
+  auto *window = entry.window.data ();
+
+  /* Run the page's own close handling (it may stop a running download) and let
+   * `WA_DeleteOnClose` delete it. It is detached first, so deleting the window
+   * does not delete it a second time. */
+  page->close ();
+  if (window)
+    {
+      window->removeEventFilter (this);
+      if (auto *layout = window->layout ())
+        layout->removeWidget (page);
+      page->setParent (nullptr);
+      window->deleteLater ();
+    }
+}
+
 void
 MainWindow::tryShrinkTopWidget ()
 {
@@ -931,6 +1098,24 @@ MainWindow::tryShrinkTopWidget ()
 bool
 MainWindow::eventFilter (QObject *object, QEvent *event)
 {
+  if (auto *row = qobject_cast<QWidget *> (object);
+      row && topLayout && topLayout->indexOf (row) >= 0)
+    {
+      /* A row can change what it wants to be after it appears: an error row is
+       * added empty and given its text — and so a much taller size hint — just
+       * afterwards. `LayoutRequest` is the only signal such a change gives
+       * (`KMessageWidget` has no `textChanged`), so re-pin and re-fit on it,
+       * and on show/hide too, so a row folding away gives its space back. Done
+       * on the next pass, once the row has settled.
+       *
+       * `LayoutRequest` also fires from the `setFixedHeight ()` that leads to,
+       * but that pass finds the row already at the height it needs and stops,
+       * so it settles after one extra pass. */
+      if (event->type () == QEvent::Show || event->type () == QEvent::Hide
+          || event->type () == QEvent::LayoutRequest)
+        QTimer::singleShot (0, this, &MainWindow::fitTopArea);
+    }
+
   if (object == topWidget && event->type () == QEvent::ChildRemoved)
     tryShrinkTopWidget ();
 
@@ -944,6 +1129,27 @@ MainWindow::eventFilter (QObject *object, QEvent *event)
       auto *resize = static_cast<QResizeEvent *> (event);
       if (resize->oldSize ().width () != resize->size ().width ())
         QTimer::singleShot (0, this, &MainWindow::refreshTopAreaRows);
+    }
+
+  /* Closing a torn-off window. A normal page is discarded, as closing its tab
+   * would be; the singleton is brought back as a tab instead, so it is never
+   * lost. Skipped while the main window closes, when these close with it. */
+  if (!closing)
+    {
+      if (auto *window = qobject_cast<QWidget *> (object);
+          window && event->type () == QEvent::Close)
+        {
+          auto *page = window->property ("dhlrcPage").value<QWidget *> ();
+          if (page && indexOfFloating (page) >= 0)
+            {
+              event->ignore ();
+              if (page == ManageRegionUI::instance ())
+                dockBackPage (page);
+              else
+                discardFloatingPage (page);
+              return true;
+            }
+        }
     }
 
   return QMainWindow::eventFilter (object, event);
@@ -961,6 +1167,7 @@ MainWindow::instance ()
 void
 MainWindow::closeEvent (QCloseEvent *event)
 {
+  closing = true;
   Q_EMIT windowClosed ();
   QMainWindow::closeEvent (event);
 }

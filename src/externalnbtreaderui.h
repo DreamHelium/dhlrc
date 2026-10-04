@@ -2,6 +2,7 @@
 #define DHLRC_EXTERNALNBTREADERUI_H
 
 #include "dhwidget.h"
+#include "loadmodule.h"
 #include "nbtreaderui.h"
 #include "region.h"
 #include <KMessageWidget>
@@ -10,7 +11,6 @@
 #include <QPushButton>
 #include <QVBoxLayout>
 #include <QWidget>
-#include <qlibrary.h>
 
 class ExternalNbtReaderUI : public DhWidget
 {
@@ -40,11 +40,8 @@ private:
   QHBoxLayout *hLayout;
   QLabel *label;
   KMessageWidget *messageWidget;
-  QLibrary *library;
-  using GetFunc = const char *(*)(VecU8 *, NBTRoot **, HelperStruct *);
-  using FreeFunc = void (*) (NBTRoot *);
-  GetFunc getFn = nullptr;
-  FreeFunc freeFn = nullptr;
+  LoadObjectFunc getFn = nullptr;
+  ObjFreeFunc freeFn = nullptr;
   void freeNBT (NBTRoot *);
   HelperStruct *helperStruct;
 };

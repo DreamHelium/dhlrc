@@ -38,3 +38,6 @@ po/dhlrc/rc.cpp
 # cargo build
 */target
 target
+
+# zed
+.zed/

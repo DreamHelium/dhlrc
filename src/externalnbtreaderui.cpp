@@ -1,12 +1,12 @@
 #include "externalnbtreaderui.h"
 #include "dhwidget.h"
+#include "manageregionui.h"
 #include "region.h"
 #include "settings.h"
 
 #include <QMessageBox>
 #include <libintl.h>
 #include <qevent.h>
-#include <qlibrary.h>
 #include <qmimedata.h>
 #define _(str) gettext (str)
 #undef asprintf
@@ -30,9 +30,17 @@ ExternalNbtReaderUI::ExternalNbtReaderUI (QWidget *parent) : DhWidget (parent)
   resize (500, 500);
   setAcceptDrops (true);
   layout = new QVBoxLayout (this);
-  library = new QLibrary ("./load_module/libnbt_component.so");
-  getFn = reinterpret_cast<GetFunc> (library->resolve ("region_get_object"));
-  freeFn = reinterpret_cast<FreeFunc> (library->resolve ("object_free"));
+  /* The codec itself is loaded with the rest of `load_module/`; this window
+   * only looks up the one that decodes Java NBT. */
+  for (const auto &codec : ManageRegionUI::getLoadObjectList ())
+    {
+      if (codec.baseType () == "NBT")
+        {
+          getFn = codec.loadObjectFunc;
+          freeFn = codec.objFreeFunc;
+          break;
+        }
+    }
 
   messageWidget = new KMessageWidget ();
   messageWidget->setIcon (QIcon::fromTheme ("dialog-warning"));
@@ -114,10 +122,17 @@ ExternalNbtReaderUI::dropEvent (QDropEvent *event)
   const char *failMessage = nullptr;
   int failed = false;
 
+  if (!getFn)
+    {
+      messageWidget->setText (_ ("The NBT codec is not available."));
+      messageWidget->setVisible (true);
+      return;
+    }
+
   auto vec = file_try_uncompress (filename.toUtf8 (), helperStruct, &failed);
   if (!failed)
     {
-      failMessage = getFn (vec, &nbt, helperStruct);
+      failMessage = getFn (vec, &nbt, helperStruct, nullptr);
     }
   else
     {

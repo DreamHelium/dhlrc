@@ -14,7 +14,7 @@
 
 namespace
 {
-/* A row of the module list: the type, then the file it came from in grey. */
+/* A row of the region-module list: the type, then the suffix it claims. */
 QString
 moduleRow (ModuleBase *module)
 {
@@ -22,6 +22,14 @@ moduleRow (ModuleBase *module)
   if (!suffix.isEmpty ())
     suffix = QStringLiteral (" (*.%1)").arg (suffix);
   return QStringLiteral ("%1%2").arg (module->type (), suffix);
+}
+
+/* A row of the load-module list: the object type the codec produces, e.g.
+ * `"NBT"`. */
+QString
+loadModuleRow (const LoadObjectBase &codec)
+{
+  return codec.baseType ();
 }
 }
 
@@ -81,6 +89,24 @@ DhAboutUI::DhAboutUI (QWidget *parent) : QDialog (parent)
   modules->setStyleSheet ("color:gray;");
   modules->setFont (QFontDatabase::systemFont (QFontDatabase::FixedFont));
   layout->addWidget (modules);
+
+  /* The object codecs in `load_module/` are what actually turn a file into an
+   * object; without one, none of the plugins above can read anything. */
+  auto *loadModulesLabel = new QLabel (_ ("Loaded load modules:"));
+  layout->addWidget (loadModulesLabel);
+
+  auto *loadModules = new QLabel ();
+  QStringList codecRows;
+  for (const auto &codec : ManageRegionUI::getLoadObjectList ())
+    codecRows << loadModuleRow (codec);
+  if (codecRows.isEmpty ())
+    loadModules->setText (_ ("None."));
+  else
+    loadModules->setText (codecRows.join ('\n'));
+  loadModules->setTextInteractionFlags (Qt::TextSelectableByMouse);
+  loadModules->setStyleSheet ("color:gray;");
+  loadModules->setFont (QFontDatabase::systemFont (QFontDatabase::FixedFont));
+  layout->addWidget (loadModules);
 
   auto *buttons = new QDialogButtonBox (QDialogButtonBox::Close);
   connect (buttons, &QDialogButtonBox::rejected, this, &QDialog::reject);

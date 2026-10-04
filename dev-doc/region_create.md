@@ -32,8 +32,12 @@ passed as `void *`.
 ```c++
 /* Provided by `load_module/libnbt_component.so` */
 const char* region_get_object(VecU8 *bytes, void **object,
-                              HelperStruct *helper_struct);
+                              HelperStruct *helper_struct,
+                              const ObjectLoadOptions *options);
 ```
+
+`options` may be `nullptr` (try every encoding); it can also pin the decode to one encoding for strict matching — see
+[Load module](load_module.md#optional-strict-matching).
 
 The codec tries the supported NBT encodings itself (big endian, little endian, network little endian) and keeps the
 first one that parses, so the caller does not have to know or declare the endianness, nor which Minecraft edition
@@ -47,8 +51,9 @@ The object is released with the matching free function, which is published as a 
 void object_free(void *object);
 ```
 
-dhlrc binds `region_get_object` / `object_free` once, at startup, and keeps them in a `LoadObjectBase`
-(`baseType`, `loadObjectFunc`, `objFreeFunc`). The pair is looked up by the module's `region_base_type()`.
+dhlrc loads every codec in `load_module/` at startup and keeps them in a list of `LoadObjectBase`
+(`baseType()`, `loadObjectFunc`, `objFreeFunc`); see [Load module](load_module.md). A plugin is then chosen by
+matching its `region_base_type()` against the codec's `baseType()`.
 
 ## 3. Build the region
 

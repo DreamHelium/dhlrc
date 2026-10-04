@@ -5,9 +5,10 @@
 
 /* The "About" window.
  *
- * Besides the version it lists the region modules that were actually loaded,
- * so a report can say which formats were available without the reporter having
- * to look through `region_module` themselves. */
+ * Besides the version it lists the region modules and the object codecs (load
+ * modules) that were actually loaded, so a report can say which formats were
+ * available without the reporter having to look through `region_module` or
+ * `load_module` themselves. */
 class DhAboutUI : public QDialog
 {
   Q_OBJECT

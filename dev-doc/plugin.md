@@ -18,13 +18,14 @@ the metadata.
 
 ## Metadata symbols
 
-| Symbol                 | Required | Meaning                                                                                      |
-| ---------------------- | -------- | -------------------------------------------------------------------------------------------- |
-| `region_type()`        | **yes**  | The unique name of the format, e.g. `"nbt"`. Used as the module's identity.                  |
-| `region_file_suffix()` | no       | File suffix without the dot, e.g. `"nbt"`. Matched against the loaded file extension.        |
-| `region_base_type()`   | no       | Name of the object codec this plugin expects, e.g. `"JavaNBT"` or `"BedrockNBT"`. See below. |
-| `region_file_type()`   | no       | The (already translated) file dialog filter, e.g. `"NBT File (*.nbt)"`.                      |
-| `region_is_multi()`    | no       | `1` for a multi-region format, `0` (or absent) for a single-region one.                      |
+| Symbol                  | Required | Meaning                                                                               |
+| ----------------------- | -------- | ------------------------------------------------------------------------------------- |
+| `region_type()`         | **yes**  | The unique name of the format, e.g. `"nbt"`. Used as the module's identity.           |
+| `region_file_suffix()`  | no       | File suffix without the dot, e.g. `"nbt"`. Matched against the loaded file extension. |
+| `region_base_type()`    | no       | Name of the object codec this plugin expects, e.g. `"NBT"`. See below.                |
+| `region_file_type()`    | no       | The (already translated) file dialog filter, e.g. `"NBT File (*.nbt)"`.               |
+| `region_is_multi()`     | no       | `1` for a multi-region format, `0` (or absent) for a single-region one.               |
+| `region_nbt_encoding()` | no       | The NBT encoding the format requires, as an `ObjectEncoding` value. See below.        |
 
 All metadata functions take no arguments:
 
@@ -34,6 +35,7 @@ const char* region_file_suffix();
 const char* region_base_type();
 const char* region_file_type();
 int32_t     region_is_multi();
+int32_t     region_nbt_encoding();
 ```
 
 `region_type()` is the only strictly required symbol. Because the format name is the module's identity,
@@ -44,22 +46,39 @@ already translated (or translatable through the plugin's own domain, `ModuleBase
 dhlrc does not translate it a second time.
 
 The base type names the **object codec** the plugin needs, not a byte order. The loader decodes the file with a
-codec first, then only offers the plugins whose `region_base_type()` matches `LoadObjectBase::baseType`.
+codec first, then only offers the plugins whose `region_base_type()` matches `LoadObjectBase::baseType()`.
+See [Load module](load_module.md) for the codec side.
 
-Codecs currently built into the application:
+`region-nbt-rs` and `region-litematic-rs` both use `NBT`.
 
-- `JavaNBT` — `nbt-component` (`load_module/libnbt_component.so`). Handles Java Edition NBT.
-- `BedrockNBT` — reserved for Bedrock Edition NBT.
-- `JSON` — reserved.
+### Declaring the encoding (optional)
 
-`region-nbt-rs` and `region-litematic-rs` both use `JavaNBT`.
+NBT comes in three encodings — big endian, little endian and network little endian — and by default the codec tries
+them all and keeps the first that parses. That is convenient, but it means a file that was meant to be, say, big
+endian can be read as another encoding without anyone noticing.
 
-### Encoding is not a plugin concern
+A plugin that knows which encoding its format uses can say so:
 
-The codec tries the supported NBT encodings itself — big endian, little endian, and network little endian — and keeps
-the first one that parses. A plugin therefore never has to detect or declare endianness, and never sees the raw
-bytes: by the time it is called it gets an already-decoded NBT tree. `region_create_from_file*()` only has to
-interpret the structure.
+```c++
+/* One of the ObjectEncoding values (see [Load module](load_module.md#optional-strict-matching)).
+ * ObjectEncodingAny (0), or leaving the symbol out, means "don't care". */
+int32_t region_nbt_encoding();
+```
+
+With **Strict NBT Encoding Matching** enabled in the settings, the loader resolves the plugin from the file's suffix
+_before_ decoding, and requires the decode to be in that plugin's encoding. The file is decoded permissively and the
+encoding it actually parsed as is compared afterwards, so a file in any other encoding fails to load with that
+encoding named, instead of being read as the wrong one. The setting is off by default, so a plugin declaring an
+encoding changes nothing until the user asks for strict matching. The value has to be one of the known encodings;
+anything else is treated as `ObjectEncodingAny`.
+
+`region-nbt-rs` and `region-litematic-rs` both declare `ObjectEncodingBigEndian`, as Java Edition NBT is big endian.
+
+### Seeing the raw bytes
+
+The codec tries the supported NBT encodings itself and hands the plugin an already-decoded NBT tree, so a plugin never
+sees the raw bytes and never has to detect an encoding itself. `region_create_from_file*()` only has to interpret the
+structure.
 
 ## Single-region plugins
 

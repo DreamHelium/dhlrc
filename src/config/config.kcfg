@@ -48,6 +48,12 @@
             >When failed, the file will try to be loaded by other modules.</tooltip>
             <default>false</default>
         </entry>
+        <entry name="StrictNbtEncoding" type="Bool">
+            <label>Strict NBT Encoding Matching</label>
+            <tooltip
+            >If you check this, a file is also decoded strictly with the NBT encoding declared by the plugin its suffix points at (region_nbt_encoding ()). A file in another encoding then fails to load instead of being read as the wrong one.</tooltip>
+            <default>false</default>
+        </entry>
         <entry name="CacheDirectory" type="Path">
             <label>Cache Directory</label>
             <tooltip>The directory to store cache files.</tooltip>

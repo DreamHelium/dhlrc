@@ -109,6 +109,27 @@ candidatesFor (const QString &filename, const QString &baseType)
   return result;
 }
 
+/* The plugin a file's suffix points at, resolved before the file is decoded.
+ *
+ * `candidatesFor ()` cannot be used for this: it also needs the object codec,
+ * which is only known after decoding. For strict encoding matching the suffix
+ * is all there is to go on, so this looks at nothing else. A file with no
+ * suffix, or one no plugin claims, gets `nullptr`.
+ */
+static ModuleBase *
+moduleForSuffix (const QString &filename)
+{
+  auto extension = QFileInfo (filename).suffix ();
+  if (extension.isEmpty ())
+    return nullptr;
+  for (auto *module : ManageRegionUI::getModules ())
+    {
+      if (module->fileSuffix () == extension)
+        return module;
+    }
+  return nullptr;
+}
+
 void
 DhLoadJob::start ()
 {
@@ -137,6 +158,27 @@ DhLoadJob::start ()
                     if (cancel_flag_is_cancelled (cancel_flag))
                       throw DhLoadError (_ ("Cancelled."), _ ("Loading File"));
 
+                    /* Optional strict matching: require the file to decode as
+                     * the encoding the plugin the suffix points at declares,
+                     * so a file in another encoding fails instead of silently
+                     * being read as the wrong one. The decode itself stays
+                     * permissive, so the error can name the encoding found.
+                     * Without a suffix, or without a declaration, decoding is
+                     * not checked at all. */
+                    ObjectLoadOptions strictOptions{ 0, ObjectEncodingAny };
+                    const ObjectLoadOptions *options = nullptr;
+                    if (DhConfig::strictNbtEncoding ())
+                      {
+                        if (auto *expected = moduleForSuffix (filename);
+                            expected
+                            && expected->encoding () != ObjectEncodingAny)
+                          {
+                            strictOptions.strict = 1;
+                            strictOptions.encoding = expected->encoding ();
+                            options = &strictOptions;
+                          }
+                      }
+
                     /* Loading Object */
                     auto objectList = ManageRegionUI::getLoadObjectList ();
                     DhMultiLoadError errors;
@@ -144,18 +186,19 @@ DhLoadJob::start ()
                       {
                         void *object = nullptr;
                         auto msg = load.loadObjectFunc (ptr.get (), &object,
-                                                        helper_struct.get ());
+                                                        helper_struct.get (),
+                                                        options);
                         if (msg)
                           {
                             QString typeWithPrefix = _ ("Loading Object %1");
                             typeWithPrefix
-                                = typeWithPrefix.arg (load.baseType);
+                                = typeWithPrefix.arg (load.baseType ());
                             errors.appendError (msg, typeWithPrefix);
                             string_free (msg);
                             continue;
                           }
                         return std::make_pair (
-                            load.baseType,
+                            load.baseType (),
                             std::unique_ptr<void, void (*) (void *)>{
                                 object, load.objFreeFunc });
                       }
