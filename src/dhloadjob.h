@@ -1,9 +1,9 @@
 #ifndef DHLRC_DHLOADJOB_H
 #define DHLRC_DHLOADJOB_H
 
+#include "dhcore.h"
 #include "manageregionui.h"
 #include "region.h"
-#include "settings.h"
 #include <KCompositeJob>
 #include <QPointer>
 #include <condition_variable>
@@ -65,9 +65,10 @@ public:
                       QObject *parent = nullptr)
       : KJob (parent), filename (filename), cancel_flag (cancel_flag),
         inputConfigs (inputConfigs),
-        helper_struct (helper_struct_new (setFunc, this, cancel_flag,
-                                          DhConfig::elapsedMilliseconds (),
-                                          DhConfig::memoryLimit ()),
+        helper_struct (helper_struct_new (
+                           setFunc, this, cancel_flag,
+                           DhCore::instance ()->config ().elapsedMilliseconds,
+                           DhCore::instance ()->config ().memoryLimit),
                        helper_struct_free)
   {
   }

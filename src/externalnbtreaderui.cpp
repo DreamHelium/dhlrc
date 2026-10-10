@@ -1,8 +1,8 @@
 #include "externalnbtreaderui.h"
+#include "dhcore.h"
 #include "dhwidget.h"
 #include "manageregionui.h"
 #include "region.h"
-#include "settings.h"
 
 #include <QMessageBox>
 #include <libintl.h>
@@ -72,9 +72,10 @@ ExternalNbtReaderUI::ExternalNbtReaderUI (QWidget *parent) : DhWidget (parent)
            &QProgressBar::setValue);
   connect (this, &ExternalNbtReaderUI::setLabel, progressLabel,
            &QLabel::setText);
-  helperStruct = helper_struct_new (progressFn, this, nullptr,
-                                    DhConfig::elapsedMilliseconds (),
-                                    DhConfig::memoryLimit ());
+  helperStruct
+      = helper_struct_new (progressFn, this, nullptr,
+                           DhCore::instance ()->config ().elapsedMilliseconds,
+                           DhCore::instance ()->config ().memoryLimit);
 }
 
 void

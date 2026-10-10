@@ -9,6 +9,7 @@
 #include "utility.h"
 #include <QApplication>
 #include <QCheckBox>
+#include <QDateTime>
 #include <QFileDialog>
 #include <QFontDatabase>
 #include <QInputDialog>
@@ -16,6 +17,7 @@
 #include <QPointer>
 #include <QPushButton>
 #include <QTimer>
+#include <QUuid>
 #include <algorithm>
 #include <functional>
 #include <libintl.h>

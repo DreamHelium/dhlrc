@@ -1,3 +1,0 @@
-[submodule "src/dhconfigdialog"]
-	path = src/dhconfigdialog
-	url = https://github.com/DreamHelium/DhConfigDialog

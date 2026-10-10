@@ -2,9 +2,9 @@
 
 #include "configobjectitems.h"
 #include "configobjectui.h"
+#include "dhcore.h"
 #include "mainwindow.h"
 #include "manageregionui.h"
-#include "settings.h"
 
 #include <KMessageWidget>
 #include <QDebug>
@@ -26,9 +26,10 @@ SaveRegionJob::SaveRegionJob (std::shared_ptr<RegionClass> region,
       /* Lock for the whole job: nothing may rename, remove or modify a region
        * while it is being written. */
       lock (std::make_unique<AutoLocker> (*this->region)),
-      helper_struct (helper_struct_new (progressFunc, this, cancelFlag,
-                                        DhConfig::elapsedMilliseconds (),
-                                        DhConfig::memoryLimit ()),
+      helper_struct (helper_struct_new (
+                         progressFunc, this, cancelFlag,
+                         DhCore::instance ()->config ().elapsedMilliseconds,
+                         DhCore::instance ()->config ().memoryLimit),
                      helper_struct_free)
 {
   /* The row is built here, at construction, exactly as `DhLoadJob` does: it
@@ -632,9 +633,10 @@ SaveMultiRegionJob::SaveMultiRegionJob (
     QObject *parent)
     : KJob (parent), regions (list), filename (filename), func (func),
       configObject (configObject), cancelFlag (cancelFlag),
-      helper_struct (helper_struct_new (progressFunc, this, cancelFlag,
-                                        DhConfig::elapsedMilliseconds (),
-                                        DhConfig::memoryLimit ()),
+      helper_struct (helper_struct_new (
+                         progressFunc, this, cancelFlag,
+                         DhCore::instance ()->config ().elapsedMilliseconds,
+                         DhCore::instance ()->config ().memoryLimit),
                      helper_struct_free)
 {
   /* Every region is locked for the whole write: it is one file, so it cannot

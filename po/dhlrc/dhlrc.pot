@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-04 20:53+0800\n"
+"POT-Creation-Date: 2026-10-10 21:56+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -51,7 +51,7 @@ msgid "z"
 msgstr ""
 
 #: ../../src/blocklistui.cpp:59 ../../src/blocklistui.cpp:62
-#: ../../build/src/settings.cpp:143 rc.cpp:156
+#: ../../src/mainwindow.cpp:570
 msgid "Palette"
 msgstr ""
 
@@ -104,8 +104,8 @@ msgstr ""
 msgid "Unknown"
 msgstr ""
 
-#: ../../src/blockreaderui.cpp:290 ../../src/externalnbtreaderui.cpp:108
-#: ../../src/manageregionui.cpp:242 ../../src/manageregionui.cpp:567
+#: ../../src/blockreaderui.cpp:290 ../../src/externalnbtreaderui.cpp:109
+#: ../../src/manageregionui.cpp:244 ../../src/manageregionui.cpp:569
 #: ../../src/regionmodifyui.cpp:13 ../../src/utility.cpp:24
 #: ../../src/utility.cpp:45 ../../src/utility.cpp:53
 msgid "Error!"
@@ -119,8 +119,8 @@ msgstr ""
 msgid "The block is in (%1, %2, %3), information is:\n"
 msgstr ""
 
-#: ../../src/blockshowui.cpp:81 ../../src/generalchoosedialog.cpp:45 rc.cpp:196
-#: rc.cpp:256
+#: ../../src/blockshowui.cpp:81 ../../src/generalchoosedialog.cpp:45 rc.cpp:102
+#: rc.cpp:162
 msgid "&OK"
 msgstr ""
 
@@ -132,7 +132,7 @@ msgstr ""
 msgid "&Modify Property"
 msgstr ""
 
-#: ../../src/blockshowui.cpp:101 ../../src/manageregionui.cpp:275
+#: ../../src/blockshowui.cpp:101 ../../src/manageregionui.cpp:277
 msgid "Warning!"
 msgstr ""
 
@@ -160,7 +160,7 @@ msgstr ""
 msgid "About dhlrc"
 msgstr ""
 
-#: ../../src/dhaboutui.cpp:56 ../../src/main.cpp:35
+#: ../../src/dhaboutui.cpp:56 ../../src/main.cpp:36
 msgid "Minecraft Structure Modifier"
 msgstr ""
 
@@ -219,16 +219,16 @@ msgstr ""
 msgid "Please click `Continue` to choose the region(s) to load."
 msgstr ""
 
-#: ../../src/dhloadjob.cpp:451 ../../src/dhloadjob.cpp:458
+#: ../../src/dhloadjob.cpp:452 ../../src/dhloadjob.cpp:459
 msgid "Finish processing %1 of %2 (%3%)."
 msgstr ""
 
-#: ../../src/dhloadjob.cpp:579 ../../src/saveregionjob.cpp:455
-#: ../../src/saveregionjob.cpp:557
+#: ../../src/dhloadjob.cpp:580 ../../src/saveregionjob.cpp:456
+#: ../../src/saveregionjob.cpp:558
 msgid "Continue"
 msgstr ""
 
-#: ../../src/externalnbtreaderui.cpp:29 ../../src/mainwindow.cpp:662
+#: ../../src/externalnbtreaderui.cpp:29 ../../src/mainwindow.cpp:643
 msgid "NBT Reader"
 msgstr ""
 
@@ -236,11 +236,11 @@ msgstr ""
 msgid "Drag file to read NBT."
 msgstr ""
 
-#: ../../src/externalnbtreaderui.cpp:109
+#: ../../src/externalnbtreaderui.cpp:110
 msgid "Multiple files dropped!"
 msgstr ""
 
-#: ../../src/externalnbtreaderui.cpp:127
+#: ../../src/externalnbtreaderui.cpp:128
 msgid "The NBT codec is not available."
 msgstr ""
 
@@ -248,178 +248,235 @@ msgstr ""
 msgid "&All"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:160
-msgid "Select Cache Directory"
-msgstr ""
-
-#: ../../src/mainwindow.cpp:187 ../../build/src/settings.cpp:106 rc.cpp:117
-msgid "Multi-Region Display Name"
-msgstr ""
-
-#: ../../src/mainwindow.cpp:192
-msgid "Name pattern:"
-msgstr ""
-
-#: ../../src/mainwindow.cpp:196
-msgid "Insert a placeholder:"
-msgstr ""
-
-#: ../../src/mainwindow.cpp:198
-msgid "File name"
-msgstr ""
-
-#: ../../src/mainwindow.cpp:199
-msgid "Region name"
-msgstr ""
-
-#: ../../src/mainwindow.cpp:203
-msgid "Preview with these sample values:"
-msgstr ""
-
-#: ../../src/mainwindow.cpp:206
-msgid "Sample file name"
-msgstr ""
-
-#: ../../src/mainwindow.cpp:208
-msgid "Sample region name"
-msgstr ""
-
-#: ../../src/mainwindow.cpp:217
-msgid ""
-"${file} is replaced with the file name, ${region} with the region name "
-"inside the file. They can be used in any order and repeated. Anything else "
-"is kept as written."
-msgstr ""
-
-#: ../../src/mainwindow.cpp:327
-msgid "Pre&view..."
-msgstr ""
-
-#: ../../src/mainwindow.cpp:512
+#: ../../src/mainwindow.cpp:379
 msgid "Config"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:513
+#: ../../src/mainwindow.cpp:380
 msgid "Icon Theme"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:531
+#: ../../src/mainwindow.cpp:398
 msgid "Help"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:532
+#: ../../src/mainwindow.cpp:399
 msgid "&About"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:565
+#: ../../src/mainwindow.cpp:432
 msgid "Search..."
 msgstr ""
 
-#: ../../src/mainwindow.cpp:595
+#: ../../src/mainwindow.cpp:462
 msgid "NBT File Reader"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:596 ../../src/mainwindow.cpp:667
+#: ../../src/mainwindow.cpp:463 ../../src/mainwindow.cpp:648
 msgid "Manage Region"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:597 ../../src/mainwindow.cpp:680
+#: ../../src/mainwindow.cpp:464 ../../src/mainwindow.cpp:661
 msgid "Region Reader/Modifier"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:598
+#: ../../src/mainwindow.cpp:465
 msgid "Settings"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:1011
+#: ../../src/mainwindow.cpp:521 ../../src/dhgameconfigui.h:15
+msgid "General"
+msgstr ""
+
+#: ../../src/mainwindow.cpp:525
+msgid "Application Memory Limit"
+msgstr ""
+
+#: ../../src/mainwindow.cpp:536
+msgid "Elapsed Milliseconds"
+msgstr ""
+
+#: ../../src/mainwindow.cpp:538
+msgid "Select All Regions In Loading"
+msgstr ""
+
+#: ../../src/mainwindow.cpp:540
+msgid "Loading File by File Extension"
+msgstr ""
+
+#: ../../src/mainwindow.cpp:542
+msgid "Retry Loading File when Failed"
+msgstr ""
+
+#: ../../src/mainwindow.cpp:544
+msgid "Strict NBT Encoding Matching"
+msgstr ""
+
+#: ../../src/mainwindow.cpp:547
+msgid "Use Cached File when Downloading Failed"
+msgstr ""
+
+#: ../../src/mainwindow.cpp:552
+msgid "Cache Directory"
+msgstr ""
+
+#: ../../src/mainwindow.cpp:556 ../../src/dhgameconfigui.h:15
+msgid "Default"
+msgstr ""
+
+#: ../../src/mainwindow.cpp:557
+msgid "Region Base Name"
+msgstr ""
+
+#: ../../src/mainwindow.cpp:558 rc.cpp:153
+msgid "Region Name"
+msgstr ""
+
+#: ../../src/mainwindow.cpp:559
+msgid "Multi-Region Display Name"
+msgstr ""
+
+#: ../../src/mainwindow.cpp:561
+msgid "Region Description"
+msgstr ""
+
+#: ../../src/mainwindow.cpp:562
+msgid "Region Author"
+msgstr ""
+
+#: ../../src/mainwindow.cpp:564 ../../src/dhgameconfigui.h:15
+msgid "Game"
+msgstr ""
+
+#: ../../src/mainwindow.cpp:565
+msgid "Override Settings"
+msgstr ""
+
+#: ../../src/mainwindow.cpp:566
+msgid "Override Version"
+msgstr ""
+
+#: ../../src/mainwindow.cpp:568
+msgid "Reader"
+msgstr ""
+
+#: ../../src/mainwindow.cpp:569
+msgid "Default Show Option"
+msgstr ""
+
+#: ../../src/mainwindow.cpp:570 ../../src/paletteaddui.cpp:68
+msgid "Name"
+msgstr ""
+
+#: ../../src/mainwindow.cpp:572
+msgid "Manage"
+msgstr ""
+
+#: ../../src/mainwindow.cpp:583
+msgid "reading"
+msgstr ""
+
+#: ../../src/mainwindow.cpp:584
+msgid "writing"
+msgstr ""
+
+#: ../../src/mainwindow.cpp:586
+msgid "Use saved options for %1 (%2) instead of asking"
+msgstr ""
+
+#: ../../src/mainwindow.cpp:758
+msgid "Configuration reloaded from %1"
+msgstr ""
+
+#: ../../src/mainwindow.cpp:1041
 msgid "Return to tabs"
 msgstr ""
 
-#: ../../src/manageregionui.cpp:185
+#: ../../src/manageregionui.cpp:187
 msgid "&Select"
 msgstr ""
 
-#: ../../src/manageregionui.cpp:189 rc.cpp:190
+#: ../../src/manageregionui.cpp:191 rc.cpp:96
 msgid "&Add"
 msgstr ""
 
-#: ../../src/manageregionui.cpp:202
+#: ../../src/manageregionui.cpp:204
 msgid "Select &All"
 msgstr ""
 
-#: ../../src/manageregionui.cpp:209
+#: ../../src/manageregionui.cpp:211
 msgid "&Remove Selected"
 msgstr ""
 
-#: ../../src/manageregionui.cpp:213
+#: ../../src/manageregionui.cpp:215
 msgid "&Save Selected"
 msgstr ""
 
-#: ../../src/manageregionui.cpp:240
+#: ../../src/manageregionui.cpp:242
 msgid "Select Files"
 msgstr ""
 
-#: ../../src/manageregionui.cpp:243
+#: ../../src/manageregionui.cpp:245
 msgid "No file selected!"
 msgstr ""
 
-#: ../../src/manageregionui.cpp:276
+#: ../../src/manageregionui.cpp:278
 msgid "Locked regions were kept."
 msgstr ""
 
-#: ../../src/manageregionui.cpp:395
+#: ../../src/manageregionui.cpp:397
 msgid "%1 region(s) selected"
 msgstr ""
 
-#: ../../src/manageregionui.cpp:452 ../../src/utility.cpp:82
+#: ../../src/manageregionui.cpp:454 ../../src/utility.cpp:82
 msgid "Locked"
 msgstr ""
 
-#: ../../src/manageregionui.cpp:489
+#: ../../src/manageregionui.cpp:491
 msgid "Select Save Format"
 msgstr ""
 
-#: ../../src/manageregionui.cpp:489
+#: ../../src/manageregionui.cpp:491
 msgid "Please select the format to save to."
 msgstr ""
 
-#: ../../src/manageregionui.cpp:515
+#: ../../src/manageregionui.cpp:517
 msgid "Use MultiFunc?"
 msgstr ""
 
-#: ../../src/manageregionui.cpp:516
+#: ../../src/manageregionui.cpp:518
 msgid "This type supports regions to save as one file, do you want to use it?"
 msgstr ""
 
-#: ../../src/manageregionui.cpp:532
+#: ../../src/manageregionui.cpp:534
 msgid "Select File"
 msgstr ""
 
-#: ../../src/manageregionui.cpp:568
+#: ../../src/manageregionui.cpp:570
 msgid "This type cannot save a single region."
 msgstr ""
 
-#: ../../src/manageregionui.cpp:573
+#: ../../src/manageregionui.cpp:575
 msgid "Select Directory"
 msgstr ""
 
-#: ../../src/manageregionui.cpp:673
+#: ../../src/manageregionui.cpp:675
 msgid "Locked!"
 msgstr ""
 
-#: ../../src/manageregionui.cpp:685
+#: ../../src/manageregionui.cpp:687
 msgid "Region identifier"
 msgstr ""
 
-#: ../../src/manageregionui.cpp:688
+#: ../../src/manageregionui.cpp:690
 msgid "Added: %1"
 msgstr ""
 
-#: ../../src/manageregionui.cpp:727
+#: ../../src/manageregionui.cpp:729
 msgid "Input a New Name"
 msgstr ""
 
-#: ../../src/manageregionui.cpp:728
+#: ../../src/manageregionui.cpp:730
 msgid "Please input a new name for the region."
 msgstr ""
 
@@ -447,33 +504,8 @@ msgstr ""
 msgid "Please enter a data."
 msgstr ""
 
-#: ../../src/paletteaddui.cpp:68 ../../build/src/settings.cpp:149 rc.cpp:159
-msgid "Name"
-msgstr ""
-
 #: ../../src/paletteaddui.cpp:68
 msgid "Data"
-msgstr ""
-
-#: ../../src/pluginoptionsconfig.cpp:270 ../../src/pluginoptionsconfig.cpp:341
-msgid "loading"
-msgstr ""
-
-#: ../../src/pluginoptionsconfig.cpp:271 ../../src/pluginoptionsconfig.cpp:341
-msgid "saving"
-msgstr ""
-
-#: ../../src/pluginoptionsconfig.cpp:273
-msgid "Options for %1 when %2"
-msgstr ""
-
-#: ../../src/pluginoptionsconfig.cpp:342
-msgid "Use the settings below when %1"
-msgstr ""
-
-#: ../../src/pluginoptionsconfig.cpp:344
-msgid ""
-"Use the options below for every %1 operation, instead of asking each time."
 msgstr ""
 
 #: ../../src/regionmodifyui.cpp:55
@@ -492,90 +524,90 @@ msgstr ""
 msgid "Failed to set the region name."
 msgstr ""
 
-#: ../../src/resourcegetter.cpp:67
+#: ../../src/resourcegetter.cpp:68
 msgid "Finished!"
 msgstr ""
 
-#: ../../src/resourcegetter.cpp:70
+#: ../../src/resourcegetter.cpp:71
 msgid "A download process is running."
 msgstr ""
 
-#: ../../src/resourcegetter.cpp:77
+#: ../../src/resourcegetter.cpp:78
 msgid "Couldn't create directory!"
 msgstr ""
 
-#: ../../src/resourcegetter.cpp:239
+#: ../../src/resourcegetter.cpp:240
 msgid "Downloading manifest."
 msgstr ""
 
-#: ../../src/resourcegetter.cpp:319
+#: ../../src/resourcegetter.cpp:320
 msgid "No matching index json found, file corrupted?"
 msgstr ""
 
-#: ../../src/resourcegetter.cpp:339
+#: ../../src/resourcegetter.cpp:340
 msgid "Downloading index json of this version."
 msgstr ""
 
-#: ../../src/resourcegetter.cpp:356
+#: ../../src/resourcegetter.cpp:357
 msgid "Downloading asset index of this version."
 msgstr ""
 
-#: ../../src/resourcegetter.cpp:379
+#: ../../src/resourcegetter.cpp:380
 msgid "Downloading object."
 msgstr ""
 
-#: ../../src/resourcegetter.cpp:380
+#: ../../src/resourcegetter.cpp:381
 msgid "Downloading finished!"
 msgstr ""
 
-#: ../../src/saveregionjob.cpp:39
+#: ../../src/saveregionjob.cpp:40
 msgid "Saving %1..."
 msgstr ""
 
-#: ../../src/saveregionjob.cpp:48
+#: ../../src/saveregionjob.cpp:49
 msgid "Saving %1 (%2%)"
 msgstr ""
 
-#: ../../src/saveregionjob.cpp:56
+#: ../../src/saveregionjob.cpp:57
 msgid "Saving %1 (%2%): %3"
 msgstr ""
 
-#: ../../src/saveregionjob.cpp:218 ../../src/saveregionjob.cpp:430
-#: ../../src/saveregionjob.cpp:593
+#: ../../src/saveregionjob.cpp:219 ../../src/saveregionjob.cpp:431
+#: ../../src/saveregionjob.cpp:594
 msgid "Saved %1 of %2 (%3%)."
 msgstr ""
 
-#: ../../src/saveregionjob.cpp:414
+#: ../../src/saveregionjob.cpp:415
 msgid ""
 "Region %1 could not be saved:\n"
 "\n"
 "%2"
 msgstr ""
 
-#: ../../src/saveregionjob.cpp:452
+#: ../../src/saveregionjob.cpp:453
 msgid "Ready to save %1. Click Continue to set the options."
 msgstr ""
 
-#: ../../src/saveregionjob.cpp:554
+#: ../../src/saveregionjob.cpp:555
 msgid "Ready to save %1 region(s). Click Continue to set the options."
 msgstr ""
 
-#: ../../src/saveregionjob.cpp:608
+#: ../../src/saveregionjob.cpp:609
 msgid ""
 "The file %1 could not be written:\n"
 "\n"
 "%2"
 msgstr ""
 
-#: ../../src/saveregionjob.cpp:649
+#: ../../src/saveregionjob.cpp:651
 msgid "Saving %1 region(s)..."
 msgstr ""
 
-#: ../../src/saveregionjob.cpp:658
+#: ../../src/saveregionjob.cpp:660
 msgid "Saving %1 region(s) (%2%)"
 msgstr ""
 
-#: ../../src/saveregionjob.cpp:667
+#: ../../src/saveregionjob.cpp:669
 msgid "Saving %1 region(s) (%2%): %3"
 msgstr ""
 
@@ -601,175 +633,6 @@ msgid ""
 "the formats the installed region modules support."
 msgstr ""
 
-#: ../../build/src/settings.cpp:39 rc.cpp:72
-msgid "Application Memory Limit"
-msgstr ""
-
-#: ../../build/src/settings.cpp:40 rc.cpp:75
-msgid "The limit memory(bytes) for application."
-msgstr ""
-
-#: ../../build/src/settings.cpp:64
-msgid "LimitUnit"
-msgstr ""
-
-#: ../../build/src/settings.cpp:67 rc.cpp:78
-msgid "Elapsed Milliseconds"
-msgstr ""
-
-#: ../../build/src/settings.cpp:68
-msgid ""
-"The elapsed milliseconds for the progress bar, if set too small will affect "
-"the speed."
-msgstr ""
-
-#: ../../build/src/settings.cpp:71 rc.cpp:81
-msgid "Select All Regions In Loading"
-msgstr ""
-
-#: ../../build/src/settings.cpp:72
-msgid "If you check this, all regions will be loaded in the loading progress."
-msgstr ""
-
-#: ../../build/src/settings.cpp:75 rc.cpp:84
-msgid "Loading File by File Extension"
-msgstr ""
-
-#: ../../build/src/settings.cpp:76
-msgid "If you check this, the file will be loaded by the file extension name."
-msgstr ""
-
-#: ../../build/src/settings.cpp:79 rc.cpp:87
-msgid "Retry Loading File when Failed"
-msgstr ""
-
-#: ../../build/src/settings.cpp:80
-msgid "When failed, the file will try to be loaded by other modules."
-msgstr ""
-
-#: ../../build/src/settings.cpp:83 rc.cpp:90
-msgid "Strict NBT Encoding Matching"
-msgstr ""
-
-#: ../../build/src/settings.cpp:84
-msgid ""
-"If you check this, a file is also decoded strictly with the NBT encoding "
-"declared by the plugin its suffix points at (region_nbt_encoding ()). A file "
-"in another encoding then fails to load instead of being read as the wrong "
-"one."
-msgstr ""
-
-#: ../../build/src/settings.cpp:87 rc.cpp:93
-msgid "Cache Directory"
-msgstr ""
-
-#: ../../build/src/settings.cpp:88 rc.cpp:96
-msgid "The directory to store cache files."
-msgstr ""
-
-#: ../../build/src/settings.cpp:91 rc.cpp:99
-msgid "Use Cached File when Downloading Failed"
-msgstr ""
-
-#: ../../build/src/settings.cpp:92 rc.cpp:102
-msgid "When downloading failed, use the cached file."
-msgstr ""
-
-#: ../../build/src/settings.cpp:97 rc.cpp:161 ../../region-rs/src/default.rs:58
-msgid "Converted"
-msgstr ""
-
-#: ../../build/src/settings.cpp:98 rc.cpp:105
-msgid "Region Base Name"
-msgstr ""
-
-#: ../../build/src/settings.cpp:99 rc.cpp:108
-msgid "The default base name for the region."
-msgstr ""
-
-#: ../../build/src/settings.cpp:101 rc.cpp:162
-#: ../../region-litematic-rs/src/output.rs:396
-#: ../../region-rs/src/default.rs:60
-msgid "Unnamed"
-msgstr ""
-
-#: ../../build/src/settings.cpp:102 rc.cpp:111 rc.cpp:247
-msgid "Region Name"
-msgstr ""
-
-#: ../../build/src/settings.cpp:103 rc.cpp:114
-msgid "The default name for the region."
-msgstr ""
-
-#: ../../build/src/settings.cpp:105 rc.cpp:163
-msgid "${file} - ${region}"
-msgstr ""
-
-#: ../../build/src/settings.cpp:107
-msgid ""
-"The display name used for a region that comes from a multi-region file. Use $"
-"{file} for the file name and ${region} for the region name inside the file."
-msgstr ""
-
-#: ../../build/src/settings.cpp:110 rc.cpp:120
-msgid "Sample File Name"
-msgstr ""
-
-#: ../../build/src/settings.cpp:111
-msgid ""
-"The sample file name used by the preview of the multi-region display name. "
-"It should not include a file extension."
-msgstr ""
-
-#: ../../build/src/settings.cpp:114 rc.cpp:123
-msgid "Sample Region Name"
-msgstr ""
-
-#: ../../build/src/settings.cpp:115
-msgid ""
-"The sample region name used by the preview of the multi-region display name."
-msgstr ""
-
-#: ../../build/src/settings.cpp:118 rc.cpp:126
-msgid "Region Description"
-msgstr ""
-
-#: ../../build/src/settings.cpp:119 rc.cpp:129
-msgid "The default description for the region."
-msgstr ""
-
-#: ../../build/src/settings.cpp:122 rc.cpp:132
-msgid "Region Author"
-msgstr ""
-
-#: ../../build/src/settings.cpp:123 rc.cpp:135
-msgid "The default author for the region."
-msgstr ""
-
-#: ../../build/src/settings.cpp:129 rc.cpp:138
-msgid "Override Settings"
-msgstr ""
-
-#: ../../build/src/settings.cpp:130 rc.cpp:141
-msgid "Whether to override setting or not."
-msgstr ""
-
-#: ../../build/src/settings.cpp:133 rc.cpp:144
-msgid "Override Version"
-msgstr ""
-
-#: ../../build/src/settings.cpp:134 rc.cpp:147
-msgid "The version to override in translation stage."
-msgstr ""
-
-#: ../../build/src/settings.cpp:153 rc.cpp:150
-msgid "Default Show Option"
-msgstr ""
-
-#: ../../build/src/settings.cpp:154 rc.cpp:153
-msgid "The default option of showing block information."
-msgstr ""
-
 #: rc.cpp:3
 msgid "Show Block Lists"
 msgstr ""
@@ -782,7 +645,7 @@ msgstr ""
 msgid "Search block name"
 msgstr ""
 
-#: rc.cpp:12 rc.cpp:184
+#: rc.cpp:12 rc.cpp:90
 msgid "&Close"
 msgstr ""
 
@@ -818,7 +681,7 @@ msgstr ""
 msgid "&List blocks"
 msgstr ""
 
-#: rc.cpp:54 rc.cpp:202
+#: rc.cpp:54 rc.cpp:108
 msgid "&Show blocks"
 msgstr ""
 
@@ -838,99 +701,99 @@ msgstr ""
 msgid "Modify &Block"
 msgstr ""
 
-#: rc.cpp:166
+#: rc.cpp:72
 msgid "Form"
 msgstr ""
 
-#: rc.cpp:169
+#: rc.cpp:75
 msgid "Type:"
 msgstr ""
 
-#: rc.cpp:172
+#: rc.cpp:78
 msgid "Key:"
 msgstr ""
 
-#: rc.cpp:175
+#: rc.cpp:81
 msgid "Value:"
 msgstr ""
 
-#: rc.cpp:178
+#: rc.cpp:84
 msgid "&Export"
 msgstr ""
 
-#: rc.cpp:181
+#: rc.cpp:87
 msgid "PushButton"
 msgstr ""
 
-#: rc.cpp:187
+#: rc.cpp:93
 msgid "PaletteAddUI"
 msgstr ""
 
-#: rc.cpp:193
+#: rc.cpp:99
 msgid "&Remove"
 msgstr ""
 
-#: rc.cpp:199
+#: rc.cpp:105
 msgid "PaletteListUI"
 msgstr ""
 
-#: rc.cpp:205
+#: rc.cpp:111
 msgid "Modify Property of Block(s)"
 msgstr ""
 
-#: rc.cpp:208
+#: rc.cpp:114
 msgid "Modify the property of the block in:"
 msgstr ""
 
-#: rc.cpp:211
+#: rc.cpp:117
 msgid "With the block that is the same property"
 msgstr ""
 
-#: rc.cpp:214
+#: rc.cpp:120
 msgid "Properties:"
 msgstr ""
 
-#: rc.cpp:217
+#: rc.cpp:123
 msgid "RegionModifyUI"
 msgstr ""
 
-#: rc.cpp:220
+#: rc.cpp:126
 msgid "Modify the infomation of the Region."
 msgstr ""
 
-#: rc.cpp:223
+#: rc.cpp:129
 msgid "Create Time"
 msgstr ""
 
-#: rc.cpp:226 rc.cpp:232
+#: rc.cpp:132 rc.cpp:138
 msgid "yyyy/MM/dd HH:mm:ss.zzz"
 msgstr ""
 
-#: rc.cpp:229
+#: rc.cpp:135
 msgid "Modify Time"
 msgstr ""
 
-#: rc.cpp:235
+#: rc.cpp:141
 msgid "Description"
 msgstr ""
 
-#: rc.cpp:238
+#: rc.cpp:144
 msgid "Offset"
 msgstr ""
 
-#: rc.cpp:241
+#: rc.cpp:147
 msgid "Author"
 msgstr ""
 
-#: rc.cpp:244
+#: rc.cpp:150
 msgid "Base Name"
 msgstr ""
 
-#: rc.cpp:250
+#: rc.cpp:156
 msgid "Data Version"
 msgstr ""
 
-#: rc.cpp:253
+#: rc.cpp:159
 msgid "Version"
 msgstr ""
 
@@ -948,6 +811,41 @@ msgstr ""
 
 #: ../../common-rs/src/util.rs:149
 msgid "Uncompress finish!"
+msgstr ""
+
+#: ../../dhlrc-core/src/config.rs:177 ../../region-rs/src/default.rs:58
+msgid "Converted"
+msgstr ""
+
+#: ../../dhlrc-core/src/config.rs:183
+#: ../../region-litematic-rs/src/output.rs:396
+#: ../../region-rs/src/default.rs:60
+msgid "Unnamed"
+msgstr ""
+
+#: ../../dhlrc-core/src/config.rs:189
+#, rust-format
+msgid "${file} - ${region}"
+msgstr ""
+
+#: ../../dhlrc-core/src/config.rs:296
+msgid "Configuration created"
+msgstr ""
+
+#: ../../dhlrc-core/src/config.rs:298
+#, rust-format
+msgid "A new configuration file was created at {}."
+msgstr ""
+
+#: ../../dhlrc-core/src/config.rs:306
+msgid "Configuration could not be read"
+msgstr ""
+
+#: ../../dhlrc-core/src/config.rs:309
+#, rust-format
+msgid ""
+"The configuration file could not be read ({}). It was moved aside and a new "
+"one with the default values was created at {}."
 msgstr ""
 
 #: ../../nbt-component/src/lib.rs:69
@@ -1115,18 +1013,6 @@ msgstr ""
 msgid "Getting Palette."
 msgstr ""
 
-#: ../../src/dhgameconfigui.h:15
-msgid "General"
-msgstr ""
-
-#: ../../src/dhgameconfigui.h:15
-msgid "Default"
-msgstr ""
-
-#: ../../src/dhgameconfigui.h:15
-msgid "Game"
-msgstr ""
-
-#: ../../src/dhconfigdialog/src/dhconfigdialog.cpp:72
+#: ../../src/dhsettingsdialog/dhsettingsdialog.cpp:24
 msgid "&Reload"
 msgstr ""

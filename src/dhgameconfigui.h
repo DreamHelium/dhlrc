@@ -2,8 +2,8 @@
 #define DHLRC_DHGAMECONFIGUI_H
 
 #include "dhcheckboxgroup.h"
-#include "dhconfigdialog/src/dhconfigdialog.h"
-#include "settings.h"
+#include "dhcore.h"
+#include "dhsettingsdialog/dhsettingsdialog.h"
 
 #include <KCoreConfigSkeleton>
 #include <QFormLayout>
@@ -14,18 +14,20 @@
 
 inline const char *groups[] = { N_ ("General"), N_ ("Default"), N_ ("Game") };
 
-class DhSetConfigAssistant : public DhHelpAssistant
+class DhSetConfigAssistant : public DhSettingsAssistant
 {
 public:
   void
   applyHelp () const override
   {
-    const char *realAuthor = DhConfig::author ().isEmpty ()
-                                 ? nullptr
-                                 : DhConfig::author ().toUtf8 ().constData ();
-    init_default_strings (realAuthor, DhConfig::baseName ().toUtf8 (),
-                          DhConfig::regionName ().toUtf8 (),
-                          DhConfig::description ().toUtf8 ());
+    const char *realAuthor
+        = DhCore::instance ()->config ().author.isEmpty ()
+              ? nullptr
+              : DhCore::instance ()->config ().author.toUtf8 ().constData ();
+    init_default_strings (
+        realAuthor, DhCore::instance ()->config ().baseName.toUtf8 (),
+        DhCore::instance ()->config ().regionName.toUtf8 (),
+        DhCore::instance ()->config ().description.toUtf8 ());
   }
 };
 

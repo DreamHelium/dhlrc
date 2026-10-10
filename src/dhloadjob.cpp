@@ -1,6 +1,7 @@
 #include "dhloadjob.h"
 #include "configobjectitems.h"
 #include "configobjectui.h"
+#include "dhcore.h"
 #include "pluginoptionsconfig.h"
 #include <QFuture>
 #include <libintl.h>
@@ -11,7 +12,6 @@
 #include "mainwindow.h"
 #include "manageregionui.h"
 #include "region.h"
-#include "settings.h"
 #include "utility.h"
 #undef asprintf
 #include <QTimer>
@@ -67,7 +67,7 @@ candidatesFor (const QString &filename, const QString &baseType)
 
   /* Only look at the suffix when the user asked for that; ignoring it is the
    * whole point of turning the option off. */
-  if (!DhConfig::loadingFileByExtension ())
+  if (!DhCore::instance ()->config ().loadingFileByExtension)
     {
       result.types = all;
       return result;
@@ -98,7 +98,7 @@ candidatesFor (const QString &filename, const QString &baseType)
    * after it failing is what the retry option decides. */
   result.matched = true;
   result.types << matchedType;
-  if (DhConfig::failThenRetry ())
+  if (DhCore::instance ()->config ().failThenRetry)
     {
       for (const auto &type : all)
         {
@@ -167,7 +167,7 @@ DhLoadJob::start ()
                      * not checked at all. */
                     ObjectLoadOptions strictOptions{ 0, ObjectEncodingAny };
                     const ObjectLoadOptions *options = nullptr;
-                    if (DhConfig::strictNbtEncoding ())
+                    if (DhCore::instance ()->config ().strictNbtEncoding)
                       {
                         if (auto *expected = moduleForSuffix (filename);
                             expected
@@ -374,7 +374,7 @@ DhLoadJob::loadMultiRegion (MultiModuleBase *multiBase, void *object,
         regionList.append (name);
       string_free (name);
     }
-  if (!DhConfig::selectAllRegionsInLoading ())
+  if (!DhCore::instance ()->config ().selectAllRegionsInLoading)
     {
 
       Q_EMIT infoMessage (this, _ ("Please click `Continue` to choose "
@@ -421,7 +421,8 @@ DhLoadJob::loadMultiRegion (MultiModuleBase *multiBase, void *object,
       /* GUI label for the region list, built from the configured pattern. If
        * it expands to nothing, fall back to a plain "file - region". */
       auto displayName = dh::expandRegionNamePattern (
-          DhConfig::multiRegionNamePattern (), fileBaseName, name);
+          DhCore::instance ()->config ().multiRegionNamePattern, fileBaseName,
+          name);
       if (displayName.trimmed ().isEmpty ())
         displayName = QStringLiteral ("%1 - %2").arg (fileBaseName).arg (name);
       string_free (rawName);

@@ -15,6 +15,9 @@
 
 #include "pluginoptionsconfig.h"
 
+class KMessageWidget;
+class DhSettingsDialog;
+
 class MainWindow : public QMainWindow
 {
   Q_OBJECT
@@ -47,6 +50,11 @@ private:
   QStandardItemModel *model;
   QAction *actionSearch;
   QVBoxLayout *topLayout;
+  /* Reused for the "configuration reloaded" message, so repeated edits do not
+   * pile up one widget per change. */
+  KMessageWidget *configMessage = nullptr;
+  /* Owned by Qt (parented to this); shown from the menu. */
+  DhSettingsDialog *settingsDialog = nullptr;
 
 public Q_SLOTS:
   void tryShrinkTopWidget ();
@@ -59,6 +67,8 @@ public Q_SLOTS:
    * caches it, so after a resize that height is wrong and the text is
    * squeezed. Both the row and the layout keep a hint, so both are dropped. */
   void refreshTopAreaRows ();
+  /* Shows a message that the core reloaded the configuration file. */
+  void onConfigChanged ();
 
 private:
   /* Height the visible rows need at the width the strip currently has.

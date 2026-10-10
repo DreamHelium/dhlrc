@@ -1,5 +1,5 @@
 #include "resourcegetter.h"
-#include "settings.h"
+#include "dhcore.h"
 #include <QCoroAsyncGenerator>
 #include <QCoroNetworkReply>
 #include <QCoroSignal>
@@ -40,9 +40,10 @@ Q_GLOBAL_STATIC (UrlMap, urlMap)
 static auto getDirectory = [] (const QString &childPath)
   {
     if (childPath.isEmpty ())
-      return DhConfig::cacheDirectory ();
+      return DhCore::instance ()->config ().cacheDirectory;
     else
-      return DhConfig::cacheDirectory () + QDir::separator () + childPath;
+      return DhCore::instance ()->config ().cacheDirectory + QDir::separator ()
+             + childPath;
   };
 
 DhDownloader::DhDownloader (QObject *object) : QObject (object) {}
@@ -153,7 +154,7 @@ DhDownloader::download (const QString &url, const QString &dest,
   if (reply->error ())
     {
       /* Use cache file, no error emitted. */
-      if (f.exists () && DhConfig::failDownloadUseCache ())
+      if (f.exists () && DhCore::instance ()->config ().failDownloadUseCache)
         co_return realDir;
       auto err = reply->errorString ();
       reply->deleteLater ();
@@ -193,7 +194,7 @@ DhDownloader::sourceNewer (const QString &url, const QString &dest)
   if (value.isEmpty ())
     {
       reply->deleteLater ();
-      if (DhConfig::failDownloadUseCache ())
+      if (DhCore::instance ()->config ().failDownloadUseCache)
         co_return false;
       else
         co_return true;

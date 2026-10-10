@@ -1,10 +1,10 @@
 #include "blockshowui.h"
 #include "blockreaderui.h"
+#include "dhcore.h"
 #include "nbtreaderui.h"
 #include "palettelistui.h"
 #include "region.h"
 #include "resourcegetter.h"
-#include "settings.h"
 #include "ui_blockshowui.h"
 #include <QProgressBar>
 #include <QProgressDialog>
@@ -169,7 +169,7 @@ BlockShowUI::updateUI ()
                 palette_str = trans_str;
               if (!modeSwitch)
                 {
-                  if (DhConfig::defaultShowOption () == 0)
+                  if (DhCore::instance ()->config ().defaultShowOption == 0)
                     {
                       model->setData (model->index (x, z), palette_num,
                                       Qt::DisplayRole);
@@ -186,7 +186,7 @@ BlockShowUI::updateUI ()
                 }
               else
                 {
-                  if (DhConfig::defaultShowOption () == 0)
+                  if (DhCore::instance ()->config ().defaultShowOption == 0)
                     {
                       model->setData (model->index (z, x), palette_num,
                                       Qt::DisplayRole);

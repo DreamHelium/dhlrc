@@ -81,14 +81,14 @@ const char* region_create_from_file_as_index(void *object, void **region,
 ```
 
 `region_num()` / `region_name_index()` feed the selection dialog unless
-`DhConfig::selectAllRegionsInLoading()` is enabled, in which case every index is used.
+`DhCore::instance()->config().selectAllRegionsInLoading` is enabled, in which case every index is used.
 
 `input_config` is the reading options resolved for the plugin the loader expected to win (see the table in
 [plugin.md](plugin.md#how-the-host-uses-them)); it is `nullptr` when a different plugin ends up reading the file, so
 the plugin must tolerate that and use its defaults.
 
 Each region that comes back is registered under a **display name** built from
-`DhConfig::multiRegionNamePattern()`, which uses named placeholders:
+`DhCore::instance()->config().multiRegionNamePattern`, which uses named placeholders:
 
 - `${file}` — the file name without its extension (`house` for `house.litematic`)
 - `${region}` — the region name reported by `region_name_index()`
@@ -98,7 +98,7 @@ The default is `${file} - ${region}`, so `house.litematic` holding a region call
 that is not one of the two above is left untouched, so a typo stays visible instead of silently producing a wrong
 name. The pattern can be changed under _Settings → Default → Multi-Region Display Name_ by pressing **Preview...**,
 which opens a dialog with a live preview, a description of the placeholders, buttons to insert them, and two editable
-sample values (`NamePatternSampleFile` / `NamePatternSampleRegion`, default `house` and `main`) so the preview can be
+sample values (`namePatternSampleFile` / `namePatternSampleRegion`, default `house` and `main`) so the preview can be
 checked against a realistic name. An empty pattern falls back to `${file} - ${region}`.
 
 The display name is only the label used in the region list. The region's own name — the `name` field of its base data,
@@ -116,10 +116,10 @@ immediately after creation.
 ## Choosing which plugin to try
 
 The loader collects the modules whose `baseType()` matches the object codec that succeeded, then decides the order
-using `DhConfig`:
+using `DhCore::instance()->config()`:
 
-- `loadingFileByExtension()` matches the file suffix against each module's `fileSuffix()`.
-- `failThenRetry()` decides whether to fall back to the remaining candidates after the preferred one fails.
+- `loadingFileByExtension` matches the file suffix against each module's `fileSuffix()`.
+- `failThenRetry` decides whether to fall back to the remaining candidates after the preferred one fails.
 
 `HelperStruct` (progress callback, cancel flag, elapsed time, memory limit) is shared by all of these calls and is
 created once per job with `helper_struct_new()`.

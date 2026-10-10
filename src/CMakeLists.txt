@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.17)
 
 project(dhlrc_qt LANGUAGES CXX)
 
-add_subdirectory(dhconfigdialog)
+add_subdirectory(dhsettingsdialog)
 
 find_package(Intl)
 
@@ -84,6 +84,7 @@ set(TEMP_PROJECT_SOURCES
         resourcegetter.h
         resourcegetter.cpp
         dhwidget.h dhwidget.cpp
+        dhcore.h dhcore.cpp
 )
 
 if(DH_ENABLE_DEBUG)
@@ -120,17 +121,16 @@ endif ()
 
 target_link_libraries(dhlrc_qt PRIVATE Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::Svg
  KF6::ColorScheme QCoro::Core QCoro::Network
- KF6::ConfigWidgets KF6::I18n KF6::I18nLocaleData region_rs Qt6::Concurrent ${Intl_LIBRARIES}
- dhconfigdialog KF6::WidgetsAddons KF6::CoreAddons KF6::IconThemes)
+ KF6::ConfigWidgets KF6::I18n KF6::I18nLocaleData region_rs dhlrc_core Qt6::Concurrent ${Intl_LIBRARIES}
+ dhsettingsdialog KF6::WidgetsAddons KF6::CoreAddons KF6::IconThemes)
 target_link_directories(dhlrc_qt PRIVATE ${CMAKE_BINARY_DIR})
 target_include_directories(dhlrc_qt PUBLIC
         "${CMAKE_CURRENT_BINARY_DIR}"
         "${CMAKE_CURRENT_SOURCE_DIR}"
+        "${CMAKE_SOURCE_DIR}/dhlrc-core/include"
 )
 
 add_dependencies(dhlrc_qt dhlrc_cargo_build)
-
-kconfig_add_kcfg_files(dhlrc_qt config/settings.kcfgc)
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
 # If you are developing for iOS or macOS you should consider setting an

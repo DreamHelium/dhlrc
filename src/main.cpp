@@ -1,3 +1,4 @@
+#include "dhcore.h"
 #include "mainwindow.h"
 #include "utility.h"
 #include "version.h"
@@ -49,6 +50,10 @@ main (int argc, char *argv[])
   parser.process (a);
 
   QApplication::setStyle ("breeze");
+
+  /* Opens the configuration and starts watching it; the notifications it
+   * produces are shown once the window exists. */
+  DhCore::init (&a);
 
   MainWindow w;
   w.show ();
