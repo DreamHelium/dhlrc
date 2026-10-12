@@ -5,9 +5,7 @@
 #include "dhwidget.h"
 #include "manageregionui.h"
 #include "resourcegetter.h"
-#include <KConfigDialog>
 #include <kcolorschememenu.h>
-#include <kcoreconfigskeleton.h>
 #include <kicontheme.h>
 #include <libintl.h>
 #include <memory>
@@ -42,6 +40,7 @@
 #include "utility.h"
 #include <QComboBox>
 #include <QDesktopServices>
+#include <QGuiApplication>
 #include <QLineEdit>
 #include <QResizeEvent>
 #include <QScrollBar>
@@ -79,7 +78,10 @@ public:
     valueEdit = new QLineEdit ();
     row->addWidget (valueEdit);
     unitCombo = new QComboBox ();
-    unitCombo->addItems ({ "GiB", "MiB", "KiB", "Bytes" });
+    /* The choices come from the `LimitUnit` item the core describes, so they
+     * are not repeated here. */
+    if (auto *unitItem = dialog->item (QStringLiteral ("LimitUnit")))
+      unitCombo->addItems (unitItem->choices ());
     row->addWidget (unitCombo);
     layout->addLayout (row);
 
@@ -218,90 +220,65 @@ findItem (DhSettingsDialog *dialog, const QString &key)
   return dialog ? dialog->item (key) : nullptr;
 }
 void
-setIntItem (DhSettingsDialog *dialog, const QString &key, int value)
-{
-  if (auto *i = findItem (dialog, key))
-    i->setProperty (value);
-}
-void
 setBoolItem (DhSettingsDialog *dialog, const QString &key, bool value)
 {
   if (auto *i = findItem (dialog, key))
     i->setProperty (value);
 }
-void
-setStringItem (DhSettingsDialog *dialog, const QString &key,
-               const QString &value)
+
+/* The control a `DHLRC_SETTING_*` value names. The order matches
+ * `DhSettingItem::Type`, but the mapping is spelled out so a change to either
+ * side cannot silently reorder the other. */
+DhSettingItem::Type
+itemType (int type)
 {
-  if (auto *i = findItem (dialog, key))
-    i->setProperty (value);
+  switch (type)
+    {
+    case DHLRC_SETTING_INT:
+      return DhSettingItem::Type::Int;
+    case DHLRC_SETTING_STRING:
+      return DhSettingItem::Type::String;
+    case DHLRC_SETTING_PATH:
+      return DhSettingItem::Type::Path;
+    case DHLRC_SETTING_ENUM:
+      return DhSettingItem::Type::Enum;
+    case DHLRC_SETTING_BOOL:
+    default:
+      return DhSettingItem::Type::Bool;
+    }
 }
 
-/* Puts the core's scalar values into the dialog's items. */
-void
-fillDialogFromData (DhSettingsDialog *dialog, const DhConfigData &data)
+/* A setting's text as the item holding it wants it. */
+QVariant
+itemValue (int type, const QString &text)
 {
-  setIntItem (dialog, "MemoryLimit", static_cast<int> (data.memoryLimit));
-  setIntItem (dialog, "LimitUnit", data.limitUnit);
-  setIntItem (dialog, "ElapsedMilliseconds",
-              static_cast<int> (data.elapsedMilliseconds));
-  setBoolItem (dialog, "SelectAllRegionsInLoading",
-               data.selectAllRegionsInLoading);
-  setBoolItem (dialog, "LoadingFileByExtension", data.loadingFileByExtension);
-  setBoolItem (dialog, "FailThenRetry", data.failThenRetry);
-  setBoolItem (dialog, "StrictNbtEncoding", data.strictNbtEncoding);
-  setBoolItem (dialog, "FailDownloadUseCache", data.failDownloadUseCache);
-  setStringItem (dialog, "CacheDirectory", data.cacheDirectory);
-  setStringItem (dialog, "BaseName", data.baseName);
-  setStringItem (dialog, "RegionName", data.regionName);
-  setStringItem (dialog, "MultiRegionNamePattern",
-                 data.multiRegionNamePattern);
-  setStringItem (dialog, "Description", data.description);
-  setStringItem (dialog, "Author", data.author);
-  setBoolItem (dialog, "OverrideSetting", data.overrideSetting);
-  setStringItem (dialog, "OverrideVersion", data.overrideVersion);
-  setIntItem (dialog, "DefaultShowOption", data.defaultShowOption);
+  switch (itemType (type))
+    {
+    case DhSettingItem::Type::Bool:
+      return text == QLatin1String ("true");
+    case DhSettingItem::Type::Int:
+    case DhSettingItem::Type::Enum:
+      return text.toInt ();
+    default:
+      return text;
+    }
 }
 
-/* Reads the dialog's scalar items back into `data`. */
-DhConfigData
-dataFromDialog (DhSettingsDialog *dialog, DhConfigData data)
+/* The reverse of `itemValue`: an item's value as text. */
+QString
+itemText (DhSettingItem *item)
 {
-  if (auto *i = findItem (dialog, "MemoryLimit"))
-    data.memoryLimit = i->toInt ();
-  if (auto *i = findItem (dialog, "LimitUnit"))
-    data.limitUnit = i->toInt ();
-  if (auto *i = findItem (dialog, "ElapsedMilliseconds"))
-    data.elapsedMilliseconds = i->toInt ();
-  if (auto *i = findItem (dialog, "SelectAllRegionsInLoading"))
-    data.selectAllRegionsInLoading = i->toBool ();
-  if (auto *i = findItem (dialog, "LoadingFileByExtension"))
-    data.loadingFileByExtension = i->toBool ();
-  if (auto *i = findItem (dialog, "FailThenRetry"))
-    data.failThenRetry = i->toBool ();
-  if (auto *i = findItem (dialog, "StrictNbtEncoding"))
-    data.strictNbtEncoding = i->toBool ();
-  if (auto *i = findItem (dialog, "FailDownloadUseCache"))
-    data.failDownloadUseCache = i->toBool ();
-  if (auto *i = findItem (dialog, "CacheDirectory"))
-    data.cacheDirectory = i->toString ();
-  if (auto *i = findItem (dialog, "BaseName"))
-    data.baseName = i->toString ();
-  if (auto *i = findItem (dialog, "RegionName"))
-    data.regionName = i->toString ();
-  if (auto *i = findItem (dialog, "MultiRegionNamePattern"))
-    data.multiRegionNamePattern = i->toString ();
-  if (auto *i = findItem (dialog, "Description"))
-    data.description = i->toString ();
-  if (auto *i = findItem (dialog, "Author"))
-    data.author = i->toString ();
-  if (auto *i = findItem (dialog, "OverrideSetting"))
-    data.overrideSetting = i->toBool ();
-  if (auto *i = findItem (dialog, "OverrideVersion"))
-    data.overrideVersion = i->toString ();
-  if (auto *i = findItem (dialog, "DefaultShowOption"))
-    data.defaultShowOption = i->toInt ();
-  return data;
+  switch (item->type ())
+    {
+    case DhSettingItem::Type::Bool:
+      return item->toBool () ? QStringLiteral ("true")
+                             : QStringLiteral ("false");
+    case DhSettingItem::Type::Int:
+    case DhSettingItem::Type::Enum:
+      return QString::number (item->toInt ());
+    default:
+      return item->toString ();
+    }
 }
 
 /* Puts the plugin options the core holds into the dialog's items. */
@@ -370,6 +347,34 @@ dataFromPlugins (DhSettingsDialog *dialog)
             }
         }
     }
+}
+
+/* Puts the core's current scalar settings into the dialog's items. */
+void
+fillDialogFromSettings (DhSettingsDialog *dialog)
+{
+  auto *core = DhCore::instance ();
+  if (!core)
+    return;
+  for (const auto &info : DhCore::settings ())
+    if (auto *item = findItem (dialog, info.key))
+      item->setProperty (itemValue (info.type, core->settingValue (info.key)));
+}
+
+/* Reads the dialog's scalar items back into the core and persists them,
+ * followed by the plugin options. */
+void
+applySettingsFromDialog (DhSettingsDialog *dialog)
+{
+  auto *core = DhCore::instance ();
+  if (!core)
+    return;
+  for (const auto &info : DhCore::settings ())
+    if (auto *item = findItem (dialog, info.key))
+      core->setSettingValue (info.key, itemText (item));
+  dataFromPlugins (dialog);
+  core->save ();
+  core->refresh ();
 }
 
 MainWindow::MainWindow (QWidget *parent) : QMainWindow (parent)
@@ -485,90 +490,54 @@ MainWindow::MainWindow (QWidget *parent) : QMainWindow (parent)
   PluginOptionsConfig::init ();
 
   auto *core = DhCore::instance ();
-  const DhConfigData data = core ? core->config () : DhConfigData{};
 
   settingsDialog = new DhSettingsDialog (this);
   settingsDialog->setPathText (core ? core->configPath () : QString ());
 
-  auto addBool = [this] (const QString &key, const QString &label, bool value)
+  /* One item per setting the core describes, so adding a setting is one entry
+   * in the core's schema rather than code here. Only the two controls that
+   * have to work together (the memory value and its unit) get a creator of
+   * their own; every other item uses the dialog's per-`Type` template. */
+  const QVector<DhCore::SettingInfo> settings = DhCore::settings ();
+  QString currentGroup;
+  for (const auto &info : settings)
     {
-      auto *item = new DhSettingItem (key, DhSettingItem::Type::Bool, value);
-      item->setLabel (label);
-      settingsDialog->addItem (item, {});
-    };
-  auto addInt = [this] (const QString &key, const QString &label, int value)
-    {
-      auto *item = new DhSettingItem (key, DhSettingItem::Type::Int, value);
-      item->setLabel (label);
-      settingsDialog->addItem (item, {});
-    };
-  auto addString
-      = [this] (const QString &key, const QString &label, const QString &value)
-    {
-      auto *item = new DhSettingItem (key, DhSettingItem::Type::String, value);
-      item->setLabel (label);
-      settingsDialog->addItem (item, {});
-    };
-  auto addEnum = [this] (const QString &key, const QString &label, int value,
-                         const QStringList &choices)
-    {
-      auto *item = new DhSettingItem (key, DhSettingItem::Type::Enum, value);
-      item->setLabel (label);
-      item->setChoices (choices);
-      settingsDialog->addItem (item, {});
-    };
+      if (info.group != currentGroup)
+        {
+          settingsDialog->addGroup (_ (info.group.toUtf8 ()));
+          currentGroup = info.group;
+        }
 
-  settingsDialog->addGroup (_ ("General"));
-  {
-    auto *memory = new DhSettingItem ("MemoryLimit", DhSettingItem::Type::Int,
-                                      static_cast<int> (data.memoryLimit));
-    memory->setLabel (_ ("Application Memory Limit"));
-    settingsDialog->addItem (
-        memory, [] (DhSettingItem *i, QVBoxLayout *l, DhSettingsDialog *d)
-          { return std::make_unique<DhMemorySettingTemplate> (i, l, d); });
-    auto *unit = new DhSettingItem ("LimitUnit", DhSettingItem::Type::Enum,
-                                    data.limitUnit);
-    unit->setChoices ({ "GiB", "MiB", "KiB", "Bytes" });
-    settingsDialog->addItem (
-        unit, [] (DhSettingItem *i, QVBoxLayout *l, DhSettingsDialog *d)
-          { return std::make_unique<DhNullSettingTemplate> (i, l, d); });
-  }
-  addInt ("ElapsedMilliseconds", _ ("Elapsed Milliseconds"),
-          static_cast<int> (data.elapsedMilliseconds));
-  addBool ("SelectAllRegionsInLoading", _ ("Select All Regions In Loading"),
-           data.selectAllRegionsInLoading);
-  addBool ("LoadingFileByExtension", _ ("Loading File by File Extension"),
-           data.loadingFileByExtension);
-  addBool ("FailThenRetry", _ ("Retry Loading File when Failed"),
-           data.failThenRetry);
-  addBool ("StrictNbtEncoding", _ ("Strict NBT Encoding Matching"),
-           data.strictNbtEncoding);
-  addBool ("FailDownloadUseCache",
-           _ ("Use Cached File when Downloading Failed"),
-           data.failDownloadUseCache);
-  {
-    auto *item = new DhSettingItem (
-        "CacheDirectory", DhSettingItem::Type::Path, data.cacheDirectory);
-    item->setLabel (_ ("Cache Directory"));
-    settingsDialog->addItem (item, {});
-  }
+      const QString value = core ? core->settingValue (info.key) : QString ();
+      auto *item = new DhSettingItem (info.key, itemType (info.type),
+                                      itemValue (info.type, value));
+      item->setLabel (_ (info.label.toUtf8 ()));
+      if (!info.tooltip.isEmpty ())
+        item->setToolTip (_ (info.tooltip.toUtf8 ()));
+      if (!info.choices.isEmpty ())
+        {
+          QStringList choices;
+          for (const auto &choice : info.choices)
+            choices.append (_ (choice.toUtf8 ()));
+          item->setChoices (choices);
+        }
+      item->setDefault (
+          itemValue (info.type, _ (info.defaultValue.toUtf8 ())));
+      if (info.longText)
+        settingsDialog->addLongTextItems (info.key);
 
-  settingsDialog->addGroup (_ ("Default"));
-  addString ("BaseName", _ ("Region Base Name"), data.baseName);
-  addString ("RegionName", _ ("Region Name"), data.regionName);
-  addString ("MultiRegionNamePattern", _ ("Multi-Region Display Name"),
-             data.multiRegionNamePattern);
-  addString ("Description", _ ("Region Description"), data.description);
-  addString ("Author", _ ("Region Author"), data.author);
+      DhSettingsTemplateCreator creator;
+      if (info.key == QLatin1String ("MemoryLimit"))
+        creator = [] (DhSettingItem *i, QVBoxLayout *l, DhSettingsDialog *d)
+          { return std::make_unique<DhMemorySettingTemplate> (i, l, d); };
+      else if (info.key == QLatin1String ("LimitUnit"))
+        creator = [] (DhSettingItem *i, QVBoxLayout *l, DhSettingsDialog *d)
+          { return std::make_unique<DhNullSettingTemplate> (i, l, d); };
+      settingsDialog->addItem (item, creator);
+    }
 
-  settingsDialog->addGroup (_ ("Game"));
-  addBool ("OverrideSetting", _ ("Override Settings"), data.overrideSetting);
-  addString ("OverrideVersion", _ ("Override Version"), data.overrideVersion);
-
-  settingsDialog->addGroup (_ ("Reader"));
-  addEnum ("DefaultShowOption", _ ("Default Show Option"),
-           data.defaultShowOption, { _ ("Palette"), _ ("Name") });
-
+  /* The plugin options are discovered at run time, so they are added here
+   * rather than described by the core's schema. */
   settingsDialog->addGroup (_ ("Manage"));
   {
     auto *plugins = PluginOptionsConfig::instance ();
@@ -582,51 +551,43 @@ MainWindow::MainWindow (QWidget *parent) : QMainWindow (parent)
             const QString direction = kind == ConfigObjectItems::Kind::Input
                                           ? _ ("reading")
                                           : _ ("writing");
-            addBool (pluginUseKey (plugin.type, kind),
-                     QString (_ ("Use saved options for %1 (%2) instead of "
-                                 "asking"))
-                         .arg (plugin.type, direction),
-                     plugins->useConfigured (plugin.type, kind));
+            auto *useItem = new DhSettingItem (
+                pluginUseKey (plugin.type, kind), DhSettingItem::Type::Bool,
+                plugins->useConfigured (plugin.type, kind));
+            useItem->setLabel (
+                QString (_ ("Use saved options for %1 (%2) instead of asking"))
+                    .arg (plugin.type, direction));
+            settingsDialog->addItem (useItem, {});
+
             const auto &options = kind == ConfigObjectItems::Kind::Input
                                       ? plugin.input
                                       : plugin.output;
             for (const auto &option : options)
               {
-                const QVariant value
-                    = plugins->optionValue (plugin.type, kind, option);
-                if (option.type == ConfigObjectItems::Option::Type::Bool)
-                  addBool (pluginOptionKey (plugin.type, kind, option.key),
-                           option.label, value.toBool ());
-                else
-                  addInt (pluginOptionKey (plugin.type, kind, option.key),
-                          option.label, value.toInt ());
+                const bool isBool
+                    = option.type == ConfigObjectItems::Option::Type::Bool;
+                auto *optionItem = new DhSettingItem (
+                    pluginOptionKey (plugin.type, kind, option.key),
+                    isBool ? DhSettingItem::Type::Bool
+                           : DhSettingItem::Type::Int,
+                    plugins->optionValue (plugin.type, kind, option));
+                optionItem->setLabel (option.label);
+                settingsDialog->addItem (optionItem, {});
               }
           }
       }
   }
 
   settingsDialog->addAssistant (std::make_unique<DhSetConfigAssistant> ());
-  settingsDialog->addLongTextItems ("Description");
   settingsDialog->setReloadHandler (
       [this]
         {
-          if (auto *c = DhCore::instance ())
-            {
-              fillDialogFromData (settingsDialog, c->config ());
-              fillDialogFromPlugins (settingsDialog);
-            }
+          fillDialogFromSettings (settingsDialog);
+          fillDialogFromPlugins (settingsDialog);
         });
 
   connect (settingsDialog, &DhSettingsDialog::saved, this,
-           [this]
-             {
-               auto *c = DhCore::instance ();
-               if (!c)
-                 return;
-               c->applyAndSave (dataFromDialog (settingsDialog, c->config ()));
-               dataFromPlugins (settingsDialog);
-               c->save ();
-             });
+           [this] { applySettingsFromDialog (settingsDialog); });
 
   connect (lineEdit, &QLineEdit::textChanged, this,
            [&] (const QString &pattern)
@@ -716,24 +677,62 @@ MainWindow::MainWindow (QWidget *parent) : QMainWindow (parent)
    * had to say, and follow later changes. */
   if (auto *core = DhCore::instance ())
     {
-      auto showCoreMessage
-          = [] (int level, const QString &title, const QString &text)
-        {
-          auto *message = new KMessageWidget ();
-          message->setText (title.isEmpty ()
-                                ? text
-                                : QStringLiteral ("%1: %2").arg (title, text));
-          message->setMessageType (level >= 2   ? KMessageWidget::Error
-                                   : level == 1 ? KMessageWidget::Warning
-                                                : KMessageWidget::Information);
-          message->setCloseButtonVisible (true);
-          MainWindow::addWidgetToTopArea (message);
-        };
       for (const auto &note : core->takePendingNotifications ())
-        showCoreMessage (note.level, note.title, note.text);
+        showNotification (note.level, note.eventId, note.title, note.text);
       connect (core, &DhCore::configChanged, this,
                &MainWindow::onConfigChanged);
+      /* Keep the core's desktop notifications in step with this window's
+       * active state and the setting that governs them. */
+      connect (qApp, &QGuiApplication::applicationStateChanged, this,
+               [this] (Qt::ApplicationState) { updateNotificationGate (); });
+      updateNotificationGate ();
     }
+}
+
+void
+MainWindow::showNotification (int level, const QString &eventId,
+                              const QString &title, const QString &text)
+{
+  KMessageWidget *message = nullptr;
+  if (!eventId.isEmpty ())
+    message = notificationWidgets.value (eventId, nullptr);
+  if (!message)
+    {
+      message = new KMessageWidget ();
+      message->setCloseButtonVisible (true);
+      MainWindow::addWidgetToTopArea (message);
+      if (!eventId.isEmpty ())
+        notificationWidgets.insert (eventId, message);
+    }
+  message->setText (
+      title.isEmpty () ? text : QStringLiteral ("%1: %2").arg (title, text));
+  message->setMessageType (level >= 2   ? KMessageWidget::Error
+                           : level == 1 ? KMessageWidget::Warning
+                                        : KMessageWidget::Information);
+  message->setVisible (true);
+
+  /* Disappear again on its own, like the desktop notification does. */
+  auto *core = DhCore::instance ();
+  const int timeout
+      = core ? core->settingValue (QStringLiteral ("NotificationTimeout"))
+                   .toInt ()
+             : 0;
+  if (timeout > 0)
+    QTimer::singleShot (timeout, message, &KMessageWidget::animatedHide);
+}
+
+void
+MainWindow::updateNotificationGate ()
+{
+  auto *core = DhCore::instance ();
+  if (!core)
+    return;
+  const bool suppress
+      = core->settingValue (QStringLiteral ("SuppressWhenActive"))
+        == QLatin1String ("true");
+  const bool active
+      = QGuiApplication::applicationState () == Qt::ApplicationActive;
+  core->setNotificationsEnabled (!(suppress && active));
 }
 
 void
@@ -741,23 +740,19 @@ MainWindow::onConfigChanged ()
 {
   auto *core = DhCore::instance ();
   /* The core reloaded the file; make the dialog (and so every reader) see the
-   * new values. */
+   * new values, then show whatever it reported. */
   if (core && settingsDialog)
     {
-      fillDialogFromData (settingsDialog, core->config ());
+      fillDialogFromSettings (settingsDialog);
       fillDialogFromPlugins (settingsDialog);
       settingsDialog->refresh ();
     }
-  if (!configMessage)
-    {
-      configMessage = new KMessageWidget ();
-      configMessage->setMessageType (KMessageWidget::Information);
-      configMessage->setCloseButtonVisible (true);
-      MainWindow::addWidgetToTopArea (configMessage);
-    }
-  configMessage->setText (QString (_ ("Configuration reloaded from %1"))
-                              .arg (core ? core->configPath () : QString ()));
-  configMessage->setVisible (true);
+  if (!core)
+    return;
+  for (const auto &note : core->takePendingNotifications ())
+    showNotification (note.level, note.eventId, note.title, note.text);
+  /* The setting that governs the desktop notifications may have changed. */
+  updateNotificationGate ();
 }
 
 MainWindow::~MainWindow ()

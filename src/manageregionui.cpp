@@ -1,13 +1,13 @@
 #include "manageregionui.h"
 #include "configobjectitems.h"
 #include "configobjectui.h"
+#include "dhcore.h"
 #include "dhloadjob.h"
 #include "generalchoosedialog.h"
 #include "pluginoptionsconfig.h"
 #include "region.h"
 #include "saveregionjob.h"
 #include "utility.h"
-#include <QApplication>
 #include <QCheckBox>
 #include <QDateTime>
 #include <QFileDialog>
@@ -26,8 +26,6 @@
 #include <qcoreapplication.h>
 #include <qevent.h>
 #include <qglobalstatic.h>
-#include <qguiapplication.h>
-#include <qlibrary.h>
 #include <qmimedata.h>
 #include <stdexcept>
 
@@ -60,67 +58,28 @@ ModuleBase::multi ()
 void
 ModuleBase::initialize ()
 {
-  using GetNameFn = ModuleBase::GetNameFunc;
-  auto resolveName = [this] (const char *symbol) -> std::optional<QString>
+  if (!module.isValid ())
     {
-      auto fn = reinterpret_cast<GetNameFn> (module->resolve (symbol));
-      if (!fn)
-        return std::nullopt;
-      auto *name = fn ();
-      if (!name)
-        return std::nullopt;
-      QString result = QString::fromUtf8 (name);
-      string_free (name);
-      return result;
-    };
-
-  auto type = resolveName ("region_type");
-  if (!type)
-    {
-      error = QStringLiteral ("region_type () is missing or returned null");
+      error = QStringLiteral ("the module could not be opened");
       return;
     }
-  typeString = *type;
-  if (auto suffix = resolveName ("region_file_suffix"))
-    fileSuffixString = *suffix;
-  if (auto base = resolveName ("region_base_type"))
-    baseTypeString = *base;
-  if (auto fileType = resolveName ("region_file_type"))
-    filterString = *fileType;
-
-  /* Optional: the encoding the format requires. Anything that is not one of
-   * the known values is treated as "any", so a broken plugin cannot pin
-   * decoding to an encoding the codec would not recognise. */
-  if (auto *encodingFn = reinterpret_cast<ModuleBase::EncodingFunc> (
-          module->resolve ("region_nbt_encoding")))
-    {
-      auto value = encodingFn ();
-      if (value != ObjectEncodingBigEndian
-          && value != ObjectEncodingLittleEndian
-          && value != ObjectEncodingNetworkLittleEndian)
-        value = ObjectEncodingAny;
-      encodingValue = value;
-    }
-
-  auto isMultiFn
-      = reinterpret_cast<IsMultiFunc> (module->resolve ("region_is_multi"));
 
   if (multiMode)
     {
       auto *multiBase = asMulti ();
       multiBase->multiSaveFunc = reinterpret_cast<MultiTransFunc> (
-          module->resolve ("region_save_into_multi"));
+          module.resolve ("region_save_into_multi"));
       /* Optional: a multi-region format may still be able to write one region
        * to its own file, which is what lets a single selected region be saved.
        */
-      multiBase->saveFunc = reinterpret_cast<SingleTransFunc> (
-          module->resolve ("region_save"));
+      multiBase->saveFunc
+          = reinterpret_cast<SingleTransFunc> (module.resolve ("region_save"));
       multiBase->numFunc = reinterpret_cast<MultiModuleBase::NumFunc> (
-          module->resolve ("region_num"));
+          module.resolve ("region_num"));
       multiBase->nameFunc = reinterpret_cast<MultiModuleBase::NameFunc> (
-          module->resolve ("region_name_index"));
+          module.resolve ("region_name_index"));
       multiBase->loadFunc = reinterpret_cast<MultiModuleBase::LoadFunc> (
-          module->resolve ("region_create_from_file_as_index"));
+          module.resolve ("region_create_from_file_as_index"));
       if (!multiBase->numFunc || !multiBase->nameFunc || !multiBase->loadFunc)
         {
           error = QStringLiteral ("incomplete multi-region module");
@@ -130,10 +89,10 @@ ModuleBase::initialize ()
   else
     {
       auto *singleBase = asSingle ();
-      singleBase->saveFunc = reinterpret_cast<SingleTransFunc> (
-          module->resolve ("region_save"));
+      singleBase->saveFunc
+          = reinterpret_cast<SingleTransFunc> (module.resolve ("region_save"));
       singleBase->loadFunc = reinterpret_cast<SingleModuleBase::LoadFunc> (
-          module->resolve ("region_create_from_file"));
+          module.resolve ("region_create_from_file"));
       if (!singleBase->loadFunc)
         {
           error = QStringLiteral ("region_create_from_file () is missing");
@@ -141,30 +100,39 @@ ModuleBase::initialize ()
         }
     }
 
-  /* `region_is_multi` is optional; when present it must agree with the class
-   * we were asked to build, otherwise the plugin lies about its capability. */
-  if (isMultiFn && ((isMultiFn () != 0) != multiMode))
-    {
-      error = QStringLiteral ("region_is_multi () disagrees with the expected "
-                              "module kind");
-      return;
-    }
-
   valid = true;
 }
 
 std::unique_ptr<ModuleBase>
-ModuleBase::fromLibrary (std::unique_ptr<QLibrary> library)
+ModuleBase::fromIndex (std::size_t index)
 {
-  auto isMultiFn
-      = reinterpret_cast<IsMultiFunc> (library->resolve ("region_is_multi"));
-  bool multiMode = isMultiFn && isMultiFn () != 0;
-
-  std::unique_ptr<ModuleBase> module
-      = multiMode ? std::unique_ptr<ModuleBase> (new MultiModuleBase)
-                  : std::unique_ptr<ModuleBase> (new SingleModuleBase);
-  module->multiMode = multiMode;
-  module->module = std::move (library);
+  std::unique_ptr<ModuleBase> module;
+  auto *core = DhCore::instance ();
+  DhlrcModuleInfo info{};
+  if (core
+      && dhlrc_core_region_module_info (core->handle (), index, &info) == 0
+      && info.type_name)
+    {
+      /* The core has already read the module's metadata (type, suffix, base
+       * type, filter, kind, encoding) and normalised the encoding. */
+      const bool multi = info.is_multi != 0;
+      module = multi ? std::unique_ptr<ModuleBase> (new MultiModuleBase)
+                     : std::unique_ptr<ModuleBase> (new SingleModuleBase);
+      module->multiMode = multi;
+      module->module = ModuleLibrary::region (core->handle (), index);
+      auto text = [] (const char *value)
+        { return value ? QString::fromUtf8 (value) : QString (); };
+      module->typeString = text (info.type_name);
+      module->fileSuffixString = text (info.file_suffix);
+      module->baseTypeString = text (info.base_type);
+      module->filterString = text (info.filter);
+      module->encodingValue = info.encoding;
+    }
+  else
+    {
+      module = std::unique_ptr<ModuleBase> (new SingleModuleBase);
+      module->error = QStringLiteral ("the region module could not be read");
+    }
   module->initialize ();
   return module;
 }
@@ -285,36 +253,34 @@ ManageRegionUI::ManageRegionUI (QWidget *parent) : DhWidget (parent)
 void
 ManageRegionUI::loadModules ()
 {
-  auto moduleDir = QApplication::applicationDirPath ();
-  moduleDir += QDir::separator ();
-  moduleDir += "region_module";
-
-  auto moduleList = QDir (moduleDir).entryList (QDir::Files);
-
-  /* The object codecs live in `load_module/` and are loaded the same way as
-   * the region plugins: scan the directory and keep whatever validates. They
-   * are shared by every plugin, so the list is built once and kept for the
-   * lifetime of the application. */
-  auto loadDir = QApplication::applicationDirPath ();
-  loadDir += QDir::separator ();
-  loadDir += "load_module";
-  loadObjectList = loadObjectModules (loadDir);
-
-  for (const auto &module : moduleList)
+  auto *core = DhCore::instance ();
+  if (!core)
     {
-      QString realDir = moduleDir + QDir::separator () + module;
-      auto library = std::make_unique<QLibrary> (realDir);
-      if (!library->load ())
-        {
-          qWarning () << "Failed to load region module" << realDir << ":"
-                      << library->errorString ();
-          continue;
-        }
+      qWarning () << "The core is not open; no modules were loaded.";
+      return;
+    }
 
-      auto moduleBase = ModuleBase::fromLibrary (std::move (library));
+  /* The core opens `region_module/` and `load_module/` (next to the
+   * executable) and reads every module's metadata, dropping the ones that will
+   * not open or are incomplete. What is left is worth wrapping. */
+  char *error = nullptr;
+  if (dhlrc_core_load_modules (core->handle (), &error) != 0)
+    {
+      qWarning () << "Failed to load the modules:"
+                  << (error ? error : "unknown error");
+      if (error)
+        dhlrc_string_free (error);
+      return;
+    }
+
+  const std::size_t regionCount
+      = dhlrc_core_region_module_count (core->handle ());
+  for (std::size_t i = 0; i < regionCount; ++i)
+    {
+      auto moduleBase = ModuleBase::fromIndex (i);
       if (!moduleBase->isValid ())
         {
-          qWarning () << "Ignoring invalid region module" << realDir << ":"
+          qWarning () << "Ignoring invalid region module" << i << ":"
                       << moduleBase->errorString ();
           continue;
         }
@@ -327,6 +293,21 @@ ManageRegionUI::loadModules ()
         supportList << moduleBase->type ();
 
       moduleBaseList.emplace_back (moduleBase.release ());
+    }
+
+  /* The object codecs live in `load_module/` and are shared by every plugin,
+   * so the list is built once and kept for the lifetime of the application. */
+  const std::size_t loadCount = dhlrc_core_load_module_count (core->handle ());
+  for (std::size_t i = 0; i < loadCount; ++i)
+    {
+      auto codec = LoadObjectBase::fromIndex (i);
+      if (!codec.isValid ())
+        {
+          qWarning () << "Ignoring invalid object codec" << i << ":"
+                      << codec.errorString ();
+          continue;
+        }
+      loadObjectList << codec;
     }
 }
 

@@ -2,8 +2,8 @@
 #define DHLRC_PLUGINOPTIONSCONFIG_H
 
 #include "configobjectitems.h"
+#include "modulelibrary.h"
 
-#include <QLibrary>
 #include <QList>
 #include <QString>
 #include <QVariant>
@@ -23,7 +23,7 @@ public:
   struct Plugin
   {
     QString type;
-    QLibrary *library = nullptr;
+    ModuleLibrary *library = nullptr;
     QList<ConfigObjectItems::Option> input;
     QList<ConfigObjectItems::Option> output;
   };

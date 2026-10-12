@@ -1,6 +1,7 @@
 #ifndef DHLRC_DEBUGLOADINGUI_H
 #define DHLRC_DEBUGLOADINGUI_H
 
+#include <QHash>
 #include <QListView>
 #include <QMainWindow>
 #include <QPointer>
@@ -50,9 +51,10 @@ private:
   QStandardItemModel *model;
   QAction *actionSearch;
   QVBoxLayout *topLayout;
-  /* Reused for the "configuration reloaded" message, so repeated edits do not
-   * pile up one widget per change. */
-  KMessageWidget *configMessage = nullptr;
+  /* One message row per notification event, reused so repeated changes to the
+   * same thing (for example a file saved several times) update one row instead
+   * of piling up a new one each time. Owned by the top area. */
+  QHash<QString, KMessageWidget *> notificationWidgets;
   /* Owned by Qt (parented to this); shown from the menu. */
   DhSettingsDialog *settingsDialog = nullptr;
 
@@ -83,6 +85,15 @@ private:
    * that gets narrower keeps its old height and cuts its text off. Nothing
    * else applies it, so it is applied here. */
   void applyTopAreaRowHeights ();
+
+  /* Shows a notification (from the core) as a message row, reusing the row of
+   * the same `eventId` if there is one. */
+  void showNotification (int level, const QString &eventId,
+                         const QString &title, const QString &text);
+
+  /* Tells the core whether it may show desktop notifications, which is "no"
+   * while this window is active and the setting says so. */
+  void updateNotificationGate ();
 
   /* Detaches the tab at `index` into a window of its own. */
   void tearOffTab (int index);

@@ -13,7 +13,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-10 21:55+0800\n"
+"POT-Creation-Date: 2026-10-12 22:42+0800\n"
 "PO-Revision-Date: 2026-09-07 22:54+0800\n"
 "Last-Translator: 孟小骇 <48383878+DreamHelium@users.noreply.github.com>\n"
 "Language-Team: Chinese <kde-i18n-doc@kde.org>\n"
@@ -60,7 +60,7 @@ msgid "z"
 msgstr "z"
 
 #: ../../src/blocklistui.cpp:59 ../../src/blocklistui.cpp:62
-#: ../../src/mainwindow.cpp:570
+#: ../../dhlrc-core/src/schema.rs:70
 msgid "Palette"
 msgstr "偏移码"
 
@@ -123,7 +123,7 @@ msgid "Unknown"
 msgstr "未知"
 
 #: ../../src/blockreaderui.cpp:290 ../../src/externalnbtreaderui.cpp:109
-#: ../../src/manageregionui.cpp:244 ../../src/manageregionui.cpp:569
+#: ../../src/manageregionui.cpp:212 ../../src/manageregionui.cpp:550
 #: ../../src/regionmodifyui.cpp:13 ../../src/utility.cpp:24
 #: ../../src/utility.cpp:45 ../../src/utility.cpp:53
 msgid "Error!"
@@ -150,7 +150,7 @@ msgstr "展示实体NBT(&S)"
 msgid "&Modify Property"
 msgstr "修改属性(&M)"
 
-#: ../../src/blockshowui.cpp:101 ../../src/manageregionui.cpp:277
+#: ../../src/blockshowui.cpp:101 ../../src/manageregionui.cpp:245
 msgid "Warning!"
 msgstr "警告！"
 
@@ -192,7 +192,7 @@ msgstr "无。"
 
 #: ../../src/dhaboutui.cpp:95
 msgid "Loaded load modules:"
-msgstr ""
+msgstr "已加载模块："
 
 #: ../../src/dhhelpui.cpp:49
 msgid ""
@@ -200,6 +200,9 @@ msgid ""
 "\n"
 "![test_svg](:/cn/dh/dhlrc/show.svg)"
 msgstr ""
+"测试\n"
+"\n"
+"![test_svg](:/cn/dh/dhlrc/show.svg)"
 
 #: ../../src/dhloadjob.cpp:26 ../../src/dhloadjob.cpp:410
 msgid "Loading region type %1"
@@ -241,12 +244,12 @@ msgstr "请点击`继续`选择要加载的区域。"
 msgid "Finish processing %1 of %2 (%3%)."
 msgstr "已结束处理了%2个中的%1个（%3%）。"
 
-#: ../../src/dhloadjob.cpp:580 ../../src/saveregionjob.cpp:456
-#: ../../src/saveregionjob.cpp:558
+#: ../../src/dhloadjob.cpp:580 ../../src/saveregionjob.cpp:457
+#: ../../src/saveregionjob.cpp:559
 msgid "Continue"
 msgstr "继续"
 
-#: ../../src/externalnbtreaderui.cpp:29 ../../src/mainwindow.cpp:643
+#: ../../src/externalnbtreaderui.cpp:29 ../../src/mainwindow.cpp:604
 msgid "NBT Reader"
 msgstr "NBT阅读器"
 
@@ -266,235 +269,147 @@ msgstr "NBT 编解码器不可用。"
 msgid "&All"
 msgstr "全选 (&A)"
 
-#: ../../src/mainwindow.cpp:379
+#: ../../src/mainwindow.cpp:384
 msgid "Config"
 msgstr "配置"
 
-#: ../../src/mainwindow.cpp:380
+#: ../../src/mainwindow.cpp:385
 msgid "Icon Theme"
 msgstr "图标主题"
 
-#: ../../src/mainwindow.cpp:398
+#: ../../src/mainwindow.cpp:403
 msgid "Help"
-msgstr ""
+msgstr "帮助"
 
-#: ../../src/mainwindow.cpp:399
+#: ../../src/mainwindow.cpp:404
 msgid "&About"
 msgstr "关于(&A)"
 
-#: ../../src/mainwindow.cpp:432
+#: ../../src/mainwindow.cpp:437
 msgid "Search..."
 msgstr "搜索……"
 
-#: ../../src/mainwindow.cpp:462
+#: ../../src/mainwindow.cpp:467
 msgid "NBT File Reader"
 msgstr "NBT文件阅读器"
 
-#: ../../src/mainwindow.cpp:463 ../../src/mainwindow.cpp:648
+#: ../../src/mainwindow.cpp:468 ../../src/mainwindow.cpp:609
 msgid "Manage Region"
 msgstr "管理区域"
 
-#: ../../src/mainwindow.cpp:464 ../../src/mainwindow.cpp:661
+#: ../../src/mainwindow.cpp:469 ../../src/mainwindow.cpp:622
 msgid "Region Reader/Modifier"
 msgstr "区域阅读器及修改器"
 
-#: ../../src/mainwindow.cpp:465
+#: ../../src/mainwindow.cpp:470
 msgid "Settings"
 msgstr "设置"
 
-#: ../../src/mainwindow.cpp:521 ../../src/dhgameconfigui.h:15
-msgid "General"
-msgstr "概况"
-
-#: ../../src/mainwindow.cpp:525
-msgid "Application Memory Limit"
-msgstr "应用内存限制"
-
-#: ../../src/mainwindow.cpp:536
-msgid "Elapsed Milliseconds"
-msgstr "持续毫秒"
-
-#: ../../src/mainwindow.cpp:538
-msgid "Select All Regions In Loading"
-msgstr "在加载时选择所有区域"
-
-#: ../../src/mainwindow.cpp:540
-msgid "Loading File by File Extension"
-msgstr "使用文件扩展名加载文件"
-
-#: ../../src/mainwindow.cpp:542
-msgid "Retry Loading File when Failed"
-msgstr "在失败时重试加载文件"
-
-#: ../../src/mainwindow.cpp:544
-msgid "Strict NBT Encoding Matching"
-msgstr "严格NBT编码匹配"
-
-#: ../../src/mainwindow.cpp:547
-msgid "Use Cached File when Downloading Failed"
-msgstr "在下载失败时使用缓存文件"
+#: ../../src/mainwindow.cpp:541
+msgid "Manage"
+msgstr "管理"
 
 #: ../../src/mainwindow.cpp:552
-msgid "Cache Directory"
-msgstr "缓存目录"
-
-#: ../../src/mainwindow.cpp:556 ../../src/dhgameconfigui.h:15
-msgid "Default"
-msgstr "默认"
-
-#: ../../src/mainwindow.cpp:557
-msgid "Region Base Name"
-msgstr "区域基础名字"
-
-#: ../../src/mainwindow.cpp:558 rc.cpp:153
-msgid "Region Name"
-msgstr "区域名称"
-
-#: ../../src/mainwindow.cpp:559
-msgid "Multi-Region Display Name"
-msgstr "多区域显示名称"
-
-#: ../../src/mainwindow.cpp:561
-msgid "Region Description"
-msgstr "区域描述"
-
-#: ../../src/mainwindow.cpp:562
-msgid "Region Author"
-msgstr "区域作者"
-
-#: ../../src/mainwindow.cpp:564 ../../src/dhgameconfigui.h:15
-msgid "Game"
-msgstr "游戏"
-
-#: ../../src/mainwindow.cpp:565
-msgid "Override Settings"
-msgstr "覆盖设置"
-
-#: ../../src/mainwindow.cpp:566
-msgid "Override Version"
-msgstr "覆盖版本"
-
-#: ../../src/mainwindow.cpp:568
-msgid "Reader"
-msgstr ""
-
-#: ../../src/mainwindow.cpp:569
-msgid "Default Show Option"
-msgstr "默认展示选项"
-
-#: ../../src/mainwindow.cpp:570 ../../src/paletteaddui.cpp:68
-msgid "Name"
-msgstr "名称"
-
-#: ../../src/mainwindow.cpp:572
-msgid "Manage"
-msgstr ""
-
-#: ../../src/mainwindow.cpp:583
 msgid "reading"
-msgstr ""
+msgstr "读取"
 
-#: ../../src/mainwindow.cpp:584
+#: ../../src/mainwindow.cpp:553
 msgid "writing"
-msgstr ""
+msgstr "写入"
 
-#: ../../src/mainwindow.cpp:586
+#: ../../src/mainwindow.cpp:558
 msgid "Use saved options for %1 (%2) instead of asking"
-msgstr ""
+msgstr "对 %1（%2）使用已保存的选项而不询问"
 
-#: ../../src/mainwindow.cpp:758
-msgid "Configuration reloaded from %1"
-msgstr ""
-
-#: ../../src/mainwindow.cpp:1041
+#: ../../src/mainwindow.cpp:1036
 msgid "Return to tabs"
 msgstr "返回选项卡"
 
-#: ../../src/manageregionui.cpp:187
+#: ../../src/manageregionui.cpp:155
 msgid "&Select"
 msgstr "选择(&S)"
 
-#: ../../src/manageregionui.cpp:191 rc.cpp:96
+#: ../../src/manageregionui.cpp:159 rc.cpp:96
 msgid "&Add"
 msgstr "添加(&A)"
 
-#: ../../src/manageregionui.cpp:204
+#: ../../src/manageregionui.cpp:172
 msgid "Select &All"
 msgstr "全选(&A)"
 
-#: ../../src/manageregionui.cpp:211
+#: ../../src/manageregionui.cpp:179
 msgid "&Remove Selected"
 msgstr "移除选中项(&R)"
 
-#: ../../src/manageregionui.cpp:215
+#: ../../src/manageregionui.cpp:183
 msgid "&Save Selected"
 msgstr "保存选中项(&S)"
 
-#: ../../src/manageregionui.cpp:242
+#: ../../src/manageregionui.cpp:210
 msgid "Select Files"
 msgstr "选择文件"
 
-#: ../../src/manageregionui.cpp:245
+#: ../../src/manageregionui.cpp:213
 msgid "No file selected!"
 msgstr "没有文件被选中！"
 
-#: ../../src/manageregionui.cpp:278
+#: ../../src/manageregionui.cpp:246
 msgid "Locked regions were kept."
 msgstr "已锁定的区域被保留。"
 
-#: ../../src/manageregionui.cpp:397
+#: ../../src/manageregionui.cpp:378
 msgid "%1 region(s) selected"
 msgstr "已选中 %1 个区域"
 
-#: ../../src/manageregionui.cpp:454 ../../src/utility.cpp:82
+#: ../../src/manageregionui.cpp:435 ../../src/utility.cpp:82
 msgid "Locked"
 msgstr "已锁定"
 
-#: ../../src/manageregionui.cpp:491
+#: ../../src/manageregionui.cpp:472
 msgid "Select Save Format"
 msgstr "选择保存格式"
 
-#: ../../src/manageregionui.cpp:491
+#: ../../src/manageregionui.cpp:472
 msgid "Please select the format to save to."
 msgstr "请选择要保存到的格式。"
 
-#: ../../src/manageregionui.cpp:517
+#: ../../src/manageregionui.cpp:498
 msgid "Use MultiFunc?"
 msgstr "使用多区域功能？"
 
-#: ../../src/manageregionui.cpp:518
+#: ../../src/manageregionui.cpp:499
 msgid "This type supports regions to save as one file, do you want to use it?"
 msgstr "此类型支持将多个区域保存为一个文件，您想要使用它吗？"
 
-#: ../../src/manageregionui.cpp:534
+#: ../../src/manageregionui.cpp:515
 msgid "Select File"
-msgstr ""
+msgstr "选择文件"
 
-#: ../../src/manageregionui.cpp:570
+#: ../../src/manageregionui.cpp:551
 msgid "This type cannot save a single region."
 msgstr "此类型无法保存单个区域。"
 
-#: ../../src/manageregionui.cpp:575
+#: ../../src/manageregionui.cpp:556
 msgid "Select Directory"
 msgstr "选择目录"
 
-#: ../../src/manageregionui.cpp:675
+#: ../../src/manageregionui.cpp:656
 msgid "Locked!"
 msgstr "已锁定！"
 
-#: ../../src/manageregionui.cpp:687
+#: ../../src/manageregionui.cpp:668
 msgid "Region identifier"
 msgstr "区域标识符"
 
-#: ../../src/manageregionui.cpp:690
+#: ../../src/manageregionui.cpp:671
 msgid "Added: %1"
 msgstr "添加于：%1"
 
-#: ../../src/manageregionui.cpp:729
+#: ../../src/manageregionui.cpp:710
 msgid "Input a New Name"
 msgstr "输入新名称"
 
-#: ../../src/manageregionui.cpp:730
+#: ../../src/manageregionui.cpp:711
 msgid "Please input a new name for the region."
 msgstr "请输入此区域的新名称。"
 
@@ -521,6 +436,10 @@ msgstr "输入数据"
 #: ../../src/paletteaddui.cpp:28
 msgid "Please enter a data."
 msgstr "请输入数据。"
+
+#: ../../src/paletteaddui.cpp:68 ../../dhlrc-core/src/schema.rs:70
+msgid "Name"
+msgstr "名称"
 
 #: ../../src/paletteaddui.cpp:68
 msgid "Data"
@@ -590,12 +509,12 @@ msgstr "正在保存%1（%2%）"
 msgid "Saving %1 (%2%): %3"
 msgstr "正在保存%1（%2%）：%3"
 
-#: ../../src/saveregionjob.cpp:219 ../../src/saveregionjob.cpp:431
-#: ../../src/saveregionjob.cpp:594
+#: ../../src/saveregionjob.cpp:220 ../../src/saveregionjob.cpp:432
+#: ../../src/saveregionjob.cpp:595
 msgid "Saved %1 of %2 (%3%)."
 msgstr "已保存 %1 / %2（%3%）。"
 
-#: ../../src/saveregionjob.cpp:415
+#: ../../src/saveregionjob.cpp:416
 msgid ""
 "Region %1 could not be saved:\n"
 "\n"
@@ -605,32 +524,35 @@ msgstr ""
 "\n"
 "%2"
 
-#: ../../src/saveregionjob.cpp:453
+#: ../../src/saveregionjob.cpp:454
 msgid "Ready to save %1. Click Continue to set the options."
-msgstr ""
+msgstr "已准备好保存 %1。点击“继续”以设置选项。"
 
-#: ../../src/saveregionjob.cpp:555
+#: ../../src/saveregionjob.cpp:556
 msgid "Ready to save %1 region(s). Click Continue to set the options."
-msgstr ""
+msgstr "已准备好保存 %1 个区域。点击“继续”以设置选项。"
 
-#: ../../src/saveregionjob.cpp:609
+#: ../../src/saveregionjob.cpp:610
 msgid ""
 "The file %1 could not be written:\n"
 "\n"
 "%2"
 msgstr ""
+"无法写入文件 %1：\n"
+"\n"
+"%2"
 
-#: ../../src/saveregionjob.cpp:651
+#: ../../src/saveregionjob.cpp:652
 msgid "Saving %1 region(s)..."
-msgstr ""
+msgstr "正在保存 %1 个区域……"
 
-#: ../../src/saveregionjob.cpp:660
+#: ../../src/saveregionjob.cpp:661
 msgid "Saving %1 region(s) (%2%)"
-msgstr ""
+msgstr "正在保存 %1 个区域（%2%）"
 
-#: ../../src/saveregionjob.cpp:669
+#: ../../src/saveregionjob.cpp:670
 msgid "Saving %1 region(s) (%2%): %3"
-msgstr ""
+msgstr "正在保存 %1 个区域（%2%）：%3"
 
 #: ../../src/utility.cpp:25
 msgid "Manage Region window is not initialized"
@@ -646,7 +568,7 @@ msgstr "没有区域或没有区域选中！"
 
 #: ../../src/utility.cpp:87
 msgid "%1 (%2)"
-msgstr ""
+msgstr "%1（%2）"
 
 #: ../../src/version.cpp:15
 msgid ""
@@ -812,6 +734,10 @@ msgstr "作者"
 msgid "Base Name"
 msgstr "基础名称"
 
+#: rc.cpp:153 ../../dhlrc-core/src/schema.rs:203
+msgid "Region Name"
+msgstr "区域名称"
+
 #: rc.cpp:156
 msgid "Data Version"
 msgstr "数据版本"
@@ -836,40 +762,356 @@ msgstr "压缩操作被取消。"
 msgid "Uncompress finish!"
 msgstr "解压完成！"
 
-#: ../../dhlrc-core/src/config.rs:177 ../../region-rs/src/default.rs:58
+#: ../../dhlrc-core/src/config.rs:166 ../../dhlrc-core/src/schema.rs:195
+#: ../../region-rs/src/default.rs:58
 msgid "Converted"
 msgstr "已转换"
 
-#: ../../dhlrc-core/src/config.rs:183
+#: ../../dhlrc-core/src/config.rs:172 ../../dhlrc-core/src/schema.rs:207
 #: ../../region-litematic-rs/src/output.rs:396
 #: ../../region-rs/src/default.rs:60
 msgid "Unnamed"
 msgstr "未命名"
 
-#: ../../dhlrc-core/src/config.rs:189
+#: ../../dhlrc-core/src/config.rs:178 ../../dhlrc-core/src/schema.rs:221
 #, rust-format
 msgid "${file} - ${region}"
 msgstr "${file} - ${region}"
 
-#: ../../dhlrc-core/src/config.rs:296
-msgid "Configuration created"
-msgstr ""
+#: ../../dhlrc-core/src/config.rs:295
+msgid "Configuration reloaded"
+msgstr "配置已重载"
 
-#: ../../dhlrc-core/src/config.rs:298
+#: ../../dhlrc-core/src/config.rs:297
+#, rust-format
+msgid "The configuration was reloaded from {}."
+msgstr "配置已从 {} 重载。"
+
+#: ../../dhlrc-core/src/config.rs:333
+msgid "Configuration created"
+msgstr "已创建配置"
+
+#: ../../dhlrc-core/src/config.rs:335
 #, rust-format
 msgid "A new configuration file was created at {}."
-msgstr ""
+msgstr "已在 {} 创建新的配置文件。"
 
-#: ../../dhlrc-core/src/config.rs:306
+#: ../../dhlrc-core/src/config.rs:343
 msgid "Configuration could not be read"
-msgstr ""
+msgstr "无法读取配置"
 
-#: ../../dhlrc-core/src/config.rs:309
+#: ../../dhlrc-core/src/config.rs:346
 #, rust-format
 msgid ""
 "The configuration file could not be read ({}). It was moved aside and a new "
 "one with the default values was created at {}."
 msgstr ""
+"配置文件无法读取（{}）。已将其移开，并在 {} 创建了一个使用默认值的新文件。"
+
+#: ../../dhlrc-core/src/schema.rs:63
+msgid "General"
+msgstr "概况"
+
+#: ../../dhlrc-core/src/schema.rs:64
+msgid "Default"
+msgstr "默认"
+
+#: ../../dhlrc-core/src/schema.rs:65
+msgid "Game"
+msgstr "游戏"
+
+#: ../../dhlrc-core/src/schema.rs:66
+msgid "Reader"
+msgstr "阅读器"
+
+#: ../../dhlrc-core/src/schema.rs:67
+msgid "Notifications"
+msgstr "通知"
+
+#: ../../dhlrc-core/src/schema.rs:69
+msgid "GiB"
+msgstr "GiB"
+
+#: ../../dhlrc-core/src/schema.rs:69
+msgid "MiB"
+msgstr "MiB"
+
+#: ../../dhlrc-core/src/schema.rs:69
+msgid "KiB"
+msgstr "KiB"
+
+#: ../../dhlrc-core/src/schema.rs:69
+msgid "Bytes"
+msgstr "字节"
+
+#: ../../dhlrc-core/src/schema.rs:79
+msgid "Application Memory Limit"
+msgstr "应用内存限制"
+
+#: ../../dhlrc-core/src/schema.rs:80
+msgid "The limit memory(bytes) for application."
+msgstr "应用限制内存（以字节计）。"
+
+#: ../../dhlrc-core/src/schema.rs:103
+msgid "Elapsed Milliseconds"
+msgstr "持续毫秒"
+
+#: ../../dhlrc-core/src/schema.rs:105
+msgid ""
+"The elapsed milliseconds for the progress bar, if set too small will affect "
+"the speed."
+msgstr "进度条的持续毫秒，如果设置太小将会影响速度。"
+
+#: ../../dhlrc-core/src/schema.rs:117
+msgid "Select All Regions In Loading"
+msgstr "在加载时选择所有区域"
+
+#: ../../dhlrc-core/src/schema.rs:118
+msgid "If you check this, all regions will be loaded in the loading progress."
+msgstr "如果你选择此项，所有区域将在加载时载入。"
+
+#: ../../dhlrc-core/src/schema.rs:129
+msgid "Loading File by File Extension"
+msgstr "使用文件扩展名加载文件"
+
+#: ../../dhlrc-core/src/schema.rs:130
+msgid "If you check this, the file will be loaded by the file extension name."
+msgstr "如果你选择此项，文件将会依靠文件扩展名加载。"
+
+#: ../../dhlrc-core/src/schema.rs:141
+msgid "Retry Loading File when Failed"
+msgstr "在失败时重试加载文件"
+
+#: ../../dhlrc-core/src/schema.rs:142
+msgid "When failed, the file will try to be loaded by other modules."
+msgstr "当失败时，此文件将会尝试使用其它模组加载。"
+
+#: ../../dhlrc-core/src/schema.rs:153
+msgid "Strict NBT Encoding Matching"
+msgstr "严格NBT编码匹配"
+
+#: ../../dhlrc-core/src/schema.rs:155
+msgid ""
+"If you check this, a file is also decoded strictly with the NBT encoding "
+"declared by the plugin its suffix points at (region_nbt_encoding ()). A file "
+"in another encoding then fails to load instead of being read as the wrong "
+"one."
+msgstr ""
+"如果选择此项，文件还会按其后缀对应插件声明的NBT编码（region_nbt_encoding()）"
+"严格解码。使用其它编码的文件将加载失败，而不会被以错误的编码读取。"
+
+#: ../../dhlrc-core/src/schema.rs:167
+msgid "Cache Directory"
+msgstr "缓存目录"
+
+#: ../../dhlrc-core/src/schema.rs:168
+msgid "The directory to store cache files."
+msgstr "存放缓存文件的目录。"
+
+#: ../../dhlrc-core/src/schema.rs:179
+msgid "Use Cached File when Downloading Failed"
+msgstr "在下载失败时使用缓存文件"
+
+#: ../../dhlrc-core/src/schema.rs:180
+msgid "When downloading failed, use the cached file."
+msgstr "当下载失败时，用缓存文件。"
+
+#: ../../dhlrc-core/src/schema.rs:191
+msgid "Region Base Name"
+msgstr "区域基础名字"
+
+#: ../../dhlrc-core/src/schema.rs:192
+msgid "The default base name for the region."
+msgstr "默认的区域基础名字"
+
+#: ../../dhlrc-core/src/schema.rs:204
+msgid "The default name for the region."
+msgstr "默认的区域名字"
+
+#: ../../dhlrc-core/src/schema.rs:215
+msgid "Multi-Region Display Name"
+msgstr "多区域显示名称"
+
+#: ../../dhlrc-core/src/schema.rs:217
+#, rust-format
+msgid ""
+"The display name used for a region that comes from a multi-region file. Use $"
+"{file} for the file name and ${region} for the region name inside the file."
+msgstr ""
+"多区域文件中的区域所使用的显示名称。使用 ${file} 表示文件名，使用 ${region} "
+"表示文件内的区域名称。"
+
+#: ../../dhlrc-core/src/schema.rs:229
+msgid "Region Description"
+msgstr "区域描述"
+
+#: ../../dhlrc-core/src/schema.rs:230
+msgid "The default description for the region."
+msgstr "默认的区域描述"
+
+#: ../../dhlrc-core/src/schema.rs:241
+msgid "Region Author"
+msgstr "区域作者"
+
+#: ../../dhlrc-core/src/schema.rs:242
+msgid "The default author for the region."
+msgstr "默认的区域作者"
+
+#: ../../dhlrc-core/src/schema.rs:253
+msgid "Override Settings"
+msgstr "覆盖设置"
+
+#: ../../dhlrc-core/src/schema.rs:254
+msgid "Whether to override setting or not."
+msgstr "是否覆盖设置。"
+
+#: ../../dhlrc-core/src/schema.rs:265
+msgid "Override Version"
+msgstr "覆盖版本"
+
+#: ../../dhlrc-core/src/schema.rs:266
+msgid "The version to override in translation stage."
+msgstr "在翻译阶段覆盖的版本。"
+
+#: ../../dhlrc-core/src/schema.rs:277
+msgid "Default Show Option"
+msgstr "默认展示选项"
+
+#: ../../dhlrc-core/src/schema.rs:278
+msgid "The default option of showing block information."
+msgstr "展示方块信息的默认选项。"
+
+#: ../../dhlrc-core/src/schema.rs:289
+msgid "Notification Application ID"
+msgstr "通知应用 ID"
+
+#: ../../dhlrc-core/src/schema.rs:291
+msgid ""
+"The application a desktop notification is sent as: the Windows "
+"AppUserModelID, or the macOS bundle identifier. Windows needs it registered, "
+"or the toast may not show. Empty uses the platform default."
+msgstr ""
+"桌面通知以哪个应用的身份发送：Windows 的 AppUserModelID，或 macOS 的 bundle "
+"identifier。Windows 需要先注册它，否则通知可能不显示。留空则使用平台默认值。"
+
+#: ../../dhlrc-core/src/schema.rs:303
+msgid "Notification Timeout (ms)"
+msgstr "通知超时（毫秒）"
+
+#: ../../dhlrc-core/src/schema.rs:305
+msgid ""
+"How long a notification stays before it disappears, in milliseconds. Zero "
+"leaves it to the platform."
+msgstr "通知消失前停留的时长，单位为毫秒。为零则交给平台决定。"
+
+#: ../../dhlrc-core/src/schema.rs:317
+msgid "Only Notify When Inactive"
+msgstr "仅在非激活时通知"
+
+#: ../../dhlrc-core/src/schema.rs:319
+msgid ""
+"Do not show a desktop notification while the application is active; the in-"
+"app one is enough then."
+msgstr "应用处于激活状态时不显示桌面通知；此时应用内的提示已足够。"
+
+#: ../../dhlrc-tui/src/completions.rs:49
+msgid ""
+"This shell has no standard completion directory, so the script was printed "
+"instead."
+msgstr "该 shell 没有标准的补全目录，因此改为打印脚本。"
+
+#: ../../dhlrc-tui/src/completions.rs:62 ../../dhlrc-tui/src/completions.rs:164
+msgid "Could not write the completion script"
+msgstr "无法写入补全脚本"
+
+#: ../../dhlrc-tui/src/completions.rs:70
+#, rust-format
+msgid "Wrote {}."
+msgstr "已写入 {}。"
+
+#: ../../dhlrc-tui/src/completions.rs:78
+#, rust-format
+msgid "If completions do not load, add {} to your fpath."
+msgstr "如果补全未生效，请将 {} 加入你的 fpath。"
+
+#: ../../dhlrc-tui/src/completions.rs:165
+msgid "standard output"
+msgstr "标准输出"
+
+#: ../../dhlrc-tui/src/main.rs:43
+msgid ""
+"The interactive terminal UI is not written yet; pick one of the commands "
+"above."
+msgstr "交互式终端界面尚未实现；请从上面的命令中选择一个。"
+
+#: ../../dhlrc-tui/src/modules.rs:54
+msgid "Region modules"
+msgstr "区域模块"
+
+#: ../../dhlrc-tui/src/modules.rs:57 ../../dhlrc-tui/src/modules.rs:106
+msgid "none found"
+msgstr "未找到"
+
+#: ../../dhlrc-tui/src/modules.rs:63
+msgid "type"
+msgstr "类型"
+
+#: ../../dhlrc-tui/src/modules.rs:64
+msgid "suffix"
+msgstr "后缀"
+
+#: ../../dhlrc-tui/src/modules.rs:65 ../../dhlrc-tui/src/modules.rs:110
+msgid "codec"
+msgstr "编解码器"
+
+#: ../../dhlrc-tui/src/modules.rs:66
+msgid "regions"
+msgstr "区域"
+
+#: ../../dhlrc-tui/src/modules.rs:67
+msgid "encoding"
+msgstr "编码"
+
+#: ../../dhlrc-tui/src/modules.rs:70 ../../dhlrc-tui/src/modules.rs:112
+msgid "file"
+msgstr "文件"
+
+#: ../../dhlrc-tui/src/modules.rs:84
+msgid "multi"
+msgstr "多区域"
+
+#: ../../dhlrc-tui/src/modules.rs:86
+msgid "single"
+msgstr "单区域"
+
+#: ../../dhlrc-tui/src/modules.rs:103
+msgid "Object codecs"
+msgstr "对象编解码器"
+
+#: ../../dhlrc-tui/src/modules.rs:161
+msgid "Warnings"
+msgstr "警告"
+
+#: ../../dhlrc-tui/src/modules.rs:167
+#, rust-format
+msgid "Region module \"{}\" needs codec \"{}\", which is not installed."
+msgstr "区域模块“{}”需要编解码器“{}”，但未安装。"
+
+#: ../../dhlrc-tui/src/modules.rs:218
+msgid "big-endian"
+msgstr "大端序"
+
+#: ../../dhlrc-tui/src/modules.rs:219
+msgid "little-endian"
+msgstr "小端序"
+
+#: ../../dhlrc-tui/src/modules.rs:220
+msgid "network little-endian"
+msgstr "网络小端序"
+
+#: ../../dhlrc-tui/src/modules.rs:221
+msgid "any"
+msgstr "任意"
 
 #: ../../nbt-component/src/lib.rs:69
 msgid "Loading NBT"
@@ -891,7 +1133,7 @@ msgstr "未知的对象编码。"
 #: ../../nbt-component/src/lib.rs:262
 #, rust-format
 msgid "The file is in the {} encoding, but the {} encoding is required."
-msgstr ""
+msgstr "该文件是 {} 编码，但需要的是 {} 编码。"
 
 #: ../../nbt-component/src/lib.rs:310
 msgid "Reading NBT finished."
@@ -944,11 +1186,11 @@ msgstr "错误的区域类型。"
 
 #: ../../region-litematic-rs/src/output.rs:182
 msgid "Packing blocks"
-msgstr ""
+msgstr "正在打包方块"
 
 #: ../../region-litematic-rs/src/output.rs:290
 msgid "There is no region to write."
-msgstr ""
+msgstr "没有可写入的区域。"
 
 #: ../../region-litematic-rs/src/output.rs:391
 #: ../../region-litematic-rs/src/output.rs:426
@@ -960,12 +1202,12 @@ msgstr "检测到空指针！"
 #: ../../region-litematic-rs/src/output.rs:438
 #, rust-format
 msgid "Region {}"
-msgstr ""
+msgstr "区域 {}"
 
 #: ../../region-litematic-rs/src/output.rs:449
 #, rust-format
 msgid "{} ({})"
-msgstr ""
+msgstr "{}（{}）"
 
 #: ../../region-nbt-rs/src/config.rs:23
 msgid "Ignore Air"
@@ -1041,55 +1283,6 @@ msgstr "获取调色板。"
 msgid "&Reload"
 msgstr "重新加载(&R)"
 
-#~ msgid "The limit memory(bytes) for application."
-#~ msgstr "应用限制内存（以字节计）。"
-
-#~ msgid ""
-#~ "The elapsed milliseconds for the progress bar, if set too small will "
-#~ "affect the speed."
-#~ msgstr "进度条的持续毫秒，如果设置太小将会影响速度。"
-
-#~ msgid ""
-#~ "If you check this, all regions will be loaded in the loading progress."
-#~ msgstr "如果你选择此项，所有区域将在加载时载入。"
-
-#~ msgid ""
-#~ "If you check this, the file will be loaded by the file extension name."
-#~ msgstr "如果你选择此项，文件将会依靠文件扩展名加载。"
-
-#~ msgid "When failed, the file will try to be loaded by other modules."
-#~ msgstr "当失败时，此文件将会尝试使用其它模组加载。"
-
-#~ msgid ""
-#~ "If you check this, a file is also decoded strictly with the NBT encoding "
-#~ "declared by the plugin its suffix points at (region_nbt_encoding ()). A "
-#~ "file in another encoding then fails to load instead of being read as the "
-#~ "wrong one."
-#~ msgstr ""
-#~ "如果选择此项，文件还会按其后缀对应插件声明的NBT编码"
-#~ "（region_nbt_encoding()）严格解码。使用其它编码的文件将加载失败，而不会被"
-#~ "以错误的编码读取。"
-
-#~ msgid "The directory to store cache files."
-#~ msgstr "存放缓存文件的目录。"
-
-#~ msgid "When downloading failed, use the cached file."
-#~ msgstr "当下载失败时，用缓存文件。"
-
-#~ msgid "The default base name for the region."
-#~ msgstr "默认的区域基础名字"
-
-#~ msgid "The default name for the region."
-#~ msgstr "默认的区域名字"
-
-#~ msgid ""
-#~ "The display name used for a region that comes from a multi-region file. "
-#~ "Use ${file} for the file name and ${region} for the region name inside "
-#~ "the file."
-#~ msgstr ""
-#~ "多区域文件中的区域所使用的显示名称。使用 ${file} 表示文件名，使用 $"
-#~ "{region} 表示文件内的区域名称。"
-
 #~ msgid "Sample File Name"
 #~ msgstr "示例文件名"
 
@@ -1105,21 +1298,6 @@ msgstr "重新加载(&R)"
 #~ "The sample region name used by the preview of the multi-region display "
 #~ "name."
 #~ msgstr "多区域显示名称预览所使用的示例区域名称。"
-
-#~ msgid "The default description for the region."
-#~ msgstr "默认的区域描述"
-
-#~ msgid "The default author for the region."
-#~ msgstr "默认的区域作者"
-
-#~ msgid "Whether to override setting or not."
-#~ msgstr "是否覆盖设置。"
-
-#~ msgid "The version to override in translation stage."
-#~ msgstr "在翻译阶段覆盖的版本。"
-
-#~ msgid "The default option of showing block information."
-#~ msgstr "展示方块信息的默认选项。"
 
 #~ msgid "Select Cache Directory"
 #~ msgstr "选择缓存目录"
@@ -2425,9 +2603,6 @@ msgstr "重新加载(&R)"
 
 #~ msgid "directory"
 #~ msgstr "目录"
-
-#~ msgid "file"
-#~ msgstr "文件"
 
 #~ msgid "Choose all numbers"
 #~ msgstr "选择所有数字"

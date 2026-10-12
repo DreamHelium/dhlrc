@@ -62,6 +62,10 @@ cmake -B build
 cmake --build build
 ```
 
+For a headless build without the Qt frontend — only the shared libraries and the
+terminal frontend — configure with `-DDH_BUILD_GUI=OFF`; Qt/KF6 are then not
+needed.
+
 ## Features
 
 - NBT and Litematica support.

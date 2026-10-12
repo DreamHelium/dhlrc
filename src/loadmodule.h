@@ -1,13 +1,12 @@
 #ifndef DHLRC_LOADMODULE_H
 #define DHLRC_LOADMODULE_H
 
+#include "modulelibrary.h"
 #include "region.h"
 
 #include <QList>
 #include <QString>
-#include <memory>
-
-class QLibrary;
+#include <cstddef>
 
 /* The NBT encodings a decode can be pinned to. Kept in sync with the
  * `OBJECT_ENCODING_*` constants in `nbt-component`. */
@@ -42,22 +41,17 @@ using LoadObjectFunc = const char *(*) (VecU8 *, void **, HelperStruct *,
 /* Frees an object created by the matching `LoadObjectFunc`. */
 using ObjFreeFunc = void (*) (void *);
 
-/* One object codec loaded from `load_module/`.
+/* One object codec the core loaded from `load_module/`.
  *
  * A codec is to the file bytes what a region plugin is to a decoded object: a
- * small dynamic library with a fixed symbol set. `fromLibrary ()` resolves and
- * validates that symbol set, so a library that is incomplete, or that lies
- * about its name, is reported and dropped rather than used.
- *
- * Ownership is RAII: the codec keeps the `QLibrary` it was built from alive,
- * so the symbols stay valid for as long as any copy of it exists. */
+ * small dynamic library with a fixed symbol set. The core opens it and reads
+ * its name; `fromIndex ()` binds the symbols the loader calls. */
 class LoadObjectBase
 {
 public:
-  /* Resolves the codec's symbols in `library`, which it takes a share of and
-   * keeps loaded. Check `isValid ()` / `errorString ()` before using it. */
-  [[nodiscard]] static LoadObjectBase
-  fromLibrary (std::shared_ptr<QLibrary> library);
+  /* Binds the codec at `index` in the core's `load_module/` list. Check
+   * `isValid ()` / `errorString ()` before using it. */
+  [[nodiscard]] static LoadObjectBase fromIndex (std::size_t index);
 
   [[nodiscard]] bool
   isValid () const
@@ -77,21 +71,15 @@ public:
     return baseTypeString;
   }
 
-  /* The resolved symbols; `nullptr` while `isValid ()` is false. */
+  /* The bound symbols; `nullptr` while `isValid ()` is false. */
   LoadObjectFunc loadObjectFunc = nullptr;
   ObjFreeFunc objFreeFunc = nullptr;
 
 private:
-  std::shared_ptr<QLibrary> library;
+  ModuleLibrary library;
   QString baseTypeString;
   bool valid = false;
   QString error;
 };
-
-/* Loads every object codec inside `directory` (normally `load_module/` next to
- * the executable). A library that fails to load, or that does not export the
- * full symbol set, is reported with `qWarning ()` and skipped. */
-[[nodiscard]] QList<LoadObjectBase>
-loadObjectModules (const QString &directory);
 
 #endif // DHLRC_LOADMODULE_H

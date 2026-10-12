@@ -29,11 +29,13 @@ on_notify (void *user, int32_t level, const char *event_id, const char *title,
 }
 
 static void
-on_change (void *user)
+on_change (void *user, int32_t level, const char *event_id, const char *title,
+           const char *text)
 {
   int *hits = (int *)user;
   (*hits)++;
-  printf ("  changed (hit %d)\n", *hits);
+  printf ("  changed (hit %d): [%d] %s - %s\n", *hits, level, title, text);
+  (void)event_id;
 }
 
 int

@@ -1,7 +1,8 @@
 #ifndef DHLRC_CONFIGOBJECTITEMS_H
 #define DHLRC_CONFIGOBJECTITEMS_H
 
-#include <QLibrary>
+#include "modulelibrary.h"
+
 #include <QList>
 #include <QString>
 #include <map>
@@ -51,26 +52,26 @@ struct Option
 /* Reads the options `library` offers for `kind`. Returns an empty list when
  * the plugin exports none, so a plugin without options simply gets no entry.
  */
-QList<Option> discover (Kind kind, QLibrary *library);
+QList<Option> discover (Kind kind, ModuleLibrary *library);
 
 /* Builds a config object for `library`, or nullptr when it offers nothing for
  * `kind`. Every option is left at the plugin's default; use `setBool ()` to
  * change one.
  *
  * The result must be released with `freeObject ()`. */
-void *createObject (Kind kind, QLibrary *library);
+void *createObject (Kind kind, ModuleLibrary *library);
 
 /* Releases a pointer from `createObject ()`, using the plugin's own
  * destructor. Accepts nullptr. */
-void freeObject (Kind kind, QLibrary *library, void *object);
+void freeObject (Kind kind, ModuleLibrary *library, void *object);
 
 /* Writes one option, addressed by the plugin's own index. An out-of-range or
  * wrongly-typed index is ignored by the plugin. */
-void setBool (Kind kind, QLibrary *library, void *object, qsizetype index,
+void setBool (Kind kind, ModuleLibrary *library, void *object, qsizetype index,
               bool value);
 
 /* Writes an int option, addressed the same way. */
-void setInt (Kind kind, QLibrary *library, void *object, qsizetype index,
+void setInt (Kind kind, ModuleLibrary *library, void *object, qsizetype index,
              qint32 value);
 }
 

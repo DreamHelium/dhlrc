@@ -10,7 +10,22 @@ common-rs = { path = "../common-rs" }
 gettext-rs = { version = "0.7.7", features = ["gettext-system"] }
 formatx = "0.2.4"
 notify = "8"
+# Opens the plugin libraries (`region_module/`, `load_module/`).
+libloading = "0.8"
+# Only pulled in by the `desktop-notifications` feature; a headless or terminal
+# build leaves it out and prints the `Notification` instead.
+notify-rust = { version = "4", optional = true }
+
+[features]
+# Shows the core's notifications as desktop notifications (D-Bus on Linux/BSD,
+# a toast on Windows, Notification Center on macOS).
+desktop-notifications = ["dep:notify-rust"]
 
 [lib]
 # An `rlib` for the Rust frontends and a `cdylib` for the C/C++ ones.
 crate-type = ["lib", "cdylib"]
+
+# Only built with the feature, so `cargo build --workspace` leaves it alone.
+[[example]]
+name = "desktop_notify"
+required-features = ["desktop-notifications"]

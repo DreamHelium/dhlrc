@@ -4,6 +4,9 @@
  * decides how to present them (a desktop notification, a terminal escape
  * sequence, a line of text, …). That is what lets the same core drive a GUI and
  * a terminal UI without either one leaking into the other.
+ *
+ * When built with the `desktop-notifications` feature the core also shows them
+ * itself, through [`crate::desktop`].
  */
 
 /// How loud a notification is.
@@ -15,7 +18,7 @@ pub enum Level {
 }
 
 /// One message, with a stable `event_id` so a frontend can group, route or mute
-/// it (the Qt frontend maps it to a `KNotification` event).
+/// it (the Qt frontend reuses one message row per `event_id`).
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Notification {
     pub event_id: &'static str,

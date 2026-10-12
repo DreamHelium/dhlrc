@@ -30,7 +30,8 @@ symbolName (ConfigObjectItems::Kind kind, const char *suffix)
 /* Resolves one exported function; nullptr when the plugin does not have it. */
 template <typename Fn>
 Fn
-resolve (QLibrary *library, ConfigObjectItems::Kind kind, const char *suffix)
+resolve (ModuleLibrary *library, ConfigObjectItems::Kind kind,
+         const char *suffix)
 {
   if (!library)
     return nullptr;
@@ -68,7 +69,7 @@ translated (const QString &text)
 }
 
 QList<ConfigObjectItems::Option>
-ConfigObjectItems::discover (Kind kind, QLibrary *library)
+ConfigObjectItems::discover (Kind kind, ModuleLibrary *library)
 {
   QList<Option> options;
 
@@ -138,7 +139,7 @@ ConfigObjectItems::discover (Kind kind, QLibrary *library)
 }
 
 void *
-ConfigObjectItems::createObject (Kind kind, QLibrary *library)
+ConfigObjectItems::createObject (Kind kind, ModuleLibrary *library)
 {
   auto newFn = resolve<newFunc> (library, kind, "new");
   if (!newFn)
@@ -151,7 +152,7 @@ ConfigObjectItems::createObject (Kind kind, QLibrary *library)
 }
 
 void
-ConfigObjectItems::freeObject (Kind kind, QLibrary *library, void *object)
+ConfigObjectItems::freeObject (Kind kind, ModuleLibrary *library, void *object)
 {
   if (!object)
     return;
@@ -161,7 +162,7 @@ ConfigObjectItems::freeObject (Kind kind, QLibrary *library, void *object)
 }
 
 void
-ConfigObjectItems::setBool (Kind kind, QLibrary *library, void *object,
+ConfigObjectItems::setBool (Kind kind, ModuleLibrary *library, void *object,
                             qsizetype index, bool value)
 {
   if (!object)
@@ -180,7 +181,7 @@ ConfigObjectItems::setBool (Kind kind, QLibrary *library, void *object,
 }
 
 void
-ConfigObjectItems::setInt (Kind kind, QLibrary *library, void *object,
+ConfigObjectItems::setInt (Kind kind, ModuleLibrary *library, void *object,
                            qsizetype index, qint32 value)
 {
   if (!object)

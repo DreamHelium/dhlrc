@@ -17,7 +17,7 @@ using setIntFunc = void (*) (void *, qsizetype, int);
 using getItemNameFunc = const char *(*) (qsizetype);
 using getItemDescriptionFunc = const char *(*) (qsizetype);
 
-ConfigObjectUI::ConfigObjectUI (QLibrary *library, ConfigType type,
+ConfigObjectUI::ConfigObjectUI (ModuleLibrary *library, ConfigType type,
                                 qsizetype len, QWidget *parent)
     : QDialog (parent), type (type), library (library)
 {
@@ -149,7 +149,7 @@ ConfigObjectUI::handleCancel ()
 }
 
 void *
-ConfigObjectUI::getObject (QLibrary *library, ConfigType type, bool ask,
+ConfigObjectUI::getObject (ModuleLibrary *library, ConfigType type, bool ask,
                            bool *cancelled)
 {
   const char *getFnName = nullptr;

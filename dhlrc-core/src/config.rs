@@ -1,14 +1,3 @@
-/*! The configuration: a plain value plus how it is read, written and created.
- *
- * The old frontend used `KConfig` (`config.kcfg` → a generated `DhConfig`).
- * This replaces it with an ordinary Rust value serialised as TOML, so the core
- * needs no toolkit at all. The shape mirrors the old entries one for one; the
- * group names lost their capitals and the two `Enum`s became TOML strings.
- *
- * The old `KConfig` file (`~/.config/dhlrcrc`) is not read at all: the first
- * run always starts from the defaults.
- */
-
 use crate::notification::{Level, Notification};
 use common_rs::i18n::i18n;
 use formatx::formatx;
@@ -223,6 +212,34 @@ impl Default for Reader {
     }
 }
 
+/// The `[notifications]` group.
+///
+/// `app_id` names the sender of a desktop notification: the Windows
+/// `System.AppUserModel.ID`, or the macOS bundle identifier. Unset (the default)
+/// leaves the platform's own choice.
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(default)]
+pub struct Notifications {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub app_id: Option<String>,
+    /// How long a notification stays before it disappears, in milliseconds;
+    /// zero leaves it to the platform.
+    pub timeout_ms: u32,
+    /// Whether to hold back a desktop notification while the application is
+    /// active (the in-app one is enough then).
+    pub suppress_when_active: bool,
+}
+
+impl Default for Notifications {
+    fn default() -> Self {
+        Self {
+            app_id: None,
+            timeout_ms: 5000,
+            suppress_when_active: true,
+        }
+    }
+}
+
 /// The whole configuration.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(default)]
@@ -233,6 +250,7 @@ pub struct Config {
     pub defaults: Defaults,
     pub game: Game,
     pub reader: Reader,
+    pub notifications: Notifications,
     #[serde(skip_serializing_if = "map_is_empty")]
     pub plugins: BTreeMap<String, PluginConfig>,
 }
@@ -245,6 +263,7 @@ impl Default for Config {
             defaults: Defaults::default(),
             game: Game::default(),
             reader: Reader::default(),
+            notifications: Notifications::default(),
             plugins: BTreeMap::new(),
         }
     }
@@ -263,6 +282,24 @@ impl Config {
 pub struct ConfigPaths {
     /// The file this build uses (`<config_home>/dhlrc/config.toml`).
     pub file: PathBuf,
+}
+
+impl ConfigPaths {
+    /// The message a frontend shows when the file changed on disk and the new
+    /// values were applied. Used by the watcher and available to a frontend
+    /// that polls the file itself.
+    pub fn reloaded_notification(&self) -> Notification {
+        Notification::new(
+            "configReloaded",
+            Level::Info,
+            gettext(i18n("Configuration reloaded")),
+            formatx!(
+                gettext(i18n("The configuration was reloaded from {}.")),
+                self.file.display().to_string()
+            )
+            .unwrap_or_default(),
+        )
+    }
 }
 
 /// What happened when the configuration was opened.
@@ -599,6 +636,23 @@ mod tests {
         let text = serialize(&config);
         let parsed: Config = toml::from_str(&text).unwrap();
         assert_eq!(config, parsed);
+    }
+
+    #[test]
+    fn notifications_app_id_round_trips_and_is_left_out_unset() {
+        // Unset: no `app_id`, but the group's other values are written.
+        let unset = serialize(&Config::default());
+        assert!(unset.contains("[notifications]"), "text was {unset}");
+        assert!(!unset.contains("app_id"), "text was {unset}");
+
+        // Set: it survives a write and a read.
+        let mut config = Config::default();
+        config.notifications.app_id = Some("cn.dh.dhlrc".to_owned());
+        let text = serialize(&config);
+        let parsed: Config = toml::from_str(&text).unwrap();
+        assert_eq!(parsed.notifications.app_id.as_deref(), Some("cn.dh.dhlrc"));
+        assert_eq!(parsed.notifications.timeout_ms, 5000);
+        assert!(parsed.notifications.suppress_when_active);
     }
 
     #[test]

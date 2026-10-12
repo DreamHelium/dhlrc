@@ -173,7 +173,8 @@ SaveAllRegionJob::SaveAllRegionJob (QObject *parent) : KCompositeJob (parent)
 SaveAllRegionJob::~SaveAllRegionJob () = default;
 
 void *
-SaveAllRegionJob::resolveOutputConfig (const QString &type, QLibrary *library,
+SaveAllRegionJob::resolveOutputConfig (const QString &type,
+                                       ModuleLibrary *library,
                                        PluginOptionsConfig *pluginOptions,
                                        bool *cancelled)
 {
@@ -333,7 +334,7 @@ void
 SaveAllRegionJob::addSave (const QList<std::shared_ptr<RegionClass>> &list,
                            const QString &outputDir, const QString &suffix,
                            SingleTransFunc func, const QString &type,
-                           QLibrary *library)
+                           ModuleLibrary *library)
 {
   if (list.isEmpty ())
     return;
@@ -488,7 +489,7 @@ SaveAllRegionJob::addSave (const QList<std::shared_ptr<RegionClass>> &list,
 void
 SaveAllRegionJob::addSaveIntoMulti (
     const QList<std::shared_ptr<RegionClass>> &list, const QString &filename,
-    const QString &suffix, QLibrary *library, const QString &type)
+    const QString &suffix, ModuleLibrary *library, const QString &type)
 {
   if (list.isEmpty ())
     return;
@@ -785,7 +786,7 @@ SaveAllRegionJob::needsOptions (const QString &type) const
 }
 
 void *
-SaveAllRegionJob::askForOptions (const QString &type, QLibrary *library)
+SaveAllRegionJob::askForOptions (const QString &type, ModuleLibrary *library)
 {
   /* Runs on the GUI thread, from the Continue click: the options window is
    * modal and must not be shown from the thread pool.
@@ -807,7 +808,7 @@ SaveAllRegionJob::askForOptions (const QString &type, QLibrary *library)
 }
 
 void *
-SaveAllRegionJob::ownConfigObject (void *object, QLibrary *library)
+SaveAllRegionJob::ownConfigObject (void *object, ModuleLibrary *library)
 {
   /* The objects are owned here, not by the jobs that use them: a job is
    * deleted by `removeSubjob ()` the moment it finishes, and the object has to

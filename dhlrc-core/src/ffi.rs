@@ -9,11 +9,13 @@ use crate::config::{
     Config, ConfigPaths, ConfigWatch, ConfigWatcher, OptionValue, PluginDirection, ShowOption,
     Unit, default_paths, load_or_create, save_config,
 };
+use crate::modules::Modules;
 use crate::notification::Level;
 use std::ffi::{CStr, CString, c_char, c_void};
 use std::path::PathBuf;
 use std::ptr;
-use std::sync::{Arc, Mutex};
+use std::sync::atomic::{AtomicBool, Ordering};
+use std::sync::{Arc, Mutex, OnceLock};
 
 /* Kept in sync with the `DHLRC_LEVEL_*` values in the header. */
 const LEVEL_INFO: i32 = 0;
@@ -43,8 +45,16 @@ pub type DhlrcNotifyFunc = extern "C" fn(
     text: *const c_char,
 );
 
-/// Called from the watch thread when the configuration file changed.
-pub type DhlrcChangeFunc = extern "C" fn(user_data: *mut c_void);
+/// Called from the watch thread when the configuration file changed. The
+/// strings describe the change (a `Notification`) and are only valid for the
+/// duration of the call.
+pub type DhlrcChangeFunc = extern "C" fn(
+    user_data: *mut c_void,
+    level: i32,
+    event_id: *const c_char,
+    title: *const c_char,
+    text: *const c_char,
+);
 
 /// A snapshot of the configuration. The layout must match `DhlrcConfigView` in
 /// the header, field for field.
@@ -135,6 +145,9 @@ fn owned(strings: &mut Vec<CString>, value: &str) -> *const c_char {
 /// The part of the core the watch thread and the accessors share.
 struct Shared {
     config: Mutex<Config>,
+    /// Set false by the frontend to stop the desktop notifications, typically
+    /// while its window is active.
+    notifications_enabled: AtomicBool,
 }
 
 /// The handle a non-Rust frontend holds.
@@ -144,6 +157,8 @@ pub struct DhlrcCore {
     paths: ConfigPaths,
     shared: Arc<Shared>,
     watch: Mutex<Option<ConfigWatch>>,
+    /// The plugins, loaded by `dhlrc_core_load_modules`.
+    modules: Mutex<Option<Modules>>,
 }
 
 #[unsafe(no_mangle)]
@@ -162,12 +177,19 @@ pub extern "C" fn dhlrc_core_open(
         }
     };
 
+    let notes = init.notifications();
+    present_desktop(
+        true,
+        init.config.notifications.app_id.as_deref(),
+        init.config.notifications.timeout_ms,
+        &notes,
+    );
     if let Some(notify) = notify {
-        for note in init.notifications() {
+        for note in &notes {
             // The strings only have to live for the call.
             let event = CString::new(note.event_id).unwrap_or_default();
-            let title = CString::new(note.title).unwrap_or_default();
-            let text = CString::new(note.text).unwrap_or_default();
+            let title = CString::new(note.title.as_str()).unwrap_or_default();
+            let text = CString::new(note.text.as_str()).unwrap_or_default();
             notify(
                 notify_user_data,
                 level_to_int(note.level),
@@ -183,9 +205,11 @@ pub extern "C" fn dhlrc_core_open(
         path,
         shared: Arc::new(Shared {
             config: Mutex::new(init.config),
+            notifications_enabled: AtomicBool::new(true),
         }),
         paths,
         watch: Mutex::new(None),
+        modules: Mutex::new(None),
     });
     Box::into_raw(core)
 }
@@ -231,16 +255,37 @@ pub extern "C" fn dhlrc_core_watch_start(
         Err(_) => return -1,
     };
     let shared = Arc::clone(&core.shared);
+    let paths = core.paths.clone();
     // Carried as a `usize` so the closure is `Send`: the caller keeps `user_data`
     // valid until the watch is stopped.
     let user_address = user_data as usize;
     let watcher = ConfigWatcher::from_config(core.paths.clone(), current);
 
     match watcher.spawn(move |config| {
+        let app_id = config.notifications.app_id.clone();
+        let timeout_ms = config.notifications.timeout_ms;
         if let Ok(mut guard) = shared.config.lock() {
             *guard = config;
         }
-        on_change(user_address as *mut c_void);
+        // Tell the frontend what changed; the strings only live for the call.
+        let note = paths.reloaded_notification();
+        let enabled = shared.notifications_enabled.load(Ordering::Relaxed);
+        present_desktop(
+            enabled,
+            app_id.as_deref(),
+            timeout_ms,
+            std::slice::from_ref(&note),
+        );
+        let event = c_string(note.event_id);
+        let title = c_string(&note.title);
+        let text = c_string(&note.text);
+        on_change(
+            user_address as *mut c_void,
+            level_to_int(note.level),
+            event.as_ptr(),
+            title.as_ptr(),
+            text.as_ptr(),
+        );
     }) {
         Ok(watch) => match core.watch.lock() {
             Ok(mut guard) => {
@@ -343,6 +388,312 @@ pub extern "C" fn dhlrc_core_save(core: *const DhlrcCore, error: *mut *mut c_cha
             set_error(error, &err.to_string());
             -1
         }
+    }
+}
+
+/// Turns the desktop notifications on or off. On by default; a frontend turns
+/// them off while its window is active.
+#[unsafe(no_mangle)]
+pub extern "C" fn dhlrc_core_set_notifications_enabled(core: *mut DhlrcCore, enabled: bool) {
+    if core.is_null() {
+        return;
+    }
+    let core = unsafe { &*core };
+    core.shared
+        .notifications_enabled
+        .store(enabled, Ordering::Relaxed);
+}
+
+/// One module, as the C interface describes it. The pointers are borrowed from
+/// the module the core loaded and stay valid until the modules are loaded
+/// again or the core is freed; a NULL string means the module does not declare
+/// that value.
+#[repr(C)]
+pub struct DhlrcModuleInfo {
+    pub file: *const c_char,
+    pub type_name: *const c_char,
+    pub file_suffix: *const c_char,
+    pub base_type: *const c_char,
+    pub filter: *const c_char,
+    pub is_multi: i32,
+    pub encoding: i32,
+}
+
+fn optional_ptr(value: &Option<CString>) -> *const c_char {
+    value.as_ref().map_or(ptr::null(), |string| string.as_ptr())
+}
+
+/// Opens every plugin next to the executable. Loading again replaces the
+/// current set (and invalidates the pointers a previous `*_info` handed out).
+#[unsafe(no_mangle)]
+pub extern "C" fn dhlrc_core_load_modules(core: *mut DhlrcCore, error: *mut *mut c_char) -> i32 {
+    if core.is_null() {
+        set_error(error, "dhlrc_core_load_modules: null argument");
+        return -1;
+    }
+    let core = unsafe { &*core };
+    let (region_dir, load_dir) = crate::modules::default_dirs();
+    let modules = Modules::load(&region_dir, &load_dir);
+    match core.modules.lock() {
+        Ok(mut guard) => {
+            *guard = Some(modules);
+            0
+        }
+        Err(_) => {
+            set_error(error, "the modules are being read");
+            -1
+        }
+    }
+}
+
+#[unsafe(no_mangle)]
+pub extern "C" fn dhlrc_core_region_module_count(core: *const DhlrcCore) -> usize {
+    if core.is_null() {
+        return 0;
+    }
+    let core = unsafe { &*core };
+    match core.modules.lock() {
+        Ok(guard) => guard.as_ref().map_or(0, Modules::region_count),
+        Err(_) => 0,
+    }
+}
+
+#[unsafe(no_mangle)]
+pub extern "C" fn dhlrc_core_load_module_count(core: *const DhlrcCore) -> usize {
+    if core.is_null() {
+        return 0;
+    }
+    let core = unsafe { &*core };
+    match core.modules.lock() {
+        Ok(guard) => guard.as_ref().map_or(0, Modules::load_count),
+        Err(_) => 0,
+    }
+}
+
+#[unsafe(no_mangle)]
+pub extern "C" fn dhlrc_core_region_module_info(
+    core: *const DhlrcCore,
+    index: usize,
+    info: *mut DhlrcModuleInfo,
+) -> i32 {
+    if core.is_null() || info.is_null() {
+        return -1;
+    }
+    let core = unsafe { &*core };
+    let Ok(guard) = core.modules.lock() else {
+        return -1;
+    };
+    let Some(module) = guard
+        .as_ref()
+        .and_then(|modules| modules.region_info(index))
+    else {
+        return -1;
+    };
+    fill_module_info(info, module);
+    0
+}
+
+#[unsafe(no_mangle)]
+pub extern "C" fn dhlrc_core_load_module_info(
+    core: *const DhlrcCore,
+    index: usize,
+    info: *mut DhlrcModuleInfo,
+) -> i32 {
+    if core.is_null() || info.is_null() {
+        return -1;
+    }
+    let core = unsafe { &*core };
+    let Ok(guard) = core.modules.lock() else {
+        return -1;
+    };
+    let Some(module) = guard.as_ref().and_then(|modules| modules.load_info(index)) else {
+        return -1;
+    };
+    fill_module_info(info, module);
+    0
+}
+
+#[unsafe(no_mangle)]
+pub extern "C" fn dhlrc_core_region_module_symbol(
+    core: *const DhlrcCore,
+    index: usize,
+    name: *const c_char,
+) -> *mut c_void {
+    module_symbol(core, index, name, true)
+}
+
+#[unsafe(no_mangle)]
+pub extern "C" fn dhlrc_core_load_module_symbol(
+    core: *const DhlrcCore,
+    index: usize,
+    name: *const c_char,
+) -> *mut c_void {
+    module_symbol(core, index, name, false)
+}
+
+fn fill_module_info(info: *mut DhlrcModuleInfo, module: &crate::modules::ModuleInfo) {
+    let out = unsafe { &mut *info };
+    out.file = module.file.as_ptr();
+    out.type_name = optional_ptr(&module.type_name);
+    out.file_suffix = optional_ptr(&module.file_suffix);
+    out.base_type = optional_ptr(&module.base_type);
+    out.filter = optional_ptr(&module.filter);
+    out.is_multi = i32::from(module.is_multi);
+    out.encoding = module.encoding;
+}
+
+fn module_symbol(
+    core: *const DhlrcCore,
+    index: usize,
+    name: *const c_char,
+    region: bool,
+) -> *mut c_void {
+    if core.is_null() || name.is_null() {
+        return ptr::null_mut();
+    }
+    let core = unsafe { &*core };
+    let name = unsafe { CStr::from_ptr(name) }.to_string_lossy();
+    let Ok(guard) = core.modules.lock() else {
+        return ptr::null_mut();
+    };
+    match guard.as_ref() {
+        Some(modules) if region => modules.region_symbol(index, &name),
+        Some(modules) => modules.load_symbol(index, &name),
+        None => ptr::null_mut(),
+    }
+}
+
+/// One setting, as the C interface describes it. The pointers are borrowed
+/// from the static table and stay valid for the whole run; an `Enum` setting
+/// has `choice_count` choices, read with `dhlrc_core_setting_choice`.
+#[repr(C)]
+pub struct DhlrcSettingInfo {
+    pub key: *const c_char,
+    pub group: *const c_char,
+    pub kind: i32,
+    pub label: *const c_char,
+    pub tooltip: *const c_char,
+    pub choice_count: usize,
+    pub default_value: *const c_char,
+    pub long_text: bool,
+}
+
+/// A `SettingDef` turned into NUL-terminated message ids, so a C frontend can
+/// read them. Built once and kept for the run.
+struct SettingRow {
+    key: CString,
+    group: CString,
+    kind: i32,
+    label: CString,
+    tooltip: CString,
+    choices: Vec<CString>,
+    default_value: CString,
+    long_text: bool,
+}
+
+/// The settings, in the order the schema lists them.
+fn settings_table() -> &'static [SettingRow] {
+    static TABLE: OnceLock<Vec<SettingRow>> = OnceLock::new();
+    TABLE.get_or_init(|| {
+        crate::schema::SETTINGS
+            .iter()
+            .map(|def| SettingRow {
+                key: c_string(def.key),
+                group: c_string(def.group),
+                kind: def.kind.to_int(),
+                label: c_string(def.label),
+                tooltip: c_string(def.tooltip),
+                choices: def.choices.iter().map(|choice| c_string(choice)).collect(),
+                default_value: c_string(def.default),
+                long_text: def.long_text,
+            })
+            .collect()
+    })
+}
+
+fn c_string(value: &str) -> CString {
+    CString::new(value).unwrap_or_default()
+}
+
+#[unsafe(no_mangle)]
+pub extern "C" fn dhlrc_core_setting_count() -> usize {
+    settings_table().len()
+}
+
+#[unsafe(no_mangle)]
+pub extern "C" fn dhlrc_core_setting_info(index: usize, info: *mut DhlrcSettingInfo) -> i32 {
+    if info.is_null() {
+        return -1;
+    }
+    let Some(row) = settings_table().get(index) else {
+        return -1;
+    };
+    let out = unsafe { &mut *info };
+    out.key = row.key.as_ptr();
+    out.group = row.group.as_ptr();
+    out.kind = row.kind;
+    out.label = row.label.as_ptr();
+    out.tooltip = row.tooltip.as_ptr();
+    out.choice_count = row.choices.len();
+    out.default_value = row.default_value.as_ptr();
+    out.long_text = row.long_text;
+    0
+}
+
+#[unsafe(no_mangle)]
+pub extern "C" fn dhlrc_core_setting_choice(index: usize, choice: usize) -> *const c_char {
+    settings_table()
+        .get(index)
+        .and_then(|row| row.choices.get(choice))
+        .map_or(ptr::null(), |value| value.as_ptr())
+}
+
+#[unsafe(no_mangle)]
+pub extern "C" fn dhlrc_core_setting_get(
+    core: *const DhlrcCore,
+    key: *const c_char,
+) -> *mut c_char {
+    if core.is_null() || key.is_null() {
+        return ptr::null_mut();
+    }
+    let core = unsafe { &*core };
+    let key = unsafe { CStr::from_ptr(key) }.to_string_lossy();
+    let config = match core.shared.config.lock() {
+        Ok(guard) => guard,
+        Err(_) => return ptr::null_mut(),
+    };
+    match config.setting(&key) {
+        Some(value) => match CString::new(value) {
+            Ok(string) => string.into_raw(),
+            Err(_) => ptr::null_mut(),
+        },
+        None => ptr::null_mut(),
+    }
+}
+
+#[unsafe(no_mangle)]
+pub extern "C" fn dhlrc_core_setting_set(
+    core: *mut DhlrcCore,
+    key: *const c_char,
+    value: *const c_char,
+) -> i32 {
+    if core.is_null() || key.is_null() {
+        return -1;
+    }
+    let core = unsafe { &*core };
+    let key = unsafe { CStr::from_ptr(key) }
+        .to_string_lossy()
+        .into_owned();
+    let value = from_c_required(value);
+    match core.shared.config.lock() {
+        Ok(mut guard) => {
+            if guard.set_setting(&key, &value) {
+                0
+            } else {
+                -1
+            }
+        }
+        Err(_) => -1,
     }
 }
 
@@ -611,6 +962,22 @@ fn level_to_int(level: Level) -> i32 {
         Level::Warning => LEVEL_WARNING,
         Level::Error => LEVEL_ERROR,
     }
+}
+
+/// Shows `notes` on the desktop when the `desktop-notifications` feature is
+/// built in and notifications are enabled, and does nothing otherwise.
+fn present_desktop(
+    enabled: bool,
+    app_id: Option<&str>,
+    timeout_ms: u32,
+    notes: &[crate::notification::Notification],
+) {
+    #[cfg(feature = "desktop-notifications")]
+    if enabled {
+        crate::desktop::present_all(notes, app_id, timeout_ms);
+    }
+    #[cfg(not(feature = "desktop-notifications"))]
+    let _ = (enabled, app_id, timeout_ms, notes);
 }
 
 fn unit_to_int(unit: Unit) -> i32 {

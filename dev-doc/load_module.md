@@ -70,18 +70,20 @@ the module self-describing: the host never hard-codes `"NBT"`, so adding a codec
 
 ## How the application loads them
 
-`loadObjectModules()` in `src/loadmodule.cpp` scans `load_module/` and calls `LoadObjectBase::fromLibrary()` for each
-file:
+`dhlrc_core_load_modules()` (in `dhlrc-core/src/modules.rs`) scans `region_module/` and `load_module/` next to the
+executable, `dlopen`s each library and reads `object_base_type()` from the codecs. On the C++ side,
+`ManageRegionUI::loadModules()` asks the core to load them, then wraps each survivor with
+`LoadObjectBase::fromIndex()`:
 
-1. `QLibrary::load()` — the library must load; otherwise it is reported with `qWarning()` and skipped.
-2. `object_base_type()` is resolved and called; the returned name is copied and the `CString` freed.
-3. `region_get_object()` and `object_free()` are resolved.
+1. The core opens the library; one that will not open is reported and skipped.
+2. `object_base_type()` is read by the core; the returned name is copied and the `CString` freed.
+3. `LoadObjectBase::fromIndex()` binds `region_get_object()` and `object_free()` through the core.
 4. Anything missing makes the codec invalid; it is reported with `qWarning()` and **dropped**, so a partially
    implemented library can never crash the program later.
 
-Ownership is RAII: `LoadObjectBase` keeps the `QLibrary` alive, and the list of codecs lives for the lifetime of the
-application. There is no manual `delete` and no leaked library. The result is a `QList<LoadObjectBase>`, reachable
-through `ManageRegionUI::getLoadObjectList()`.
+Ownership lives in the core, which keeps the library loaded for the run; `LoadObjectBase` holds only a `ModuleLibrary`
+handle. There is no manual `delete` and no leaked library. The result is a `QList<LoadObjectBase>`, reachable through
+`ManageRegionUI::getLoadObjectList()`.
 
 `DhLoadJob` walks that list, trying each codec on the file until one returns an object, and keeps the codec's
 `baseType()` to pick the region plugins afterwards.

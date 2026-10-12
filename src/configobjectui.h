@@ -3,9 +3,10 @@
 
 #include <QDialog>
 #include <QLabel>
-#include <QLibrary>
 #include <QVBoxLayout>
 #include <QWidget>
+
+#include "modulelibrary.h"
 
 using ConfigType = enum ConfigType
 {
@@ -17,8 +18,8 @@ class ConfigObjectUI : public QDialog
 {
   Q_OBJECT
 public:
-  explicit ConfigObjectUI (QLibrary *library, ConfigType type, qsizetype len,
-                           QWidget *parent = nullptr);
+  explicit ConfigObjectUI (ModuleLibrary *library, ConfigType type,
+                           qsizetype len, QWidget *parent = nullptr);
   ~ConfigObjectUI () = default;
 
   /* The plugin's config object. With `ask` false (the default) it holds the
@@ -29,8 +30,8 @@ public:
    * without confirming. Callers that must not proceed on a dismissal (a write,
    * say) check it and abort; a null result then means the user said no rather
    * than "this plugin has no options". */
-  static void *getObject (QLibrary *library, ConfigType type, bool ask = false,
-                          bool *cancelled = nullptr);
+  static void *getObject (ModuleLibrary *library, ConfigType type,
+                          bool ask = false, bool *cancelled = nullptr);
   /* The plugin's config object, carried by the window. */
   void *defaultObject = nullptr;
   /* True when the window was closed without the OK button. */
@@ -44,7 +45,7 @@ private:
   QPushButton *okBtn;
   QPushButton *cancelBtn;
   QList<QWidget *> widgets;
-  QLibrary *library;
+  ModuleLibrary *library;
 
 private Q_SLOTS:
   void okBtn_clicked ();

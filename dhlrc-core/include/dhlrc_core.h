@@ -57,8 +57,12 @@ extern "C"
                                    const char *text);
 
   /* Called from the watch thread when the configuration file changed. The new
-   * values are read with `dhlrc_core_config_view`. */
-  typedef void (*DhlrcChangeFunc) (void *user_data);
+   * values are read with `dhlrc_core_config_view`; `level`, `event_id`,
+   * `title` and `text` describe the change (a notification, see
+   * `DhlrcNotifyFunc`) and are only valid for the duration of the call. */
+  typedef void (*DhlrcChangeFunc) (void *user_data, int32_t level,
+                                   const char *event_id, const char *title,
+                                   const char *text);
 
   /* A snapshot of the configuration. Free it with `dhlrc_config_view_free`.
    *
@@ -123,6 +127,52 @@ extern "C"
   /* Writes the current configuration back to the file. */
   int32_t dhlrc_core_save (const DhlrcCore *core, char **error);
 
+  /* Turns the desktop notifications on or off (on by default). A frontend
+   * turns them off while its window is active, so the in-app message is
+   * enough.
+   */
+  void dhlrc_core_set_notifications_enabled (DhlrcCore *core, bool enabled);
+
+  /* One module the core loaded. Every string is borrowed from the core and
+   * stays valid until `dhlrc_core_load_modules` is called again or the core is
+   * freed; a NULL string means the module does not declare that value (and
+   * `type_name` is always NULL for an object codec). */
+  struct DhlrcModuleInfo
+  {
+    const char *file;
+    const char *type_name;
+    const char *file_suffix;
+    const char *base_type;
+    const char *filter;
+    int32_t is_multi; /* 0 or 1; region modules only */
+    int32_t encoding; /* required NBT encoding, region modules only:
+                         0 any, 1 big-endian, 2 little-endian,
+                         3 network little-endian */
+  };
+
+  /* Opens the plugins next to the executable (`region_module/`,
+   * `load_module/`). A library that will not open, or that is incomplete, is
+   * skipped. Returns 0 on success, -1 with an owned `*error` otherwise. */
+  int32_t dhlrc_core_load_modules (DhlrcCore *core, char **error);
+
+  /* How many region modules / object codecs were loaded. */
+  size_t dhlrc_core_region_module_count (const DhlrcCore *core);
+  size_t dhlrc_core_load_module_count (const DhlrcCore *core);
+
+  /* Fills `*info` for region module / object codec `index`; returns 0, or -1
+   * when `index` is out of range. */
+  int32_t dhlrc_core_region_module_info (const DhlrcCore *core, size_t index,
+                                         struct DhlrcModuleInfo *info);
+  int32_t dhlrc_core_load_module_info (const DhlrcCore *core, size_t index,
+                                       struct DhlrcModuleInfo *info);
+
+  /* The address of a symbol in a module, or NULL when it has none. Cast it
+   * back to the function's own type before calling. */
+  void *dhlrc_core_region_module_symbol (const DhlrcCore *core, size_t index,
+                                         const char *name);
+  void *dhlrc_core_load_module_symbol (const DhlrcCore *core, size_t index,
+                                       const char *name);
+
   /* Which symbol set a plugin option belongs to. */
   typedef enum
   {
@@ -148,6 +198,48 @@ extern "C"
   void dhlrc_core_plugin_set_int (DhlrcCore *core, const char *type,
                                   int32_t kind, const char *key,
                                   int64_t value);
+
+  /* Which control a setting wants. Kept in sync with `SettingType::to_int` in
+   * the core, and ordered like `DhSettingItem::Type`. */
+  typedef enum
+  {
+    DHLRC_SETTING_BOOL = 0,
+    DHLRC_SETTING_INT = 1,
+    DHLRC_SETTING_STRING = 2,
+    DHLRC_SETTING_PATH = 3,
+    DHLRC_SETTING_ENUM = 4,
+  } DhlrcSettingType;
+
+  /* One editable setting the core describes, so a frontend adds no per-setting
+   * code of its own. Every string is a message id (localise it before showing
+   * it) and is borrowed from the core, valid for the whole run. An `Enum` has
+   * `choice_count` choices, read with `dhlrc_core_setting_choice`. */
+  struct DhlrcSettingInfo
+  {
+    const char *key;
+    const char *group;
+    int32_t kind;        /* a DhlrcSettingType */
+    const char *label;   /* may be "" */
+    const char *tooltip; /* may be "" */
+    size_t choice_count;
+    const char *default_value; /* a message id or a plain value */
+    bool long_text;
+  };
+
+  /* How many settings the core describes. */
+  size_t dhlrc_core_setting_count (void);
+  /* Fills `*info` for setting `index`; returns 0, or -1 when out of range. */
+  int32_t dhlrc_core_setting_info (size_t index,
+                                   struct DhlrcSettingInfo *info);
+  /* The `choice`-th choice label of setting `index`; NULL when out of range.
+   */
+  const char *dhlrc_core_setting_choice (size_t index, size_t choice);
+  /* Reads one setting as text; the result is owned, free it with
+   * `dhlrc_string_free`. NULL when `key` is unknown. */
+  char *dhlrc_core_setting_get (const DhlrcCore *core, const char *key);
+  /* Writes one setting from text; returns 0, or -1 when `key` is unknown. */
+  int32_t dhlrc_core_setting_set (DhlrcCore *core, const char *key,
+                                  const char *value);
 
   /* Frees a `char *` the library returned for the caller to own. */
   void dhlrc_string_free (char *string);

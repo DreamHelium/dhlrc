@@ -3,6 +3,7 @@
 
 #include "dhwidget.h"
 #include "loadmodule.h"
+#include "modulelibrary.h"
 #include "region.h"
 #include "regionclass.h"
 #include <KColorButton>
@@ -11,7 +12,6 @@
 #include <QDateTime>
 #include <QFrame>
 #include <QLabel>
-#include <QLibrary>
 #include <QMainWindow>
 #include <QReadWriteLock>
 #include <QScrollArea>
@@ -36,17 +36,14 @@ using SingleTransFunc
  * / `asMulti ()` return a ready-to-use pointer or `nullptr`, so unsupported
  * operations are just a null check.
  *
- * Ownership: a module owns its library and frees it in its destructor, and a
- * failed module (`isValid () == false`) reports why through `errorString ()`.
- * Use `ModuleBase::fromLibrary ()` to build one; it resolves and validates
- * every required symbol up front. */
+ * Ownership: the core owns the loaded library and its lifetime; a module here
+ * is a thin wrapper over one entry in the core's `region_module/` list. A
+ * module that cannot be used (`isValid () == false`) reports why through
+ * `errorString ()`. Use `ModuleBase::fromIndex ()` to build one; it binds and
+ * validates every required symbol up front. */
 class ModuleBase
 {
 public:
-  using GetNameFunc = const char *(*) ();
-  using IsMultiFunc = int32_t (*) ();
-  using EncodingFunc = int32_t (*) ();
-
   virtual ~ModuleBase ();
 
   ModuleBase (const ModuleBase &) = delete;
@@ -54,10 +51,11 @@ public:
   ModuleBase (ModuleBase &&) = delete;
   ModuleBase &operator= (ModuleBase &&) = delete;
 
-  /* Loads `library` (taking ownership) and creates the matching module. The
-   * result is never null; check `isValid ()` / `errorString ()` before use. */
+  /* Builds the module the core loaded at `index` in its `region_module/` list.
+   * The result is never null; check `isValid ()` / `errorString ()` before
+   * use. */
   [[nodiscard]] static std::unique_ptr<ModuleBase>
-  fromLibrary (std::unique_ptr<QLibrary> library);
+  fromIndex (std::size_t index);
 
   [[nodiscard]] bool
   isValid () const
@@ -100,10 +98,10 @@ public:
   }
   /* The file dialog filter, already translated. */
   [[nodiscard]] QString filter () const;
-  [[nodiscard]] QLibrary *
-  library () const
+  [[nodiscard]] ModuleLibrary *
+  library ()
   {
-    return module.get ();
+    return &module;
   }
 
   /* The plugin's own translation domain. */
@@ -131,7 +129,7 @@ protected:
    */
   void initialize ();
 
-  std::unique_ptr<QLibrary> module;
+  ModuleLibrary module;
   QString typeString;
   QString fileSuffixString;
   QString baseTypeString;

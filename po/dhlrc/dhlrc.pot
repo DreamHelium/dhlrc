@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-10 21:56+0800\n"
+"POT-Creation-Date: 2026-10-12 22:49+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -51,7 +51,7 @@ msgid "z"
 msgstr ""
 
 #: ../../src/blocklistui.cpp:59 ../../src/blocklistui.cpp:62
-#: ../../src/mainwindow.cpp:570
+#: ../../dhlrc-core/src/schema.rs:70
 msgid "Palette"
 msgstr ""
 
@@ -105,7 +105,7 @@ msgid "Unknown"
 msgstr ""
 
 #: ../../src/blockreaderui.cpp:290 ../../src/externalnbtreaderui.cpp:109
-#: ../../src/manageregionui.cpp:244 ../../src/manageregionui.cpp:569
+#: ../../src/manageregionui.cpp:212 ../../src/manageregionui.cpp:550
 #: ../../src/regionmodifyui.cpp:13 ../../src/utility.cpp:24
 #: ../../src/utility.cpp:45 ../../src/utility.cpp:53
 msgid "Error!"
@@ -132,7 +132,7 @@ msgstr ""
 msgid "&Modify Property"
 msgstr ""
 
-#: ../../src/blockshowui.cpp:101 ../../src/manageregionui.cpp:277
+#: ../../src/blockshowui.cpp:101 ../../src/manageregionui.cpp:245
 msgid "Warning!"
 msgstr ""
 
@@ -223,12 +223,12 @@ msgstr ""
 msgid "Finish processing %1 of %2 (%3%)."
 msgstr ""
 
-#: ../../src/dhloadjob.cpp:580 ../../src/saveregionjob.cpp:456
-#: ../../src/saveregionjob.cpp:558
+#: ../../src/dhloadjob.cpp:580 ../../src/saveregionjob.cpp:457
+#: ../../src/saveregionjob.cpp:559
 msgid "Continue"
 msgstr ""
 
-#: ../../src/externalnbtreaderui.cpp:29 ../../src/mainwindow.cpp:643
+#: ../../src/externalnbtreaderui.cpp:29 ../../src/mainwindow.cpp:604
 msgid "NBT Reader"
 msgstr ""
 
@@ -248,235 +248,147 @@ msgstr ""
 msgid "&All"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:379
+#: ../../src/mainwindow.cpp:384
 msgid "Config"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:380
+#: ../../src/mainwindow.cpp:385
 msgid "Icon Theme"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:398
+#: ../../src/mainwindow.cpp:403
 msgid "Help"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:399
+#: ../../src/mainwindow.cpp:404
 msgid "&About"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:432
+#: ../../src/mainwindow.cpp:437
 msgid "Search..."
 msgstr ""
 
-#: ../../src/mainwindow.cpp:462
+#: ../../src/mainwindow.cpp:467
 msgid "NBT File Reader"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:463 ../../src/mainwindow.cpp:648
+#: ../../src/mainwindow.cpp:468 ../../src/mainwindow.cpp:609
 msgid "Manage Region"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:464 ../../src/mainwindow.cpp:661
+#: ../../src/mainwindow.cpp:469 ../../src/mainwindow.cpp:622
 msgid "Region Reader/Modifier"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:465
+#: ../../src/mainwindow.cpp:470
 msgid "Settings"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:521 ../../src/dhgameconfigui.h:15
-msgid "General"
-msgstr ""
-
-#: ../../src/mainwindow.cpp:525
-msgid "Application Memory Limit"
-msgstr ""
-
-#: ../../src/mainwindow.cpp:536
-msgid "Elapsed Milliseconds"
-msgstr ""
-
-#: ../../src/mainwindow.cpp:538
-msgid "Select All Regions In Loading"
-msgstr ""
-
-#: ../../src/mainwindow.cpp:540
-msgid "Loading File by File Extension"
-msgstr ""
-
-#: ../../src/mainwindow.cpp:542
-msgid "Retry Loading File when Failed"
-msgstr ""
-
-#: ../../src/mainwindow.cpp:544
-msgid "Strict NBT Encoding Matching"
-msgstr ""
-
-#: ../../src/mainwindow.cpp:547
-msgid "Use Cached File when Downloading Failed"
-msgstr ""
-
-#: ../../src/mainwindow.cpp:552
-msgid "Cache Directory"
-msgstr ""
-
-#: ../../src/mainwindow.cpp:556 ../../src/dhgameconfigui.h:15
-msgid "Default"
-msgstr ""
-
-#: ../../src/mainwindow.cpp:557
-msgid "Region Base Name"
-msgstr ""
-
-#: ../../src/mainwindow.cpp:558 rc.cpp:153
-msgid "Region Name"
-msgstr ""
-
-#: ../../src/mainwindow.cpp:559
-msgid "Multi-Region Display Name"
-msgstr ""
-
-#: ../../src/mainwindow.cpp:561
-msgid "Region Description"
-msgstr ""
-
-#: ../../src/mainwindow.cpp:562
-msgid "Region Author"
-msgstr ""
-
-#: ../../src/mainwindow.cpp:564 ../../src/dhgameconfigui.h:15
-msgid "Game"
-msgstr ""
-
-#: ../../src/mainwindow.cpp:565
-msgid "Override Settings"
-msgstr ""
-
-#: ../../src/mainwindow.cpp:566
-msgid "Override Version"
-msgstr ""
-
-#: ../../src/mainwindow.cpp:568
-msgid "Reader"
-msgstr ""
-
-#: ../../src/mainwindow.cpp:569
-msgid "Default Show Option"
-msgstr ""
-
-#: ../../src/mainwindow.cpp:570 ../../src/paletteaddui.cpp:68
-msgid "Name"
-msgstr ""
-
-#: ../../src/mainwindow.cpp:572
+#: ../../src/mainwindow.cpp:541
 msgid "Manage"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:583
+#: ../../src/mainwindow.cpp:552
 msgid "reading"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:584
+#: ../../src/mainwindow.cpp:553
 msgid "writing"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:586
+#: ../../src/mainwindow.cpp:558
 msgid "Use saved options for %1 (%2) instead of asking"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:758
-msgid "Configuration reloaded from %1"
-msgstr ""
-
-#: ../../src/mainwindow.cpp:1041
+#: ../../src/mainwindow.cpp:1036
 msgid "Return to tabs"
 msgstr ""
 
-#: ../../src/manageregionui.cpp:187
+#: ../../src/manageregionui.cpp:155
 msgid "&Select"
 msgstr ""
 
-#: ../../src/manageregionui.cpp:191 rc.cpp:96
+#: ../../src/manageregionui.cpp:159 rc.cpp:96
 msgid "&Add"
 msgstr ""
 
-#: ../../src/manageregionui.cpp:204
+#: ../../src/manageregionui.cpp:172
 msgid "Select &All"
 msgstr ""
 
-#: ../../src/manageregionui.cpp:211
+#: ../../src/manageregionui.cpp:179
 msgid "&Remove Selected"
 msgstr ""
 
-#: ../../src/manageregionui.cpp:215
+#: ../../src/manageregionui.cpp:183
 msgid "&Save Selected"
 msgstr ""
 
-#: ../../src/manageregionui.cpp:242
+#: ../../src/manageregionui.cpp:210
 msgid "Select Files"
 msgstr ""
 
-#: ../../src/manageregionui.cpp:245
+#: ../../src/manageregionui.cpp:213
 msgid "No file selected!"
 msgstr ""
 
-#: ../../src/manageregionui.cpp:278
+#: ../../src/manageregionui.cpp:246
 msgid "Locked regions were kept."
 msgstr ""
 
-#: ../../src/manageregionui.cpp:397
+#: ../../src/manageregionui.cpp:378
 msgid "%1 region(s) selected"
 msgstr ""
 
-#: ../../src/manageregionui.cpp:454 ../../src/utility.cpp:82
+#: ../../src/manageregionui.cpp:435 ../../src/utility.cpp:82
 msgid "Locked"
 msgstr ""
 
-#: ../../src/manageregionui.cpp:491
+#: ../../src/manageregionui.cpp:472
 msgid "Select Save Format"
 msgstr ""
 
-#: ../../src/manageregionui.cpp:491
+#: ../../src/manageregionui.cpp:472
 msgid "Please select the format to save to."
 msgstr ""
 
-#: ../../src/manageregionui.cpp:517
+#: ../../src/manageregionui.cpp:498
 msgid "Use MultiFunc?"
 msgstr ""
 
-#: ../../src/manageregionui.cpp:518
+#: ../../src/manageregionui.cpp:499
 msgid "This type supports regions to save as one file, do you want to use it?"
 msgstr ""
 
-#: ../../src/manageregionui.cpp:534
+#: ../../src/manageregionui.cpp:515
 msgid "Select File"
 msgstr ""
 
-#: ../../src/manageregionui.cpp:570
+#: ../../src/manageregionui.cpp:551
 msgid "This type cannot save a single region."
 msgstr ""
 
-#: ../../src/manageregionui.cpp:575
+#: ../../src/manageregionui.cpp:556
 msgid "Select Directory"
 msgstr ""
 
-#: ../../src/manageregionui.cpp:675
+#: ../../src/manageregionui.cpp:656
 msgid "Locked!"
 msgstr ""
 
-#: ../../src/manageregionui.cpp:687
+#: ../../src/manageregionui.cpp:668
 msgid "Region identifier"
 msgstr ""
 
-#: ../../src/manageregionui.cpp:690
+#: ../../src/manageregionui.cpp:671
 msgid "Added: %1"
 msgstr ""
 
-#: ../../src/manageregionui.cpp:729
+#: ../../src/manageregionui.cpp:710
 msgid "Input a New Name"
 msgstr ""
 
-#: ../../src/manageregionui.cpp:730
+#: ../../src/manageregionui.cpp:711
 msgid "Please input a new name for the region."
 msgstr ""
 
@@ -502,6 +414,10 @@ msgstr ""
 
 #: ../../src/paletteaddui.cpp:28
 msgid "Please enter a data."
+msgstr ""
+
+#: ../../src/paletteaddui.cpp:68 ../../dhlrc-core/src/schema.rs:70
+msgid "Name"
 msgstr ""
 
 #: ../../src/paletteaddui.cpp:68
@@ -572,42 +488,42 @@ msgstr ""
 msgid "Saving %1 (%2%): %3"
 msgstr ""
 
-#: ../../src/saveregionjob.cpp:219 ../../src/saveregionjob.cpp:431
-#: ../../src/saveregionjob.cpp:594
+#: ../../src/saveregionjob.cpp:220 ../../src/saveregionjob.cpp:432
+#: ../../src/saveregionjob.cpp:595
 msgid "Saved %1 of %2 (%3%)."
 msgstr ""
 
-#: ../../src/saveregionjob.cpp:415
+#: ../../src/saveregionjob.cpp:416
 msgid ""
 "Region %1 could not be saved:\n"
 "\n"
 "%2"
 msgstr ""
 
-#: ../../src/saveregionjob.cpp:453
+#: ../../src/saveregionjob.cpp:454
 msgid "Ready to save %1. Click Continue to set the options."
 msgstr ""
 
-#: ../../src/saveregionjob.cpp:555
+#: ../../src/saveregionjob.cpp:556
 msgid "Ready to save %1 region(s). Click Continue to set the options."
 msgstr ""
 
-#: ../../src/saveregionjob.cpp:609
+#: ../../src/saveregionjob.cpp:610
 msgid ""
 "The file %1 could not be written:\n"
 "\n"
 "%2"
 msgstr ""
 
-#: ../../src/saveregionjob.cpp:651
+#: ../../src/saveregionjob.cpp:652
 msgid "Saving %1 region(s)..."
 msgstr ""
 
-#: ../../src/saveregionjob.cpp:660
+#: ../../src/saveregionjob.cpp:661
 msgid "Saving %1 region(s) (%2%)"
 msgstr ""
 
-#: ../../src/saveregionjob.cpp:669
+#: ../../src/saveregionjob.cpp:670
 msgid "Saving %1 region(s) (%2%): %3"
 msgstr ""
 
@@ -789,6 +705,10 @@ msgstr ""
 msgid "Base Name"
 msgstr ""
 
+#: rc.cpp:153 ../../dhlrc-core/src/schema.rs:203
+msgid "Region Name"
+msgstr ""
+
 #: rc.cpp:156
 msgid "Data Version"
 msgstr ""
@@ -813,39 +733,348 @@ msgstr ""
 msgid "Uncompress finish!"
 msgstr ""
 
-#: ../../dhlrc-core/src/config.rs:177 ../../region-rs/src/default.rs:58
+#: ../../dhlrc-core/src/config.rs:166 ../../dhlrc-core/src/schema.rs:195
+#: ../../region-rs/src/default.rs:58
 msgid "Converted"
 msgstr ""
 
-#: ../../dhlrc-core/src/config.rs:183
+#: ../../dhlrc-core/src/config.rs:172 ../../dhlrc-core/src/schema.rs:207
 #: ../../region-litematic-rs/src/output.rs:396
 #: ../../region-rs/src/default.rs:60
 msgid "Unnamed"
 msgstr ""
 
-#: ../../dhlrc-core/src/config.rs:189
+#: ../../dhlrc-core/src/config.rs:178 ../../dhlrc-core/src/schema.rs:221
 #, rust-format
 msgid "${file} - ${region}"
 msgstr ""
 
-#: ../../dhlrc-core/src/config.rs:296
+#: ../../dhlrc-core/src/config.rs:295
+msgid "Configuration reloaded"
+msgstr ""
+
+#: ../../dhlrc-core/src/config.rs:297
+#, rust-format
+msgid "The configuration was reloaded from {}."
+msgstr ""
+
+#: ../../dhlrc-core/src/config.rs:333
 msgid "Configuration created"
 msgstr ""
 
-#: ../../dhlrc-core/src/config.rs:298
+#: ../../dhlrc-core/src/config.rs:335
 #, rust-format
 msgid "A new configuration file was created at {}."
 msgstr ""
 
-#: ../../dhlrc-core/src/config.rs:306
+#: ../../dhlrc-core/src/config.rs:343
 msgid "Configuration could not be read"
 msgstr ""
 
-#: ../../dhlrc-core/src/config.rs:309
+#: ../../dhlrc-core/src/config.rs:346
 #, rust-format
 msgid ""
 "The configuration file could not be read ({}). It was moved aside and a new "
 "one with the default values was created at {}."
+msgstr ""
+
+#: ../../dhlrc-core/src/schema.rs:63
+msgid "General"
+msgstr ""
+
+#: ../../dhlrc-core/src/schema.rs:64
+msgid "Default"
+msgstr ""
+
+#: ../../dhlrc-core/src/schema.rs:65
+msgid "Game"
+msgstr ""
+
+#: ../../dhlrc-core/src/schema.rs:66
+msgid "Reader"
+msgstr ""
+
+#: ../../dhlrc-core/src/schema.rs:67
+msgid "Notifications"
+msgstr ""
+
+#: ../../dhlrc-core/src/schema.rs:69
+msgid "GiB"
+msgstr ""
+
+#: ../../dhlrc-core/src/schema.rs:69
+msgid "MiB"
+msgstr ""
+
+#: ../../dhlrc-core/src/schema.rs:69
+msgid "KiB"
+msgstr ""
+
+#: ../../dhlrc-core/src/schema.rs:69
+msgid "Bytes"
+msgstr ""
+
+#: ../../dhlrc-core/src/schema.rs:79
+msgid "Application Memory Limit"
+msgstr ""
+
+#: ../../dhlrc-core/src/schema.rs:80
+msgid "The limit memory(bytes) for application."
+msgstr ""
+
+#: ../../dhlrc-core/src/schema.rs:103
+msgid "Elapsed Milliseconds"
+msgstr ""
+
+#: ../../dhlrc-core/src/schema.rs:105
+msgid ""
+"The elapsed milliseconds for the progress bar, if set too small will affect "
+"the speed."
+msgstr ""
+
+#: ../../dhlrc-core/src/schema.rs:117
+msgid "Select All Regions In Loading"
+msgstr ""
+
+#: ../../dhlrc-core/src/schema.rs:118
+msgid "If you check this, all regions will be loaded in the loading progress."
+msgstr ""
+
+#: ../../dhlrc-core/src/schema.rs:129
+msgid "Loading File by File Extension"
+msgstr ""
+
+#: ../../dhlrc-core/src/schema.rs:130
+msgid "If you check this, the file will be loaded by the file extension name."
+msgstr ""
+
+#: ../../dhlrc-core/src/schema.rs:141
+msgid "Retry Loading File when Failed"
+msgstr ""
+
+#: ../../dhlrc-core/src/schema.rs:142
+msgid "When failed, the file will try to be loaded by other modules."
+msgstr ""
+
+#: ../../dhlrc-core/src/schema.rs:153
+msgid "Strict NBT Encoding Matching"
+msgstr ""
+
+#: ../../dhlrc-core/src/schema.rs:155
+msgid ""
+"If you check this, a file is also decoded strictly with the NBT encoding "
+"declared by the plugin its suffix points at (region_nbt_encoding ()). A file "
+"in another encoding then fails to load instead of being read as the wrong "
+"one."
+msgstr ""
+
+#: ../../dhlrc-core/src/schema.rs:167
+msgid "Cache Directory"
+msgstr ""
+
+#: ../../dhlrc-core/src/schema.rs:168
+msgid "The directory to store cache files."
+msgstr ""
+
+#: ../../dhlrc-core/src/schema.rs:179
+msgid "Use Cached File when Downloading Failed"
+msgstr ""
+
+#: ../../dhlrc-core/src/schema.rs:180
+msgid "When downloading failed, use the cached file."
+msgstr ""
+
+#: ../../dhlrc-core/src/schema.rs:191
+msgid "Region Base Name"
+msgstr ""
+
+#: ../../dhlrc-core/src/schema.rs:192
+msgid "The default base name for the region."
+msgstr ""
+
+#: ../../dhlrc-core/src/schema.rs:204
+msgid "The default name for the region."
+msgstr ""
+
+#: ../../dhlrc-core/src/schema.rs:215
+msgid "Multi-Region Display Name"
+msgstr ""
+
+#: ../../dhlrc-core/src/schema.rs:217
+#, rust-format
+msgid ""
+"The display name used for a region that comes from a multi-region file. Use $"
+"{file} for the file name and ${region} for the region name inside the file."
+msgstr ""
+
+#: ../../dhlrc-core/src/schema.rs:229
+msgid "Region Description"
+msgstr ""
+
+#: ../../dhlrc-core/src/schema.rs:230
+msgid "The default description for the region."
+msgstr ""
+
+#: ../../dhlrc-core/src/schema.rs:241
+msgid "Region Author"
+msgstr ""
+
+#: ../../dhlrc-core/src/schema.rs:242
+msgid "The default author for the region."
+msgstr ""
+
+#: ../../dhlrc-core/src/schema.rs:253
+msgid "Override Settings"
+msgstr ""
+
+#: ../../dhlrc-core/src/schema.rs:254
+msgid "Whether to override setting or not."
+msgstr ""
+
+#: ../../dhlrc-core/src/schema.rs:265
+msgid "Override Version"
+msgstr ""
+
+#: ../../dhlrc-core/src/schema.rs:266
+msgid "The version to override in translation stage."
+msgstr ""
+
+#: ../../dhlrc-core/src/schema.rs:277
+msgid "Default Show Option"
+msgstr ""
+
+#: ../../dhlrc-core/src/schema.rs:278
+msgid "The default option of showing block information."
+msgstr ""
+
+#: ../../dhlrc-core/src/schema.rs:289
+msgid "Notification Application ID"
+msgstr ""
+
+#: ../../dhlrc-core/src/schema.rs:291
+msgid ""
+"The application a desktop notification is sent as: the Windows "
+"AppUserModelID, or the macOS bundle identifier. Windows needs it registered, "
+"or the toast may not show. Empty uses the platform default."
+msgstr ""
+
+#: ../../dhlrc-core/src/schema.rs:303
+msgid "Notification Timeout (ms)"
+msgstr ""
+
+#: ../../dhlrc-core/src/schema.rs:305
+msgid ""
+"How long a notification stays before it disappears, in milliseconds. Zero "
+"leaves it to the platform."
+msgstr ""
+
+#: ../../dhlrc-core/src/schema.rs:317
+msgid "Only Notify When Inactive"
+msgstr ""
+
+#: ../../dhlrc-core/src/schema.rs:319
+msgid ""
+"Do not show a desktop notification while the application is active; the in-"
+"app one is enough then."
+msgstr ""
+
+#: ../../dhlrc-tui/src/completions.rs:49
+msgid ""
+"This shell has no standard completion directory, so the script was printed "
+"instead."
+msgstr ""
+
+#: ../../dhlrc-tui/src/completions.rs:62 ../../dhlrc-tui/src/completions.rs:164
+msgid "Could not write the completion script"
+msgstr ""
+
+#: ../../dhlrc-tui/src/completions.rs:70
+#, rust-format
+msgid "Wrote {}."
+msgstr ""
+
+#: ../../dhlrc-tui/src/completions.rs:78
+#, rust-format
+msgid "If completions do not load, add {} to your fpath."
+msgstr ""
+
+#: ../../dhlrc-tui/src/completions.rs:165
+msgid "standard output"
+msgstr ""
+
+#: ../../dhlrc-tui/src/main.rs:43
+msgid ""
+"The interactive terminal UI is not written yet; pick one of the commands "
+"above."
+msgstr ""
+
+#: ../../dhlrc-tui/src/modules.rs:54
+msgid "Region modules"
+msgstr ""
+
+#: ../../dhlrc-tui/src/modules.rs:57 ../../dhlrc-tui/src/modules.rs:106
+msgid "none found"
+msgstr ""
+
+#: ../../dhlrc-tui/src/modules.rs:63
+msgid "type"
+msgstr ""
+
+#: ../../dhlrc-tui/src/modules.rs:64
+msgid "suffix"
+msgstr ""
+
+#: ../../dhlrc-tui/src/modules.rs:65 ../../dhlrc-tui/src/modules.rs:110
+msgid "codec"
+msgstr ""
+
+#: ../../dhlrc-tui/src/modules.rs:66
+msgid "regions"
+msgstr ""
+
+#: ../../dhlrc-tui/src/modules.rs:67
+msgid "encoding"
+msgstr ""
+
+#: ../../dhlrc-tui/src/modules.rs:70 ../../dhlrc-tui/src/modules.rs:112
+msgid "file"
+msgstr ""
+
+#: ../../dhlrc-tui/src/modules.rs:84
+msgid "multi"
+msgstr ""
+
+#: ../../dhlrc-tui/src/modules.rs:86
+msgid "single"
+msgstr ""
+
+#: ../../dhlrc-tui/src/modules.rs:103
+msgid "Object codecs"
+msgstr ""
+
+#: ../../dhlrc-tui/src/modules.rs:161
+msgid "Warnings"
+msgstr ""
+
+#: ../../dhlrc-tui/src/modules.rs:167
+#, rust-format
+msgid "Region module \"{}\" needs codec \"{}\", which is not installed."
+msgstr ""
+
+#: ../../dhlrc-tui/src/modules.rs:218
+msgid "big-endian"
+msgstr ""
+
+#: ../../dhlrc-tui/src/modules.rs:219
+msgid "little-endian"
+msgstr ""
+
+#: ../../dhlrc-tui/src/modules.rs:220
+msgid "network little-endian"
+msgstr ""
+
+#: ../../dhlrc-tui/src/modules.rs:221
+msgid "any"
 msgstr ""
 
 #: ../../nbt-component/src/lib.rs:69

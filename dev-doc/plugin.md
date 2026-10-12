@@ -5,16 +5,20 @@ The application loads every file inside the `region_module/` directory that sits
 
 A plugin is discovered in two steps:
 
-1. `ModuleBase::fromLibrary()` calls the optional `region_is_multi()` to decide whether the plugin describes a
-   **single-region** or a **multi-region** format, and builds a `SingleModuleBase` or a `MultiModuleBase`.
-2. `ModuleBase::initialize()` resolves the rest of the required symbols, fills the module metadata (type, suffix,
-   base type, filter) and validates the plugin. A plugin that fails validation is reported with `qWarning()` and
-   **dropped**, so a partially implemented library can never crash the program later.
+1. The core opens every library in `region_module/`, reads its metadata symbols (type, suffix, base type, filter,
+   kind, encoding) and drops any library that will not open or is missing something it requires. It then normalises
+   the encoding and exposes the surviving modules in a fixed order, so the frontend never has to scan a directory or
+   call a symbol just to describe a module.
+2. On the C++ side, `ModuleBase::fromIndex()` wraps one entry of that list and `ModuleBase::initialize()` binds the
+   operations the module supports (`region_is_multi()` selects a `SingleModuleBase` or a `MultiModuleBase`). A module
+   that cannot bind its required symbols is reported with `qWarning()` and **dropped**, so a partially implemented
+   library can never crash the program later.
 
-Ownership is RAII: every module owns the `QLibrary` it was created from and unloads it in its destructor. There is no
-manual `delete` and no leaked library on the error paths. All `const char *` returned by the plugin are expected to
-be `CString`s allocated by Rust and must be released with `string_free()`; dhlrc does this automatically while reading
-the metadata.
+Ownership lives in the core: the core owns the `dlopen` and keeps the library loaded for the run. There is no manual
+`delete` and no leaked library on the error paths. All `const char *` returned by the plugin are expected to be
+`CString`s allocated by Rust and must be released with `string_free()`; the core does this while reading the metadata.
+A call site reaches a symbol through `ModuleLibrary` (`ModuleBase::library()`), a small handle that forwards to
+`dhlrc_core_region_module_symbol()`.
 
 ## Metadata symbols
 

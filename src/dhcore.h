@@ -5,6 +5,7 @@
 
 #include <QObject>
 #include <QString>
+#include <QStringList>
 #include <QVector>
 
 /* A snapshot of the configuration, mirroring the old `DhConfig` accessors so a
@@ -61,12 +62,31 @@ public:
 
   ~DhCore () override;
 
+  /* One editable setting the core describes: its key, the page it belongs to,
+   * the control it wants and the text to show. The strings are message ids. */
+  struct SettingInfo
+  {
+    QString key;
+    QString group;
+    int type = 0; /* a DhlrcSettingType */
+    QString label;
+    QString tooltip;
+    QStringList choices;
+    QString defaultValue;
+    bool longText = false;
+  };
+
+  /* Every setting, in the order the core lists them. Needs no instance. */
+  [[nodiscard]] static QVector<SettingInfo> settings ();
+
+  /* Reads one setting as text; empty when `key` is unknown. */
+  [[nodiscard]] QString settingValue (const QString &key) const;
+  /* Writes one setting from text; ignored when `key` is unknown. */
+  void setSettingValue (const QString &key, const QString &value);
+
   [[nodiscard]] QString configPath () const;
   /* The last snapshot read from the core; refreshed on every change. */
   [[nodiscard]] const DhConfigData &config () const;
-
-  /* Writes `data` into the core and persists it to the file. */
-  bool applyAndSave (const DhConfigData &data);
 
   /* Plugin options. `kind` is 0 for input, 1 for output. */
   [[nodiscard]] bool pluginUseConfigured (const QString &type, int kind) const;
@@ -83,21 +103,36 @@ public:
   /* Persists the current configuration. */
   bool save ();
 
+  /* Turns the desktop notifications on or off (on by default). */
+  void setNotificationsEnabled (bool enabled);
+
   /* The notifications collected while opening; emptied by the call. */
   QVector<DhCoreNotification> takePendingNotifications ();
+
+  /* Re-reads the configuration from the core into the cache. */
+  void refresh ();
+
+  /* The raw C handle, for the places that talk to the core directly (the
+   * module libraries, for instance). */
+  [[nodiscard]] DhlrcCore *
+  handle () const
+  {
+    return core;
+  }
 
   /* Internal: called by the C trampolines. */
   void addNotification (int level, const char *eventId, const char *title,
                         const char *text);
-  void requestReload ();
+  /* Runs on the watcher thread; hops to this object's thread with a queued
+   * notification describing the change. */
+  void requestReload (int level, const char *eventId, const char *title,
+                      const char *text);
 
 Q_SIGNALS:
   void configChanged ();
 
 private:
   explicit DhCore (QObject *parent);
-  void onFileChanged ();
-  void refresh ();
 
   DhlrcCore *core = nullptr;
   DhConfigData cached;

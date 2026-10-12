@@ -54,6 +54,8 @@ cmake -B build
 cmake --build build
 ```
 
+若不需要 Qt 界面（只编译共享库与终端前端），加上 `-DDH_BUILD_GUI=OFF`，此时不再需要 Qt/KF6。
+
 你可能需要从`region-rs/target/debug(或release)`复制`region_rs`到项目根目录及构建目录中。如果条件允许，使用一个软链接。
 
 ## 功能

@@ -15,9 +15,10 @@ dhcore_notify_trampoline (void *user, int level, const char *eventId,
 }
 
 extern "C" void
-dhcore_change_trampoline (void *user)
+dhcore_change_trampoline (void *user, int level, const char *eventId,
+                          const char *title, const char *text)
 {
-  static_cast<DhCore *> (user)->requestReload ();
+  static_cast<DhCore *> (user)->requestReload (level, eventId, title, text);
 }
 
 static DhCore *dhCore = nullptr;
@@ -80,6 +81,57 @@ DhCore::config () const
   return cached;
 }
 
+QVector<DhCore::SettingInfo>
+DhCore::settings ()
+{
+  QVector<SettingInfo> result;
+  const size_t count = dhlrc_core_setting_count ();
+  result.reserve (static_cast<qsizetype> (count));
+  for (size_t index = 0; index < count; ++index)
+    {
+      DhlrcSettingInfo info{};
+      if (dhlrc_core_setting_info (index, &info) != 0)
+        continue;
+      SettingInfo entry;
+      entry.key = QString::fromUtf8 (info.key);
+      entry.group = QString::fromUtf8 (info.group);
+      entry.type = info.kind;
+      entry.label = QString::fromUtf8 (info.label);
+      entry.tooltip = QString::fromUtf8 (info.tooltip);
+      entry.defaultValue = QString::fromUtf8 (info.default_value);
+      entry.longText = info.long_text;
+      for (size_t choice = 0; choice < info.choice_count; ++choice)
+        entry.choices.append (
+            QString::fromUtf8 (dhlrc_core_setting_choice (index, choice)));
+      result.append (entry);
+    }
+  return result;
+}
+
+QString
+DhCore::settingValue (const QString &key) const
+{
+  if (!core)
+    return {};
+  const QByteArray keyUtf8 = key.toUtf8 ();
+  char *value = dhlrc_core_setting_get (core, keyUtf8.constData ());
+  if (!value)
+    return {};
+  const QString result = QString::fromUtf8 (value);
+  dhlrc_string_free (value);
+  return result;
+}
+
+void
+DhCore::setSettingValue (const QString &key, const QString &value)
+{
+  if (!core)
+    return;
+  const QByteArray keyUtf8 = key.toUtf8 ();
+  const QByteArray valueUtf8 = value.toUtf8 ();
+  dhlrc_core_setting_set (core, keyUtf8.constData (), valueUtf8.constData ());
+}
+
 void
 DhCore::refresh ()
 {
@@ -116,61 +168,6 @@ DhCore::refresh ()
   dhlrc_config_view_free (view);
 }
 
-bool
-DhCore::applyAndSave (const DhConfigData &data)
-{
-  if (!core)
-    return false;
-
-  /* The strings have to outlive the call, so they are kept in locals. */
-  const QByteArray baseName = data.baseName.toUtf8 ();
-  const QByteArray regionName = data.regionName.toUtf8 ();
-  const QByteArray pattern = data.multiRegionNamePattern.toUtf8 ();
-  const QByteArray sampleFile = data.namePatternSampleFile.toUtf8 ();
-  const QByteArray sampleRegion = data.namePatternSampleRegion.toUtf8 ();
-  const QByteArray description = data.description.toUtf8 ();
-  const QByteArray author = data.author.toUtf8 ();
-  const QByteArray overrideVersion = data.overrideVersion.toUtf8 ();
-  const QByteArray cacheDirectory = data.cacheDirectory.toUtf8 ();
-
-  DhlrcConfigView view{};
-  view.memory_limit = data.memoryLimit;
-  view.limit_unit = data.limitUnit;
-  view.elapsed_milliseconds = data.elapsedMilliseconds;
-  view.select_all_regions_in_loading = data.selectAllRegionsInLoading;
-  view.loading_file_by_extension = data.loadingFileByExtension;
-  view.fail_then_retry = data.failThenRetry;
-  view.strict_nbt_encoding = data.strictNbtEncoding;
-  view.fail_download_use_cache = data.failDownloadUseCache;
-  view.default_show_option = data.defaultShowOption;
-  view.override_setting = data.overrideSetting;
-  /* An empty string means "use the localised default" for these three. */
-  view.base_name = data.baseName.isEmpty () ? nullptr : baseName.constData ();
-  view.region_name
-      = data.regionName.isEmpty () ? nullptr : regionName.constData ();
-  view.multi_region_name_pattern = data.multiRegionNamePattern.isEmpty ()
-                                       ? nullptr
-                                       : pattern.constData ();
-  view.name_pattern_sample_file = sampleFile.constData ();
-  view.name_pattern_sample_region = sampleRegion.constData ();
-  view.description = description.constData ();
-  view.author = author.constData ();
-  view.override_version = overrideVersion.constData ();
-  view.cache_directory
-      = data.cacheDirectory.isEmpty () ? nullptr : cacheDirectory.constData ();
-
-  char *error = nullptr;
-  if (dhlrc_core_apply (core, &view, &error) != 0
-      || dhlrc_core_save (core, &error) != 0)
-    {
-      dhlrc_string_free (error);
-      return false;
-    }
-
-  cached = data;
-  return true;
-}
-
 QVector<DhCoreNotification>
 DhCore::takePendingNotifications ()
 {
@@ -192,18 +189,25 @@ DhCore::addNotification (int level, const char *eventId, const char *title,
 }
 
 void
-DhCore::requestReload ()
+DhCore::requestReload (int level, const char *eventId, const char *title,
+                       const char *text)
 {
-  /* Runs on the watcher thread: hop to the GUI thread. */
-  QMetaObject::invokeMethod (this, &DhCore::onFileChanged,
-                             Qt::QueuedConnection);
-}
-
-void
-DhCore::onFileChanged ()
-{
-  refresh ();
-  Q_EMIT configChanged ();
+  /* Runs on the watcher thread: copy the strings here, then hop to the GUI
+   * thread, because `pending` (a Qt container) must not be touched off it. */
+  DhCoreNotification note;
+  note.level = level;
+  note.eventId = QString::fromUtf8 (eventId ? eventId : "");
+  note.title = QString::fromUtf8 (title ? title : "");
+  note.text = QString::fromUtf8 (text ? text : "");
+  QMetaObject::invokeMethod (
+      this,
+      [this, note]
+        {
+          pending.append (note);
+          refresh ();
+          Q_EMIT configChanged ();
+        },
+      Qt::QueuedConnection);
 }
 
 bool
@@ -290,4 +294,11 @@ DhCore::save ()
   const bool ok = dhlrc_core_save (core, &error) == 0;
   dhlrc_string_free (error);
   return ok;
+}
+
+void
+DhCore::setNotificationsEnabled (bool enabled)
+{
+  if (core)
+    dhlrc_core_set_notifications_enabled (core, enabled);
 }

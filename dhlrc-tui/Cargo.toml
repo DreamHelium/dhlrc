@@ -1,0 +1,19 @@
+[package]
+name = "dhlrc-tui"
+version = "0.1.0"
+edition = "2024"
+description = "Terminal frontend for dhlrc (experimental)."
+
+[[bin]]
+name = "dhlrc-tui"
+path = "src/main.rs"
+
+[dependencies]
+clap = { version = "4", features = ["derive"] }
+clap_complete = "4"
+dhlrc-core = { path = "../dhlrc-core" }
+formatx = "0.2.4"
+gettext-rs = { version = "0.7.7", features = ["gettext-system"] }
+# The columns in the `modules` output have to line up in Chinese too, where a
+# character is two terminal cells wide.
+unicode-width = "0.2"

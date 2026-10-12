@@ -1,33 +1,34 @@
 #ifndef DHLRC_DHGAMECONFIGUI_H
 #define DHLRC_DHGAMECONFIGUI_H
 
-#include "dhcheckboxgroup.h"
 #include "dhcore.h"
 #include "dhsettingsdialog/dhsettingsdialog.h"
+#include "region.h"
 
-#include <KCoreConfigSkeleton>
-#include <QFormLayout>
-#include <QLineEdit>
-#include <QSpinBox>
-#include <QWidget>
-#define N_(str) str
+#include <QByteArray>
 
-inline const char *groups[] = { N_ ("General"), N_ ("Default"), N_ ("Game") };
-
+/* Pushes the region defaults the core holds into `libregion_rs`, so the
+ * regions it writes carry them. Run on every apply and reload, like the old
+ * assistant. */
 class DhSetConfigAssistant : public DhSettingsAssistant
 {
 public:
   void
   applyHelp () const override
   {
-    const char *realAuthor
-        = DhCore::instance ()->config ().author.isEmpty ()
-              ? nullptr
-              : DhCore::instance ()->config ().author.toUtf8 ().constData ();
-    init_default_strings (
-        realAuthor, DhCore::instance ()->config ().baseName.toUtf8 (),
-        DhCore::instance ()->config ().regionName.toUtf8 (),
-        DhCore::instance ()->config ().description.toUtf8 ());
+    auto *core = DhCore::instance ();
+    if (!core)
+      return;
+    const DhConfigData &config = core->config ();
+    /* The byte arrays have to outlive the call, so they are kept in locals. */
+    const QByteArray author = config.author.toUtf8 ();
+    const QByteArray baseName = config.baseName.toUtf8 ();
+    const QByteArray regionName = config.regionName.toUtf8 ();
+    const QByteArray description = config.description.toUtf8 ();
+    init_default_strings (config.author.isEmpty () ? nullptr
+                                                   : author.constData (),
+                          baseName.constData (), regionName.constData (),
+                          description.constData ());
   }
 };
 

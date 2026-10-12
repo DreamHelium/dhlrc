@@ -72,12 +72,24 @@ fn open_read_watch_round_trip() {
     assert_eq!(base_name, "Converted");
     dhlrc_config_view_free(view);
 
-    // Watch: the callback runs on the watcher thread and just pings us.
-    extern "C" fn on_change(user: *mut c_void) {
-        let tx = unsafe { &*(user as *const mpsc::Sender<()>) };
-        let _ = tx.send(());
+    // Watch: the callback runs on the watcher thread and sends us the
+    // notification that describes the change.
+    extern "C" fn on_change(
+        user: *mut c_void,
+        level: i32,
+        event_id: *const c_char,
+        title: *const c_char,
+        text: *const c_char,
+    ) {
+        let tx = unsafe { &*(user as *const mpsc::Sender<(i32, String, String, String)>) };
+        let read = |pointer: *const c_char| {
+            unsafe { CStr::from_ptr(pointer) }
+                .to_string_lossy()
+                .into_owned()
+        };
+        let _ = tx.send((level, read(event_id), read(title), read(text)));
     }
-    let (tx, rx) = mpsc::channel::<()>();
+    let (tx, rx) = mpsc::channel::<(i32, String, String, String)>();
     let tx_box = Box::into_raw(Box::new(tx));
     assert_eq!(
         dhlrc_core_watch_start(core, Some(on_change), tx_box as *mut c_void),
@@ -90,8 +102,13 @@ fn open_read_watch_round_trip() {
         "version = 1\n\n[general]\nelapsed_milliseconds = 1234\n",
     )
     .unwrap();
-    rx.recv_timeout(Duration::from_secs(5))
+    let (level, event_id, title, text) = rx
+        .recv_timeout(Duration::from_secs(5))
         .expect("the change should arrive");
+    assert_eq!(level, 0, "an info notification");
+    assert_eq!(event_id, "configReloaded");
+    assert!(!title.is_empty());
+    assert!(text.contains("config.toml"), "text was {text}");
 
     let view = dhlrc_core_config_view(core);
     assert!(!view.is_null());

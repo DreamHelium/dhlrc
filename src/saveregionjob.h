@@ -2,6 +2,7 @@
 #define DHLRC_SAVEREGIONJOB_H
 
 #include "manageregionui.h"
+#include "modulelibrary.h"
 #include "region.h"
 
 #include <KCompositeJob>
@@ -210,14 +211,15 @@ public:
    * `resolveOutputConfig ()`) and is owned by this job from here on. */
   void addSave (const QList<std::shared_ptr<RegionClass>> &list,
                 const QString &outputDir, const QString &suffix,
-                SingleTransFunc func, const QString &type, QLibrary *library);
+                SingleTransFunc func, const QString &type,
+                ModuleLibrary *library);
 
   /* Writes every region of `list` into the single file `filename`. Built the
    * same way as `addSave ()`; one job for the whole file, so a per-region
    * cancel would have nothing to cancel. */
   void addSaveIntoMulti (const QList<std::shared_ptr<RegionClass>> &list,
                          const QString &filename, const QString &suffix,
-                         QLibrary *library, const QString &type);
+                         ModuleLibrary *library, const QString &type);
 
   void start () override;
 
@@ -233,7 +235,8 @@ public:
    * quietly using the defaults. `cancelled`, when given, tells the two cases
    * apart: a plugin with no options also yields nullptr, but it did not ask.
    */
-  static void *resolveOutputConfig (const QString &type, QLibrary *library,
+  static void *resolveOutputConfig (const QString &type,
+                                    ModuleLibrary *library,
                                     PluginOptionsConfig *pluginOptions,
                                     bool *cancelled = nullptr);
 
@@ -252,10 +255,10 @@ private:
   /* Whether `type` has to be asked about before writing. */
   [[nodiscard]] bool needsOptions (const QString &type) const;
   /* Resolves the options on the GUI thread, for one file. */
-  void *askForOptions (const QString &type, QLibrary *library);
+  void *askForOptions (const QString &type, ModuleLibrary *library);
   /* Takes ownership of an options object and hands it back, so a caller can
    * write `job->adoptConfigObject (ownConfigObject (o, lib))`. */
-  void *ownConfigObject (void *object, QLibrary *library);
+  void *ownConfigObject (void *object, ModuleLibrary *library);
   /* Lets go of every parked worker. One answer settles the whole batch, since
    * the options object is shared. */
   void resumeAll ();
@@ -293,11 +296,11 @@ private:
   /* The options the plugin follows the configuration with, when it does. The
    * first owned object, kept for `freeConfigObject ()`. */
   void *configObject = nullptr;
-  QLibrary *configObjectLibrary = nullptr;
+  ModuleLibrary *configObjectLibrary = nullptr;
   /* Every options object the batch owns: one built from the saved settings
    * when the plugin follows them, or one per file that was configured by hand.
    * Held here because a job is deleted as soon as it finishes. */
-  std::vector<std::pair<void *, QLibrary *>> ownedConfigObjects;
+  std::vector<std::pair<void *, ModuleLibrary *>> ownedConfigObjects;
 
   /* The batch's own row. Every region also gets one, and this one says how
    * many of them are done, so a write of many files has a single line that

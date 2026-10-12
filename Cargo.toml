@@ -2,7 +2,7 @@
 #name = "dhlrc-deps"
 #
 [workspace]
-members = ["region-rs", "nbt-component", "region-litematic-rs", "region-nbt-rs", "dhlrc-core"]
+members = ["region-rs", "nbt-component", "region-litematic-rs", "region-nbt-rs", "dhlrc-core", "dhlrc-tui"]
 
 [profile.release]
 debug = false
