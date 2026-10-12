@@ -375,6 +375,7 @@ name = "dhlrc-core"
 version = "0.1.0"
 dependencies = [
  "common-rs",
+ "dhlrc-gettext-shim",
  "formatx",
  "gettext-rs",
  "libloading",
@@ -385,12 +386,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "dhlrc-gettext-shim"
+version = "0.1.0"
+
+[[package]]
 name = "dhlrc-tui"
 version = "0.1.0"
 dependencies = [
  "clap",
  "clap_complete",
  "dhlrc-core",
+ "dhlrc-gettext-shim",
  "formatx",
  "gettext-rs",
  "unicode-width",
@@ -781,6 +787,7 @@ version = "0.1.0"
 dependencies = [
  "cesu8",
  "common-rs",
+ "dhlrc-gettext-shim",
  "formatx",
  "gettext-rs",
  "sysinfo",
@@ -1053,6 +1060,7 @@ name = "region-litematic-rs"
 version = "0.1.0"
 dependencies = [
  "common-rs",
+ "dhlrc-gettext-shim",
  "formatx",
  "gettext-rs",
  "sysinfo",
@@ -1065,6 +1073,7 @@ name = "region-nbt-rs"
 version = "0.1.0"
 dependencies = [
  "common-rs",
+ "dhlrc-gettext-shim",
  "formatx",
  "gettext-rs",
  "sysinfo",
@@ -1077,6 +1086,7 @@ name = "region-rs"
 version = "0.1.0"
 dependencies = [
  "common-rs",
+ "dhlrc-gettext-shim",
  "flate2",
  "gettext-rs",
  "sysinfo",
@@ -1913,6 +1923,7 @@ name = "zurinbt-common"
 version = "0.1.0"
 dependencies = [
  "common-rs",
+ "dhlrc-gettext-shim",
  "formatx",
  "gettext-rs",
  "sysinfo",

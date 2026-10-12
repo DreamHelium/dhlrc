@@ -13,7 +13,13 @@ clap = { version = "4", features = ["derive"] }
 clap_complete = "4"
 dhlrc-core = { path = "../dhlrc-core" }
 formatx = "0.2.4"
-gettext-rs = { version = "0.7.7", features = ["gettext-system"] }
 # The columns in the `modules` output have to line up in Chinese too, where a
 # character is two terminal cells wide.
 unicode-width = "0.2"
+
+# Android has no libintl; `gettext-shim` stands in and messages stay English.
+[target.'cfg(not(target_os = "android"))'.dependencies]
+gettext-rs = { version = "0.7.7", features = ["gettext-system"] }
+
+[target.'cfg(target_os = "android")'.dependencies]
+gettextrs = { package = "dhlrc-gettext-shim", path = "../gettext-shim" }

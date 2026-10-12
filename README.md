@@ -64,7 +64,12 @@ cmake --build build
 
 For a headless build without the Qt frontend — only the shared libraries and the
 terminal frontend — configure with `-DDH_BUILD_GUI=OFF`; Qt/KF6 are then not
-needed.
+needed. Add `-DDH_TRANSLATIONS=OFF` to skip the gettext catalogue too (which
+otherwise needs `xgettext`/`msgfmt`); the programme then runs in English.
+
+On Termux/Android there is no `libintl`, so the Rust translation layer is
+disabled automatically (see `gettext-shim`): the build needs no C library and
+messages stay in English. Combine with `-DDH_TRANSLATIONS=OFF` there.
 
 ## Features
 

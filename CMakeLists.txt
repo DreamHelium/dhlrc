@@ -9,6 +9,11 @@ option(DH_DESKTOP_NOTIFICATIONS "Show the core's notifications as desktop notifi
 # The Qt Widgets GUI (`dhlrc_qt`). Turn it off for a headless build: the shared
 # libraries and the terminal frontend are still built, but Qt/KF6 are not needed.
 option(DH_BUILD_GUI "Build the Qt Widgets GUI (dhlrc_qt)" ON)
+# The gettext catalogue: the `po/` targets (which need `xgettext`/`msgfmt`) and
+# the `locale/` directory they produce. Turn it off where those tools are not
+# installed and translations are not wanted, e.g. Termux without `gettext`; the
+# programme then simply runs in English.
+option(DH_TRANSLATIONS "Build and install the gettext translations" ON)
 
 if (DH_DESKTOP_NOTIFICATIONS)
   # Only defined when on, so a build without it passes no extra argument.
@@ -126,7 +131,12 @@ if (DH_BUILD_GUI)
 else ()
   message(STATUS "DH_BUILD_GUI is off: building only the Rust core and the terminal frontend")
 endif ()
-add_subdirectory(po)
+
+if (DH_TRANSLATIONS)
+  add_subdirectory(po)
+else ()
+  message(STATUS "DH_TRANSLATIONS is off: no translation catalogue is built")
+endif ()
 
 # Reserved for future?
 #add_subdirectory(src-qml)

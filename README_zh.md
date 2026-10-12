@@ -54,7 +54,9 @@ cmake -B build
 cmake --build build
 ```
 
-若不需要 Qt 界面（只编译共享库与终端前端），加上 `-DDH_BUILD_GUI=OFF`，此时不再需要 Qt/KF6。
+若不需要 Qt 界面（只编译共享库与终端前端），加上 `-DDH_BUILD_GUI=OFF`，此时不再需要 Qt/KF6。再加上 `-DDH_TRANSLATIONS=OFF` 可跳过 gettext 目录（否则需要 `xgettext`/`msgfmt`），程序则一律显示英文。
+
+Termux/Android 上没有 `libintl`，Rust 侧的翻译层会自动失效（见 `gettext-shim`）：构建不再需要任何 C 库，字符串保持英文。在那里请一并加上 `-DDH_TRANSLATIONS=OFF`。
 
 你可能需要从`region-rs/target/debug(或release)`复制`region_rs`到项目根目录及构建目录中。如果条件允许，使用一个软链接。
 

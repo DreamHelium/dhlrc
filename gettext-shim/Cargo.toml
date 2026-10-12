@@ -1,0 +1,9 @@
+[package]
+name = "dhlrc-gettext-shim"
+version = "0.1.0"
+edition = "2024"
+description = "Identity stand-in for `gettext-rs` where libintl cannot be built (Android/Termux)."
+
+[lib]
+# Depended on as `gettextrs`, so `use gettextrs::…` keeps working unchanged.
+name = "gettextrs"

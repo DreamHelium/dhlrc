@@ -7,7 +7,6 @@ edition = "2024"
 serde = { version = "1", features = ["derive"] }
 toml = "1"
 common-rs = { path = "../common-rs" }
-gettext-rs = { version = "0.7.7", features = ["gettext-system"] }
 formatx = "0.2.4"
 notify = "8"
 # Opens the plugin libraries (`region_module/`, `load_module/`).
@@ -29,3 +28,10 @@ crate-type = ["lib", "cdylib"]
 [[example]]
 name = "desktop_notify"
 required-features = ["desktop-notifications"]
+
+# Android has no libintl; `gettext-shim` stands in and messages stay English.
+[target.'cfg(not(target_os = "android"))'.dependencies]
+gettext-rs = { version = "0.7.7", features = ["gettext-system"] }
+
+[target.'cfg(target_os = "android")'.dependencies]
+gettextrs = { package = "dhlrc-gettext-shim", path = "../gettext-shim" }
