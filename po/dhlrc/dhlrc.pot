@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-12 23:30+0800\n"
+"POT-Creation-Date: 2026-10-14 18:09+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -55,23 +55,23 @@ msgstr ""
 msgid "Palette"
 msgstr ""
 
-#: ../../src/blockreaderui.cpp:104
+#: ../../src/blockreaderui.cpp:103
 msgid "Select an Index"
 msgstr ""
 
-#: ../../src/blockreaderui.cpp:104
+#: ../../src/blockreaderui.cpp:103
 msgid "Please select an index."
 msgstr ""
 
-#: ../../src/blockreaderui.cpp:121
+#: ../../src/blockreaderui.cpp:120
 msgid "Region Modifier"
 msgstr ""
 
-#: ../../src/blockreaderui.cpp:185
+#: ../../src/blockreaderui.cpp:183
 msgid "Not valid!"
 msgstr ""
 
-#: ../../src/blockreaderui.cpp:200
+#: ../../src/blockreaderui.cpp:198
 msgid ""
 "Name: %1\n"
 "Translation Name: %2\n"
@@ -80,7 +80,7 @@ msgid ""
 "Properties:\n"
 msgstr ""
 
-#: ../../src/blockreaderui.cpp:213
+#: ../../src/blockreaderui.cpp:211
 msgid ""
 "Name: %1\n"
 "Index: %2\n"
@@ -88,55 +88,55 @@ msgid ""
 "Properties:\n"
 msgstr ""
 
-#: ../../src/blockreaderui.cpp:252
+#: ../../src/blockreaderui.cpp:250
 msgid "With DataVersion %4, version %5."
 msgstr ""
 
-#: ../../src/blockreaderui.cpp:254
+#: ../../src/blockreaderui.cpp:252
 msgid "Created time: %6, Modified time: %7, Author: %8, Name: %9"
 msgstr ""
 
-#: ../../src/blockreaderui.cpp:256
+#: ../../src/blockreaderui.cpp:254
 msgid "Description: %10"
 msgstr ""
 
-#: ../../src/blockreaderui.cpp:259 ../../src/regionmodifyui.cpp:72
+#: ../../src/blockreaderui.cpp:257 ../../src/regionmodifyui.cpp:72
 msgid "Unknown"
 msgstr ""
 
-#: ../../src/blockreaderui.cpp:290 ../../src/externalnbtreaderui.cpp:109
+#: ../../src/blockreaderui.cpp:289 ../../src/externalnbtreaderui.cpp:109
 #: ../../src/manageregionui.cpp:212 ../../src/manageregionui.cpp:550
 #: ../../src/regionmodifyui.cpp:13 ../../src/utility.cpp:24
 #: ../../src/utility.cpp:45 ../../src/utility.cpp:53
 msgid "Error!"
 msgstr ""
 
-#: ../../src/blockreaderui.cpp:291 ../../common-rs/src/util.rs:45
+#: ../../src/blockreaderui.cpp:290 ../../common-rs/src/util.rs:45
 msgid "Out of memory!"
 msgstr ""
 
-#: ../../src/blockshowui.cpp:69
+#: ../../src/blockshowui.cpp:68
 msgid "The block is in (%1, %2, %3), information is:\n"
 msgstr ""
 
-#: ../../src/blockshowui.cpp:81 ../../src/generalchoosedialog.cpp:45 rc.cpp:102
+#: ../../src/blockshowui.cpp:80 ../../src/generalchoosedialog.cpp:45 rc.cpp:102
 #: rc.cpp:162
 msgid "&OK"
 msgstr ""
 
-#: ../../src/blockshowui.cpp:83 rc.cpp:48
+#: ../../src/blockshowui.cpp:82 rc.cpp:48
 msgid "&Show Entity NBT"
 msgstr ""
 
-#: ../../src/blockshowui.cpp:94 rc.cpp:45
+#: ../../src/blockshowui.cpp:93 rc.cpp:45
 msgid "&Modify Property"
 msgstr ""
 
-#: ../../src/blockshowui.cpp:101 ../../src/manageregionui.cpp:245
+#: ../../src/blockshowui.cpp:100 ../../src/manageregionui.cpp:245
 msgid "Warning!"
 msgstr ""
 
-#: ../../src/blockshowui.cpp:102
+#: ../../src/blockshowui.cpp:101
 msgid "This function is not implemented yet!"
 msgstr ""
 
@@ -228,7 +228,7 @@ msgstr ""
 msgid "Continue"
 msgstr ""
 
-#: ../../src/externalnbtreaderui.cpp:29 ../../src/mainwindow.cpp:604
+#: ../../src/externalnbtreaderui.cpp:29 ../../src/mainwindow.cpp:909
 msgid "NBT Reader"
 msgstr ""
 
@@ -248,59 +248,102 @@ msgstr ""
 msgid "&All"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:384
+#: ../../src/mainwindow.cpp:278 ../../dhlrc-core/src/schema.rs:215
+msgid "Multi-Region Display Name"
+msgstr ""
+
+#: ../../src/mainwindow.cpp:283
+msgid "Name pattern:"
+msgstr ""
+
+#: ../../src/mainwindow.cpp:287
+msgid "Insert a placeholder:"
+msgstr ""
+
+#: ../../src/mainwindow.cpp:290
+msgid "File name"
+msgstr ""
+
+#: ../../src/mainwindow.cpp:293
+msgid "Region name"
+msgstr ""
+
+#: ../../src/mainwindow.cpp:297
+msgid "Preview with these sample values:"
+msgstr ""
+
+#: ../../src/mainwindow.cpp:301
+msgid "Sample file name"
+msgstr ""
+
+#: ../../src/mainwindow.cpp:305
+msgid "Sample region name"
+msgstr ""
+
+#: ../../src/mainwindow.cpp:314
+msgid ""
+"${file} is replaced with the file name, ${region} with the region name "
+"inside the file. They can be used in any order and repeated. Anything else "
+"is kept as written."
+msgstr ""
+
+#: ../../src/mainwindow.cpp:449
+msgid "Pre&view..."
+msgstr ""
+
+#: ../../src/mainwindow.cpp:676
 msgid "Config"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:385
+#: ../../src/mainwindow.cpp:677
 msgid "Icon Theme"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:403
+#: ../../src/mainwindow.cpp:695
 msgid "Help"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:404
+#: ../../src/mainwindow.cpp:696
 msgid "&About"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:437
+#: ../../src/mainwindow.cpp:729
 msgid "Search..."
 msgstr ""
 
-#: ../../src/mainwindow.cpp:467
+#: ../../src/mainwindow.cpp:759
 msgid "NBT File Reader"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:468 ../../src/mainwindow.cpp:609
+#: ../../src/mainwindow.cpp:760 ../../src/mainwindow.cpp:914
 msgid "Manage Region"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:469 ../../src/mainwindow.cpp:622
+#: ../../src/mainwindow.cpp:761 ../../src/mainwindow.cpp:927
 msgid "Region Reader/Modifier"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:470
+#: ../../src/mainwindow.cpp:762
 msgid "Settings"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:541
+#: ../../src/mainwindow.cpp:846
 msgid "Manage"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:552
+#: ../../src/mainwindow.cpp:857
 msgid "reading"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:553
+#: ../../src/mainwindow.cpp:858
 msgid "writing"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:558
+#: ../../src/mainwindow.cpp:863
 msgid "Use saved options for %1 (%2) instead of asking"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:1036
+#: ../../src/mainwindow.cpp:1341
 msgid "Return to tabs"
 msgstr ""
 
@@ -440,40 +483,8 @@ msgstr ""
 msgid "Failed to set the region name."
 msgstr ""
 
-#: ../../src/resourcegetter.cpp:68
-msgid "Finished!"
-msgstr ""
-
-#: ../../src/resourcegetter.cpp:71
-msgid "A download process is running."
-msgstr ""
-
-#: ../../src/resourcegetter.cpp:78
-msgid "Couldn't create directory!"
-msgstr ""
-
-#: ../../src/resourcegetter.cpp:240
-msgid "Downloading manifest."
-msgstr ""
-
-#: ../../src/resourcegetter.cpp:320
-msgid "No matching index json found, file corrupted?"
-msgstr ""
-
-#: ../../src/resourcegetter.cpp:340
-msgid "Downloading index json of this version."
-msgstr ""
-
-#: ../../src/resourcegetter.cpp:357
-msgid "Downloading asset index of this version."
-msgstr ""
-
-#: ../../src/resourcegetter.cpp:380
-msgid "Downloading object."
-msgstr ""
-
-#: ../../src/resourcegetter.cpp:381
-msgid "Downloading finished!"
+#: ../../src/resourcegetter.cpp:83
+msgid "The download failed."
 msgstr ""
 
 #: ../../src/saveregionjob.cpp:40
@@ -733,49 +744,69 @@ msgstr ""
 msgid "Uncompress finish!"
 msgstr ""
 
-#: ../../dhlrc-core/src/config.rs:166 ../../dhlrc-core/src/schema.rs:195
+#: ../../dhlrc-core/src/config.rs:182 ../../dhlrc-core/src/schema.rs:195
 #: ../../region-rs/src/default.rs:58
 msgid "Converted"
 msgstr ""
 
-#: ../../dhlrc-core/src/config.rs:172 ../../dhlrc-core/src/schema.rs:207
+#: ../../dhlrc-core/src/config.rs:188 ../../dhlrc-core/src/schema.rs:207
 #: ../../region-litematic-rs/src/output.rs:396
 #: ../../region-rs/src/default.rs:60
 msgid "Unnamed"
 msgstr ""
 
-#: ../../dhlrc-core/src/config.rs:178 ../../dhlrc-core/src/schema.rs:221
+#: ../../dhlrc-core/src/config.rs:194 ../../dhlrc-core/src/schema.rs:221
 #, rust-format
 msgid "${file} - ${region}"
 msgstr ""
 
-#: ../../dhlrc-core/src/config.rs:295
+#: ../../dhlrc-core/src/config.rs:311
 msgid "Configuration reloaded"
 msgstr ""
 
-#: ../../dhlrc-core/src/config.rs:297
+#: ../../dhlrc-core/src/config.rs:313
 #, rust-format
 msgid "The configuration was reloaded from {}."
 msgstr ""
 
-#: ../../dhlrc-core/src/config.rs:333
+#: ../../dhlrc-core/src/config.rs:349
 msgid "Configuration created"
 msgstr ""
 
-#: ../../dhlrc-core/src/config.rs:335
+#: ../../dhlrc-core/src/config.rs:351
 #, rust-format
 msgid "A new configuration file was created at {}."
 msgstr ""
 
-#: ../../dhlrc-core/src/config.rs:343
+#: ../../dhlrc-core/src/config.rs:359
 msgid "Configuration could not be read"
 msgstr ""
 
-#: ../../dhlrc-core/src/config.rs:346
+#: ../../dhlrc-core/src/config.rs:362
 #, rust-format
 msgid ""
 "The configuration file could not be read ({}). It was moved aside and a new "
 "one with the default values was created at {}."
+msgstr ""
+
+#: ../../dhlrc-core/src/download.rs:150
+msgid "Downloading manifest."
+msgstr ""
+
+#: ../../dhlrc-core/src/download.rs:159
+msgid "Downloading index json of this version."
+msgstr ""
+
+#: ../../dhlrc-core/src/download.rs:168
+msgid "Downloading asset index of this version."
+msgstr ""
+
+#: ../../dhlrc-core/src/download.rs:179
+msgid "Downloading object."
+msgstr ""
+
+#: ../../dhlrc-core/src/download.rs:183
+msgid "Downloading finished!"
 msgstr ""
 
 #: ../../dhlrc-core/src/schema.rs:63
@@ -896,10 +927,6 @@ msgstr ""
 msgid "The default name for the region."
 msgstr ""
 
-#: ../../dhlrc-core/src/schema.rs:215
-msgid "Multi-Region Display Name"
-msgstr ""
-
 #: ../../dhlrc-core/src/schema.rs:217
 #, rust-format
 msgid ""
@@ -908,71 +935,101 @@ msgid ""
 msgstr ""
 
 #: ../../dhlrc-core/src/schema.rs:229
+msgid "Sample File Name"
+msgstr ""
+
+#: ../../dhlrc-core/src/schema.rs:231
+msgid ""
+"The sample file name used by the preview of the multi-region display name. "
+"It should not include a file extension."
+msgstr ""
+
+#: ../../dhlrc-core/src/schema.rs:243
+msgid "Sample Region Name"
+msgstr ""
+
+#: ../../dhlrc-core/src/schema.rs:245
+msgid ""
+"The sample region name used by the preview of the multi-region display name."
+msgstr ""
+
+#: ../../dhlrc-core/src/schema.rs:257
 msgid "Region Description"
 msgstr ""
 
-#: ../../dhlrc-core/src/schema.rs:230
+#: ../../dhlrc-core/src/schema.rs:258
 msgid "The default description for the region."
 msgstr ""
 
-#: ../../dhlrc-core/src/schema.rs:241
+#: ../../dhlrc-core/src/schema.rs:269
 msgid "Region Author"
 msgstr ""
 
-#: ../../dhlrc-core/src/schema.rs:242
+#: ../../dhlrc-core/src/schema.rs:270
 msgid "The default author for the region."
 msgstr ""
 
-#: ../../dhlrc-core/src/schema.rs:253
+#: ../../dhlrc-core/src/schema.rs:281
 msgid "Override Settings"
 msgstr ""
 
-#: ../../dhlrc-core/src/schema.rs:254
+#: ../../dhlrc-core/src/schema.rs:282
 msgid "Whether to override setting or not."
 msgstr ""
 
-#: ../../dhlrc-core/src/schema.rs:265
+#: ../../dhlrc-core/src/schema.rs:293
 msgid "Override Version"
 msgstr ""
 
-#: ../../dhlrc-core/src/schema.rs:266
+#: ../../dhlrc-core/src/schema.rs:294
 msgid "The version to override in translation stage."
 msgstr ""
 
-#: ../../dhlrc-core/src/schema.rs:277
+#: ../../dhlrc-core/src/schema.rs:305
+msgid "Block Name Language"
+msgstr ""
+
+#: ../../dhlrc-core/src/schema.rs:307
+msgid ""
+"The Minecraft locale (like zh_cn) block and item names are shown in. The "
+"language file is read from the downloaded assets, so it works as soon as "
+"that version's assets are there."
+msgstr ""
+
+#: ../../dhlrc-core/src/schema.rs:319
 msgid "Default Show Option"
 msgstr ""
 
-#: ../../dhlrc-core/src/schema.rs:278
+#: ../../dhlrc-core/src/schema.rs:320
 msgid "The default option of showing block information."
 msgstr ""
 
-#: ../../dhlrc-core/src/schema.rs:289
+#: ../../dhlrc-core/src/schema.rs:331
 msgid "Notification Application ID"
 msgstr ""
 
-#: ../../dhlrc-core/src/schema.rs:291
+#: ../../dhlrc-core/src/schema.rs:333
 msgid ""
 "The application a desktop notification is sent as: the Windows "
 "AppUserModelID, or the macOS bundle identifier. Windows needs it registered, "
 "or the toast may not show. Empty uses the platform default."
 msgstr ""
 
-#: ../../dhlrc-core/src/schema.rs:303
+#: ../../dhlrc-core/src/schema.rs:345
 msgid "Notification Timeout (ms)"
 msgstr ""
 
-#: ../../dhlrc-core/src/schema.rs:305
+#: ../../dhlrc-core/src/schema.rs:347
 msgid ""
 "How long a notification stays before it disappears, in milliseconds. Zero "
 "leaves it to the platform."
 msgstr ""
 
-#: ../../dhlrc-core/src/schema.rs:317
+#: ../../dhlrc-core/src/schema.rs:359
 msgid "Only Notify When Inactive"
 msgstr ""
 
-#: ../../dhlrc-core/src/schema.rs:319
+#: ../../dhlrc-core/src/schema.rs:361
 msgid ""
 "Do not show a desktop notification while the application is active; the in-"
 "app one is enough then."

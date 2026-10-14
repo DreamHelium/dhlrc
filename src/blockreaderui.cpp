@@ -40,37 +40,36 @@ BlockReaderUI::BlockReaderUI (int index,
   ui->setupUi (this);
   version = regionClass->dataVersion ();
   connect (this, &BlockReaderUI::start, this,
-           [&] () -> QCoro::Task<>
+           [&]
              {
-               QPointer<BlockReaderUI> pointer = this;
-               auto selfDownloader = downloader;
-               auto realVersion = this->version;
-               auto path = co_await download_object (
-                   *selfDownloader, realVersion, "minecraft/lang/zh_cn.json");
-               if (!pointer.isNull ())
+               downloader->downloadObject (
+                   version, QStringLiteral ("minecraft/lang/zh_cn.json"));
+             });
+  connect (downloader.get (), &DhDownloader::finished, this,
+           [&] (const QString &error)
+             {
+               if (error.isEmpty ())
                  {
-                   if (path.has_value ())
-                     {
-                       pointer->objectPath = path.value ();
-                       Q_EMIT pointer->finishLoadingTranslation ();
-                       Q_EMIT pointer->changeVal (100);
-                     }
-                   else
-                     {
-                       auto message = new KMessageWidget (path.error ());
-                       message->setMessageType (KMessageWidget::Error);
-                       pointer->ui->verticalLayout->insertWidget (0, message);
-                       connect (message,
-                                &KMessageWidget::hideAnimationFinished,
-                                message, &KMessageWidget::deleteLater);
-                       QTimer::singleShot (5000, message,
-                                           &KMessageWidget::animatedHide);
-                     }
+                   /* The download put the language file where the core's
+                    * resource set can find it; the lookup itself goes through
+                    * the core, so only the "ready" flag is kept here. */
+                   translationReady = true;
+                   Q_EMIT finishLoadingTranslation ();
+                   Q_EMIT changeVal (100);
+                 }
+               else
+                 {
+                   auto message = new KMessageWidget (error);
+                   message->setMessageType (KMessageWidget::Error);
+                   ui->verticalLayout->insertWidget (0, message);
+                   connect (message, &KMessageWidget::hideAnimationFinished,
+                            message, &KMessageWidget::deleteLater);
+                   QTimer::singleShot (5000, message,
+                                       &KMessageWidget::animatedHide);
                  }
              });
   Q_EMIT start ();
   setText ();
-  // download_manifest ();
   connect (ui->xEdit, &QLineEdit::textChanged, this,
            &BlockReaderUI::textChanged_cb);
   connect (ui->yEdit, &QLineEdit::textChanged, this,
@@ -139,7 +138,6 @@ BlockReaderUI::~BlockReaderUI ()
   delete ui;
   // delete bsui;
   // dh_info_reader_unlock (DH_TYPE_REGION, uuid.toUtf8 ());
-  // g_free (large_version);
 }
 
 void
@@ -163,7 +161,7 @@ BlockReaderUI::textChanged_cb ()
           int index = regionClass->index (xText.toInt (), yText.toInt (),
                                           zText.toInt ());
           infos = getBlockInfo (regionClass->locked_region (), index,
-                                objectPath);
+                                translationReady);
           const char *transName = nullptr;
 
           if (region_get_palette_property_len (regionClass->locked_region (),
@@ -188,14 +186,14 @@ BlockReaderUI::textChanged_cb ()
 }
 
 QString
-BlockReaderUI::getBlockInfo (void *region, quint32 index, const QString &path)
+BlockReaderUI::getBlockInfo (void *region, quint32 index, bool hasTranslation)
 {
   auto id = region_get_block_id_by_index (region, index);
   auto name = region_get_palette_id_name (region, id);
   auto palette_len = region_get_palette_property_len (region, id);
   QString infos;
 
-  if (!path.isEmpty ())
+  if (hasTranslation)
     {
       infos = QString (_ ("Name: %1\n"
                           "Translation Name: %2\n"
@@ -203,7 +201,7 @@ BlockReaderUI::getBlockInfo (void *region, quint32 index, const QString &path)
                           "Palette: %4\n"
                           "Properties:\n"))
                   .arg (name)
-                  .arg (get_translation_from_object (path, name))
+                  .arg (get_translation_from_object (name))
                   .arg (index)
                   .arg (id);
       string_free (name);
@@ -280,7 +278,8 @@ BlockReaderUI::setText ()
 void
 BlockReaderUI::listBtn_clicked ()
 {
-  auto blui = new BlockListUI (regionClass->locked_region (), large_version);
+  auto blui
+      = new BlockListUI (regionClass->locked_region (), translationReady);
   blui->updateBlockList ();
   blui->setAttribute (Qt::WA_DeleteOnClose);
   blui->show ();
@@ -347,7 +346,7 @@ BlockReaderUI::showBtn_clicked ()
 {
   if (!bsui)
     {
-      bsui = new BlockShowUI (regionClass->locked_region (), objectPath);
+      bsui = new BlockShowUI (regionClass->locked_region (), translationReady);
       connect (this, &BlockReaderUI::windowClosed, bsui, &BlockShowUI::close);
       connect (this, &BlockReaderUI::finishLoadingTranslation, bsui,
                &BlockShowUI::updateUI);

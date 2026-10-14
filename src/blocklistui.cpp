@@ -13,14 +13,14 @@
 #include <qstandarditemmodel.h>
 #include <region.h>
 
+#include <resourcegetter.h>
 #include <utility.h>
 
-BlockListUI::BlockListUI (void *region, const char *large_version,
-                          QWidget *parent)
+BlockListUI::BlockListUI (void *region, bool translationReady, QWidget *parent)
     : QWidget (parent), ui (new Ui::BlockListUI), region (region)
 {
   this->region = region;
-  this->large_version = large_version;
+  this->translationReady = translationReady;
   model = new QStandardItemModel (this);
   proxyModel = new QSortFilterProxyModel (this);
   auto btn = QMessageBox::question (this, _ ("Ignore Air?"),
@@ -54,7 +54,7 @@ void
 BlockListUI::updateBlockList ()
 {
   QStringList stringList;
-  if (large_version)
+  if (translationReady)
     stringList << _ ("id") << _ ("id Name") << _ ("Block Name") << _ ("x")
                << _ ("y") << _ ("z") << _ ("Palette");
   else
@@ -122,9 +122,12 @@ BlockListUI::updateBlockList ()
 
           QStandardItem *item0 = new QStandardItem (QString::number (i));
           QStandardItem *item1 = new QStandardItem (id_name);
-
-          // if ( large_version)
-          // item2 = new QStandardItem (mctr (id_name, large_version));
+          if (translationReady)
+            {
+              auto translated = get_translation_from_object (id_name);
+              if (!translated.isEmpty ())
+                item2 = new QStandardItem (translated);
+            }
           QStandardItem *item3 = new QStandardItem (QString::number (x));
           QStandardItem *item4 = new QStandardItem (QString::number (y));
           QStandardItem *item5 = new QStandardItem (QString::number (z));

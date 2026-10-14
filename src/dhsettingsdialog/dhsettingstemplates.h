@@ -8,6 +8,7 @@
 
 class DhSettingsDialog;
 class QComboBox;
+class QHBoxLayout;
 class QLineEdit;
 class QTextEdit;
 class QVBoxLayout;
@@ -39,8 +40,10 @@ public:
   QWidget *widget = nullptr;
 
 protected:
-  /* A label with the item's text and tooltip, added to the layout. */
-  void addLabel ();
+  /* Starts a row on the page: a label with the item's text and tooltip, with
+   * room to its right for the control. Returns the row so the caller can add
+   * the control (and anything else it needs, like a browse button). */
+  QHBoxLayout *addRow ();
 };
 
 class DhBoolSettingTemplate : public DhSettingsTemplate

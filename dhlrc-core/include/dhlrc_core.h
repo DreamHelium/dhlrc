@@ -64,10 +64,22 @@ extern "C"
                                    const char *event_id, const char *title,
                                    const char *text);
 
+  /* Called with a status line while a download runs; the text is borrowed and
+   * only valid for the call. */
+  typedef void (*DhlrcDownloadInfoFunc) (void *user_data, const char *message);
+  /* Called with the bytes received so far and the total (`total` is 0 when the
+   * server does not say). Runs on the download's thread, not the caller's. */
+  typedef void (*DhlrcDownloadProgressFunc) (void *user_data,
+                                             uint64_t received,
+                                             uint64_t total);
+  /* Polled between reads; return non-zero to stop the download. */
+  typedef int32_t (*DhlrcCancelFunc) (void *user_data);
+
   /* A snapshot of the configuration. Free it with `dhlrc_config_view_free`.
    *
    * The `char *` fields point into the view and stay valid until it is freed;
-   * a NULL field means the value is unset (so the localised default applies).
+   * they hold the values a frontend should use, with any built-in default
+   * already resolved (the cache directory, for one, is never empty).
    */
   struct DhlrcConfigView
   {
@@ -91,6 +103,7 @@ extern "C"
     const char *author;
     const char *override_version;
     const char *cache_directory;
+    const char *language;
   };
 
   /* Opens (creating from the defaults if missing) the configuration in
@@ -240,6 +253,48 @@ extern "C"
   /* Writes one setting from text; returns 0, or -1 when `key` is unknown. */
   int32_t dhlrc_core_setting_set (DhlrcCore *core, const char *key,
                                   const char *value);
+
+  /* The bytes of a file the library carries inside itself, or NULL when there
+   * is no such file. Borrowed: valid for the whole run, and not
+   * NUL-terminated, so read `*length` bytes; `length` may be NULL. This is how
+   * a non-Rust frontend reads a bundled file without a toolkit (`qrc` would
+   * need Qt), so the GUI and the terminal frontend see the same bytes. Known
+   * names:
+   * `"data_version.csv"`, `"handle_block.json"`. */
+  const char *dhlrc_core_bundled_resource (const char *name, size_t *length);
+
+  /* Points the core at its resource files: the cache directory the downloader
+   * filled, the version whose client jar to use (`version` may be NULL), and
+   * `pack_count` resource packs / mod jars, highest priority first (`packs`
+   * may be NULL). Replaces any previous set. Returns 0, or -1 on a bad handle.
+   */
+  int32_t dhlrc_core_resources_configure (DhlrcCore *core,
+                                          const char *cache_dir,
+                                          const char *version,
+                                          const char *const *packs,
+                                          size_t pack_count);
+
+  /* The localized name of a block or item (`minecraft:oak_log`) in `locale`
+   * (`zh_cn`), looked up through the resource set. Owned; free it with
+   * `dhlrc_string_free`. NULL when there is no name for it. The set is built
+   * from the configuration the first time, so a frontend happy with the
+   * defaults need not call `dhlrc_core_resources_configure` at all. */
+  char *dhlrc_core_translate (const DhlrcCore *core, const char *locale,
+                              const char *name);
+
+  /* Downloads `object` (`minecraft/lang/zh_cn.json`) for the version whose
+   * data version is `version`, following the version manifest and the asset
+   * index into the cache directory the core resolved. This blocks until the
+   * file is in place, so call it off the UI thread. `info`, `progress` and
+   * `cancel` may be NULL; when set they run on the calling thread, and
+   * `cancel` returning non-zero stops the download. Returns 0, or -1 with an
+   * owned `*error`. */
+  int32_t dhlrc_core_download_object (DhlrcCore *core, int32_t version,
+                                      const char *object,
+                                      DhlrcDownloadInfoFunc info,
+                                      DhlrcDownloadProgressFunc progress,
+                                      DhlrcCancelFunc cancel, void *user_data,
+                                      char **error);
 
   /* Frees a `char *` the library returned for the caller to own. */
   void dhlrc_string_free (char *string);

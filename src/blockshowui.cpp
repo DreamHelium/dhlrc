@@ -21,10 +21,9 @@
 #include <qpushbutton.h>
 #define _(str) gettext (str)
 
-BlockShowUI::BlockShowUI (void *region, const QString &large_version,
-                          QWidget *parent)
+BlockShowUI::BlockShowUI (void *region, bool translationReady, QWidget *parent)
     : QWidget (parent), ui (new Ui::BlockShowUI),
-      large_version (large_version), region (region)
+      translationReady (translationReady), region (region)
 {
   ui->setupUi (this);
   ui->modeBtn->setText ("x/z");
@@ -48,8 +47,8 @@ BlockShowUI::BlockShowUI (void *region, const QString &large_version,
   QObject::connect (ui->lpBtn, &QPushButton::clicked, this,
                     [&]
                       {
-                        auto plui
-                            = new PaletteListUI (this->region, large_version);
+                        auto plui = new PaletteListUI (this->region,
+                                                       translationReady);
                         plui->setAttribute (Qt::WA_DeleteOnClose);
                         plui->exec ();
                       });
@@ -71,7 +70,7 @@ BlockShowUI::BlockShowUI (void *region, const QString &large_version,
                     .arg (y)
                     .arg (z);
           str += BlockReaderUI::getBlockInfo (this->region, blockIndex,
-                                              large_version);
+                                              translationReady);
           auto nbt = region_get_block_entity (this->region, blockIndex);
           auto label = new QLabel (str);
           auto layout = new QVBoxLayout (dialog);
@@ -163,8 +162,9 @@ BlockShowUI::updateUI ()
               auto palette = region_get_palette_id_name (region, palette_num);
               auto palette_str = QString (palette);
               string_free (palette);
-              auto trans_str
-                  = get_translation_from_object (large_version, palette_str);
+              auto trans_str = translationReady
+                                   ? get_translation_from_object (palette_str)
+                                   : QString ();
               if (!trans_str.isEmpty ())
                 palette_str = trans_str;
               if (!modeSwitch)

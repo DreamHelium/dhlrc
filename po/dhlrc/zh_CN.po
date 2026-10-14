@@ -13,7 +13,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-12 22:42+0800\n"
+"POT-Creation-Date: 2026-10-14 18:09+0800\n"
 "PO-Revision-Date: 2026-09-07 22:54+0800\n"
 "Last-Translator: 孟小骇 <48383878+DreamHelium@users.noreply.github.com>\n"
 "Language-Team: Chinese <kde-i18n-doc@kde.org>\n"
@@ -64,23 +64,23 @@ msgstr "z"
 msgid "Palette"
 msgstr "偏移码"
 
-#: ../../src/blockreaderui.cpp:104
+#: ../../src/blockreaderui.cpp:103
 msgid "Select an Index"
 msgstr "选择一个索引"
 
-#: ../../src/blockreaderui.cpp:104
+#: ../../src/blockreaderui.cpp:103
 msgid "Please select an index."
 msgstr "请选择一个索引。"
 
-#: ../../src/blockreaderui.cpp:121
+#: ../../src/blockreaderui.cpp:120
 msgid "Region Modifier"
 msgstr "区域修改器"
 
-#: ../../src/blockreaderui.cpp:185
+#: ../../src/blockreaderui.cpp:183
 msgid "Not valid!"
 msgstr "无效！"
 
-#: ../../src/blockreaderui.cpp:200
+#: ../../src/blockreaderui.cpp:198
 msgid ""
 "Name: %1\n"
 "Translation Name: %2\n"
@@ -94,7 +94,7 @@ msgstr ""
 "调色板：%4\n"
 "属性：\n"
 
-#: ../../src/blockreaderui.cpp:213
+#: ../../src/blockreaderui.cpp:211
 msgid ""
 "Name: %1\n"
 "Index: %2\n"
@@ -106,55 +106,55 @@ msgstr ""
 "偏移量：%3\n"
 "属性：\n"
 
-#: ../../src/blockreaderui.cpp:252
+#: ../../src/blockreaderui.cpp:250
 msgid "With DataVersion %4, version %5."
 msgstr "数据版本%4，版本%5。"
 
-#: ../../src/blockreaderui.cpp:254
+#: ../../src/blockreaderui.cpp:252
 msgid "Created time: %6, Modified time: %7, Author: %8, Name: %9"
 msgstr "创建时间：%6，修改时间：%7，作者：%8，名字：%9"
 
-#: ../../src/blockreaderui.cpp:256
+#: ../../src/blockreaderui.cpp:254
 msgid "Description: %10"
 msgstr "描述：%10"
 
-#: ../../src/blockreaderui.cpp:259 ../../src/regionmodifyui.cpp:72
+#: ../../src/blockreaderui.cpp:257 ../../src/regionmodifyui.cpp:72
 msgid "Unknown"
 msgstr "未知"
 
-#: ../../src/blockreaderui.cpp:290 ../../src/externalnbtreaderui.cpp:109
+#: ../../src/blockreaderui.cpp:289 ../../src/externalnbtreaderui.cpp:109
 #: ../../src/manageregionui.cpp:212 ../../src/manageregionui.cpp:550
 #: ../../src/regionmodifyui.cpp:13 ../../src/utility.cpp:24
 #: ../../src/utility.cpp:45 ../../src/utility.cpp:53
 msgid "Error!"
 msgstr "错误！"
 
-#: ../../src/blockreaderui.cpp:291 ../../common-rs/src/util.rs:45
+#: ../../src/blockreaderui.cpp:290 ../../common-rs/src/util.rs:45
 msgid "Out of memory!"
 msgstr "内存不足！"
 
-#: ../../src/blockshowui.cpp:69
+#: ../../src/blockshowui.cpp:68
 msgid "The block is in (%1, %2, %3), information is:\n"
 msgstr "方块在(%1, %2, %3)，信息是：\n"
 
-#: ../../src/blockshowui.cpp:81 ../../src/generalchoosedialog.cpp:45 rc.cpp:102
+#: ../../src/blockshowui.cpp:80 ../../src/generalchoosedialog.cpp:45 rc.cpp:102
 #: rc.cpp:162
 msgid "&OK"
 msgstr "确定(&O)"
 
-#: ../../src/blockshowui.cpp:83 rc.cpp:48
+#: ../../src/blockshowui.cpp:82 rc.cpp:48
 msgid "&Show Entity NBT"
 msgstr "展示实体NBT(&S)"
 
-#: ../../src/blockshowui.cpp:94 rc.cpp:45
+#: ../../src/blockshowui.cpp:93 rc.cpp:45
 msgid "&Modify Property"
 msgstr "修改属性(&M)"
 
-#: ../../src/blockshowui.cpp:101 ../../src/manageregionui.cpp:245
+#: ../../src/blockshowui.cpp:100 ../../src/manageregionui.cpp:245
 msgid "Warning!"
 msgstr "警告！"
 
-#: ../../src/blockshowui.cpp:102
+#: ../../src/blockshowui.cpp:101
 msgid "This function is not implemented yet!"
 msgstr "此功能尚未实现！"
 
@@ -249,7 +249,7 @@ msgstr "已结束处理了%2个中的%1个（%3%）。"
 msgid "Continue"
 msgstr "继续"
 
-#: ../../src/externalnbtreaderui.cpp:29 ../../src/mainwindow.cpp:604
+#: ../../src/externalnbtreaderui.cpp:29 ../../src/mainwindow.cpp:910
 msgid "NBT Reader"
 msgstr "NBT阅读器"
 
@@ -269,59 +269,104 @@ msgstr "NBT 编解码器不可用。"
 msgid "&All"
 msgstr "全选 (&A)"
 
-#: ../../src/mainwindow.cpp:384
+#: ../../src/mainwindow.cpp:278 ../../dhlrc-core/src/schema.rs:215
+msgid "Multi-Region Display Name"
+msgstr "多区域显示名称"
+
+#: ../../src/mainwindow.cpp:283
+msgid "Name pattern:"
+msgstr "名称格式："
+
+#: ../../src/mainwindow.cpp:287
+msgid "Insert a placeholder:"
+msgstr "插入占位符："
+
+#: ../../src/mainwindow.cpp:290
+msgid "File name"
+msgstr "文件名"
+
+#: ../../src/mainwindow.cpp:293
+msgid "Region name"
+msgstr "区域名称"
+
+#: ../../src/mainwindow.cpp:297
+msgid "Preview with these sample values:"
+msgstr "使用这些示例值预览："
+
+#: ../../src/mainwindow.cpp:301
+msgid "Sample file name"
+msgstr "示例文件名"
+
+#: ../../src/mainwindow.cpp:305
+msgid "Sample region name"
+msgstr "示例区域名称"
+
+#: ../../src/mainwindow.cpp:314
+msgid ""
+"${file} is replaced with the file name, ${region} with the region name "
+"inside the file. They can be used in any order and repeated. Anything else "
+"is kept as written."
+msgstr ""
+"${file} 将被替换为文件名，${region} 将被替换为文件内的区域名称。它们可以以任"
+"意顺序使用且可重复使用。其它内容将按原样保留。"
+
+#: ../../src/mainwindow.cpp:449
+msgid "Pre&view..."
+msgstr "预览(&V)……"
+
+#: ../../src/mainwindow.cpp:676
 msgid "Config"
 msgstr "配置"
 
-#: ../../src/mainwindow.cpp:385
+#: ../../src/mainwindow.cpp:677
 msgid "Icon Theme"
 msgstr "图标主题"
 
-#: ../../src/mainwindow.cpp:403
+#: ../../src/mainwindow.cpp:695
 msgid "Help"
 msgstr "帮助"
 
-#: ../../src/mainwindow.cpp:404
+#: ../../src/mainwindow.cpp:696
 msgid "&About"
 msgstr "关于(&A)"
 
-#: ../../src/mainwindow.cpp:437
+#: ../../src/mainwindow.cpp:729
 msgid "Search..."
 msgstr "搜索……"
 
-#: ../../src/mainwindow.cpp:467
+#: ../../src/mainwindow.cpp:759
 msgid "NBT File Reader"
 msgstr "NBT文件阅读器"
 
-#: ../../src/mainwindow.cpp:468 ../../src/mainwindow.cpp:609
+#: ../../src/mainwindow.cpp:760 ../../src/mainwindow.cpp:915
 msgid "Manage Region"
 msgstr "管理区域"
 
-#: ../../src/mainwindow.cpp:469 ../../src/mainwindow.cpp:622
+#: ../../src/mainwindow.cpp:761 ../../src/mainwindow.cpp:928
 msgid "Region Reader/Modifier"
 msgstr "区域阅读器及修改器"
 
-#: ../../src/mainwindow.cpp:470
+#: ../../src/mainwindow.cpp:762
 msgid "Settings"
 msgstr "设置"
 
-#: ../../src/mainwindow.cpp:541
+#: ../../src/mainwindow.cpp:846
 msgid "Manage"
 msgstr "管理"
 
-#: ../../src/mainwindow.cpp:552
+#: ../../src/mainwindow.cpp:857
 msgid "reading"
 msgstr "读取"
 
-#: ../../src/mainwindow.cpp:553
+#: ../../src/mainwindow.cpp:858
 msgid "writing"
 msgstr "写入"
 
-#: ../../src/mainwindow.cpp:558
+#: ../../src/mainwindow.cpp:863
 msgid "Use saved options for %1 (%2) instead of asking"
 msgstr "对 %1（%2）使用已保存的选项而不询问"
 
-#: ../../src/mainwindow.cpp:1036
+#: ../../src/mainwindow.cpp:1342
 msgid "Return to tabs"
 msgstr "返回选项卡"
 
@@ -461,41 +506,9 @@ msgstr "设置描述失败。"
 msgid "Failed to set the region name."
 msgstr "设置区域名称失败。"
 
-#: ../../src/resourcegetter.cpp:68
-msgid "Finished!"
-msgstr "已完成！"
-
-#: ../../src/resourcegetter.cpp:71
-msgid "A download process is running."
-msgstr "有一个下载进程正在运行。"
-
-#: ../../src/resourcegetter.cpp:78
-msgid "Couldn't create directory!"
-msgstr "无法创建目录！"
-
-#: ../../src/resourcegetter.cpp:240
-msgid "Downloading manifest."
-msgstr "正在下载清单。"
-
-#: ../../src/resourcegetter.cpp:320
-msgid "No matching index json found, file corrupted?"
-msgstr "未找到匹配的索引json，文件已损坏？"
-
-#: ../../src/resourcegetter.cpp:340
-msgid "Downloading index json of this version."
-msgstr "正在下载此版本的索引json。"
-
-#: ../../src/resourcegetter.cpp:357
-msgid "Downloading asset index of this version."
-msgstr "正在下载此版本的资源索引。"
-
-#: ../../src/resourcegetter.cpp:380
-msgid "Downloading object."
-msgstr "正在下载对象。"
-
-#: ../../src/resourcegetter.cpp:381
-msgid "Downloading finished!"
-msgstr "下载完成！"
+#: ../../src/resourcegetter.cpp:83
+msgid "The download failed."
+msgstr "下载失败。"
 
 #: ../../src/saveregionjob.cpp:40
 msgid "Saving %1..."
@@ -762,51 +775,71 @@ msgstr "压缩操作被取消。"
 msgid "Uncompress finish!"
 msgstr "解压完成！"
 
-#: ../../dhlrc-core/src/config.rs:166 ../../dhlrc-core/src/schema.rs:195
+#: ../../dhlrc-core/src/config.rs:182 ../../dhlrc-core/src/schema.rs:195
 #: ../../region-rs/src/default.rs:58
 msgid "Converted"
 msgstr "已转换"
 
-#: ../../dhlrc-core/src/config.rs:172 ../../dhlrc-core/src/schema.rs:207
+#: ../../dhlrc-core/src/config.rs:188 ../../dhlrc-core/src/schema.rs:207
 #: ../../region-litematic-rs/src/output.rs:396
 #: ../../region-rs/src/default.rs:60
 msgid "Unnamed"
 msgstr "未命名"
 
-#: ../../dhlrc-core/src/config.rs:178 ../../dhlrc-core/src/schema.rs:221
+#: ../../dhlrc-core/src/config.rs:194 ../../dhlrc-core/src/schema.rs:221
 #, rust-format
 msgid "${file} - ${region}"
 msgstr "${file} - ${region}"
 
-#: ../../dhlrc-core/src/config.rs:295
+#: ../../dhlrc-core/src/config.rs:311
 msgid "Configuration reloaded"
 msgstr "配置已重载"
 
-#: ../../dhlrc-core/src/config.rs:297
+#: ../../dhlrc-core/src/config.rs:313
 #, rust-format
 msgid "The configuration was reloaded from {}."
 msgstr "配置已从 {} 重载。"
 
-#: ../../dhlrc-core/src/config.rs:333
+#: ../../dhlrc-core/src/config.rs:349
 msgid "Configuration created"
 msgstr "已创建配置"
 
-#: ../../dhlrc-core/src/config.rs:335
+#: ../../dhlrc-core/src/config.rs:351
 #, rust-format
 msgid "A new configuration file was created at {}."
 msgstr "已在 {} 创建新的配置文件。"
 
-#: ../../dhlrc-core/src/config.rs:343
+#: ../../dhlrc-core/src/config.rs:359
 msgid "Configuration could not be read"
 msgstr "无法读取配置"
 
-#: ../../dhlrc-core/src/config.rs:346
+#: ../../dhlrc-core/src/config.rs:362
 #, rust-format
 msgid ""
 "The configuration file could not be read ({}). It was moved aside and a new "
 "one with the default values was created at {}."
 msgstr ""
 "配置文件无法读取（{}）。已将其移开，并在 {} 创建了一个使用默认值的新文件。"
+
+#: ../../dhlrc-core/src/download.rs:150
+msgid "Downloading manifest."
+msgstr "正在下载清单。"
+
+#: ../../dhlrc-core/src/download.rs:159
+msgid "Downloading index json of this version."
+msgstr "正在下载此版本的索引json。"
+
+#: ../../dhlrc-core/src/download.rs:168
+msgid "Downloading asset index of this version."
+msgstr "正在下载此版本的资源索引。"
+
+#: ../../dhlrc-core/src/download.rs:179
+msgid "Downloading object."
+msgstr "正在下载对象。"
+
+#: ../../dhlrc-core/src/download.rs:183
+msgid "Downloading finished!"
+msgstr "下载完成！"
 
 #: ../../dhlrc-core/src/schema.rs:63
 msgid "General"
@@ -928,10 +961,6 @@ msgstr "默认的区域基础名字"
 msgid "The default name for the region."
 msgstr "默认的区域名字"
 
-#: ../../dhlrc-core/src/schema.rs:215
-msgid "Multi-Region Display Name"
-msgstr "多区域显示名称"
-
 #: ../../dhlrc-core/src/schema.rs:217
 #, rust-format
 msgid ""
@@ -942,50 +971,82 @@ msgstr ""
 "表示文件内的区域名称。"
 
 #: ../../dhlrc-core/src/schema.rs:229
+msgid "Sample File Name"
+msgstr "示例文件名"
+
+#: ../../dhlrc-core/src/schema.rs:231
+msgid ""
+"The sample file name used by the preview of the multi-region display name. "
+"It should not include a file extension."
+msgstr "多区域显示名称预览所使用的示例文件名。不应包含文件扩展名。"
+
+#: ../../dhlrc-core/src/schema.rs:243
+msgid "Sample Region Name"
+msgstr "示例区域名称"
+
+#: ../../dhlrc-core/src/schema.rs:245
+msgid ""
+"The sample region name used by the preview of the multi-region display name."
+msgstr "多区域显示名称预览所使用的示例区域名称。"
+
+#: ../../dhlrc-core/src/schema.rs:257
 msgid "Region Description"
 msgstr "区域描述"
 
-#: ../../dhlrc-core/src/schema.rs:230
+#: ../../dhlrc-core/src/schema.rs:258
 msgid "The default description for the region."
 msgstr "默认的区域描述"
 
-#: ../../dhlrc-core/src/schema.rs:241
+#: ../../dhlrc-core/src/schema.rs:269
 msgid "Region Author"
 msgstr "区域作者"
 
-#: ../../dhlrc-core/src/schema.rs:242
+#: ../../dhlrc-core/src/schema.rs:270
 msgid "The default author for the region."
 msgstr "默认的区域作者"
 
-#: ../../dhlrc-core/src/schema.rs:253
+#: ../../dhlrc-core/src/schema.rs:281
 msgid "Override Settings"
 msgstr "覆盖设置"
 
-#: ../../dhlrc-core/src/schema.rs:254
+#: ../../dhlrc-core/src/schema.rs:282
 msgid "Whether to override setting or not."
 msgstr "是否覆盖设置。"
 
-#: ../../dhlrc-core/src/schema.rs:265
+#: ../../dhlrc-core/src/schema.rs:293
 msgid "Override Version"
 msgstr "覆盖版本"
 
-#: ../../dhlrc-core/src/schema.rs:266
+#: ../../dhlrc-core/src/schema.rs:294
 msgid "The version to override in translation stage."
 msgstr "在翻译阶段覆盖的版本。"
 
-#: ../../dhlrc-core/src/schema.rs:277
+#: ../../dhlrc-core/src/schema.rs:305
+msgid "Block Name Language"
+msgstr "方块名称语言"
+
+#: ../../dhlrc-core/src/schema.rs:307
+msgid ""
+"The Minecraft locale (like zh_cn) block and item names are shown in. The "
+"language file is read from the downloaded assets, so it works as soon as "
+"that version's assets are there."
+msgstr ""
+"方块和物品名称显示时使用的 Minecraft 语言环境（如 zh_cn）。语言文件从已下载的"
+"资源中读取，因此只要该版本的资源已就绪即可生效。"
+
+#: ../../dhlrc-core/src/schema.rs:319
 msgid "Default Show Option"
 msgstr "默认展示选项"
 
-#: ../../dhlrc-core/src/schema.rs:278
+#: ../../dhlrc-core/src/schema.rs:320
 msgid "The default option of showing block information."
 msgstr "展示方块信息的默认选项。"
 
-#: ../../dhlrc-core/src/schema.rs:289
+#: ../../dhlrc-core/src/schema.rs:331
 msgid "Notification Application ID"
 msgstr "通知应用 ID"
 
-#: ../../dhlrc-core/src/schema.rs:291
+#: ../../dhlrc-core/src/schema.rs:333
 msgid ""
 "The application a desktop notification is sent as: the Windows "
 "AppUserModelID, or the macOS bundle identifier. Windows needs it registered, "
@@ -994,21 +1055,21 @@ msgstr ""
 "桌面通知以哪个应用的身份发送：Windows 的 AppUserModelID，或 macOS 的 bundle "
 "identifier。Windows 需要先注册它，否则通知可能不显示。留空则使用平台默认值。"
 
-#: ../../dhlrc-core/src/schema.rs:303
+#: ../../dhlrc-core/src/schema.rs:345
 msgid "Notification Timeout (ms)"
 msgstr "通知超时（毫秒）"
 
-#: ../../dhlrc-core/src/schema.rs:305
+#: ../../dhlrc-core/src/schema.rs:347
 msgid ""
 "How long a notification stays before it disappears, in milliseconds. Zero "
 "leaves it to the platform."
 msgstr "通知消失前停留的时长，单位为毫秒。为零则交给平台决定。"
 
-#: ../../dhlrc-core/src/schema.rs:317
+#: ../../dhlrc-core/src/schema.rs:359
 msgid "Only Notify When Inactive"
 msgstr "仅在非激活时通知"
 
-#: ../../dhlrc-core/src/schema.rs:319
+#: ../../dhlrc-core/src/schema.rs:361
 msgid ""
 "Do not show a desktop notification while the application is active; the in-"
 "app one is enough then."
@@ -1283,56 +1344,20 @@ msgstr "获取调色板。"
 msgid "&Reload"
 msgstr "重新加载(&R)"
 
-#~ msgid "Sample File Name"
-#~ msgstr "示例文件名"
+#~ msgid "Finished!"
+#~ msgstr "已完成！"
 
-#~ msgid ""
-#~ "The sample file name used by the preview of the multi-region display "
-#~ "name. It should not include a file extension."
-#~ msgstr "多区域显示名称预览所使用的示例文件名。不应包含文件扩展名。"
+#~ msgid "A download process is running."
+#~ msgstr "有一个下载进程正在运行。"
 
-#~ msgid "Sample Region Name"
-#~ msgstr "示例区域名称"
+#~ msgid "Couldn't create directory!"
+#~ msgstr "无法创建目录！"
 
-#~ msgid ""
-#~ "The sample region name used by the preview of the multi-region display "
-#~ "name."
-#~ msgstr "多区域显示名称预览所使用的示例区域名称。"
+#~ msgid "No matching index json found, file corrupted?"
+#~ msgstr "未找到匹配的索引json，文件已损坏？"
 
 #~ msgid "Select Cache Directory"
 #~ msgstr "选择缓存目录"
-
-#~ msgid "Name pattern:"
-#~ msgstr "名称格式："
-
-#~ msgid "Insert a placeholder:"
-#~ msgstr "插入占位符："
-
-#~ msgid "File name"
-#~ msgstr "文件名"
-
-#~ msgid "Region name"
-#~ msgstr "区域名称"
-
-#~ msgid "Preview with these sample values:"
-#~ msgstr "使用这些示例值预览："
-
-#~ msgid "Sample file name"
-#~ msgstr "示例文件名"
-
-#~ msgid "Sample region name"
-#~ msgstr "示例区域名称"
-
-#~ msgid ""
-#~ "${file} is replaced with the file name, ${region} with the region name "
-#~ "inside the file. They can be used in any order and repeated. Anything "
-#~ "else is kept as written."
-#~ msgstr ""
-#~ "${file} 将被替换为文件名，${region} 将被替换为文件内的区域名称。它们可以以"
-#~ "任意顺序使用且可重复使用。其它内容将按原样保留。"
-
-#~ msgid "Pre&view..."
-#~ msgstr "预览(&V)……"
 
 #~ msgid "loading"
 #~ msgstr "加载"

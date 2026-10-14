@@ -18,8 +18,7 @@ class BlockListUI : public QWidget
   Q_OBJECT
 
 public:
-  BlockListUI (void *region, const char *large_version,
-               QWidget *parent = nullptr);
+  BlockListUI (void *region, bool translationReady, QWidget *parent = nullptr);
   ~BlockListUI ();
   void updateBlockList ();
 
@@ -30,7 +29,7 @@ Q_SIGNALS:
   void setValue (int value);
 
 private:
-  const char *large_version;
+  bool translationReady;
   Ui::BlockListUI *ui;
   void drawList ();
   void *region;

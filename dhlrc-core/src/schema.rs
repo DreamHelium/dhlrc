@@ -223,6 +223,34 @@ pub static SETTINGS: &[SettingDef] = &[
         set: set_multi_region_pattern,
     },
     SettingDef {
+        key: "NamePatternSampleFile",
+        group: DEFAULT,
+        kind: SettingType::String,
+        label: i18n("Sample File Name"),
+        tooltip: i18n(
+            "The sample file name used by the preview of the multi-region display name. It should not include a file extension.",
+        ),
+        choices: NO_CHOICES,
+        long_text: false,
+        default: "house",
+        get: get_sample_file,
+        set: set_sample_file,
+    },
+    SettingDef {
+        key: "NamePatternSampleRegion",
+        group: DEFAULT,
+        kind: SettingType::String,
+        label: i18n("Sample Region Name"),
+        tooltip: i18n(
+            "The sample region name used by the preview of the multi-region display name.",
+        ),
+        choices: NO_CHOICES,
+        long_text: false,
+        default: "main",
+        get: get_sample_region,
+        set: set_sample_region,
+    },
+    SettingDef {
         key: "Description",
         group: DEFAULT,
         kind: SettingType::String,
@@ -269,6 +297,20 @@ pub static SETTINGS: &[SettingDef] = &[
         default: "",
         get: get_override_version,
         set: set_override_version,
+    },
+    SettingDef {
+        key: "Language",
+        group: READER,
+        kind: SettingType::String,
+        label: i18n("Block Name Language"),
+        tooltip: i18n(
+            "The Minecraft locale (like zh_cn) block and item names are shown in. The language file is read from the downloaded assets, so it works as soon as that version's assets are there.",
+        ),
+        choices: NO_CHOICES,
+        long_text: false,
+        default: "zh_cn",
+        get: get_language,
+        set: set_language,
     },
     SettingDef {
         key: "DefaultShowOption",
@@ -476,12 +518,9 @@ fn set_fail_use_cache(config: &mut Config, text: &str) {
 }
 
 fn get_cache_directory(config: &Config) -> String {
-    config
-        .general
-        .cache_directory
-        .as_ref()
-        .map(|path| path.to_string_lossy().into_owned())
-        .unwrap_or_default()
+    /* The configured path, or the platform default when unset, so the file a
+     * frontend writes the setting from is a usable directory. */
+    config.general.cache_dir().to_string_lossy().into_owned()
 }
 
 fn set_cache_directory(config: &mut Config, text: &str) {
@@ -490,6 +529,14 @@ fn set_cache_directory(config: &mut Config, text: &str) {
     } else {
         Some(PathBuf::from(text))
     };
+}
+
+fn get_language(config: &Config) -> String {
+    config.general.language.clone()
+}
+
+fn set_language(config: &mut Config, text: &str) {
+    config.general.language = text.trim().to_owned();
 }
 
 fn get_base_name(config: &Config) -> String {
@@ -514,6 +561,22 @@ fn get_multi_region_pattern(config: &Config) -> String {
 
 fn set_multi_region_pattern(config: &mut Config, text: &str) {
     set_optional_string(&mut config.defaults.multi_region_name_pattern, text);
+}
+
+fn get_sample_file(config: &Config) -> String {
+    config.defaults.name_pattern_sample_file.clone()
+}
+
+fn set_sample_file(config: &mut Config, text: &str) {
+    config.defaults.name_pattern_sample_file = text.to_owned();
+}
+
+fn get_sample_region(config: &Config) -> String {
+    config.defaults.name_pattern_sample_region.clone()
+}
+
+fn set_sample_region(config: &mut Config, text: &str) {
+    config.defaults.name_pattern_sample_region = text.to_owned();
 }
 
 fn get_description(config: &Config) -> String {

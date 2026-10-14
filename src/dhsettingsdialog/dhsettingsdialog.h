@@ -85,6 +85,11 @@ public:
   }
   [[nodiscard]] DhSettingItem *item (const QString &key) const;
 
+  /* The template a key's row was built with, or NULL. Lets one row drive
+   * another (the multi-region preview edits the sample values, which have no
+   * control of their own). */
+  [[nodiscard]] DhSettingsTemplate *templateFor (const QString &key) const;
+
   /* Puts every item's current value back into its control. */
   void refresh ();
 
@@ -108,6 +113,7 @@ private:
   QMap<DhSettingItem *, DhSettingsTemplateCreator> itemCreators;
   QMap<int, DhSettingsTemplateCreator> typeCreators;
   std::vector<std::unique_ptr<DhSettingsTemplate>> templates;
+  QHash<QString, DhSettingsTemplate *> templatesByKey;
   std::vector<std::unique_ptr<DhSettingsAssistant>> assistants;
   QList<DhSettingItem *> allItems;
   QList<KPageWidgetItem *> pageItems;

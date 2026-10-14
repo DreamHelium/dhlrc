@@ -11,6 +11,7 @@ use crate::config::{
 };
 use crate::modules::Modules;
 use crate::notification::Level;
+use crate::resource::{ResourceEnvironment, ResourceSet};
 use std::ffi::{CStr, CString, c_char, c_void};
 use std::path::PathBuf;
 use std::ptr;
@@ -56,6 +57,18 @@ pub type DhlrcChangeFunc = extern "C" fn(
     text: *const c_char,
 );
 
+/// Called with a status line while a download runs; `message` is borrowed and
+/// only valid for the call.
+pub type DhlrcDownloadInfoFunc = extern "C" fn(user_data: *mut c_void, message: *const c_char);
+
+/// Called with the bytes received and the total (`total` is 0 when the server
+/// does not say). Runs on the download's thread.
+pub type DhlrcDownloadProgressFunc =
+    extern "C" fn(user_data: *mut c_void, received: u64, total: u64);
+
+/// Polled between reads; a non-zero return stops the download.
+pub type DhlrcCancelFunc = extern "C" fn(user_data: *mut c_void) -> i32;
+
 /// A snapshot of the configuration. The layout must match `DhlrcConfigView` in
 /// the header, field for field.
 #[repr(C)]
@@ -79,6 +92,7 @@ pub struct DhlrcConfigView {
     pub author: *const c_char,
     pub override_version: *const c_char,
     pub cache_directory: *const c_char,
+    pub language: *const c_char,
 }
 
 /// The view plus the `CString`s its pointers point into. `view` is the first
@@ -120,10 +134,8 @@ impl ConfigViewData {
             description: owned(&mut strings, &config.defaults.description),
             author: owned(&mut strings, &config.defaults.author),
             override_version: owned(&mut strings, &config.game.override_version),
-            cache_directory: match &config.general.cache_directory {
-                Some(path) => owned(&mut strings, &path.to_string_lossy()),
-                None => ptr::null(),
-            },
+            cache_directory: owned(&mut strings, &config.general.cache_dir().to_string_lossy()),
+            language: owned(&mut strings, &config.general.language),
         };
         Self { view, strings }
     }
@@ -159,6 +171,9 @@ pub struct DhlrcCore {
     watch: Mutex<Option<ConfigWatch>>,
     /// The plugins, loaded by `dhlrc_core_load_modules`.
     modules: Mutex<Option<Modules>>,
+    /// The stacked resource sources; built on demand or by
+    /// `dhlrc_core_resources_configure`.
+    resources: Mutex<Option<ResourceSet>>,
 }
 
 #[unsafe(no_mangle)]
@@ -210,6 +225,7 @@ pub extern "C" fn dhlrc_core_open(
         paths,
         watch: Mutex::new(None),
         modules: Mutex::new(None),
+        resources: Mutex::new(None),
     });
     Box::into_raw(core)
 }
@@ -697,6 +713,216 @@ pub extern "C" fn dhlrc_core_setting_set(
     }
 }
 
+/// The bytes of a file the library carries inside itself (see the `bundled`
+/// module), or null when there is no such file. Borrowed and valid for the
+/// whole run; the length is written to `length` when it is not null. The bytes
+/// are not NUL-terminated, so callers must read `*length` of them.
+#[unsafe(no_mangle)]
+pub extern "C" fn dhlrc_core_bundled_resource(
+    name: *const c_char,
+    length: *mut usize,
+) -> *const c_char {
+    let Some(name) = from_c(name) else {
+        return ptr::null();
+    };
+    match crate::resource::bundled::get(&name) {
+        Some(bytes) => {
+            if !length.is_null() {
+                unsafe { *length = bytes.len() };
+            }
+            bytes.as_ptr().cast::<c_char>()
+        }
+        None => ptr::null(),
+    }
+}
+
+/// Points the core at its resource files: the cache directory the downloader
+/// filled, the version whose client jar to use (`version` may be NULL), and
+/// `pack_count` resource packs / mod jars, highest priority first (`packs` may
+/// be NULL). Replaces any previous set. Returns 0, or -1 on a bad handle.
+#[unsafe(no_mangle)]
+pub extern "C" fn dhlrc_core_resources_configure(
+    core: *mut DhlrcCore,
+    cache_dir: *const c_char,
+    version: *const c_char,
+    packs: *const *const c_char,
+    pack_count: usize,
+) -> i32 {
+    let Some(core) = (unsafe { core.as_ref() }) else {
+        return -1;
+    };
+    let environment = ResourceEnvironment {
+        cache_dir: PathBuf::from(from_c_required(cache_dir)),
+        version: from_c(version).filter(|value| !value.is_empty()),
+        packs: collect_paths(packs, pack_count),
+    };
+    match core.resources.lock() {
+        Ok(mut guard) => {
+            *guard = Some(environment.resource_set());
+            0
+        }
+        Err(_) => -1,
+    }
+}
+
+/// The localized name of a block or item (`minecraft:oak_log`) in `locale`
+/// (`zh_cn`), looked up through the resource set. Owned; free it with
+/// `dhlrc_string_free`. NULL when there is no name for it.
+///
+/// The set is built from the configuration the first time it is needed, so a
+/// frontend happy with the defaults never has to call
+/// `dhlrc_core_resources_configure`.
+#[unsafe(no_mangle)]
+pub extern "C" fn dhlrc_core_translate(
+    core: *const DhlrcCore,
+    locale: *const c_char,
+    name: *const c_char,
+) -> *mut c_char {
+    let Some(core) = (unsafe { core.as_ref() }) else {
+        return ptr::null_mut();
+    };
+    let (Some(locale), Some(name)) = (from_c(locale), from_c(name)) else {
+        return ptr::null_mut();
+    };
+    let Some(translated) = with_resources(core, |set| {
+        crate::resource::translate::translate(set, &locale, &name)
+    }) else {
+        return ptr::null_mut();
+    };
+    match translated {
+        Some(text) => CString::new(text)
+            .map(CString::into_raw)
+            .unwrap_or(ptr::null_mut()),
+        None => ptr::null_mut(),
+    }
+}
+
+/// Runs `with` against the core's resource set, building the default one from
+/// the configuration the first time it is needed.
+fn with_resources<T>(core: &DhlrcCore, with: impl FnOnce(&ResourceSet) -> T) -> Option<T> {
+    let mut guard = core.resources.lock().ok()?;
+    if guard.is_none() {
+        let cache_dir = core
+            .shared
+            .config
+            .lock()
+            .ok()
+            .map(|config| config.general.cache_dir())
+            .unwrap_or_default();
+        *guard = Some(
+            ResourceEnvironment {
+                cache_dir,
+                ..ResourceEnvironment::default()
+            }
+            .resource_set(),
+        );
+    }
+    guard.as_ref().map(with)
+}
+
+/// Reads a `const char *const *` array of `count` strings into paths.
+fn collect_paths(pointer: *const *const c_char, count: usize) -> Vec<PathBuf> {
+    if pointer.is_null() {
+        return Vec::new();
+    }
+    (0..count)
+        .filter_map(|index| from_c(unsafe { *pointer.add(index) }))
+        .filter(|path| !path.is_empty())
+        .map(PathBuf::from)
+        .collect()
+}
+
+/// Fetches `object` (`minecraft/lang/zh_cn.json`) for the version with data
+/// version `version`, following the manifest and the asset index into the
+/// cache directory the core resolved. Blocking, so a frontend runs it off its
+/// own thread; `info`, `progress` and `cancel` may be NULL and, when set, run on
+/// that thread. Returns 0 when the file is in place, or -1 with an owned
+/// `*error`.
+#[unsafe(no_mangle)]
+pub extern "C" fn dhlrc_core_download_object(
+    core: *mut DhlrcCore,
+    version: i32,
+    object: *const c_char,
+    info: Option<DhlrcDownloadInfoFunc>,
+    progress: Option<DhlrcDownloadProgressFunc>,
+    cancel: Option<DhlrcCancelFunc>,
+    user_data: *mut c_void,
+    error: *mut *mut c_char,
+) -> i32 {
+    let Some(core) = (unsafe { core.as_ref() }) else {
+        set_error(error, "dhlrc_core_download_object: null core");
+        return -1;
+    };
+    let Some(object) = from_c(object) else {
+        set_error(error, "dhlrc_core_download_object: null object");
+        return -1;
+    };
+    let Ok(config) = core.shared.config.lock().map(|guard| guard.clone()) else {
+        set_error(
+            error,
+            "dhlrc_core_download_object: configuration lock poisoned",
+        );
+        return -1;
+    };
+
+    let mut downloader = crate::download::Downloader::new(config.general.cache_dir());
+    downloader.set_prefer_cache(config.general.fail_download_use_cache);
+
+    let sink = DownloadSink {
+        info,
+        progress,
+        user_data,
+    };
+    let stop = DownloadCancel { cancel, user_data };
+
+    match downloader.download_object(version, &object, &sink, &stop) {
+        Ok(_) => 0,
+        Err(problem) => {
+            set_error(error, &problem.to_string());
+            -1
+        }
+    }
+}
+
+/// Forwards a [`Sink`](crate::download::Sink) to the C callbacks (either may be
+/// absent).
+struct DownloadSink {
+    info: Option<DhlrcDownloadInfoFunc>,
+    progress: Option<DhlrcDownloadProgressFunc>,
+    user_data: *mut c_void,
+}
+
+impl crate::download::Sink for DownloadSink {
+    fn info(&self, message: &str) {
+        if let Some(callback) = self.info {
+            if let Ok(text) = CString::new(message) {
+                callback(self.user_data, text.as_ptr());
+            }
+        }
+    }
+
+    fn progress(&self, received: u64, total: u64) {
+        if let Some(callback) = self.progress {
+            callback(self.user_data, received, total);
+        }
+    }
+}
+
+/// Forwards a [`Cancel`](crate::download::Cancel) to the C callback (absent
+/// means "never").
+struct DownloadCancel {
+    cancel: Option<DhlrcCancelFunc>,
+    user_data: *mut c_void,
+}
+
+impl crate::download::Cancel for DownloadCancel {
+    fn cancelled(&self) -> bool {
+        self.cancel
+            .map(|callback| callback(self.user_data) != 0)
+            .unwrap_or(false)
+    }
+}
+
 /// A `const char *` the caller passed: NULL means unset.
 fn from_c(pointer: *const c_char) -> Option<String> {
     if pointer.is_null() {
@@ -729,6 +955,9 @@ fn config_from_view(view: &DhlrcConfigView, base: &Config) -> Config {
     config.general.cache_directory = from_c(view.cache_directory)
         .filter(|value| !value.is_empty())
         .map(PathBuf::from);
+    if let Some(language) = from_c(view.language).filter(|value| !value.is_empty()) {
+        config.general.language = language;
+    }
     config.defaults.base_name = from_c(view.base_name);
     config.defaults.region_name = from_c(view.region_name);
     config.defaults.multi_region_name_pattern = from_c(view.multi_region_name_pattern);

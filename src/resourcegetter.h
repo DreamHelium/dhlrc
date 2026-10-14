@@ -1,61 +1,53 @@
 #ifndef RESOURCEGETTER_H
 #define RESOURCEGETTER_H
 
-#include <expected>
-#include <optional>
-#include <qcorotask.h>
-#include <qnetworkreply.h>
-#include <qobject.h>
+#include <QMap>
+#include <QObject>
+#include <QString>
+#include <atomic>
+#include <thread>
 
 using VersionMap = QMap<int, QString>;
+
+/* Fetches files from Mojang's servers into the cache directory.
+ *
+ * The work itself lives in the core (one blocking C call,
+ * `dhlrc_core_download_object`), so this only runs it on a worker thread and
+ * turns the core's progress into Qt signals. The terminal frontend calls the
+ * same core entry point directly, with no Qt involved. */
 class DhDownloader : public QObject
 {
   Q_OBJECT
 public:
   explicit DhDownloader (QObject *object = nullptr);
-  ~DhDownloader ();
+  ~DhDownloader () override;
+
+  /* Starts fetching `object` (`minecraft/lang/zh_cn.json`) for the version
+   * whose data version is `version`. Emits `progress` and `info` while
+   * running, then `finished` exactly once. */
+  void downloadObject (int version, const QString &object);
+  /* Asks a running download to stop; it ends soon after. */
+  void stop ();
+  /* Whether a stop has been asked for (the core's cancel callback reads this).
+   */
+  [[nodiscard]] bool isCancelled () const;
 
 Q_SIGNALS:
+  /* 0-100; the core reports bytes, this reports the percentage. */
   void progress (int value);
-  void error (const QString &);
-  void info (const QString &);
-
-public Q_SLOTS:
-  QCoro::Task<std::expected<QString, QString>>
-  download (const QString &url, const QString &dest,
-            const QString &infoSend = {}, bool *isOverwrittern = nullptr);
-  QCoro::Task<std::expected<QString, QString>>
-  download (const QString &url, const QString &dest, bool overwrite,
-            const QString &infoSend = {});
-  void stop ();
-  /* One should use this to terminate the usage of the Downloader and delete
-   * it. */
-  void finish ();
-  QCoro::Task<bool> sourceNewer (const QString &url, const QString &dest);
-  bool isFinished ();
+  void info (const QString &message);
+  /* Empty when the file is in place, otherwise the reason it is not. */
+  void finished (const QString &error);
 
 private:
-  QNetworkReply *reply = nullptr;
-  bool stopped = false;
-  bool finished = false;
+  void run (int version, const QString &object);
+  std::thread worker;
+  std::atomic<bool> cancelled = false;
 };
 
-QCoro::Task<std::expected<QString, QString>>
-download_manifest (DhDownloader &downloader, bool *isOverwrittern = nullptr);
 const VersionMap *get_version_list ();
-/** If there's no error, nothing returned. */
-QCoro::Task<std::optional<QString>>
-get_manifest_url_list (DhDownloader &downloader);
-QCoro::Task<std::expected<QString, QString>>
-get_manifest_url (const QString &id, DhDownloader &downloader);
-QCoro::Task<std::expected<QString, QString>>
-get_manifest_url (int version, DhDownloader &downloader);
-QCoro::Task<std::expected<QString, QString>>
-download_manifest_index_json (DhDownloader &downloader, int version);
-QCoro::Task<std::expected<QString, QString>>
-download_asset_index (DhDownloader &downloader, int version);
-QCoro::Task<std::expected<QString, QString>>
-download_object (DhDownloader &downloader, int version, const QString &object);
-QString get_translation_from_object (const QString &path, const QString &name);
+/** The localized name of a block or item (`minecraft:oak_log`), in the locale
+ * the configuration carries. Empty when there is no name for it. */
+QString get_translation_from_object (const QString &name);
 
 #endif /* RESOURCEGETTER_H */

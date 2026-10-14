@@ -6,15 +6,18 @@
  * under the user's config directory.
  *
  * The `desktop-notifications` feature adds `desktop`, which shows the core's
- * notifications on the desktop with no GUI toolkit involved.
+ * notifications on the desktop with no GUI toolkit involved. The `download`
+ * module fetches the resource files, so no frontend has to.
  */
 
 pub mod config;
 #[cfg(feature = "desktop-notifications")]
 pub mod desktop;
+pub mod download;
 pub mod ffi;
 pub mod modules;
 pub mod notification;
+pub mod resource;
 pub mod schema;
 
 pub use config::{

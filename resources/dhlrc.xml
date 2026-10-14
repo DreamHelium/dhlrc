@@ -1,12 +1,10 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8" ?>
 <gresources>
   <gresource prefix="/cn/dh/dhlrc">
     <file>dhlrc.svg</file>
     <file>nbt_tree.svg</file>
     <file>region.svg</file>
     <file>item_list.svg</file>
-    <file>data_version.csv</file>
-    <file>handle_block.json</file>
     <file>show.svg</file>
     <file>hide.svg</file>
   </gresource>

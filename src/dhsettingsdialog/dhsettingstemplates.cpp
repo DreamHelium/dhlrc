@@ -14,12 +14,15 @@
 #include <QVBoxLayout>
 #include <limits>
 
-void
-DhSettingsTemplate::addLabel ()
+QHBoxLayout *
+DhSettingsTemplate::addRow ()
 {
+  auto *row = new QHBoxLayout ();
   auto *label = new QLabel (item->label ());
   label->setToolTip (item->toolTip ());
-  layout->addWidget (label);
+  row->addWidget (label);
+  layout->addLayout (row);
+  return row;
 }
 
 void
@@ -62,12 +65,12 @@ DhBoolSettingTemplate::changeConfig () const
 void
 DhIntSettingTemplate::initWidget (QVBoxLayout *, DhSettingsDialog *)
 {
-  addLabel ();
+  auto *row = addRow ();
   auto *spinBox = new QSpinBox ();
   spinBox->setToolTip (item->toolTip ());
   spinBox->setRange (0, std::numeric_limits<int>::max ());
   spinBox->setValue (item->toInt ());
-  layout->addWidget (spinBox);
+  row->addWidget (spinBox, 1);
   widget = spinBox;
   QObject::connect (spinBox, &QSpinBox::valueChanged, dialog,
                     &DhSettingsDialog::detect);
@@ -100,14 +103,19 @@ DhIntSettingTemplate::changeConfig () const
 void
 DhStringSettingTemplate::initWidget (QVBoxLayout *, DhSettingsDialog *dialog)
 {
-  addLabel ();
   longText = dialog->isLongText (item->key ());
+  auto *row = addRow ();
+  /* The default is shown as a grey hint, so an empty box still says what value
+   * will be used; it is never written into the item, so clearing a field keeps
+   * meaning "unset". */
+  const QString fallback = item->getDefault ().toString ();
   if (longText)
     {
       auto *edit = new QTextEdit ();
       edit->setToolTip (item->toolTip ());
+      edit->setPlaceholderText (fallback);
       edit->setPlainText (item->toString ());
-      layout->addWidget (edit);
+      row->addWidget (edit, 1);
       widget = edit;
       QObject::connect (edit, &QTextEdit::textChanged, dialog,
                         &DhSettingsDialog::detect);
@@ -116,8 +124,9 @@ DhStringSettingTemplate::initWidget (QVBoxLayout *, DhSettingsDialog *dialog)
     {
       auto *edit = new QLineEdit ();
       edit->setToolTip (item->toolTip ());
+      edit->setPlaceholderText (fallback);
       edit->setText (item->toString ());
-      layout->addWidget (edit);
+      row->addWidget (edit, 1);
       widget = edit;
       QObject::connect (edit, &QLineEdit::textChanged, dialog,
                         &DhSettingsDialog::detect);
@@ -168,15 +177,14 @@ DhStringSettingTemplate::changeConfig () const
 void
 DhPathSettingTemplate::initWidget (QVBoxLayout *, DhSettingsDialog *)
 {
-  addLabel ();
-  auto *row = new QHBoxLayout ();
+  auto *row = addRow ();
   auto *edit = new QLineEdit (item->toString ());
   edit->setToolTip (item->toolTip ());
+  edit->setPlaceholderText (item->getDefault ().toString ());
   auto *browse = new QPushButton ();
   browse->setIcon (QIcon::fromTheme (QStringLiteral ("folder-open")));
-  row->addWidget (edit);
+  row->addWidget (edit, 1);
   row->addWidget (browse);
-  layout->addLayout (row);
   widget = edit;
   QObject::connect (edit, &QLineEdit::textChanged, dialog,
                     &DhSettingsDialog::detect);
@@ -219,12 +227,12 @@ DhPathSettingTemplate::changeConfig () const
 void
 DhEnumSettingTemplate::initWidget (QVBoxLayout *, DhSettingsDialog *)
 {
-  addLabel ();
+  auto *row = addRow ();
   comboBox = new QComboBox ();
   comboBox->setToolTip (item->toolTip ());
   comboBox->addItems (item->choices ());
   comboBox->setCurrentIndex (item->toInt ());
-  layout->addWidget (comboBox);
+  row->addWidget (comboBox, 1);
   widget = comboBox;
   QObject::connect (comboBox, &QComboBox::currentIndexChanged, dialog,
                     &DhSettingsDialog::detect);

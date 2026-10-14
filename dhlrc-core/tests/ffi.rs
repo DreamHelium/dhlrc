@@ -2,8 +2,8 @@
 
 use dhlrc_core::ffi::{
     DhlrcConfigView, DhlrcCore, dhlrc_config_view_free, dhlrc_core_apply, dhlrc_core_config_path,
-    dhlrc_core_config_view, dhlrc_core_free, dhlrc_core_open, dhlrc_core_plugin_get_bool,
-    dhlrc_core_plugin_set_bool, dhlrc_core_plugin_set_use_configured,
+    dhlrc_core_config_view, dhlrc_core_download_object, dhlrc_core_free, dhlrc_core_open,
+    dhlrc_core_plugin_get_bool, dhlrc_core_plugin_set_bool, dhlrc_core_plugin_set_use_configured,
     dhlrc_core_plugin_use_configured, dhlrc_core_save, dhlrc_core_watch_start,
     dhlrc_core_watch_stop, dhlrc_string_free,
 };
@@ -70,6 +70,15 @@ fn open_read_watch_round_trip() {
         .to_string_lossy()
         .into_owned();
     assert_eq!(base_name, "Converted");
+    // The cache directory is resolved in the core, so it is never empty even
+    // though the freshly created file leaves it unset.
+    let cache_directory = unsafe { CStr::from_ptr(snapshot.cache_directory) }
+        .to_string_lossy()
+        .into_owned();
+    assert!(
+        !cache_directory.is_empty(),
+        "an unset cache directory should resolve to the platform default"
+    );
     dhlrc_config_view_free(view);
 
     // Watch: the callback runs on the watcher thread and sends us the
@@ -206,6 +215,39 @@ fn plugin_options_round_trip() {
         1
     );
     assert!(out);
+    dhlrc_core_free(core);
+    let _ = std::fs::remove_dir_all(&dir);
+}
+
+#[test]
+fn downloading_an_unknown_version_is_reported_without_the_network() {
+    let dir = temp_dir("download");
+    let dir_c = CString::new(dir.to_string_lossy().to_string()).unwrap();
+    let mut error: *mut c_char = ptr::null_mut();
+    let core = dhlrc_core_open(dir_c.as_ptr(), None, ptr::null_mut(), &mut error);
+    assert!(!core.is_null());
+
+    let object = CString::new("minecraft/lang/zh_cn.json").unwrap();
+    /* Data version -1 is not in the bundled table, so this fails before any
+     * request is made (no callbacks, which is also the NULL case). */
+    let result = dhlrc_core_download_object(
+        core,
+        -1,
+        object.as_ptr(),
+        None,
+        None,
+        None,
+        ptr::null_mut(),
+        &mut error,
+    );
+    assert_eq!(result, -1);
+    assert!(!error.is_null(), "an error message should be set");
+    let message = unsafe { CStr::from_ptr(error) }
+        .to_string_lossy()
+        .into_owned();
+    assert!(message.contains("-1"), "message was {message}");
+    dhlrc_string_free(error);
+
     dhlrc_core_free(core);
     let _ = std::fs::remove_dir_all(&dir);
 }

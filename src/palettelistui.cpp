@@ -3,12 +3,13 @@
 #include "ui_palettelistui.h"
 
 #include "region.h"
+#include "resourcegetter.h"
 #include <qobject.h>
 
-PaletteListUI::PaletteListUI (void *region, const QString &large_version,
+PaletteListUI::PaletteListUI (void *region, bool translationReady,
                               QWidget *parent)
     : QDialog (parent), ui (new Ui::PaletteListUI),
-      large_version (large_version), region (region)
+      translationReady (translationReady), region (region)
 {
   ui->setupUi (this);
   model = new QStandardItemModel (this);
@@ -36,7 +37,7 @@ void
 PaletteListUI::drawList ()
 {
   QStringList stringlist;
-  if (!large_version.isEmpty ())
+  if (translationReady)
     stringlist << "Id" << "Name" << "Translation name" << "Properties";
   else
     stringlist << "Id" << "Name" << "Properties";
@@ -48,10 +49,13 @@ PaletteListUI::drawList ()
       QStandardItem *item0 = new QStandardItem (QString::number (i));
       auto name = region_get_palette_id_name (region, i);
       QStandardItem *item1 = new QStandardItem (name);
+      if (translationReady)
+        {
+          auto translated = get_translation_from_object (name);
+          if (!translated.isEmpty ())
+            item2 = new QStandardItem (translated);
+        }
       string_free (name);
-      // if (dhlrc_mcdata_enabled () && large_version)
-      //     item2 = new QStandardItem (
-      //         mctr (palette->id_name, large_version));
       QStandardItem *item3;
 
       auto len = region_get_palette_property_len (region, i);

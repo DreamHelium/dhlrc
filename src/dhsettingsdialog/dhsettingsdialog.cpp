@@ -115,6 +115,12 @@ DhSettingsDialog::item (const QString &key) const
   return nullptr;
 }
 
+DhSettingsTemplate *
+DhSettingsDialog::templateFor (const QString &key) const
+{
+  return templatesByKey.value (key);
+}
+
 void
 DhSettingsDialog::addWidget (DhSettingItem *item, QVBoxLayout *layout)
 {
@@ -125,6 +131,7 @@ DhSettingsDialog::addWidget (DhSettingItem *item, QVBoxLayout *layout)
         {
           t->initWidget (layout, this);
           templates.emplace_back (std::move (t));
+          templatesByKey.insert (item->key (), templates.back ().get ());
           return;
         }
     }
@@ -137,6 +144,7 @@ DhSettingsDialog::addWidget (DhSettingItem *item, QVBoxLayout *layout)
         {
           t->initWidget (layout, this);
           templates.emplace_back (std::move (t));
+          templatesByKey.insert (item->key (), templates.back ().get ());
           return;
         }
     }
@@ -165,6 +173,7 @@ DhSettingsDialog::addWidget (DhSettingItem *item, QVBoxLayout *layout)
       break;
     }
   templates.back ()->initWidget (layout, this);
+  templatesByKey.insert (item->key (), templates.back ().get ());
 }
 
 void

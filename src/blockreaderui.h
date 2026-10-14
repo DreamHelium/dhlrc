@@ -29,7 +29,7 @@ public:
                  QWidget *parent = nullptr);
   ~BlockReaderUI ();
   static QString getBlockInfo (void *region, quint32 index,
-                               const QString &path = QString{});
+                               bool hasTranslation = false);
 
 private:
   Ui::BlockReaderUI *ui;
@@ -37,13 +37,12 @@ private:
   std::shared_ptr<RegionClass> regionClass;
   //   QString uuid = {};
   void setText ();
-  char *large_version = nullptr;
   bool readerIsUnlocked = false;
   void *instance = nullptr;
   BlockShowUI *bsui = nullptr;
   const void *nbt = nullptr;
   AutoLocker locker;
-  QString objectPath;
+  bool translationReady = false;
   std::shared_ptr<DhDownloader> downloader;
   int version;
 

@@ -164,6 +164,7 @@ DhCore::refresh ()
   cached.author = text (view->author);
   cached.overrideVersion = text (view->override_version);
   cached.cacheDirectory = text (view->cache_directory);
+  cached.language = text (view->language);
 
   dhlrc_config_view_free (view);
 }

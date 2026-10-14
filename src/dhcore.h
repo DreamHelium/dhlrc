@@ -31,6 +31,7 @@ struct DhConfigData
   QString author;
   QString overrideVersion;
   QString cacheDirectory;
+  QString language;
 };
 
 /* One notification the core produced while opening (for example, that it

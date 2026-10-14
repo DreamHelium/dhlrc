@@ -106,6 +106,9 @@ pub struct General {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cache_directory: Option<PathBuf>,
     pub fail_download_use_cache: bool,
+    /// The language block and item names are shown in, as a Minecraft locale
+    /// (`zh_cn`). Used when a caller does not name one.
+    pub language: String,
 }
 
 impl Default for General {
@@ -120,7 +123,20 @@ impl Default for General {
             strict_nbt_encoding: false,
             cache_directory: None,
             fail_download_use_cache: false,
+            language: "zh_cn".to_owned(),
         }
+    }
+}
+
+impl General {
+    /// The directory the downloader fills and the resource layer reads: the
+    /// configured one, or the platform's default when unset. Going through here
+    /// (rather than the raw field) is what lets both frontends and the resource
+    /// layer agree on where the cache is without any of them computing it.
+    pub fn cache_dir(&self) -> PathBuf {
+        self.cache_directory
+            .clone()
+            .unwrap_or_else(default_cache_dir)
     }
 }
 
@@ -374,6 +390,41 @@ fn config_home() -> PathBuf {
     }
 
     PathBuf::from(".")
+}
+
+/// The platform's default cache directory for dhlrc, following
+/// `XDG_CACHE_HOME` (and the platform's own location on Windows/macOS),
+/// falling back to `~/.cache`, then the temporary directory.
+///
+/// Qt's `QStandardPaths::CacheLocation` resolves to the same place for an
+/// application named `dhlrc`, so the GUI and this agree.
+fn default_cache_dir() -> PathBuf {
+    #[cfg(target_os = "windows")]
+    if let Some(dir) = env::var_os("LOCALAPPDATA") {
+        if !dir.is_empty() {
+            return PathBuf::from(dir).join("dhlrc");
+        }
+    }
+
+    #[cfg(target_os = "macos")]
+    if let Some(home) = env::var_os("HOME") {
+        return PathBuf::from(home).join("Library/Caches/dhlrc");
+    }
+
+    #[cfg(not(any(target_os = "windows", target_os = "macos")))]
+    {
+        if let Some(dir) = env::var_os("XDG_CACHE_HOME") {
+            let dir = PathBuf::from(dir);
+            if dir.is_absolute() {
+                return dir.join("dhlrc");
+            }
+        }
+        if let Some(home) = env::var_os("HOME") {
+            return PathBuf::from(home).join(".cache/dhlrc");
+        }
+    }
+
+    env::temp_dir().join("dhlrc")
 }
 
 /// The paths for the current user, without touching the filesystem.
@@ -636,6 +687,22 @@ mod tests {
         let text = serialize(&config);
         let parsed: Config = toml::from_str(&text).unwrap();
         assert_eq!(config, parsed);
+    }
+
+    #[test]
+    fn an_unset_cache_directory_resolves_to_a_platform_default() {
+        /* Unset stays unset in the file, but reading it yields a real place to
+         * put the cache. */
+        let general = General::default();
+        assert!(general.cache_directory.is_none());
+        assert!(!general.cache_dir().as_os_str().is_empty());
+
+        /* A configured directory wins over the default. */
+        let configured = General {
+            cache_directory: Some(PathBuf::from("/tmp/dhlrc-cache")),
+            ..General::default()
+        };
+        assert_eq!(configured.cache_dir(), PathBuf::from("/tmp/dhlrc-cache"));
     }
 
     #[test]

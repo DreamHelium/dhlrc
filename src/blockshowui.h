@@ -28,7 +28,7 @@ class BlockShowUI : public QWidget
   Q_OBJECT
 
 public:
-  explicit BlockShowUI (void *region, const QString &large_version,
+  explicit BlockShowUI (void *region, bool translationReady,
                         QWidget *parent = nullptr);
   ~BlockShowUI () override;
 
@@ -48,7 +48,7 @@ private:
   QWidget *widget;
   Ui::BlockShowUI *ui;
   void *region;
-  const QString &large_version;
+  bool translationReady;
   QStandardItemModel *model = nullptr;
 
 public Q_SLOTS:

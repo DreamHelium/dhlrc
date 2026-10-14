@@ -1,244 +1,89 @@
 #include "resourcegetter.h"
 #include "dhcore.h"
-#include <QCoroAsyncGenerator>
-#include <QCoroNetworkReply>
-#include <QCoroSignal>
-#include <QDir>
-#include <QNetworkAccessManager>
+#include <QByteArray>
 #include <QString>
-#include <expected>
 #include <libintl.h>
-#include <qcoroiodevice.h>
-#include <qcorotask.h>
-#include <qcorotimer.h>
-#include <qdatetime.h>
-#include <qdir.h>
 #include <qglobalstatic.h>
-#include <qhttpheaders.h>
-#include <qiodevicebase.h>
-#include <qjsonarray.h>
-#include <qjsondocument.h>
-#include <qjsonobject.h>
-#include <qjsonparseerror.h>
-#include <qlogging.h>
 #include <qmap.h>
-#include <qnetworkaccessmanager.h>
-#include <qnetworkreply.h>
-#include <qnetworkrequest.h>
-#include <qobject.h>
-#include <qstandardpaths.h>
-#include <qurl.h>
-#include <tuple>
 #define _(str) gettext (str)
 
-using CacheList = QMap<QString, QJsonDocument>;
-using UrlMap = QMap<QString, QString>;
-Q_GLOBAL_STATIC (CacheList, jsonCache)
 Q_GLOBAL_STATIC (VersionMap, versionMap)
-Q_GLOBAL_STATIC (UrlMap, urlMap)
 
-static auto getDirectory = [] (const QString &childPath)
-  {
-    if (childPath.isEmpty ())
-      return DhCore::instance ()->config ().cacheDirectory;
-    else
-      return DhCore::instance ()->config ().cacheDirectory + QDir::separator ()
-             + childPath;
-  };
+/* The core calls these on the download's thread (see
+ * `dhlrc_core_download_object`); `user` is the `DhDownloader`. They emit
+ * signals, which Qt queues onto the thread the receiver lives on. */
+extern "C" void
+dh_download_info (void *user, const char *message)
+{
+  auto *downloader = static_cast<DhDownloader *> (user);
+  Q_EMIT downloader->info (QString::fromUtf8 (message));
+}
+
+extern "C" void
+dh_download_progress (void *user, uint64_t received, uint64_t total)
+{
+  auto *downloader = static_cast<DhDownloader *> (user);
+  const int percent
+      = total > 0 ? static_cast<int> (received * 100 / total) : 0;
+  Q_EMIT downloader->progress (percent);
+}
+
+extern "C" int32_t
+dh_download_cancel (void *user)
+{
+  return static_cast<DhDownloader *> (user)->isCancelled () ? 1 : 0;
+}
 
 DhDownloader::DhDownloader (QObject *object) : QObject (object) {}
 
-DhDownloader::~DhDownloader () { finish (); }
-
-QCoro::Task<std::expected<QString, QString>>
-DhDownloader::download (const QString &url, const QString &dest,
-                        const QString &infoSend, bool *isOverwritten)
+DhDownloader::~DhDownloader ()
 {
-  auto newer = co_await sourceNewer (url, dest);
-  if (isOverwritten)
-    *isOverwritten = newer;
-  co_return co_await download (url, dest, newer, infoSend);
+  /* Ask the worker to stop, then wait for it, so it cannot call back into this
+   * object once it is gone. */
+  stop ();
+  if (worker.joinable ())
+    worker.join ();
 }
 
-QCoro::Task<std::expected<QString, QString>>
-DhDownloader::download (const QString &url, const QString &dest,
-                        bool overwrite, const QString &infoSend)
+void
+DhDownloader::downloadObject (int version, const QString &object)
 {
-  if (finished)
-    co_return std::unexpected (_ ("Finished!"));
-  /* Someone is running */
-  if (reply)
-    co_return std::unexpected (_ ("A download process is running."));
-  /* Reuse */
-  stopped = false;
-  QDir d (dest);
-  if (!d.exists ())
-    {
-      if (!d.mkpath (dest))
-        co_return std::unexpected (_ ("Couldn't create directory!"));
-    }
-  QNetworkAccessManager nam;
-  QUrl urlVar (url);
-  auto filename = urlVar.fileName ();
-  auto realDir = dest + QDir::separator () + filename;
-  QFile f (realDir);
-  if (f.exists () && !overwrite)
-    /* It can be determined as not an error. */
-    co_return realDir;
-  auto tempFilename = filename + ".dhtmpf";
-  auto tempFilenameDir
-      = QStandardPaths::writableLocation (QStandardPaths::TempLocation)
-        + QDir::separator () + tempFilename;
-  QFile tempF (tempFilenameDir);
-  qint64 offset = 0;
-  bool tempExists = false;
-  if (tempF.exists ())
-    {
-      tempExists = true;
-      if (!tempF.open (QIODeviceBase::Append))
-        co_return std::unexpected (tempF.errorString ());
-      offset = tempF.size ();
-    }
-
-  QNetworkRequest req (url);
-  if (tempExists)
-    {
-      auto val = "bytes=" + QString::number (offset) + "-";
-      req.setRawHeader ("Range", val.toUtf8 ());
-    }
-
-  if (!tempF.exists ())
-    {
-      if (!tempF.open (QIODeviceBase::NewOnly | QIODeviceBase::WriteOnly))
-        co_return std::unexpected (tempF.errorString ());
-    }
-
-  Q_EMIT info (infoSend);
-  reply = nam.get (req);
-
-  auto listener
-      = qCoroSignalListener (reply, &QNetworkReply::downloadProgress);
-  auto it = co_await listener.begin (); // waits for first emission
-  bool first = true;
-  while (it != listener.end () && reply->isRunning ())
-    {
-      if (first)
-        {
-          first = false;
-          auto status
-              = reply->attribute (QNetworkRequest::HttpStatusCodeAttribute)
-                    .toInt ();
-          if (status == 200)
-            {
-              tempF.close ();
-              tempF.remove ();
-              if (!tempF.open (QIODeviceBase::NewOnly
-                               | QIODeviceBase::WriteOnly))
-                {
-                  auto err = tempF.errorString ();
-                  reply->deleteLater ();
-                  reply = nullptr;
-                  co_return std::unexpected (err);
-                }
-            }
-        }
-      const auto [received, total] = *it;
-      if (total > 0)
-        Q_EMIT progress (received * 100 / total);
-      auto data = reply->readAll ();
-      tempF.write (data);
-      if (received == total || reply->isFinished ())
-        break;
-      co_await ++it; // waits for next signal emission
-    }
-  if (reply->error ())
-    {
-      /* Use cache file, no error emitted. */
-      if (f.exists () && DhCore::instance ()->config ().failDownloadUseCache)
-        co_return realDir;
-      auto err = reply->errorString ();
-      reply->deleteLater ();
-      reply = nullptr;
-      co_return std::unexpected (err);
-    }
-  auto data = reply->readAll ();
-  tempF.write (data);
-  if (reply->isFinished ())
-    Q_EMIT progress (100);
-
-  if (!stopped && reply->isFinished ())
-    {
-      QFile::remove (realDir);
-      tempF.copy (realDir);
-      tempF.remove ();
-    }
-
-  reply->deleteLater ();
-  reply = nullptr;
-  co_return realDir;
-}
-
-QCoro::Task<bool>
-DhDownloader::sourceNewer (const QString &url, const QString &dest)
-{
-  QNetworkAccessManager nam;
-  QUrl urlVar (url);
-  auto filename = urlVar.fileName ();
-  QNetworkRequest req (urlVar);
-
-  auto reply = co_await nam.head (req);
-  auto value = reply->headers ()
-                   .value (QHttpHeaders::WellKnownHeader::LastModified)
-                   .toByteArray ();
-  /* Force a fail */
-  if (value.isEmpty ())
-    {
-      reply->deleteLater ();
-      if (DhCore::instance ()->config ().failDownloadUseCache)
-        co_return false;
-      else
-        co_return true;
-    }
-  auto sourceDateTime
-      = QDateTime::fromString (value, "ddd, dd MMM yyyy hh:mm:ss t");
-  reply->deleteLater ();
-
-  auto realFileDir = dest + QDir::separator () + filename;
-  QFile f (realFileDir);
-
-  if (!f.exists ())
-    co_return true;
-  co_return f.fileTime (QFileDevice::FileBirthTime) < sourceDateTime;
+  if (worker.joinable ())
+    worker.join ();
+  cancelled = false;
+  worker = std::thread ([this, version, object] { run (version, object); });
 }
 
 void
 DhDownloader::stop ()
 {
-  if (reply)
-    reply->abort ();
-  stopped = true;
-}
-
-void
-DhDownloader::finish ()
-{
-  stop ();
-  finished = true;
+  cancelled = true;
 }
 
 bool
-DhDownloader::isFinished ()
+DhDownloader::isCancelled () const
 {
-  return finished;
+  return cancelled.load ();
 }
 
-QCoro::Task<std::expected<QString, QString>>
-download_manifest (DhDownloader &downloader, bool *isOverwrittern)
+void
+DhDownloader::run (int version, const QString &object)
 {
-  co_return co_await downloader.download (
-      "https://launchermeta.mojang.com/mc/game/version_manifest.json",
-      getDirectory ({}), QString (_ ("Downloading manifest.")),
-      isOverwrittern);
+  auto *core = DhCore::instance ();
+  const QByteArray objectUtf8 = object.toUtf8 ();
+  char *error = nullptr;
+  const int32_t result
+      = core ? dhlrc_core_download_object (
+                   core->handle (), version, objectUtf8.constData (),
+                   &dh_download_info, &dh_download_progress,
+                   &dh_download_cancel, this, &error)
+             : -1;
+  QString message;
+  if (result != 0)
+    message = error ? QString::fromUtf8 (error) : _ ("The download failed.");
+  if (error)
+    dhlrc_string_free (error);
+  Q_EMIT finished (message);
 }
 
 const VersionMap *
@@ -246,10 +91,14 @@ get_version_list ()
 {
   if (versionMap->isEmpty ())
     {
-      QFile f (":/cn/dh/dhlrc/data_version.csv");
-      if (!f.open (QIODeviceBase::ReadOnly))
+      /* The table is embedded in the core, so the terminal frontend reads the
+       * same bytes without a Qt resource. */
+      size_t length = 0;
+      const char *bundled
+          = dhlrc_core_bundled_resource ("data_version.csv", &length);
+      if (!bundled)
         return nullptr;
-      auto data = f.readAll ();
+      auto data = QByteArray (bundled, static_cast<qsizetype> (length));
       auto lines = data.split ('\n');
       for (const auto &line : lines)
         {
@@ -273,142 +122,24 @@ get_version_list ()
   return versionMap;
 }
 
-QCoro::Task<std::optional<QString>>
-get_manifest_url_list (DhDownloader &downloader)
-{
-  bool overwritten = false;
-  auto ret = co_await download_manifest (downloader, &overwritten);
-  if (!ret.has_value ())
-    co_return ret.error ();
-
-  auto filename = ret.value ();
-  QFile f (filename);
-  if (!f.exists () || !f.open (QIODeviceBase::ReadOnly))
-    co_return f.errorString ();
-  auto data = f.readAll ();
-  f.close ();
-
-  if (overwritten || urlMap->isEmpty ())
-    {
-      QJsonParseError error;
-      auto json = QJsonDocument::fromJson (data, &error);
-      if (error.error)
-        {
-          qDebug () << error.errorString ();
-          co_return error.errorString ();
-        }
-      auto array = json["versions"].toArray ();
-      for (const auto &i : array)
-        {
-          auto id = i.toObject ()["id"].toString ();
-          auto url = i.toObject ()["url"].toString ();
-          urlMap->insert (id, url);
-        }
-    }
-  co_return std::nullopt;
-}
-
-QCoro::Task<std::expected<QString, QString>>
-get_manifest_url (const QString &id, DhDownloader &downloader)
-{
-  auto list = co_await get_manifest_url_list (downloader);
-  if (list.has_value ())
-    co_return std::unexpected (list.value ());
-  if (urlMap->keys ().contains (id))
-    co_return urlMap->value (id);
-  co_return std::unexpected (
-      _ ("No matching index json found, file corrupted?"));
-}
-
-QCoro::Task<std::expected<QString, QString>>
-get_manifest_url (int version, DhDownloader &downloader)
-{
-  get_version_list ();
-  co_return co_await get_manifest_url (versionMap->value (version),
-                                       downloader);
-}
-
-QCoro::Task<std::expected<QString, QString>>
-download_manifest_index_json (DhDownloader &downloader, int version)
-{
-  auto url = co_await get_manifest_url (version, downloader);
-  if (!url.has_value ())
-    co_return url;
-  auto dest = getDirectory ("index_json");
-  co_return co_await downloader.download (
-      url.value (), dest,
-      QString (_ ("Downloading index json of this version.")));
-}
-
-QCoro::Task<std::expected<QString, QString>>
-download_asset_index (DhDownloader &downloader, int version)
-{
-  auto json = co_await download_manifest_index_json (downloader, version);
-  if (!json.has_value ())
-    co_return json;
-  QFile f (json.value ());
-  if (!f.open (QIODeviceBase::ReadOnly))
-    co_return std::unexpected (f.errorString ());
-  auto data = co_await qCoro (f).readAll ();
-  auto realJson = QJsonDocument::fromJson (data);
-  auto url = realJson["assetIndex"].toObject ()["url"].toString ();
-  auto dest = getDirectory ("asset_json");
-  co_return co_await downloader.download (
-      url, dest, QString (_ ("Downloading asset index of this version.")));
-}
-
-QCoro::Task<std::expected<QString, QString>>
-download_object (DhDownloader &downloader, int version, const QString &object)
-{
-  auto asset = co_await download_asset_index (downloader, version);
-  if (!asset.has_value ())
-    co_return asset;
-  QFile f (asset.value ());
-  if (!f.open (QIODeviceBase::ReadOnly))
-    co_return {};
-  auto data = co_await qCoro (f).readAll ();
-  auto realJson = QJsonDocument::fromJson (data);
-  auto hash = realJson["objects"]
-                  .toObject ()[object]
-                  .toObject ()["hash"]
-                  .toString ();
-  QString hashBefore = QString (hash[0]) + hash[1];
-  QString url
-      = "https://resources.download.minecraft.net/" + hashBefore + "/" + hash;
-  auto dest = getDirectory ("object");
-  auto ret = co_await downloader.download (
-      url, dest, QString (_ ("Downloading object.")));
-  Q_EMIT downloader.info (_ ("Downloading finished!"));
-  co_return ret;
-}
-
 QString
-get_translation_from_object (const QString &path, const QString &name)
+get_translation_from_object (const QString &name)
 {
-  if (path.isEmpty ())
+  auto *core = DhCore::instance ();
+  if (!core)
     return {};
-  auto realGetFunc = [] (const QJsonDocument &json, const QString &name)
-    {
-      auto index = name.indexOf (':');
-      auto realName = name;
-      realName[index] = '.';
-      auto blockName = "block." + realName;
-      auto itemName = "item." + realName;
-      auto blockTrans = json[blockName].toString ();
-      if (!blockTrans.isEmpty ())
-        return blockTrans;
-      auto itemTrans = json[itemName].toString ();
-      if (!itemTrans.isEmpty ())
-        return itemTrans;
-      return QString{};
-    };
-  if (jsonCache->keys ().contains (path))
-    return realGetFunc (jsonCache->value (path), name);
-  QFile f (path);
-  if (!f.open (QIODeviceBase::ReadOnly))
+  /* The locale is a core setting; fall back to `zh_cn` when it is unset so the
+   * historical default keeps working. */
+  auto locale = core->config ().language;
+  if (locale.isEmpty ())
+    locale = QStringLiteral ("zh_cn");
+  auto key = name.toUtf8 ();
+  auto localeKey = locale.toUtf8 ();
+  char *translated = dhlrc_core_translate (
+      core->handle (), localeKey.constData (), key.constData ());
+  if (!translated)
     return {};
-  auto data = f.readAll ();
-  auto realJson = QJsonDocument::fromJson (data);
-  jsonCache->insert (path, realJson);
-  return realGetFunc (realJson, name);
+  auto text = QString::fromUtf8 (translated);
+  dhlrc_string_free (translated);
+  return text;
 }

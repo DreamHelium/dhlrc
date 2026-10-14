@@ -41,6 +41,7 @@
 #include <QComboBox>
 #include <QDesktopServices>
 #include <QGuiApplication>
+#include <QIcon>
 #include <QLineEdit>
 #include <QResizeEvent>
 #include <QScrollBar>
@@ -74,7 +75,9 @@ public:
   initWidget (QVBoxLayout *layout, DhSettingsDialog *) override
   {
     auto *row = new QHBoxLayout ();
-    row->addWidget (new QLabel (item->label ()));
+    auto *label = new QLabel (item->label ());
+    label->setToolTip (item->toolTip ());
+    row->addWidget (label);
     valueEdit = new QLineEdit ();
     row->addWidget (valueEdit);
     unitCombo = new QComboBox ();
@@ -116,9 +119,11 @@ public:
   void
   setDefault () const override
   {
-    unitCombo->setCurrentIndex (0);
-    valueEdit->setText (
-        QString::number (value (item->getDefault ().toInt (), 0)));
+    int unit = 0;
+    if (auto *unitItem = dialog->item (QStringLiteral ("LimitUnit")))
+      unit = unitItem->getDefault ().toInt ();
+    unitCombo->setCurrentIndex (unit);
+    valueEdit->setText (format (item->getDefault ().toInt (), unit));
   }
 
   void
@@ -128,10 +133,27 @@ public:
     if (auto *unitItem = dialog->item (QStringLiteral ("LimitUnit")))
       unit = unitItem->toInt ();
     unitCombo->setCurrentIndex (unit);
-    valueEdit->setText (QString::number (value (item->toInt (), unit)));
+    valueEdit->setText (format (item->toInt (), unit));
   }
 
 private:
+  /* The text for `bytes` in `unit`: the shortest decimal that reads back as
+   * the same number of bytes. `QString::number`'s default six digits is not
+   * enough (500 MiB is 0.48828125 GiB), and a value that does not round-trip
+   * would be seen as an edit and written back rounded. */
+  static QString
+  format (int bytes, int unit)
+  {
+    const double shown = value (bytes, unit);
+    for (int precision = 1; precision <= 17; precision++)
+      {
+        auto text = QString::number (shown, 'g', precision);
+        if (saveValue (text.toDouble (), unit) == bytes)
+          return text;
+      }
+    return QString::number (shown, 'g', 17);
+  }
+
   static double
   value (int bytes, int unit)
   {
@@ -193,6 +215,276 @@ public:
   void
   changeConfig () const override
   {
+  }
+};
+
+/* A setting with no control of its own on the page, whose value is edited from
+ * another dialog: the multi-region preview's sample values. `pending` stands
+ * in for the control, so detect/apply/changeConfig behave like any other row.
+ */
+class DhValueOnlySettingTemplate : public DhSettingsTemplate
+{
+public:
+  using DhSettingsTemplate::DhSettingsTemplate;
+
+  void
+  initWidget (QVBoxLayout *, DhSettingsDialog *) override
+  {
+    pending = item->toString ();
+  }
+
+  void
+  applyChange () const override
+  {
+    item->setProperty (pending);
+  }
+
+  [[nodiscard]] bool
+  detect () const override
+  {
+    return pending != item->toString ();
+  }
+
+  void
+  setDefault () const override
+  {
+    pending = item->getDefault ().toString ();
+  }
+
+  void
+  changeConfig () const override
+  {
+    pending = item->toString ();
+  }
+
+  /* The value the preview dialog edits, in place of a control; `mutable` so
+   * the const detect/setDefault/changeConfig overrides can update it. */
+  mutable QString pending;
+};
+
+/* Dialog for editing the multi-region display name.
+ *
+ * Shows the pattern, a live preview built from sample values, a grey legend
+ * for the placeholders, and buttons that insert one at the cursor, the way the
+ * old config dialog did. The pattern is written back to the row's line edit,
+ * which stays the single owner of the value; the samples live only here, as
+ * they are for the preview alone. */
+class DhNamePatternDialog : public QDialog
+{
+public:
+  DhNamePatternDialog (QLineEdit *edit, DhSettingsDialog *dialog)
+      : QDialog (dialog), edit (edit), dialog (dialog)
+  {
+    setWindowTitle (_ ("Multi-Region Display Name"));
+    resize (520, 340);
+
+    auto *layout = new QVBoxLayout (this);
+
+    layout->addWidget (new QLabel (_ ("Name pattern:")));
+    patternEdit = new QLineEdit (edit->text ());
+    layout->addWidget (patternEdit);
+
+    layout->addWidget (new QLabel (_ ("Insert a placeholder:")));
+    auto *buttons = new QHBoxLayout ();
+    addPlaceholderButton (buttons, QString::fromUtf8 (dh::fileNamePlaceholder),
+                          _ ("File name"));
+    addPlaceholderButton (buttons,
+                          QString::fromUtf8 (dh::regionNamePlaceholder),
+                          _ ("Region name"));
+    buttons->addStretch ();
+    layout->addLayout (buttons);
+
+    layout->addWidget (new QLabel (_ ("Preview with these sample values:")));
+    auto *samples = new QHBoxLayout ();
+    sampleFileEdit = addSampleEdit (
+        samples, sampleText ("NamePatternSampleFile", dh::defaultSampleFile),
+        _ ("Sample file name"));
+    sampleRegionEdit = addSampleEdit (
+        samples,
+        sampleText ("NamePatternSampleRegion", dh::defaultSampleRegion),
+        _ ("Sample region name"));
+    layout->addLayout (samples);
+
+    previewLabel = new QLabel ();
+    previewLabel->setWordWrap (true);
+    previewLabel->setTextInteractionFlags (Qt::TextSelectableByMouse);
+    layout->addWidget (previewLabel);
+
+    auto *help = new QLabel (
+        _ ("${file} is replaced with the file name, ${region} with the region "
+           "name inside the file. They can be used in any order and repeated. "
+           "Anything else is kept as written."));
+    help->setWordWrap (true);
+    help->setStyleSheet (QStringLiteral ("color:gray;"));
+    layout->addWidget (help);
+
+    layout->addStretch ();
+
+    auto *buttonBox = new QDialogButtonBox (QDialogButtonBox::Ok
+                                            | QDialogButtonBox::Cancel);
+    layout->addWidget (buttonBox);
+    connect (buttonBox, &QDialogButtonBox::accepted, this, &QDialog::accept);
+    connect (buttonBox, &QDialogButtonBox::rejected, this, &QDialog::reject);
+
+    connect (patternEdit, &QLineEdit::textChanged, this,
+             [this] { updatePreview (); });
+    updatePreview ();
+  }
+
+  /* Writes the pattern and the samples back to their rows, which stay the
+   * owners of the values, so the settings dialog's Apply saves them. */
+  void
+  apply ()
+  {
+    edit->setText (patternEdit->text ());
+    writeSample ("NamePatternSampleFile", sampleFileEdit->text ());
+    writeSample ("NamePatternSampleRegion", sampleRegionEdit->text ());
+  }
+
+private:
+  /* Falls back to the built-in sample when one is left empty, so the preview
+   * always shows something readable. */
+  QString
+  sampleFile () const
+  {
+    return sampleFileEdit->text ().isEmpty ()
+               ? QString::fromUtf8 (dh::defaultSampleFile)
+               : sampleFileEdit->text ();
+  }
+
+  QString
+  sampleRegion () const
+  {
+    return sampleRegionEdit->text ().isEmpty ()
+               ? QString::fromUtf8 (dh::defaultSampleRegion)
+               : sampleRegionEdit->text ();
+  }
+
+  /* The sample a value-only row currently holds, or the built-in one when it
+   * is empty (so the preview always shows something readable). */
+  QString
+  sampleText (const QString &key, const char *fallback) const
+  {
+    auto *row = dynamic_cast<DhValueOnlySettingTemplate *> (
+        dialog->templateFor (key));
+    if (row && !row->pending.isEmpty ())
+      return row->pending;
+    return QString::fromUtf8 (fallback);
+  }
+
+  void
+  writeSample (const QString &key, const QString &text) const
+  {
+    if (auto *row = dynamic_cast<DhValueOnlySettingTemplate *> (
+            dialog->templateFor (key)))
+      row->pending = text;
+  }
+
+  QLineEdit *
+  addSampleEdit (QHBoxLayout *layout, const QString &initial,
+                 const QString &label)
+  {
+    auto *editWidget = new QLineEdit (initial);
+    editWidget->setPlaceholderText (label);
+    editWidget->setToolTip (label);
+    layout->addWidget (editWidget);
+    connect (editWidget, &QLineEdit::textChanged, this,
+             [this] { updatePreview (); });
+    return editWidget;
+  }
+
+  void
+  addPlaceholderButton (QHBoxLayout *layout, const QString &placeholder,
+                        const QString &label)
+  {
+    auto *button = new QPushButton (placeholder);
+    button->setToolTip (label);
+    connect (button, &QPushButton::clicked, this,
+             [this, placeholder]
+               {
+                 /* Insert at the cursor and keep the caret after it. */
+                 auto text = patternEdit->text ();
+                 auto pos = patternEdit->cursorPosition ();
+                 patternEdit->setText (text.insert (pos, placeholder));
+                 patternEdit->setCursorPosition (pos + placeholder.size ());
+               });
+    layout->addWidget (button);
+  }
+
+  void
+  updatePreview ()
+  {
+    auto preview = dh::expandRegionNamePattern (
+        patternEdit->text (), sampleFile (), sampleRegion ());
+    if (preview.trimmed ().isEmpty ())
+      preview
+          = QStringLiteral ("%1 - %2").arg (sampleFile (), sampleRegion ());
+    previewLabel->setText (preview);
+  }
+
+  QLineEdit *edit = nullptr;
+  DhSettingsDialog *dialog = nullptr;
+  QLineEdit *patternEdit = nullptr;
+  QLineEdit *sampleFileEdit = nullptr;
+  QLineEdit *sampleRegionEdit = nullptr;
+  QLabel *previewLabel = nullptr;
+};
+
+/* The multi-region display name, with a `Preview...` button that opens the
+ * dialog above so the pattern and its placeholders do not take up room in the
+ * settings page. */
+class DhNamePatternSettingTemplate : public DhSettingsTemplate
+{
+public:
+  using DhSettingsTemplate::DhSettingsTemplate;
+
+  void
+  initWidget (QVBoxLayout *, DhSettingsDialog *dialog) override
+  {
+    auto *row = addRow ();
+    auto *edit = new QLineEdit (item->toString ());
+    edit->setToolTip (item->toolTip ());
+    edit->setPlaceholderText (item->getDefault ().toString ());
+    row->addWidget (edit, 1);
+    auto *previewBtn = new QPushButton (_ ("Pre&view..."));
+    previewBtn->setIcon (
+        QIcon::fromTheme (QStringLiteral ("document-preview")));
+    row->addWidget (previewBtn);
+    widget = edit;
+    QObject::connect (edit, &QLineEdit::textChanged, dialog,
+                      &DhSettingsDialog::detect);
+    QObject::connect (previewBtn, &QPushButton::clicked, edit,
+                      [edit, dialog]
+                        {
+                          DhNamePatternDialog patternDialog (edit, dialog);
+                          if (patternDialog.exec () == QDialog::Accepted)
+                            patternDialog.apply ();
+                        });
+  }
+
+  void
+  applyChange () const override
+  {
+    item->setProperty (qobject_cast<QLineEdit *> (widget)->text ());
+  }
+
+  [[nodiscard]] bool
+  detect () const override
+  {
+    return qobject_cast<QLineEdit *> (widget)->text () != item->toString ();
+  }
+
+  void
+  setDefault () const override
+  {
+    qobject_cast<QLineEdit *> (widget)->setText (
+        item->getDefault ().toString ());
+  }
+
+  void
+  changeConfig () const override
+  {
+    qobject_cast<QLineEdit *> (widget)->setText (item->toString ());
   }
 };
 
@@ -511,7 +803,8 @@ MainWindow::MainWindow (QWidget *parent) : QMainWindow (parent)
       const QString value = core ? core->settingValue (info.key) : QString ();
       auto *item = new DhSettingItem (info.key, itemType (info.type),
                                       itemValue (info.type, value));
-      item->setLabel (_ (info.label.toUtf8 ()));
+      item->setLabel (info.label.isEmpty () ? QString ()
+                                            : _ (info.label.toUtf8 ()));
       if (!info.tooltip.isEmpty ())
         item->setToolTip (_ (info.tooltip.toUtf8 ()));
       if (!info.choices.isEmpty ())
@@ -521,8 +814,13 @@ MainWindow::MainWindow (QWidget *parent) : QMainWindow (parent)
             choices.append (_ (choice.toUtf8 ()));
           item->setChoices (choices);
         }
-      item->setDefault (
-          itemValue (info.type, _ (info.defaultValue.toUtf8 ())));
+      /* A default that is not a message id (a plain value, or empty) must not
+       * go through `gettext`: `gettext("")` returns the whole PO header, which
+       * would then show up as the default. */
+      const QString defaultText = info.defaultValue.isEmpty ()
+                                      ? QString ()
+                                      : _ (info.defaultValue.toUtf8 ());
+      item->setDefault (itemValue (info.type, defaultText));
       if (info.longText)
         settingsDialog->addLongTextItems (info.key);
 
@@ -533,6 +831,13 @@ MainWindow::MainWindow (QWidget *parent) : QMainWindow (parent)
       else if (info.key == QLatin1String ("LimitUnit"))
         creator = [] (DhSettingItem *i, QVBoxLayout *l, DhSettingsDialog *d)
           { return std::make_unique<DhNullSettingTemplate> (i, l, d); };
+      else if (info.key == QLatin1String ("MultiRegionNamePattern"))
+        creator = [] (DhSettingItem *i, QVBoxLayout *l, DhSettingsDialog *d)
+          { return std::make_unique<DhNamePatternSettingTemplate> (i, l, d); };
+      else if (info.key == QLatin1String ("NamePatternSampleFile")
+               || info.key == QLatin1String ("NamePatternSampleRegion"))
+        creator = [] (DhSettingItem *i, QVBoxLayout *l, DhSettingsDialog *d)
+          { return std::make_unique<DhValueOnlySettingTemplate> (i, l, d); };
       settingsDialog->addItem (item, creator);
     }
 
@@ -628,7 +933,7 @@ MainWindow::MainWindow (QWidget *parent) : QMainWindow (parent)
                                    {
                                      if (i.first == win)
                                        {
-                                         i.second->finish ();
+                                         i.second->stop ();
                                          downloaderList->removeOne (i);
                                        }
                                    }

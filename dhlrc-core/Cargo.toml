@@ -6,11 +6,20 @@ edition = "2024"
 [dependencies]
 serde = { version = "1", features = ["derive"] }
 toml = "1"
+# The asset index is JSON, so the object store can be resolved by name.
+serde_json = "1"
 common-rs = { path = "../common-rs" }
 formatx = "0.2.4"
 notify = "8"
 # Opens the plugin libraries (`region_module/`, `load_module/`).
 libloading = "0.8"
+# Reads the resource zips: a version's client jar, a resource pack, a mod jar.
+zip = { version = "2", default-features = false, features = ["deflate"] }
+# The downloader: fetches the version manifest, asset index and objects over
+# HTTPS. `tls` is rustls, so no system OpenSSL is needed.
+ureq = { version = "2", default-features = false, features = ["tls"] }
+# Reads and writes the HTTP `Last-Modified` date the freshness check compares.
+httpdate = "1"
 # Only pulled in by the `desktop-notifications` feature; a headless or terminal
 # build leaves it out and prints the `Notification` instead.
 notify-rust = { version = "4", optional = true }

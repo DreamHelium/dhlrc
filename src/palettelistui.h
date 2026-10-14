@@ -22,13 +22,13 @@ class PaletteListUI : public QDialog
   Q_OBJECT
 
 public:
-  explicit PaletteListUI (void *region, const QString &large_version,
+  explicit PaletteListUI (void *region, bool translationReady,
                           QWidget *parent = nullptr);
   ~PaletteListUI () override;
 
 private:
   Ui::PaletteListUI *ui;
-  const QString &large_version;
+  bool translationReady;
   void *region;
   QStandardItemModel *model;
   QSortFilterProxyModel *proxyModel;
