@@ -71,6 +71,26 @@ On Termux/Android there is no `libintl`, so the Rust translation layer is
 disabled automatically (see `gettext-shim`): the build needs no C library and
 messages stay in English. Combine with `-DDH_TRANSLATIONS=OFF` there.
 
+On Windows with [MSYS2](https://www.msys2.org/), `build-msys2.sh` drives the
+whole build from the UCRT64 environment: it checks the packages it needs (and
+offers to install the missing ones), configures, builds, and — with `--package`
+— assembles a redistributable archive, or an installer when NSIS is installed.
+
+```bash
+./build-msys2.sh            # release build into build-ucrt64/
+./build-msys2.sh --package  # also a portable .zip and, with NSIS installed, a setup .exe
+```
+
+The installer lets the user choose the frontends (the Qt GUI and/or the terminal
+one), the object codecs and region modules to install, and whether to create
+Start Menu shortcuts. Selecting a region module pulls in the NBT codec it needs
+(a module only works on the object a codec produced). It also registers the
+AppUserModelID the core's desktop notifications are sent as, so Windows names
+them after the application rather than PowerShell.
+
+Run `./build-msys2.sh --help` for the other options (`--debug`, `--no-gui`,
+`--no-translations`, `--offline`, `--clean`, `--build-dir`, `--jobs`).
+
 ## Features
 
 - NBT and Litematica support.

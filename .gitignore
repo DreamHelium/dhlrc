@@ -12,6 +12,7 @@ src/*.user*
 
 build/
 build-release
+build-ucrt64/
 
 # temp file
 temp/

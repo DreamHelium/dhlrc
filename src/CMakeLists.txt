@@ -25,9 +25,6 @@ set(CMAKE_MODULE_PATH ${ECM_MODULE_PATH})
 find_package(KF6 REQUIRED COMPONENTS ColorScheme ConfigWidgets I18n WidgetsAddons CoreAddons IconThemes)
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets Svg Concurrent)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets Svg Concurrent)
-find_package(QCoro6 REQUIRED COMPONENTS Core Network)
-
-qcoro_enable_coroutines()
 
 add_definitions(-DQT_NO_SIGNALS_SLOTS_KEYWORDS)
 
@@ -120,7 +117,7 @@ else ()
 endif ()
 
 target_link_libraries(dhlrc_qt PRIVATE Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::Svg
- KF6::ColorScheme QCoro::Core QCoro::Network
+ KF6::ColorScheme
  KF6::ConfigWidgets KF6::I18n KF6::I18nLocaleData region_rs dhlrc_core Qt6::Concurrent ${Intl_LIBRARIES}
  dhsettingsdialog KF6::WidgetsAddons KF6::CoreAddons KF6::IconThemes)
 target_link_directories(dhlrc_qt PRIVATE ${CMAKE_BINARY_DIR})

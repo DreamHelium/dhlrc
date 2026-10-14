@@ -1,0 +1,232 @@
+; dhlrc's Windows installer, compiled by `makensis` from `installer/dhlrc.nsi.in`
+; (CMake substitutes the `@...@` placeholders, see CMakeLists.txt).
+;
+; The script copies straight from the build tree: the two executables and the
+; modules from `APPDIR`, the terminal frontend's runtime from `RUNTIME_BASE` and
+; the Qt/KF6 one from `RUNTIME_GUI`. Splitting the runtime that way is what lets
+; a terminal-only install stay small.
+;
+; The installer offers the two frontends and the modules as components, asks
+; whether to create the Start Menu shortcuts, and registers the AppUserModelID
+; the desktop notifications need.
+;
+; APP_ID (below) must match the AppUserModelID the core sends its desktop
+; notifications as (dhlrc-core/src/desktop.rs).
+;
+; Keep this file ASCII: makensis reads it in the ANSI code page before it
+; reaches the `Unicode` directive below, so anything else has to be a comment
+; after that point.
+
+Unicode true
+
+!include "MUI2.nsh"
+!include "LogicLib.nsh"
+!include "Sections.nsh"
+!include "FileFunc.nsh"
+!include "nsDialogs.nsh"
+
+!define APP_NAME "Minecraft Structure Modifier"
+!define APP_ID   "@DH_APP_ID@"
+!define VERSION  "@DH_VERSION@"
+!define APPDIR   "@DH_APPDIR_NATIVE@"
+!define RUNTIME_BASE "@DH_RUNTIME_BASE_NATIVE@"
+!define RUNTIME_GUI  "@DH_RUNTIME_GUI_NATIVE@"
+!define OUTFILE  "@DH_OUTFILE_NATIVE@"
+
+Name "${APP_NAME}"
+OutFile "${OUTFILE}"
+InstallDir "$PROGRAMFILES64\dhlrc"
+InstallDirRegKey HKLM "Software\dhlrc" "InstallDir"
+RequestExecutionLevel admin
+SetCompressor /SOLID lzma
+
+Var StartMenuState
+
+Function .onInit
+  SetShellVarContext all
+FunctionEnd
+
+Function un.onInit
+  SetShellVarContext all
+FunctionEnd
+
+!define MUI_ABORTWARNING
+; `MUI_FINISHPAGE_RUN` is what makes the finish page show the "run" checkbox;
+; the function below then decides what to run (the GUI, if it was installed).
+!define MUI_FINISHPAGE_RUN "$INSTDIR\dhlrc_qt.exe"
+!define MUI_FINISHPAGE_RUN_TEXT "Launch ${APP_NAME}"
+!define MUI_FINISHPAGE_RUN_FUNCTION LaunchApp
+
+!insertmacro MUI_PAGE_WELCOME
+!define MUI_PAGE_CUSTOMFUNCTION_LEAVE ComponentsDependencies
+!insertmacro MUI_PAGE_COMPONENTS
+Page custom OptionsCreate OptionsLeave
+!insertmacro MUI_PAGE_DIRECTORY
+!insertmacro MUI_PAGE_INSTFILES
+!insertmacro MUI_PAGE_FINISH
+
+!insertmacro MUI_UNPAGE_CONFIRM
+!insertmacro MUI_UNPAGE_INSTFILES
+
+!insertmacro MUI_LANGUAGE "English"
+!insertmacro MUI_LANGUAGE "SimpChinese"
+
+;--------------------------------
+; The options page: the Start Menu choice.
+Function OptionsCreate
+  !insertmacro MUI_HEADER_TEXT "Options" "Choose additional tasks."
+  nsDialogs::Create 1018
+  Pop $0
+  ${If} $0 == error
+    Abort
+  ${EndIf}
+
+  ${NSD_CreateCheckbox} 0 0 100% 12u "Create Start Menu shortcuts"
+  Pop $StartMenuState
+  ${NSD_Check} $StartMenuState
+
+  nsDialogs::Show
+FunctionEnd
+
+Function OptionsLeave
+  ${NSD_GetState} $StartMenuState $StartMenuState
+FunctionEnd
+
+;--------------------------------
+; Installer sections
+
+; What every frontend and module needs: the MinGW/gettext runtime, the region
+; library the modules link against, and the catalogue.
+Section "Shared runtime" SecShared
+  SectionIn RO
+  SetOutPath "$INSTDIR"
+  File "${APPDIR}\region_rs.dll"
+  File "${RUNTIME_BASE}\*.*"
+  SetOutPath "$INSTDIR\locale"
+  File /r "${APPDIR}\locale\*.*"
+  SetOutPath "$INSTDIR"
+
+  ; Register the AppUserModelID so Windows names the toasts after the
+  ; application (the core sends them as this ID, see desktop.rs).
+  WriteRegStr HKCU "Software\Classes\AppUserModelId\${APP_ID}" "DisplayName" "${APP_NAME}"
+  WriteRegStr HKCU "Software\Classes\AppUserModelId\${APP_ID}" "IconUri" "$INSTDIR\dhlrc_qt.exe"
+
+  ; Add/Remove Programs entry.
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\dhlrc" "DisplayName" "${APP_NAME}"
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\dhlrc" "DisplayVersion" "${VERSION}"
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\dhlrc" "InstallLocation" "$INSTDIR"
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\dhlrc" "DisplayIcon" "$INSTDIR\dhlrc_qt.exe"
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\dhlrc" "UninstallString" '"$INSTDIR\uninstall.exe"'
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\dhlrc" "QuietUninstallString" '"$INSTDIR\uninstall.exe" /S'
+  WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\dhlrc" "NoModify" 1
+  WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\dhlrc" "NoRepair" 1
+  WriteRegStr HKLM "Software\dhlrc" "InstallDir" "$INSTDIR"
+
+  WriteUninstaller "$INSTDIR\uninstall.exe"
+
+  ${GetSize} "$INSTDIR" "/S=0K" $0 $1 $2
+  IntFmt $0 "0x%08X" $0
+  WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\dhlrc" "EstimatedSize" "$0"
+SectionEnd
+
+Section "Graphical interface (dhlrc_qt)" SecGui
+  SetOutPath "$INSTDIR"
+  File "${APPDIR}\dhlrc_qt.exe" "${APPDIR}\dhsettingsdialog.dll" "${APPDIR}\dhlrc_core.dll"
+  File "${RUNTIME_GUI}\*.*"
+  ; The Qt plugins and the Breeze style live in subdirectories of the
+  ; executable, where Qt looks for them.
+  SetOutPath "$INSTDIR\platforms"
+  File "${RUNTIME_GUI}\platforms\*.*"
+  SetOutPath "$INSTDIR\styles"
+  File "${RUNTIME_GUI}\styles\*.*"
+  SetOutPath "$INSTDIR\imageformats"
+  File "${RUNTIME_GUI}\imageformats\*.*"
+  SetOutPath "$INSTDIR\iconengines"
+  File "${RUNTIME_GUI}\iconengines\*.*"
+
+  ${If} $StartMenuState == ${BST_CHECKED}
+    CreateDirectory "$SMPROGRAMS\dhlrc"
+    CreateShortCut "$SMPROGRAMS\dhlrc\${APP_NAME}.lnk" "$INSTDIR\dhlrc_qt.exe"
+  ${EndIf}
+SectionEnd
+
+Section "Terminal interface (dhlrc-tui)" SecTui
+  SetOutPath "$INSTDIR"
+  File "${APPDIR}\dhlrc-tui.exe"
+SectionEnd
+
+; The object codec a region module needs to make sense of a file.
+Section "Object codec: NBT" SecCodecNbt
+  SetOutPath "$INSTDIR\load_module"
+  File "${APPDIR}\load_module\nbt_component.dll"
+SectionEnd
+
+Section "Region module: NBT (Java structure)" SecRegionNbt
+  SetOutPath "$INSTDIR\region_module"
+  File "${APPDIR}\region_module\region_nbt_rs.dll"
+SectionEnd
+
+Section "Region module: Litematica" SecRegionLitematic
+  SetOutPath "$INSTDIR\region_module"
+  File "${APPDIR}\region_module\region_litematic_rs.dll"
+SectionEnd
+
+!insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
+  !insertmacro MUI_DESCRIPTION_TEXT ${SecShared} "The MinGW/gettext runtime, the region library and the catalogue every frontend and module uses."
+  !insertmacro MUI_DESCRIPTION_TEXT ${SecGui} "The Qt Widgets interface (dhlrc_qt.exe) and the Qt/KF6 runtime and Breeze style it needs."
+  !insertmacro MUI_DESCRIPTION_TEXT ${SecTui} "The terminal frontend (dhlrc-tui.exe)."
+  !insertmacro MUI_DESCRIPTION_TEXT ${SecCodecNbt} "Turns a file's bytes into an object. Required by the region modules."
+  !insertmacro MUI_DESCRIPTION_TEXT ${SecRegionNbt} "Reads and writes Java Edition NBT structure files."
+  !insertmacro MUI_DESCRIPTION_TEXT ${SecRegionLitematic} "Reads and writes Litematica projection files."
+!insertmacro MUI_FUNCTION_DESCRIPTION_END
+
+;--------------------------------
+; A region module cannot decode a file on its own -- it works on the object a
+; codec produced -- so selecting one pulls the NBT codec in as well. This runs
+; when the components page is left, so the sections below are already defined.
+Function ComponentsDependencies
+  SectionGetFlags ${SecRegionNbt} $0
+  SectionGetFlags ${SecRegionLitematic} $1
+  IntOp $0 $0 | $1
+  IntOp $0 $0 & ${SF_SELECTED}
+  ${If} $0 == ${SF_SELECTED}
+    SectionGetFlags ${SecCodecNbt} $0
+    IntOp $0 $0 | ${SF_SELECTED}
+    SectionSetFlags ${SecCodecNbt} $0
+  ${EndIf}
+FunctionEnd
+
+;--------------------------------
+; Called by the finish page to start the GUI, if it was installed.
+Function LaunchApp
+  ${If} ${FileExists} "$INSTDIR\dhlrc_qt.exe"
+    ExecShell "open" "$INSTDIR\dhlrc_qt.exe"
+  ${EndIf}
+FunctionEnd
+
+;--------------------------------
+; Uninstaller
+
+Section "Uninstall"
+  ; Start Menu folder (only what we created).
+  Delete "$SMPROGRAMS\dhlrc\${APP_NAME}.lnk"
+  RMDir "$SMPROGRAMS\dhlrc"
+
+  ; The AppUserModelID registration and the Add/Remove Programs entry.
+  DeleteRegKey HKCU "Software\Classes\AppUserModelId\${APP_ID}"
+  DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\dhlrc"
+  DeleteRegKey HKLM "Software\dhlrc"
+
+  ; Files and directories.
+  Delete "$INSTDIR\*.dll"
+  Delete "$INSTDIR\*.exe"
+  RMDir /r "$INSTDIR\platforms"
+  RMDir /r "$INSTDIR\styles"
+  RMDir /r "$INSTDIR\imageformats"
+  RMDir /r "$INSTDIR\iconengines"
+  RMDir /r "$INSTDIR\load_module"
+  RMDir /r "$INSTDIR\region_module"
+  RMDir /r "$INSTDIR\locale"
+  Delete "$INSTDIR\uninstall.exe"
+  RMDir "$INSTDIR"
+SectionEnd

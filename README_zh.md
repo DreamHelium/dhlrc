@@ -58,7 +58,16 @@ cmake --build build
 
 Termux/Android 上没有 `libintl`，Rust 侧的翻译层会自动失效（见 `gettext-shim`）：构建不再需要任何 C 库，字符串保持英文。在那里请一并加上 `-DDH_TRANSLATIONS=OFF`。
 
-你可能需要从`region-rs/target/debug(或release)`复制`region_rs`到项目根目录及构建目录中。如果条件允许，使用一个软链接。
+在 Windows 上，配合 [MSYS2](https://www.msys2.org/) 的 `build-msys2.sh` 可从 UCRT64 环境一键构建：脚本会检查所需软件包（并询问是否安装缺少的包）、配置并编译；加上 `--package` 还会打包成可分发压缩包，若安装了 NSIS 则生成安装程序。
+
+```bash
+./build-msys2.sh            # 以 release 构建到 build-ucrt64/
+./build-msys2.sh --package  # 同时生成便携 .zip；装了 NSIS 还会生成安装程序 .exe
+```
+
+安装程序可让用户选择要安装的前端（Qt 界面和/或终端前端）、对象编解码器与区域模块，以及是否创建开始菜单快捷方式；勾选任一区域模块会自动带上它所需的 NBT 编解码器（模块只能处理编解码器解析出的对象）。它还会注册核心的桌面通知所用的 AppUserModelID，使 Windows 把通知显示为本程序而不是 PowerShell。
+
+其它选项（`--debug`、`--no-gui`、`--no-translations`、`--offline`、`--clean`、`--build-dir`、`--jobs`）见 `./build-msys2.sh --help`。
 
 ## 功能
 
