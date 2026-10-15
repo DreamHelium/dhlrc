@@ -1,0 +1,134 @@
+#ifndef DHLRC_RENDER_H
+#define DHLRC_RENDER_H
+
+#include <stddef.h>
+#include <stdint.h>
+
+/* Drawing a region.
+ *
+ * This is the C side of `dhlrc_core`'s `render` feature (see
+ * `dhlrc-core/src/render.rs`): a region and the core handle go in, a picture
+ * comes out. A scene is built once — reading every model, every texture and
+ * every block — and then drawn as often as the view moves, so a drag only
+ * re-rasterises.
+ *
+ * The pixels a draw returns are owned by the scene and stay valid only until
+ * the next draw on that scene or its free; copy them into a `QImage` before
+ * drawing again.
+ */
+
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
+  typedef struct DhlrcScene DhlrcScene;
+
+  typedef struct DhlrcCamera
+  {
+    double target[3];
+    double yaw;
+    double pitch;
+    double distance;
+    double fov;
+    /* Any non-zero value uses the orthographic projection. */
+    int32_t orthographic;
+  } DhlrcCamera;
+
+  /* Builds the scene of `region` (a `Region *` from `libregion_rs`), reading
+   * models and textures through the resources `core` has configured. NULL
+   * when a handle is NULL or the scene could not be built. */
+  DhlrcScene *dhlrc_render_scene_new (void *core, const void *region);
+
+  /* Frees a scene built by `dhlrc_render_scene_new`. NULL is allowed. */
+  void dhlrc_render_scene_free (DhlrcScene *scene);
+
+  /* How many quads the scene holds, and how many palette entries were left
+   * out (a block whose model could not be read). */
+  size_t dhlrc_render_scene_quads (const DhlrcScene *scene);
+  size_t dhlrc_render_scene_skipped (const DhlrcScene *scene);
+
+  /* Why one palette entry was left out. Borrowed from the scene; valid for as
+   * long as it lives. NULL for an index out of range. */
+  const char *dhlrc_render_scene_skipped_reason (const DhlrcScene *scene,
+                                                 size_t index);
+
+  /* Points `camera` at the whole scene so it fits a `width` by `height`
+   * picture, keeping the camera's angles. Call it when a region is first
+   * shown, or when the view is reset. */
+  void dhlrc_render_fit (const DhlrcScene *scene, DhlrcCamera *camera,
+                         uint32_t width, uint32_t height);
+
+  /* Slides the target across the plane the camera looks at, by a fraction of
+   * the picture's height: `right` positive goes towards the camera's right,
+   * `up` positive towards the top. This is a middle/right button drag. */
+  void dhlrc_render_pan (DhlrcCamera *camera, double right, double up);
+
+  /* Draws the scene and returns `width * height * 4` RGBA bytes, row by row
+   * from the top, on a transparent background. Owned by the scene and valid
+   * until the next draw on it or its free; NULL when a handle is NULL or a
+   * size is zero. */
+  const uint8_t *dhlrc_render_image (DhlrcScene *scene,
+                                     const DhlrcCamera *camera, uint32_t width,
+                                     uint32_t height);
+
+  /* The block under pixel `(x, y)`, written to `block` as a region coordinate
+   * (three `int32_t`). Returns 1 on a hit and 0 on a miss. */
+  int32_t dhlrc_render_pick (const DhlrcScene *scene, const DhlrcCamera *camera,
+                             uint32_t width, uint32_t height, double x,
+                             double y, int32_t *block);
+
+  /* ---- Drawing it on a GPU instead -------------------------------------
+   *
+   * The same scene, handed over piece by piece, so a `QOpenGLWidget` can draw
+   * it with the same geometry, the same light and the same textures the
+   * software rasteriser uses. The pieces are borrowed from the scene and stay
+   * valid for as long as it does.
+   */
+
+  typedef struct DhlrcQuad
+  {
+    /* Block space, wound so the front looks outwards; two triangles per quad,
+     * `0, 1, 2` and `0, 2, 3`. */
+    float positions[4][3];
+    float uv[4][2];
+    /* What the texture is multiplied by; `{1, 1, 1}` for no tint. */
+    float tint[3];
+    /* 1.0 in full light, down to 0.5 on a block's bottom. */
+    float light;
+    /* Which of the scene's textures to sample. */
+    uint32_t texture;
+    /* How the texture's alpha behaves: 0 covers, 1 is cut out where it is
+     * clear, 2 is blended. */
+    int32_t alpha;
+  } DhlrcQuad;
+
+  /* How many quads the scene holds. */
+  size_t dhlrc_render_scene_quad_count (const DhlrcScene *scene);
+
+  /* One quad, written to `quad`. Returns 1, or 0 for an index past the end. */
+  int32_t dhlrc_render_scene_quad (const DhlrcScene *scene, size_t index,
+                                   DhlrcQuad *quad);
+
+  /* How many textures the scene holds. Index 0 is always the missing-texture
+   * checker, so a quad's index is never out of range. */
+  size_t dhlrc_render_scene_texture_count (const DhlrcScene *scene);
+
+  /* One texture as `width * height * 4` RGBA bytes, top-down — what
+   * `glTexImage2D` takes. Any output pointer may be NULL. Returns 1, or 0 for
+   * an index past the end. */
+  int32_t dhlrc_render_scene_texture (const DhlrcScene *scene, size_t index,
+                                      const uint8_t **pixels, uint32_t *width,
+                                      uint32_t *height);
+
+  /* The view-projection matrix of `camera` for a `width` by `height` picture:
+   * sixteen column-major floats, the very matrix the software rasteriser
+   * uses. */
+  void dhlrc_render_matrix (const DhlrcScene *scene, const DhlrcCamera *camera,
+                            uint32_t width, uint32_t height, float *out16);
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* DHLRC_RENDER_H */

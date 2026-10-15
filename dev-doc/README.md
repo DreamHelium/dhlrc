@@ -14,3 +14,4 @@ symbols by name.
 - [Plugin reference](plugin.md) — every symbol a region plugin may or must export, plus the option sets
 - [Load module](load_module.md) — the object codecs that decode a file before a region plugin sees it
 - [Create a region](region_create.md) — how a file is loaded and turned into a region
+- [Rendering](render.md) — how a block becomes pixels: the model, the renderer, and the C ABI the Qt view draws through

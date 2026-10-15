@@ -765,6 +765,49 @@ pub extern "C" fn dhlrc_core_resources_configure(
     }
 }
 
+/// Points the core at the resources of one version, resolved from a region's
+/// data version: the version's client jar under the configured cache
+/// directory, plus any resource packs and mod jars. This is what a frontend
+/// that draws calls before building a scene — the block models and textures
+/// are only in the client jar, so without it a scene has nothing to draw.
+///
+/// The module's own `cache_dir` comes from the configuration, so a caller only
+/// names the version and the packs. Returns 0, or -1 when the data version
+/// names no known version or the handle is bad.
+#[unsafe(no_mangle)]
+pub extern "C" fn dhlrc_core_resources_configure_for_data_version(
+    core: *mut DhlrcCore,
+    data_version: i32,
+    packs: *const *const c_char,
+    pack_count: usize,
+) -> i32 {
+    let Some(core) = (unsafe { core.as_ref() }) else {
+        return -1;
+    };
+    let Some(version) = crate::download::version_id(data_version) else {
+        return -1;
+    };
+    let cache_dir = core
+        .shared
+        .config
+        .lock()
+        .ok()
+        .map(|config| config.general.cache_dir())
+        .unwrap_or_default();
+    let environment = ResourceEnvironment {
+        cache_dir,
+        version: Some(version),
+        packs: collect_paths(packs, pack_count),
+    };
+    match core.resources.lock() {
+        Ok(mut guard) => {
+            *guard = Some(environment.resource_set());
+            0
+        }
+        Err(_) => -1,
+    }
+}
+
 /// The localized name of a block or item (`minecraft:oak_log`) in `locale`
 /// (`zh_cn`), looked up through the resource set. Owned; free it with
 /// `dhlrc_string_free`. NULL when there is no name for it.
@@ -802,22 +845,40 @@ pub extern "C" fn dhlrc_core_translate(
 fn with_resources<T>(core: &DhlrcCore, with: impl FnOnce(&ResourceSet) -> T) -> Option<T> {
     let mut guard = core.resources.lock().ok()?;
     if guard.is_none() {
-        let cache_dir = core
+        let (cache_dir, version) = core
             .shared
             .config
             .lock()
             .ok()
-            .map(|config| config.general.cache_dir())
+            .map(|config| {
+                let version = config.game.override_version.trim().to_owned();
+                (
+                    config.general.cache_dir(),
+                    (!version.is_empty()).then_some(version),
+                )
+            })
             .unwrap_or_default();
         *guard = Some(
             ResourceEnvironment {
                 cache_dir,
+                version,
                 ..ResourceEnvironment::default()
             }
             .resource_set(),
         );
     }
     guard.as_ref().map(with)
+}
+
+impl DhlrcCore {
+    /// Runs `with` against the core's resource set, building the default one
+    /// from the configuration the first time. This is the Rust-side seam for a
+    /// library that reads the same resources — the renderer does — so it does
+    /// not have to rebuild the set the frontend already configured, nor go
+    /// through the C ABI for something that is Rust on both sides.
+    pub fn resources<T>(&self, with: impl FnOnce(&ResourceSet) -> T) -> Option<T> {
+        with_resources(self, with)
+    }
 }
 
 /// Reads a `const char *const *` array of `count` strings into paths.
@@ -876,6 +937,108 @@ pub extern "C" fn dhlrc_core_download_object(
     let stop = DownloadCancel { cancel, user_data };
 
     match downloader.download_object(version, &object, &sink, &stop) {
+        Ok(_) => 0,
+        Err(problem) => {
+            set_error(error, &problem.to_string());
+            -1
+        }
+    }
+}
+
+/// The cache directory the configuration names, or the platform default.
+fn configured_cache_dir(core: &DhlrcCore) -> PathBuf {
+    core.shared
+        .config
+        .lock()
+        .ok()
+        .map(|config| config.general.cache_dir())
+        .unwrap_or_default()
+}
+
+/// Where the client jar of the version `data_version` names belongs in the
+/// cache directory, as an owned string. NULL when the handle is bad or the data
+/// version names no known version. The file may or may not be there; ask
+/// `dhlrc_core_client_jar_state` for that.
+///
+/// This is the file a 3D preview reads a version's block models and textures
+/// from, so a frontend can show the path to a user who has to fetch it by hand.
+#[unsafe(no_mangle)]
+pub extern "C" fn dhlrc_core_client_jar_path(
+    core: *const DhlrcCore,
+    data_version: i32,
+) -> *mut c_char {
+    let Some(core) = (unsafe { core.as_ref() }) else {
+        return ptr::null_mut();
+    };
+    let Some(version) = crate::download::version_id(data_version) else {
+        return ptr::null_mut();
+    };
+    let path = crate::resource::cache::client_jar(&configured_cache_dir(core), &version);
+    CString::new(path.to_string_lossy().as_bytes())
+        .map(CString::into_raw)
+        .unwrap_or(ptr::null_mut())
+}
+
+/// 1 when the version's client jar is in the cache, 0 when it is not, and -1
+/// when the handle is bad or the data version names no known version.
+#[unsafe(no_mangle)]
+pub extern "C" fn dhlrc_core_client_jar_state(
+    core: *const DhlrcCore,
+    data_version: i32,
+) -> i32 {
+    let Some(core) = (unsafe { core.as_ref() }) else {
+        return -1;
+    };
+    let Some(version) = crate::download::version_id(data_version) else {
+        return -1;
+    };
+    i32::from(crate::download::client_jar_is_there(
+        &configured_cache_dir(core),
+        &version,
+    ))
+}
+
+/// Downloads the client jar of the version `data_version` names into the cache
+/// directory's `client_jar/` folder, which is where the renderer reads a
+/// version's block models and textures from. An empty error when there is
+/// nothing to fetch.
+///
+/// Blocking, so a frontend runs it off its own thread; `info`, `progress` and
+/// `cancel` behave as they do for `dhlrc_core_download_object`. Returns 0 when
+/// the jar is in place, or -1 with an owned `*error`.
+#[unsafe(no_mangle)]
+pub extern "C" fn dhlrc_core_download_client_jar(
+    core: *mut DhlrcCore,
+    data_version: i32,
+    info: Option<DhlrcDownloadInfoFunc>,
+    progress: Option<DhlrcDownloadProgressFunc>,
+    cancel: Option<DhlrcCancelFunc>,
+    user_data: *mut c_void,
+    error: *mut *mut c_char,
+) -> i32 {
+    let Some(core) = (unsafe { core.as_ref() }) else {
+        set_error(error, "dhlrc_core_download_client_jar: null core");
+        return -1;
+    };
+    let Ok(config) = core.shared.config.lock().map(|guard| guard.clone()) else {
+        set_error(
+            error,
+            "dhlrc_core_download_client_jar: configuration lock poisoned",
+        );
+        return -1;
+    };
+
+    let mut downloader = crate::download::Downloader::new(config.general.cache_dir());
+    downloader.set_prefer_cache(config.general.fail_download_use_cache);
+
+    let sink = DownloadSink {
+        info,
+        progress,
+        user_data,
+    };
+    let stop = DownloadCancel { cancel, user_data };
+
+    match downloader.download_client(data_version, &sink, &stop) {
         Ok(_) => 0,
         Err(problem) => {
             set_error(error, &problem.to_string());

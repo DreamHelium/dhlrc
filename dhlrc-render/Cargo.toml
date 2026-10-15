@@ -1,0 +1,20 @@
+[package]
+name = "dhlrc-render"
+version = "0.1.0"
+edition = "2024"
+description = "Draws blocks and regions from dhlrc-model's geometry into an image."
+
+[dependencies]
+# The geometry: blockstates, models and the quads they bake to.
+dhlrc-model = { path = "../dhlrc-model" }
+# The resource layer the textures are read through, so a pack overrides
+# vanilla exactly as it does for the models.
+dhlrc-resource = { path = "../dhlrc-resource" }
+# Reads the animation metadata beside an animated texture.
+serde_json = "1"
+# Decodes the texture PNGs and writes the rendered image back out.
+png = "0.17"
+
+[lib]
+# An `rlib` for the Rust frontends and a `cdylib` for the C/C++ ones.
+crate-type = ["lib", "cdylib"]

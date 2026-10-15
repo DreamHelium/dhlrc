@@ -23,9 +23,21 @@ option(DH_BUILD_GUI "Build the Qt Widgets GUI (dhlrc_qt)" ON)
 # programme then simply runs in English.
 option(DH_TRANSLATIONS "Build and install the gettext translations" ON)
 
+# The core features this build wants, collected so either can be turned off. A
+# build with no argument passes none, and the core then carries neither the
+# desktop notifications nor the geometry.
+set(DHLRC_CARGO_FEATURES "")
 if (DH_DESKTOP_NOTIFICATIONS)
-  # Only defined when on, so a build without it passes no extra argument.
-  set(DHLRC_CARGO_FEATURE_ARGS --features dhlrc-core/desktop-notifications)
+  list(APPEND DHLRC_CARGO_FEATURES dhlrc-core/desktop-notifications)
+endif ()
+if (DH_BUILD_GUI)
+  # The Qt view draws blocks; the terminal frontend does not, so the renderer
+  # only comes along with a build that can show it.
+  list(APPEND DHLRC_CARGO_FEATURES dhlrc-core/render)
+endif ()
+if (DHLRC_CARGO_FEATURES)
+  list(JOIN DHLRC_CARGO_FEATURES "," DHLRC_CARGO_FEATURE_LIST)
+  set(DHLRC_CARGO_FEATURE_ARGS --features ${DHLRC_CARGO_FEATURE_LIST})
 endif ()
 
 if (CARGO_RELEASE)

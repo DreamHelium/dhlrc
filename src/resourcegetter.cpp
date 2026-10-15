@@ -86,6 +86,35 @@ DhDownloader::run (int version, const QString &object)
   Q_EMIT finished (message);
 }
 
+void
+DhDownloader::downloadClientJar (int version)
+{
+  if (worker.joinable ())
+    worker.join ();
+  cancelled = false;
+  worker = std::thread ([this, version] { runClientJar (version); });
+}
+
+void
+DhDownloader::runClientJar (int version)
+{
+  /* The jar's own worker, so a preview fetching 30 MB does not queue behind a
+   * language file the block reader asked for (and the other way round). */
+  auto *core = DhCore::instance ();
+  char *error = nullptr;
+  const int32_t result
+      = core ? dhlrc_core_download_client_jar (
+                   core->handle (), version, &dh_download_info,
+                   &dh_download_progress, &dh_download_cancel, this, &error)
+             : -1;
+  QString message;
+  if (result != 0)
+    message = error ? QString::fromUtf8 (error) : _ ("The download failed.");
+  if (error)
+    dhlrc_string_free (error);
+  Q_EMIT finished (message);
+}
+
 const VersionMap *
 get_version_list ()
 {

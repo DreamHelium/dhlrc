@@ -274,6 +274,16 @@ extern "C"
                                           const char *const *packs,
                                           size_t pack_count);
 
+  /* Points the core at the resources of the version a region's data version
+   * names: that version's client jar under the configured cache directory,
+   * plus any resource packs / mod jars, highest priority first. A frontend
+   * that draws blocks calls this before building a scene — the block models
+   * and textures are only in the client jar. Returns 0, or -1 when the data
+   * version names no known version or the handle is bad. */
+  int32_t dhlrc_core_resources_configure_for_data_version (
+      DhlrcCore *core, int32_t data_version, const char *const *packs,
+      size_t pack_count);
+
   /* The localized name of a block or item (`minecraft:oak_log`) in `locale`
    * (`zh_cn`), looked up through the resource set. Owned; free it with
    * `dhlrc_string_free`. NULL when there is no name for it. The set is built
@@ -295,6 +305,28 @@ extern "C"
                                       DhlrcDownloadProgressFunc progress,
                                       DhlrcCancelFunc cancel, void *user_data,
                                       char **error);
+
+  /* Where the client jar of the version a data version names belongs in the
+   * cache directory. Owned; free it with `dhlrc_string_free`. NULL when the
+   * handle is bad or the data version names no known version. A version's block
+   * models and block textures are only in this jar, so it is what a 3D preview
+   * reads; `dhlrc_core_client_jar_state` says whether it is there yet. */
+  char *dhlrc_core_client_jar_path (const DhlrcCore *core, int32_t data_version);
+
+  /* 1 when that jar is in the cache, 0 when it is not, -1 when the handle is
+   * bad or the data version names no known version. */
+  int32_t dhlrc_core_client_jar_state (const DhlrcCore *core,
+                                       int32_t data_version);
+
+  /* Downloads the client jar of the version a data version names into the
+   * cache directory's `client_jar/` folder, so a preview can read its models
+   * and textures (about 30 MB, once per version; a jar already there is left
+   * alone). Blocking, so call it off the UI thread. Returns 0 when the jar is
+   * in place, or -1 with an owned `*error`. */
+  int32_t dhlrc_core_download_client_jar (
+      DhlrcCore *core, int32_t data_version, DhlrcDownloadInfoFunc info,
+      DhlrcDownloadProgressFunc progress, DhlrcCancelFunc cancel,
+      void *user_data, char **error);
 
   /* Frees a `char *` the library returned for the caller to own. */
   void dhlrc_string_free (char *string);

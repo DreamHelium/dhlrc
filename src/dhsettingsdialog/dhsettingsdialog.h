@@ -1,6 +1,8 @@
 #ifndef DHLRC_DHSETTINGSDIALOG_H
 #define DHLRC_DHSETTINGSDIALOG_H
 
+#include "dhsettingsdialog_export.h"
+
 #include "dhsettingitem.h"
 
 #include <KPageDialog>
@@ -41,8 +43,13 @@ using DhSettingsTemplateCreator
  * It is extended the same way the old dialog was: a template per control, an
  * assistant for extra work, long-text items as needed. The dialog owns the
  * items it is handed, and emits `saved ()` after `apply ()` has written every
- * item, so the host can persist them wherever it likes. */
-class DhSettingsDialog : public KPageDialog
+ * item, so the host can persist them wherever it likes.
+ *
+ * It is exported because the host connects to `saved ()` from outside this
+ * library: Qt matches a signal by comparing the address of the member function
+ * the host passes with the one in the meta object here, and on Windows only a
+ * class declared export/import gives both sides the same address. */
+class DHSETTINGSDIALOG_EXPORT DhSettingsDialog : public KPageDialog
 {
   Q_OBJECT
 public:

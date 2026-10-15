@@ -70,7 +70,7 @@ impl Source for ZipSource {
 #[cfg(test)]
 mod tests {
     use super::ZipSource;
-    use crate::resource::{Identifier, Source};
+    use crate::{Identifier, Source};
     use std::fs::File;
     use std::io::Write;
 

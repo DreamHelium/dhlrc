@@ -112,7 +112,7 @@ impl Source for ObjectSource {
 #[cfg(test)]
 mod tests {
     use super::ObjectSource;
-    use crate::resource::{Identifier, Source};
+    use crate::{Identifier, Source};
 
     const INDEX: &str = r#"{
         "objects": {

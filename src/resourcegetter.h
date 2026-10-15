@@ -26,6 +26,10 @@ public:
    * whose data version is `version`. Emits `progress` and `info` while
    * running, then `finished` exactly once. */
   void downloadObject (int version, const QString &object);
+  /* Starts fetching a version's client jar — the one file its block models and
+   * textures live in — into the cache directory, where the 3D view reads it
+   * from. Emits the same signals as `downloadObject`. */
+  void downloadClientJar (int version);
   /* Asks a running download to stop; it ends soon after. */
   void stop ();
   /* Whether a stop has been asked for (the core's cancel callback reads this).
@@ -41,6 +45,7 @@ Q_SIGNALS:
 
 private:
   void run (int version, const QString &object);
+  void runClientJar (int version);
   std::thread worker;
   std::atomic<bool> cancelled = false;
 };

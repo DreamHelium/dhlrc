@@ -1,14 +1,20 @@
 /*! Where dhlrc gets its resource files from.
  *
- * Two quite different things live under "resource" here:
+ * Two quite different things live here:
  *
  * - the files dhlrc ships inside itself (see [`bundled`]), and
  * - Minecraft's own assets, addressed by a namespaced path ([`Identifier`]).
  *
- * Both frontends share this layer: the Qt GUI reaches it through the C ABI,
- * the terminal frontend uses it directly. Keeping it in the core is what lets a
- * bundled file be read without a toolkit — a Qt `.qrc` would only be readable
- * from Qt.
+ * Every reader of a resource comes through this layer, and they do not all
+ * come through the core: `dhlrc-core` addresses the language files and the
+ * client jar, `dhlrc-model` the blockstates and models, `dhlrc-render` the
+ * textures. Keeping it its own crate is what lets the renderer read packs and
+ * the client jar without linking the core — and so without the core's whole C
+ * API ending up inside the library the Qt view draws through.
+ *
+ * A resource is asked for by [`Identifier`] and answered by a [`Source`]; the
+ * sources are stacked in a [`ResourceSet`], so a resource pack overrides
+ * vanilla exactly as it does in game.
  */
 
 pub mod archive;

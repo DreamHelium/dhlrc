@@ -1,0 +1,14 @@
+[package]
+name = "dhlrc-model"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+serde_json = "1"
+# The resource layer (`ResourceSet`, `Identifier`) the model files are read
+# through, so a resource pack or a mod overrides vanilla exactly as in game.
+dhlrc-resource = { path = "../dhlrc-resource" }
+
+[lib]
+# An `rlib` for the frontends; nothing loads this at run time.
+crate-type = ["lib"]

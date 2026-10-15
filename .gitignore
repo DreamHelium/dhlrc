@@ -13,6 +13,7 @@ src/*.user*
 build/
 build-release
 build-ucrt64/
+build-render/
 
 # temp file
 temp/

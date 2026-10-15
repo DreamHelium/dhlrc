@@ -2,6 +2,7 @@
 #define DHLRC_DHSETTINGSTEMPLATES_H
 
 #include "dhsettingitem.h"
+#include "dhsettingsdialog_export.h"
 
 #include <QWidget>
 #include <memory>
@@ -18,7 +19,7 @@ class QVBoxLayout;
  * in `detect` whether the control differs from the item, resets the control to
  * the item's default in `setDefault`, and puts the item's value back into the
  * control in `changeConfig`. */
-class DhSettingsTemplate
+class DHSETTINGSDIALOG_EXPORT DhSettingsTemplate
 {
 public:
   DhSettingsTemplate (DhSettingItem *item, QVBoxLayout *layout,

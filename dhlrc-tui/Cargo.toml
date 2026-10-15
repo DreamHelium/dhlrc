@@ -12,7 +12,15 @@ path = "src/main.rs"
 clap = { version = "4", features = ["derive"] }
 clap_complete = "4"
 dhlrc-core = { path = "../dhlrc-core" }
+# The `render` command draws through the same software renderer the Qt view
+# does, reading its models and textures through the resource layer.
+dhlrc-render = { path = "../dhlrc-render" }
+dhlrc-resource = { path = "../dhlrc-resource" }
 formatx = "0.2.4"
+# Loading the region modules reads their symbols at run time, and `libregion_rs`
+# has to be opened before them and process-wide so a plugin's own `region_new`
+# resolves against it.
+libloading = "0.8"
 # The columns in the `modules` output have to line up in Chinese too, where a
 # character is two terminal cells wide.
 unicode-width = "0.2"

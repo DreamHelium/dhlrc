@@ -95,6 +95,8 @@ Run `./build-msys2.sh --help` for the other options (`--debug`, `--no-gui`,
 
 - NBT and Litematica support.
 - Modify base data of the region.
+- A 3D preview that draws a region from its block models and textures, with
+  turning, zooming and block picking (see the [developer document](dev-doc/render.md)).
 - Old-school GUI.
 
 ## Usage

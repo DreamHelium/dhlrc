@@ -6,6 +6,8 @@
  * - argument parsing (`cli`),
  * - the `modules` command, which reports what the core can load and whether the
  *   region modules have the object codecs they need (`modules`),
+ * - the `render` command, which loads a structure file headlessly and writes a
+ *   rendered PNG (`render`, over `region`),
  * - shell completion (`completions`),
  * - the shared gettext setup (`i18n`).
  *
@@ -19,6 +21,8 @@ mod cli;
 mod completions;
 mod i18n;
 mod modules;
+mod region;
+mod render;
 
 use clap::{CommandFactory, Parser};
 use cli::{Cli, Command};
@@ -30,6 +34,7 @@ fn main() -> ExitCode {
     let cli = Cli::parse();
     match cli.command {
         Some(Command::Modules(args)) => modules::run(args),
+        Some(Command::Render(args)) => render::run(args),
         Some(Command::Completions(args)) => completions::run(args),
         None => {
             /* The interactive UI will take this branch once it exists. Until

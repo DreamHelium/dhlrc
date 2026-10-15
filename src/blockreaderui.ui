@@ -183,6 +183,13 @@
          </property>
         </widget>
        </item>
+       <item>
+        <widget class="QPushButton" name="previewBtn">
+         <property name="text">
+          <string>3D &amp;Preview</string>
+         </property>
+        </widget>
+       </item>
       </layout>
      </item>
     </layout>

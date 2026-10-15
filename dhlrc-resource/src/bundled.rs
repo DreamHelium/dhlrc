@@ -12,9 +12,9 @@
  */
 
 /// The `data version -> version id` table, used to pick a version's asset index.
-const DATA_VERSION_CSV: &str = include_str!("../../data/data_version.csv");
+const DATA_VERSION_CSV: &str = include_str!("../data/data_version.csv");
 /// The block-to-item mapping the material list is built from.
-const HANDLE_BLOCK_JSON: &str = include_str!("../../data/handle_block.json");
+const HANDLE_BLOCK_JSON: &str = include_str!("../data/handle_block.json");
 
 /// Every bundled file, by the name it is looked up with.
 const FILES: &[(&str, &str)] = &[

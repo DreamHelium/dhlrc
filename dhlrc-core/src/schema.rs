@@ -65,6 +65,7 @@ const DEFAULT: &str = i18n("Default");
 const GAME: &str = i18n("Game");
 const READER: &str = i18n("Reader");
 const NOTIFICATIONS: &str = i18n("Notifications");
+const RENDER: &str = i18n("3D Preview");
 
 const UNITS: &[&str] = &[i18n("GiB"), i18n("MiB"), i18n("KiB"), i18n("Bytes")];
 const SHOW_OPTIONS: &[&str] = &[i18n("Palette"), i18n("Name")];
@@ -366,6 +367,20 @@ pub static SETTINGS: &[SettingDef] = &[
         get: get_suppress_when_active,
         set: set_suppress_when_active,
     },
+    SettingDef {
+        key: "DownloadClientJar",
+        group: RENDER,
+        kind: SettingType::Bool,
+        label: i18n("Download the Client Jar Automatically"),
+        tooltip: i18n(
+            "A block's models and textures are only in its version's client jar. When a 3D preview needs one the cache directory does not have, download it (about 30 MB) instead of drawing nothing.",
+        ),
+        choices: NO_CHOICES,
+        long_text: false,
+        default: "true",
+        get: get_download_client_jar,
+        set: set_download_client_jar,
+    },
 ];
 
 impl Config {
@@ -645,6 +660,14 @@ fn set_suppress_when_active(config: &mut Config, text: &str) {
     config.notifications.suppress_when_active = parse_bool(text);
 }
 
+fn get_download_client_jar(config: &Config) -> String {
+    bool_text(config.render.download_client_jar)
+}
+
+fn set_download_client_jar(config: &mut Config, text: &str) {
+    config.render.download_client_jar = parse_bool(text);
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -674,5 +697,13 @@ mod tests {
         let mut config = Config::default();
         assert!(config.setting("NoSuchSetting").is_none());
         assert!(!config.set_setting("NoSuchSetting", "1"));
+    }
+
+    #[test]
+    fn the_client_jar_setting_moves_the_configuration() {
+        let mut config = Config::default();
+        assert_eq!(config.setting("DownloadClientJar").as_deref(), Some("true"));
+        assert!(config.set_setting("DownloadClientJar", "false"));
+        assert!(!config.render.download_client_jar);
     }
 }

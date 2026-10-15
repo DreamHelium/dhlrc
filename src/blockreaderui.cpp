@@ -1,5 +1,6 @@
 #include "blockreaderui.h"
 // #include "blocklistui.h"
+#include "dhrenderui.h"
 #include "dhwidget.h"
 #include "resourcegetter.h"
 #include "ui_blockreaderui.h"
@@ -86,6 +87,15 @@ BlockReaderUI::BlockReaderUI (int index,
            &BlockReaderUI::propertyBtn_clicked);
   connect (ui->showBtn, &QPushButton::clicked, this,
            &BlockReaderUI::showBtn_clicked);
+  connect (ui->previewBtn, &QPushButton::clicked, this,
+           [&]
+             {
+               /* The 3D window takes a snapshot of the region while it is
+                * locked, so it keeps drawing after this dialog closes. */
+               auto render = new DhRenderUI (regionClass);
+               render->setAttribute (Qt::WA_DeleteOnClose);
+               render->show ();
+             });
   connect (ui->entityBtn_2, &QPushButton::clicked, this,
            [&]
              {

@@ -106,7 +106,7 @@ impl Source for ResourceSet {
 #[cfg(test)]
 mod tests {
     use super::ResourceSet;
-    use crate::resource::{Identifier, Source};
+    use crate::{Identifier, Source};
     use std::sync::Arc;
     use std::sync::atomic::{AtomicUsize, Ordering};
 

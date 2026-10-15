@@ -1,4 +1,5 @@
 #include "dhcore.h"
+#include "dhpreview.h"
 #include "mainwindow.h"
 #include "utility.h"
 #include "version.h"
@@ -47,6 +48,55 @@ main (int argc, char *argv[])
   parser.setApplicationDescription (QApplication::applicationDisplayName ());
   parser.addHelpOption ();
   parser.addVersionOption ();
+
+  /* The headless preview. It draws one picture of a file and exits, which is
+   * how both backends of the 3D view are checked without a display: the same
+   * command with `--backend cpu` and `--backend gpu` has to give the same
+   * picture. */
+  QCommandLineOption previewOption (
+      QStringLiteral ("preview"),
+      i18n ("Draw one picture of a region file and exit; needs --png"),
+      QStringLiteral ("file"));
+  QCommandLineOption pngOption (
+      QStringLiteral ("png"),
+      i18n ("Where the preview writes its PNG picture"),
+      QStringLiteral ("out.png"));
+  QCommandLineOption backendOption (
+      QStringLiteral ("backend"),
+      i18n ("Preview backend: cpu or gpu (the default is the GPU when OpenGL "
+            "is available)"),
+      QStringLiteral ("cpu|gpu"));
+  QCommandLineOption sizeOption (
+      QStringLiteral ("size"), i18n ("Preview picture size"),
+      QStringLiteral ("WxH"), QStringLiteral ("900x640"));
+  QCommandLineOption yawOption (
+      QStringLiteral ("yaw"), i18n ("Preview camera yaw in degrees"),
+      QStringLiteral ("D"));
+  QCommandLineOption pitchOption (
+      QStringLiteral ("pitch"), i18n ("Preview camera pitch in degrees"),
+      QStringLiteral ("D"));
+  QCommandLineOption jarOption (
+      QStringLiteral ("jar"),
+      i18n ("Preview: read the block models and textures from this client jar"),
+      QStringLiteral ("path"));
+  QCommandLineOption resourcesOption (
+      QStringLiteral ("resources"),
+      i18n ("Preview: read resources from this cache directory"),
+      QStringLiteral ("dir"));
+  QCommandLineOption versionOption (
+      QStringLiteral ("version"),
+      i18n ("Preview: use the client jar of this game version"),
+      QStringLiteral ("id"));
+  parser.addOption (previewOption);
+  parser.addOption (pngOption);
+  parser.addOption (backendOption);
+  parser.addOption (sizeOption);
+  parser.addOption (yawOption);
+  parser.addOption (pitchOption);
+  parser.addOption (jarOption);
+  parser.addOption (resourcesOption);
+  parser.addOption (versionOption);
+
   parser.process (a);
 
   QApplication::setStyle ("breeze");
@@ -54,6 +104,23 @@ main (int argc, char *argv[])
   /* Opens the configuration and starts watching it; the notifications it
    * produces are shown once the window exists. */
   DhCore::init (&a);
+
+  /* A preview never opens the main window: it loads the file, draws one
+   * picture and exits. */
+  if (parser.isSet (previewOption))
+    {
+      DhPreviewOptions options;
+      options.file = parser.value (previewOption);
+      options.png = parser.value (pngOption);
+      options.backend = parser.value (backendOption);
+      options.size = parser.value (sizeOption);
+      options.yaw = parser.value (yawOption);
+      options.pitch = parser.value (pitchOption);
+      options.jar = parser.value (jarOption);
+      options.resources = parser.value (resourcesOption);
+      options.version = parser.value (versionOption);
+      return dhRunPreview (options);
+    }
 
   MainWindow w;
   w.show ();

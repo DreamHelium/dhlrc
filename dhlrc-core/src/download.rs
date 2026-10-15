@@ -208,6 +208,89 @@ impl Downloader {
         Ok(dest)
     }
 
+    /// Fetches the client jar of the version `data_version` names into the
+    /// cache directory's `client_jar/` folder and returns its path.
+    ///
+    /// This is the one file a 3D preview cannot do without: a version's
+    /// blockstates, models and block textures are inside its client jar and not
+    /// in the asset objects (which carry sounds, language files and a handful
+    /// of GUI textures). A jar already in the cache is used as it is — it is
+    /// named after the version and never changes — so opening a preview a
+    /// second time downloads nothing.
+    pub fn download_client(
+        &self,
+        data_version: i32,
+        sink: &dyn Sink,
+        cancel: &dyn Cancel,
+    ) -> Result<PathBuf, Error> {
+        let id = version_id(data_version).ok_or(Error::UnknownVersion(data_version))?;
+        self.download_client_version(&id, sink, cancel)
+    }
+
+    /// The same, for a caller that already knows the version's id (`1.21.4`)
+    /// rather than the data version a region carries.
+    pub fn download_client_version(
+        &self,
+        version: &str,
+        sink: &dyn Sink,
+        cancel: &dyn Cancel,
+    ) -> Result<PathBuf, Error> {
+        let dest = cache::client_jar(&self.cache_dir, version);
+        if is_a_file(&dest) {
+            return Ok(dest);
+        }
+
+        let manifest = self.download(
+            VERSION_MANIFEST,
+            &self.cache_dir,
+            &gettext(i18n("Downloading manifest.")),
+            sink,
+            cancel,
+        )?;
+        let version_url = version_url(&manifest, version)?;
+        let version_json = self.download(
+            &version_url,
+            &cache::index_json(&self.cache_dir),
+            &gettext(i18n("Downloading index json of this version.")),
+            sink,
+            cancel,
+        )?;
+        let client_url = json_text(&read(&version_json)?, &["downloads", "client", "url"])?;
+
+        self.download_to(
+            &client_url,
+            &dest,
+            &gettext(i18n("Downloading the client jar of this version.")),
+            sink,
+            cancel,
+        )?;
+        sink.info(&gettext(i18n("Downloading finished!")));
+        Ok(dest)
+    }
+
+    /// Fetches `url` into the file `dest`, creating the directories above it.
+    /// Unlike [`Downloader::download`], the file's name is the caller's rather
+    /// than the one in the url, which is what the client jar needs: the url
+    /// ends in `client.jar`, while the resource layer looks for
+    /// `<version>.jar`.
+    pub fn download_to(
+        &self,
+        url: &str,
+        dest: &Path,
+        info: &str,
+        sink: &dyn Sink,
+        cancel: &dyn Cancel,
+    ) -> Result<(), Error> {
+        if let Some(parent) = dest.parent() {
+            fs::create_dir_all(parent)?;
+        }
+        if is_a_file(dest) && !self.source_newer(url, dest) {
+            return Ok(());
+        }
+        sink.info(info);
+        self.fetch(url, dest, sink, cancel)
+    }
+
     /// Whether the file at `url` is newer than the one already at `dest`. When
     /// the server does not say, the cache is preferred exactly when the
     /// configuration asks for it.
@@ -295,8 +378,27 @@ impl Downloader {
     }
 }
 
+/// Whether `path` is a file with something in it: a download that died half way
+/// leaves an empty file, which must not be mistaken for the real thing.
+fn is_a_file(path: &Path) -> bool {
+    fs::metadata(path)
+        .map(|metadata| metadata.is_file() && metadata.len() > 0)
+        .unwrap_or(false)
+}
+
+/// Whether the client jar of `version` is already in `cache_dir`, which is what
+/// a frontend asks before it offers to download one.
+pub fn client_jar_is_there(cache_dir: &Path, version: &str) -> bool {
+    is_a_file(&cache::client_jar(cache_dir, version))
+}
+
 /// The version id (`1.21.4`) a data version names, from the bundled table.
-fn version_id(data_version: i32) -> Option<String> {
+///
+/// Public because a frontend that has to point the resource layer at a
+/// version's client jar — the renderer's models and textures are only in there
+/// — resolves it exactly as the downloader does, rather than keeping a second
+/// copy of the table or of the lookup.
+pub fn version_id(data_version: i32) -> Option<String> {
     for line in bundled::data_version_csv().lines() {
         let line = line.trim();
         if line.is_empty() {
@@ -369,12 +471,11 @@ fn transport_error(error: ureq::Error) -> Error {
 
 #[cfg(test)]
 mod tests {
-    use super::{Error, file_name, json_text, temp_path, version_id, version_url};
+    use super::{Downloader, Error, Quiet, Never, file_name, is_a_file, json_text, temp_path, version_id, version_url};
     use std::path::Path;
 
     #[test]
-    fn a_data_version_maps_to_its_id() {
-        /* The table is `id,data version`, newest first. */
+    fn a_data_version_maps_to_its_id() {        /* The table is `id,data version`, newest first. */
         assert_eq!(version_id(4903).as_deref(), Some("26.2"));
         assert!(version_id(-1).is_none());
     }
@@ -424,6 +525,56 @@ mod tests {
         assert!(matches!(
             version_url(&manifest, "9.9"),
             Err(Error::Parse(_))
+        ));
+        std::fs::remove_dir_all(&dir).ok();
+    }
+
+    /// A cache directory of this test's own, named by `suffix`.
+    fn cache(suffix: &str) -> std::path::PathBuf {
+        let dir = std::env::temp_dir().join(format!(
+            "dhlrc-download-{}-{suffix}",
+            std::process::id()
+        ));
+        std::fs::create_dir_all(&dir).unwrap();
+        dir
+    }
+
+    #[test]
+    fn a_client_jar_already_in_the_cache_is_used_as_it_is() {
+        /* No network: the version's jar is there, so nothing is fetched. A
+         * second preview of the same version must not download 30 MB again. */
+        let dir = cache("client");
+        let dest = crate::resource::cache::client_jar(&dir, "1.21.4");
+        std::fs::create_dir_all(dest.parent().unwrap()).unwrap();
+        std::fs::write(&dest, b"a jar").unwrap();
+
+        let downloader = Downloader::new(&dir);
+        let path = downloader
+            .download_client(4189, &Quiet, &Never)
+            .expect("the cached jar");
+        assert_eq!(path, dest);
+        assert_eq!(std::fs::read(&path).unwrap(), b"a jar");
+
+        std::fs::remove_dir_all(&dir).ok();
+    }
+
+    #[test]
+    fn an_empty_client_jar_is_not_mistaken_for_one() {
+        let dir = cache("empty");
+        let dest = crate::resource::cache::client_jar(&dir, "1.21.4");
+        std::fs::create_dir_all(dest.parent().unwrap()).unwrap();
+        std::fs::write(&dest, b"").unwrap();
+        assert!(!is_a_file(&dest));
+        std::fs::remove_dir_all(&dir).ok();
+    }
+
+    #[test]
+    fn a_data_version_no_version_has_cannot_be_downloaded() {
+        let dir = cache("unknown");
+        let downloader = Downloader::new(&dir);
+        assert!(matches!(
+            downloader.download_client(-1, &Quiet, &Never),
+            Err(Error::UnknownVersion(-1))
         ));
         std::fs::remove_dir_all(&dir).ok();
     }

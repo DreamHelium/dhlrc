@@ -228,6 +228,24 @@ impl Default for Reader {
     }
 }
 
+/// The `[render]` group.
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(default)]
+pub struct Render {
+    /// Whether the client jar a version's block models and textures live in is
+    /// fetched by itself when a preview needs one the cache does not have. Off,
+    /// a preview of a version whose jar is missing draws nothing and says so.
+    pub download_client_jar: bool,
+}
+
+impl Default for Render {
+    fn default() -> Self {
+        Self {
+            download_client_jar: true,
+        }
+    }
+}
+
 /// The `[notifications]` group.
 ///
 /// `app_id` names the sender of a desktop notification: the Windows
@@ -266,6 +284,7 @@ pub struct Config {
     pub defaults: Defaults,
     pub game: Game,
     pub reader: Reader,
+    pub render: Render,
     pub notifications: Notifications,
     #[serde(skip_serializing_if = "map_is_empty")]
     pub plugins: BTreeMap<String, PluginConfig>,
@@ -279,6 +298,7 @@ impl Default for Config {
             defaults: Defaults::default(),
             game: Game::default(),
             reader: Reader::default(),
+            render: Render::default(),
             notifications: Notifications::default(),
             plugins: BTreeMap::new(),
         }

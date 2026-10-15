@@ -41,11 +41,18 @@ pub fn translate(resources: &ResourceSet, locale: &str, name: &str) -> Option<St
 #[cfg(test)]
 mod tests {
     use super::translate;
-    use crate::resource::{DirSource, ResourceSet};
+    use crate::{DirSource, ResourceSet};
 
     /// A pack whose `zh_cn` file names a vanilla block and a modded one.
-    fn resources() -> ResourceSet {
-        let root = std::env::temp_dir().join(format!("dhlrc-translate-{}", std::process::id()));
+    ///
+    /// Each test gets its own directory: they run on threads of one process, so
+    /// a name made of the process id alone would have one test truncating the
+    /// file another is reading.
+    fn resources(tag: &str) -> ResourceSet {
+        let root = std::env::temp_dir().join(format!(
+            "dhlrc-translate-{}-{tag}",
+            std::process::id()
+        ));
         let minecraft = root.join("assets/minecraft/lang/zh_cn.json");
         std::fs::create_dir_all(minecraft.parent().unwrap()).unwrap();
         std::fs::write(&minecraft, r#"{"block.minecraft.oak_log":"橡木原木"}"#).unwrap();
@@ -60,7 +67,7 @@ mod tests {
 
     #[test]
     fn a_vanilla_block_is_named_from_the_language_file() {
-        let set = resources();
+        let set = resources("vanilla");
         assert_eq!(
             translate(&set, "zh_cn", "minecraft:oak_log").as_deref(),
             Some("橡木原木")
@@ -69,7 +76,7 @@ mod tests {
 
     #[test]
     fn a_modded_block_is_named_from_its_own_namespace() {
-        let set = resources();
+        let set = resources("modded");
         assert_eq!(
             translate(&set, "zh_cn", "examplemod:cogwheel").as_deref(),
             Some("齿轮")
@@ -78,7 +85,7 @@ mod tests {
 
     #[test]
     fn an_unknown_block_or_locale_has_no_name() {
-        let set = resources();
+        let set = resources("unknown");
         assert!(translate(&set, "zh_cn", "minecraft:dirt").is_none());
         assert!(translate(&set, "fr_fr", "minecraft:oak_log").is_none());
     }

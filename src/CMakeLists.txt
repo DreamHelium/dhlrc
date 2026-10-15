@@ -80,6 +80,10 @@ set(TEMP_PROJECT_SOURCES
         dhbuttondelegate.h
         resourcegetter.h
         resourcegetter.cpp
+        dhrenderui.h dhrenderui.cpp
+        dhrenderwidget.h dhrenderwidget.cpp
+        dhgpuwidget.h dhgpuwidget.cpp
+        dhpreview.h dhpreview.cpp
         dhwidget.h dhwidget.cpp
         dhcore.h dhcore.cpp
 )
@@ -120,6 +124,16 @@ target_link_libraries(dhlrc_qt PRIVATE Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VER
  KF6::ColorScheme
  KF6::ConfigWidgets KF6::I18n KF6::I18nLocaleData region_rs dhlrc_core Qt6::Concurrent ${Intl_LIBRARIES}
  dhsettingsdialog KF6::WidgetsAddons KF6::CoreAddons KF6::IconThemes)
+
+# The GPU path of the 3D view needs Qt's OpenGL widgets, which a Qt built
+# without OpenGL does not have. Where the module is missing the view keeps the
+# CPU picture and the program still builds: the call sites are guarded by
+# `DH_HAVE_OPENGL`.
+find_package(Qt${QT_VERSION_MAJOR} QUIET OPTIONAL_COMPONENTS OpenGL OpenGLWidgets)
+if (TARGET Qt${QT_VERSION_MAJOR}::OpenGLWidgets)
+  target_link_libraries(dhlrc_qt PRIVATE Qt${QT_VERSION_MAJOR}::OpenGLWidgets)
+  target_compile_definitions(dhlrc_qt PRIVATE DH_HAVE_OPENGL)
+endif()
 target_link_directories(dhlrc_qt PRIVATE ${CMAKE_BINARY_DIR})
 target_include_directories(dhlrc_qt PUBLIC
         "${CMAKE_CURRENT_BINARY_DIR}"
