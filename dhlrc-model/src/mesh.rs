@@ -96,7 +96,13 @@ fn quad(
         uv,
         texture: model.texture(&face.texture),
         tint: face.tint,
-        cullface: face.cullface,
+        /* The direction is in block space, like the corners, so a turned model
+         * hides its face behind whatever stands on the side it now looks at —
+         * a `glass_pane` arm turned onto the east side has to be culled by the
+         * block to its east, not the one to its north. */
+        cullface: face
+            .cullface
+            .map(|direction| turn_direction(direction, variant.x, variant.y)),
         shade: element.shade,
     }
 }
@@ -160,25 +166,9 @@ fn uv_axes(direction: Direction) -> ([f32; 3], [f32; 3]) {
 }
 
 /// The direction a face ends up looking once the blockstate has turned the
-/// model: `y` first, then `x`, the order `turn_variant` uses.
+/// model. It is [`turn_variant`]'s own turn, so the two cannot drift apart.
 fn turn_direction(direction: Direction, x: i32, y: i32) -> Direction {
-    let mut normal = direction.offset();
-    if y != 0 {
-        let (sin, cos) = (y as f32).to_radians().sin_cos();
-        normal = [
-            normal[0] * cos + normal[2] * sin,
-            normal[1],
-            -normal[0] * sin + normal[2] * cos,
-        ];
-    }
-    if x != 0 {
-        let (sin, cos) = (x as f32).to_radians().sin_cos();
-        normal = [
-            normal[0],
-            normal[1] * cos - normal[2] * sin,
-            normal[1] * sin + normal[2] * cos,
-        ];
-    }
+    let normal = turn_variant_vector(direction.offset(), x, y);
     /* The turn is always a multiple of a quarter turn, so the normal lands on
      * an axis and the largest component names it. */
     let named = [
@@ -355,39 +345,57 @@ fn turn_uv(mut uv: [[f32; 2]; 4], rotation: i32) -> [[f32; 2]; 4] {
 /// Turns a point the way a blockstate variant asks: about the block's centre,
 /// `y` before `x`.
 fn turn_variant(point: [f32; 3], x: i32, y: i32) -> [f32; 3] {
-    let mut point = point;
-    if y != 0 {
-        point = turn_about(point, 1, y as f32);
-    }
-    if x != 0 {
-        point = turn_about(point, 0, x as f32);
-    }
-    point
+    let centred = [point[0] - 0.5, point[1] - 0.5, point[2] - 0.5];
+    let turned = turn_variant_vector(centred, x, y);
+    [turned[0] + 0.5, turned[1] + 0.5, turned[2] + 0.5]
 }
 
-/// Turns `point` about the axis `0`/`1`/`2` through the block's centre.
-fn turn_about(point: [f32; 3], axis: usize, degrees: f32) -> [f32; 3] {
+/// The turn a variant's `x` and `y` ask for, applied to a direction.
+///
+/// A variant's angles run the other way round from an element's own `rotation`
+/// (`turn_element`): the game turns the model clockwise seen from above, so a
+/// `y` of 90 takes the north side to the east one, which is what `glass_pane`
+/// and `oak_fence` are written for. The turn about `x` happens first, the order
+/// `end_rod` and `chain` need to lie along the axis they name.
+///
+/// Both [`turn_variant`] and [`turn_direction`] come through here, so the
+/// geometry and the face it is looked at as cannot drift apart.
+fn turn_variant_vector(vector: [f32; 3], x: i32, y: i32) -> [f32; 3] {
+    let mut vector = vector;
+    if x != 0 {
+        vector = turn_about(vector, 0, -(x as f32));
+    }
+    if y != 0 {
+        vector = turn_about(vector, 1, -(y as f32));
+    }
+    vector
+}
+
+/// Turns a vector about one of the block's axes through the origin, the usual
+/// way round for that axis. An element's own `rotation` is written in this
+/// sense; a variant's is written the other way round and negates its angles.
+fn turn_about(vector: [f32; 3], axis: usize, degrees: f32) -> [f32; 3] {
     let radians = degrees.to_radians();
     let (sin, cos) = radians.sin_cos();
     let (a, b) = match axis {
-        0 => (point[1] - 0.5, point[2] - 0.5),
-        1 => (point[2] - 0.5, point[0] - 0.5),
-        _ => (point[0] - 0.5, point[1] - 0.5),
+        0 => (vector[1], vector[2]),
+        1 => (vector[2], vector[0]),
+        _ => (vector[0], vector[1]),
     };
     let (turned_a, turned_b) = (a * cos - b * sin, a * sin + b * cos);
-    let mut turned = point;
+    let mut turned = vector;
     match axis {
         0 => {
-            turned[1] = turned_a + 0.5;
-            turned[2] = turned_b + 0.5;
+            turned[1] = turned_a;
+            turned[2] = turned_b;
         }
         1 => {
-            turned[2] = turned_a + 0.5;
-            turned[0] = turned_b + 0.5;
+            turned[2] = turned_a;
+            turned[0] = turned_b;
         }
         _ => {
-            turned[0] = turned_a + 0.5;
-            turned[1] = turned_b + 0.5;
+            turned[0] = turned_a;
+            turned[1] = turned_b;
         }
     }
     turned
@@ -426,6 +434,39 @@ mod tests {
                 faces,
             }],
             ambient_occlusion: true,
+            chain: Vec::new(),
+        }
+    }
+
+    /// The `template_glass_pane_side` model: the two-pixel pane on the north
+    /// half of the block, drawn with the faces the game gives it.
+    fn pane_side() -> ResolvedModel {
+        let mut faces = BTreeMap::new();
+        for direction in [Direction::North, Direction::West, Direction::East] {
+            faces.insert(
+                direction,
+                Face {
+                    texture: "#edge".to_owned(),
+                    uv: None,
+                    cullface: None,
+                    rotation: 0,
+                    tint: None,
+                },
+            );
+        }
+        ResolvedModel {
+            textures: BTreeMap::from([(
+                "edge".to_owned(),
+                "minecraft:block/glass_pane_top".to_owned(),
+            )]),
+            elements: vec![Element {
+                from: [7.0, 0.0, 0.0],
+                to: [9.0, 16.0, 7.0],
+                rotation: None,
+                shade: false,
+                faces,
+            }],
+            ambient_occlusion: false,
             chain: Vec::new(),
         }
     }
@@ -558,17 +599,29 @@ mod tests {
 
     #[test]
     fn a_variant_rotation_turns_the_whole_model() {
-        let mut model = block(cube([0.0; 3], [16.0; 3]));
-        model.variant.y = 90;
-        let quads = quads(&model);
-        /* The north face (normal -Z) is turned a quarter turn about y, so it
-         * now looks along -X. */
-        let north = quads
-            .iter()
-            .find(|quad| quad.cullface == Some(Direction::North))
-            .unwrap();
-        let got = normal(north);
-        assert!((got[0] + 1.0).abs() < 1e-5, "normal was {got:?}");
+        for (x, y) in [(0, 90), (0, 180), (0, 270), (90, 0), (90, 90), (270, 180)] {
+            let mut model = block(cube([0.0; 3], [16.0; 3]));
+            model.variant.x = x;
+            model.variant.y = y;
+            let quads = quads(&model);
+            /* Every face is still there, and the side it is hidden behind is the
+             * side it now looks at: the direction and the corners are turned by
+             * the same rule, so neither can drift from the other. */
+            for direction in Direction::ALL {
+                let quad = quads
+                    .iter()
+                    .find(|quad| quad.cullface == Some(direction))
+                    .unwrap_or_else(|| panic!("nothing looks {direction:?} at {x}/{y}"));
+                let got = normal(quad);
+                let want = direction.offset();
+                for axis in 0..3 {
+                    assert!(
+                        (got[axis] - want[axis] as f32).abs() < 1e-5,
+                        "the {direction:?} face of a {x}/{y} turn looks {got:?}"
+                    );
+                }
+            }
+        }
     }
 
     #[test]
@@ -649,10 +702,67 @@ mod tests {
     #[test]
     fn a_turned_face_lands_on_the_right_direction() {
         use super::turn_direction;
-        assert_eq!(turn_direction(Direction::North, 0, 90), Direction::West);
+        /* `y` turns the block clockwise seen from above, so north goes to east
+         * — `glass_pane [east=true]` is the north pane turned by 90. */
+        assert_eq!(turn_direction(Direction::North, 0, 90), Direction::East);
+        assert_eq!(turn_direction(Direction::East, 0, 90), Direction::South);
+        assert_eq!(turn_direction(Direction::South, 0, 90), Direction::West);
+        assert_eq!(turn_direction(Direction::West, 0, 90), Direction::North);
         assert_eq!(turn_direction(Direction::Up, 0, 90), Direction::Up);
         assert_eq!(turn_direction(Direction::East, 180, 0), Direction::East);
-        assert_eq!(turn_direction(Direction::Up, 90, 0), Direction::South);
+        /* `end_rod` is a rod pointing up: `x: 90` lays it down to the north,
+         * and it is the `x` turn that happens first, so `x: 90, y: 90` points
+         * it east rather than leaving it north. */
+        assert_eq!(turn_direction(Direction::Up, 90, 0), Direction::North);
+        assert_eq!(turn_direction(Direction::Up, 90, 90), Direction::East);
+        assert_eq!(turn_direction(Direction::Up, 90, 270), Direction::West);
+        assert_eq!(turn_direction(Direction::Up, 180, 0), Direction::Down);
+    }
+
+    #[test]
+    fn a_pane_arm_is_drawn_on_the_side_its_property_names() {
+        /* `glass_pane` writes one arm per side: the north one is this model
+         * unturned, the east one the same model with `y: 90`, the west one is
+         * the south half with `y: 90` (`glass_pane_side_alt`), and so on. With
+         * the turn the wrong way round the pane comes out mirrored, which is
+         * what a left arm appearing on the right looks like. */
+        let north = quads(&block(pane_side()));
+        for quad in &north {
+            for position in quad.positions {
+                assert!(
+                    position[2] <= 7.0 / 16.0 + 1e-5,
+                    "the north arm reached {}",
+                    position[2]
+                );
+                assert!((7.0 / 16.0 - 1e-5..=9.0 / 16.0 + 1e-5).contains(&position[0]));
+            }
+        }
+
+        let mut model = block(pane_side());
+        model.variant.y = 90;
+        for quad in &quads(&model) {
+            for position in quad.positions {
+                assert!(
+                    position[0] >= 9.0 / 16.0 - 1e-5,
+                    "the east arm was drawn on the west side at {position:?}"
+                );
+                assert!((7.0 / 16.0 - 1e-5..=9.0 / 16.0 + 1e-5).contains(&position[2]));
+            }
+        }
+
+        /* The south half turned by 90 is the west arm. */
+        let mut alt = block(pane_side());
+        alt.model.elements[0].from = [7.0, 0.0, 9.0];
+        alt.model.elements[0].to = [9.0, 16.0, 16.0];
+        alt.variant.y = 90;
+        for quad in &quads(&alt) {
+            for position in quad.positions {
+                assert!(
+                    position[0] <= 7.0 / 16.0 + 1e-5,
+                    "the west arm was drawn on the east side at {position:?}"
+                );
+            }
+        }
     }
 
     #[test]
@@ -686,13 +796,38 @@ mod tests {
 
     #[test]
     fn uvlock_turns_the_top_of_a_turned_block_back() {
-        /* The top cannot move to another face, so without uvlock its texture
-         * would come out a quarter turn round; with it, the texture stays put. */
-        let up = face(&quads(&turned(0, 90, true)), Direction::Up);
-        assert_eq!(up.uv, [[0.0, 1.0], [1.0, 1.0], [1.0, 0.0], [0.0, 0.0]]);
+        /* The top face does not change shape when a block is turned about y, so
+         * its world corners stay where they are: with uvlock each corner keeps
+         * the UV it had, and without it the texture turns with the block. */
+        let still = face(&quads(&turned(0, 0, true)), Direction::Up);
+        let locked = face(&quads(&turned(0, 90, true)), Direction::Up);
+        for (position, uv) in locked.positions.iter().zip(locked.uv.iter()) {
+            let was = still
+                .positions
+                .iter()
+                .position(|other| {
+                    (0..3).all(|axis| (other[axis] - position[axis]).abs() < 1e-5)
+                })
+                .expect("the top face keeps its four corners");
+            assert_eq!(*uv, still.uv[was], "the corner {position:?} kept its UV");
+        }
 
+        /* Without uvlock the texture rides on the model's own corners, so a
+         * corner that moved took its UV with it: the texture turns with the
+         * block instead of staying put in the world. */
         let loose = face(&quads(&turned(0, 90, false)), Direction::Up);
-        assert_eq!(loose.uv, [[0.0, 0.0], [0.0, 1.0], [1.0, 1.0], [1.0, 0.0]]);
+        let moved = loose
+            .positions
+            .iter()
+            .zip(loose.uv.iter())
+            .filter(|(position, uv)| {
+                let was = still.positions.iter().position(|other| {
+                    (0..3).all(|axis| (other[axis] - position[axis]).abs() < 1e-5)
+                });
+                was.is_none_or(|was| still.uv[was] != **uv)
+            })
+            .count();
+        assert!(moved > 0, "without uvlock the texture turns with the block");
     }
 
     #[test]

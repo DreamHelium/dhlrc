@@ -66,11 +66,13 @@ impl BaseData {
     }
 }
 
+#[derive(Clone)]
 pub struct Palette {
     pub id_name: String,
     pub property: Vec<(String, String)>,
 }
 
+#[derive(Clone)]
 pub struct BlockEntity {
     pub pos: (i32, i32, i32),
     pub entity: Compound,
@@ -93,6 +95,21 @@ pub struct Region {
     pub entity_array: Vec<Compound>,
     /** The Palette info array*/
     pub palette_array: Vec<Palette>,
+    /** Biome data, when the format carries it: one palette index per block
+     * position (in the same order as `block_array`) and the palette those
+     * indices point into. Both are empty when the format keeps no biomes, in
+     * which case a save drops the biome data the file had. */
+    pub biome_array: Vec<u32>,
+    pub biome_palette_array: Vec<Palette>,
+    /** Format-specific data that `BaseData` has no room for, kept as the file
+     * wrote it so saving the region again does not drop it (for example a
+     * Sponge schematic's `Metadata` compound). */
+    pub format_data: Option<Compound>,
+    /** The version of the file format the region was read from, when the
+     * format has versions; `0` when it has none or does not say. A writer can
+     * use it to keep writing the version it read, instead of imposing its own
+     * default on a file that was already newer. */
+    pub format_version: i32,
 }
 
 impl Region {

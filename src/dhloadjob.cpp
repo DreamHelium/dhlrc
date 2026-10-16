@@ -35,22 +35,37 @@ failedMessage (const QString &state, const QString &error)
 /* The plugin types that can read a file, most likely first.
  *
  * Every candidate shares the object codec that was used to decode the file, so
- * the order only says which of them to try first. It is decided by the suffix:
+ * the order only says which of them to try first.
  *
- * - a suffix that names a plugin puts that plugin first;
- * - a missing or unknown suffix puts nothing first, and the order is then just
- *   the module order, which is arbitrary but stable.
- *
- * Callers must not treat the first entry as authoritative: with no suffix
- * there is no "expected" type, so `matched` reports whether the suffix
- * actually identified one. That is what the warning about "the file type
- * should be X" must key off, rather than whichever entry happens to be first.
+ * The file extension decides: the module that claims it is the expected reader,
+ * and `matched` says whether the extension actually named one. The other
+ * modules follow when the retry option is on, and whenever no module claims the
+ * extension — there is no expectation then, so every module that understands
+ * the codec is worth a try. A file that loads through a different module than
+ * its extension named is not an error: the job reports it once the load is
+ * done, so the user is told without losing the file.
  */
 struct PluginCandidates
 {
   QList<QString> types;
   bool matched = false;
 };
+
+/* The module whose `fileSuffix ()` matches the file's extension and that
+ * understands `baseType`, or an empty string. */
+static QString
+moduleForSuffix (const QString &filename, const QString &baseType)
+{
+  const auto extension = QFileInfo (filename).suffix ();
+  if (extension.isEmpty ())
+    return {};
+  for (auto *module : ManageRegionUI::getModules ())
+    {
+      if (module->baseType () == baseType && module->fileSuffix () == extension)
+        return module->type ();
+    }
+  return {};
+}
 
 static PluginCandidates
 candidatesFor (const QString &filename, const QString &baseType)
@@ -64,31 +79,10 @@ candidatesFor (const QString &filename, const QString &baseType)
     }
 
   PluginCandidates result;
-
-  /* Only look at the suffix when the user asked for that; ignoring it is the
-   * whole point of turning the option off. */
-  if (!DhCore::instance ()->config ().loadingFileByExtension)
-    {
-      result.types = all;
-      return result;
-    }
-
-  auto extension = QFileInfo (filename).suffix ();
-  QString matchedType;
-  for (auto *module : ManageRegionUI::getModules ())
-    {
-      if (module->baseType () != baseType || extension.isEmpty ())
-        continue;
-      if (module->fileSuffix () == extension)
-        {
-          matchedType = module->type ();
-          break;
-        }
-    }
-
+  const auto matchedType = moduleForSuffix (filename, baseType);
   if (matchedType.isEmpty ())
     {
-      /* No suffix, or one no plugin claims. There is no expected type, so the
+      /* No suffix, or one no plugin claims: there is no expected type, so the
        * order is the module order and every candidate is worth trying. */
       result.types = all;
       return result;
@@ -109,25 +103,36 @@ candidatesFor (const QString &filename, const QString &baseType)
   return result;
 }
 
-/* The plugin a file's suffix points at, resolved before the file is decoded.
- *
- * `candidatesFor ()` cannot be used for this: it also needs the object codec,
- * which is only known after decoding. For strict encoding matching the suffix
- * is all there is to go on, so this looks at nothing else. A file with no
- * suffix, or one no plugin claims, gets `nullptr`.
- */
-static ModuleBase *
-moduleForSuffix (const QString &filename)
+/* The name of a compression form, for the sentences below. */
+static QString
+compressionName (int value)
 {
-  auto extension = QFileInfo (filename).suffix ();
-  if (extension.isEmpty ())
-    return nullptr;
-  for (auto *module : ManageRegionUI::getModules ())
+  switch (value)
     {
-      if (module->fileSuffix () == extension)
-        return module;
+    case ObjectCompressionGZip:
+      return _ ("gzip");
+    case ObjectCompressionZLib:
+      return _ ("zlib");
+    default:
+      return _ ("no compression");
     }
-  return nullptr;
+}
+
+/* The name of an NBT encoding, matching the labels the object codec uses. */
+static QString
+encodingName (int value)
+{
+  switch (value)
+    {
+    case ObjectEncodingBigEndian:
+      return QStringLiteral ("BigEndian");
+    case ObjectEncodingLittleEndian:
+      return QStringLiteral ("LittleEndian");
+    case ObjectEncodingNetworkLittleEndian:
+      return QStringLiteral ("NetworkLittleEndian");
+    default:
+      return QStringLiteral ("?");
+    }
 }
 
 void
@@ -139,8 +144,12 @@ DhLoadJob::start ()
               {
                 /* Loading File */
                 int failed = false;
+                /* The compression the file turned out to have is kept for the
+                 * report at the end: whether it is what the format wanted is
+                 * only known once the plugin that read it is. */
                 auto tempVec = file_try_uncompress (
-                    filename.toUtf8 (), helper_struct.get (), &failed);
+                    filename.toUtf8 (), helper_struct.get (), &failed,
+                    &detectedCompression);
                 if (failed)
                   {
                     auto msg = vec_to_cstr (tempVec);
@@ -158,26 +167,13 @@ DhLoadJob::start ()
                     if (cancel_flag_is_cancelled (cancel_flag))
                       throw DhLoadError (_ ("Cancelled."), _ ("Loading File"));
 
-                    /* Optional strict matching: require the file to decode as
-                     * the encoding the plugin the suffix points at declares,
-                     * so a file in another encoding fails instead of silently
-                     * being read as the wrong one. The decode itself stays
-                     * permissive, so the error can name the encoding found.
-                     * Without a suffix, or without a declaration, decoding is
-                     * not checked at all. */
-                    ObjectLoadOptions strictOptions{ 0, ObjectEncodingAny };
-                    const ObjectLoadOptions *options = nullptr;
-                    if (DhCore::instance ()->config ().strictNbtEncoding)
-                      {
-                        if (auto *expected = moduleForSuffix (filename);
-                            expected
-                            && expected->encoding () != ObjectEncodingAny)
-                          {
-                            strictOptions.strict = 1;
-                            strictOptions.encoding = expected->encoding ();
-                            options = &strictOptions;
-                          }
-                      }
+                    /* Decoding is permissive — every supported encoding is
+                     * tried and the first that parses is kept — but which one
+                     * parsed is asked for, so a file read as something other
+                     * than its format's own encoding can be reported instead of
+                     * passing unnoticed. */
+                    ObjectLoadOptions loadOptions{ 0, ObjectEncodingAny,
+                                                   &detectedEncoding };
 
                     /* Loading Object */
                     auto objectList = ManageRegionUI::getLoadObjectList ();
@@ -187,7 +183,7 @@ DhLoadJob::start ()
                         void *object = nullptr;
                         auto msg = load.loadObjectFunc (ptr.get (), &object,
                                                         helper_struct.get (),
-                                                        options);
+                                                        &loadOptions);
                         if (msg)
                           {
                             QString typeWithPrefix = _ ("Loading Object %1");
@@ -213,6 +209,10 @@ DhLoadJob::start ()
                     auto candidates
                         = candidatesFor (filename, tempObject.first);
                     DhMultiLoadError err;
+                    /* Whether any candidate managed to read the file. The
+                     * messages of the ones that did not are only worth showing
+                     * when none did. */
+                    bool loaded = false;
                     for (const auto &type : candidates.types)
                       {
                         auto *base = ManageRegionUI::getModule (type);
@@ -227,7 +227,7 @@ DhLoadJob::start ()
                         auto *config = configEntry == inputConfigs.end ()
                                            ? nullptr
                                            : configEntry->second;
-                        bool loaded = false;
+                        loaded = false;
                         if (auto *multi = base->multi ())
                           loaded = loadMultiRegion (
                               multi, tempObject.second.get (), err, config);
@@ -255,24 +255,29 @@ DhLoadJob::start ()
                         if (!loaded)
                           continue;
 
-                        /* The suffix named a plugin and a different one had to
-                         * be used: worth saying, since the file is then not
-                         * quite what its name says. With no suffix there was
-                         * never an expectation, so nothing is reported. */
-                        if (candidates.matched
-                            && type != candidates.types.first ())
-                          {
-                            QString message
-                                = _ ("Loading progress is successful, but the "
-                                     "file type should be %1.");
-                            message = message.arg (candidates.types.first ());
-                            err.appendError (message,
-                                             loadingTypePrefix (type));
-                          }
+                        /* The load worked; anything odd about the file is
+                         * reported when the job finishes rather than being
+                         * dropped, or the user would never learn that the file
+                         * is not quite what its name or its format says. */
+                        collectWarnings (base, candidates.matched,
+                                         candidates.types.isEmpty ()
+                                             ? QString ()
+                                             : candidates.types.first (),
+                                         type);
                         typeName = type;
                         break;
                       }
-                    throw err;
+                    /* Nothing could read the file: every attempt is reported.
+                     * Otherwise the job is done and reports success — the
+                     * earlier attempts' messages are left behind, since the
+                     * file did load after all, and what is worth saying (a
+                     * name or format that did not match) was collected as a
+                     * warning above. */
+                    if (!loaded)
+                      {
+                        throw err;
+                      }
+                    Q_EMIT emitResult ();
                   })
             .onFailed (
                 [&] (const DhLoadError &err)
@@ -367,6 +372,14 @@ DhLoadJob::loadMultiRegion (MultiModuleBase *multiBase, void *object,
   regionIndexes.clear ();
 
   auto num = multiBase->numFunc (object);
+  /* A file this module finds no region in is not its format, so the retry can
+   * move on; asking which region to load would offer an empty list. */
+  if (num <= 0)
+    {
+      err.appendError (_ ("The file holds no region this module can read."),
+                       loadingTypePrefix (multiBase->type ()));
+      return false;
+    }
   for (int j = 0; j < num; j++)
     {
       auto name = multiBase->nameFunc (object, j);
@@ -434,6 +447,54 @@ DhLoadJob::loadMultiRegion (MultiModuleBase *multiBase, void *object,
   return true;
 }
 
+void
+DhLoadJob::collectWarnings (ModuleBase *base, bool matched,
+                            const QString &expectedType, const QString &type)
+{
+  /* The extension named one plugin and another one read the file. With no
+   * suffix there was never an expectation, so nothing is said. */
+  if (matched && !expectedType.isEmpty () && type != expectedType)
+    {
+      loadWarnings << QString (_ ("The file extension points at %1, but the "
+                                  "file was read as %2."))
+                          .arg (expectedType, type);
+    }
+
+  /* The format says how its files are compressed; this one is another way. */
+  const int expectedCompression = base->compression ();
+  if (expectedCompression != ObjectCompressionAny
+      && detectedCompression != ObjectCompressionAny
+      && expectedCompression != detectedCompression)
+    {
+      if (detectedCompression == ObjectCompressionNone)
+        {
+          loadWarnings << QString (_ ("The file is not compressed, but the %1 "
+                                      "format expects %2."))
+                              .arg (type, compressionName (expectedCompression));
+        }
+      else
+        {
+          loadWarnings << QString (_ ("The file is %1-compressed, but the %2 "
+                                      "format expects %3."))
+                              .arg (compressionName (detectedCompression), type,
+                                    compressionName (expectedCompression));
+        }
+    }
+
+  /* The format declares the NBT encoding it uses; this file decoded as another
+   * one, so it was read as something it is not quite. */
+  const int expectedEncoding = base->encoding ();
+  if (expectedEncoding != ObjectEncodingAny
+      && detectedEncoding != ObjectEncodingAny
+      && expectedEncoding != detectedEncoding)
+    {
+      loadWarnings << QString (_ ("The file was decoded as %1, but the %2 "
+                                  "format declares %3."))
+                          .arg (encodingName (detectedEncoding), type,
+                                encodingName (expectedEncoding));
+    }
+}
+
 DhAllLoadJob::DhAllLoadJob (QStringList list, QObject *parent)
     : KCompositeJob (parent)
 {
@@ -447,6 +508,23 @@ DhAllLoadJob::DhAllLoadJob (QStringList list, QObject *parent)
                  qobject_cast<DhLoadJob *> (job)->forceResume ();
              });
   jobNums = list.length ();
+
+  /* Which plugins the user asked to be prompted about. Only the ones a file's
+   * extension points at: a window for a plugin that cannot read any of these
+   * files is noise, and before decoding the extension is the only hint there
+   * is. A file whose extension names nothing is read with the saved options,
+   * since which plugin's options would matter is exactly what is unknown. */
+  for (const auto &file : list)
+    {
+      const auto extension = QFileInfo (file).suffix ();
+      if (extension.isEmpty ())
+        continue;
+      for (auto *module : ManageRegionUI::getModules ())
+        {
+          if (module->fileSuffix () == extension)
+            askTypes.insert (module->type ());
+        }
+    }
   messageWidget = new KMessageWidget ();
   messageWidget->installEventFilter (this);
   QString text = _ ("Finish processing %1 of %2 (%3%).");
@@ -519,6 +597,30 @@ DhAllLoadJob::DhAllLoadJob (QStringList list, QObject *parent)
                        failedWidget->setText (failedText);
                        failedWidget->setTextFormat (Qt::MarkdownText);
                        QTimer::singleShot (5000, failedWidget,
+                                           &KMessageWidget::animatedHide);
+                     }
+                   else if (auto *loadJob
+                            = qobject_cast<DhLoadJob *> (finishedJob);
+                            loadJob && !loadJob->warnings ().isEmpty ())
+                     {
+                       /* The file loaded, but it is not quite what its name or
+                        * its format says. Said once the reading is done, and
+                        * as a hint rather than an error: the regions are there
+                        * and usable either way. */
+                       auto *warningWidget = new KMessageWidget ();
+                       connect (warningWidget,
+                                &KMessageWidget::hideAnimationFinished,
+                                warningWidget, &KMessageWidget::deleteLater);
+                       MainWindow::addWidgetToTopArea (warningWidget);
+                       warningWidget->setMessageType (KMessageWidget::Warning);
+                       QString warningText = "%1\n\n%2";
+                       warningText
+                           = warningText.arg (loadJob->getFilename (),
+                                              loadJob->warnings ().join (
+                                                  "\n\n"));
+                       warningWidget->setText (warningText);
+                       warningWidget->setTextFormat (Qt::MarkdownText);
+                       QTimer::singleShot (8000, warningWidget,
                                            &KMessageWidget::animatedHide);
                      }
                    removeSubjob (finishedJob);
@@ -606,10 +708,12 @@ DhAllLoadJob::start ()
 bool
 DhAllLoadJob::registerInputConfigs ()
 {
-  /* Every plugin, not every candidate for one file: the batch may hold several
-   * formats and the codec is unknown until each file is decoded, so this is
-   * the only point where the set is known. Resolving a plugin that never ends
-   * up being used costs nothing beyond a settings lookup. */
+  /* Every plugin, not just the ones a file's extension points at: the batch
+   * may hold several formats and the codec is unknown until each file is
+   * decoded, so this is the only point where the set is known. A plugin is
+   * only *asked* about when the user turned asking on for it (see
+   * `askTypes`); the rest get their saved options, so a fallback reader still
+   * runs with the settings the user chose for it. */
   for (auto *module : ManageRegionUI::getModules ())
     {
       bool dismissed = false;
@@ -639,10 +743,12 @@ DhAllLoadJob::acquireInputConfig (const QString &type, bool *dismissed)
   if (module && config
       && config->hasOptions (type, ConfigObjectItems::Kind::Input))
     {
-      if (config->useConfigured (type, ConfigObjectItems::Kind::Input))
+      if (config->useConfigured (type, ConfigObjectItems::Kind::Input)
+          || !askTypes.contains (type))
         {
-          /* Follows the global configuration: the saved values are used and
-           * nothing is asked. */
+          /* Follows the global configuration, or the user never asked to be
+           * prompted about this plugin: the saved values (or the plugin's own
+           * defaults) are used and nothing is asked. */
           object = ConfigObjectItems::createObject (
               ConfigObjectItems::Kind::Input, module->library ());
           config->apply (type, ConfigObjectItems::Kind::Input, object);

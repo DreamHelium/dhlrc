@@ -1,5 +1,7 @@
 #include "dhrenderui.h"
+#include "propertymodifyui.h"
 
+#include "blockreaderui.h"
 #include "dhcore.h"
 #include "dhrenderwidget.h"
 #include "region.h"
@@ -45,11 +47,15 @@ DhRenderUI::DhRenderUI (std::shared_ptr<RegionClass> region, QWidget *parent)
   orthoButton->setCheckable (true);
   auto reloadButton = new QPushButton (_ ("&Reload"), this);
   fetchButton = new QPushButton (_ ("Get &Resources"), this);
+  modifyButton = new QPushButton (_ ("&Modify Properties..."), this);
+  /* Nothing to modify until a click has named a block. */
+  modifyButton->setEnabled (false);
   summary = new QLabel (this);
   controls->addWidget (fitButton);
   controls->addWidget (orthoButton);
   controls->addWidget (reloadButton);
   controls->addWidget (fetchButton);
+  controls->addWidget (modifyButton);
   controls->addWidget (summary, 1);
   layout->addLayout (controls);
 
@@ -72,7 +78,12 @@ DhRenderUI::DhRenderUI (std::shared_ptr<RegionClass> region, QWidget *parent)
            &DhRenderWidget::setOrthographic);
   connect (reloadButton, &QPushButton::clicked, this, &DhRenderUI::rebuild);
   connect (fetchButton, &QPushButton::clicked, this, &DhRenderUI::toggleFetch);
+  connect (modifyButton, &QPushButton::clicked, this, &DhRenderUI::modifyPicked);
   connect (view, &DhRenderWidget::blockPicked, this, &DhRenderUI::describe);
+  /* The view finds the block; this window is the one that holds the region,
+   * so the tooltip's text is built here. */
+  connect (view, &DhRenderWidget::blockHovered, this,
+           &DhRenderUI::describeHover);
   /* A failed GL frame drops the view back to the rasteriser, so the line
    * saying which one is in use has to follow. */
   connect (view, &DhRenderWidget::backendChanged, this,
@@ -239,6 +250,13 @@ DhRenderUI::describe (int x, int y, int z)
       return;
     }
 
+  pickedX = x;
+  pickedY = y;
+  pickedZ = z;
+  hasPicked = true;
+  if (modifyButton)
+    modifyButton->setEnabled (true);
+
   const quint32 id = regionClass->blockId (index);
   const char *name = region_get_palette_id_name (raw, id);
   picked->setText (QString (_ ("Block (%1, %2, %3): %4"))
@@ -248,4 +266,49 @@ DhRenderUI::describe (int x, int y, int z)
                        .arg (QString::fromUtf8 (name ? name : "")));
   if (name)
     string_free (name);
+}
+
+void
+DhRenderUI::modifyPicked ()
+{
+  if (!hasPicked)
+    return;
+
+  /* The dialog writes through the region and locks it itself. The picture is a
+   * snapshot taken while the scene was built, so a change only shows once a
+   * fresh one is taken — which is what `rebuild ()` does. */
+  PropertyModifyUI dialog (regionClass, pickedX, pickedY, pickedZ, this);
+  bool written = false;
+  connect (&dialog, &PropertyModifyUI::propertiesModified, this,
+           [&written] { written = true; });
+  dialog.exec ();
+  if (!written)
+    return;
+
+  const qint32 x = pickedX;
+  const qint32 y = pickedY;
+  const qint32 z = pickedZ;
+  rebuild ();
+  describe (x, y, z);
+}
+
+void
+DhRenderUI::describeHover (int x, int y, int z)
+{
+  AutoLocker locker (*regionClass);
+  void *raw = regionClass->get_region ();
+  const qint32 index = regionClass->index (x, y, z);
+  if (index < 0)
+    {
+      view->setHoverInfo (QString ());
+      return;
+    }
+
+  /* The very text the block reader shows, so the wording stays in one place;
+   * the coordinate is put in front because the tooltip has no other way to say
+   * where the block is. */
+  const QString info
+      = BlockReaderUI::getBlockInfo (raw, static_cast<quint32> (index), false);
+  view->setHoverInfo (QString (_ ("Block (%1, %2, %3)")).arg (x).arg (y).arg (z)
+                      + QLatin1Char ('\n') + info);
 }

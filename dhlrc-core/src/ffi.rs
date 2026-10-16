@@ -77,9 +77,8 @@ pub struct DhlrcConfigView {
     pub limit_unit: i32,
     pub elapsed_milliseconds: i64,
     pub select_all_regions_in_loading: bool,
-    pub loading_file_by_extension: bool,
+    /// Try the other modules when the one the file extension points at fails.
     pub fail_then_retry: bool,
-    pub strict_nbt_encoding: bool,
     pub fail_download_use_cache: bool,
     pub default_show_option: i32,
     pub override_setting: bool,
@@ -111,9 +110,7 @@ impl ConfigViewData {
             limit_unit: unit_to_int(config.general.limit_unit),
             elapsed_milliseconds: i64::from(config.general.elapsed_milliseconds),
             select_all_regions_in_loading: config.general.select_all_regions_in_loading,
-            loading_file_by_extension: config.general.loading_file_by_extension,
             fail_then_retry: config.general.fail_then_retry,
-            strict_nbt_encoding: config.general.strict_nbt_encoding,
             fail_download_use_cache: config.general.fail_download_use_cache,
             default_show_option: show_to_int(config.reader.default_show_option),
             override_setting: config.game.override_setting,
@@ -433,6 +430,7 @@ pub struct DhlrcModuleInfo {
     pub filter: *const c_char,
     pub is_multi: i32,
     pub encoding: i32,
+    pub compression: i32,
 }
 
 fn optional_ptr(value: &Option<CString>) -> *const c_char {
@@ -556,6 +554,7 @@ fn fill_module_info(info: *mut DhlrcModuleInfo, module: &crate::modules::ModuleI
     out.filter = optional_ptr(&module.filter);
     out.is_multi = i32::from(module.is_multi);
     out.encoding = module.encoding;
+    out.compression = module.compression;
 }
 
 fn module_symbol(
@@ -1111,9 +1110,7 @@ fn config_from_view(view: &DhlrcConfigView, base: &Config) -> Config {
     config.general.limit_unit = int_to_unit(view.limit_unit);
     config.general.elapsed_milliseconds = view.elapsed_milliseconds.max(0) as u32;
     config.general.select_all_regions_in_loading = view.select_all_regions_in_loading;
-    config.general.loading_file_by_extension = view.loading_file_by_extension;
     config.general.fail_then_retry = view.fail_then_retry;
-    config.general.strict_nbt_encoding = view.strict_nbt_encoding;
     config.general.fail_download_use_cache = view.fail_download_use_cache;
     config.general.cache_directory = from_c(view.cache_directory)
         .filter(|value| !value.is_empty())
@@ -1148,6 +1145,17 @@ fn int_to_show(value: i32) -> ShowOption {
         SHOW_NAME => ShowOption::Name,
         _ => ShowOption::Palette,
     }
+}
+
+/// What a plugin that has never been configured does for one direction.
+///
+/// Reading uses the saved options without asking: a load does not know which
+/// plugin will end up reading the file until it has been decoded, so asking
+/// about every plugin would be noise. Writing asks, because the format was
+/// picked on purpose and its options are per export. Either way the switch on
+/// the plugin's page in the settings can turn the question the other way.
+fn default_use_configured(kind: i32) -> bool {
+    kind != KIND_OUTPUT
 }
 
 /// One plugin's options for one direction, read-only.
@@ -1188,8 +1196,8 @@ pub extern "C" fn dhlrc_core_plugin_use_configured(
     let flags = match core.shared.config.lock() {
         Ok(guard) => direction(&guard, &type_name, kind)
             .map(|dir| dir.use_configured)
-            .unwrap_or(false),
-        Err(_) => false,
+            .unwrap_or_else(|| default_use_configured(kind)),
+        Err(_) => default_use_configured(kind),
     };
     i32::from(flags)
 }

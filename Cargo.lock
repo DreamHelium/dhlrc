@@ -1353,6 +1353,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "region-schem-rs"
+version = "0.1.0"
+dependencies = [
+ "common-rs",
+ "dhlrc-gettext-shim",
+ "flate2",
+ "formatx",
+ "gettext-rs",
+ "sysinfo",
+ "time",
+ "zuri_nbt",
+ "zurinbt-common",
+]
+
+[[package]]
 name = "ring"
 version = "0.17.14"
 source = "registry+https://github.com/rust-lang/crates.io-index"

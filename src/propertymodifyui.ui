@@ -1,73 +1,84 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
-    <class>PropertyModifyUI</class>
-    <widget class="QWidget" name="PropertyModifyUI">
-        <property name="geometry">
-            <rect>
-                <x>0</x>
-                <y>0</y>
-                <width>400</width>
-                <height>300</height>
-            </rect>
-        </property>
-        <property name="windowTitle">
-            <string>Modify Property of Block(s)</string>
-        </property>
-        <layout class="QVBoxLayout" name="verticalLayout">
-            <item>
-                <widget class="QLabel" name="label">
-                    <property name="text">
-                        <string>Modify the property of the block in:</string>
-                    </property>
-                </widget>
-            </item>
-            <item>
-                <widget class="QLabel" name="positionLabel">
-                    <property name="text">
-                        <string notr="true">BlockPosition</string>
-                    </property>
-                </widget>
-            </item>
-            <item>
-                <widget class="QLabel" name="sameLabel">
-                    <property name="text">
-                        <string>With the block that is the same property</string>
-                    </property>
-                </widget>
-            </item>
-            <item>
-                <widget class="QLabel" name="label_2">
-                    <property name="text">
-                        <string>Properties:</string>
-                    </property>
-                </widget>
-            </item>
-            <item>
-                <widget class="QScrollArea" name="scrollArea">
-                    <property name="widgetResizable">
-                        <bool>true</bool>
-                    </property>
-                    <widget class="QWidget" name="scrollAreaWidgetContents">
-                        <property name="geometry">
-                            <rect>
-                                <x>0</x>
-                                <y>0</y>
-                                <width>388</width>
-                                <height>150</height>
-                            </rect>
-                        </property>
-                    </widget>
-                </widget>
-            </item>
-            <item>
-                <widget class="QDialogButtonBox" name="buttonBox">
-                    <property name="standardButtons">
-                        <set>QDialogButtonBox::StandardButton::Cancel|QDialogButtonBox::StandardButton::Ok</set>
-                    </property>
-                </widget>
-            </item>
-        </layout>
+ <class>PropertyModifyUI</class>
+ <widget class="QDialog" name="PropertyModifyUI">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>420</width>
+    <height>340</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Modify Property of Block(s)</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QLabel" name="label">
+     <property name="text">
+      <string>Modify the property of the block in:</string>
+     </property>
     </widget>
-    <resources/>
-    <connections/>
+   </item>
+   <item>
+    <widget class="QLabel" name="positionLabel">
+     <property name="text">
+      <string notr="true">BlockPosition</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QRadioButton" name="thisBlockRadio">
+     <property name="text">
+      <string>Only this block</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QRadioButton" name="allBlocksRadio">
+     <property name="text">
+      <string>Every block with this palette entry</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="label_2">
+     <property name="text">
+      <string>Properties:</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QScrollArea" name="scrollArea">
+     <property name="widgetResizable">
+      <bool>true</bool>
+     </property>
+     <widget class="QWidget" name="scrollAreaWidgetContents">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>400</width>
+        <height>150</height>
+       </rect>
+      </property>
+      <layout class="QGridLayout" name="propertiesLayout"/>
+     </widget>
+    </widget>
+   </item>
+   <item>
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="standardButtons">
+      <set>QDialogButtonBox::StandardButton::Cancel|QDialogButtonBox::StandardButton::Ok</set>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
 </ui>

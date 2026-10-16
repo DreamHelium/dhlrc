@@ -8,6 +8,16 @@
 namespace dh
 {
 QString getTranslationDir ();
+
+/* The directory the configuration file lives in, whether or not it exists
+ * yet. The core decides where that is; this only takes the directory off the
+ * path it reports. */
+QString configDirectory ();
+
+/* The cache directory: the one the configuration names, or the platform
+ * default the core itself would resolve to. */
+QString cacheDirectory ();
+
 int getRegion (QWidget *widget, ManageRegionUI *mr, bool write);
 QDateTime getDateTimeFromTimeStamp (qint64 timeStamp);
 

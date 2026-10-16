@@ -35,6 +35,13 @@ private:
   void rebuild ();
   void updateSummary ();
   void describe (int x, int y, int z);
+  /* Opens the property dialog for the block that was last clicked, and takes a
+   * fresh look at the region when something was written. */
+  void modifyPicked ();
+  /* Builds the text the tooltip shows for the block under the pointer and
+   * hands it to the view, which puts it beside the cursor. The bottom labels
+   * are not touched by a hover. */
+  void describeHover (int x, int y, int z);
 
   /* Whether the version's client jar is in the cache, and where it belongs. */
   int jarState () const;
@@ -50,6 +57,13 @@ private:
   QLabel *summary = nullptr;
   QLabel *picked = nullptr;
   QPushButton *fetchButton = nullptr;
+  QPushButton *modifyButton = nullptr;
+  /* The block the last click named, so the property dialog has somewhere to
+   * act; `hasPicked` says whether there is one. */
+  bool hasPicked = false;
+  qint32 pickedX = 0;
+  qint32 pickedY = 0;
+  qint32 pickedZ = 0;
   std::shared_ptr<DhDownloader> downloader;
   bool fetching = false;
 };

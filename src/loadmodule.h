@@ -31,6 +31,11 @@ struct ObjectLoadOptions
   /* One of the `ObjectEncoding` values; the encoding `strict` requires and the
    * one tried first. Read only when `strict` is non-zero. */
   int encoding;
+  /* Where to write the encoding that actually parsed (`ObjectEncodingAny` when
+   * none did), so a caller that does not pin the encoding can still see when a
+   * file was read as something other than the format's own encoding. May be
+   * nullptr. */
+  int *detected;
 };
 
 /* Turns the uncompressed file bytes into an object (an NBT tree, a JSON

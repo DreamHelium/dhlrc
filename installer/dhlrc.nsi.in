@@ -171,6 +171,11 @@ Section "Region module: Litematica" SecRegionLitematic
   File "${APPDIR}\region_module\region_litematic_rs.dll"
 SectionEnd
 
+Section "Region module: Sponge schematic" SecRegionSchem
+  SetOutPath "$INSTDIR\region_module"
+  File "${APPDIR}\region_module\region_schem_rs.dll"
+SectionEnd
+
 !insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
   !insertmacro MUI_DESCRIPTION_TEXT ${SecShared} "The MinGW/gettext runtime, the region library and the catalogue every frontend and module uses."
   !insertmacro MUI_DESCRIPTION_TEXT ${SecGui} "The Qt Widgets interface (dhlrc_qt.exe) and the Qt/KF6 runtime and Breeze style it needs."
@@ -178,6 +183,7 @@ SectionEnd
   !insertmacro MUI_DESCRIPTION_TEXT ${SecCodecNbt} "Turns a file's bytes into an object. Required by the region modules."
   !insertmacro MUI_DESCRIPTION_TEXT ${SecRegionNbt} "Reads and writes Java Edition NBT structure files."
   !insertmacro MUI_DESCRIPTION_TEXT ${SecRegionLitematic} "Reads and writes Litematica projection files."
+  !insertmacro MUI_DESCRIPTION_TEXT ${SecRegionSchem} "Reads and writes Sponge schematic files (.schem), versions 1 to 3."
 !insertmacro MUI_FUNCTION_DESCRIPTION_END
 
 ;--------------------------------
@@ -187,7 +193,9 @@ SectionEnd
 Function ComponentsDependencies
   SectionGetFlags ${SecRegionNbt} $0
   SectionGetFlags ${SecRegionLitematic} $1
+  SectionGetFlags ${SecRegionSchem} $2
   IntOp $0 $0 | $1
+  IntOp $0 $0 | $2
   IntOp $0 $0 & ${SF_SELECTED}
   ${If} $0 == ${SF_SELECTED}
     SectionGetFlags ${SecCodecNbt} $0

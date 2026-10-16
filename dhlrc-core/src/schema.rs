@@ -124,42 +124,16 @@ pub static SETTINGS: &[SettingDef] = &[
         set: set_select_all,
     },
     SettingDef {
-        key: "LoadingFileByExtension",
-        group: GENERAL,
-        kind: SettingType::Bool,
-        label: i18n("Loading File by File Extension"),
-        tooltip: i18n("If you check this, the file will be loaded by the file extension name."),
-        choices: NO_CHOICES,
-        long_text: false,
-        default: "true",
-        get: get_by_extension,
-        set: set_by_extension,
-    },
-    SettingDef {
         key: "FailThenRetry",
         group: GENERAL,
         kind: SettingType::Bool,
-        label: i18n("Retry Loading File when Failed"),
-        tooltip: i18n("When failed, the file will try to be loaded by other modules."),
+        label: i18n("Try Other Modules when Loading Fails"),
+        tooltip: i18n("A file is first read by the module its extension points at; when that fails, the other modules are tried as well. Turn this off to make a file whose extension is wrong fail instead."),
         choices: NO_CHOICES,
         long_text: false,
-        default: "false",
+        default: "true",
         get: get_fail_then_retry,
         set: set_fail_then_retry,
-    },
-    SettingDef {
-        key: "StrictNbtEncoding",
-        group: GENERAL,
-        kind: SettingType::Bool,
-        label: i18n("Strict NBT Encoding Matching"),
-        tooltip: i18n(
-            "If you check this, a file is also decoded strictly with the NBT encoding declared by the plugin its suffix points at (region_nbt_encoding ()). A file in another encoding then fails to load instead of being read as the wrong one.",
-        ),
-        choices: NO_CHOICES,
-        long_text: false,
-        default: "false",
-        get: get_strict_nbt,
-        set: set_strict_nbt,
     },
     SettingDef {
         key: "CacheDirectory",
@@ -500,28 +474,12 @@ fn set_select_all(config: &mut Config, text: &str) {
     config.general.select_all_regions_in_loading = parse_bool(text);
 }
 
-fn get_by_extension(config: &Config) -> String {
-    bool_text(config.general.loading_file_by_extension)
-}
-
-fn set_by_extension(config: &mut Config, text: &str) {
-    config.general.loading_file_by_extension = parse_bool(text);
-}
-
 fn get_fail_then_retry(config: &Config) -> String {
     bool_text(config.general.fail_then_retry)
 }
 
 fn set_fail_then_retry(config: &mut Config, text: &str) {
     config.general.fail_then_retry = parse_bool(text);
-}
-
-fn get_strict_nbt(config: &Config) -> String {
-    bool_text(config.general.strict_nbt_encoding)
-}
-
-fn set_strict_nbt(config: &mut Config, text: &str) {
-    config.general.strict_nbt_encoding = parse_bool(text);
 }
 
 fn get_fail_use_cache(config: &Config) -> String {

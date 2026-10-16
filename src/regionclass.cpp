@@ -20,7 +20,7 @@ private:
 bool
 RegionClass::isLocked (qsizetype index)
 {
-  const auto &all = ManageRegionUI::getRegions ();
+  const auto all = ManageRegionUI::getRegions ();
   if (index < 0 || static_cast<qsizetype> (all.size ()) <= index)
     return false;
   return all[index]->locked ();
@@ -330,6 +330,89 @@ RegionClass::paletteLen () const
 {
   Guard guard (*const_cast<RegionClass *> (this));
   return region_get_palette_len (region.get ());
+}
+
+qsizetype
+RegionClass::palettePropertyLen (quint32 id) const
+{
+  Guard guard (*const_cast<RegionClass *> (this));
+  return region_get_palette_property_len (region.get (), id);
+}
+
+QString
+RegionClass::palettePropertyName (quint32 id, qsizetype index) const
+{
+  Guard guard (*const_cast<RegionClass *> (this));
+  auto *raw = region_get_palette_property_name (region.get (), id, index);
+  if (!raw)
+    return {};
+  QString result = QString::fromUtf8 (raw);
+  string_free (raw);
+  return result;
+}
+
+QString
+RegionClass::palettePropertyData (quint32 id, qsizetype index) const
+{
+  Guard guard (*const_cast<RegionClass *> (this));
+  auto *raw = region_get_palette_property_data (region.get (), id, index);
+  if (!raw)
+    return {};
+  QString result = QString::fromUtf8 (raw);
+  string_free (raw);
+  return result;
+}
+
+bool
+RegionClass::setPaletteProperty (quint32 id, qsizetype index,
+                                 const QString &name, const QString &data)
+{
+  Guard guard (*this);
+  auto nameBytes = name.toUtf8 ();
+  auto dataBytes = data.toUtf8 ();
+  auto *msg = region_set_palette_property_name_and_data (
+      region.get (), id, index, nameBytes.constData (), dataBytes.constData ());
+  if (msg)
+    {
+      string_free (msg);
+      return false;
+    }
+  return true;
+}
+
+bool
+RegionClass::setBlockProperties (qsizetype index, const QStringList &names,
+                                 const QStringList &datas, quint32 *outId)
+{
+  if (names.size () != datas.size ())
+    return false;
+  /* Keep the UTF-8 data alive while the C ABI copies it out of the arrays. */
+  QList<QByteArray> nameBytes;
+  QList<QByteArray> dataBytes;
+  for (const auto &name : names)
+    nameBytes.append (name.toUtf8 ());
+  for (const auto &data : datas)
+    dataBytes.append (data.toUtf8 ());
+  QList<const char *> namePtrs;
+  QList<const char *> dataPtrs;
+  for (const auto &bytes : nameBytes)
+    namePtrs.append (bytes.constData ());
+  for (const auto &bytes : dataBytes)
+    dataPtrs.append (bytes.constData ());
+
+  Guard guard (*this);
+  quint32 newId = 0;
+  auto *msg = region_set_block_properties (
+      region.get (), index, namePtrs.constData (), dataPtrs.constData (),
+      namePtrs.size (), &newId);
+  if (msg)
+    {
+      string_free (msg);
+      return false;
+    }
+  if (outId)
+    *outId = newId;
+  return true;
 }
 
 AutoLocker::AutoLocker (RegionClass &region_class_)

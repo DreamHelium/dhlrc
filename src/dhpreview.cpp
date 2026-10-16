@@ -1,11 +1,13 @@
 #include "dhpreview.h"
 
+#include "blockreaderui.h"
 #include "dhcore.h"
 #include "dhgpuwidget.h"
 #include "dhloadjob.h"
 #include "manageregionui.h"
 #include "region.h"
 #include "regionclass.h"
+#include "utility.h"
 
 #include <libintl.h>
 
@@ -23,7 +25,6 @@
 #include <QImage>
 #include <QPainter>
 #include <QRegularExpression>
-#include <QStandardPaths>
 #include <QStringList>
 #include <QThread>
 #include <cmath>
@@ -87,6 +88,31 @@ parseSize (const QString &text, int *width, int *height, QString *error)
   return true;
 }
 
+/* `X,Y`, as `--hover` spells one picture pixel. */
+bool
+parseHover (const QString &text, int *x, int *y, QString *error)
+{
+  const QStringList parts
+      = text.split (QRegularExpression (QStringLiteral ("\\s*,\\s*")));
+  bool ok = parts.size () == 2;
+  int parsedX = 0;
+  int parsedY = 0;
+  if (ok)
+    {
+      parsedX = parts[0].toInt (&ok);
+      if (ok)
+        parsedY = parts[1].toInt (&ok);
+    }
+  if (!ok || parsedX < 0 || parsedY < 0)
+    {
+      *error = QString (_ ("%1 is not a pixel; write it as X,Y")).arg (text);
+      return false;
+    }
+  *x = parsedX;
+  *y = parsedY;
+  return true;
+}
+
 /* Loads the first region of `file` through the app's own pipeline:
  * `ManageRegionUI` supplies the plugins and `DhLoadJob` decodes the file and
  * hands the region back. The job is asynchronous, so a one-off event loop
@@ -144,19 +170,6 @@ loadFirstRegion (const QString &file, std::shared_ptr<RegionClass> *out,
   return *out != nullptr;
 }
 
-/* The cache directory the configuration names, or the platform default the
- * core itself would resolve to. */
-QString
-configuredCacheDir ()
-{
-  const QString configured
-      = DhCore::instance () ? DhCore::instance ()->config ().cacheDirectory
-                            : QString ();
-  if (!configured.isEmpty ())
-    return configured;
-  return QStandardPaths::writableLocation (QStandardPaths::CacheLocation);
-}
-
 /* The version a data version names, read back from where its client jar
  * belongs: the core resolves the version, this only splits the file name. */
 QString
@@ -186,7 +199,7 @@ resolveResources (DhlrcCore *core, uint32_t dataVersion,
                   const DhPreviewOptions &options, ResourcePaths *paths,
                   QString *error)
 {
-  paths->cacheDir = options.resources.isEmpty () ? configuredCacheDir ()
+  paths->cacheDir = options.resources.isEmpty () ? dh::cacheDirectory ()
                                                  : options.resources;
   paths->version = options.version.isEmpty ()
                        ? versionForDataVersion (core, dataVersion)
@@ -350,10 +363,14 @@ renderCpu (DhlrcScene *scene, const DhlrcCamera &camera, int width, int height,
 
 /* The same picture from the GL widget: it is shown on a virtual display and its
  * framebuffer is read back, which is the only way a headless run can see what a
- * GPU path drew. */
+ * GPU path drew.
+ *
+ * `highlight` is the box `--hover` set, or NULL; with one, the frames after the
+ * first are used to prove the outline's own buffer is re-read when it changes,
+ * which is the path a real hover takes. */
 int
 renderGpu (DhlrcScene *scene, const DhlrcCamera &camera, int width, int height,
-           const QString &png)
+           const QString &png, const float *highlight)
 {
   if (!DhGpuWidget::available ())
     return fail (_ ("this machine cannot give a desktop OpenGL 3.3 context"));
@@ -415,6 +432,48 @@ renderGpu (DhlrcScene *scene, const DhlrcCamera &camera, int width, int height,
               .arg (GPU_FRAMES)
               .arg (elapsed)
               .arg (static_cast<double> (elapsed) / GPU_FRAMES, 0, 'f', 1));
+
+  if (highlight != nullptr)
+    {
+      /* A hover only rewrites the outline's own buffer. Clearing it and
+       * putting it back through `highlightChanged ()` has to take the outline
+       * out of the picture and then put the first frame back exactly.
+       *
+       * `grabFramebuffer ()` renders by itself, so no event loop is pumped
+       * here: on this bare X server more event processing can resize the
+       * window under the check and make the two frames incomparable. */
+      const QImage withOutline = widget.grabFramebuffer ();
+
+      dhlrc_render_scene_set_highlight (scene, nullptr);
+      widget.highlightChanged ();
+      QImage without = widget.grabFramebuffer ();
+      if (without == withOutline)
+        return fail (_ ("hover: clearing the highlight did not change the "
+                        "OpenGL picture"));
+
+      dhlrc_render_scene_set_highlight (scene, const_cast<float *> (highlight));
+      widget.highlightChanged ();
+      const QImage again = widget.grabFramebuffer ();
+      if (again != withOutline)
+        {
+          QImage d1 = withOutline.convertToFormat (QImage::Format_RGB32);
+          QImage d2 = again.convertToFormat (QImage::Format_RGB32);
+          quint64 changed = 0;
+          for (int y = 0; y < d1.height (); ++y)
+            {
+              for (int x = 0; x < d1.width (); ++x)
+                {
+                  if (d1.pixel (x, y) != d2.pixel (x, y))
+                    ++changed;
+                }
+            }
+          return fail (
+              QString (_ ("hover: setting the highlight again did not put the "
+                          "OpenGL picture back (%1 pixels differ)"))
+                  .arg (changed));
+        }
+      report (_ ("hover: the OpenGL outline follows highlightChanged () alone"));
+    }
   return 0;
 }
 } // namespace
@@ -501,10 +560,96 @@ dhRunPreview (const DhPreviewOptions &options)
   dhlrc_render_fit (scene, &camera, static_cast<uint32_t> (width),
                     static_cast<uint32_t> (height));
 
+  /* `--hover` points at one picture pixel before the draw, so the outline is
+   * part of the picture; the text the tooltip would show goes to stderr, which
+   * is the only way a headless run can read it. */
+  const float *hoverBox = nullptr;
+  float box[6] = { 0 };
+  if (!options.hover.isEmpty ())
+    {
+      int hoverX = 0;
+      int hoverY = 0;
+      if (!parseHover (options.hover, &hoverX, &hoverY, &error))
+        {
+          dhlrc_render_scene_free (scene);
+          return fail (error);
+        }
+
+      int32_t block[3] = { 0, 0, 0 };
+      QElapsedTimer pick;
+      pick.start ();
+      const bool hit
+          = dhlrc_render_pick (scene, &camera, static_cast<uint32_t> (width),
+                               static_cast<uint32_t> (height),
+                               static_cast<double> (hoverX),
+                               static_cast<double> (hoverY), block)
+            != 0;
+      report (QString (_ ("hover: the pick took %1 ms"))
+                  .arg (static_cast<double> (pick.nsecsElapsed ()) / 1.0e6, 0,
+                        'f', 3));
+      if (!hit)
+        {
+          report (QString (_ ("hover: pixel %1,%2 is the background; nothing "
+                              "is highlighted"))
+                      .arg (hoverX)
+                      .arg (hoverY));
+        }
+      else
+        {
+          /* The box the block is drawn in — a slab gives half a cell — and the
+           * whole cell as the answer for a block that drew nothing. */
+          box[0] = static_cast<float> (block[0]);
+          box[1] = static_cast<float> (block[1]);
+          box[2] = static_cast<float> (block[2]);
+          box[3] = static_cast<float> (block[0] + 1);
+          box[4] = static_cast<float> (block[1] + 1);
+          box[5] = static_cast<float> (block[2] + 1);
+          dhlrc_render_scene_block_box (scene, block[0], block[1], block[2], box);
+          hoverBox = box;
+          dhlrc_render_scene_set_highlight (scene, box);
+          report (
+              QString (_ ("hover: pixel %1,%2 picks block (%3, %4, %5); the "
+                          "outline is %6 quads"))
+                  .arg (hoverX)
+                  .arg (hoverY)
+                  .arg (block[0])
+                  .arg (block[1])
+                  .arg (block[2])
+                  .arg (static_cast<quint64> (
+                      dhlrc_render_scene_highlight_count (scene))));
+
+          QString info;
+          {
+            AutoLocker locker (*regionClass);
+            const qint32 index
+                = regionClass->index (block[0], block[1], block[2]);
+            if (index >= 0)
+              info = BlockReaderUI::getBlockInfo (
+                  regionClass->get_region (), static_cast<quint32> (index),
+                  false);
+          }
+          report (_ ("hover: the tooltip would say:"));
+          if (info.isEmpty ())
+            report (QStringLiteral ("hover| (no info text for this block)"));
+          else
+            {
+              /* One line each, prefixed, so the block of text is still easy to
+               * pick out of a log. */
+              const QStringList lines = info.split (QLatin1Char ('\n'));
+              for (const QString &line : lines)
+                {
+                  if (!line.isEmpty ())
+                    report (QStringLiteral ("hover| ") + line);
+                }
+            }
+        }
+    }
+
   report (QString (_ ("drawing with %1")).arg (
       useGpu ? QString (_ ("OpenGL")) : QString (_ ("the CPU"))));
+
   const int result = useGpu ? renderGpu (scene, camera, width, height,
-                                         options.png)
+                                         options.png, hoverBox)
                             : renderCpu (scene, camera, width, height,
                                          options.png);
   dhlrc_render_scene_free (scene);

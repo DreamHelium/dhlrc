@@ -1,9 +1,11 @@
 #include "dhsettingstemplates.h"
 
+#include "dhsettingitem.h"
 #include "dhsettingsdialog.h"
 
 #include <QCheckBox>
 #include <QComboBox>
+#include <QDesktopServices>
 #include <QFileDialog>
 #include <QHBoxLayout>
 #include <QLabel>
@@ -13,6 +15,8 @@
 #include <QTextEdit>
 #include <QVBoxLayout>
 #include <limits>
+#include <qicon.h>
+#include <qpushbutton.h>
 
 QHBoxLayout *
 DhSettingsTemplate::addRow ()
@@ -181,22 +185,33 @@ DhPathSettingTemplate::initWidget (QVBoxLayout *, DhSettingsDialog *)
   auto *edit = new QLineEdit (item->toString ());
   edit->setToolTip (item->toolTip ());
   edit->setPlaceholderText (item->getDefault ().toString ());
-  auto *browse = new QPushButton ();
-  browse->setIcon (QIcon::fromTheme (QStringLiteral ("folder-open")));
+  auto *open = new QPushButton ();
+  open->setIcon (QIcon::fromTheme (QStringLiteral ("folder-open")));
+  auto *select = new QPushButton ();
+  select->setIcon (QIcon::fromTheme (QStringLiteral ("edit-select")));
   row->addWidget (edit, 1);
-  row->addWidget (browse);
+  row->addWidget (open);
+  row->addWidget (select);
   widget = edit;
   QObject::connect (edit, &QLineEdit::textChanged, dialog,
                     &DhSettingsDialog::detect);
-  QObject::connect (browse, &QPushButton::clicked, edit,
+  QObject::connect (open, &QPushButton::clicked,
                     [edit]
                       {
-                        auto dir = QFileDialog::getExistingDirectory (
-                            edit, QStringLiteral ("Select Directory"),
-                            edit->text ());
-                        if (!dir.isEmpty ())
-                          edit->setText (dir);
+                        auto dir = edit->text ();
+                        QDesktopServices::openUrl (dir);
                       });
+  QObject::connect (
+      select, &QPushButton::clicked, edit,
+      [edit, this]
+        {
+          auto realCaption
+              = title.isEmpty () ? QStringLiteral ("Select Directory") : title;
+          auto dir = QFileDialog::getExistingDirectory (edit, realCaption,
+                                                        edit->text ());
+          if (!dir.isEmpty ())
+            edit->setText (dir);
+        });
 }
 
 void

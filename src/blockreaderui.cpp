@@ -13,6 +13,7 @@
 #include "generalchoosedialog.h"
 #include "mainwindow.h"
 #include "nbtreaderui.h"
+#include "propertymodifyui.h"
 #include "region.h"
 #include "utility.h"
 #include <kmessagewidget.h>
@@ -316,39 +317,16 @@ BlockReaderUI::entityBtn_clicked ()
 void
 BlockReaderUI::propertyBtn_clicked ()
 {
-  /* It seems that I can't write when it's locked with reader lock */
-  // dh_info_reader_unlock (DH_TYPE_REGION, uuid.toUtf8 ());
-  /* It seems that it will lock multiple times,
-   * And doing so will break the infomation of the reader,
-   * so this **must** be blocked way.
-   */
-  // if (dh_info_writer_trylock (DH_TYPE_REGION, uuid.toUtf8 ()))
-  //     {
-  //         auto ret = QMessageBox::question (
-  //             this, _ ("Select an option."),
-  //             _ ("Do you want to modify the property of this block or "
-  //                "blocks that has the same property?"
-  //                "\nWarning: if a wrong key is input, we don't take any "
-  //                "warranty."),
-  //             QMessageBox::Yes | QMessageBox::YesAll | QMessageBox::No,
-  //             QMessageBox::Yes);
-  //         bool all = false;
-  //         if (ret == QMessageBox::YesAll)
-  //             all = true;
-  //         else if (ret == QMessageBox::No)
-  //             {
-  //                 dh_info_writer_unlock (DH_TYPE_REGION, uuid.toUtf8 ());
-  //                 dh_info_reader_trylock (DH_TYPE_REGION, uuid.toUtf8 ());
-  //                 return;
-  //             }
-  //         auto pmui = new PropertyModifyUI (region, info, all);
-  //         pmui->setAttribute (Qt::WA_DeleteOnClose);
-  //         pmui->exec ();
-  //
-  //         dh_info_writer_unlock (DH_TYPE_REGION, uuid.toUtf8 ());
-  //         dh_info_reader_trylock (DH_TYPE_REGION, uuid.toUtf8 ());
-  //         textChanged_cb ();
-  //     }
+  /* RegionClass owns the region lock now, and it is re-entrant, so the dialog
+   * can write while this reader keeps holding `locker`. */
+  auto *pmui
+      = new PropertyModifyUI (regionClass, ui->xEdit->text ().toInt (),
+                              ui->yEdit->text ().toInt (),
+                              ui->zEdit->text ().toInt (), this);
+  pmui->setAttribute (Qt::WA_DeleteOnClose);
+  connect (pmui, &PropertyModifyUI::propertiesModified, this,
+           &BlockReaderUI::textChanged_cb);
+  pmui->exec ();
 }
 
 void

@@ -30,6 +30,7 @@ A call site reaches a symbol through `ModuleLibrary` (`ModuleBase::library()`), 
 | `region_file_type()`    | no       | The (already translated) file dialog filter, e.g. `"NBT File (*.nbt)"`.               |
 | `region_is_multi()`     | no       | `1` for a multi-region format, `0` (or absent) for a single-region one.               |
 | `region_nbt_encoding()` | no       | The NBT encoding the format requires, as an `ObjectEncoding` value. See below.        |
+| `region_compression()`  | no       | How the format's files are compressed, as an `ObjectCompression` value. See below.    |
 
 All metadata functions take no arguments:
 
@@ -53,7 +54,7 @@ The base type names the **object codec** the plugin needs, not a byte order. The
 codec first, then only offers the plugins whose `region_base_type()` matches `LoadObjectBase::baseType()`.
 See [Load module](load_module.md) for the codec side.
 
-`region-nbt-rs` and `region-litematic-rs` both use `NBT`.
+`region-nbt-rs`, `region-litematic-rs` and `region-schem-rs` all use `NBT`.
 
 ### Declaring the encoding (optional)
 
@@ -69,14 +70,33 @@ A plugin that knows which encoding its format uses can say so:
 int32_t region_nbt_encoding();
 ```
 
-With **Strict NBT Encoding Matching** enabled in the settings, the loader resolves the plugin from the file's suffix
-_before_ decoding, and requires the decode to be in that plugin's encoding. The file is decoded permissively and the
-encoding it actually parsed as is compared afterwards, so a file in any other encoding fails to load with that
-encoding named, instead of being read as the wrong one. The setting is off by default, so a plugin declaring an
-encoding changes nothing until the user asks for strict matching. The value has to be one of the known encodings;
-anything else is treated as `ObjectEncodingAny`.
+The loader does not pin the decode, but it does ask the codec which encoding parsed (`ObjectLoadOptions::detected`).
+When that is not the encoding the plugin that read the file declares, the load still succeeds and the user is told
+afterwards, so a file that is not quite what its format says is not silently read as something it is not. The value
+has to be one of the known encodings; anything else is treated as `ObjectEncodingAny` (no expectation, nothing is
+reported).
 
-`region-nbt-rs` and `region-litematic-rs` both declare `ObjectEncodingBigEndian`, as Java Edition NBT is big endian.
+`region-nbt-rs`, `region-litematic-rs` and `region-schem-rs` all declare `ObjectEncodingBigEndian`, as Java Edition
+NBT is big endian.
+
+### Declaring the compression (optional)
+
+The Java Edition formats this project reads are gzipped NBT, but the file reader accepts zlib and plain bytes too, so
+a file that was compressed the wrong way would otherwise load without anyone noticing. A plugin can say what its
+format expects:
+
+```c++
+/* One of the ObjectCompression values; ObjectCompressionAny (0), or leaving the
+ * symbol out, means the format states no expectation and nothing is reported. */
+int32_t region_compression();
+```
+
+The loader reports the compression it found (from `file_try_uncompress ()`) and, when that is not what the reading
+plugin declares, shows it once the load has finished — the file is still read, since the bytes are the same either
+way. The same happens for the encoding above, and for a file that was read by a module other than the one its
+extension named.
+
+`region-nbt-rs`, `region-litematic-rs` and `region-schem-rs` all declare `ObjectCompressionGZip` (1).
 
 ### Seeing the raw bytes
 

@@ -10,7 +10,6 @@
 #include <QDir>
 #include <QTranslator>
 #include <QWidget>
-#include <cstdio>
 #include <qcoreapplication.h>
 
 int
@@ -69,15 +68,21 @@ main (int argc, char *argv[])
   QCommandLineOption sizeOption (
       QStringLiteral ("size"), i18n ("Preview picture size"),
       QStringLiteral ("WxH"), QStringLiteral ("900x640"));
-  QCommandLineOption yawOption (
-      QStringLiteral ("yaw"), i18n ("Preview camera yaw in degrees"),
-      QStringLiteral ("D"));
-  QCommandLineOption pitchOption (
-      QStringLiteral ("pitch"), i18n ("Preview camera pitch in degrees"),
-      QStringLiteral ("D"));
+  QCommandLineOption yawOption (QStringLiteral ("yaw"),
+                                i18n ("Preview camera yaw in degrees"),
+                                QStringLiteral ("D"));
+  QCommandLineOption pitchOption (QStringLiteral ("pitch"),
+                                  i18n ("Preview camera pitch in degrees"),
+                                  QStringLiteral ("D"));
+  QCommandLineOption hoverOption (
+      QStringLiteral ("hover"),
+      i18n ("Preview: highlight the block under this picture pixel (X,Y) and "
+            "print the tooltip text"),
+      QStringLiteral ("X,Y"));
   QCommandLineOption jarOption (
       QStringLiteral ("jar"),
-      i18n ("Preview: read the block models and textures from this client jar"),
+      i18n (
+          "Preview: read the block models and textures from this client jar"),
       QStringLiteral ("path"));
   QCommandLineOption resourcesOption (
       QStringLiteral ("resources"),
@@ -93,6 +98,7 @@ main (int argc, char *argv[])
   parser.addOption (sizeOption);
   parser.addOption (yawOption);
   parser.addOption (pitchOption);
+  parser.addOption (hoverOption);
   parser.addOption (jarOption);
   parser.addOption (resourcesOption);
   parser.addOption (versionOption);
@@ -116,6 +122,7 @@ main (int argc, char *argv[])
       options.size = parser.value (sizeOption);
       options.yaw = parser.value (yawOption);
       options.pitch = parser.value (pitchOption);
+      options.hover = parser.value (hoverOption);
       options.jar = parser.value (jarOption);
       options.resources = parser.value (resourcesOption);
       options.version = parser.value (versionOption);

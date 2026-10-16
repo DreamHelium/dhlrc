@@ -5,11 +5,9 @@ mod helper_struct;
 mod region_getter;
 
 use crate::default::NewOne;
-use common_rs::ProgressFn;
 use common_rs::i18n::i18n;
-use common_rs::region::{BlockEntity, Palette, Region};
+use common_rs::region::{Palette, Region};
 use common_rs::util::{cstr_to_str, string_to_ptr_fail_to_null};
-use std::any::Any;
 use std::collections::HashMap;
 use std::ffi::{CString, c_char};
 use std::ops::IndexMut;
@@ -148,6 +146,9 @@ pub extern "C" fn region_set_palette_property_name_and_data(
     name: *const c_char,
     data: *const c_char,
 ) -> *const c_char {
+    if region.is_null() {
+        return string_to_ptr_fail_to_null(i18n("The region is null."));
+    }
     let real_name = match cstr_to_str(name) {
         Ok(str) => str,
         Err(err) => return string_to_ptr_fail_to_null(&err.to_string()),
@@ -157,16 +158,89 @@ pub extern "C" fn region_set_palette_property_name_and_data(
         Err(err) => return string_to_ptr_fail_to_null(&err.to_string()),
     };
     let palette_array = unsafe { &mut (*region).palette_array };
-    if palette_array.len() < id {
+    if palette_array.len() <= id {
         /* Note: Can be translated */
         return string_to_ptr_fail_to_null(i18n("The index is out of range."));
     }
     let palette_property = &mut palette_array[id].property;
-    if palette_property.len() < index {
+    if palette_property.len() <= index {
         return string_to_ptr_fail_to_null(i18n("The index is out of range."));
     }
     palette_property.index_mut(index).0 = real_name;
     palette_property.index_mut(index).1 = real_data;
+    null()
+}
+
+/* Writes the given properties on a single block.
+ *
+ * The block's palette entry is copied, the copy is changed and only the given
+ * block is pointed at it, so every other block that still uses the old entry
+ * keeps its properties. Returns null on success and an error message (to be
+ * released with `string_free`) on failure. An added property name is appended
+ * to the copy. */
+#[unsafe(no_mangle)]
+pub extern "C" fn region_set_block_properties(
+    region: *mut Region,
+    index: usize,
+    names: *const *const c_char,
+    datas: *const *const c_char,
+    count: usize,
+    out_id: *mut u32,
+) -> *const c_char {
+    if region.is_null() {
+        return string_to_ptr_fail_to_null(i18n("The region is null."));
+    }
+    if out_id.is_null() {
+        return string_to_ptr_fail_to_null(i18n("The output pointer is null."));
+    }
+    if names.is_null() || datas.is_null() {
+        return string_to_ptr_fail_to_null(i18n("The property list is null."));
+    }
+    if count == 0 {
+        return string_to_ptr_fail_to_null(i18n("No property is given."));
+    }
+    let r = unsafe { &mut *region };
+    if index >= r.block_array.len() {
+        return string_to_ptr_fail_to_null(i18n("The index is out of range."));
+    }
+    let old_id = r.block_array[index] as usize;
+    if old_id >= r.palette_array.len() {
+        return string_to_ptr_fail_to_null(i18n("The palette index is out of range."));
+    }
+
+    /* Build the copy first: a bad name/value pair must leave the region as it
+     * was instead of half modified. */
+    let id_name = r.palette_array[old_id].id_name.clone();
+    let mut property = r.palette_array[old_id].property.clone();
+    for i in 0..count {
+        let name_ptr = unsafe { *names.add(i) };
+        let data_ptr = unsafe { *datas.add(i) };
+        let real_name = match cstr_to_str(name_ptr) {
+            Ok(str) => str,
+            Err(err) => return string_to_ptr_fail_to_null(&err.to_string()),
+        };
+        let real_data = match cstr_to_str(data_ptr) {
+            Ok(str) => str,
+            Err(err) => return string_to_ptr_fail_to_null(&err.to_string()),
+        };
+        match property.iter_mut().find(|(key, _)| *key == real_name) {
+            Some((_, value)) => *value = real_data,
+            /* The dialog's rows are existing properties, but adding a new one
+             * is cheap here and keeps the API useful. */
+            None => property.push((real_name, real_data)),
+        }
+    }
+
+    /* Every block with this palette entry has to keep it when nothing changed,
+     * otherwise each OK press would grow the palette. */
+    let new_id = if property == r.palette_array[old_id].property {
+        old_id
+    } else {
+        r.palette_array.push(Palette { id_name, property });
+        r.palette_array.len() - 1
+    };
+    r.block_array[index] = new_id as u32;
+    unsafe { *out_id = new_id as u32 };
     null()
 }
 
@@ -297,4 +371,224 @@ pub extern "C" fn nbt_list_len(list: *const List) -> u32 {
 #[unsafe(no_mangle)]
 pub extern "C" fn nbt_list_index_tag(list: *const List, index: u32) -> *const NBTTag {
     ptr::from_ref(&unsafe { &(*list) }.0[index as usize])
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::region_getter::{region_get_palette_property_len, region_get_palette_property_name};
+    use common_rs::region::Palette;
+
+    /* An error message is handed out as a C string the caller owns. */
+    fn take_message(message: *const c_char) -> Option<String> {
+        if message.is_null() {
+            return None;
+        }
+        let text = unsafe { std::ffi::CStr::from_ptr(message) }
+            .to_string_lossy()
+            .into_owned();
+        string_free(message as *mut c_char);
+        Some(text)
+    }
+
+    /* Four blocks that all share the same palette entry, as an editor sees
+     * after loading a file. */
+    fn test_region() -> *mut Region {
+        let region = region_new();
+        let r = unsafe { &mut *region };
+        r.region_size = (2, 1, 2);
+        r.block_array = vec![0, 0, 0, 0];
+        r.palette_array = vec![Palette {
+            id_name: "minecraft:oak_slab".to_string(),
+            property: vec![
+                ("type".to_string(), "bottom".to_string()),
+                ("waterlogged".to_string(), "false".to_string()),
+            ],
+        }];
+        region
+    }
+
+    fn call_set_block_properties(
+        region: *mut Region,
+        index: usize,
+        pairs: &[(&str, &str)],
+    ) -> (Option<String>, u32) {
+        let names: Vec<CString> = pairs
+            .iter()
+            .map(|(name, _)| CString::new(*name).unwrap())
+            .collect();
+        let datas: Vec<CString> = pairs
+            .iter()
+            .map(|(_, data)| CString::new(*data).unwrap())
+            .collect();
+        let name_ptrs: Vec<*const c_char> = names.iter().map(|name| name.as_ptr()).collect();
+        let data_ptrs: Vec<*const c_char> = datas.iter().map(|data| data.as_ptr()).collect();
+        let mut out_id = 0;
+        let message = region_set_block_properties(
+            region,
+            index,
+            name_ptrs.as_ptr(),
+            data_ptrs.as_ptr(),
+            name_ptrs.len(),
+            &mut out_id,
+        );
+        (take_message(message), out_id)
+    }
+
+    fn properties(region: *mut Region, id: usize) -> Vec<(String, String)> {
+        unsafe { (&(*region).palette_array)[id].property.clone() }
+    }
+
+    #[test]
+    fn per_block_write_copies_the_entry_for_one_block_only() {
+        let region = test_region();
+        let (error, new_id) = call_set_block_properties(region, 1, &[("type", "top")]);
+        assert!(error.is_none(), "unexpected error: {error:?}");
+        assert_eq!(new_id, 1);
+        unsafe {
+            assert_eq!((*region).palette_array.len(), 2);
+            /* Only block 1 moved to the copy; its neighbours still point at
+             * the unchanged entry. */
+            assert_eq!((*region).block_array, vec![0, 1, 0, 0]);
+        }
+        assert_eq!(
+            properties(region, 0),
+            vec![
+                ("type".to_string(), "bottom".to_string()),
+                ("waterlogged".to_string(), "false".to_string())
+            ]
+        );
+        assert_eq!(
+            properties(region, 1),
+            vec![
+                ("type".to_string(), "top".to_string()),
+                ("waterlogged".to_string(), "false".to_string())
+            ]
+        );
+        region_free(region);
+    }
+
+    #[test]
+    fn in_place_write_changes_every_block_that_shares_the_entry() {
+        let region = test_region();
+        let name = CString::new("type").unwrap();
+        let data = CString::new("top").unwrap();
+        let error = region_set_palette_property_name_and_data(
+            region,
+            0,
+            0,
+            name.as_ptr(),
+            data.as_ptr(),
+        );
+        assert!(error.is_null());
+        unsafe {
+            assert_eq!((*region).palette_array.len(), 1);
+            assert_eq!((*region).block_array, vec![0, 0, 0, 0]);
+        }
+        assert_eq!(
+            properties(region, 0)[0],
+            ("type".to_string(), "top".to_string())
+        );
+        region_free(region);
+    }
+
+    #[test]
+    fn unknown_property_name_is_added() {
+        let region = test_region();
+        let (error, new_id) =
+            call_set_block_properties(region, 0, &[("half", "upper"), ("type", "top")]);
+        assert!(error.is_none(), "unexpected error: {error:?}");
+        assert_eq!(new_id, 1);
+        assert_eq!(
+            properties(region, 1),
+            vec![
+                ("type".to_string(), "top".to_string()),
+                ("waterlogged".to_string(), "false".to_string()),
+                ("half".to_string(), "upper".to_string())
+            ]
+        );
+        region_free(region);
+    }
+
+    #[test]
+    fn writing_the_same_values_keeps_the_palette() {
+        let region = test_region();
+        let (error, new_id) = call_set_block_properties(region, 2, &[("type", "bottom")]);
+        assert!(error.is_none(), "unexpected error: {error:?}");
+        assert_eq!(new_id, 0);
+        unsafe {
+            assert_eq!((*region).palette_array.len(), 1);
+            assert_eq!((*region).block_array, vec![0, 0, 0, 0]);
+        }
+        region_free(region);
+    }
+
+    #[test]
+    fn bad_arguments_return_a_message_instead_of_panicking() {
+        let region = test_region();
+
+        let (error, _) = call_set_block_properties(region, 99, &[("type", "top")]);
+        assert!(error.is_some());
+
+        let (error, _) = call_set_block_properties(region, 0, &[]);
+        assert!(error.is_some());
+        region_free(region);
+    }
+
+    #[test]
+    fn null_pointers_return_a_message() {
+        let region = test_region();
+        let mut out_id = 0;
+        let message = region_set_block_properties(
+            region,
+            0,
+            std::ptr::null(),
+            std::ptr::null(),
+            1,
+            &mut out_id,
+        );
+        assert!(take_message(message).is_some());
+
+        let message = region_set_block_properties(
+            region,
+            0,
+            std::ptr::null(),
+            std::ptr::null(),
+            1,
+            std::ptr::null_mut(),
+        );
+        assert!(take_message(message).is_some());
+        region_free(region);
+    }
+
+    #[test]
+    fn out_of_range_palette_and_property_indices_are_rejected() {
+        let region = test_region();
+        let name = CString::new("type").unwrap();
+        let data = CString::new("top").unwrap();
+
+        let message = region_set_palette_property_name_and_data(
+            region,
+            1, /* id == palette len */
+            0,
+            name.as_ptr(),
+            data.as_ptr(),
+        );
+        assert!(take_message(message).is_some());
+
+        let message = region_set_palette_property_name_and_data(
+            region,
+            0,
+            2, /* index == property len */
+            name.as_ptr(),
+            data.as_ptr(),
+        );
+        assert!(take_message(message).is_some());
+
+        /* The getters must answer with null rather than panic. */
+        assert!(region_get_palette_property_name(region, 1, 0).is_null());
+        assert!(region_get_palette_property_name(region, 0, 2).is_null());
+        assert_eq!(region_get_palette_property_len(region, 1), 0);
+        region_free(region);
+    }
 }

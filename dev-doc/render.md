@@ -82,7 +82,19 @@ Each crate only knows the one below it:
    (with `rescale` stretching the two axes the rotation is not about, which is
    what keeps a `block/cross` plant its full width), and the blockstate's `x`
    and `y` turn the whole model about the block's centre.
-5. When the variant asks for `uvlock`, the texture is tied to the world instead
+5. The two kinds of turn do **not** count the same way, which is a trap worth
+   knowing about. An element's own `rotation` is written the way the axis reads:
+   `template_torch_wall`'s `-22.5` about `z` leans the torch out of the wall it
+   is fixed to. A variant's `x` and `y` are written the other way round — the
+   game turns the model **clockwise seen from above**, so `y: 90` takes the
+   north side to the east one, which is exactly how `glass_pane` and `oak_fence`
+   write their four arms — and the turn about `x` happens **first**, the order
+   `end_rod` and `chain` need to lie along the axis they name. Getting either
+   wrong mirrors every turned block: a pane's arms swap sides, a stair's facing
+   flips, an end rod points the wrong way. `turn_variant_vector ()` holds both
+   rules in one place, and the direction a face ends up looking is worked out by
+   the same turn, so geometry and face can never disagree.
+6. When the variant asks for `uvlock`, the texture is tied to the world instead
    of to the model. A turn about an axis moves a face with its normal **along**
    that axis to another face, and the texture has to turn back; a face whose
    normal is **across** the axis lands on an equivalent face where the texture
@@ -218,6 +230,20 @@ projection. The view takes a snapshot of the region when it opens, so it keeps
 drawing after the region dialog is closed; `Reload` takes a fresh one. The
 status line says which renderer drew the frame.
 
+The block the pointer is over is outlined in black, and a tooltip beside the
+cursor names it and lists its properties; moving off the scene takes the outline
+away again. The outline follows the block's own shape, so a slab is boxed at half
+a cell and a pane at a sliver of one — `dhlrc_render_scene_block_box ()` reads it
+back out of the scene's quads. Only the outline is redrawn as the pointer moves:
+the scene's buffers and textures are untouched until the view is rebuilt. A click
+still sets the line at the bottom of the window.
+
+**Modify Properties…** opens the clicked block's palette entry as editable rows,
+either for that one block — the entry is copied and only that block is pointed at
+the copy — or for every block that shares the entry. A write goes through the
+region's own lock (`RegionClass`), and the view takes a fresh snapshot
+afterwards, so the change is visible at once.
+
 Without a GUI, the same view can draw one picture of a file and exit — this is
 what the two backends are checked with, and it needs a display for the GL one
 (`Xvfb` is enough):
@@ -243,7 +269,9 @@ dhlrc-tui render house.litematic -o house.png --jar /path/to/client-1.21.4.jar
 ```
 
 It takes `--size WxH`, `--yaw`, `--pitch`, `--distance`, `--ortho`,
-`--background rrggbb`, `--region INDEX|NAME` for a multi-region file, and
+`--background rrggbb`, `--region INDEX|NAME` for a multi-region file,
+`--highlight X,Y,Z` to box the block at that region coordinate the way the Qt
+view boxes what the pointer is over, and
 `--region-dir`/`--load-dir` for where the plugin libraries are (the same options
 `dhlrc-tui modules` has). Without `--jar` it reads the configured cache
 directory, and `--resources DIR`/`--version ID` point it somewhere else.

@@ -40,6 +40,10 @@ impl NewOne for Region {
             block_entity_array: vec![],
             entity_array: vec![],
             palette_array: vec![],
+            biome_array: vec![],
+            biome_palette_array: vec![],
+            format_data: None,
+            format_version: 0,
         }
     }
 }

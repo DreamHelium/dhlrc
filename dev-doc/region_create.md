@@ -115,11 +115,14 @@ immediately after creation.
 
 ## Choosing which plugin to try
 
-The loader collects the modules whose `baseType()` matches the object codec that succeeded, then decides the order
-using `DhCore::instance()->config()`:
+The loader collects the modules whose `baseType()` matches the object codec that succeeded, then decides the order:
+the module whose `fileSuffix()` matches the file's extension is tried first. `DhCore::instance()->config().failThenRetry`
+decides whether the remaining candidates are tried after it fails — and they are always tried when no module claims the
+extension, since there is no expectation to go on then.
 
-- `loadingFileByExtension` matches the file suffix against each module's `fileSuffix()`.
-- `failThenRetry` decides whether to fall back to the remaining candidates after the preferred one fails.
+A file that ends up being read by a module other than the one its extension named is not an error: the job keeps a
+warning (see `DhLoadJob::collectWarnings()`) and it is shown once the load finishes, together with a warning when the
+file's compression or NBT encoding is not what the reading plugin declares.
 
 `HelperStruct` (progress callback, cancel flag, elapsed time, memory limit) is shared by all of these calls and is
 created once per job with `helper_struct_new()`.

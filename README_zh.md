@@ -71,7 +71,7 @@ Termux/Android 上没有 `libintl`，Rust 侧的翻译层会自动失效（见 `
 
 ## 功能
 
-- 支持NBT和投影文件。
+- 支持NBT、投影文件和Sponge结构文件（`.schem`）。
 - 修改区域的基础数据。
 - 3D预览：按方块模型与材质绘制区域，可旋转、缩放并点选方块（见[开发文档](dev-doc/render.md)）。
 - 老掉牙的界面。
@@ -79,6 +79,10 @@ Termux/Android 上没有 `libintl`，Rust 侧的翻译层会自动失效（见 `
 ## 使用
 
 只用运行`dhlrc_qt`，Qt后端将会启动，除非你用的是Linux tty。
+
+程序内置了一份简短的使用说明：打开`帮助 -> 帮助`即可看到快速入门（英文原文在
+`resources/usage.md`，中文译文在它旁边的`resources/usage.zh_CN.md`）。左侧列表里的
+`程序目录`会列出程序使用的各个目录，卸载前请在那里查看配置和缓存目录。
 
 tty支持可能已在计划中。
 

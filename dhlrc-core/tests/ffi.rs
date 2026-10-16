@@ -173,7 +173,16 @@ fn plugin_options_round_trip() {
     let input = 0i32;
     let output = 1i32;
 
-    // Nothing configured to start with.
+    // Nothing configured yet. Reading follows the saved options without
+    // asking — a load cannot know which plugin will read the file until it has
+    // been decoded — while writing asks once per export, since the format was
+    // picked on purpose.
+    assert_eq!(
+        dhlrc_core_plugin_use_configured(core, type_name.as_ptr(), input),
+        1
+    );
+    // The switch still turns the question back on for reading.
+    dhlrc_core_plugin_set_use_configured(core, type_name.as_ptr(), input, false);
     assert_eq!(
         dhlrc_core_plugin_use_configured(core, type_name.as_ptr(), input),
         0
@@ -215,6 +224,45 @@ fn plugin_options_round_trip() {
         1
     );
     assert!(out);
+    dhlrc_core_free(core);
+    let _ = std::fs::remove_dir_all(&dir);
+}
+
+#[test]
+fn an_older_configuration_stops_asking_before_reading() {
+    let dir = temp_dir("migrate");
+    // A version 1 file, as the previous build wrote it: every plugin's reading
+    // options asked, because `use_configured` started false.
+    std::fs::write(
+        dir.join("config.toml"),
+        "version = 1\n\n[plugins.nbt.input]\nuse_configured = false\n\n[plugins.nbt.output]\nuse_configured = false\n",
+    )
+    .unwrap();
+
+    let dir_c = CString::new(dir.to_string_lossy().to_string()).unwrap();
+    let mut error: *mut c_char = ptr::null_mut();
+    let core = dhlrc_core_open(dir_c.as_ptr(), None, ptr::null_mut(), &mut error);
+    assert!(!core.is_null());
+
+    let type_name = CString::new("nbt").unwrap();
+    let input = 0i32;
+    let output = 1i32;
+    // Reading: that old default becomes the new one, so a load no longer asks.
+    assert_eq!(
+        dhlrc_core_plugin_use_configured(core, type_name.as_ptr(), input),
+        1
+    );
+    // Writing still asks, since the format is picked on purpose there.
+    assert_eq!(
+        dhlrc_core_plugin_use_configured(core, type_name.as_ptr(), output),
+        0
+    );
+
+    // The migrated version is what gets written back.
+    assert_eq!(dhlrc_core_save(core, &mut error), 0);
+    let text = std::fs::read_to_string(dir.join("config.toml")).unwrap();
+    assert!(text.contains("version = 2"), "config was {text}");
+
     dhlrc_core_free(core);
     let _ = std::fs::remove_dir_all(&dir);
 }

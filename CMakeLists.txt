@@ -110,7 +110,8 @@ set(DHLRC_LOAD_LIBRARIES
   ${CARGO_TARGET_DIR}/${CARGO_TYPE}/${CARGO_LIB_PREFIX}nbt_component${CARGO_LIB_SUFFIX})
 set(DHLRC_MODULE_LIBRARIES
   ${CARGO_TARGET_DIR}/${CARGO_TYPE}/${CARGO_LIB_PREFIX}region_nbt_rs${CARGO_LIB_SUFFIX}
-  ${CARGO_TARGET_DIR}/${CARGO_TYPE}/${CARGO_LIB_PREFIX}region_litematic_rs${CARGO_LIB_SUFFIX})
+  ${CARGO_TARGET_DIR}/${CARGO_TYPE}/${CARGO_LIB_PREFIX}region_litematic_rs${CARGO_LIB_SUFFIX}
+  ${CARGO_TARGET_DIR}/${CARGO_TYPE}/${CARGO_LIB_PREFIX}region_schem_rs${CARGO_LIB_SUFFIX})
 # The terminal frontend, staged next to `dhlrc_qt` so it finds the modules and
 # the catalogue in the same directories as the Qt build.
 set(DHLRC_TUI_BINARY

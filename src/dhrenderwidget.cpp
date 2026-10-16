@@ -3,9 +3,11 @@
 #include "dhgpuwidget.h"
 
 #include <QKeyEvent>
+#include <QLabel>
 #include <QMouseEvent>
 #include <QPainter>
 #include <QResizeEvent>
+#include <QToolTip>
 #include <QWheelEvent>
 #include <libintl.h>
 #include <algorithm>
@@ -34,6 +36,22 @@ DhRenderWidget::DhRenderWidget (void *core, void *region, QWidget *parent)
   setFocusPolicy (Qt::StrongFocus);
   setMinimumSize (240, 180);
   setCursor (Qt::OpenHandCursor);
+  /* Every move asks what is under the pointer, so the outline and the tooltip
+   * follow the mouse without a button held down. */
+  setMouseTracking (true);
+
+  /* A plain child label is the tooltip: it is transparent to mouse events, so
+   * it can never swallow a drag or a click, and it can be raised over the GL
+   * child when one is drawing. The text arrives through `setHoverInfo ()`,
+   * because the block's name lives in the region this widget does not hold. */
+  tip = new QLabel (this);
+  tip->setTextFormat (Qt::PlainText);
+  tip->setPalette (QToolTip::palette ());
+  tip->setAutoFillBackground (true);
+  tip->setFrameShape (QFrame::Box);
+  tip->setAttribute (Qt::WA_TransparentForMouseEvents);
+  tip->setAttribute (Qt::WA_ShowWithoutActivating);
+  tip->hide ();
 
   /* The GPU child is the picture; the parent keeps the events, the CPU
    * fallback and the problem text. A machine that cannot give a context gets
@@ -72,6 +90,11 @@ DhRenderWidget::discard ()
 void
 DhRenderWidget::rebuild (void *core, void *region)
 {
+  /* The outline belongs to the old scene, and a tooltip naming one of its
+   * blocks must not stay up. */
+  hovered = false;
+  if (tip)
+    tip->hide ();
   discard ();
   scene = dhlrc_render_scene_new (core, region);
   problemText = scene
@@ -95,6 +118,9 @@ DhRenderWidget::rebuild (void *core, void *region)
         gpu->hide ();
     }
   update ();
+  /* A reload of the same region keeps the pointer where it was, so the block
+   * under it is found again on the fresh scene. */
+  rehover ();
 }
 
 void
@@ -103,6 +129,10 @@ DhRenderWidget::applyCamera ()
   if (gpu)
     gpu->setCamera (camera);
   update ();
+  /* A camera move changes which block a picture pixel names, so the outline
+   * is found again under the last pointer position. A drag clears the hover
+   * before it starts, so this does nothing while the mouse is down. */
+  rehover ();
 }
 
 void
@@ -218,6 +248,9 @@ DhRenderWidget::paintEvent (QPaintEvent *)
 void
 DhRenderWidget::mousePressEvent (QMouseEvent *event)
 {
+  /* The outline and the tooltip would only get in the way of a drag, and the
+   * answer under the pointer is stale the moment the camera moves. */
+  clearHover ();
   lastPos = event->position ().toPoint ();
   dragButton = event->button ();
   dragging = true;
@@ -228,9 +261,12 @@ DhRenderWidget::mousePressEvent (QMouseEvent *event)
 void
 DhRenderWidget::mouseMoveEvent (QMouseEvent *event)
 {
-  if (!dragging)
-    return;
   const QPoint now = event->position ().toPoint ();
+  if (!dragging)
+    {
+      hoverAt (now);
+      return;
+    }
   const QPoint delta = now - lastPos;
   lastPos = now;
   if (std::abs (delta.x ()) + std::abs (delta.y ()) > 2)
@@ -261,7 +297,20 @@ DhRenderWidget::mouseReleaseEvent (QMouseEvent *event)
   setCursor (Qt::OpenHandCursor);
   if (wasDragging && !moved && event->button () == Qt::LeftButton)
     pickAt (event->position ().toPoint ());
+  /* Where the button came up is where the pointer is, so the outline is put
+   * back under it. */
+  hoverAt (event->position ().toPoint ());
   update ();
+}
+
+void
+DhRenderWidget::leaveEvent (QEvent *event)
+{
+  /* Over the window's other widgets, or out of the window: nothing is under
+   * the pointer any more. */
+  clearHover ();
+  pointerKnown = false;
+  QWidget::leaveEvent (event);
 }
 
 void
@@ -324,4 +373,121 @@ DhRenderWidget::pickAt (const QPoint &at)
   if (dhlrc_render_pick (scene, &camera, pictureWidth, pictureHeight,
                          at.x () * ratio, at.y () * ratio, block))
     Q_EMIT blockPicked (block[0], block[1], block[2]);
+}
+
+void
+DhRenderWidget::setHoverInfo (const QString &text)
+{
+  if (!tip)
+    return;
+  if (text.isEmpty () || !hovered)
+    {
+      tip->hide ();
+      return;
+    }
+  tip->setText (text);
+  tip->adjustSize ();
+  placeTip ();
+  tip->show ();
+  /* Over the GL child, which is the picture when one is drawing. */
+  tip->raise ();
+}
+
+void
+DhRenderWidget::hoverAt (const QPoint &at)
+{
+  hoverPoint = at;
+  pointerKnown = true;
+  if (!scene)
+    return;
+
+  /* The ray is measured against the full-size picture in device pixels, the
+   * same picture a click measures against. */
+  const qreal ratio = devicePixelRatioF ();
+  const int pictureWidth = std::max (1, static_cast<int> (width () * ratio));
+  const int pictureHeight = std::max (1, static_cast<int> (height () * ratio));
+  int32_t block[3] = { 0, 0, 0 };
+  if (dhlrc_render_pick (scene, &camera, pictureWidth, pictureHeight,
+                         at.x () * ratio, at.y () * ratio, block)
+      == 0)
+    {
+      clearHover ();
+      return;
+    }
+
+  if (hovered && block[0] == hoverBlock[0] && block[1] == hoverBlock[1]
+      && block[2] == hoverBlock[2])
+    {
+      /* Still the same block: only the tooltip follows the pointer, and the
+       * picture is not drawn again. */
+      placeTip ();
+      return;
+    }
+
+  hovered = true;
+  hoverBlock[0] = block[0];
+  hoverBlock[1] = block[1];
+  hoverBlock[2] = block[2];
+  /* The box the block is actually drawn in, so a slab gets half a cell and a
+   * pane a sliver of one. A block that drew nothing — culled away, or not
+   * there at all — falls back to the whole cell. */
+  float box[6] = { static_cast<float> (block[0]),
+                   static_cast<float> (block[1]),
+                   static_cast<float> (block[2]),
+                   static_cast<float> (block[0] + 1),
+                   static_cast<float> (block[1] + 1),
+                   static_cast<float> (block[2] + 1) };
+  dhlrc_render_scene_block_box (scene, block[0], block[1], block[2], box);
+  dhlrc_render_scene_set_highlight (scene, box);
+  /* The GL child keeps its own small buffer for the outline; only that buffer
+   * is read again, never the scene's. */
+  if (gpu && useGpu)
+    gpu->highlightChanged ();
+  update ();
+  Q_EMIT blockHovered (block[0], block[1], block[2]);
+}
+
+void
+DhRenderWidget::clearHover ()
+{
+  /* The tooltip is hidden even when no block was hovered, so a stale one from
+   * an earlier hover cannot stay up. */
+  if (tip && tip->isVisible ())
+    tip->hide ();
+  if (!hovered)
+    return;
+  hovered = false;
+  if (scene)
+    {
+      dhlrc_render_scene_set_highlight (scene, nullptr);
+      if (gpu && useGpu)
+        gpu->highlightChanged ();
+      update ();
+    }
+}
+
+void
+DhRenderWidget::rehover ()
+{
+  if (pointerKnown)
+    hoverAt (hoverPoint);
+}
+
+void
+DhRenderWidget::placeTip ()
+{
+  if (!tip || !hovered)
+    return;
+  const QRect area = rect ().adjusted (4, 4, -6, -6);
+  QPoint at = hoverPoint + QPoint (14, 18);
+  const QSize size = tip->size ();
+  /* Beside the cursor, flipped to the other side rather than hanging off the
+   * widget. */
+  if (at.x () + size.width () > area.right ())
+    at.setX (hoverPoint.x () - size.width () - 12);
+  if (at.y () + size.height () > area.bottom ())
+    at.setY (hoverPoint.y () - size.height () - 12);
+  at.setX (std::max (area.left (), at.x ()));
+  at.setY (std::max (area.top (), at.y ()));
+  tip->move (at);
 }

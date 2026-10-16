@@ -149,9 +149,7 @@ DhCore::refresh ()
   cached.limitUnit = view->limit_unit;
   cached.elapsedMilliseconds = view->elapsed_milliseconds;
   cached.selectAllRegionsInLoading = view->select_all_regions_in_loading;
-  cached.loadingFileByExtension = view->loading_file_by_extension;
   cached.failThenRetry = view->fail_then_retry;
-  cached.strictNbtEncoding = view->strict_nbt_encoding;
   cached.failDownloadUseCache = view->fail_download_use_cache;
   cached.defaultShowOption = view->default_show_option;
   cached.overrideSetting = view->override_setting;

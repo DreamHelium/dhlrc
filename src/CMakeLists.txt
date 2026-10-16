@@ -34,6 +34,7 @@ set(ui_files
         blockshowui.ui
         regionmodifyui.ui
         palettelistui.ui
+        propertymodifyui.ui
         #        paletteaddui.ui
         nbtreaderui.ui
 )
@@ -45,6 +46,7 @@ set(TEMP_PROJECT_SOURCES
         ../resources/dhlrc.qrc
         generalchoosedialog.cpp generalchoosedialog.h
         blockreaderui.cpp blockreaderui.h
+        propertymodifyui.cpp propertymodifyui.h
         utility.cpp utility.h
         regionmodifyui.cpp regionmodifyui.h
         blocklistui.cpp blocklistui.h
@@ -69,6 +71,8 @@ set(TEMP_PROJECT_SOURCES
         pluginoptionsconfig.h
         dhhelpui.cpp
         dhhelpui.h
+        dhdirectoryui.cpp
+        dhdirectoryui.h
         manageregionui.cpp
         manageregionui.h
         regionclass.cpp regionclass.h

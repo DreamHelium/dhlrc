@@ -1,0 +1,27 @@
+[package]
+name = "region-schem-rs"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+formatx = "0.2.4"
+sysinfo = "0.38.1"
+common-rs = { path = "../common-rs" }
+zuri_nbt = "0.5.0"
+zurinbt-common = { path = "../zurinbt-common" }
+
+[lib]
+crate-type = ["cdylib"]
+
+[dev-dependencies]
+# The tests build and read a whole file, so they need the compressor the format
+# mandates and a clock for the region's timestamps.
+flate2 = "1"
+time = "0.3"
+
+# Android has no libintl; `gettext-shim` stands in and messages stay English.
+[target.'cfg(not(target_os = "android"))'.dependencies]
+gettext-rs = { version = "0.7.7", features = ["gettext-system"] }
+
+[target.'cfg(target_os = "android")'.dependencies]
+gettextrs = { package = "dhlrc-gettext-shim", path = "../gettext-shim" }

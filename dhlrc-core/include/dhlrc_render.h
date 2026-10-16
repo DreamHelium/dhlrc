@@ -127,6 +127,35 @@ extern "C"
   void dhlrc_render_matrix (const DhlrcScene *scene, const DhlrcCamera *camera,
                             uint32_t width, uint32_t height, float *out16);
 
+  /* ---- Pointing at a block -------------------------------------------------
+   *
+   * The block a view is over is drawn as an outline over the scene: twelve
+   * thin black edges around its box. `dhlrc_render_image` draws it, and a GPU
+   * reads the very same quads below, so both show the same box.
+   */
+
+  /* Points the view at a block, or at nothing: `block` is six floats, the low
+   * corner then the high one in block space (one block is `x, y, z, x + 1,
+   * y + 1, z + 1`), or NULL to clear the highlight. Returns 1 when a box was
+   * set and 0 when it was cleared. */
+  int32_t dhlrc_render_scene_set_highlight (DhlrcScene *scene,
+                                            const float *block);
+
+  /* The box the block at a whole-numbered position is drawn in, as the six
+   * floats `dhlrc_render_scene_set_highlight` takes: a slab gives half a cell,
+   * not the whole one. Returns 1, or 0 when the cell drew nothing (a block that
+   * was culled away or is not there), so a caller can fall back to the cell. */
+  int32_t dhlrc_render_scene_block_box (const DhlrcScene *scene, int32_t x,
+                                        int32_t y, int32_t z, float *block);
+
+  /* How many quads the outline is made of, or 0 when nothing is highlighted. */
+  size_t dhlrc_render_scene_highlight_count (const DhlrcScene *scene);
+
+  /* One quad of the outline, in the same shape as a scene quad. Returns 1, or
+   * 0 for an index past the end. */
+  int32_t dhlrc_render_scene_highlight_quad (const DhlrcScene *scene,
+                                             size_t index, DhlrcQuad *quad);
+
 #ifdef __cplusplus
 }
 #endif

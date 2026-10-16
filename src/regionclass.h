@@ -4,6 +4,7 @@
 #include <QDateTime>
 #include <QObject>
 #include <QString>
+#include <QStringList>
 #include <atomic>
 #include <memory>
 #include <mutex>
@@ -80,6 +81,27 @@ public:
   [[nodiscard]] qint32 index (qint32 x, qint32 y, qint32 z) const;
   [[nodiscard]] quint32 blockId (qsizetype index) const;
   [[nodiscard]] qsizetype paletteLen () const;
+
+  /* Property accessors of a palette entry; the palette id of a block comes
+   * from blockId (). */
+  [[nodiscard]] qsizetype palettePropertyLen (quint32 id) const;
+  [[nodiscard]] QString palettePropertyName (quint32 id,
+                                             qsizetype index) const;
+  [[nodiscard]] QString palettePropertyData (quint32 id,
+                                             qsizetype index) const;
+
+  /* Property writers. They lock the region themselves, like the getters
+   * above. */
+  /* Changes one property of the palette entry itself, so every block using
+   * that entry sees the new value. */
+  bool setPaletteProperty (quint32 id, qsizetype index, const QString &name,
+                           const QString &data);
+  /* Changes the named properties of a single block by giving that block its
+   * own copy of the palette entry. `outId` receives the palette id the block
+   * points at afterwards; names and datas must have the same size. */
+  bool setBlockProperties (qsizetype index, const QStringList &names,
+                           const QStringList &datas,
+                           quint32 *outId = nullptr);
 
   /* Compatibility aliases. Prefer callers to hold an AutoLocker for anything
    * that must stay locked across several statements. */

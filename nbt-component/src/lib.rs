@@ -37,6 +37,11 @@ pub struct ObjectLoadOptions {
     /* One of the OBJECT_ENCODING_* values; the encoding `strict` requires and
      * the one tried first. Read only when `strict`. */
     pub encoding: c_int,
+    /* Where to write the encoding that actually parsed, or
+     * `OBJECT_ENCODING_ANY` when none did. May be null. A caller that does not
+     * pin the encoding can use this to report that a file was read as
+     * something other than the format's own encoding. */
+    pub detected: *mut c_int,
 }
 
 struct ReadStruct<R: Reader> {
@@ -185,6 +190,10 @@ pub extern "C" fn region_get_object(
      * so a file that is in it succeeds as before; a file in another encoding is
      * still read far enough to name the encoding it really is, and the caller is
      * told both what was found and what was expected. */
+    let detected = unsafe { options.as_ref() }
+        .map(|o| o.detected)
+        .filter(|pointer| !pointer.is_null());
+
     let all = [
         OBJECT_ENCODING_BIG_ENDIAN,
         OBJECT_ENCODING_LITTLE_ENDIAN,
@@ -214,6 +223,9 @@ pub extern "C" fn region_get_object(
     for encoding in order {
         match decode_once(bytes, helper_struct, encoding) {
             Some(Ok(nbt)) => {
+                if let Some(out) = detected {
+                    unsafe { *out = encoding };
+                }
                 /* The encoding that parsed, compared to the one that was
                  * required. */
                 if let Some(want) = expected {
@@ -316,4 +328,79 @@ fn nbt_create_real<R: Reader + 'static>(
 #[unsafe(no_mangle)]
 pub extern "C" fn object_free(object: *mut NBTRoot) {
     drop(Box::from(object));
+}
+
+#[cfg(test)]
+mod tests
+{
+    use super::*;
+    use common_rs::helper_struct::HelperStruct;
+    use std::collections::HashMap;
+    use std::ptr::{null, null_mut};
+    use zuri_nbt::encoding::LittleEndian;
+    use zuri_nbt::tag::{Compound, Int, String as NbtString};
+    use zuri_nbt::NBTTag;
+
+    fn helper () -> HelperStruct {
+        HelperStruct::new (None, null_mut (), null (), u64::MAX, 0)
+    }
+
+    /// A tree written in little endian. The string makes a big endian read of
+    /// the same bytes fail on its length, so exactly one encoding parses and
+    /// the test says which one that was.
+    fn little_endian_bytes () -> Vec<u8> {
+        let mut fields = HashMap::new ();
+        fields.insert (
+            "message".to_string (),
+            NBTTag::String (NbtString ("hello, world".to_string ())),
+        );
+        fields.insert ("count".to_string (), NBTTag::Int (Int (7)));
+        let root = NBTRoot {
+            tag_name: String::new (),
+            data: NBTTag::Compound (Compound (fields)),
+        };
+        let mut bytes = vec![];
+        root.write (&mut bytes, LittleEndian::default ()).unwrap ();
+        bytes
+    }
+
+    #[test]
+    fn the_encoding_that_parsed_is_reported () {
+        let mut bytes = little_endian_bytes ();
+        let mut object: *mut NBTRoot = null_mut ();
+        let mut helper_struct = helper ();
+        let mut detected = OBJECT_ENCODING_ANY;
+        let options = ObjectLoadOptions {
+            strict: 0,
+            encoding: OBJECT_ENCODING_ANY,
+            detected: &mut detected,
+        };
+        let message = region_get_object (
+            &mut bytes,
+            &mut object,
+            &mut helper_struct,
+            &options,
+        );
+        assert! (message.is_null (), "the file should decode");
+        assert! (!object.is_null ());
+        assert_eq! (detected, OBJECT_ENCODING_LITTLE_ENDIAN);
+        object_free (object);
+    }
+
+    #[test]
+    fn decoding_without_the_out_pointer_still_works () {
+        let mut bytes = little_endian_bytes ();
+        let mut object: *mut NBTRoot = null_mut ();
+        let mut helper_struct = helper ();
+        let options = ObjectLoadOptions {
+            strict: 0,
+            encoding: OBJECT_ENCODING_ANY,
+            detected: null_mut (),
+        };
+        assert! (
+            region_get_object (&mut bytes, &mut object, &mut helper_struct, &options).is_null ()
+        );
+        assert! (!object.is_null ());
+        object_free (object);
+    }
 }

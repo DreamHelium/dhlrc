@@ -383,6 +383,12 @@ pub unsafe extern "C" fn dhlrc_render_scene_quad(
     let Some(source) = scene.scene.quads.get(index) else {
         return 0;
     };
+    fill_quad(source, out);
+    1
+}
+
+/// Copies one of the scene's quads into the C shape a GPU reads.
+fn fill_quad(source: &dhlrc_render::SceneQuad, out: &mut DhlrcQuad) {
     *out = DhlrcQuad {
         positions: source.positions,
         uv: source.uv,
@@ -401,6 +407,103 @@ pub unsafe extern "C" fn dhlrc_render_scene_quad(
             Alpha::Translucent => ALPHA_TRANSLUCENT,
         },
     };
+}
+
+/// Points the view at a block, or at nothing.
+///
+/// `block` is six floats — the low corner then the high one, in block space, so
+/// one block is `x, y, z, x + 1, y + 1, z + 1` — or null to clear the
+/// highlight. The outline is drawn by `dhlrc_render_image`, and a GPU can read
+/// the very same quads with `dhlrc_render_scene_highlight_count` and
+/// `dhlrc_render_scene_highlight_quad`, so both draw the same box. Returns 1
+/// when a box was set and 0 when it was cleared.
+///
+/// # Safety
+///
+/// `scene` must be a pointer this library returned, and `block` readable for
+/// six `float`s when it is not null.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn dhlrc_render_scene_set_highlight(
+    scene: *mut DhlrcScene,
+    block: *const f32,
+) -> i32 {
+    let Some(scene) = (unsafe { scene.as_mut() }) else {
+        return 0;
+    };
+    if block.is_null() {
+        scene.scene.set_highlight(None);
+        return 0;
+    }
+    let box6 = unsafe { slice::from_raw_parts(block, 6) };
+    scene.scene.set_highlight(Some(dhlrc_render::Highlight {
+        min: [box6[0], box6[1], box6[2]],
+        max: [box6[3], box6[4], box6[5]],
+    }));
+    1
+}
+
+/// The box the block at a whole-numbered position is drawn in, written to
+/// `block` as six floats like [`dhlrc_render_scene_set_highlight`] takes.
+///
+/// A block is not always a whole cell — a slab is half of one — so a caller
+/// pointing at one asks here for the box to draw around it. Returns 1 when the
+/// cell drew something and 0 when it did not, which is a block that was culled
+/// away or is not there: the caller can then fall back to the whole cell.
+///
+/// # Safety
+///
+/// `scene` must be a pointer this library returned and `block` writable for six
+/// `float`s.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn dhlrc_render_scene_block_box(
+    scene: *const DhlrcScene,
+    x: i32,
+    y: i32,
+    z: i32,
+    block: *mut f32,
+) -> i32 {
+    let (Some(scene), Some(out)) = (unsafe { scene.as_ref() }, unsafe { block.as_mut() }) else {
+        return 0;
+    };
+    let Some(boxed) = scene.scene.block_box([x, y, z]) else {
+        return 0;
+    };
+    unsafe { slice::from_raw_parts_mut(out, 6) }.copy_from_slice(&[
+        boxed.min[0], boxed.min[1], boxed.min[2], boxed.max[0], boxed.max[1], boxed.max[2],
+    ]);
+    1
+}
+
+/// How many quads the highlight outline is made of, or 0 when nothing is
+/// highlighted.
+///
+/// # Safety
+///
+/// `scene` must be a pointer this library returned.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn dhlrc_render_scene_highlight_count(scene: *const DhlrcScene) -> usize {
+    unsafe { scene.as_ref() }.map_or(0, |scene| scene.scene.highlight.len())
+}
+
+/// One quad of the highlight outline, in the same shape as a scene quad.
+/// Returns 1, or 0 for a null handle or an index past the end.
+///
+/// # Safety
+///
+/// `scene` must be a pointer this library returned and `quad` writable.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn dhlrc_render_scene_highlight_quad(
+    scene: *const DhlrcScene,
+    index: usize,
+    quad: *mut DhlrcQuad,
+) -> i32 {
+    let (Some(scene), Some(out)) = (unsafe { scene.as_ref() }, unsafe { quad.as_mut() }) else {
+        return 0;
+    };
+    let Some(source) = scene.scene.highlight.get(index) else {
+        return 0;
+    };
+    fill_quad(source, out);
     1
 }
 
@@ -508,6 +611,7 @@ mod tests {
             min: [0.0; 3],
             max: [1.0; 3],
             skipped: Vec::new(),
+            highlight: Vec::new(),
         })
     }
 
@@ -545,6 +649,51 @@ mod tests {
         assert_eq!((width, height), (1, 1));
         assert_eq!(unsafe { *pixels }, 10, "red first");
         assert_eq!(unsafe { dhlrc_render_scene_texture(pointer, 9, &mut pixels, &mut width, &mut height) }, 0);
+    }
+
+    #[test]
+    fn a_highlight_is_set_and_read_back() {
+        let mut scene = scene();
+        assert_eq!(unsafe { dhlrc_render_scene_highlight_count(&scene) }, 0);
+
+        let block = [2.0f32, 1.0, 3.0, 3.0, 2.0, 4.0];
+        assert_eq!(
+            unsafe { dhlrc_render_scene_set_highlight(&mut scene, block.as_ptr()) },
+            1
+        );
+        assert_eq!(unsafe { dhlrc_render_scene_highlight_count(&scene) }, 12 * 6);
+
+        let mut quad = DhlrcQuad {
+            positions: [[0.0; 3]; 4],
+            uv: [[0.0; 2]; 4],
+            tint: [1.0; 3],
+            light: 0.0,
+            texture: 1,
+            alpha: -1,
+        };
+        assert_eq!(
+            unsafe { dhlrc_render_scene_highlight_quad(&scene, 0, &mut quad) },
+            1
+        );
+        assert_eq!(quad.tint, [0.0, 0.0, 0.0], "the outline is black");
+        assert_eq!(quad.texture, 0, "the checker, which the tint blacks out");
+        assert_eq!(quad.alpha, ALPHA_OPAQUE);
+        for position in quad.positions {
+            for axis in 0..3 {
+                assert!((block[axis] - 0.05..=block[axis + 3] + 0.05).contains(&position[axis]));
+            }
+        }
+
+        /* Past the end is a miss, and clearing takes the outline away. */
+        assert_eq!(
+            unsafe { dhlrc_render_scene_highlight_quad(&scene, 999, &mut quad) },
+            0
+        );
+        assert_eq!(
+            unsafe { dhlrc_render_scene_set_highlight(&mut scene, ptr::null()) },
+            0
+        );
+        assert_eq!(unsafe { dhlrc_render_scene_highlight_count(&scene) }, 0);
     }
 
     #[test]

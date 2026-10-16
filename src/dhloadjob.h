@@ -6,6 +6,7 @@
 #include "region.h"
 #include <KCompositeJob>
 #include <QPointer>
+#include <QSet>
 #include <condition_variable>
 #include <memory>
 #include <qexception.h>
@@ -89,6 +90,13 @@ public:
   QPointer<KMessageWidget> messageWidget = nullptr;
   QString getFilename ();
   QString getTypeName ();
+  /* Anything odd about a file that loaded anyway, ready to be shown. Filled by
+   * the worker, read once the job reports its result. */
+  [[nodiscard]] const QStringList &
+  warnings () const
+  {
+    return loadWarnings;
+  }
 
 Q_SIGNALS:
   void selfSuspended (KJob *job);
@@ -106,6 +114,17 @@ private:
   QString filename;
   QString typeName;
   const void *cancel_flag;
+  /* What the worker found out about the file: how it is compressed and which
+   * NBT encoding parsed it, as the shared `ObjectCompression` / `ObjectEncoding`
+   * values. Compared against what the reading plugin declares. */
+  int detectedCompression = ObjectCompressionAny;
+  int detectedEncoding = ObjectEncodingAny;
+  QStringList loadWarnings;
+  /* Fills `loadWarnings` from what the reading plugin declares and what the
+   * file actually was. `expectedType` is the plugin the extension pointed at,
+   * or empty when it pointed at none. */
+  void collectWarnings (ModuleBase *base, bool matched,
+                        const QString &expectedType, const QString &type);
   /* The options of every candidate plugin, borrowed from the batch that owns
    * them. The job picks the entry for whichever plugin ends up reading the
    * file, so it does not matter that the winner is unknown at this point. */
@@ -161,6 +180,10 @@ private:
    * owned here: a batch may mix formats, and a job must not free a pointer its
    * siblings are still using. */
   std::map<QString, void *> inputConfigs;
+  /* The plugin types the user asked to be prompted about: those whose switch in
+   * the settings says "ask" and that a file's extension points at. Everything
+   * else is read with the saved options without a window. */
+  QSet<QString> askTypes;
 };
 
 #endif // DHLRC_DHLOADJOB_H

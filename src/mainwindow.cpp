@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include "dhcore.h"
+#include "dhhelpui.h"
 #include "dhsettingsdialog/dhsettingsdialog.h"
 #include "dhsettingsdialog/dhsettingstemplates.h"
 #include "dhwidget.h"
@@ -9,6 +10,7 @@
 #include <kicontheme.h>
 #include <libintl.h>
 #include <memory>
+#include <qaction.h>
 #include <qboxlayout.h>
 #include <qcombobox.h>
 #include <qdesktopservices.h>
@@ -16,6 +18,7 @@
 #include <qdialogbuttonbox.h>
 #include <qfiledialog.h>
 #include <qglobalstatic.h>
+#include <qicon.h>
 #include <qlabel.h>
 #include <qlineedit.h>
 #include <qlogging.h>
@@ -35,6 +38,7 @@
 #include "blockreaderui.h"
 #include "configobjectitems.h"
 #include "dhaboutui.h"
+#include "dhdirectoryui.h"
 #include "dhgameconfigui.h"
 #include "externalnbtreaderui.h"
 #include "utility.h"
@@ -62,6 +66,36 @@ using DownloaderList
     = QList<std::pair<QWidget *, std::shared_ptr<DhDownloader>>>;
 static MainWindow *mainWindow = nullptr;
 Q_GLOBAL_STATIC (DownloaderList, downloaderList)
+
+/* What a sidebar row opens.
+ *
+ * The row's position is not used: the list is filtered by the search box, so
+ * the position of a row changes while this id does not. */
+enum class SidebarAction
+{
+  NbtReader,
+  ManageRegion,
+  RegionReader,
+  Settings,
+  ProgramDirectories,
+#ifdef DH_DEBUG_IN_IDE
+  Debug,
+#endif
+};
+
+/* Where a row keeps its `SidebarAction`. */
+constexpr int sidebarActionRole = Qt::UserRole;
+
+/* Pages that are kept alive when their tab (or their torn-off window) is
+ * closed, so opening them again brings back the same page with the state it
+ * had. The others are discarded, as closing their tab would be. */
+static bool
+isPersistentPage (QWidget *page)
+{
+  return page != nullptr
+         && (page == ManageRegionUI::instance ()
+             || qobject_cast<DhDirectoryUI *> (page) != nullptr);
+}
 
 /* The memory limit and its unit are edited together, so they get one row
  * instead of two. The unit item is registered with a null control and written
@@ -692,11 +726,19 @@ MainWindow::MainWindow (QWidget *parent) : QMainWindow (parent)
 
   menuBar ()->addMenu (menu);
 
-  auto *helpMenu = new QMenu (_ ("Help"));
+  auto *helpMenu = new QMenu (_ ("&Help"));
   auto *aboutAction = new QAction (_ ("&About"), this);
+  auto *helpAction = new QAction (_ ("&Help"), this);
+  /* `help` is the cursor of a question-mark pointer, not an icon; the theme's
+   * help article is `help-contents` (Breeze has it at 16 and 22, plus the
+   * high-DPI variants). */
+  helpAction->setIcon (QIcon::fromTheme ("help-contents"));
   aboutAction->setIcon (QIcon::fromTheme ("help-about"));
   connect (aboutAction, &QAction::triggered, this,
            [this] { DhAboutUI::showAbout (this); });
+  connect (helpAction, &QAction::triggered, this,
+           [] { DhHelpUI::showHelp (QStringLiteral ("usage")); });
+  helpMenu->addAction (helpAction);
   helpMenu->addAction (aboutAction);
   menuBar ()->addMenu (helpMenu);
 
@@ -743,25 +785,80 @@ MainWindow::MainWindow (QWidget *parent) : QMainWindow (parent)
   leftLayout->addWidget (lineEdit);
   leftLayout->addWidget (listView);
 
-  tabWidget = new QTabWidget (this);
+  tabWidget = new QTabWidget ();
+
+  welcomeWidget = new QWidget ();
+  tabLayout = new QVBoxLayout ();
+  tabLayout->setAlignment (Qt::AlignCenter);
+  welcomeWidget->setLayout (tabLayout);
+
+  auto welcomeLabel = new QLabel (_ ("Welcome!"));
+  welcomeLabel->setAlignment (Qt::AlignCenter);
+  QFont font;
+  font.setPointSize (20);
+  font.setBold (true);
+  welcomeLabel->setFont (font);
+  tabLayout->addWidget (welcomeLabel);
+
+  auto tabLabel = new QLabel (
+      _ ("If you don't know how to use, we "
+         "provide some helps. Just click \"Help -> Help\" to see "
+         "them.\n\nAlso we provide some quick start to help you use."));
+  tabLabel->setAlignment (Qt::AlignCenter);
+  tabLabel->setTextFormat (Qt::MarkdownText);
+  tabLayout->addWidget (tabLabel);
+
+  /* The two things a new user needs most, one click away: the quick start
+   * article and where the program keeps its files. */
+  auto *quickStartBtn = new QPushButton (_ ("Quick Start"));
+  connect (quickStartBtn, &QPushButton::clicked, this,
+           [] { DhHelpUI::showHelp (QStringLiteral ("usage")); });
+  tabLayout->addWidget (quickStartBtn);
+  auto *directoriesBtn = new QPushButton (_ ("Program Directories"));
+  connect (directoriesBtn, &QPushButton::clicked, this,
+           [this] { openProgramDirectories (); });
+  tabLayout->addWidget (directoriesBtn);
+
+  auto externalReaderBtn = new QPushButton (_ ("NBT Reader"));
+  connect (externalReaderBtn, &QPushButton::clicked, this,
+           &MainWindow::openExternalNbtReader);
+  tabLayout->addWidget (externalReaderBtn);
+  auto addBtn = new QPushButton (_ ("Add Files to Regions"));
+  connect (addBtn, &QPushButton::clicked, this,
+           [this]
+             {
+               ensureTab (ManageRegionUI::instance (), _ ("Manage Region"));
+               ManageRegionUI::addFilesToRegions (this);
+             });
+  tabLayout->addWidget (addBtn);
+
   tabWidget->setTabsClosable (true);
   /* Tabs can be dragged along the bar to reorder them freely. */
   tabWidget->setMovable (true);
 
   splitter->addWidget (leftWidget);
-  splitter->addWidget (tabWidget);
+  splitter->addWidget (welcomeWidget);
   splitter->setCollapsible (1, false);
 
   splitter->setStretchFactor (0, 0);
   splitter->setStretchFactor (1, 1);
   model = new QStandardItemModel (this);
 
-  model->appendRow (new QStandardItem (_ ("NBT File Reader")));
-  model->appendRow (new QStandardItem (_ ("Manage Region")));
-  model->appendRow (new QStandardItem (_ ("Region Reader/Modifier")));
-  model->appendRow (new QStandardItem (_ ("Settings")));
+  /* One row per sidebar entry, each carrying the action it opens. */
+  const auto addRow = [this] (SidebarAction action, const QString &text)
+    {
+      auto *item = new QStandardItem (text);
+      item->setData (static_cast<int> (action), sidebarActionRole);
+      item->setEditable (false);
+      model->appendRow (item);
+    };
+  addRow (SidebarAction::NbtReader, _ ("NBT File Reader"));
+  addRow (SidebarAction::ManageRegion, _ ("Manage Region"));
+  addRow (SidebarAction::RegionReader, _ ("Region Reader/Modifier"));
+  addRow (SidebarAction::Settings, _ ("Settings"));
+  addRow (SidebarAction::ProgramDirectories, _ ("Program Directories"));
 #ifdef DH_DEBUG_IN_IDE
-  model->appendRow (new QStandardItem ("Debug"));
+  addRow (SidebarAction::Debug, QStringLiteral ("Debug"));
 #endif
   auto maxLen = 0;
   auto rows = model->rowCount ();
@@ -838,6 +935,12 @@ MainWindow::MainWindow (QWidget *parent) : QMainWindow (parent)
                || info.key == QLatin1String ("NamePatternSampleRegion"))
         creator = [] (DhSettingItem *i, QVBoxLayout *l, DhSettingsDialog *d)
           { return std::make_unique<DhValueOnlySettingTemplate> (i, l, d); };
+      else if (info.key == QLatin1String ("CacheDirectory"))
+        creator = [] (DhSettingItem *i, QVBoxLayout *l, DhSettingsDialog *d)
+          {
+            return std::make_unique<DhPathSettingTemplate> (
+                i, l, d, _ ("Select Cache Directory"));
+          };
       settingsDialog->addItem (item, creator);
     }
 
@@ -899,21 +1002,23 @@ MainWindow::MainWindow (QWidget *parent) : QMainWindow (parent)
              { proxyModel->setFilterRegularExpression (pattern); });
   connect (
       listView, &QListView::doubleClicked, this,
-      [&] (const QModelIndex &index)
+      [this] (const QModelIndex &index)
         {
-          switch (index.row ())
+          /* The action is read from the row, not from its position: the search
+           * box filters the list, so a position means a different entry as
+           * soon as something is typed. */
+          switch (static_cast<SidebarAction> (
+              index.data (sidebarActionRole).toInt ()))
             {
-            case 0:
+            case SidebarAction::NbtReader:
               {
-                auto enui = new ExternalNbtReaderUI ();
-                auto tabIndex = tabWidget->addTab (enui, _ ("NBT Reader"));
-                tabWidget->setCurrentIndex (tabIndex);
+                openExternalNbtReader ();
                 break;
               }
-            case 1:
+            case SidebarAction::ManageRegion:
               ensureTab (ManageRegionUI::instance (), _ ("Manage Region"));
               break;
-            case 2:
+            case SidebarAction::RegionReader:
               {
                 auto region
                     = dh::getRegion (this, ManageRegionUI::instance (), false);
@@ -941,7 +1046,7 @@ MainWindow::MainWindow (QWidget *parent) : QMainWindow (parent)
                   }
                 break;
               }
-            case 3:
+            case SidebarAction::Settings:
               {
                 if (settingsDialog)
                   {
@@ -951,22 +1056,26 @@ MainWindow::MainWindow (QWidget *parent) : QMainWindow (parent)
                   }
                 break;
               }
+            case SidebarAction::ProgramDirectories:
+              openProgramDirectories ();
+              break;
 #ifdef DH_DEBUG_IN_IDE
-            case 4:
+            case SidebarAction::Debug:
               {
                 auto widget = new DhDebugWidget;
                 widget->setAttribute (Qt::WA_DeleteOnClose);
                 widget->show ();
               }
+              break;
 #endif
             default:
               break;
             }
         });
   connect (tabWidget, &QTabWidget::tabCloseRequested, this,
-           [&] (int index)
+           [this] (int index)
              {
-               if (tabWidget->widget (index) != ManageRegionUI::instance ())
+               if (!isPersistentPage (tabWidget->widget (index)))
                  {
                    auto widget = tabWidget->widget (index);
                    widget->close ();
@@ -977,6 +1086,15 @@ MainWindow::MainWindow (QWidget *parent) : QMainWindow (parent)
              });
   connect (tabWidget, &QTabWidget::tabBarDoubleClicked, this,
            &MainWindow::tearOffTab);
+  connect (tabWidget, &QTabWidget::currentChanged, this,
+           [this]
+             {
+               if (tabWidget->count () == 1
+                   && splitter->widget (1) != tabWidget)
+                 splitter->replaceWidget (1, tabWidget);
+               else if (tabWidget->count () == 0)
+                 splitter->replaceWidget (1, welcomeWidget);
+             });
 
   /* The core opened the configuration before the window existed; show what it
    * had to say, and follow later changes. */
@@ -992,6 +1110,26 @@ MainWindow::MainWindow (QWidget *parent) : QMainWindow (parent)
                [this] (Qt::ApplicationState) { updateNotificationGate (); });
       updateNotificationGate ();
     }
+}
+
+void
+MainWindow::openExternalNbtReader ()
+{
+  auto enui = new ExternalNbtReaderUI ();
+  auto tabIndex = tabWidget->addTab (enui, _ ("NBT Reader"));
+  tabWidget->setCurrentIndex (tabIndex);
+}
+
+void
+MainWindow::openProgramDirectories ()
+{
+  /* One page, reused: an already open tab is brought to the front instead of a
+   * second copy of the same listing being added. */
+  if (!directoriesPage)
+    directoriesPage = new DhDirectoryUI ();
+  /* The files may have changed while the page was hidden or torn off. */
+  directoriesPage->refresh ();
+  ensureTab (directoriesPage, _ ("Program Directories"));
 }
 
 void
@@ -1321,8 +1459,8 @@ MainWindow::tearOffTab (int index)
   tabWidget->removeTab (index);
 
   /* A reader with a running download stops it from its close handling, so let
-   * closing the window delete it; the singleton has to survive instead. */
-  if (page != ManageRegionUI::instance ())
+   * closing the window delete it; a persistent page has to survive instead. */
+  if (!isPersistentPage (page))
     page->setAttribute (Qt::WA_DeleteOnClose);
   else
     page->setAttribute (Qt::WA_DeleteOnClose, false);
@@ -1462,8 +1600,9 @@ MainWindow::eventFilter (QObject *object, QEvent *event)
     }
 
   /* Closing a torn-off window. A normal page is discarded, as closing its tab
-   * would be; the singleton is brought back as a tab instead, so it is never
-   * lost. Skipped while the main window closes, when these close with it. */
+   * would be; a persistent page is brought back as a tab instead, so it is
+   * never lost. Skipped while the main window closes, when these close with
+   * it. */
   if (!closing)
     {
       if (auto *window = qobject_cast<QWidget *> (object);
@@ -1473,7 +1612,7 @@ MainWindow::eventFilter (QObject *object, QEvent *event)
           if (page && indexOfFloating (page) >= 0)
             {
               event->ignore ();
-              if (page == ManageRegionUI::instance ())
+              if (isPersistentPage (page))
                 dockBackPage (page);
               else
                 discardFloatingPage (page);

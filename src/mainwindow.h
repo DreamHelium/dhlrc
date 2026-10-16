@@ -2,6 +2,7 @@
 #define DHLRC_DEBUGLOADINGUI_H
 
 #include <QHash>
+#include <QLabel>
 #include <QListView>
 #include <QMainWindow>
 #include <QPointer>
@@ -11,6 +12,7 @@
 #include <QTabWidget>
 #include <QVBoxLayout>
 #include <QWidget>
+#include <qboxlayout.h>
 #include <qevent.h>
 #include <qscrollarea.h>
 
@@ -18,6 +20,7 @@
 
 class KMessageWidget;
 class DhSettingsDialog;
+class DhDirectoryUI;
 
 class MainWindow : public QMainWindow
 {
@@ -51,12 +54,18 @@ private:
   QStandardItemModel *model;
   QAction *actionSearch;
   QVBoxLayout *topLayout;
+  QWidget *welcomeWidget;
+  QVBoxLayout *tabLayout;
   /* One message row per notification event, reused so repeated changes to the
    * same thing (for example a file saved several times) update one row instead
    * of piling up a new one each time. Owned by the top area. */
   QHash<QString, KMessageWidget *> notificationWidgets;
   /* Owned by Qt (parented to this); shown from the menu. */
   DhSettingsDialog *settingsDialog = nullptr;
+  /* The one program-directories page, owned by the tab stack once it is added.
+   * A guarded pointer, so a torn-off page that is closed for good leaves this
+   * empty instead of dangling. */
+  QPointer<DhDirectoryUI> directoriesPage;
 
 public Q_SLOTS:
   void tryShrinkTopWidget ();
@@ -106,6 +115,12 @@ private:
   /* Brings `page` to the front, whether it is already a tab or is floating in
    * its own window. Returns its tab index. */
   int ensureTab (QWidget *page, const QString &title);
+
+  void openExternalNbtReader ();
+  /* Brings the program-directories page to the front, creating it on first
+   * use. It is one page kept for the life of the window, so its tab shows the
+   * same view again when it is reopened. */
+  void openProgramDirectories ();
 
   /* A page torn off into a window of its own.
    *

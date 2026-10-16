@@ -60,6 +60,10 @@ fn region(blocks: &[((i32, i32, i32), usize)], palette_array: Vec<Palette>) -> R
         block_entity_array: Vec::new(),
         entity_array: Vec::new(),
         palette_array,
+        biome_array: Vec::new(),
+        biome_palette_array: Vec::new(),
+        format_data: None,
+        format_version: 0,
     }
 }
 

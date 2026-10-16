@@ -17,7 +17,7 @@ use crate::region;
 use dhlrc_core::config::{Config, default_paths, load_or_create};
 use dhlrc_core::download::{Downloader, Never, Sink};
 use dhlrc_render::camera::Camera;
-use dhlrc_render::{Image, build_scene, render};
+use dhlrc_render::{Highlight, Image, build_scene, render};
 use dhlrc_resource::{ResourceEnvironment, ResourceSet, ZipSource};
 use formatx::formatx;
 use std::path::PathBuf;
@@ -58,7 +58,22 @@ fn draw(args: &RenderArgs) -> Result<(), String> {
 
     let set = resource_set(args, voxels.data_version())?;
 
-    let scene = build_scene(&set, &voxels);    for skipped in &scene.skipped {
+    let mut scene = build_scene(&set, &voxels);
+    if let Some(cell) = &args.highlight {
+        let cell = highlight_cell(cell)?;
+        /* The box the block is drawn in, so a slab comes out half a cell; the
+         * whole cell is the answer when the block drew nothing. */
+        let boxed = scene.block_box(cell).unwrap_or(Highlight {
+            min: [cell[0] as f32, cell[1] as f32, cell[2] as f32],
+            max: [
+                cell[0] as f32 + 1.0,
+                cell[1] as f32 + 1.0,
+                cell[2] as f32 + 1.0,
+            ],
+        });
+        scene.set_highlight(Some(boxed));
+    }
+    for skipped in &scene.skipped {
         eprintln!("dhlrc-tui: {skipped}");
     }
 
@@ -260,6 +275,21 @@ fn output_path(args: &RenderArgs) -> PathBuf {
     }
 }
 
+/// `X,Y,Z`, as `--highlight` spells it.
+fn highlight_cell(text: &str) -> Result<[i32; 3], String> {
+    let parts: Vec<&str> = text.split(',').map(str::trim).collect();
+    if parts.len() != 3 {
+        return Err(format!("{text} is not a block coordinate; write it as X,Y,Z"));
+    }
+    let mut cell = [0i32; 3];
+    for (index, part) in parts.iter().enumerate() {
+        cell[index] = part
+            .parse()
+            .map_err(|_| format!("{part} is not a whole number"))?;
+    }
+    Ok(cell)
+}
+
 /// `WxH`, as `--size` spells it.
 fn parse_size(value: &str) -> Result<(u32, u32), String> {
     let (width, height) = value
@@ -318,6 +348,7 @@ mod tests {
             pitch: None,
             distance: None,
             ortho: false,
+            highlight: None,
             background: None,
             region_dir: None,
             load_dir: None,

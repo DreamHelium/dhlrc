@@ -94,6 +94,11 @@ pub struct RenderArgs {
     #[arg(long)]
     pub ortho: bool,
 
+    /// Put the block outline around the block at this region coordinate, the
+    /// way the Qt view highlights the block the mouse is over (`X,Y,Z`).
+    #[arg(long, value_name = "X,Y,Z")]
+    pub highlight: Option<String>,
+
     /// A flat colour (`rrggbb`, with or without a leading `#`) to put behind
     /// the blocks. Without it the PNG keeps its transparent background.
     #[arg(long, value_name = "RRGGBB")]

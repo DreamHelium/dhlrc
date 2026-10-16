@@ -93,7 +93,7 @@ Run `./build-msys2.sh --help` for the other options (`--debug`, `--no-gui`,
 
 ## Features
 
-- NBT and Litematica support.
+- NBT, Litematica and Sponge schematic (`.schem`) support.
 - Modify base data of the region.
 - A 3D preview that draws a region from its block models and textures, with
   turning, zooming and block picking (see the [developer document](dev-doc/render.md)).
@@ -102,6 +102,12 @@ Run `./build-msys2.sh --help` for the other options (`--debug`, `--no-gui`,
 ## Usage
 
 Just run `dhlrc_qt`, and the Qt backend will start unless you are using Linux tty.
+
+A short guide is built into the programme: open `Help -> Help` for the quick
+start (also in `resources/usage.md`, with the Chinese translation next to it in
+`resources/usage.zh_CN.md`). The `Program Directories` entry in the left sidebar
+shows the folders the programme uses — check the configuration and cache folders
+there before uninstalling.
 
 tty support might be planned.
 

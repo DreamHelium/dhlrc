@@ -87,9 +87,8 @@ extern "C"
     int32_t limit_unit; /* a DhlrcUnit */
     int64_t elapsed_milliseconds;
     bool select_all_regions_in_loading;
-    bool loading_file_by_extension;
+    /* Try the other modules when the one the file extension points at fails. */
     bool fail_then_retry;
-    bool strict_nbt_encoding;
     bool fail_download_use_cache;
     int32_t default_show_option; /* a DhlrcShowOption */
     bool override_setting;
@@ -161,6 +160,8 @@ extern "C"
     int32_t encoding; /* required NBT encoding, region modules only:
                          0 any, 1 big-endian, 2 little-endian,
                          3 network little-endian */
+    int32_t compression; /* how the format's files are compressed:
+                            0 any/unsaid, 1 gzip, 2 zlib, 3 uncompressed */
   };
 
   /* Opens the plugins next to the executable (`region_module/`,

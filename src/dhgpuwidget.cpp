@@ -76,12 +76,18 @@ DhGpuWidget::~DhGpuWidget ()
         glDeleteVertexArrays (1, &vao);
       if (vbo != 0)
         glDeleteBuffers (1, &vbo);
+      if (highlightVao != 0)
+        glDeleteVertexArrays (1, &highlightVao);
+      if (highlightVbo != 0)
+        glDeleteBuffers (1, &highlightVbo);
       if (program != 0)
         glDeleteProgram (program);
       if (textures.empty () && solidBatches.empty ())
         {
           vao = 0;
           vbo = 0;
+          highlightVao = 0;
+          highlightVbo = 0;
           program = 0;
         }
       doneCurrent ();
@@ -139,8 +145,10 @@ DhGpuWidget::setScene (const DhlrcScene *value)
     return;
   scene = value;
   /* The old scene's GL objects are dropped on the next frame, where the
-   * context is current; only the reference changes here. */
+   * context is current; only the reference changes here. A new scene carries
+   * no highlight, so the outline's buffer is read again too. */
   sceneDirty = true;
+  highlightDirty = true;
   update ();
 }
 
@@ -149,6 +157,13 @@ DhGpuWidget::setCamera (const DhlrcCamera &value)
 {
   camera = value;
   cameraSet = true;
+  update ();
+}
+
+void
+DhGpuWidget::highlightChanged ()
+{
+  highlightDirty = true;
   update ();
 }
 
@@ -181,6 +196,27 @@ DhGpuWidget::initializeGL ()
   glBindVertexArray (vao);
   glGenBuffers (1, &vbo);
   glBindBuffer (GL_ARRAY_BUFFER, vbo);
+  bindQuadLayout ();
+
+  /* The outline gets its own vertex array and buffer: a hover then rewrites a
+   * few kilobytes instead of the whole scene. */
+  glGenVertexArrays (1, &highlightVao);
+  glBindVertexArray (highlightVao);
+  glGenBuffers (1, &highlightVbo);
+  glBindBuffer (GL_ARRAY_BUFFER, highlightVbo);
+  bindQuadLayout ();
+  glBindVertexArray (0);
+  glBindBuffer (GL_ARRAY_BUFFER, 0);
+
+  glUseProgram (program);
+  glUniform1i (textureLocation, 0);
+  glUseProgram (0);
+  glReady = true;
+}
+
+void
+DhGpuWidget::bindQuadLayout ()
+{
   /* position (3), uv (2), tint (3), light (1) */
   const GLsizei stride = 9 * sizeof (float);
   glEnableVertexAttribArray (0);
@@ -194,12 +230,6 @@ DhGpuWidget::initializeGL ()
   glEnableVertexAttribArray (3);
   glVertexAttribPointer (3, 1, GL_FLOAT, GL_FALSE, stride,
                          reinterpret_cast<const void *> (8 * sizeof (float)));
-  glBindVertexArray (0);
-
-  glUseProgram (program);
-  glUniform1i (textureLocation, 0);
-  glUseProgram (0);
-  glReady = true;
 }
 
 void
@@ -230,6 +260,9 @@ DhGpuWidget::paintGL ()
       Q_EMIT frameDrawn (false);
       return;
     }
+  /* Read the outline only when it changed, which is what a hover does. */
+  if (highlightDirty)
+    rebuildHighlight ();
 
   glEnable (GL_DEPTH_TEST);
   glDepthFunc (GL_LESS);
@@ -243,7 +276,8 @@ DhGpuWidget::paintGL ()
   glBlendFuncSeparate (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE,
                        GL_ONE_MINUS_SRC_ALPHA);
 
-  if (!solidBatches.empty () || !blendedBatches.empty ())
+  const bool hasScene = !solidBatches.empty () || !blendedBatches.empty ();
+  if (hasScene || highlightVertices > 0)
     {
       float matrix[16] = { 0 };
       dhlrc_render_matrix (scene, &camera,
@@ -252,10 +286,25 @@ DhGpuWidget::paintGL ()
       glUseProgram (program);
       glUniformMatrix4fv (mvpLocation, 1, GL_FALSE, matrix);
       glActiveTexture (GL_TEXTURE0);
-      glBindVertexArray (vao);
-      drawBatches (solidBatches);
-      drawBatches (blendedBatches);
+      if (hasScene)
+        {
+          glBindVertexArray (vao);
+          drawBatches (solidBatches);
+          drawBatches (blendedBatches);
+        }
+      if (highlightVertices > 0 && !textures.empty ())
+        {
+          /* The outline's quads are ordinary quads: the shared shader with the
+           * scene's own black tint draws them. They go last, so where they lie
+           * on the face they trace they win the depth test, exactly as the
+           * rasteriser draws them. */
+          glBindVertexArray (highlightVao);
+          glBindTexture (GL_TEXTURE_2D, textures[0]);
+          glUniform1i (cutoutLocation, 0);
+          glDrawArrays (GL_TRIANGLES, 0, highlightVertices);
+        }
       glBindVertexArray (0);
+      glBindTexture (GL_TEXTURE_2D, 0);
       glUseProgram (0);
     }
 
@@ -418,6 +467,48 @@ DhGpuWidget::rebuildScene ()
 }
 
 void
+DhGpuWidget::rebuildHighlight ()
+{
+  highlightDirty = false;
+  highlightVertices = 0;
+  if (scene == nullptr || highlightVbo == 0)
+    return;
+
+  /* The outline's quads come out of the scene in the same shape as its own,
+   * so they are unpacked exactly as `rebuildScene ()` unpacks the scene. */
+  const size_t count = dhlrc_render_scene_highlight_count (scene);
+  std::vector<float> vertices;
+  vertices.reserve (count * 6 * 9);
+  const int corners[6] = { 0, 1, 2, 0, 2, 3 };
+  for (size_t index = 0; index < count; ++index)
+    {
+      DhlrcQuad quad{};
+      if (dhlrc_render_scene_highlight_quad (scene, index, &quad) == 0)
+        continue;
+      for (int corner : corners)
+        {
+          const float *position = quad.positions[corner];
+          vertices.push_back (position[0]);
+          vertices.push_back (position[1]);
+          vertices.push_back (position[2]);
+          vertices.push_back (quad.uv[corner][0]);
+          vertices.push_back (quad.uv[corner][1]);
+          vertices.push_back (quad.tint[0]);
+          vertices.push_back (quad.tint[1]);
+          vertices.push_back (quad.tint[2]);
+          vertices.push_back (quad.light);
+        }
+    }
+  highlightVertices = static_cast<int> (vertices.size () / 9);
+
+  glBindBuffer (GL_ARRAY_BUFFER, highlightVbo);
+  glBufferData (GL_ARRAY_BUFFER,
+                static_cast<GLsizeiptr> (vertices.size () * sizeof (float)),
+                vertices.empty () ? nullptr : vertices.data (), GL_DYNAMIC_DRAW);
+  glBindBuffer (GL_ARRAY_BUFFER, 0);
+}
+
+void
 DhGpuWidget::drawBatches (const std::vector<Batch> &batches)
 {
   for (const Batch &batch : batches)
@@ -447,6 +538,9 @@ DhGpuWidget::releaseScene ()
   textures.clear ();
   solidBatches.clear ();
   blendedBatches.clear ();
+  /* The highlight's buffer is rebuilt against whatever scene is set next. */
+  highlightDirty = true;
+  highlightVertices = 0;
 }
 
 #else /* DH_HAVE_OPENGL */
@@ -466,6 +560,9 @@ DhGpuWidget::setScene (const DhlrcScene *) {}
 
 void
 DhGpuWidget::setCamera (const DhlrcCamera &) {}
+
+void
+DhGpuWidget::highlightChanged () {}
 
 bool
 DhGpuWidget::drew () const

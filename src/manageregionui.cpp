@@ -33,6 +33,7 @@
 std::vector<ModuleBase *> ManageRegionUI::moduleBaseList = {};
 QList<LoadObjectBase> ManageRegionUI::loadObjectList = {};
 std::vector<std::shared_ptr<RegionClass>> ManageRegionUI::regions = {};
+std::mutex ManageRegionUI::regionsMutex = {};
 QPointer<ManageRegionUI> ManageRegionUI::mrui = nullptr;
 
 ModuleBase::~ModuleBase () = default;
@@ -127,6 +128,7 @@ ModuleBase::fromIndex (std::size_t index)
       module->baseTypeString = text (info.base_type);
       module->filterString = text (info.filter);
       module->encodingValue = info.encoding;
+      module->compressionValue = info.compression;
     }
   else
     {
@@ -197,26 +199,7 @@ ManageRegionUI::ManageRegionUI (QWidget *parent) : DhWidget (parent)
   layout->addWidget (scrollArea);
 
   connect (addButton, &QPushButton::clicked, this,
-           [&]
-             {
-               QStringList filters;
-               for (auto *module : moduleBaseList)
-                 {
-                   auto filter = module->filter ();
-                   if (!filter.isEmpty ())
-                     filters << filter;
-                 }
-               auto dirs = QFileDialog::getOpenFileNames (
-                   this, _ ("Select Files"), nullptr, filters.join (";;"));
-               if (dirs.isEmpty ())
-                 QMessageBox::critical (this, _ ("Error!"),
-                                        _ ("No file selected!"));
-               else
-                 {
-                   auto job = new DhAllLoadJob (dirs);
-                   job->start ();
-                 }
-             });
+           [&] { addFilesToRegions (this); });
   connect (selectButton, &QCheckBox::clicked, this,
            [this] { setSelectionMode (selectButton->isChecked ()); });
   connect (selectAllButton, &QPushButton::clicked, this,
@@ -248,6 +231,27 @@ ManageRegionUI::ManageRegionUI (QWidget *parent) : DhWidget (parent)
              });
   connect (saveSelectedButton, &QPushButton::clicked, this,
            [this] { save (checkedIndexes ()); });
+}
+
+void
+ManageRegionUI::addFilesToRegions (QWidget *parent)
+{
+  QStringList filters;
+  for (auto *module : moduleBaseList)
+    {
+      auto filter = module->filter ();
+      if (!filter.isEmpty ())
+        filters << filter;
+    }
+  auto dirs = QFileDialog::getOpenFileNames (parent, _ ("Select Files"),
+                                             nullptr, filters.join (";;"));
+  if (dirs.isEmpty ())
+    QMessageBox::critical (parent, _ ("Error!"), _ ("No file selected!"));
+  else
+    {
+      auto job = new DhAllLoadJob (dirs);
+      job->start ();
+    }
 }
 
 void
@@ -326,6 +330,7 @@ ManageRegionUI::removeRegions (const QList<int> &indexes)
       auto region = getRegion (index);
       if (!region || region->locked ())
         continue;
+      const std::lock_guard lock (regionsMutex);
       regions.erase (regions.begin () + index);
       removed++;
     }
@@ -439,6 +444,7 @@ ManageRegionUI::getRegionNames ()
 std::shared_ptr<RegionClass>
 ManageRegionUI::getRegion (qsizetype index)
 {
+  const std::lock_guard lock (regionsMutex);
   if (index < 0 || static_cast<qsizetype> (regions.size ()) <= index)
     return nullptr;
   return regions[index];
@@ -447,6 +453,10 @@ ManageRegionUI::getRegion (qsizetype index)
 void
 ManageRegionUI::appendRegion (void *region, const QString &displayName)
 {
+  /* Called from a loading job's worker thread, so the vector is never touched
+   * without the lock: the GUI thread walks it to rebuild the rows as soon as
+   * another file of the same batch finishes. */
+  const std::lock_guard lock (regionsMutex);
   regions.emplace_back (std::make_shared<RegionClass> (
       region, displayName,
       QUuid::createUuid ().toString (QUuid::WithoutBraces),
@@ -456,12 +466,14 @@ ManageRegionUI::appendRegion (void *region, const QString &displayName)
 qsizetype
 ManageRegionUI::regionNum ()
 {
+  const std::lock_guard lock (regionsMutex);
   return regions.size ();
 }
 
-std::vector<std::shared_ptr<RegionClass>> &
+std::vector<std::shared_ptr<RegionClass>>
 ManageRegionUI::getRegions ()
 {
+  const std::lock_guard lock (regionsMutex);
   return regions;
 }
 
@@ -610,8 +622,12 @@ ManageRegionUI::refresh_triggered ()
     delete widget;
   itemFrames.clear ();
 
+  /* A copy taken under the lock: a loading job may append a region from its
+   * worker thread while the rows are being rebuilt, and appending to the vector
+   * this loop is walking would invalidate it under our feet. */
+  const auto snapshot = getRegions ();
   int i = 0;
-  for (auto &region : regions)
+  for (const auto &region : snapshot)
     {
       auto frame = new ItemFrame (region.get (), i, this);
       if (region->locked ())

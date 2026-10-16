@@ -144,28 +144,32 @@ impl Renderer {
     /// the order they are drawn, and that order has to be the one the
     /// single-threaded fill used. A chunk is kept large — preparing a quad is a
     /// handful of multiplies, so a small one would be all dispatch.
+    ///
+    /// The highlight's outline goes last, so that where it lands on the very
+    /// same depth as a face it wins — it is the thing the view is pointing at.
     fn prepare_quads(&mut self, scene: &Scene, matrix: &Mat4, eye: Vec3, width: u32, height: u32) {
-        let chunk = scene
-            .quads
-            .len()
-            .div_ceil(workers() * 4)
-            .max(64);
-        let mut prepared: Vec<Vec<Triangle>> = (0..scene.quads.len().div_ceil(chunk))
-            .map(|_| Vec::new())
-            .collect();
-        thread::scope(|scope| {
-            for (out, quads) in prepared.iter_mut().zip(scene.quads.chunks(chunk)) {
-                scope.spawn(move || {
-                    out.reserve(quads.len() * 2);
-                    for quad in quads {
-                        prepare(quad, matrix, eye, width, height, out);
-                    }
-                });
-            }
-        });
         self.triangles.clear();
-        for mut chunk in prepared {
-            self.triangles.append(&mut chunk);
+        for quads in [&scene.quads, &scene.highlight] {
+            if quads.is_empty() {
+                continue;
+            }
+            let chunk = quads.len().div_ceil(workers() * 4).max(64);
+            let mut prepared: Vec<Vec<Triangle>> = (0..quads.len().div_ceil(chunk))
+                .map(|_| Vec::new())
+                .collect();
+            thread::scope(|scope| {
+                for (out, quads) in prepared.iter_mut().zip(quads.chunks(chunk)) {
+                    scope.spawn(move || {
+                        out.reserve(quads.len() * 2);
+                        for quad in quads {
+                            prepare(quad, matrix, eye, width, height, out);
+                        }
+                    });
+                }
+            });
+            for mut chunk in prepared {
+                self.triangles.append(&mut chunk);
+            }
         }
     }
 }
@@ -551,6 +555,7 @@ mod tests {
             min: [0.0; 3],
             max: [1.0; 3],
             skipped: Vec::new(),
+            highlight: Vec::new(),
         }
     }
 
@@ -581,6 +586,7 @@ mod tests {
             min: [-8.0; 3],
             max: [8.0; 3],
             skipped: Vec::new(),
+            highlight: Vec::new(),
         }
     }
 
@@ -665,6 +671,33 @@ mod tests {
     /// A band owns whole rows, and a pixel is only ever touched by triangles
     /// that cover it, so cutting the picture into bands — any number of rows
     /// each, and at any row — must reproduce the whole-picture fill exactly.
+    #[test]
+    fn the_highlight_outline_is_drawn_over_the_scene() {
+        use crate::scene::Highlight;
+
+        let mut scene = scene(vec![quad(0.0, 0, Alpha::Opaque, None)], [200, 60, 60, 255]);
+        let plain = render(&scene, &camera(), 64, 64);
+        scene.set_highlight(Some(Highlight {
+            min: [0.0, 0.0, 0.0],
+            max: [1.0, 1.0, 0.0],
+        }));
+        let marked = render(&scene, &camera(), 64, 64);
+
+        assert_ne!(plain.pixels, marked.pixels, "the outline has to be visible");
+        /* The outline is black; the face under it is red, so the picture now
+         * holds pixels that are neither. */
+        let black = marked
+            .pixels
+            .chunks(4)
+            .filter(|pixel| pixel[0] < 60 && pixel[1] < 60 && pixel[2] < 60)
+            .count();
+        assert!(black > 20, "only {black} outline pixels came out");
+
+        /* Clearing it gives the plain picture back. */
+        scene.set_highlight(None);
+        assert_eq!(render(&scene, &camera(), 64, 64).pixels, plain.pixels);
+    }
+
     #[test]
     fn bands_draw_exactly_what_one_pass_draws() {
         let cases = [

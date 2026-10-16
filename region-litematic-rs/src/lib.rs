@@ -54,6 +54,13 @@ pub extern "C" fn region_nbt_encoding() -> i32 {
     1
 }
 
+/* The specification these formats follow gzips the NBT. Declared so the
+ * loader can say when a file turned out to be compressed another way. */
+#[unsafe(no_mangle)]
+pub extern "C" fn region_compression() -> i32 {
+    1
+}
+
 #[unsafe(no_mangle)]
 pub extern "C" fn region_file_type() -> *const c_char {
     string_to_ptr_fail_to_null(&gettext_text(i18n("Litematic File (*.litematic)")))

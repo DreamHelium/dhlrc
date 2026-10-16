@@ -52,12 +52,33 @@ extern "C"
                                                          size_t index,
                                                          const char *name,
                                                          const char *data);
+  /* Assigns the given (name, data) pairs to a single block: its palette entry
+   * is copied, changed and only that block is pointed at the copy. Returns
+   * nullptr on success or an error message (free it with string_free ()). */
+  const char *region_set_block_properties (void *region, size_t index,
+                                           const char *const *names,
+                                           const char *const *datas,
+                                           size_t count, uint32_t *out_id);
 
   typedef void (*ProgressFunc) (void *, int, const char *, const char *);
   typedef void HelperStruct;
   typedef void VecU8;
+  /* How a file is (or should be) compressed. Kept in sync with the
+   * `OBJECT_COMPRESSION_*` constants in `region-rs` and the `region_compression
+   * ()` a region plugin may export. */
+  enum ObjectCompression
+  {
+    ObjectCompressionAny = 0,
+    ObjectCompressionGZip = 1,
+    ObjectCompressionZLib = 2,
+    ObjectCompressionNone = 3,
+  };
+  /* Reads and decompresses a file. `compression` receives how the file turned
+   * out to be compressed (an `ObjectCompression` value), so a caller can say
+   * when that is not what the format wanted; it may be nullptr. */
   VecU8 *file_try_uncompress (const char *filename,
-                              HelperStruct *helper_struct, int *failed);
+                              HelperStruct *helper_struct, int *failed,
+                              int *compression);
   void vec_free (VecU8 *vec);
   char *vec_to_cstr (void *vec);
   const void *cancel_flag_new ();

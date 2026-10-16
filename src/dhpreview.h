@@ -24,6 +24,10 @@ struct DhPreviewOptions
   /* The camera's angles in degrees; empty keeps the 3D view's own first view. */
   QString yaw;
   QString pitch;
+  /* `X,Y`, one picture pixel whose block is highlighted, or empty for none.
+   * The block's info text — what the tooltip would show — is printed on
+   * stderr, which is how the hover path is checked without a mouse. */
+  QString hover;
   /* Where the resources come from: a client jar to read the block models and
    * textures from (`--jar`), the cache directory to look in (`--resources`),
    * and the version id whose client jar to use (`--version`). Empty means what

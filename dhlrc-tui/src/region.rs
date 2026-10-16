@@ -231,7 +231,11 @@ impl RegionLib {
         let name = CString::new(file.to_string_lossy().as_bytes())
             .map_err(|_| Error::new(format!("{} holds a NUL byte", file.display())))?;
         let mut failed: c_int = 0;
-        let pointer = unsafe { (self.file_try_uncompress)(name.as_ptr(), helper, &mut failed) };
+        /* The compression the file turned out to have is not used here. */
+        let mut compression: c_int = 0;
+        let pointer = unsafe {
+            (self.file_try_uncompress)(name.as_ptr(), helper, &mut failed, &mut compression)
+        };
         if pointer.is_null() {
             return Err(Error::new(format!("{} could not be read", file.display())));
         }
@@ -704,8 +708,12 @@ fn open_process_wide(path: &Path) -> std::result::Result<Library, libloading::Er
     unsafe { Library::new(path) }
 }
 
-type FileTryUncompress =
-    unsafe extern "C" fn(*const c_char, *mut c_void, *mut c_int) -> *mut c_void;
+type FileTryUncompress = unsafe extern "C" fn(
+    *const c_char,
+    *mut c_void,
+    *mut c_int,
+    *mut c_int,
+) -> *mut c_void;
 type VecFree = unsafe extern "C" fn(*mut c_void);
 type VecToCStr = unsafe extern "C" fn(*mut c_void) -> *mut c_char;
 type StringFree = unsafe extern "C" fn(*mut c_char);

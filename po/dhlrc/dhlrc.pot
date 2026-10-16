@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-16 00:21+0800\n"
+"POT-Creation-Date: 2026-10-16 23:58+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -55,23 +55,23 @@ msgstr ""
 msgid "Palette"
 msgstr ""
 
-#: ../../src/blockreaderui.cpp:113
+#: ../../src/blockreaderui.cpp:114
 msgid "Select an Index"
 msgstr ""
 
-#: ../../src/blockreaderui.cpp:113
+#: ../../src/blockreaderui.cpp:114
 msgid "Please select an index."
 msgstr ""
 
-#: ../../src/blockreaderui.cpp:130
+#: ../../src/blockreaderui.cpp:131
 msgid "Region Modifier"
 msgstr ""
 
-#: ../../src/blockreaderui.cpp:193
+#: ../../src/blockreaderui.cpp:194
 msgid "Not valid!"
 msgstr ""
 
-#: ../../src/blockreaderui.cpp:208
+#: ../../src/blockreaderui.cpp:209
 msgid ""
 "Name: %1\n"
 "Translation Name: %2\n"
@@ -80,7 +80,7 @@ msgid ""
 "Properties:\n"
 msgstr ""
 
-#: ../../src/blockreaderui.cpp:221
+#: ../../src/blockreaderui.cpp:222
 msgid ""
 "Name: %1\n"
 "Index: %2\n"
@@ -88,30 +88,30 @@ msgid ""
 "Properties:\n"
 msgstr ""
 
-#: ../../src/blockreaderui.cpp:260
+#: ../../src/blockreaderui.cpp:261
 msgid "With DataVersion %4, version %5."
 msgstr ""
 
-#: ../../src/blockreaderui.cpp:262
+#: ../../src/blockreaderui.cpp:263
 msgid "Created time: %6, Modified time: %7, Author: %8, Name: %9"
 msgstr ""
 
-#: ../../src/blockreaderui.cpp:264
+#: ../../src/blockreaderui.cpp:265
 msgid "Description: %10"
 msgstr ""
 
-#: ../../src/blockreaderui.cpp:267 ../../src/regionmodifyui.cpp:72
+#: ../../src/blockreaderui.cpp:268 ../../src/regionmodifyui.cpp:72
 msgid "Unknown"
 msgstr ""
 
-#: ../../src/blockreaderui.cpp:299 ../../src/externalnbtreaderui.cpp:109
-#: ../../src/manageregionui.cpp:212 ../../src/manageregionui.cpp:550
-#: ../../src/regionmodifyui.cpp:13 ../../src/utility.cpp:24
-#: ../../src/utility.cpp:45 ../../src/utility.cpp:53
+#: ../../src/blockreaderui.cpp:300 ../../src/externalnbtreaderui.cpp:109
+#: ../../src/manageregionui.cpp:249 ../../src/manageregionui.cpp:562
+#: ../../src/propertymodifyui.cpp:89 ../../src/regionmodifyui.cpp:13
+#: ../../src/utility.cpp:51 ../../src/utility.cpp:72 ../../src/utility.cpp:80
 msgid "Error!"
 msgstr ""
 
-#: ../../src/blockreaderui.cpp:300 ../../common-rs/src/util.rs:45
+#: ../../src/blockreaderui.cpp:301 ../../common-rs/src/util.rs:45
 msgid "Out of memory!"
 msgstr ""
 
@@ -120,7 +120,7 @@ msgid "The block is in (%1, %2, %3), information is:\n"
 msgstr ""
 
 #: ../../src/blockshowui.cpp:80 ../../src/generalchoosedialog.cpp:45 rc.cpp:105
-#: rc.cpp:165
+#: rc.cpp:168
 msgid "&OK"
 msgstr ""
 
@@ -132,7 +132,7 @@ msgstr ""
 msgid "&Modify Property"
 msgstr ""
 
-#: ../../src/blockshowui.cpp:100 ../../src/manageregionui.cpp:245
+#: ../../src/blockshowui.cpp:100 ../../src/manageregionui.cpp:228
 msgid "Warning!"
 msgstr ""
 
@@ -152,7 +152,7 @@ msgstr ""
 msgid "&Continue"
 msgstr ""
 
-#: ../../src/configobjectui.cpp:125 ../../src/dhrenderui.cpp:164
+#: ../../src/configobjectui.cpp:125 ../../src/dhrenderui.cpp:175
 #: ../../src/generalchoosedialog.cpp:46
 msgid "&Cancel"
 msgstr ""
@@ -161,7 +161,7 @@ msgstr ""
 msgid "About dhlrc"
 msgstr ""
 
-#: ../../src/dhaboutui.cpp:56 ../../src/main.cpp:37
+#: ../../src/dhaboutui.cpp:56 ../../src/main.cpp:36
 msgid "Minecraft Structure Modifier"
 msgstr ""
 
@@ -177,14 +177,125 @@ msgstr ""
 msgid "Loaded load modules:"
 msgstr ""
 
-#: ../../src/dhhelpui.cpp:49
-msgid ""
-"test\n"
-"\n"
-"![test_svg](:/cn/dh/dhlrc/show.svg)"
+#: ../../src/dhdirectoryui.cpp:51
+msgid "%1 item(s)"
 msgstr ""
 
-#: ../../src/dhloadjob.cpp:26 ../../src/dhloadjob.cpp:410
+#: ../../src/dhdirectoryui.cpp:87 ../../src/dhdirectoryui.cpp:278
+#: ../../src/mainwindow.cpp:817 ../../src/mainwindow.cpp:859
+#: ../../src/mainwindow.cpp:1132
+msgid "Program Directories"
+msgstr ""
+
+#: ../../src/dhdirectoryui.cpp:95
+msgid ""
+"It is the developer's job to let you know what the program is doing, so here "
+"are the directories the program uses and the files in them. If you need to "
+"uninstall the program, please check these directories, because they may not "
+"be removed automatically."
+msgstr ""
+
+#: ../../src/dhdirectoryui.cpp:104
+msgid "Double-click a directory to open it in the file manager."
+msgstr ""
+
+#: ../../src/dhdirectoryui.cpp:111 ../../src/paletteaddui.cpp:68
+#: ../../dhlrc-core/src/schema.rs:71
+msgid "Name"
+msgstr ""
+
+#: ../../src/dhdirectoryui.cpp:111
+msgid "Size"
+msgstr ""
+
+#: ../../src/dhdirectoryui.cpp:111
+msgid "Path"
+msgstr ""
+
+#: ../../src/dhdirectoryui.cpp:132 ../../src/dhdirectoryui.cpp:160
+msgid "Open"
+msgstr ""
+
+#: ../../src/dhdirectoryui.cpp:133
+msgid "Refresh"
+msgstr ""
+
+#: ../../src/dhdirectoryui.cpp:161
+msgid "Copy Path"
+msgstr ""
+
+#: ../../src/dhdirectoryui.cpp:212
+msgid "(does not exist yet)"
+msgstr ""
+
+#: ../../src/dhdirectoryui.cpp:217
+msgid "(not a directory)"
+msgstr ""
+
+#: ../../src/dhdirectoryui.cpp:224
+msgid "(cannot be read)"
+msgstr ""
+
+#: ../../src/dhdirectoryui.cpp:234
+msgid "(empty)"
+msgstr ""
+
+#: ../../src/dhdirectoryui.cpp:279
+msgid "Could not open %1."
+msgstr ""
+
+#: ../../src/dhdirectoryui.cpp:330
+msgid "Program"
+msgstr ""
+
+#: ../../src/dhdirectoryui.cpp:331
+msgid ""
+"The program itself, its libraries, its plugins (region_module/ and "
+"load_module/) and its translations (locale/)."
+msgstr ""
+
+#: ../../src/dhdirectoryui.cpp:333
+msgid "Configuration"
+msgstr ""
+
+#: ../../src/dhdirectoryui.cpp:334
+msgid ""
+"config.toml, which holds every setting, and anything else the program writes "
+"next to it."
+msgstr ""
+
+#: ../../src/dhdirectoryui.cpp:337
+msgid "Cache"
+msgstr ""
+
+#: ../../src/dhdirectoryui.cpp:338
+msgid ""
+"Downloaded client jars (client_jar/), resource packs and the resources read "
+"from them. Deleting this directory is harmless: the program downloads what "
+"it needs again."
+msgstr ""
+
+#: ../../src/dhhelpui.cpp:45 ../../src/mainwindow.cpp:813
+msgid "Quick Start"
+msgstr ""
+
+#: ../../src/dhhelpui.cpp:46
+msgid "Create Region"
+msgstr ""
+
+#: ../../src/dhhelpui.cpp:171
+msgid "Help"
+msgstr ""
+
+#: ../../src/dhhelpui.cpp:185 ../../src/mainwindow.cpp:771
+msgid "Search..."
+msgstr ""
+
+#: ../../src/dhhelpui.cpp:286
+msgid "The article could not be read (%1)."
+msgstr ""
+
+#: ../../src/dhloadjob.cpp:26 ../../src/dhloadjob.cpp:423
 msgid "Loading region type %1"
 msgstr ""
 
@@ -192,253 +303,324 @@ msgstr ""
 msgid "Failed when %1: %2"
 msgstr ""
 
-#: ../../src/dhloadjob.cpp:149 ../../src/dhloadjob.cpp:159
+#: ../../src/dhloadjob.cpp:113
+msgid "gzip"
+msgstr ""
+
+#: ../../src/dhloadjob.cpp:115
+msgid "zlib"
+msgstr ""
+
+#: ../../src/dhloadjob.cpp:117
+msgid "no compression"
+msgstr ""
+
+#: ../../src/dhloadjob.cpp:158 ../../src/dhloadjob.cpp:168
 msgid "Loading File"
 msgstr ""
 
-#: ../../src/dhloadjob.cpp:159
+#: ../../src/dhloadjob.cpp:168
 msgid "Cancelled."
 msgstr ""
 
-#: ../../src/dhloadjob.cpp:193
+#: ../../src/dhloadjob.cpp:189
 msgid "Loading Object %1"
 msgstr ""
 
-#: ../../src/dhloadjob.cpp:266
-msgid "Loading progress is successful, but the file type should be %1."
-msgstr ""
-
-#: ../../src/dhloadjob.cpp:318 ../../src/utility.cpp:31
+#: ../../src/dhloadjob.cpp:323 ../../src/utility.cpp:58
 msgid "Select Region(s)"
 msgstr ""
 
-#: ../../src/dhloadjob.cpp:318 ../../src/utility.cpp:31
+#: ../../src/dhloadjob.cpp:323 ../../src/utility.cpp:58
 msgid "Please select region(s)."
 msgstr ""
 
-#: ../../src/dhloadjob.cpp:380
+#: ../../src/dhloadjob.cpp:379
+msgid "The file holds no region this module can read."
+msgstr ""
+
+#: ../../src/dhloadjob.cpp:393
 msgid "Please click `Continue` to choose the region(s) to load."
 msgstr ""
 
-#: ../../src/dhloadjob.cpp:452 ../../src/dhloadjob.cpp:459
+#: ../../src/dhloadjob.cpp:458
+msgid "The file extension points at %1, but the file was read as %2."
+msgstr ""
+
+#: ../../src/dhloadjob.cpp:471
+msgid "The file is not compressed, but the %1 format expects %2."
+msgstr ""
+
+#: ../../src/dhloadjob.cpp:477
+msgid "The file is %1-compressed, but the %2 format expects %3."
+msgstr ""
+
+#: ../../src/dhloadjob.cpp:491
+msgid "The file was decoded as %1, but the %2 format declares %3."
+msgstr ""
+
+#: ../../src/dhloadjob.cpp:530 ../../src/dhloadjob.cpp:537
 msgid "Finish processing %1 of %2 (%3%)."
 msgstr ""
 
-#: ../../src/dhloadjob.cpp:580 ../../src/saveregionjob.cpp:457
+#: ../../src/dhloadjob.cpp:682 ../../src/saveregionjob.cpp:457
 #: ../../src/saveregionjob.cpp:559
 msgid "Continue"
 msgstr ""
 
-#: ../../src/dhpreview.cpp:82
+#: ../../src/dhpreview.cpp:83
 msgid "%1 is not a size; write it as WxH"
 msgstr ""
 
-#: ../../src/dhpreview.cpp:101
+#: ../../src/dhpreview.cpp:108
+msgid "%1 is not a pixel; write it as X,Y"
+msgstr ""
+
+#: ../../src/dhpreview.cpp:127
 msgid "the core could not be opened"
 msgstr ""
 
-#: ../../src/dhpreview.cpp:140
+#: ../../src/dhpreview.cpp:166
 msgid "the file held no region that could be read"
 msgstr ""
 
-#: ../../src/dhpreview.cpp:196
+#: ../../src/dhpreview.cpp:209
 msgid "the region's data version names no known version; pass --version"
 msgstr ""
 
-#: ../../src/dhpreview.cpp:213 ../../src/dhpreview.cpp:430
+#: ../../src/dhpreview.cpp:226 ../../src/dhpreview.cpp:489
 msgid "%1 is not a file"
 msgstr ""
 
-#: ../../src/dhpreview.cpp:221
+#: ../../src/dhpreview.cpp:234
 msgid "%1 is not a zip archive"
 msgstr ""
 
-#: ../../src/dhpreview.cpp:240
+#: ../../src/dhpreview.cpp:253
 msgid "the client jar of %1 is not in %2"
 msgstr ""
 
-#: ../../src/dhpreview.cpp:244
+#: ../../src/dhpreview.cpp:257
 msgid "%1; pass --jar or point --resources at one"
 msgstr ""
 
-#: ../../src/dhpreview.cpp:253
+#: ../../src/dhpreview.cpp:266
 msgid "%1; pass --jar, or let it be downloaded (the DownloadClientJar setting)"
 msgstr ""
 
-#: ../../src/dhpreview.cpp:259
+#: ../../src/dhpreview.cpp:272
 msgid "downloading the client jar of %1 (about 30 MB)"
 msgstr ""
 
-#: ../../src/dhpreview.cpp:267
+#: ../../src/dhpreview.cpp:280
 msgid "the client jar could not be downloaded: %1"
 msgstr ""
 
-#: ../../src/dhpreview.cpp:269
+#: ../../src/dhpreview.cpp:282
 msgid "unknown error"
 msgstr ""
 
-#: ../../src/dhpreview.cpp:276
+#: ../../src/dhpreview.cpp:289
 msgid "downloaded %1"
 msgstr ""
 
-#: ../../src/dhpreview.cpp:296
+#: ../../src/dhpreview.cpp:309
 msgid "the resource set could not be configured"
 msgstr ""
 
-#: ../../src/dhpreview.cpp:312
+#: ../../src/dhpreview.cpp:325
 msgid "%1 is not a number for %2"
 msgstr ""
 
-#: ../../src/dhpreview.cpp:327
+#: ../../src/dhpreview.cpp:340
 msgid "the CPU renderer returned no picture"
 msgstr ""
 
-#: ../../src/dhpreview.cpp:337 ../../src/dhpreview.cpp:406
+#: ../../src/dhpreview.cpp:350 ../../src/dhpreview.cpp:423
 msgid "%1 could not be written"
 msgstr ""
 
-#: ../../src/dhpreview.cpp:344
+#: ../../src/dhpreview.cpp:357
 msgid "cpu: %1 frames in %2 ms (%3 ms/frame)"
 msgstr ""
 
-#: ../../src/dhpreview.cpp:359
+#: ../../src/dhpreview.cpp:376
 msgid "this machine cannot give a desktop OpenGL 3.3 context"
 msgstr ""
 
-#: ../../src/dhpreview.cpp:393
+#: ../../src/dhpreview.cpp:410
 msgid "the OpenGL frame could not be drawn: %1"
 msgstr ""
 
-#: ../../src/dhpreview.cpp:396
+#: ../../src/dhpreview.cpp:413
 msgid "the OpenGL frame came back empty"
 msgstr ""
 
-#: ../../src/dhpreview.cpp:398
+#: ../../src/dhpreview.cpp:415
 msgid "the OpenGL framebuffer is %1x%2, not %3x%4 (the screen scale is %5)"
 msgstr ""
 
-#: ../../src/dhpreview.cpp:407
+#: ../../src/dhpreview.cpp:424
 msgid "gpu: first frame in %1 ms"
 msgstr ""
 
-#: ../../src/dhpreview.cpp:414
+#: ../../src/dhpreview.cpp:431
 msgid "gpu: %1 frames in %2 ms (%3 ms/frame)"
 msgstr ""
 
-#: ../../src/dhpreview.cpp:426
+#: ../../src/dhpreview.cpp:451
+msgid "hover: clearing the highlight did not change the OpenGL picture"
+msgstr ""
+
+#: ../../src/dhpreview.cpp:471
+msgid ""
+"hover: setting the highlight again did not put the OpenGL picture back (%1 "
+"pixels differ)"
+msgstr ""
+
+#: ../../src/dhpreview.cpp:475
+msgid "hover: the OpenGL outline follows highlightChanged () alone"
+msgstr ""
+
+#: ../../src/dhpreview.cpp:485
 msgid "--preview needs the region file to draw"
 msgstr ""
 
-#: ../../src/dhpreview.cpp:428
+#: ../../src/dhpreview.cpp:487
 msgid "--preview needs --png to say where the picture goes"
 msgstr ""
 
-#: ../../src/dhpreview.cpp:448
+#: ../../src/dhpreview.cpp:507
 msgid "%1 is not a backend; use cpu or gpu"
 msgstr ""
 
-#: ../../src/dhpreview.cpp:474
+#: ../../src/dhpreview.cpp:533
 msgid "the scene could not be built"
 msgstr ""
 
-#: ../../src/dhpreview.cpp:478
+#: ../../src/dhpreview.cpp:537
 msgid "%1: %2 quads, %3 palette entries not drawn"
 msgstr ""
 
-#: ../../src/dhpreview.cpp:483
+#: ../../src/dhpreview.cpp:542
 msgid ""
 "nothing could be drawn: the block models and textures of this region's "
 "version were not found"
 msgstr ""
 
-#: ../../src/dhpreview.cpp:504
+#: ../../src/dhpreview.cpp:587
+msgid "hover: the pick took %1 ms"
+msgstr ""
+
+#: ../../src/dhpreview.cpp:592
+msgid "hover: pixel %1,%2 is the background; nothing is highlighted"
+msgstr ""
+
+#: ../../src/dhpreview.cpp:611
+msgid "hover: pixel %1,%2 picks block (%3, %4, %5); the outline is %6 quads"
+msgstr ""
+
+#: ../../src/dhpreview.cpp:631
+msgid "hover: the tooltip would say:"
+msgstr ""
+
+#: ../../src/dhpreview.cpp:648
 msgid "drawing with %1"
 msgstr ""
 
-#: ../../src/dhpreview.cpp:505
+#: ../../src/dhpreview.cpp:649
 msgid "OpenGL"
 msgstr ""
 
-#: ../../src/dhpreview.cpp:505
+#: ../../src/dhpreview.cpp:649
 msgid "the CPU"
 msgstr ""
 
-#: ../../src/dhrenderui.cpp:20
+#: ../../src/dhrenderui.cpp:22
 msgid "3D Preview - %1"
 msgstr ""
 
-#: ../../src/dhrenderui.cpp:31
+#: ../../src/dhrenderui.cpp:33
 msgid "Downloading the client jar: %1%"
 msgstr ""
 
-#: ../../src/dhrenderui.cpp:43
+#: ../../src/dhrenderui.cpp:45
 msgid "&Fit"
 msgstr ""
 
-#: ../../src/dhrenderui.cpp:44
+#: ../../src/dhrenderui.cpp:46
 msgid "&Orthographic"
 msgstr ""
 
-#: ../../src/dhrenderui.cpp:46
+#: ../../src/dhrenderui.cpp:48
 #: ../../src/dhsettingsdialog/dhsettingsdialog.cpp:24
 msgid "&Reload"
 msgstr ""
 
-#: ../../src/dhrenderui.cpp:47 ../../src/dhrenderui.cpp:164
+#: ../../src/dhrenderui.cpp:49 ../../src/dhrenderui.cpp:175
 msgid "Get &Resources"
 msgstr ""
 
-#: ../../src/dhrenderui.cpp:155
+#: ../../src/dhrenderui.cpp:50
+msgid "&Modify Properties..."
+msgstr ""
+
+#: ../../src/dhrenderui.cpp:166
 msgid "The client jar could not be downloaded: %1"
 msgstr ""
 
-#: ../../src/dhrenderui.cpp:188
+#: ../../src/dhrenderui.cpp:199
 msgid "drawn with OpenGL"
 msgstr ""
 
-#: ../../src/dhrenderui.cpp:189
+#: ../../src/dhrenderui.cpp:200
 msgid "drawn by the CPU"
 msgstr ""
 
-#: ../../src/dhrenderui.cpp:190
+#: ../../src/dhrenderui.cpp:201
 msgid "%1 x %2 x %3, %4 quads, %5 blocks not drawn, %6"
 msgstr ""
 
-#: ../../src/dhrenderui.cpp:204
+#: ../../src/dhrenderui.cpp:215
 msgid ""
 "Drag with the left button to turn, with the middle or right button to move, "
 "and use the wheel to zoom. A click names the block under it."
 msgstr ""
 
-#: ../../src/dhrenderui.cpp:216
+#: ../../src/dhrenderui.cpp:227
 msgid ""
 "Nothing could be drawn: the block models and textures of this region's "
 "version could not be placed, and the version is not one the client jar table "
 "knows."
 msgstr ""
 
-#: ../../src/dhrenderui.cpp:221
+#: ../../src/dhrenderui.cpp:232
 msgid ""
 "Nothing could be drawn. The block models and textures of a version live in "
 "its client jar, which belongs at %1. Press \"Get Resources\" to download it "
 "(about 30 MB)."
 msgstr ""
 
-#: ../../src/dhrenderui.cpp:235
+#: ../../src/dhrenderui.cpp:246
 msgid "(%1, %2, %3) is outside the region"
 msgstr ""
 
-#: ../../src/dhrenderui.cpp:244
+#: ../../src/dhrenderui.cpp:262
 msgid "Block (%1, %2, %3): %4"
 msgstr ""
 
-#: ../../src/dhrenderwidget.cpp:79
+#: ../../src/dhrenderui.cpp:312
+msgid "Block (%1, %2, %3)"
+msgstr ""
+
+#: ../../src/dhrenderwidget.cpp:102
 msgid ""
 "The region could not be drawn: no block in it could be resolved. Check that "
 "the resource files for this version have been downloaded in the settings."
 msgstr ""
 
-#: ../../src/externalnbtreaderui.cpp:29 ../../src/mainwindow.cpp:909
+#: ../../src/externalnbtreaderui.cpp:29 ../../src/mainwindow.cpp:822
+#: ../../src/mainwindow.cpp:1119
 msgid "NBT Reader"
 msgstr ""
 
@@ -458,227 +640,250 @@ msgstr ""
 msgid "&All"
 msgstr ""
 
-#: ../../src/main.cpp:58
+#: ../../src/main.cpp:57
 msgid "Draw one picture of a region file and exit; needs --png"
 msgstr ""
 
-#: ../../src/main.cpp:62
+#: ../../src/main.cpp:61
 msgid "Where the preview writes its PNG picture"
 msgstr ""
 
-#: ../../src/main.cpp:66
+#: ../../src/main.cpp:65
 msgid ""
 "Preview backend: cpu or gpu (the default is the GPU when OpenGL is available)"
 msgstr ""
 
-#: ../../src/main.cpp:70
+#: ../../src/main.cpp:69
 msgid "Preview picture size"
 msgstr ""
 
-#: ../../src/main.cpp:73
+#: ../../src/main.cpp:72
 msgid "Preview camera yaw in degrees"
 msgstr ""
 
-#: ../../src/main.cpp:76
+#: ../../src/main.cpp:75
 msgid "Preview camera pitch in degrees"
 msgstr ""
 
-#: ../../src/main.cpp:80
+#: ../../src/main.cpp:79
+msgid ""
+"Preview: highlight the block under this picture pixel (X,Y) and print the "
+"tooltip text"
+msgstr ""
+
+#: ../../src/main.cpp:85
 msgid "Preview: read the block models and textures from this client jar"
 msgstr ""
 
-#: ../../src/main.cpp:84
+#: ../../src/main.cpp:89
 msgid "Preview: read resources from this cache directory"
 msgstr ""
 
-#: ../../src/main.cpp:88
+#: ../../src/main.cpp:93
 msgid "Preview: use the client jar of this game version"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:278 ../../dhlrc-core/src/schema.rs:216
+#: ../../src/mainwindow.cpp:312 ../../dhlrc-core/src/schema.rs:190
 msgid "Multi-Region Display Name"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:283
+#: ../../src/mainwindow.cpp:317
 msgid "Name pattern:"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:287
+#: ../../src/mainwindow.cpp:321
 msgid "Insert a placeholder:"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:290
+#: ../../src/mainwindow.cpp:324
 msgid "File name"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:293
+#: ../../src/mainwindow.cpp:327
 msgid "Region name"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:297
+#: ../../src/mainwindow.cpp:331
 msgid "Preview with these sample values:"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:301
+#: ../../src/mainwindow.cpp:335
 msgid "Sample file name"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:305
+#: ../../src/mainwindow.cpp:339
 msgid "Sample region name"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:314
+#: ../../src/mainwindow.cpp:348
 msgid ""
 "${file} is replaced with the file name, ${region} with the region name "
 "inside the file. They can be used in any order and repeated. Anything else "
 "is kept as written."
 msgstr ""
 
-#: ../../src/mainwindow.cpp:449
+#: ../../src/mainwindow.cpp:483
 msgid "Pre&view..."
 msgstr ""
 
-#: ../../src/mainwindow.cpp:676
+#: ../../src/mainwindow.cpp:710
 msgid "Config"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:677
+#: ../../src/mainwindow.cpp:711
 msgid "Icon Theme"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:695
-msgid "Help"
+#: ../../src/mainwindow.cpp:729 ../../src/mainwindow.cpp:731
+msgid "&Help"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:696
+#: ../../src/mainwindow.cpp:730
 msgid "&About"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:729
-msgid "Search..."
+#: ../../src/mainwindow.cpp:795
+msgid "Welcome!"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:759
-msgid "NBT File Reader"
+#: ../../src/mainwindow.cpp:804
+msgid ""
+"If you don't know how to use, we provide some helps. Just click \"Help -> "
+"Help\" to see them.\n"
+"\n"
+"Also we provide some quick start to help you use."
 msgstr ""
 
-#: ../../src/mainwindow.cpp:760 ../../src/mainwindow.cpp:914
+#: ../../src/mainwindow.cpp:826
+msgid "Add Files to Regions"
+msgstr ""
+
+#: ../../src/mainwindow.cpp:830 ../../src/mainwindow.cpp:856
+#: ../../src/mainwindow.cpp:1019
 msgid "Manage Region"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:761 ../../src/mainwindow.cpp:927
+#: ../../src/mainwindow.cpp:855
+msgid "NBT File Reader"
+msgstr ""
+
+#: ../../src/mainwindow.cpp:857 ../../src/mainwindow.cpp:1032
 msgid "Region Reader/Modifier"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:762
+#: ../../src/mainwindow.cpp:858
 msgid "Settings"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:846
+#: ../../src/mainwindow.cpp:942
+msgid "Select Cache Directory"
+msgstr ""
+
+#: ../../src/mainwindow.cpp:949
 msgid "Manage"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:857
+#: ../../src/mainwindow.cpp:960
 msgid "reading"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:858
+#: ../../src/mainwindow.cpp:961
 msgid "writing"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:863
+#: ../../src/mainwindow.cpp:966
 msgid "Use saved options for %1 (%2) instead of asking"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:1341
+#: ../../src/mainwindow.cpp:1479
 msgid "Return to tabs"
 msgstr ""
 
-#: ../../src/manageregionui.cpp:155
+#: ../../src/manageregionui.cpp:157
 msgid "&Select"
 msgstr ""
 
-#: ../../src/manageregionui.cpp:159 rc.cpp:99
+#: ../../src/manageregionui.cpp:161 rc.cpp:99
 msgid "&Add"
 msgstr ""
 
-#: ../../src/manageregionui.cpp:172
+#: ../../src/manageregionui.cpp:174
 msgid "Select &All"
 msgstr ""
 
-#: ../../src/manageregionui.cpp:179
+#: ../../src/manageregionui.cpp:181
 msgid "&Remove Selected"
 msgstr ""
 
-#: ../../src/manageregionui.cpp:183
+#: ../../src/manageregionui.cpp:185
 msgid "&Save Selected"
 msgstr ""
 
-#: ../../src/manageregionui.cpp:210
-msgid "Select Files"
-msgstr ""
-
-#: ../../src/manageregionui.cpp:213
-msgid "No file selected!"
-msgstr ""
-
-#: ../../src/manageregionui.cpp:246
+#: ../../src/manageregionui.cpp:229
 msgid "Locked regions were kept."
 msgstr ""
 
-#: ../../src/manageregionui.cpp:378
+#: ../../src/manageregionui.cpp:246
+msgid "Select Files"
+msgstr ""
+
+#: ../../src/manageregionui.cpp:249
+msgid "No file selected!"
+msgstr ""
+
+#: ../../src/manageregionui.cpp:383
 msgid "%1 region(s) selected"
 msgstr ""
 
-#: ../../src/manageregionui.cpp:435 ../../src/utility.cpp:82
+#: ../../src/manageregionui.cpp:440 ../../src/utility.cpp:109
 msgid "Locked"
 msgstr ""
 
-#: ../../src/manageregionui.cpp:472
+#: ../../src/manageregionui.cpp:484
 msgid "Select Save Format"
 msgstr ""
 
-#: ../../src/manageregionui.cpp:472
+#: ../../src/manageregionui.cpp:484
 msgid "Please select the format to save to."
 msgstr ""
 
-#: ../../src/manageregionui.cpp:498
+#: ../../src/manageregionui.cpp:510
 msgid "Use MultiFunc?"
 msgstr ""
 
-#: ../../src/manageregionui.cpp:499
+#: ../../src/manageregionui.cpp:511
 msgid "This type supports regions to save as one file, do you want to use it?"
 msgstr ""
 
-#: ../../src/manageregionui.cpp:515
+#: ../../src/manageregionui.cpp:527
 msgid "Select File"
 msgstr ""
 
-#: ../../src/manageregionui.cpp:551
+#: ../../src/manageregionui.cpp:563
 msgid "This type cannot save a single region."
 msgstr ""
 
-#: ../../src/manageregionui.cpp:556
+#: ../../src/manageregionui.cpp:568
 msgid "Select Directory"
 msgstr ""
 
-#: ../../src/manageregionui.cpp:656
+#: ../../src/manageregionui.cpp:672
 msgid "Locked!"
 msgstr ""
 
-#: ../../src/manageregionui.cpp:668
+#: ../../src/manageregionui.cpp:684
 msgid "Region identifier"
 msgstr ""
 
-#: ../../src/manageregionui.cpp:671
+#: ../../src/manageregionui.cpp:687
 msgid "Added: %1"
 msgstr ""
 
-#: ../../src/manageregionui.cpp:710
+#: ../../src/manageregionui.cpp:726
 msgid "Input a New Name"
 msgstr ""
 
-#: ../../src/manageregionui.cpp:711
+#: ../../src/manageregionui.cpp:727
 msgid "Please input a new name for the region."
 msgstr ""
 
@@ -706,12 +911,12 @@ msgstr ""
 msgid "Please enter a data."
 msgstr ""
 
-#: ../../src/paletteaddui.cpp:68 ../../dhlrc-core/src/schema.rs:71
-msgid "Name"
-msgstr ""
-
 #: ../../src/paletteaddui.cpp:68
 msgid "Data"
+msgstr ""
+
+#: ../../src/propertymodifyui.cpp:90
+msgid "Failed to modify the property."
 msgstr ""
 
 #: ../../src/regionmodifyui.cpp:55
@@ -785,19 +990,19 @@ msgstr ""
 msgid "Saving %1 region(s) (%2%): %3"
 msgstr ""
 
-#: ../../src/utility.cpp:25
+#: ../../src/utility.cpp:52
 msgid "Manage Region window is not initialized"
 msgstr ""
 
-#: ../../src/utility.cpp:46
+#: ../../src/utility.cpp:73
 msgid "Region is locked!"
 msgstr ""
 
-#: ../../src/utility.cpp:54
+#: ../../src/utility.cpp:81
 msgid "No Region or no Region selected!"
 msgstr ""
 
-#: ../../src/utility.cpp:87
+#: ../../src/utility.cpp:114
 msgid "%1 (%2)"
 msgstr ""
 
@@ -924,66 +1129,70 @@ msgid "Modify the property of the block in:"
 msgstr ""
 
 #: rc.cpp:120
-msgid "With the block that is the same property"
+msgid "Only this block"
 msgstr ""
 
 #: rc.cpp:123
-msgid "Properties:"
+msgid "Every block with this palette entry"
 msgstr ""
 
 #: rc.cpp:126
-msgid "RegionModifyUI"
+msgid "Properties:"
 msgstr ""
 
 #: rc.cpp:129
-msgid "Modify the infomation of the Region."
+msgid "RegionModifyUI"
 msgstr ""
 
 #: rc.cpp:132
+msgid "Modify the infomation of the Region."
+msgstr ""
+
+#: rc.cpp:135
 msgid "Create Time"
 msgstr ""
 
-#: rc.cpp:135 rc.cpp:141
+#: rc.cpp:138 rc.cpp:144
 msgid "yyyy/MM/dd HH:mm:ss.zzz"
 msgstr ""
 
-#: rc.cpp:138
+#: rc.cpp:141
 msgid "Modify Time"
 msgstr ""
 
-#: rc.cpp:144
+#: rc.cpp:147
 msgid "Description"
 msgstr ""
 
-#: rc.cpp:147
+#: rc.cpp:150
 msgid "Offset"
 msgstr ""
 
-#: rc.cpp:150
+#: rc.cpp:153
 msgid "Author"
 msgstr ""
 
-#: rc.cpp:153
+#: rc.cpp:156
 msgid "Base Name"
 msgstr ""
 
-#: rc.cpp:156 ../../dhlrc-core/src/schema.rs:204
+#: rc.cpp:159 ../../dhlrc-core/src/schema.rs:178
 msgid "Region Name"
 msgstr ""
 
-#: rc.cpp:159
+#: rc.cpp:162
 msgid "Data Version"
 msgstr ""
 
-#: rc.cpp:162
+#: rc.cpp:165
 msgid "Version"
 msgstr ""
 
-#: ../../common-rs/src/util.rs:63
+#: ../../common-rs/src/util.rs:63 ../../region-schem-rs/src/output.rs:46
 msgid "Null pointer detected"
 msgstr ""
 
-#: ../../common-rs/src/util.rs:129 ../../region-rs/src/file.rs:63
+#: ../../common-rs/src/util.rs:129 ../../region-rs/src/file.rs:79
 msgid "Uncompressing data."
 msgstr ""
 
@@ -995,45 +1204,45 @@ msgstr ""
 msgid "Uncompress finish!"
 msgstr ""
 
-#: ../../dhlrc-core/src/config.rs:182 ../../dhlrc-core/src/schema.rs:196
-#: ../../region-rs/src/default.rs:58
+#: ../../dhlrc-core/src/config.rs:205 ../../dhlrc-core/src/schema.rs:170
+#: ../../region-rs/src/default.rs:62
 msgid "Converted"
 msgstr ""
 
-#: ../../dhlrc-core/src/config.rs:188 ../../dhlrc-core/src/schema.rs:208
+#: ../../dhlrc-core/src/config.rs:211 ../../dhlrc-core/src/schema.rs:182
 #: ../../region-litematic-rs/src/output.rs:396
-#: ../../region-rs/src/default.rs:60
+#: ../../region-rs/src/default.rs:64
 msgid "Unnamed"
 msgstr ""
 
-#: ../../dhlrc-core/src/config.rs:194 ../../dhlrc-core/src/schema.rs:222
+#: ../../dhlrc-core/src/config.rs:217 ../../dhlrc-core/src/schema.rs:196
 #, rust-format
 msgid "${file} - ${region}"
 msgstr ""
 
-#: ../../dhlrc-core/src/config.rs:331
+#: ../../dhlrc-core/src/config.rs:354
 msgid "Configuration reloaded"
 msgstr ""
 
-#: ../../dhlrc-core/src/config.rs:333
+#: ../../dhlrc-core/src/config.rs:356
 #, rust-format
 msgid "The configuration was reloaded from {}."
 msgstr ""
 
-#: ../../dhlrc-core/src/config.rs:369
+#: ../../dhlrc-core/src/config.rs:392
 msgid "Configuration created"
 msgstr ""
 
-#: ../../dhlrc-core/src/config.rs:371
+#: ../../dhlrc-core/src/config.rs:394
 #, rust-format
 msgid "A new configuration file was created at {}."
 msgstr ""
 
-#: ../../dhlrc-core/src/config.rs:379
+#: ../../dhlrc-core/src/config.rs:402
 msgid "Configuration could not be read"
 msgstr ""
 
-#: ../../dhlrc-core/src/config.rs:382
+#: ../../dhlrc-core/src/config.rs:405
 #, rust-format
 msgid ""
 "The configuration file could not be read ({}). It was moved aside and a new "
@@ -1131,174 +1340,157 @@ msgid "If you check this, all regions will be loaded in the loading progress."
 msgstr ""
 
 #: ../../dhlrc-core/src/schema.rs:130
-msgid "Loading File by File Extension"
+msgid "Try Other Modules when Loading Fails"
 msgstr ""
 
 #: ../../dhlrc-core/src/schema.rs:131
-msgid "If you check this, the file will be loaded by the file extension name."
+msgid ""
+"A file is first read by the module its extension points at; when that fails, "
+"the other modules are tried as well. Turn this off to make a file whose "
+"extension is wrong fail instead."
 msgstr ""
 
 #: ../../dhlrc-core/src/schema.rs:142
-msgid "Retry Loading File when Failed"
-msgstr ""
-
-#: ../../dhlrc-core/src/schema.rs:143
-msgid "When failed, the file will try to be loaded by other modules."
-msgstr ""
-
-#: ../../dhlrc-core/src/schema.rs:154
-msgid "Strict NBT Encoding Matching"
-msgstr ""
-
-#: ../../dhlrc-core/src/schema.rs:156
-msgid ""
-"If you check this, a file is also decoded strictly with the NBT encoding "
-"declared by the plugin its suffix points at (region_nbt_encoding ()). A file "
-"in another encoding then fails to load instead of being read as the wrong "
-"one."
-msgstr ""
-
-#: ../../dhlrc-core/src/schema.rs:168
 msgid "Cache Directory"
 msgstr ""
 
-#: ../../dhlrc-core/src/schema.rs:169
+#: ../../dhlrc-core/src/schema.rs:143
 msgid "The directory to store cache files."
 msgstr ""
 
-#: ../../dhlrc-core/src/schema.rs:180
+#: ../../dhlrc-core/src/schema.rs:154
 msgid "Use Cached File when Downloading Failed"
 msgstr ""
 
-#: ../../dhlrc-core/src/schema.rs:181
+#: ../../dhlrc-core/src/schema.rs:155
 msgid "When downloading failed, use the cached file."
 msgstr ""
 
-#: ../../dhlrc-core/src/schema.rs:192
+#: ../../dhlrc-core/src/schema.rs:166
 msgid "Region Base Name"
 msgstr ""
 
-#: ../../dhlrc-core/src/schema.rs:193
+#: ../../dhlrc-core/src/schema.rs:167
 msgid "The default base name for the region."
 msgstr ""
 
-#: ../../dhlrc-core/src/schema.rs:205
+#: ../../dhlrc-core/src/schema.rs:179
 msgid "The default name for the region."
 msgstr ""
 
-#: ../../dhlrc-core/src/schema.rs:218
+#: ../../dhlrc-core/src/schema.rs:192
 #, rust-format
 msgid ""
 "The display name used for a region that comes from a multi-region file. Use $"
 "{file} for the file name and ${region} for the region name inside the file."
 msgstr ""
 
-#: ../../dhlrc-core/src/schema.rs:230
+#: ../../dhlrc-core/src/schema.rs:204
 msgid "Sample File Name"
 msgstr ""
 
-#: ../../dhlrc-core/src/schema.rs:232
+#: ../../dhlrc-core/src/schema.rs:206
 msgid ""
 "The sample file name used by the preview of the multi-region display name. "
 "It should not include a file extension."
 msgstr ""
 
-#: ../../dhlrc-core/src/schema.rs:244
+#: ../../dhlrc-core/src/schema.rs:218
 msgid "Sample Region Name"
 msgstr ""
 
-#: ../../dhlrc-core/src/schema.rs:246
+#: ../../dhlrc-core/src/schema.rs:220
 msgid ""
 "The sample region name used by the preview of the multi-region display name."
 msgstr ""
 
-#: ../../dhlrc-core/src/schema.rs:258
+#: ../../dhlrc-core/src/schema.rs:232
 msgid "Region Description"
 msgstr ""
 
-#: ../../dhlrc-core/src/schema.rs:259
+#: ../../dhlrc-core/src/schema.rs:233
 msgid "The default description for the region."
 msgstr ""
 
-#: ../../dhlrc-core/src/schema.rs:270
+#: ../../dhlrc-core/src/schema.rs:244
 msgid "Region Author"
 msgstr ""
 
-#: ../../dhlrc-core/src/schema.rs:271
+#: ../../dhlrc-core/src/schema.rs:245
 msgid "The default author for the region."
 msgstr ""
 
-#: ../../dhlrc-core/src/schema.rs:282
+#: ../../dhlrc-core/src/schema.rs:256
 msgid "Override Settings"
 msgstr ""
 
-#: ../../dhlrc-core/src/schema.rs:283
+#: ../../dhlrc-core/src/schema.rs:257
 msgid "Whether to override setting or not."
 msgstr ""
 
-#: ../../dhlrc-core/src/schema.rs:294
+#: ../../dhlrc-core/src/schema.rs:268
 msgid "Override Version"
 msgstr ""
 
-#: ../../dhlrc-core/src/schema.rs:295
+#: ../../dhlrc-core/src/schema.rs:269
 msgid "The version to override in translation stage."
 msgstr ""
 
-#: ../../dhlrc-core/src/schema.rs:306
+#: ../../dhlrc-core/src/schema.rs:280
 msgid "Block Name Language"
 msgstr ""
 
-#: ../../dhlrc-core/src/schema.rs:308
+#: ../../dhlrc-core/src/schema.rs:282
 msgid ""
 "The Minecraft locale (like zh_cn) block and item names are shown in. The "
 "language file is read from the downloaded assets, so it works as soon as "
 "that version's assets are there."
 msgstr ""
 
-#: ../../dhlrc-core/src/schema.rs:320
+#: ../../dhlrc-core/src/schema.rs:294
 msgid "Default Show Option"
 msgstr ""
 
-#: ../../dhlrc-core/src/schema.rs:321
+#: ../../dhlrc-core/src/schema.rs:295
 msgid "The default option of showing block information."
 msgstr ""
 
-#: ../../dhlrc-core/src/schema.rs:332
+#: ../../dhlrc-core/src/schema.rs:306
 msgid "Notification Application ID"
 msgstr ""
 
-#: ../../dhlrc-core/src/schema.rs:334
+#: ../../dhlrc-core/src/schema.rs:308
 msgid ""
 "The application a desktop notification is sent as: the Windows "
 "AppUserModelID, or the macOS bundle identifier. Windows needs it registered, "
 "or the toast may not show. Empty uses the platform default."
 msgstr ""
 
-#: ../../dhlrc-core/src/schema.rs:346
+#: ../../dhlrc-core/src/schema.rs:320
 msgid "Notification Timeout (ms)"
 msgstr ""
 
-#: ../../dhlrc-core/src/schema.rs:348
+#: ../../dhlrc-core/src/schema.rs:322
 msgid ""
 "How long a notification stays before it disappears, in milliseconds. Zero "
 "leaves it to the platform."
 msgstr ""
 
-#: ../../dhlrc-core/src/schema.rs:360
+#: ../../dhlrc-core/src/schema.rs:334
 msgid "Only Notify When Inactive"
 msgstr ""
 
-#: ../../dhlrc-core/src/schema.rs:362
+#: ../../dhlrc-core/src/schema.rs:336
 msgid ""
 "Do not show a desktop notification while the application is active; the in-"
 "app one is enough then."
 msgstr ""
 
-#: ../../dhlrc-core/src/schema.rs:374
+#: ../../dhlrc-core/src/schema.rs:348
 msgid "Download the Client Jar Automatically"
 msgstr ""
 
-#: ../../dhlrc-core/src/schema.rs:376
+#: ../../dhlrc-core/src/schema.rs:350
 msgid ""
 "A block's models and textures are only in its version's client jar. When a "
 "3D preview needs one the cache directory does not have, download it (about "
@@ -1404,69 +1596,70 @@ msgstr ""
 msgid "any"
 msgstr ""
 
-#: ../../dhlrc-tui/src/render.rs:90
+#: ../../dhlrc-tui/src/render.rs:105
 msgid "Nothing was drawn: check --jar/--resources and the region's palette."
 msgstr ""
 
-#: ../../dhlrc-tui/src/render.rs:109
+#: ../../dhlrc-tui/src/render.rs:124
 #, rust-format
 msgid "{}x{}: {} quads, {} textures, {} skipped palette entries -> {}"
 msgstr ""
 
-#: ../../dhlrc-tui/src/render.rs:159
+#: ../../dhlrc-tui/src/render.rs:174
 #, rust-format
 msgid ""
 "the client jar of {} is not in {}: pass --jar, or let it be downloaded (the "
 "DownloadClientJar setting)"
 msgstr ""
 
-#: ../../dhlrc-tui/src/render.rs:191
+#: ../../dhlrc-tui/src/render.rs:206
 msgid ""
 "no resources to read models and textures from; pass --jar or --resources"
 msgstr ""
 
-#: ../../dhlrc-tui/src/render.rs:203
+#: ../../dhlrc-tui/src/render.rs:218
 #, rust-format
 msgid "downloading the client jar of {} (about 30 MB)"
 msgstr ""
 
-#: ../../dhlrc-tui/src/render.rs:211
+#: ../../dhlrc-tui/src/render.rs:226
 #, rust-format
 msgid "downloaded {}"
 msgstr ""
 
-#: ../../dhlrc-tui/src/render.rs:214
+#: ../../dhlrc-tui/src/render.rs:229
 #, rust-format
 msgid "could not download the client jar: {}"
 msgstr ""
 
-#: ../../nbt-component/src/lib.rs:69
+#: ../../nbt-component/src/lib.rs:74
 msgid "Loading NBT"
 msgstr ""
 
-#: ../../nbt-component/src/lib.rs:70 ../../region-rs/src/file.rs:32
+#: ../../nbt-component/src/lib.rs:75 ../../region-rs/src/file.rs:41
 msgid "The loading operation is cancelled."
 msgstr ""
 
-#: ../../nbt-component/src/lib.rs:172 ../../region-litematic-rs/src/lib.rs:397
-#: ../../region-nbt-rs/src/lib.rs:286
+#: ../../nbt-component/src/lib.rs:177 ../../region-litematic-rs/src/lib.rs:404
+#: ../../region-nbt-rs/src/lib.rs:293 ../../region-schem-rs/src/lib.rs:131
 msgid "The region value is not provided."
 msgstr ""
 
-#: ../../nbt-component/src/lib.rs:199
+#: ../../nbt-component/src/lib.rs:208
 msgid "Unknown object encoding."
 msgstr ""
 
-#: ../../nbt-component/src/lib.rs:262
+#: ../../nbt-component/src/lib.rs:274
 #, rust-format
 msgid "The file is in the {} encoding, but the {} encoding is required."
 msgstr ""
 
-#: ../../nbt-component/src/lib.rs:310
+#: ../../nbt-component/src/lib.rs:322
 msgid "Reading NBT finished."
 msgstr ""
 
 #: ../../region-litematic-rs/src/config.rs:25
+#: ../../region-schem-rs/src/config.rs:36
 msgid "Ignore Base Data"
 msgstr ""
 
@@ -1484,29 +1677,29 @@ msgid ""
 "you open the file with requires a newer one."
 msgstr ""
 
-#: ../../region-litematic-rs/src/lib.rs:59
+#: ../../region-litematic-rs/src/lib.rs:66
 msgid "Litematic File (*.litematic)"
 msgstr ""
 
-#: ../../region-litematic-rs/src/lib.rs:127 ../../region-nbt-rs/src/lib.rs:187
-#: ../../region-nbt-rs/src/lib.rs:208
+#: ../../region-litematic-rs/src/lib.rs:134 ../../region-nbt-rs/src/lib.rs:194
+#: ../../region-nbt-rs/src/lib.rs:215 ../../region-schem-rs/src/schem.rs:533
 msgid "Reading blocks is cancelled."
 msgstr ""
 
-#: ../../region-litematic-rs/src/lib.rs:134
+#: ../../region-litematic-rs/src/lib.rs:141
 #, rust-format
 msgid "Reading block id: {} / {}."
 msgstr ""
 
-#: ../../region-litematic-rs/src/lib.rs:154
+#: ../../region-litematic-rs/src/lib.rs:161
 msgid "Out of range!"
 msgstr ""
 
-#: ../../region-litematic-rs/src/lib.rs:168
+#: ../../region-litematic-rs/src/lib.rs:175
 msgid "Reading blocks finished."
 msgstr ""
 
-#: ../../region-litematic-rs/src/lib.rs:239
+#: ../../region-litematic-rs/src/lib.rs:246
 msgid "Wrong type of region."
 msgstr ""
 
@@ -1543,27 +1736,27 @@ msgstr ""
 msgid "There will be no air block in the output structure"
 msgstr ""
 
-#: ../../region-nbt-rs/src/lib.rs:60
+#: ../../region-nbt-rs/src/lib.rs:67
 msgid "NBT File (*.nbt)"
 msgstr ""
 
-#: ../../region-nbt-rs/src/lib.rs:66 ../../region-nbt-rs/src/lib.rs:78
+#: ../../region-nbt-rs/src/lib.rs:73 ../../region-nbt-rs/src/lib.rs:85
 msgid "The length of the size is wrong."
 msgstr ""
 
-#: ../../region-nbt-rs/src/lib.rs:94
+#: ../../region-nbt-rs/src/lib.rs:101 ../../region-schem-rs/src/schem.rs:596
 msgid "Reading entities is cancelled."
 msgstr ""
 
-#: ../../region-nbt-rs/src/lib.rs:115
+#: ../../region-nbt-rs/src/lib.rs:122
 msgid "Not a double value"
 msgstr ""
 
-#: ../../region-nbt-rs/src/lib.rs:127
+#: ../../region-nbt-rs/src/lib.rs:134
 msgid "Wrong type of entity's pos!"
 msgstr ""
 
-#: ../../region-nbt-rs/src/lib.rs:215
+#: ../../region-nbt-rs/src/lib.rs:222
 #, rust-format
 msgid "Processing blocks: {} / {}."
 msgstr ""
@@ -1585,20 +1778,211 @@ msgstr ""
 msgid "Pushing index is cancelled."
 msgstr ""
 
-#: ../../region-rs/src/file.rs:31
+#: ../../region-rs/src/file.rs:40
 msgid "Loading file."
 msgstr ""
 
-#: ../../region-rs/src/file.rs:64
+#: ../../region-rs/src/file.rs:80
 msgid "The uncompressing operation is cancelled."
 msgstr ""
 
-#: ../../region-rs/src/file.rs:79
+#: ../../region-rs/src/file.rs:95
 msgid "Uncompress finished."
 msgstr ""
 
-#: ../../region-rs/src/lib.rs:162 ../../region-rs/src/lib.rs:166
+#: ../../region-rs/src/lib.rs:150 ../../region-rs/src/lib.rs:191
+msgid "The region is null."
+msgstr ""
+
+#: ../../region-rs/src/lib.rs:163 ../../region-rs/src/lib.rs:167
+#: ../../region-rs/src/lib.rs:204
 msgid "The index is out of range."
+msgstr ""
+
+#: ../../region-rs/src/lib.rs:194
+msgid "The output pointer is null."
+msgstr ""
+
+#: ../../region-rs/src/lib.rs:197
+msgid "The property list is null."
+msgstr ""
+
+#: ../../region-rs/src/lib.rs:200
+msgid "No property is given."
+msgstr ""
+
+#: ../../region-rs/src/lib.rs:208
+msgid "The palette index is out of range."
+msgstr ""
+
+#: ../../region-schem-rs/src/config.rs:38
+msgid ""
+"Keep the region's own name, author, description and time instead of taking "
+"them from the file"
+msgstr ""
+
+#: ../../region-schem-rs/src/config.rs:47
+msgid "Refuse Incomplete Entities"
+msgstr ""
+
+#: ../../region-schem-rs/src/config.rs:49
+msgid ""
+"An entity or block entity without a position or an id fails the load instead "
+"of being skipped. Off by default: WorldEdit does not store entities, so the "
+"files it writes have none, and one broken entry should not cost the whole "
+"schematic."
+msgstr ""
+
+#: ../../region-schem-rs/src/config.rs:96
+msgid "Sponge Format Version"
+msgstr ""
+
+#: ../../region-schem-rs/src/config.rs:98
+msgid ""
+"Which version to write: 0 keeps the version the file was read from (2 when "
+"that is unknown), 1 is the legacy layout, 2 is what WorldEdit 7 writes and 3 "
+"is the current one. Writing 2 from a version 3 file packs its per-block "
+"biomes into one per column."
+msgstr ""
+
+#: ../../region-schem-rs/src/lib.rs:72
+msgid "Sponge Schematic (*.schem)"
+msgstr ""
+
+#: ../../region-schem-rs/src/lib.rs:97
+#, rust-format
+msgid "{} entities or block entities were incomplete and were skipped."
+msgstr ""
+
+#: ../../region-schem-rs/src/schem.rs:275
+msgid "Reading the block palette."
+msgstr ""
+
+#: ../../region-schem-rs/src/schem.rs:276
+msgid "Reading the block palette is cancelled."
+msgstr ""
+
+#: ../../region-schem-rs/src/schem.rs:287
+#, rust-format
+msgid "The palette entry for {} is not a number."
+msgstr ""
+
+#: ../../region-schem-rs/src/schem.rs:297
+#, rust-format
+msgid "The palette entry for {} is negative."
+msgstr ""
+
+#: ../../region-schem-rs/src/schem.rs:328
+msgid "The block data ends in the middle of a number."
+msgstr ""
+
+#: ../../region-schem-rs/src/schem.rs:341
+msgid "A number in the block data is too long."
+msgstr ""
+
+#: ../../region-schem-rs/src/schem.rs:442
+msgid "The file's root tag is not a compound."
+msgstr ""
+
+#: ../../region-schem-rs/src/schem.rs:458
+msgid "The schematic has no Width, Height and Length."
+msgstr ""
+
+#: ../../region-schem-rs/src/schem.rs:465
+#, rust-format
+msgid "The schematic size {} x {} x {} is empty."
+msgstr ""
+
+#: ../../region-schem-rs/src/schem.rs:493
+msgid ""
+"The schematic has no block palette. Without one the block ids would have to "
+"come from the game's own block registry, which this program does not have."
+msgstr ""
+
+#: ../../region-schem-rs/src/schem.rs:501
+msgid "The schematic has no block data."
+msgstr ""
+
+#: ../../region-schem-rs/src/schem.rs:514
+#, rust-format
+msgid "The block data holds {} blocks, but the size needs {}."
+msgstr ""
+
+#: ../../region-schem-rs/src/schem.rs:529
+#, rust-format
+msgid "Reading blocks: {} / {}."
+msgstr ""
+
+#: ../../region-schem-rs/src/schem.rs:539
+#, rust-format
+msgid ""
+"The block data refers to palette entry {}, which the palette does not have."
+msgstr ""
+
+#: ../../region-schem-rs/src/schem.rs:558
+#, rust-format
+msgid "Reading block entities: {} / {}."
+msgstr ""
+
+#: ../../region-schem-rs/src/schem.rs:562
+msgid "Reading block entities is cancelled."
+msgstr ""
+
+#: ../../region-schem-rs/src/schem.rs:571
+#, rust-format
+msgid ""
+"Block entity {} has no position or no id, and skipping incomplete entities "
+"is off."
+msgstr ""
+
+#: ../../region-schem-rs/src/schem.rs:592
+#, rust-format
+msgid "Reading entities: {} / {}."
+msgstr ""
+
+#: ../../region-schem-rs/src/schem.rs:605
+#, rust-format
+msgid ""
+"Entity {} has no position or no id, and skipping incomplete entities is off."
+msgstr ""
+
+#: ../../region-schem-rs/src/schem.rs:646
+#, rust-format
+msgid "The biome data holds {} entries, but the size needs {}."
+msgstr ""
+
+#: ../../region-schem-rs/src/schem.rs:932
+#, rust-format
+msgid "The Sponge schematic version {} is not supported; use 1, 2 or 3."
+msgstr ""
+
+#: ../../region-schem-rs/src/schem.rs:942
+msgid "The region has no size to write."
+msgstr ""
+
+#: ../../region-schem-rs/src/schem.rs:948
+msgid ""
+"The region is larger than the format can describe: its size has to fit an "
+"unsigned 16 bit number."
+msgstr ""
+
+#: ../../region-schem-rs/src/schem.rs:958
+#, rust-format
+msgid "The region holds {} blocks, but its size needs {}."
+msgstr ""
+
+#: ../../region-schem-rs/src/schem.rs:967
+msgid "The region has no block palette to write."
+msgstr ""
+
+#: ../../region-schem-rs/src/schem.rs:1027
+#, rust-format
+msgid "Writing block entities: {} / {}."
+msgstr ""
+
+#: ../../region-schem-rs/src/schem.rs:1031
+#: ../../region-schem-rs/src/schem.rs:1037
+msgid "Writing is cancelled."
 msgstr ""
 
 #: ../../zurinbt-common/src/lib.rs:85

@@ -53,16 +53,23 @@ struct ObjectLoadOptions {
   /* One of the ObjectEncoding values; the encoding `strict` requires and the
    * one tried first. Read only when `strict`. */
   int encoding;
+  /* Where to write the encoding that actually parsed (ObjectEncodingAny when
+   * none did), so a caller that does not pin the encoding still learns when a
+   * file was read as something other than its format's own encoding. May be
+   * nullptr. */
+  int *detected;
 };
 ```
 
 - `nullptr`, or `strict == 0`: every encoding is tried and the first that parses wins. A decode that succeeds after
-  an earlier attempt failed is a plain success (`nullptr`), never an error.
+  an earlier attempt failed is a plain success (`nullptr`), never an error. `detected` receives the encoding that
+  won, which is how the loader reports a file that decoded as another encoding than the format declares.
 - `strict != 0`: the file must decode as `encoding`. `encoding` is tried first, so a matching file is accepted as
   before; but the decode is not restricted to it, so a file in another encoding is still read far enough to name the
   encoding it actually is, and then **fails** with a message giving both — instead of silently falling back. This is
   what a caller uses when the target format is already known and a mismatch has to be caught rather than papered
-  over — see [Region plugin](plugin.md) for the plugin-side counterpart.
+  over — see [Region plugin](plugin.md) for the plugin-side counterpart. The loader itself no longer pins the
+  encoding: it decodes permissively and reports a mismatch afterwards instead of refusing the file.
 
 All three symbols are resolved by name; the module is not linked against the application. `object_base_type()` is what makes
 the module self-describing: the host never hard-codes `"NBT"`, so adding a codec is just dropping a library into

@@ -16,10 +16,28 @@ use std::thread::JoinHandle;
 use std::time::Duration;
 
 /// Bumped when the on-disk shape changes in a way older builds cannot read.
-pub const CONFIG_VERSION: u32 = 1;
+pub const CONFIG_VERSION: u32 = 2;
 
 fn config_version() -> u32 {
     CONFIG_VERSION
+}
+
+/// Brings a configuration written by an older build up to the current shape.
+///
+/// Version 1 asked before reading a file: every plugin's `use_configured`
+/// started `false`, so a `false` in the file is that old default rather than a
+/// choice the user made. Reading now uses the saved options unless the user
+/// asks to be prompted, so those are turned on here once; a value the user had
+/// already set to `true` stays on. Writing keeps asking, since the format is
+/// picked on purpose there.
+fn migrate(config: &mut Config) {
+    if config.version >= CONFIG_VERSION {
+        return;
+    }
+    for plugin in config.plugins.values_mut() {
+        plugin.input.use_configured = true;
+    }
+    config.version = CONFIG_VERSION;
 }
 
 /// The unit a memory limit is expressed in (old `LimitUnit`).
@@ -86,7 +104,15 @@ pub struct PluginConfig {
 impl Default for PluginConfig {
     fn default() -> Self {
         Self {
-            input: PluginDirection::default(),
+            /* Reading uses the saved options without asking: a load does not
+             * know which plugin will end up reading the file until it has been
+             * decoded, so asking about every plugin would be noise. Writing
+             * *does* know the format the user picked, so its options are worth
+             * asking about once per export (and can be silenced the same way). */
+            input: PluginDirection {
+                use_configured: true,
+                ..PluginDirection::default()
+            },
             output: PluginDirection::default(),
         }
     }
@@ -100,9 +126,8 @@ pub struct General {
     pub limit_unit: Unit,
     pub elapsed_milliseconds: u32,
     pub select_all_regions_in_loading: bool,
-    pub loading_file_by_extension: bool,
+    /// Try the other modules when the one the file extension points at fails.
     pub fail_then_retry: bool,
-    pub strict_nbt_encoding: bool,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cache_directory: Option<PathBuf>,
     pub fail_download_use_cache: bool,
@@ -118,9 +143,7 @@ impl Default for General {
             limit_unit: Unit::default(),
             elapsed_milliseconds: 500,
             select_all_regions_in_loading: false,
-            loading_file_by_extension: true,
-            fail_then_retry: false,
-            strict_nbt_encoding: false,
+            fail_then_retry: true,
             cache_directory: None,
             fail_download_use_cache: false,
             language: "zh_cn".to_owned(),
@@ -462,11 +485,14 @@ pub fn load_or_create(paths: &ConfigPaths) -> io::Result<ConfigInit> {
     if paths.file.is_file() {
         let text = fs::read_to_string(&paths.file)?;
         return match toml::from_str::<Config>(&text) {
-            Ok(config) => Ok(ConfigInit {
-                config,
-                paths: paths.clone(),
-                origin: ConfigOrigin::Loaded,
-            }),
+            Ok(mut config) => {
+                migrate(&mut config);
+                Ok(ConfigInit {
+                    config,
+                    paths: paths.clone(),
+                    origin: ConfigOrigin::Loaded,
+                })
+            }
             Err(error) => {
                 // Keep the unreadable file rather than dropping the user's data
                 // on the floor, and start over from the defaults.

@@ -130,7 +130,10 @@ ExternalNbtReaderUI::dropEvent (QDropEvent *event)
       return;
     }
 
-  auto vec = file_try_uncompress (filename.toUtf8 (), helperStruct, &failed);
+  /* The compression is not reported here: this window reads one file and shows
+   * its tree, and says nothing about the format it came from. */
+  auto vec = file_try_uncompress (filename.toUtf8 (), helperStruct, &failed,
+                                  nullptr);
   if (!failed)
     {
       failMessage = getFn (vec, &nbt, helperStruct, nullptr);

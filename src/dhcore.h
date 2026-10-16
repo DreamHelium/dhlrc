@@ -16,9 +16,7 @@ struct DhConfigData
   int limitUnit = 0;
   qint64 elapsedMilliseconds = 0;
   bool selectAllRegionsInLoading = false;
-  bool loadingFileByExtension = false;
   bool failThenRetry = false;
-  bool strictNbtEncoding = false;
   bool failDownloadUseCache = false;
   int defaultShowOption = 0;
   bool overrideSetting = false;

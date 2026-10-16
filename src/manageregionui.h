@@ -20,6 +20,7 @@
 #include <libintl.h>
 #include <map>
 #include <mutex>
+#include <qwidget.h>
 #define _(str) gettext (str)
 
 class ItemFrame;
@@ -96,6 +97,14 @@ public:
   {
     return encodingValue;
   }
+  /* How this format's files are compressed, as an `ObjectCompression` value
+   * (`region_compression ()`). `ObjectCompressionAny` when the plugin does not
+   * declare one, and the loader then has nothing to compare against. */
+  [[nodiscard]] int
+  compression () const
+  {
+    return compressionValue;
+  }
   /* The file dialog filter, already translated. */
   [[nodiscard]] QString filter () const;
   [[nodiscard]] ModuleLibrary *
@@ -135,6 +144,7 @@ protected:
   QString baseTypeString;
   QString filterString;
   int encodingValue = ObjectEncodingAny;
+  int compressionValue = ObjectCompressionAny;
   bool multiMode = false;
   bool valid = false;
   QString error;
@@ -210,9 +220,14 @@ public:
   static QList<LoadObjectBase> getLoadObjectList ();
   static void appendRegion (void *region, const QString &displayName);
   static qsizetype regionNum ();
-  static std::vector<std::shared_ptr<RegionClass>> &getRegions ();
+  /* A copy of the list, taken under the lock below: the loading jobs append
+   * their regions from worker threads, so a caller must not walk the vector
+   * itself while one of them is running. The shared pointers keep the regions
+   * alive for as long as the copy is held. */
+  static std::vector<std::shared_ptr<RegionClass>> getRegions ();
   static std::shared_ptr<RegionClass> getRegion (qsizetype index);
   static QStringList getRegionNames ();
+  static void addFilesToRegions (QWidget *parent);
   void save (const QList<int> &list);
   bool selectButtonIsDown ();
   /* Removes every region whose index is in `indexes`, skipping locked ones,
@@ -260,6 +275,11 @@ private:
   static std::vector<ModuleBase *> moduleBaseList;
   static QList<LoadObjectBase> loadObjectList;
   static std::vector<std::shared_ptr<RegionClass>> regions;
+  /* `regions` is written from the loading jobs' worker threads (a file that has
+   * been read appends its region there) and read from the GUI thread, which
+   * rebuilds the rows whenever a file finishes. Every access therefore goes
+   * through this. */
+  static std::mutex regionsMutex;
   static QPointer<ManageRegionUI> mrui;
 
 public Q_SLOTS:

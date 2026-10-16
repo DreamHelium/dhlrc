@@ -88,12 +88,20 @@ private:
 class DhPathSettingTemplate : public DhSettingsTemplate
 {
 public:
-  using DhSettingsTemplate::DhSettingsTemplate;
+  DhPathSettingTemplate (DhSettingItem *item, QVBoxLayout *layout,
+                         DhSettingsDialog *dialog,
+                         const QString &title = QString ())
+      : DhSettingsTemplate (item, layout, dialog), title (title)
+  {
+  }
   void initWidget (QVBoxLayout *layout, DhSettingsDialog *dialog) override;
   void applyChange () const override;
   [[nodiscard]] bool detect () const override;
   void setDefault () const override;
   void changeConfig () const override;
+
+private:
+  QString title;
 };
 
 class DhEnumSettingTemplate : public DhSettingsTemplate

@@ -50,7 +50,7 @@ pub extern "C" fn region_get_entity(region: *mut Region, index: usize) -> *const
 #[unsafe(no_mangle)]
 pub extern "C" fn region_get_palette_id_name(region: *mut Region, id: usize) -> *const c_char {
     let palette_array = unsafe { &(*region).palette_array };
-    if palette_array.len() < id {
+    if palette_array.len() <= id {
         return null();
     }
     let palette = &palette_array[id];
@@ -61,7 +61,7 @@ pub extern "C" fn region_get_palette_id_name(region: *mut Region, id: usize) -> 
 #[unsafe(no_mangle)]
 pub extern "C" fn region_get_palette_property_len(region: *mut Region, id: usize) -> usize {
     let palette_array = unsafe { &(*region).palette_array };
-    if palette_array.len() < id {
+    if palette_array.len() <= id {
         return 0;
     }
     let palette = &palette_array[id];
@@ -75,11 +75,11 @@ pub extern "C" fn region_get_palette_property_name(
     index: usize,
 ) -> *const c_char {
     let palette_array = unsafe { &(*region).palette_array };
-    if palette_array.len() < id {
+    if palette_array.len() <= id {
         return null();
     }
     let palette_property = &palette_array[id].property;
-    if palette_property.len() < index {
+    if palette_property.len() <= index {
         return null();
     }
     string_to_ptr_fail_to_null(&palette_property[index].0)
@@ -92,11 +92,11 @@ pub extern "C" fn region_get_palette_property_data(
     index: usize,
 ) -> *const c_char {
     let palette_array = unsafe { &(*region).palette_array };
-    if palette_array.len() < id {
+    if palette_array.len() <= id {
         return null();
     }
     let palette_property = &palette_array[id].property;
-    if palette_property.len() < index {
+    if palette_property.len() <= index {
         return null();
     }
     string_to_ptr_fail_to_null(&palette_property[index].1)
@@ -135,6 +135,10 @@ pub extern "C" fn region_get_offset_z(region: *mut Region) -> i32 {
 #[unsafe(no_mangle)]
 pub extern "C" fn region_get_block_id_by_index(region: *mut Region, index: usize) -> u32 {
     let r = unsafe { &*region };
+    /* A bad index must not panic across the FFI boundary. */
+    if index >= r.block_array.len() {
+        return 0;
+    }
     r.block_array[index]
 }
 

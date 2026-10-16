@@ -75,7 +75,7 @@ impl HelperStruct {
     }
 
     pub fn get_cancel_error(&self, cancel_msg: &str) -> Result<(), Box<dyn Error>> {
-        if cancel_flag_is_cancelled((self.cancel_flag)) == 1 {
+        if cancel_flag_is_cancelled(self.cancel_flag) == 1 {
             return Err(Box::new(MyError {
                 msg: cancel_msg.to_string(),
             }));

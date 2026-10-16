@@ -1,11 +1,14 @@
 #include "utility.h"
+#include "dhcore.h"
 #include "generalchoosedialog.h"
 #include "manageregionui.h"
 
 #include <QApplication>
 #include <QDir>
+#include <QFileInfo>
 #include <QLocale>
 #include <QMessageBox>
+#include <QStandardPaths>
 #define _(str) gettext (str)
 
 QString
@@ -14,6 +17,30 @@ dh::getTranslationDir ()
   auto dir
       = QApplication::applicationDirPath () + QDir::separator () + "locale";
   return dir;
+}
+
+QString
+dh::configDirectory ()
+{
+  const QString path
+      = DhCore::instance () ? DhCore::instance ()->configPath () : QString ();
+  if (!path.isEmpty ())
+    return QFileInfo (path).absolutePath ();
+  /* Before the core is up (or when it could not start) the platform's own
+   * location is still the right answer: the core resolves to the same place
+   * for an application named `dhlrc`. */
+  return QStandardPaths::writableLocation (QStandardPaths::AppConfigLocation);
+}
+
+QString
+dh::cacheDirectory ()
+{
+  const QString configured = DhCore::instance ()
+                                 ? DhCore::instance ()->config ().cacheDirectory
+                                 : QString ();
+  if (!configured.isEmpty ())
+    return configured;
+  return QStandardPaths::writableLocation (QStandardPaths::CacheLocation);
 }
 
 int

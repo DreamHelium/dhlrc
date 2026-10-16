@@ -70,6 +70,136 @@ pub struct SceneQuad {
     pub light: f32,
 }
 
+/// The block a view is pointing at, as the box to draw around it.
+///
+/// The two corners are in block space, the same space the quads are in, so a
+/// highlight is a box around one block: `[x, y, z]` to `[x + 1, y + 1, z + 1]`.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct Highlight {
+    pub min: Vec3,
+    pub max: Vec3,
+}
+
+/// How far outside the block the outline is drawn. Without it the lines lie
+/// exactly on the faces they trace and fight with them for the depth buffer.
+const HIGHLIGHT_OFFSET: f32 = 0.002;
+
+/// How thick the outline's lines are, in blocks: a block is 1 across, so this
+/// is a thirty-second of it — about a pixel in a view of a few dozen blocks.
+const HIGHLIGHT_THICKNESS: f32 = 1.0 / 32.0;
+
+/// The twelve edges of `highlight` as thin boxes, one quad per face.
+///
+/// They fit the scene's own quads so that both renderers draw the same outline
+/// without either learning a new kind of geometry: the texture is never seen
+/// because the tint is black, which leaves the texel black wherever it is
+/// sampled.
+pub fn outline(highlight: Highlight) -> Vec<SceneQuad> {
+    let min = highlight.min.map(|value| value - HIGHLIGHT_OFFSET);
+    let max = highlight.max.map(|value| value + HIGHLIGHT_OFFSET);
+    let thickness = HIGHLIGHT_THICKNESS;
+    let mut quads = Vec::with_capacity(12 * 6);
+
+    for axis in 0..3 {
+        /* An edge runs along one axis; the other two give the four corners it
+         * joins, and each of those becomes a thin box. */
+        let (along, across) = match axis {
+            0 => (0, [1, 2]),
+            1 => (1, [0, 2]),
+            _ => (2, [0, 1]),
+        };
+        for first in [false, true] {
+            for second in [false, true] {
+                let mut start = [0.0f32; 3];
+                let mut end = [0.0f32; 3];
+                start[along] = min[along];
+                end[along] = max[along];
+                for (index, other) in across.iter().enumerate() {
+                    let high = if index == 0 { first } else { second };
+                    let value = if high { max[*other] } else { min[*other] };
+                    start[*other] = value;
+                    end[*other] = value;
+                }
+                /*
+                 * The bar is the run along the edge, thickened sideways on both
+                 * of the axes it does not run along.
+                 */
+                let mut low = start;
+                let mut high = end;
+                for other in across {
+                    low[other] = start[other] - thickness;
+                    high[other] = start[other] + thickness;
+                }
+                boxed(low, high, &mut quads);
+            }
+        }
+    }
+    quads
+}
+
+/// Pushes the six faces of a box as quads, all of them wound outwards.
+fn boxed(low: Vec3, high: Vec3, out: &mut Vec<SceneQuad>) {
+    for direction in Direction::ALL {
+        out.push(SceneQuad {
+            positions: face_corners(direction, low, high),
+            /* The texel is never seen: this texture is the missing-texture
+             * checker every scene carries at index 0, and the black tint below
+             * makes whichever texel is sampled come out black. */
+            uv: [[0.0, 0.0]; 4],
+            texture: 0,
+            alpha: Alpha::Opaque,
+            tint: Some([0, 0, 0]),
+            shade: false,
+            light: 1.0,
+        });
+    }
+}
+
+/// The four corners of one face of a box, written so that the front looks along
+/// `direction` — the winding the rasteriser takes for a front face.
+fn face_corners(direction: Direction, low: Vec3, high: Vec3) -> [Vec3; 4] {
+    let (lx, ly, lz) = (low[0], low[1], low[2]);
+    let (hx, hy, hz) = (high[0], high[1], high[2]);
+    match direction {
+        Direction::North => [
+            [hx, ly, lz],
+            [lx, ly, lz],
+            [lx, hy, lz],
+            [hx, hy, lz],
+        ],
+        Direction::South => [
+            [lx, ly, hz],
+            [hx, ly, hz],
+            [hx, hy, hz],
+            [lx, hy, hz],
+        ],
+        Direction::West => [
+            [lx, ly, lz],
+            [lx, ly, hz],
+            [lx, hy, hz],
+            [lx, hy, lz],
+        ],
+        Direction::East => [
+            [hx, ly, hz],
+            [hx, ly, lz],
+            [hx, hy, lz],
+            [hx, hy, hz],
+        ],
+        Direction::Down => [
+            [lx, ly, hz],
+            [lx, ly, lz],
+            [hx, ly, lz],
+            [hx, ly, hz],
+        ],
+        Direction::Up => [
+            [lx, hy, lz],
+            [lx, hy, hz],
+            [hx, hy, hz],
+            [hx, hy, lz],
+        ],
+    }
+}
+
 /// Everything one render needs.
 pub struct Scene {
     pub quads: Vec<SceneQuad>,
@@ -83,6 +213,56 @@ pub struct Scene {
     pub max: Vec3,
     /// Blocks that could not be resolved, each once, for a frontend to report.
     pub skipped: Vec<String>,
+    /// The outline of the block a view points at, drawn over the scene and
+    /// after it. Empty when nothing is highlighted.
+    pub highlight: Vec<SceneQuad>,
+}
+
+impl Scene {
+    /// The box the block at `cell` is actually drawn in.
+    ///
+    /// A block is not always a whole cell: a slab is half of one, a pane a
+    /// sliver of one. The outline reads better when it follows what is there,
+    /// so this takes the quads that lie within the cell and returns the box
+    /// around them — `None` when the cell drew nothing, which is a block that
+    /// was culled away or is not there at all.
+    pub fn block_box(&self, cell: [i32; 3]) -> Option<Highlight> {
+        let mut min = [f32::INFINITY; 3];
+        let mut max = [f32::NEG_INFINITY; 3];
+        let mut found = false;
+        let low = [cell[0] as f32, cell[1] as f32, cell[2] as f32];
+        let high = [low[0] + 1.0, low[1] + 1.0, low[2] + 1.0];
+        for quad in &self.quads {
+            if !quad.positions.iter().all(|corner| {
+                (0..3).all(|axis| {
+                    corner[axis] >= low[axis] - 1e-3 && corner[axis] <= high[axis] + 1e-3
+                })
+            }) {
+                continue;
+            }
+            found = true;
+            for corner in quad.positions {
+                for axis in 0..3 {
+                    min[axis] = min[axis].min(corner[axis]);
+                    max[axis] = max[axis].max(corner[axis]);
+                }
+            }
+        }
+        found.then_some(Highlight { min, max })
+    }
+
+    /// Points the view at a block, or at nothing, by building — or dropping —
+    /// the outline that block is drawn with.
+    ///
+    /// The outline is part of the scene rather than something a renderer adds,
+    /// so the software rasteriser and a GPU read it from the same place and
+    /// draw the same box.
+    pub fn set_highlight(&mut self, highlight: Option<Highlight>) {
+        self.highlight = match highlight {
+            Some(highlight) => outline(highlight),
+            None => Vec::new(),
+        };
+    }
 }
 
 impl Scene {
@@ -96,6 +276,7 @@ impl Scene {
             min: [0.0; 3],
             max: [1.0; 3],
             skipped: Vec::new(),
+            highlight: Vec::new(),
         }
     }
 
@@ -230,6 +411,7 @@ pub fn build(source: &dyn Source, voxels: &dyn Voxels) -> Scene {
             size[2] as f32,
         ],
         skipped,
+        highlight: Vec::new(),
     };
 
     for y in 0..size[1] {
@@ -619,5 +801,99 @@ mod tests {
         let hit = scene.pick(&ray).unwrap();
         assert_eq!(hit.block, [0, 0, 0]);
         assert!(hit.normal[0] < -0.9, "{:?}", hit.normal);
+    }
+
+    /// The normal of a quad, from its own winding.
+    fn quad_normal(quad: &super::SceneQuad) -> [f32; 3] {
+        let [a, b, c, _] = quad.positions;
+        let u = [b[0] - a[0], b[1] - a[1], b[2] - a[2]];
+        let v = [c[0] - a[0], c[1] - a[1], c[2] - a[2]];
+        let cross = [
+            u[1] * v[2] - u[2] * v[1],
+            u[2] * v[0] - u[0] * v[2],
+            u[0] * v[1] - u[1] * v[0],
+        ];
+        let length = (cross[0] * cross[0] + cross[1] * cross[1] + cross[2] * cross[2]).sqrt();
+        [cross[0] / length, cross[1] / length, cross[2] / length]
+    }
+
+    #[test]
+    fn a_highlight_is_twelve_edges_of_thin_boxes() {
+        let highlight = super::Highlight {
+            min: [2.0, 1.0, 3.0],
+            max: [3.0, 2.0, 4.0],
+        };
+        let outline = super::outline(highlight);
+        /* Twelve edges, and each is a box of six faces. */
+        assert_eq!(outline.len(), 12 * 6);
+
+        /* Every face is wound outwards, so nothing of the outline is invisible
+         * from outside the box: the quads of an edge come in the order of the
+         * directions, each looking along its own. */
+        for (index, quad) in outline.iter().enumerate() {
+            let got = quad_normal(quad);
+            let expected = super::Direction::ALL[index % 6].offset();
+            for axis in 0..3 {
+                assert!(
+                    (got[axis] - expected[axis]).abs() < 1e-5,
+                    "quad {index} looks {got:?}, not {expected:?}"
+                );
+            }
+            /* Nothing strays from the block it is drawn around: the box is
+             * grown by the outline's own offset and line thickness, no more. */
+            for position in quad.positions {
+                for axis in 0..3 {
+                    /* The offset and half a line's thickness, with room over. */
+                    let low = highlight.min[axis] - 0.05;
+                    let high = highlight.max[axis] + 0.05;
+                    assert!(
+                        (low..=high).contains(&position[axis]),
+                        "{position:?} at axis {axis}"
+                    );
+                }
+            }
+            assert_eq!(quad.tint, Some([0, 0, 0]), "the outline is black");
+            assert_eq!(quad.texture, 0, "the checker at index 0, made black");
+        }
+    }
+
+    #[test]
+    fn a_block_box_follows_what_the_block_draws() {
+        use super::{Alpha, Highlight, Scene, SceneQuad, Textures};
+
+        let slab = SceneQuad {
+            positions: [[0.0, 0.0, 0.0], [1.0, 0.0, 0.0], [1.0, 0.5, 0.0], [0.0, 0.5, 0.0]],
+            uv: [[0.0, 0.0]; 4],
+            texture: 0,
+            alpha: Alpha::Opaque,
+            tint: None,
+            shade: false,
+            light: 1.0,
+        };
+        let mut scene = Scene::empty();
+        scene.textures = Textures::new();
+        scene.quads = vec![slab];
+
+        /* The half-height block gives a half-height box, not the whole cell. */
+        let boxed = scene.block_box([0, 0, 0]).expect("the cell drew something");
+        assert_eq!(boxed, Highlight { min: [0.0, 0.0, 0.0], max: [1.0, 0.5, 0.0] });
+
+        /* A cell nothing was drawn in has no box at all. */
+        assert!(scene.block_box([4, 4, 4]).is_none());
+    }
+
+    #[test]
+    fn setting_a_highlight_builds_and_clears_it() {
+        let mut scene = super::Scene::empty();
+        assert!(scene.highlight.is_empty());
+
+        scene.set_highlight(Some(super::Highlight {
+            min: [0.0, 0.0, 0.0],
+            max: [1.0, 1.0, 1.0],
+        }));
+        assert_eq!(scene.highlight.len(), 12 * 6);
+
+        scene.set_highlight(None);
+        assert!(scene.highlight.is_empty());
     }
 }

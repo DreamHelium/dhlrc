@@ -40,6 +40,8 @@ pub struct ModuleInfo {
     pub is_multi: bool,
     /// The NBT encoding the format requires, as an `ObjectEncoding` value.
     pub encoding: i32,
+    /// How the format's files are compressed, as an `ObjectCompression` value.
+    pub compression: i32,
 }
 
 struct Entry {
@@ -134,6 +136,9 @@ fn load_region_modules(dir: &Path) -> Vec<Entry> {
             filter: read_name(&library, b"region_file_type").map(|s| c_cstring(&s)),
             is_multi: read_int(&library, b"region_is_multi").unwrap_or(0) != 0,
             encoding: normalise_encoding(read_int(&library, b"region_nbt_encoding").unwrap_or(0)),
+            compression: normalise_compression(
+                read_int(&library, b"region_compression").unwrap_or(0),
+            ),
         };
         entries.push(Entry { library, info });
     }
@@ -175,6 +180,9 @@ fn load_object_modules(dir: &Path) -> Vec<Entry> {
             filter: None,
             is_multi: false,
             encoding: 0,
+            /* How the bytes are compressed is the region format's business,
+             * not an object codec's. */
+            compression: 0,
         };
         entries.push(Entry { library, info });
     }
@@ -257,6 +265,15 @@ fn path_cstring(path: &Path) -> CString {
 /// Anything that is not one of the known encodings is treated as "any", so a
 /// broken plugin cannot pin decoding to an encoding nothing recognises.
 fn normalise_encoding(value: i32) -> i32 {
+    match value {
+        1 | 2 | 3 => value,
+        _ => 0,
+    }
+}
+
+/// The same for compression: anything unknown means the plugin states no
+/// expectation, and the loader then has nothing to compare against.
+fn normalise_compression(value: i32) -> i32 {
     match value {
         1 | 2 | 3 => value,
         _ => 0,

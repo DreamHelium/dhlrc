@@ -9,6 +9,7 @@
 #include <QWidget>
 
 class DhGpuWidget;
+class QLabel;
 
 /* Shows a region drawn in three dimensions, and lets the user turn it.
  *
@@ -27,6 +28,12 @@ class DhGpuWidget;
  * button slides it, and the wheel comes closer or moves away. A click without
  * a drag reports the block under the pointer. `R` frames the whole region and
  * `O` switches between the perspective and orthographic projections.
+ *
+ * The block under the pointer is also outlined while the mouse moves over the
+ * picture, and `blockHovered ()` says which one it is so a tooltip can be put
+ * beside the cursor. The outline is the core's own: the scene is told the box
+ * and the rasteriser draws it, while the GL child uploads the quads the core
+ * hands out for the same box.
  */
 class DhRenderWidget : public QWidget
 {
@@ -61,9 +68,18 @@ public:
   [[nodiscard]] bool orthographic () const;
   void setOrthographic (bool on);
 
+  /* Sets the text of the tooltip shown beside the pointer. The view shows it
+   * when a block is hovered and hides it otherwise; an empty text hides it.
+   * The caller builds the text, because only it holds the region the block's
+   * name comes from. */
+  void setHoverInfo (const QString &text);
+
 Q_SIGNALS:
   /* A click landed on a block, in the region's own coordinates. */
   void blockPicked (int x, int y, int z);
+  /* The pointer moved onto another block, in the region's own coordinates.
+   * Sent only when the answer changes, never for a move within one block. */
+  void blockHovered (int x, int y, int z);
   /* The backend changed, so a status line saying which one is in use is
    * stale. */
   void backendChanged ();
@@ -74,11 +90,22 @@ protected:
   void mousePressEvent (QMouseEvent *event) override;
   void mouseMoveEvent (QMouseEvent *event) override;
   void mouseReleaseEvent (QMouseEvent *event) override;
+  void leaveEvent (QEvent *event) override;
   void wheelEvent (QWheelEvent *event) override;
   void keyPressEvent (QKeyEvent *event) override;
 
 private:
   void pickAt (const QPoint &at);
+  /* Points the highlight at the block under `at`, clearing it when the pointer
+   * is off the scene. Nothing is touched when the same block is still under
+   * the pointer, so a move within a block never redraws. */
+  void hoverAt (const QPoint &at);
+  /* Takes the outline and the tooltip away. */
+  void clearHover ();
+  /* Picks again where the pointer last was, after the camera moved under it. */
+  void rehover ();
+  /* Puts the tooltip beside the last pointer position, inside the widget. */
+  void placeTip ();
   void discard ();
   /* Hands the camera to the GL child and repaints; every camera change goes
    * through here so the two backends never disagree. */
@@ -101,6 +128,15 @@ private:
   bool dragging = false;
   bool moved = false;
   bool framed = false;
+  /* The block the outline is around, and where the pointer was when it was
+   * found, so the tooltip can follow a pointer that stays over it. */
+  QLabel *tip = nullptr;
+  QPoint hoverPoint;
+  int hoverBlock[3] = { 0, 0, 0 };
+  bool hovered = false;
+  /* Whether a move has ever been seen, so the camera cannot re-pick under a
+   * pointer the widget never had. */
+  bool pointerKnown = false;
 };
 
 #endif /* DHRENDERWIDGET_H */
