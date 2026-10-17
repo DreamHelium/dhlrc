@@ -7,6 +7,7 @@
 #include <QPoint>
 #include <QString>
 #include <QWidget>
+#include <memory>
 
 class DhGpuWidget;
 class QLabel;
@@ -43,8 +44,18 @@ public:
    * resources `core` has configured. The caller must hold the region's lock
    * for the duration of the call: everything the scene needs is copied out of
    * it, and it is not touched again afterwards. */
+  /* A view with no scene yet: the scene arrives through `setScene ()` once it
+   * has been built (typically on a worker thread). */
+  explicit DhRenderWidget (QWidget *parent = nullptr);
+  /* Builds the scene here and now. Callers that must not block the GUI build
+   * it elsewhere and call `setScene ()` instead. */
   DhRenderWidget (void *core, void *region, QWidget *parent = nullptr);
   ~DhRenderWidget () override;
+
+  /* Shows a scene built elsewhere and shares its ownership. A scene built for
+   * a big region can take a long time, which is exactly why the build is
+   * allowed to happen off the GUI thread. */
+  void setScene (std::shared_ptr<DhlrcScene> next);
 
   /* Whether a scene could be built; `problem ()` says why when it could not. */
   [[nodiscard]] bool ready () const { return scene != nullptr; }
@@ -114,7 +125,7 @@ private:
    * CPU picture rather than showing nothing. */
   void onFrameDrawn (bool ok);
 
-  DhlrcScene *scene = nullptr;
+  std::shared_ptr<DhlrcScene> scene;
   DhlrcCamera camera{};
   QString problemText;
   /* The OpenGL child, when this machine can give a context, and whether it is

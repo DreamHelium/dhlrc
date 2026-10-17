@@ -264,6 +264,9 @@ private:
   QLabel *selectionLabel;
 
   QList<ItemFrame *> itemFrames;
+  /* Set while a rebuild is queued, so a batch of changes (a load appends one
+   * region per file) results in one pass instead of one per change. */
+  bool refreshScheduled = false;
   KMessageWidget *messageWidget;
 
   QStringList supportList;
@@ -284,6 +287,8 @@ private:
 
 public Q_SLOTS:
   void refresh_triggered ();
+  /* Queues one `refresh_triggered ()` for the next event-loop turn. */
+  void scheduleRefresh ();
   /* Recomputes the selection count and enables/disables the bulk actions. */
   void updateSelectionActions ();
 };
@@ -312,6 +317,16 @@ public:
   [[nodiscard]] bool checkBoxEnabled () const;
   [[nodiscard]] bool isChecked () const;
   void setChecked (bool checked);
+  /* The region the row shows, to match rows against the list. */
+  [[nodiscard]] RegionClass *regionClass () const
+  {
+    return region;
+  }
+  /* Takes the row's new position and shows the region's current state. */
+  void updateFromRegion (int newIndex);
+  /* Shows "Locked!" and disables the row while a job holds the region, and
+   * puts it back afterwards. */
+  void updateBusyState ();
   /* The row's position in the region list. */
   [[nodiscard]] int
   regionIndex () const
@@ -333,6 +348,7 @@ private:
   QLabel *uuidLabel;
   QLabel *timeLabel;
   int index;
+  QPushButton *readBtn;
   QPushButton *renameBtn;
   QPushButton *removeBtn;
   QPushButton *saveBtn;

@@ -48,9 +48,16 @@ pub fn present(
         .appname("dhlrc")
         .summary(&notification.title)
         .body(&notification.text);
-    /* Windows names the sender with its own `System.AppUserModel.ID`. */
+    /* Windows names the sender with its own `System.AppUserModel.ID`. This has
+     * to be set: with none, the notification crate falls back to PowerShell's
+     * id and Windows shows the toast as coming from PowerShell. An empty value
+     * is treated as "the default", which is the id the installer registers. */
     #[cfg(target_os = "windows")]
-    if let Some(id) = app_id {
+    {
+        let id = app_id
+            .map(str::trim)
+            .filter(|id| !id.is_empty())
+            .unwrap_or("cn.dh.dhlrc");
         toast.app_id(id);
     }
     if timeout_ms > 0 {

@@ -1,6 +1,6 @@
 # Development Document
 
-If you are not a developer, you can ignore this directory.
+**If you are not a developer, you can ignore this directory.**
 
 This is mainly for the plugin side: the `region_module` part (currently `region-nbt-rs`, `region-litematic-rs` and `region-schem-rs`)
 and the `load_module` part (currently `nbt-component`).

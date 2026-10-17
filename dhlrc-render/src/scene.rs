@@ -15,7 +15,7 @@
  */
 
 use dhlrc_resource::{Identifier, Source};
-use dhlrc_model::{BlockModel, Direction, Quad, quads, resolve_parts};
+use dhlrc_model::{BlockModel, Direction, Quad, Variant, quads, resolve_model, resolve_parts};
 
 use crate::camera::{Hit, Ray, Vec3, cross, dot, sub};
 use crate::texture::{Alpha, Textures};
@@ -361,6 +361,18 @@ struct Entry {
 
 /// Builds the scene of `voxels`, reading models and textures through `source`.
 pub fn build(source: &dyn Source, voxels: &dyn Voxels) -> Scene {
+    build_reported(source, voxels, &mut |_| {})
+}
+
+/// `build`, reporting how far it is in percent: 0 when it starts, then once per
+/// vertical slice, and 100 when the scene is ready. A caller that draws a
+/// progress bar raises it as the number grows.
+pub fn build_reported(
+    source: &dyn Source,
+    voxels: &dyn Voxels,
+    report: &mut dyn FnMut(i32),
+) -> Scene {
+    report(0);
     let mut textures = Textures::new();
     let colormaps = Colormaps::load(source);
     let mut skipped = Vec::new();
@@ -433,8 +445,81 @@ pub fn build(source: &dyn Source, voxels: &dyn Voxels) -> Scene {
                 }
             }
         }
+        report(((y + 1) * 100 / size[1].max(1)) as i32);
+    }
+    report(100);
+
+    scene
+}
+
+/// Builds the scene of a single model, drawn as one block at the origin.
+///
+/// This is how an item icon is made: a block item names its model directly
+/// (`minecraft:block/oak_stairs`), and the game draws that model rather than a
+/// block state, so a stair looks like a stair and a grass block is not the snowy
+/// variant. `block` is the name the model belongs to, used for the colour
+/// colormaps (grass and leaves). A model with no geometry (an item sprite, whose
+/// parent is `item/generated`) yields a scene with no quads.
+pub fn build_model(source: &dyn Source, model: &Identifier, block: &Identifier) -> Scene {
+    let mut textures = Textures::new();
+    let colormaps = Colormaps::load(source);
+    let Ok(resolved) = resolve_model(source, model) else {
+        return Scene::empty();
+    };
+    let block_model = BlockModel {
+        variant: Variant {
+            model: model.to_string(),
+            ..Variant::default()
+        },
+        model: resolved,
+    };
+    let voxel = VoxelBlock {
+        name: block.clone(),
+        properties: String::new(),
+    };
+    let entry = resolve_entry(&[block_model], &voxel, source, &colormaps, &mut textures);
+    let mut quads = Vec::new();
+    for piece in &entry.pieces {
+        quads.push(place(piece, 0, 0, 0));
     }
 
+    /* A model does not always fill its cell: a torch is thin, a slab is half.
+     * The bounds come from the geometry so the camera frames what is drawn. */
+    let mut scene = Scene {
+        quads,
+        textures,
+        center: [0.5; 3],
+        radius: 0.866,
+        min: [0.0; 3],
+        max: [1.0; 3],
+        skipped: Vec::new(),
+        highlight: Vec::new(),
+    };
+    if !scene.quads.is_empty() {
+        let mut min = [f32::INFINITY; 3];
+        let mut max = [f32::NEG_INFINITY; 3];
+        for quad in &scene.quads {
+            for corner in quad.positions {
+                for axis in 0..3 {
+                    min[axis] = min[axis].min(corner[axis]);
+                    max[axis] = max[axis].max(corner[axis]);
+                }
+            }
+        }
+        scene.min = min;
+        scene.max = max;
+        scene.center = [
+            (min[0] + max[0]) / 2.0,
+            (min[1] + max[1]) / 2.0,
+            (min[2] + max[2]) / 2.0,
+        ];
+        let extent = [max[0] - min[0], max[1] - min[1], max[2] - min[2]];
+        scene.radius = (0.5 * (extent[0] * extent[0]
+            + extent[1] * extent[1]
+            + extent[2] * extent[2])
+            .sqrt())
+        .max(0.25);
+    }
     scene
 }
 
@@ -676,6 +761,23 @@ mod tests {
                 && (0..self.size[2]).contains(&z);
             inside.then_some(0)
         }
+    }
+
+    #[test]
+    fn a_scene_build_reports_its_progress() {
+        let mut values = Vec::new();
+        let scene = super::build_reported(
+            &cube_source(),
+            &Solid { size: [4, 4, 4] },
+            &mut |value| values.push(value),
+        );
+        assert!(!scene.quads.is_empty());
+        assert_eq!(values.first(), Some(&0), "the build starts at 0");
+        assert_eq!(values.last(), Some(&100), "and ends at 100");
+        assert!(
+            values.windows(2).all(|pair| pair[0] <= pair[1]),
+            "progress never goes backwards: {values:?}"
+        );
     }
 
     #[test]

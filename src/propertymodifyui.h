@@ -7,8 +7,11 @@
 
 #include "regionclass.h"
 #include <QDialog>
+#include <QFutureWatcher>
 #include <QList>
+#include <QListWidget>
 #include <QStringList>
+#include <atomic>
 #include <memory>
 
 QT_BEGIN_NAMESPACE
@@ -18,7 +21,9 @@ class PropertyModifyUI;
 }
 QT_END_NAMESPACE
 
+class QLabel;
 class QLineEdit;
+class QWidget;
 
 class PropertyModifyUI : public QDialog
 {
@@ -37,12 +42,42 @@ Q_SIGNALS:
   void propertiesModified ();
 
 private:
+  /* Disables the dialog while a background job holds the region: the write
+   * would be refused, and the typed values must not be lost on a refusal. */
+  void setEditable (bool editable);
+
+  /* The blocks the in-place edit would touch. Finding them means reading every
+   * block of the region, so they are looked up only when that mode is chosen. */
+  struct SharedBlocks
+  {
+    QStringList places;
+    int total = 0;
+    bool truncated = false;
+  };
+  static SharedBlocks findSharedBlocks (std::shared_ptr<RegionClass> region,
+                                        quint32 paletteId,
+                                        std::shared_ptr<std::atomic<bool>> stop);
+  void loadSharedBlocks ();
+  void setScanning (bool scanning);
+  void showSharedBlocks (const SharedBlocks &blocks);
+
   Ui::PropertyModifyUI *ui;
   std::shared_ptr<RegionClass> regionClass;
   qint32 blockIndex = -1;
+  qint32 blockX = 0;
+  qint32 blockY = 0;
+  qint32 blockZ = 0;
   quint32 paletteId = 0;
   QStringList propertyNames;
   QList<QLineEdit *> dataEdits;
+  QLabel *lockedHint = nullptr;
+  QLabel *sharedLabel = nullptr;
+  QListWidget *sharedList = nullptr;
+  QFutureWatcher<SharedBlocks> *sharedWatcher = nullptr;
+  std::shared_ptr<std::atomic<bool>> scanStop;
+  /* How many blocks share the palette entry, once the scan has run. */
+  int sharedTotal = 0;
+  bool sharedLoaded = false;
 
   void setPropertiesText ();
   bool writeProperties ();

@@ -8,10 +8,91 @@
 #include <QHBoxLayout>
 #include <QIcon>
 #include <QLabel>
+#include <QPointer>
 #include <QPushButton>
+#include <QToolButton>
 #include <QUrl>
 #include <QVBoxLayout>
 #include <QWidget>
+
+namespace
+{
+/* A section of the page: its title is a toggle, and the rows below it are
+ * hidden while it is collapsed. It starts collapsed, so a page with several
+ * plugins opens as a short list of module names.
+ *
+ * Sections nest: a nested one is one of its owner's parts (so folding the
+ * owner hides it too), and its own rows are hidden while either of them is
+ * folded. */
+class SectionToggle : public QToolButton
+{
+public:
+  explicit SectionToggle (const QString &title, QWidget *parent,
+                          SectionToggle *owner = nullptr)
+      : QToolButton (parent), owner (owner)
+  {
+    setText (title);
+    setCheckable (true);
+    setToolButtonStyle (Qt::ToolButtonTextBesideIcon);
+    setAutoRaise (true);
+    setArrowType (Qt::RightArrow);
+    connect (this, &QToolButton::toggled, this,
+             [this] (bool)
+               {
+                 updateArrow ();
+                 apply ();
+               });
+    updateArrow ();
+  }
+
+  /* Records one widget of the section and hides it right away when the
+   * section is collapsed. `QPointer` because the page owns the widgets. */
+  void addPart (QWidget *part)
+  {
+    parts << part;
+    part->setVisible (isExpanded ());
+  }
+
+  /* Records a nested section, which folds with this one. */
+  void addSection (SectionToggle *section)
+  {
+    sections << section;
+    addPart (section);
+  }
+
+  /* Shows the rows this section holds if it is open, then lets the nested
+   * sections apply their own state: opening the owner must not open them. */
+  void apply ()
+  {
+    const bool visible = isExpanded ();
+    for (auto &part : parts)
+      if (part)
+        part->setVisible (visible);
+    for (auto &section : sections)
+      if (section)
+        section->apply ();
+  }
+
+  [[nodiscard]] bool isOpen () const { return isChecked (); }
+  /* Open all the way up: a section inside a folded one shows nothing even
+   * when it was left open. */
+  [[nodiscard]] bool isExpanded () const
+  {
+    return isOpen () && (owner == nullptr || owner->isExpanded ());
+  }
+
+private:
+  void updateArrow ()
+  {
+    setArrowType (isOpen () ? Qt::DownArrow : Qt::RightArrow);
+  }
+
+  SectionToggle *owner = nullptr;
+  QList<QPointer<QWidget>> parts;
+  QList<QPointer<SectionToggle>> sections;
+};
+
+} // namespace
 
 DhSettingsDialog::DhSettingsDialog (QWidget *parent) : KPageDialog (parent)
 {
@@ -65,6 +146,13 @@ DhSettingsDialog::addItem (DhSettingItem *item,
   allItems.append (item);
   itemCreators.insert (item, creator);
   itemsByGroup[currentGroup].append (item);
+}
+
+void
+DhSettingsDialog::addSection (const QString &title, int level)
+{
+  sectionsByGroup[currentGroup].append (
+      Section{ title, itemsByGroup[currentGroup].size (), level });
 }
 
 void
@@ -186,8 +274,59 @@ DhSettingsDialog::build ()
     {
       auto *page = new QWidget;
       auto *layout = new QVBoxLayout (page);
-      for (auto *i : itemsByGroup.value (group))
-        addWidget (i, layout);
+      const auto items = itemsByGroup.value (group);
+      const auto sections = sectionsByGroup.value (group);
+      /* The sections opened so far, by level: a section at a level replaces
+       * every section at that level and below. */
+      QList<QPointer<SectionToggle>> open;
+      for (qsizetype index = 0; index < items.size (); ++index)
+        {
+          /* A section starts right before its first item; its rows are hidden
+           * until the toggle is opened. */
+          for (const auto &definition : sections)
+            if (definition.firstItem == index)
+              {
+                while (open.size () > definition.level)
+                  open.removeLast ();
+                auto *owner
+                    = open.isEmpty () ? nullptr : open.last ().data ();
+                auto *section
+                    = new SectionToggle (definition.title, page, owner);
+                if (owner)
+                  owner->addSection (section);
+                open.append (section);
+                /* A nested section is indented, so the fold it belongs to is
+                 * visible at a glance. The spacer is part of a row because
+                 * the theme's tool button style ignores stylesheet padding. */
+                if (definition.level > 0)
+                  {
+                    auto *row = new QHBoxLayout ();
+                    row->addSpacing (definition.level * 24);
+                    row->addWidget (section);
+                    row->addStretch ();
+                    layout->addLayout (row);
+                  }
+                else
+                  layout->addWidget (section);
+              }
+          /* A fold's rows sit one step deeper than its title, so the page
+           * reads as a tree. The templates fill a container with that left
+           * margin; the container is what the sections hide and show. */
+          if (open.isEmpty ())
+            addWidget (items[index], layout);
+          else
+            {
+              auto *container = new QWidget (page);
+              auto *inner = new QVBoxLayout (container);
+              inner->setContentsMargins (
+                  static_cast<int> (open.size ()) * 24, 0, 0, 0);
+              addWidget (items[index], inner);
+              layout->addWidget (container);
+              for (auto &section : open)
+                if (section)
+                  section->addPart (container);
+            }
+        }
 
       layout->addStretch ();
 

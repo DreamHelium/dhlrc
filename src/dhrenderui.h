@@ -1,13 +1,18 @@
 #ifndef DHRENDERUI_H
 #define DHRENDERUI_H
 
+#include "dhlrc_render.h"
 #include "dhwidget.h"
 #include "regionclass.h"
 #include "resourcegetter.h"
 
+#include <QFutureWatcher>
 #include <QLabel>
+#include <QProgressBar>
 #include <QPushButton>
+#include <QTimer>
 #include <QWidget>
+#include <atomic>
 #include <memory>
 
 class DhRenderWidget;
@@ -17,6 +22,9 @@ class DhRenderWidget;
  * It owns nothing of the region: the scene is a snapshot taken while the
  * region's lock is held, so the view keeps drawing even if the region is
  * changed or closed afterwards. `Reload` takes a fresh snapshot.
+ *
+ * The scene is built on a worker thread: for a big region that takes long
+ * enough that building it here froze the whole window (and the application).
  *
  * A version's block models and textures are only in its client jar, so when the
  * cache does not have one the window fetches it itself — about 30 MB, once per
@@ -32,6 +40,11 @@ public:
 
 private:
   void configureResources ();
+  /* Builds the scene on a worker thread and hands it to the view, which takes
+   * over its ownership. */
+  void startSceneBuild ();
+  void sceneBuilt (std::shared_ptr<DhlrcScene> scene);
+  void setBuilding (bool building);
   void rebuild ();
   void updateSummary ();
   void describe (int x, int y, int z);
@@ -56,8 +69,21 @@ private:
   DhRenderWidget *view = nullptr;
   QLabel *summary = nullptr;
   QLabel *picked = nullptr;
+  /* Says that the scene is being built; replaced by the view when it is. */
+  QLabel *buildingLabel = nullptr;
+  /* How far the scene build is, from the renderer's own report. The worker
+   * only stores the number; this window polls it, so the worker never touches
+   * a widget. */
+  QProgressBar *buildProgressBar = nullptr;
+  QTimer *buildProgressTimer = nullptr;
+  std::shared_ptr<std::atomic<int>> buildProgress;
+  QPushButton *reloadButton = nullptr;
   QPushButton *fetchButton = nullptr;
   QPushButton *modifyButton = nullptr;
+  QFutureWatcher<std::shared_ptr<DhlrcScene>> *sceneWatcher = nullptr;
+  bool building = false;
+  /* A reload requested while a build is running, done right after it. */
+  bool rebuildPending = false;
   /* The block the last click named, so the property dialog has somewhere to
    * act; `hasPicked` says whether there is one. */
   bool hasPicked = false;

@@ -136,6 +136,18 @@ pub static SETTINGS: &[SettingDef] = &[
         set: set_fail_then_retry,
     },
     SettingDef {
+        key: "CuteLanguagePack",
+        group: GENERAL,
+        kind: SettingType::Bool,
+        label: i18n("Cute Language Pack"),
+        tooltip: i18n("Use the playful catalogue (喵, 捏, kaomoji, emoji) instead of the plain one. It is read when the program starts, so a restart is needed."),
+        choices: NO_CHOICES,
+        long_text: false,
+        default: "false",
+        get: get_cute_language_pack,
+        set: set_cute_language_pack,
+    },
+    SettingDef {
         key: "CacheDirectory",
         group: GENERAL,
         kind: SettingType::Path,
@@ -480,6 +492,14 @@ fn get_fail_then_retry(config: &Config) -> String {
 
 fn set_fail_then_retry(config: &mut Config, text: &str) {
     config.general.fail_then_retry = parse_bool(text);
+}
+
+fn get_cute_language_pack(config: &Config) -> String {
+    bool_text(config.general.cute_language_pack)
+}
+
+fn set_cute_language_pack(config: &mut Config, text: &str) {
+    config.general.cute_language_pack = parse_bool(text);
 }
 
 fn get_fail_use_cache(config: &Config) -> String {

@@ -17,6 +17,7 @@ pub mod config;
 pub mod desktop;
 pub mod download;
 pub mod ffi;
+pub mod material;
 pub mod modules;
 pub mod notification;
 #[cfg(feature = "render")]

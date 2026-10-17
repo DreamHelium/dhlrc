@@ -35,10 +35,20 @@ extern "C"
     int32_t orthographic;
   } DhlrcCamera;
 
+  /* A progress callback: `value` is the percentage (0-100), `user` the pointer
+   * the caller passed in. Called from the thread that builds the scene. */
+  typedef void (*DhlrcProgressFunc) (void *user, int32_t value);
+
   /* Builds the scene of `region` (a `Region *` from `libregion_rs`), reading
    * models and textures through the resources `core` has configured. NULL
    * when a handle is NULL or the scene could not be built. */
   DhlrcScene *dhlrc_render_scene_new (void *core, const void *region);
+
+  /* Like `dhlrc_render_scene_new`, reporting how far the build is: 0 first,
+   * then once per vertical slice, and 100 when the scene is ready. */
+  DhlrcScene *dhlrc_render_scene_new_reported (void *core, const void *region,
+                                               DhlrcProgressFunc progress,
+                                               void *user);
 
   /* Frees a scene built by `dhlrc_render_scene_new`. NULL is allowed. */
   void dhlrc_render_scene_free (DhlrcScene *scene);
@@ -71,6 +81,19 @@ extern "C"
   const uint8_t *dhlrc_render_image (DhlrcScene *scene,
                                      const DhlrcCamera *camera, uint32_t width,
                                      uint32_t height);
+
+  /* An item icon, drawn the way the game draws a block item: the block's model
+   * seen from the south-east, 30 degrees above the horizon, orthographic. Only
+   * for items whose model is a block (a stair, a slab, a torch); an item drawn
+   * as a flat sprite yields NULL, and the caller should use
+   * `dhlrc_core_item_texture` instead.
+   *
+   * `size` is the width and height in pixels; `width` and `height` receive it
+   * back and may be NULL. The bytes are owned (RGBA, rows from the top,
+   * transparent background), free them with `dhlrc_core_bytes_free`. NULL when
+   * a handle is NULL, the item is a sprite, or its model could not be read. */
+  uint8_t *dhlrc_render_item_icon (void *core, const char *item, uint32_t size,
+                                   uint32_t *width, uint32_t *height);
 
   /* The block under pixel `(x, y)`, written to `block` as a region coordinate
    * (three `int32_t`). Returns 1 on a hit and 0 on a miss. */

@@ -4,6 +4,7 @@
 #include "dhcore.h"
 #include "dhloadjob.h"
 #include "generalchoosedialog.h"
+#include "mainwindow.h"
 #include "pluginoptionsconfig.h"
 #include "region.h"
 #include "saveregionjob.h"
@@ -27,6 +28,7 @@
 #include <qevent.h>
 #include <qglobalstatic.h>
 #include <qmimedata.h>
+#include <qnamespace.h>
 #include <stdexcept>
 
 /* Application-wide state, defined here and declared in the header. */
@@ -143,7 +145,7 @@ ManageRegionUI::ManageRegionUI (QWidget *parent) : DhWidget (parent)
 {
   setAcceptDrops (true);
   connect (this, &ManageRegionUI::regionChanged, this,
-           &ManageRegionUI::refresh_triggered);
+           &ManageRegionUI::scheduleRefresh);
 
   loadModules ();
 
@@ -195,6 +197,7 @@ ManageRegionUI::ManageRegionUI (QWidget *parent) : DhWidget (parent)
   scrollAreaWidget->setLayout (frameLayout);
   scrollArea->setWidget (scrollAreaWidget);
   scrollArea->setWidgetResizable (true);
+  frameLayout->setAlignment (Qt::AlignTop);
 
   layout->addWidget (scrollArea);
 
@@ -325,17 +328,33 @@ ManageRegionUI::removeRegions (const QList<int> &indexes)
   std::sort (sorted.begin (), sorted.end (), std::greater<int> ());
 
   qsizetype removed = 0;
+  QStringList removedUuids;
   for (auto index : sorted)
     {
       auto region = getRegion (index);
       if (!region || region->locked ())
         continue;
+      removedUuids.append (region->uuid ());
       const std::lock_guard lock (regionsMutex);
       regions.erase (regions.begin () + index);
       removed++;
     }
   if (removed > 0)
-    Q_EMIT regionChanged ();
+    {
+      /* A reader belongs to its region, so removing the region closes it — and
+       * with it everything the reader opened — as well as its modifier page.
+       * Left open they would keep showing a region the list no longer has. */
+      for (const auto &uuid : removedUuids)
+        {
+          if (auto *page = MainWindow::keyedTab (
+                  QStringLiteral ("region-reader:") + uuid))
+            MainWindow::closeTab (page);
+          if (auto *page = MainWindow::keyedTab (
+                  QStringLiteral ("region-modifier:") + uuid))
+            MainWindow::closeTab (page);
+        }
+      Q_EMIT regionChanged ();
+    }
   return removed;
 }
 
@@ -387,10 +406,7 @@ ManageRegionUI::updateSelectionActions ()
 
 ManageRegionUI::~ManageRegionUI ()
 {
-  for (auto &widget : frameLayout->children ())
-    frameLayout->removeWidget (qobject_cast<QWidget *> (widget));
-  for (auto &widget : itemFrames)
-    delete widget;
+  qDeleteAll (itemFrames);
   itemFrames.clear ();
   for (auto &module : moduleBaseList)
     delete module;
@@ -589,7 +605,9 @@ ManageRegionUI::save (const QList<int> &list)
 bool
 ManageRegionUI::selectButtonIsDown ()
 {
-  return selectButton->isDown ();
+  /* The rows are in selection mode while the box is ticked, not only while the
+   * mouse happens to hold it down. */
+  return selectButton->isChecked ();
 }
 
 void
@@ -614,45 +632,62 @@ ManageRegionUI::dropEvent (QDropEvent *event)
 }
 
 void
+ManageRegionUI::scheduleRefresh ()
+{
+  if (refreshScheduled)
+    return;
+  refreshScheduled = true;
+  QTimer::singleShot (0, this,
+                      [this]
+                        {
+                          refreshScheduled = false;
+                          refresh_triggered ();
+                        });
+}
+
+void
 ManageRegionUI::refresh_triggered ()
 {
-  for (auto &widget : frameLayout->children ())
-    frameLayout->removeWidget (qobject_cast<QWidget *> (widget));
-  for (auto &widget : itemFrames)
-    delete widget;
-  itemFrames.clear ();
-
   /* A copy taken under the lock: a loading job may append a region from its
-   * worker thread while the rows are being rebuilt, and appending to the vector
-   * this loop is walking would invalidate it under our feet. */
+   * worker thread while the rows are being rebuilt. */
   const auto snapshot = getRegions ();
-  int i = 0;
-  for (const auto &region : snapshot)
+
+  /* The rows follow the order of the list, so the existing frames are matched
+   * against it first. A pointer mismatch means a region in front of this row
+   * was removed and everything behind it moved up: those rows are dropped and
+   * built again. A load only appends, so its new rows are added at the end and
+   * the ones already there are left alone. */
+  qsizetype keep = 0;
+  while (keep < itemFrames.size ()
+         && keep < static_cast<qsizetype> (snapshot.size ())
+         && itemFrames[keep]->regionClass () == snapshot[keep].get ())
+    ++keep;
+  while (itemFrames.size () > keep)
     {
-      auto frame = new ItemFrame (region.get (), i, this);
-      if (region->locked ())
-        {
-          frame->setCheckBoxEnabled (false);
-          frame->setButtonEnable (false);
-        }
-      else
-        {
-          /* Row buttons are only usable outside selection mode. */
-          frame->setButtonEnable (!selectButton->isChecked ());
-        }
+      auto *frame = itemFrames.takeLast ();
+      frameLayout->removeWidget (frame);
+      frame->deleteLater ();
+    }
+
+  for (qsizetype i = 0; i < keep; ++i)
+    itemFrames[i]->updateFromRegion (static_cast<int> (i));
+
+  for (qsizetype i = keep; i < static_cast<qsizetype> (snapshot.size ()); ++i)
+    {
+      auto *frame
+          = new ItemFrame (snapshot[i].get (), static_cast<int> (i), this);
       frame->setCheckBoxVisible (selectButton->isChecked ());
       connect (frame, &ItemFrame::checkedChanged, this,
                &ManageRegionUI::updateSelectionActions);
-      /* A region becoming locked or unlocked must refresh the row (it shows
-       * "Locked!" and disables its buttons). Connecting here, once per region,
-       * avoids the O(n²) refresh churn of doing it per job. */
-      connect (region.get (), &RegionClass::lockedChanged, this,
+      /* Locking or unlocking a region goes through the same scheduled refresh
+       * as every other change: it only updates the rows, never rebuilds them,
+       * and `regionChanged` is also what the region picker dialog listens to
+       * for its "locked" labels. */
+      connect (snapshot[i].get (), &RegionClass::lockedChanged, this,
                &ManageRegionUI::regionChanged, Qt::UniqueConnection);
       frameLayout->addWidget (frame);
       itemFrames.append (frame);
-      i++;
     }
-  /* The list was rebuilt, so the old selection is gone. */
   updateSelectionActions ();
 }
 
@@ -674,10 +709,12 @@ ItemFrame::ItemFrame (RegionClass *region, int index, ManageRegionUI *mrui,
     nameLabel = new QLabel (regionLockedName);
   else
     nameLabel = new QLabel (region->displayName ());
+  nameLabel->setObjectName ("nameLabel");
   /* The UUID is an implementation detail rather than something the user reads
    * at a glance, so keep it but in grey and monospace: the fixed-width font
    * makes individual characters easier to compare. */
   uuidLabel = new QLabel (region->uuid ());
+  uuidLabel->setObjectName ("uuidLabel");
   uuidLabel->setStyleSheet ("color:gray;");
   uuidLabel->setFont (QFontDatabase::systemFont (QFontDatabase::FixedFont));
   uuidLabel->setTextInteractionFlags (Qt::TextSelectableByMouse);
@@ -686,6 +723,7 @@ ItemFrame::ItemFrame (RegionClass *region, int index, ManageRegionUI *mrui,
    * RegionModifyUI). Prefixed so the number is not mistaken for the latter. */
   timeLabel = new QLabel (QString (_ ("Added: %1"))
                               .arg (dh::formatDateTime (region->dateTime ())));
+  timeLabel->setObjectName ("timeLabel");
   timeLabel->setStyleSheet ("color:gray;");
   labelLayout = new QVBoxLayout ();
   labelLayout->addWidget (nameLabel);
@@ -693,6 +731,14 @@ ItemFrame::ItemFrame (RegionClass *region, int index, ManageRegionUI *mrui,
   labelLayout->addWidget (timeLabel);
   layout->addLayout (labelLayout);
 
+  /* Opens the reader on this region, or brings the reader that is already open
+   * for it to the front. */
+  readBtn = new QPushButton ();
+  readBtn->setIcon (QIcon::fromTheme ("document-preview"));
+  readBtn->setFlat (true);
+  readBtn->setSizePolicy (QSizePolicy::Fixed, QSizePolicy::Fixed);
+  readBtn->setToolTip (_ ("Open the region reader"));
+  readBtn->setEnabled (!mrui->selectButtonIsDown ());
   renameBtn = new QPushButton ();
   renameBtn->setIcon (QIcon::fromTheme ("edit-rename"));
   renameBtn->setFlat (true);
@@ -709,6 +755,7 @@ ItemFrame::ItemFrame (RegionClass *region, int index, ManageRegionUI *mrui,
   saveBtn->setSizePolicy (QSizePolicy::Fixed, QSizePolicy::Fixed);
   saveBtn->setEnabled (!mrui->selectButtonIsDown ());
 
+  layout->addWidget (readBtn);
   layout->addWidget (renameBtn);
   layout->addWidget (removeBtn);
   layout->addWidget (saveBtn);
@@ -716,6 +763,8 @@ ItemFrame::ItemFrame (RegionClass *region, int index, ManageRegionUI *mrui,
   auto line = new QFrame ();
   line->setFrameStyle (QFrame::HLine);
   allLayout->addWidget (line);
+  connect (readBtn, &QPushButton::clicked, this,
+           [index] { MainWindow::openRegionReader (index); });
   connect (renameBtn, &QPushButton::clicked, this,
            [&, index]
              {
@@ -728,7 +777,16 @@ ItemFrame::ItemFrame (RegionClass *region, int index, ManageRegionUI *mrui,
                    QLineEdit::Normal, regionClass->name ());
                if (!newName.isEmpty ())
                  {
-                   regionClass->setName (newName);
+                   const QString oldName = regionClass->name ();
+                   if (regionClass->setName (newName))
+                     {
+                       regionClass->recordChange (
+                           _ ("Base name"),
+                           QStringLiteral ("%1: %2 -> %3")
+                               .arg (_ ("Base name"), oldName, newName),
+                           [oldName] (RegionClass &r)
+                             { return r.setName (oldName); });
+                     }
                    Q_EMIT ManageRegionUI::instance ()->regionChanged ();
                  }
              });
@@ -736,6 +794,9 @@ ItemFrame::ItemFrame (RegionClass *region, int index, ManageRegionUI *mrui,
            [mrui, index] { mrui->removeRegions ({ index }); });
   connect (saveBtn, &QPushButton::clicked, this,
            [&, mrui, index] { mrui->save ({ index }); });
+
+  /* A row created for a region a job already holds has to start locked. */
+  updateBusyState ();
 }
 
 ItemFrame::~ItemFrame () = default;
@@ -743,6 +804,7 @@ ItemFrame::~ItemFrame () = default;
 void
 ItemFrame::setButtonEnable (bool enable)
 {
+  readBtn->setEnabled (enable);
   renameBtn->setEnabled (enable);
   removeBtn->setEnabled (enable);
   saveBtn->setEnabled (enable);
@@ -797,4 +859,25 @@ bool
 ItemFrame::isRegionLocked () const
 {
   return region->locked ();
+}
+
+void
+ItemFrame::updateFromRegion (int newIndex)
+{
+  index = newIndex;
+  updateBusyState ();
+}
+
+void
+ItemFrame::updateBusyState ()
+{
+  const bool locked = region->locked ();
+  nameLabel->setText (locked ? _ ("Locked!") : region->displayName ());
+  /* Row buttons are only usable outside selection mode, and never while a job
+   * holds the region. */
+  setButtonEnable (!locked && !mrui->selectButtonIsDown ());
+  setCheckBoxEnabled (!locked);
+  /* A row that became locked cannot stay ticked for a bulk action. */
+  if (locked && checkBox->isChecked ())
+    checkBox->setChecked (false);
 }

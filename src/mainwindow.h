@@ -21,6 +21,7 @@
 class KMessageWidget;
 class DhSettingsDialog;
 class DhDirectoryUI;
+class ExternalNbtReaderUI;
 
 class MainWindow : public QMainWindow
 {
@@ -28,8 +29,29 @@ class MainWindow : public QMainWindow
 public:
   explicit MainWindow (QWidget *parent = nullptr);
   ~MainWindow () override;
+  /* Makes `window` close when the main window closes, through the
+   * `windowClosed ()` signal. A window the program opens registers itself
+   * once, in its constructor; a window that belongs to another window (a
+   * reader's tools) is closed by that window's own hierarchy instead. */
+  static void ownWindow (QWidget *window);
   static void addWidgetToTopArea (QWidget *widget);
   static void addWidgetToTab (QWidget *widget, const QString &title);
+  /* Adds `widget` as a tab and selects it. With a non-empty `key` the tab is
+   * identified by it: when a page already holds that key, that page is brought
+   * forward instead and `widget` is discarded. */
+  static void addKeyedTab (QWidget *widget, const QString &title,
+                           const QString &key);
+  /* The page — a tab or one torn off into a window — added with `key`, or
+   * nullptr. */
+  static QWidget *keyedTab (const QString &key);
+  /* Brings an existing page forward, docking it back if it was torn off. */
+  static void showTab (QWidget *page, const QString &title);
+  /* Removes the tab holding `widget` and deletes it; does nothing when the
+   * widget is not one of the tabs. */
+  static void closeTab (QWidget *widget);
+  /* Opens the reader of the region at `index`, or brings the reader that is
+   * already open for that region forward. */
+  static void openRegionReader (int index);
   static MainWindow *instance ();
 
 Q_SIGNALS:
@@ -116,11 +138,26 @@ private:
    * its own window. Returns its tab index. */
   int ensureTab (QWidget *page, const QString &title);
 
-  void openExternalNbtReader ();
+  /* Opens an external NBT reader: as a tab, or as a window of its own when
+   * `newWindow` is set. A repeat call opens another reader; the popup lists the
+   * ones already open. */
+  void openExternalNbtReader (bool newWindow = false);
+  /* The open external NBT readers as a popup under the sidebar row, named
+   * after the file each read, plus the two ways to open another one. */
+  void showNbtReaderMenu ();
+  /* Brings a reader to the front, whether it is a tab or a window. */
+  void showNbtReader (ExternalNbtReaderUI *reader);
+  /* Runs what the sidebar row carries. Single click and Enter (the list's
+   * `clicked` and `activated` signals) both come here. */
+  void openSidebarEntry (const QModelIndex &index);
   /* Brings the program-directories page to the front, creating it on first
    * use. It is one page kept for the life of the window, so its tab shows the
    * same view again when it is reopened. */
   void openProgramDirectories ();
+  /* The region list as a popup under the sidebar row: one entry per region,
+   * checked when that region's reader is already open, and picking one opens
+   * (or brings forward) its reader. */
+  void showRegionReaderMenu ();
 
   /* A page torn off into a window of its own.
    *

@@ -1,42 +1,44 @@
 #include "blocklistui.h"
-#include <qnamespace.h>
-#define _(str) gettext (str)
 #include "ui_blocklistui.h"
-#include <QFuture>
-#include <QFutureWatcher>
-#include <QList>
-#include <QTimer>
-#include <QtConcurrentRun>
-#include <qlineedit.h>
-#include <qmessagebox.h>
-#include <qsortfilterproxymodel.h>
-#include <qstandarditemmodel.h>
+
+#include "mainwindow.h"
+#include "regionclass.h"
+#include "resourcegetter.h"
+
+#include <QHeaderView>
+#include <QLineEdit>
+#include <QMessageBox>
+#include <QMetaObject>
+#include <QSortFilterProxyModel>
+#include <QStandardItemModel>
+#include <QtGlobal>
+#include <ctime>
+#include <libintl.h>
 #include <region.h>
+#include <utility>
 
-#include <resourcegetter.h>
-#include <utility.h>
+#define _(str) gettext (str)
 
-BlockListUI::BlockListUI (void *region, bool translationReady, QWidget *parent)
-    : QWidget (parent), ui (new Ui::BlockListUI), region (region)
+BlockListUI::BlockListUI (std::shared_ptr<RegionClass> region,
+                          bool translationReady_, QWidget *parent)
+    : QWidget (parent), regionClass (std::move (region)),
+      translationReady (translationReady_), ui (new Ui::BlockListUI)
 {
-  this->region = region;
-  this->translationReady = translationReady;
+  MainWindow::ownWindow (this);
   model = new QStandardItemModel (this);
   proxyModel = new QSortFilterProxyModel (this);
   auto btn = QMessageBox::question (this, _ ("Ignore Air?"),
                                     _ ("Do you want to ignore air?"));
-  if (btn == QMessageBox::Yes)
-    ignoreAir = true;
+  ignoreAir = btn == QMessageBox::Yes;
   ui->setupUi (this);
   QObject::connect (ui->lineEdit, &QLineEdit::textChanged, this,
                     &BlockListUI::textChanged_cb);
   connect (this, &BlockListUI::setModel, this,
-           [&]
+           [this]
              {
                proxyModel->setSourceModel (model);
                ui->tableView->setModel (proxyModel);
                proxyModel->setFilterKeyColumn (-1);
-
                ui->tableView->horizontalHeader ()->setSectionResizeMode (
                    1, QHeaderView::Stretch);
              });
@@ -45,6 +47,11 @@ BlockListUI::BlockListUI (void *region, bool translationReady, QWidget *parent)
 
 BlockListUI::~BlockListUI ()
 {
+  /* The scan may still be running; stop it and wait for the current block, so
+   * it cannot touch the model or the region after this object is gone. */
+  stop = true;
+  if (worker.joinable ())
+    worker.join ();
   model->clear ();
   delete model;
   delete ui;
@@ -61,118 +68,170 @@ BlockListUI::updateBlockList ()
     stringList << _ ("id") << _ ("id Name") << _ ("x") << _ ("y") << _ ("z")
                << _ ("Palette");
   model->setHorizontalHeaderLabels (stringList);
-
-  connect (this, &BlockListUI::addItems,
-           [&] (const QList<QStandardItem *> &items)
-             { model->appendRow (items); });
   connect (this, &BlockListUI::setValue, ui->progressBar,
            &QProgressBar::setValue);
-  auto addBlockFunc = [&]
+
+  /* Translations are looked up here, on the GUI thread, once per palette
+   * entry; the worker then needs no access to the core's translation state. */
+  QVector<QString> translations;
+  if (translationReady)
     {
-      int regionX = region_get_x (region);
-      int regionY = region_get_y (region);
-      int regionZ = region_get_z (region);
-      int size = regionX * regionY * regionZ;
-      int x = 0;
-      int y = 0;
-      int z = 0;
-      auto addIndexFunc = [&x, &y, &z, regionX, regionY, regionZ]
+      AutoLocker locker (*regionClass);
+      void *region = regionClass->get_region ();
+      const auto paletteLen = region_get_palette_len (region);
+      translations.reserve (static_cast<qsizetype> (paletteLen));
+      for (size_t id = 0; id < paletteLen; id++)
         {
-          if (x < regionX - 1)
-            x++;
-          else if (z < regionZ - 1)
-            {
-              x = 0;
-              z++;
-            }
-          else if (y < regionY - 1)
-            {
-              x = 0;
-              z = 0;
-              y++;
-            }
-        };
-
-      void *system_info = get_system_info_object ();
-      clock_t start = clock ();
-      for (int i = 0; i < size; i++)
-        {
-          clock_t end = clock ();
-          if ((end - start) > 1000)
-            {
-              start = clock ();
-              Q_EMIT setValue ((i + 1) * 100 / size);
-              if (get_free_memory (system_info) < 500 * 1024 * 1024)
-                {
-                  system_info_object_free (system_info);
-                  Q_EMIT stopProcess ();
-                  return;
-                }
-            }
-
-          auto id = region_get_block_id_by_index (region, i);
-          auto id_name = region_get_palette_id_name (region, id);
-          if (!strcmp (id_name, "minecraft:air") && ignoreAir)
-            {
-              string_free (id_name);
-              addIndexFunc ();
-              continue;
-            }
-          QStandardItem *item2 = nullptr;
-
-          QStandardItem *item0 = new QStandardItem (QString::number (i));
-          QStandardItem *item1 = new QStandardItem (id_name);
-          if (translationReady)
-            {
-              auto translated = get_translation_from_object (id_name);
-              if (!translated.isEmpty ())
-                item2 = new QStandardItem (translated);
-            }
-          QStandardItem *item3 = new QStandardItem (QString::number (x));
-          QStandardItem *item4 = new QStandardItem (QString::number (y));
-          QStandardItem *item5 = new QStandardItem (QString::number (z));
-          QStandardItem *item6 = new QStandardItem (QString::number (id));
-          auto palette_index = region_get_palette_property_len (region, id);
-          QString str = QString ();
-          if (palette_index)
-            {
-              for (int j = 0; j < palette_index; j++)
-                {
-                  auto name = region_get_palette_property_name (region, id, j);
-                  str += name;
-                  string_free (name);
-                  str += ": ";
-                  auto data = region_get_palette_property_data (region, id, j);
-                  str += data;
-                  string_free (data);
-                  if (j != palette_index - 1)
-                    str += "\n";
-                }
-            }
-          item6->setToolTip (str);
-          QList<QStandardItem *> itemList;
-          if (item2)
-            itemList = { item0, item1, item2, item3, item4, item5, item6 };
-          else
-            itemList = { item0, item1, item3, item4, item5, item6 };
-
-          for (auto item : itemList)
-            item->setEditable (false);
-          Q_EMIT addItems (itemList);
-          addIndexFunc ();
-          string_free (id_name);
+          auto name = region_get_palette_id_name (region, id);
+          const QString text = name ? QString::fromUtf8 (name) : QString ();
+          string_free (name);
+          translations.append (get_translation_from_object (text));
         }
-      Q_EMIT setValue (100);
-      Q_EMIT setModel ();
-    };
+    }
 
-  std::thread trd (addBlockFunc);
-  trd.detach ();
+  /* A second scan (the button can be pressed again) waits for the first. */
+  stop = true;
+  if (worker.joinable ())
+    worker.join ();
+  stop = false;
+  const bool skipAir = ignoreAir;
+  worker = std::thread (
+      [this, translations = std::move (translations), skipAir]
+      { scanBlocks (translations, skipAir); });
 }
 
 void
-BlockListUI::resizeRow ()
+BlockListUI::scanBlocks (QVector<QString> translations, bool ignoreAir)
 {
+  /* The region is held while it is read: the GUI cannot edit it under the
+   * scan, and the row in the region list shows that it is in use. */
+  AutoLocker locker (*regionClass);
+  void *region = regionClass->get_region ();
+
+  const int regionX = region_get_x (region);
+  const int regionY = region_get_y (region);
+  const int regionZ = region_get_z (region);
+  const int size = regionX * regionY * regionZ;
+  int x = 0;
+  int y = 0;
+  int z = 0;
+  const auto advance = [&x, &y, &z, regionX, regionY, regionZ]
+    {
+      if (x < regionX - 1)
+        x++;
+      else if (z < regionZ - 1)
+        {
+          x = 0;
+          z++;
+        }
+      else if (y < regionY - 1)
+        {
+          x = 0;
+          z = 0;
+          y++;
+        }
+    };
+
+  /* Batches of rows are handed to the GUI thread; the worker itself never
+   * appends to the model. */
+  const auto post = [this] (QList<QList<QStandardItem *>> rows)
+  {
+    auto batch = std::make_shared<ItemBatch> ();
+    batch->rows = std::move (rows);
+    QMetaObject::invokeMethod (
+        this,
+        [this, batch]
+          {
+            if (!model)
+              return;
+            for (auto &row : batch->rows)
+              model->appendRow (row);
+            batch->rows.clear ();
+          },
+        Qt::QueuedConnection);
+  };
+
+  void *systemInfo = get_system_info_object ();
+  clock_t last = clock ();
+  QList<QList<QStandardItem *>> rows;
+  for (int i = 0; i < size && !stop.load (); i++)
+    {
+      const clock_t now = clock ();
+      if ((now - last) > 1000)
+        {
+          last = now;
+          Q_EMIT setValue ((i + 1) * 100 / size);
+          if (get_free_memory (systemInfo) < 500 * 1024 * 1024)
+            {
+              system_info_object_free (systemInfo);
+              Q_EMIT stopProcess ();
+              return;
+            }
+        }
+
+      const auto id = region_get_block_id_by_index (region, i);
+      auto idName = region_get_palette_id_name (region, id);
+      const QString name = idName ? QString::fromUtf8 (idName)
+                                  : QStringLiteral ("minecraft:air");
+      if (ignoreAir && name == QLatin1String ("minecraft:air"))
+        {
+          string_free (idName);
+          advance ();
+          continue;
+        }
+
+      QList<QStandardItem *> row;
+      row << new QStandardItem (QString::number (i));
+      row << new QStandardItem (name);
+      if (translationReady)
+        row << new QStandardItem (
+            id < translations.size () ? translations[id] : QString ());
+      row << new QStandardItem (QString::number (x));
+      row << new QStandardItem (QString::number (y));
+      row << new QStandardItem (QString::number (z));
+      auto *paletteItem = new QStandardItem (QString::number (id));
+      row << paletteItem;
+
+      const auto count = region_get_palette_property_len (region, id);
+      if (count)
+        {
+          QStringList properties;
+          for (int j = 0; j < count; j++)
+            {
+              auto propertyName
+                  = region_get_palette_property_name (region, id, j);
+              auto propertyData
+                  = region_get_palette_property_data (region, id, j);
+              properties << QStringLiteral ("%1: %2")
+                                .arg (propertyName ? QString::fromUtf8 (
+                                                         propertyName)
+                                                   : QString ())
+                                .arg (propertyData ? QString::fromUtf8 (
+                                                         propertyData)
+                                                   : QString ());
+              string_free (propertyName);
+              string_free (propertyData);
+            }
+          paletteItem->setToolTip (properties.join (QLatin1Char ('\n')));
+        }
+
+      for (auto *item : row)
+        item->setEditable (false);
+      string_free (idName);
+      rows.append (row);
+      if (rows.size () >= 64)
+        post (std::move (rows));
+      advance ();
+    }
+
+  if (!rows.isEmpty ())
+    post (std::move (rows));
+  system_info_object_free (systemInfo);
+  if (!stop.load ())
+    {
+      Q_EMIT setValue (100);
+      Q_EMIT setModel ();
+    }
 }
 
 void

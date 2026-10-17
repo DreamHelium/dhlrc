@@ -1,4 +1,5 @@
 #include "dhdirectoryui.h"
+#include "mainwindow.h"
 
 #include "utility.h"
 
@@ -84,6 +85,7 @@ collectListed (QTreeWidgetItem *item, QStringList *paths)
 
 DhDirectoryUI::DhDirectoryUI (QWidget *parent) : QWidget (parent)
 {
+  MainWindow::ownWindow (this);
   setWindowTitle (_ ("Program Directories"));
   resize (860, 620);
 

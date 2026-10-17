@@ -134,6 +134,9 @@ pub struct General {
     /// The language block and item names are shown in, as a Minecraft locale
     /// (`zh_cn`). Used when a caller does not name one.
     pub language: String,
+    /// Use the playful catalogue (`dhlrc-cute`) instead of the plain one. It is
+    /// read when the program starts, so turning it on takes a restart.
+    pub cute_language_pack: bool,
 }
 
 impl Default for General {
@@ -147,6 +150,7 @@ impl Default for General {
             cache_directory: None,
             fail_download_use_cache: false,
             language: "zh_cn".to_owned(),
+            cute_language_pack: false,
         }
     }
 }
@@ -272,8 +276,13 @@ impl Default for Render {
 /// The `[notifications]` group.
 ///
 /// `app_id` names the sender of a desktop notification: the Windows
-/// `System.AppUserModel.ID`, or the macOS bundle identifier. Unset (the default)
-/// leaves the platform's own choice.
+/// `System.AppUserModel.ID`, or the macOS bundle identifier.
+///
+/// On Windows it defaults to `cn.dh.dhlrc`, which is the id the installer
+/// registers and the frontends give their process — without it the notification
+/// crate falls back to PowerShell's id and Windows shows the toast as coming
+/// from PowerShell. Elsewhere the default is unset, which leaves the platform's
+/// own choice.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(default)]
 pub struct Notifications {
@@ -290,11 +299,28 @@ pub struct Notifications {
 impl Default for Notifications {
     fn default() -> Self {
         Self {
-            app_id: None,
+            app_id: default_app_id(),
             timeout_ms: 5000,
             suppress_when_active: true,
         }
     }
+}
+
+/// The sender a new configuration starts with.
+///
+/// It has to match the AppUserModelID the installer registers
+/// (`DH_APP_ID` in `CMakeLists.txt`), the one the Qt frontend gives its process
+/// (`src/windowsappid.cpp`), and the one the core hands to the notification
+/// crate. Without a match Windows shows the toast as coming from PowerShell,
+/// which is the crate's fallback.
+#[cfg(target_os = "windows")]
+fn default_app_id() -> Option<String> {
+    Some("cn.dh.dhlrc".to_owned())
+}
+
+#[cfg(not(target_os = "windows"))]
+fn default_app_id() -> Option<String> {
+    None
 }
 
 /// The whole configuration.
@@ -749,6 +775,17 @@ mod tests {
             ..General::default()
         };
         assert_eq!(configured.cache_dir(), PathBuf::from("/tmp/dhlrc-cache"));
+    }
+
+    #[cfg(target_os = "windows")]
+    #[test]
+    fn the_windows_default_app_id_is_the_one_the_installer_registers() {
+        /* Three places name the same id: the installer (`DH_APP_ID`), the Qt
+         * frontend's process (src/windowsappid.cpp) and this default. */
+        assert_eq!(
+            super::Notifications::default().app_id.as_deref(),
+            Some("cn.dh.dhlrc")
+        );
     }
 
     #[test]

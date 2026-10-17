@@ -264,6 +264,27 @@ extern "C"
    * `"data_version.csv"`, `"handle_block.json"`. */
   const char *dhlrc_core_bundled_resource (const char *name, size_t *length);
 
+  /* The material list of a region: every palette entry counted once, mapped to
+   * the item(s) a player has to prepare (the table in `handle_block.json`), and
+   * summed per item. `region` is a handle from the region module, borrowed for
+   * the call. Returns an owned JSON object, free it with `dhlrc_string_free`;
+   * NULL when `region` is NULL. The object keeps each item's sources — which
+   * blocks contributed, how many, and which rule decided it — so a frontend can
+   * show a detail for a row instead of only its total. */
+  char *dhlrc_core_material_list (const void *region);
+
+  /* The PNG bytes of an item's icon (`minecraft:oak_door`), looked up through
+   * the resource set: the item texture, the block texture of the same name, or
+   * the first texture the block model names. `length` receives the byte count
+   * and may be NULL. The bytes are owned, free them with
+   * `dhlrc_core_bytes_free`; NULL when nothing was found. The icon is 1:1 with
+   * its texture (16x16 for vanilla), so a frontend scales it to taste. */
+  uint8_t *dhlrc_core_item_texture (const DhlrcCore *core, const char *item,
+                                    size_t *length);
+
+  /* Frees bytes returned by `dhlrc_core_item_texture`. */
+  void dhlrc_core_bytes_free (uint8_t *bytes, size_t length);
+
   /* Points the core at its resource files: the cache directory the downloader
    * filled, the version whose client jar to use (`version` may be NULL), and
    * `pack_count` resource packs / mod jars, highest priority first (`packs`

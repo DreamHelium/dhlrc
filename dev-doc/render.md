@@ -230,6 +230,19 @@ projection. The view takes a snapshot of the region when it opens, so it keeps
 drawing after the region dialog is closed; `Reload` takes a fresh one. The
 status line says which renderer drew the frame.
 
+The snapshot is built on a worker thread while the window shows "Building the
+3D scene..." and a progress bar: a big region takes long enough that building it
+on the GUI thread froze the window. The region is locked while it is copied out,
+so no edit can move its data under the build; `Reload` is disabled until it
+finishes, and a reload asked for during a build runs right after it. A reload
+keeps the old picture up while the new scene is built.
+
+The progress comes from the renderer itself: `dhlrc_render_scene_new_reported`
+takes a callback that is told 0 at the start, once per vertical slice, and 100 at
+the end. The call happens on the building thread, so the Qt side only writes the
+number into an atomic and the window polls it; the worker never touches a
+widget.
+
 The block the pointer is over is outlined in black, and a tooltip beside the
 cursor names it and lists its properties; moving off the scene takes the outline
 away again. The outline follows the block's own shape, so a slab is boxed at half
@@ -246,9 +259,13 @@ afterwards, so the change is visible at once.
 
 Without a GUI, the same view can draw one picture of a file and exit — this is
 what the two backends are checked with, and it needs a display for the GL one
-(`Xvfb` is enough):
+(`Xvfb` is enough). This check is a development tool rather than a user feature:
+it is only built with `-DDH_BUILD_RENDER_CHECK=ON`, so a normal build has
+neither the code nor the options. A user who just wants a picture uses
+`dhlrc-tui render` below.
 
 ```bash
+cmake -B build -DDH_BUILD_RENDER_CHECK=ON && cmake --build build
 # Xvfb, because a QOpenGLWidget needs a display even headless
 Xvfb :99 -screen 0 1280x800x24 &
 DISPLAY=:99 LIBGL_ALWAYS_SOFTWARE=1 ./build/dhlrc_qt \

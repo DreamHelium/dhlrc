@@ -21,6 +21,7 @@ pub mod archive;
 pub mod bundled;
 pub mod cache;
 pub mod environment;
+pub mod handle_block;
 pub mod identifier;
 pub mod object;
 pub mod set;

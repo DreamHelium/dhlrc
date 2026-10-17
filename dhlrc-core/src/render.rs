@@ -11,7 +11,7 @@
  * them into a `QImage` before the next frame, so that is not a burden.
  */
 
-use std::ffi::{c_char, c_void};
+use std::ffi::{CStr, c_char, c_int, c_void};
 use std::panic::{AssertUnwindSafe, catch_unwind};
 use std::ptr;
 use std::slice;
@@ -19,10 +19,11 @@ use std::slice;
 use common_rs::region::Region;
 use crate::ffi::DhlrcCore;
 use dhlrc_render::camera::{Hit, Ray};
-use dhlrc_render::scene::{VoxelBlock, Voxels, build};
+use dhlrc_render::scene::{VoxelBlock, Voxels, build, build_reported};
 use dhlrc_render::texture::Alpha;
-use dhlrc_render::{Camera, Renderer};
-use crate::resource::Identifier;
+use dhlrc_render::{Camera, Renderer, build_model, render as render_image};
+use crate::resource::{Identifier, ResourceSet};
+use dhlrc_resource::Source;
 
 /// A region's blocks, as the renderer wants to see them.
 struct RegionVoxels<'a>(&'a Region);
@@ -62,7 +63,220 @@ impl Voxels for RegionVoxels<'_> {
     }
 }
 
-/// The camera, as C passes it.
+/// The model an item is drawn with.
+enum ItemModel {
+    /// A model the resource set has (a block model, an item model).
+    Resource(Identifier),
+    /// A model the game renders in code, which has no JSON geometry: the chest
+    /// family. The string is the entity texture to draw it with.
+    Chest(String),
+}
+
+/// The model an item is drawn with, and the block it belongs to (for the colour
+/// colormaps grass and leaves use).
+///
+/// 1.21.4+ names the model in `items/`; older versions keep the item model in
+/// `models/item/`, and a block item without one draws its block model. A chest
+/// is a special case: the game draws it from code, so a model is built for it.
+fn item_model(source: &ResourceSet, item: &str) -> Option<(ItemModel, Identifier)> {
+    let (namespace, path) = item.split_once(':').unwrap_or(("minecraft", item));
+    let block = Identifier::parse(item);
+
+    if let Some(definition) = source.get_json(&Identifier::parse(&format!(
+        "{namespace}:items/{path}.json"
+    ))) {
+        if let Some(texture) = chest_texture(&definition) {
+            return Some((ItemModel::Chest(texture), block));
+        }
+        if let Some(model) = definition
+            .get("model")
+            .and_then(|model| model.get("model"))
+            .and_then(|model| model.as_str())
+        {
+            return Some((ItemModel::Resource(Identifier::parse(model)), block));
+        }
+    }
+
+    let item_model = source.get_json(&Identifier::parse(&format!(
+        "{namespace}:models/item/{path}.json"
+    )));
+    if let Some(texture) = builtin_chest_texture(path) {
+        /* The chest's parent chain ends at `builtin/entity`; a trapped chest
+         * reaches it through `item/chest`, so the whole chain is walked. */
+        if has_builtin_parent(source, &Identifier::parse(&format!("{namespace}:item/{path}"))) {
+            return Some((ItemModel::Chest(texture), block));
+        }
+    }
+    if item_model.is_some() {
+        return Some((
+            ItemModel::Resource(Identifier::parse(&format!("{namespace}:item/{path}"))),
+            block,
+        ));
+    }
+
+    if source
+        .get_json(&Identifier::parse(&format!(
+            "{namespace}:models/block/{path}.json"
+        )))
+        .is_some()
+    {
+        return Some((
+            ItemModel::Resource(Identifier::parse(&format!("{namespace}:block/{path}"))),
+            block,
+        ));
+    }
+    None
+}
+
+/// Looks for a chest special model anywhere in an item model definition
+/// (`minecraft:select` cases, a plain `minecraft:special`, ...).
+fn chest_texture(value: &serde_json::Value) -> Option<String> {
+    if let Some(object) = value.as_object() {
+        if object.get("type").and_then(|kind| kind.as_str()) == Some("minecraft:chest") {
+            if let Some(texture) = object.get("texture").and_then(|texture| texture.as_str()) {
+                let (namespace, path) = texture.split_once(':').unwrap_or(("minecraft", texture));
+                if path.starts_with("entity/chest/") {
+                    return Some(format!("{namespace}:{path}"));
+                }
+                return Some(format!("{namespace}:entity/chest/{path}"));
+            }
+        }
+        /* A `minecraft:select` has dated cases (the christmas chest) and a
+         * `fallback`; the fallback is the ordinary look and comes first. */
+        if let Some(fallback) = object.get("fallback") {
+            if let Some(texture) = chest_texture(fallback) {
+                return Some(texture);
+            }
+        }
+        for (key, child) in object {
+            if key == "cases" || key == "fallback" {
+                continue;
+            }
+            if let Some(texture) = chest_texture(child) {
+                return Some(texture);
+            }
+        }
+    } else if let Some(items) = value.as_array() {
+        for child in items {
+            if let Some(texture) = chest_texture(child) {
+                return Some(texture);
+            }
+        }
+    }
+    None
+}
+
+/// Whether a model's parent chain ends at the game's built-in entity renderer.
+fn has_builtin_parent(source: &ResourceSet, model: &Identifier) -> bool {
+    let mut current = model.clone();
+    for _ in 0..16 {
+        let asset = Identifier::new(
+            current.namespace.clone(),
+            format!("models/{}.json", current.path),
+        );
+        let Some(value) = source.get_json(&asset) else {
+            return false;
+        };
+        match value.get("parent").and_then(|parent| parent.as_str()) {
+            Some("builtin/entity") => return true,
+            Some(parent) => current = Identifier::parse(parent),
+            None => return false,
+        }
+    }
+    false
+}
+
+/// The chest texture an older `builtin/entity` item draws with.
+fn builtin_chest_texture(path: &str) -> Option<String> {
+    let texture = match path {
+        "chest" => "normal",
+        "trapped_chest" => "trapped",
+        "ender_chest" => "ender",
+        _ => return None,
+    };
+    Some(format!("minecraft:entity/chest/{texture}"))
+}
+
+/// A model of a chest, built from the game's own chest texture.
+///
+/// The chest is a base, a lid and a small lock, with the UVs the game's box
+/// unwrap gives them, so the front shows the latch and the lid shows the lid.
+fn chest_model(texture: &str) -> String {
+    /* A texture is 64 pixels across and a model's UVs are 0..16, so a pixel is
+     * a quarter of a UV unit. */
+    fn uv(pixel: [f32; 4]) -> String {
+        let [u1, v1, u2, v2] = pixel.map(|value| value / 4.0);
+        format!("[{u1},{v1},{u2},{v2}]")
+    }
+    fn faces(regions: [(&str, [f32; 4]); 6]) -> String {
+        regions
+            .iter()
+            .map(|(direction, region)| {
+                format!(
+                    "\"{direction}\":{{\"texture\":\"#chest\",\"uv\":{}}}",
+                    uv(*region)
+                )
+            })
+            .collect::<Vec<_>>()
+            .join(",")
+    }
+    /* The latch is a small piece of its own on the front, the way the game
+     * models it. Its art is the grey patch in the atlas' top-left corner, laid
+     * out for the 2x4x1 box the game uses. */
+    let lock = faces([
+        ("up", [1.0, 0.0, 3.0, 1.0]),
+        ("down", [3.0, 0.0, 5.0, 1.0]),
+        ("west", [0.0, 1.0, 1.0, 5.0]),
+        ("north", [1.0, 1.0, 3.0, 5.0]),
+        ("east", [3.0, 1.0, 4.0, 5.0]),
+        ("south", [4.0, 1.0, 6.0, 5.0]),
+    ]);
+    /* The base and the lid. */
+    let base = faces([
+        ("up", [14.0, 19.0, 28.0, 33.0]),
+        ("down", [28.0, 19.0, 42.0, 33.0]),
+        ("west", [0.0, 33.0, 14.0, 43.0]),
+        ("north", [14.0, 33.0, 28.0, 43.0]),
+        ("east", [28.0, 33.0, 42.0, 43.0]),
+        ("south", [42.0, 33.0, 56.0, 43.0]),
+    ]);
+    let lid = faces([
+        /* The plain square is the lid's outside top; the framed one is the
+         * inside of the lid. */
+        ("up", [28.0, 0.0, 42.0, 14.0]),
+        ("down", [14.0, 0.0, 28.0, 14.0]),
+        ("west", [0.0, 14.0, 14.0, 19.0]),
+        ("north", [14.0, 14.0, 28.0, 19.0]),
+        ("east", [28.0, 14.0, 42.0, 19.0]),
+        ("south", [42.0, 14.0, 56.0, 19.0]),
+    ]);
+    format!(
+        "{{\"textures\":{{\"chest\":\"{texture}\"}},\"elements\":[\
+         {{\"from\":[1,0,1],\"to\":[15,9,15],\"faces\":{{{base}}}}},\
+         {{\"from\":[1,9,1],\"to\":[15,14,15],\"faces\":{{{lid}}}}},\
+         {{\"from\":[7,7,15],\"to\":[9,11,16],\"faces\":{{{lock}}}}}]}}"
+    )
+}
+
+/// A resource source with one extra model in it, so a built-in model can be
+/// drawn through the same path as a real one.
+struct ModelOverlay<'a> {
+    base: &'a ResourceSet,
+    id: Identifier,
+    json: String,
+}
+
+impl Source for ModelOverlay<'_> {
+    fn get(&self, id: &Identifier) -> Option<Vec<u8>> {
+        if *id == self.id {
+            Some(self.json.as_bytes().to_vec())
+        } else {
+            self.base.get(id)
+        }
+    }
+}
+
+/// The camera, as C passes it./// The camera, as C passes it.
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub struct DhlrcCamera {
@@ -157,6 +371,26 @@ pub unsafe extern "C" fn dhlrc_render_scene_new(
     core: *mut c_void,
     region: *const c_void,
 ) -> *mut DhlrcScene {
+    unsafe { dhlrc_render_scene_new_reported(core, region, None, ptr::null_mut()) }
+}
+
+/// A progress callback: `value` is the percentage (0-100) and `user` the
+/// pointer the caller passed in. Called from the thread that builds the scene.
+pub type DhlrcProgressFunc = unsafe extern "C" fn(user: *mut c_void, value: c_int);
+
+/// Like [`dhlrc_render_scene_new`], reporting how far the build is.
+///
+/// # Safety
+///
+/// Same as [`dhlrc_render_scene_new`]; `progress` (when not NULL) is called
+/// with `user` on the building thread.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn dhlrc_render_scene_new_reported(
+    core: *mut c_void,
+    region: *const c_void,
+    progress: Option<DhlrcProgressFunc>,
+    user: *mut c_void,
+) -> *mut DhlrcScene {
     if core.is_null() || region.is_null() {
         return ptr::null_mut();
     }
@@ -164,8 +398,13 @@ pub unsafe extern "C" fn dhlrc_render_scene_new(
     let region = unsafe { &*(region as *const Region) };
 
     catch_unwind(AssertUnwindSafe(|| {
+        let mut report = |value: i32| {
+            if let Some(progress) = progress {
+                unsafe { progress(user, value) };
+            }
+        };
         let scene = core
-            .resources(|source| build(source, &RegionVoxels(region)))
+            .resources(|source| build_reported(source, &RegionVoxels(region), &mut report))
             /* A core with no resource set at all still draws: every block then
              * asks for a texture the empty set does not have and comes out as
              * the missing-texture checker. */
@@ -582,6 +821,81 @@ pub unsafe extern "C" fn dhlrc_render_matrix(
         .to_camera()
         .view_projection(aspect, scene.scene.radius.max(0.5));
     unsafe { slice::from_raw_parts_mut(out, 16) }.copy_from_slice(&matrix.0);
+}
+
+/// Renders a block item's model as an isometric icon.
+///
+/// A block item — a stair, a slab, a torch — is drawn in game as the block's own
+/// model seen from above and to one side, not as a flat texture. This builds a
+/// one-block scene and draws it with an orthographic camera so the icon has the
+/// same shape; a sprite (a stick, an ingot) has no block and yields NULL, which
+/// tells the caller to show `dhlrc_core_item_texture` instead.
+///
+/// `size` is the width and height in pixels. `width` and `height` receive it
+/// back and may be NULL. The RGBA bytes are owned (rows from the top); free
+/// them with `dhlrc_core_bytes_free`.
+///
+/// # Safety
+///
+/// `core` must be a handle from `dhlrc_core_open` and `item` a NUL-terminated
+/// string; both must stay valid for the call.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn dhlrc_render_item_icon(
+    core: *mut c_void,
+    item: *const c_char,
+    size: u32,
+    width: *mut u32,
+    height: *mut u32,
+) -> *mut u8 {
+    if core.is_null() || item.is_null() {
+        return ptr::null_mut();
+    }
+    let core = unsafe { &*(core as *const DhlrcCore) };
+    let item = unsafe { CStr::from_ptr(item) }.to_string_lossy().into_owned();
+    let size = size.clamp(8, 512);
+    let pixels = core
+        .resources(|source| {
+            let (model, block) = item_model(source, &item)?;
+            let scene = match model {
+                ItemModel::Resource(model) => build_model(source, &model, &block),
+                ItemModel::Chest(texture) => {
+                    /* `build_model` asks for `models/<path>.json`, so the id the
+                     * overlay answers and the one it is passed differ. */
+                    let model = Identifier::parse("dhlrc:block/chest");
+                    let overlay = ModelOverlay {
+                        base: source,
+                        id: Identifier::parse("dhlrc:models/block/chest.json"),
+                        json: chest_model(&texture),
+                    };
+                    build_model(&overlay, &model, &block)
+                }
+            };
+            if scene.quads.is_empty() {
+                return None;
+            }
+            let mut camera = Camera::new(scene.center, scene.radius * 2.0);
+            /* The in-game item icon is an isometric view: from the south-east,
+             * 30 degrees above the horizon, with no perspective. */
+            camera.orthographic = true;
+            camera.yaw = 315.0;
+            camera.pitch = 30.0;
+            camera.fit(scene.min, scene.max, 1.0);
+            Some(render_image(&scene, &camera, size, size).pixels)
+        })
+        .flatten();
+    let Some(pixels) = pixels else {
+        return ptr::null_mut();
+    };
+    let mut boxed = pixels.into_boxed_slice();
+    let pointer = boxed.as_mut_ptr();
+    std::mem::forget(boxed);
+    if !width.is_null() {
+        unsafe { *width = size };
+    }
+    if !height.is_null() {
+        unsafe { *height = size };
+    }
+    pointer
 }
 
 #[cfg(test)]

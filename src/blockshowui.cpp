@@ -1,4 +1,5 @@
 #include "blockshowui.h"
+#include "mainwindow.h"
 #include "blockreaderui.h"
 #include "dhcore.h"
 #include "nbtreaderui.h"
@@ -25,6 +26,7 @@ BlockShowUI::BlockShowUI (void *region, bool translationReady, QWidget *parent)
     : QWidget (parent), ui (new Ui::BlockShowUI),
       translationReady (translationReady), region (region)
 {
+  MainWindow::ownWindow (this);
   ui->setupUi (this);
   ui->modeBtn->setText ("x/z");
   model = new QStandardItemModel (this);

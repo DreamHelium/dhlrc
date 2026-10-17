@@ -50,6 +50,12 @@ Function un.onInit
   SetShellVarContext all
 FunctionEnd
 
+!define MUI_ICON   "@DH_ICON_NATIVE@"
+!define MUI_UNICON "@DH_ICON_NATIVE@"
+
+Icon "${MUI_ICON}"
+UninstallIcon "${MUI_UNICON}"
+
 !define MUI_ABORTWARNING
 ; `MUI_FINISHPAGE_RUN` is what makes the finish page show the "run" checkbox;
 ; the function below then decides what to run (the GUI, if it was installed).

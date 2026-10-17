@@ -156,6 +156,14 @@ if(DH_ENABLE_DEBUG)
   add_definitions(-DDH_DEBUG_IN_IDE)
 endif()
 
+# The headless render check (`dhlrc_qt --preview`): a development tool for the
+# 3D view, so a normal build neither compiles it nor offers the options. Turn it
+# on with `-DDH_BUILD_RENDER_CHECK=ON` when checking the two renderers.
+option(DH_BUILD_RENDER_CHECK "Build the headless render check (--preview)" OFF)
+if(DH_BUILD_RENDER_CHECK)
+  add_definitions(-DDH_RENDER_CHECK)
+endif()
+
 if (DH_BUILD_GUI)
   add_subdirectory(src)
 else ()
@@ -303,6 +311,7 @@ if (DH_BUILD_INSTALLER)
   file(TO_NATIVE_PATH "${DH_RUNTIME_BASE}" DH_RUNTIME_BASE_NATIVE)
   file(TO_NATIVE_PATH "${DH_RUNTIME_GUI}" DH_RUNTIME_GUI_NATIVE)
   file(TO_NATIVE_PATH "${CMAKE_BINARY_DIR}/dhlrc-${DH_VERSION}-win64-setup.exe" DH_OUTFILE_NATIVE)
+  file(TO_NATIVE_PATH "${CMAKE_SOURCE_DIR}/resources/dhlrc.ico" DH_ICON_NATIVE)
   configure_file("${CMAKE_SOURCE_DIR}/installer/dhlrc.nsi.in"
                  "${CMAKE_BINARY_DIR}/installer/dhlrc.nsi" @ONLY)
 

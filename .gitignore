@@ -43,3 +43,6 @@ target
 
 # zed
 .zed/
+
+# dsh-linsys temp
+.dsh-linsys2

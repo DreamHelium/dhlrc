@@ -26,8 +26,7 @@ const double TURN_PER_PIXEL = 0.4;
 const double ZOOM_PER_NOTCH = 0.88;
 } // namespace
 
-DhRenderWidget::DhRenderWidget (void *core, void *region, QWidget *parent)
-    : QWidget (parent)
+DhRenderWidget::DhRenderWidget (QWidget *parent) : QWidget (parent)
 {
   camera.yaw = 45.0;
   camera.pitch = 30.0;
@@ -69,6 +68,11 @@ DhRenderWidget::DhRenderWidget (void *core, void *region, QWidget *parent)
                &DhRenderWidget::onFrameDrawn);
     }
 
+}
+
+DhRenderWidget::DhRenderWidget (void *core, void *region, QWidget *parent)
+    : DhRenderWidget (parent)
+{
   rebuild (core, region);
 }
 
@@ -80,15 +84,18 @@ DhRenderWidget::discard ()
   /* The GL child borrows the scene, so it lets go before the scene goes. */
   if (gpu)
     gpu->setScene (nullptr);
-  if (scene)
-    {
-      dhlrc_render_scene_free (scene);
-      scene = nullptr;
-    }
+  scene.reset ();
 }
 
 void
 DhRenderWidget::rebuild (void *core, void *region)
+{
+  setScene (std::shared_ptr<DhlrcScene> (dhlrc_render_scene_new (core, region),
+                                         dhlrc_render_scene_free));
+}
+
+void
+DhRenderWidget::setScene (std::shared_ptr<DhlrcScene> next)
 {
   /* The outline belongs to the old scene, and a tooltip naming one of its
    * blocks must not stay up. */
@@ -96,7 +103,7 @@ DhRenderWidget::rebuild (void *core, void *region)
   if (tip)
     tip->hide ();
   discard ();
-  scene = dhlrc_render_scene_new (core, region);
+  scene = std::move (next);
   problemText = scene
                     ? QString ()
                     : QString (_ ("The region could not be drawn: no block in "
@@ -106,7 +113,7 @@ DhRenderWidget::rebuild (void *core, void *region)
   framed = false;
   if (gpu)
     {
-      gpu->setScene (scene);
+      gpu->setScene (scene.get ());
       gpu->setGeometry (rect ());
       if (scene != nullptr && useGpu)
         {
@@ -153,13 +160,13 @@ DhRenderWidget::onFrameDrawn (bool ok)
 quint64
 DhRenderWidget::quadCount () const
 {
-  return scene ? static_cast<quint64> (dhlrc_render_scene_quads (scene)) : 0;
+  return scene ? static_cast<quint64> (dhlrc_render_scene_quads (scene.get ())) : 0;
 }
 
 quint64
 DhRenderWidget::skippedCount () const
 {
-  return scene ? static_cast<quint64> (dhlrc_render_scene_skipped (scene)) : 0;
+  return scene ? static_cast<quint64> (dhlrc_render_scene_skipped (scene.get ())) : 0;
 }
 
 bool
@@ -182,7 +189,7 @@ DhRenderWidget::resetView ()
   camera.pitch = 30.0;
   if (scene)
     {
-      dhlrc_render_fit (scene, &camera, width (), height ());
+      dhlrc_render_fit (scene.get (), &camera, width (), height ());
       framed = true;
     }
   applyCamera ();
@@ -198,7 +205,7 @@ DhRenderWidget::resizeEvent (QResizeEvent *event)
    * known the widget is still the default 100 by 30. */
   if (scene && !framed && width () > 1 && height () > 1)
     {
-      dhlrc_render_fit (scene, &camera, width (), height ());
+      dhlrc_render_fit (scene.get (), &camera, width (), height ());
       framed = true;
     }
   applyCamera ();
@@ -233,7 +240,7 @@ DhRenderWidget::paintEvent (QPaintEvent *)
   const int pictureHeight
       = std::max (1, static_cast<int> (height () * ratio) / step);
   const uint8_t *pixels
-      = dhlrc_render_image (scene, &camera, pictureWidth, pictureHeight);
+      = dhlrc_render_image (scene.get (), &camera, pictureWidth, pictureHeight);
   if (!pixels)
     return;
 
@@ -370,7 +377,7 @@ DhRenderWidget::pickAt (const QPoint &at)
   const int pictureWidth = std::max (1, static_cast<int> (width () * ratio));
   const int pictureHeight = std::max (1, static_cast<int> (height () * ratio));
   int32_t block[3] = { 0, 0, 0 };
-  if (dhlrc_render_pick (scene, &camera, pictureWidth, pictureHeight,
+  if (dhlrc_render_pick (scene.get (), &camera, pictureWidth, pictureHeight,
                          at.x () * ratio, at.y () * ratio, block))
     Q_EMIT blockPicked (block[0], block[1], block[2]);
 }
@@ -407,7 +414,7 @@ DhRenderWidget::hoverAt (const QPoint &at)
   const int pictureWidth = std::max (1, static_cast<int> (width () * ratio));
   const int pictureHeight = std::max (1, static_cast<int> (height () * ratio));
   int32_t block[3] = { 0, 0, 0 };
-  if (dhlrc_render_pick (scene, &camera, pictureWidth, pictureHeight,
+  if (dhlrc_render_pick (scene.get (), &camera, pictureWidth, pictureHeight,
                          at.x () * ratio, at.y () * ratio, block)
       == 0)
     {
@@ -437,8 +444,8 @@ DhRenderWidget::hoverAt (const QPoint &at)
                    static_cast<float> (block[0] + 1),
                    static_cast<float> (block[1] + 1),
                    static_cast<float> (block[2] + 1) };
-  dhlrc_render_scene_block_box (scene, block[0], block[1], block[2], box);
-  dhlrc_render_scene_set_highlight (scene, box);
+  dhlrc_render_scene_block_box (scene.get (), block[0], block[1], block[2], box);
+  dhlrc_render_scene_set_highlight (scene.get (), box);
   /* The GL child keeps its own small buffer for the outline; only that buffer
    * is read again, never the scene's. */
   if (gpu && useGpu)
@@ -459,7 +466,7 @@ DhRenderWidget::clearHover ()
   hovered = false;
   if (scene)
     {
-      dhlrc_render_scene_set_highlight (scene, nullptr);
+      dhlrc_render_scene_set_highlight (scene.get (), nullptr);
       if (gpu && useGpu)
         gpu->highlightChanged ();
       update ();

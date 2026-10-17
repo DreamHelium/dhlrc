@@ -56,6 +56,11 @@ impl ResourceSet {
             .map(|bytes| String::from_utf8_lossy(&bytes).into_owned())
     }
 
+    /// The raw bytes of `id`, for a file that is not text (a texture, say).
+    pub fn get_bytes(&self, id: &Identifier) -> Option<Vec<u8>> {
+        self.get(id)
+    }
+
     /// The parsed JSON of `id`, memoised. A name is looked up in a language file
     /// that is both large and asked for once per block shown, so parsing it every
     /// time would dominate; the shared `Arc` also lets many callers hold the one

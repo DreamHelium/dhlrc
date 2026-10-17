@@ -5,22 +5,28 @@
 #include <QObject>
 #include <QString>
 #include <QStringList>
+#include <QVector>
 #include <atomic>
+#include <functional>
 #include <memory>
 #include <mutex>
 
+class AutoLocker;
+
 /* Owns a libregion object and acts as the single access point to it.
  *
- * The region's lock is a re-entrant, reference-counted guard: every access to
- * the underlying region data (see locked_region ()) takes a lock for the
- * duration of the call and releases it afterwards, so the raw C API can never
- * be reached without holding the lock. Callers only need AutoLocker when they
- * want to keep the region locked across several statements (e.g. while a
- * background thread works on the object).
+ * The lock belongs to background jobs, not to the windows that show a region:
+ * a loading or saving job takes it with AutoLocker for as long as it works on
+ * the object, every accessor takes it for the duration of its own call (see
+ * locked_region ()), and every writer refuses to change the region while it is
+ * held. Reading stays possible the whole time — what the lock buys is that no
+ * writer can move data under a job that is reading it.
  *
- * The lock state is observable from the outside: locked (), isLocked (index)
- * and the lockedChanged () signal report it, and the item list shows "Locked"
- * while a region is in use, so no one can rename/remove a region being read.
+ * That is why a window does not need to hold the lock: it keeps the region
+ * alive with the shared_ptr it holds, and its reads are serialized by being on
+ * the GUI thread. The lock state is still observable — locked (), isLocked ()
+ * and the lockedChanged () signal — and the item list shows "Locked!" and
+ * disables removing, renaming and saving while a job holds it.
  */
 class RegionClass : public QObject
 {
@@ -39,10 +45,31 @@ public:
   [[nodiscard]] void *locked_region () const;
 
   [[nodiscard]] bool locked () const;
-  [[nodiscard]] int lockCount () const;
 
   [[nodiscard]] const QString &uuid () const;
   [[nodiscard]] const QDateTime &dateTime () const;
+
+  /* One reversible change in the region's history. `description` is what the
+   * change list shows, `detail` what the change was (the old and new values),
+   * and `undo` puts the region back the way it was. */
+  struct Change
+  {
+    QString description;
+    QString detail;
+    QDateTime time;
+    std::function<bool (RegionClass &)> undo;
+  };
+
+  /* Records one change, with the undo that restores the state before it. This
+   * is GUI state, like the edits it keeps: record it on the GUI thread only. */
+  void recordChange (const QString &description, const QString &detail,
+                     std::function<bool (RegionClass &)> undo);
+  [[nodiscard]] const QVector<Change> &changes () const;
+  /* Applies the undo of `index` and drops that entry when it worked. */
+  bool revertChange (qsizetype index);
+  /* Reverts from newest to oldest, stopping at the first failure. Returns how
+   * many entries were reverted. */
+  qsizetype revertAllChanges ();
 
   /* The name shown for this region in the region list. This is a GUI-level
    * label only; it is not the region's name from the file. The loader derives
@@ -74,10 +101,12 @@ public:
   [[nodiscard]] qint32 offsetX () const;
   [[nodiscard]] qint32 offsetY () const;
   [[nodiscard]] qint32 offsetZ () const;
-  void setSize (qint32 x, qint32 y, qint32 z);
-  void setOffset (qint32 x, qint32 y, qint32 z);
+  /* Writers refuse while `locked ()` is true, so a background job never sees
+   * the region change under it. */
+  bool setSize (qint32 x, qint32 y, qint32 z);
+  bool setOffset (qint32 x, qint32 y, qint32 z);
   [[nodiscard]] quint32 dataVersion () const;
-  void setDataVersion (quint32 version);
+  bool setDataVersion (quint32 version);
   [[nodiscard]] qint32 index (qint32 x, qint32 y, qint32 z) const;
   [[nodiscard]] quint32 blockId (qsizetype index) const;
   [[nodiscard]] qsizetype paletteLen () const;
@@ -103,24 +132,20 @@ public:
                            const QStringList &datas,
                            quint32 *outId = nullptr);
 
-  /* Compatibility aliases. Prefer callers to hold an AutoLocker for anything
-   * that must stay locked across several statements. */
-  [[nodiscard]] std::mutex &get_lock ();
-  [[nodiscard]] bool get_lock_status ();
-  void change_lock_status (bool status);
-  [[nodiscard]] const QString &get_display_name ();
-  [[nodiscard]] const QString &get_uuid ();
-  [[nodiscard]] const QDateTime &get_date_time ();
+Q_SIGNALS:
+  void lockedChanged (bool locked);
+  /* The region was written (by an edit or by a revert), so a view of it can
+   * refresh. */
+  void changed ();
+  /* The change list grew, shrank or was undone. */
+  void changesChanged ();
 
-  /* Low-level lock state access; most code should use AutoLocker or the
-   * locked_* accessors above instead. */
+private:
+  /* The job's lock, kept by AutoLocker for as long as the job runs. */
+  friend class AutoLocker;
   void lock ();
   void unlock ();
 
-Q_SIGNALS:
-  void lockedChanged (bool locked);
-
-private:
   struct InternalLock
   {
     std::recursive_mutex mutex;
@@ -134,11 +159,12 @@ private:
   QString uuidString;
   QDateTime dateTimeValue;
   std::unique_ptr<InternalLock> internalLock;
+  QVector<Change> changeList;
 };
 
-/* Keeps a RegionClass locked for its lifetime (RAII) and reports the change so
- * the UI can refresh. Construct it before doing anything that has to stay
- * consistent for several statements. */
+/* Keeps a RegionClass locked for its lifetime (RAII), so a background job's
+ * reads cannot interleave with a write, and the list can show that the region
+ * is in use. Only jobs use it; a window showing a region does not. */
 class AutoLocker
 {
 private:

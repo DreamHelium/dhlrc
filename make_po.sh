@@ -8,3 +8,14 @@ xgettext -k_ -kN_ \
 --default-domain=dhlrc --package-name=dhlrc \
 --output=dhlrc.pot ../../src/*.cpp rc.cpp ../../*/src/*.rs ../../src/*.h ../../src/dhsettingsdialog/*.cpp ../../src/dhsettingsdialog/*.h
 echo "Extract the po source file"
+
+# The playful catalogue is generated from the plain one, so it never drifts
+# far behind. Python is only needed here; without it the checked-in file is
+# used as it is.
+cd ../..
+if command -v python3 > /dev/null; then
+  python3 po/make_cute.py
+else
+  echo "python3 not found: the playful catalogue was not regenerated"
+fi
+exit 0

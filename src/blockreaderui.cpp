@@ -4,6 +4,9 @@
 #include "dhwidget.h"
 #include "resourcegetter.h"
 #include "ui_blockreaderui.h"
+#include <QFontDatabase>
+#include <QLabel>
+#include <QMenu>
 #include <QMessageBox>
 // #include <blockshowui.h>
 #include "regionmodifyui.h"
@@ -37,10 +40,60 @@ BlockReaderUI::BlockReaderUI (int index,
                               std::shared_ptr<DhDownloader> downloader,
                               QWidget *parent)
     : DhWidget (parent), ui (new Ui::BlockReaderUI), downloader (downloader),
-      regionClass (ManageRegionUI::getRegion (index)), locker (*regionClass)
+      regionClass (ManageRegionUI::getRegion (index))
 {
   ui->setupUi (this);
   version = regionClass->dataVersion ();
+  /* One small button opens the actions as a popup menu, so the page keeps its
+   * size in any language. The menu entries click the buttons themselves, so
+   * every handler stays wired where it was. */
+  auto *toolsMenu = new QMenu (this);
+  for (auto *button : { ui->modifyBtn, ui->changesBtn, ui->materialBtn,
+                        ui->entityBtn_2, ui->propertyBtn, ui->entityBtn,
+                        ui->listBtn, ui->showBtn, ui->previewBtn })
+    {
+      auto *action = toolsMenu->addAction (button->text ());
+      connect (action, &QAction::triggered, button, &QPushButton::click);
+    }
+  connect (ui->toolsBtn, &QPushButton::clicked, this,
+           [this, toolsMenu]
+             {
+               toolsMenu->exec (ui->toolsBtn->mapToGlobal (
+                   QPoint (0, ui->toolsBtn->height ())));
+             });
+
+  /* The region can be written by any editor while this page stays open, and a
+   * revert in the change history is a write too: keep the shown data current.
+   * A job holding the region only deselects the editing buttons, so a click
+   * cannot lead to a refused write and a lost form. */
+  connect (regionClass.get (), &RegionClass::changed, this,
+           [this]
+             {
+               setText ();
+               textChanged_cb ();
+             });
+  connect (regionClass.get (), &RegionClass::lockedChanged, this,
+           [this] (bool locked)
+             {
+               ui->modifyBtn->setEnabled (!locked);
+               ui->propertyBtn->setEnabled (!locked && blockHasProperties);
+             });
+
+  /* The tab title names the region; this is the same name at the top of the
+   * page, so a page dragged out into a window of its own still says which
+   * region it shows. Bold name, grey UUID: the UUID stays readable and
+   * selectable without competing with the name. */
+  auto *titleLabel = new QLabel (regionClass->displayName ());
+  QFont titleFont = titleLabel->font ();
+  titleFont.setBold (true);
+  titleLabel->setFont (titleFont);
+  auto *uuidLabel = new QLabel (regionClass->uuid ());
+  uuidLabel->setStyleSheet ("color:gray;");
+  uuidLabel->setFont (QFontDatabase::systemFont (QFontDatabase::FixedFont));
+  uuidLabel->setTextInteractionFlags (Qt::TextSelectableByMouse);
+  titleLabel->setToolTip (_ ("The region this reader shows"));
+  ui->verticalLayout->insertWidget (0, titleLabel);
+  ui->verticalLayout->insertWidget (1, uuidLabel);
   connect (this, &BlockReaderUI::start, this,
            [&]
              {
@@ -91,11 +144,11 @@ BlockReaderUI::BlockReaderUI (int index,
   connect (ui->previewBtn, &QPushButton::clicked, this,
            [&]
              {
-               /* The 3D window takes a snapshot of the region while it is
-                * locked, so it keeps drawing after this dialog closes. */
-               auto render = new DhRenderUI (regionClass);
-               render->setAttribute (Qt::WA_DeleteOnClose);
-               render->show ();
+               /* The 3D window copies what it needs out of the region, but it
+                * was opened from this page, so closing the page closes it. */
+               renderUi = new DhRenderUI (regionClass);
+               renderUi->setAttribute (Qt::WA_DeleteOnClose);
+               renderUi->show ();
              });
   connect (ui->entityBtn_2, &QPushButton::clicked, this,
            [&]
@@ -115,7 +168,7 @@ BlockReaderUI::BlockReaderUI (int index,
                    this);
                if (entityIndex != -1)
                  {
-                   auto nrui = new NbtReaderUI (
+                   nrui = new NbtReaderUI (
                        region_get_entity (regionClass->locked_region (),
                                           entityIndex),
                        false);
@@ -123,15 +176,72 @@ BlockReaderUI::BlockReaderUI (int index,
                    nrui->show ();
                  }
              });
+  connect (ui->changesBtn, &QPushButton::clicked, this,
+           [&]
+             {
+               /* One history page per region, like the reader and the
+                * modifier: asking again brings the open one forward. */
+               const QString title = QString (_ ("Change History: %1"))
+                                         .arg (regionClass->displayName ());
+               const QString key = QStringLiteral ("region-changes:")
+                                   + regionClass->uuid ();
+               if (auto *page = MainWindow::keyedTab (key))
+                 {
+                   MainWindow::showTab (page, title);
+                   return;
+                 }
+               changesUi = new RegionChangesUI (regionClass);
+               MainWindow::addKeyedTab (changesUi, title, key);
+             });
+  connect (ui->materialBtn, &QPushButton::clicked, this,
+           [&]
+             {
+               /* One material list per region; asking again brings the open
+                * tab forward instead of recounting the region. */
+               const QString title = QString (_ ("Material List: %1"))
+                                         .arg (regionClass->displayName ());
+               const QString key = QStringLiteral ("region-materials:")
+                                   + regionClass->uuid ();
+               if (auto *page = MainWindow::keyedTab (key))
+                 {
+                   MainWindow::showTab (page, title);
+                   return;
+                 }
+               materialUi
+                   = new MaterialListUI (regionClass, translationReady);
+               MainWindow::addKeyedTab (materialUi, title, key);
+             });
   connect (ui->modifyBtn, &QPushButton::clicked, this,
            [&]
              {
-               if (!rmui)
-                 rmui = new RegionModifyUI (*regionClass);
-               MainWindow::addWidgetToTab (rmui, _ ("Region Modifier"));
+               /* One modifier page per region: asking again brings the open
+                * one forward instead of adding a second tab. */
+               const QString key = QStringLiteral ("region-modifier:")
+                                   + regionClass->uuid ();
+               if (auto *page = MainWindow::keyedTab (key))
+                 {
+                   MainWindow::showTab (page, _ ("Region Modifier"));
+                   return;
+                 }
+               rmui = new RegionModifyUI (regionClass);
+               /* A write shows in the reader at once, and the page reports
+                * when it is done, so its tab does not linger after a save. */
+               connect (rmui, &RegionModifyUI::modified, this,
+                        &BlockReaderUI::setText);
+               connect (rmui, &RegionModifyUI::finished, this,
+                        [this]
+                          {
+                            if (rmui)
+                              {
+                                MainWindow::closeTab (rmui);
+                                rmui = nullptr;
+                              }
+                          });
+               MainWindow::addKeyedTab (rmui, _ ("Region Modifier"), key);
              });
   ui->entityBtn->setEnabled (false);
   ui->propertyBtn->setEnabled (false);
+  ui->modifyBtn->setEnabled (!regionClass->locked ());
   // ui->label_7->setText (_ ("Lack the translation module, will not "
   //                          "try to get translation!"));
   // ui->progressBar->hide ();
@@ -144,11 +254,61 @@ BlockReaderUI::BlockReaderUI (int index,
 
 BlockReaderUI::~BlockReaderUI ()
 {
-  if (rmui)
-    rmui->deleteLater ();
+  closeChildren ();
   delete ui;
-  // delete bsui;
-  // dh_info_reader_unlock (DH_TYPE_REGION, uuid.toUtf8 ());
+}
+
+void
+BlockReaderUI::closeEvent (QCloseEvent *event)
+{
+  /* Closing the page closes everything it opened; the windows would otherwise
+   * keep showing data this page is the owner of. */
+  closeChildren ();
+  DhWidget::closeEvent (event);
+}
+
+void
+BlockReaderUI::closeChildren ()
+{
+  /* Each of these was opened from this page. A window closes itself (they are
+   * all `WA_DeleteOnClose`); the modifier is a tab, so it is taken out of the
+   * tab bar. A QPointer that is already null means the user closed that one
+   * first, which is fine. */
+  if (bsui)
+    {
+      bsui->close ();
+      bsui = nullptr;
+    }
+  if (blui)
+    {
+      blui->close ();
+      blui = nullptr;
+    }
+  if (nrui)
+    {
+      nrui->close ();
+      nrui = nullptr;
+    }
+  if (renderUi)
+    {
+      renderUi->close ();
+      renderUi = nullptr;
+    }
+  if (changesUi)
+    {
+      MainWindow::closeTab (changesUi);
+      changesUi = nullptr;
+    }
+  if (rmui)
+    {
+      MainWindow::closeTab (rmui);
+      rmui = nullptr;
+    }
+  if (materialUi)
+    {
+      MainWindow::closeTab (materialUi);
+      materialUi = nullptr;
+    }
 }
 
 void
@@ -175,11 +335,12 @@ BlockReaderUI::textChanged_cb ()
                                 translationReady);
           const char *transName = nullptr;
 
-          if (region_get_palette_property_len (regionClass->locked_region (),
-                                               regionClass->blockId (index)))
-            ui->propertyBtn->setEnabled (true);
-          else
-            ui->propertyBtn->setEnabled (false);
+          blockHasProperties
+              = region_get_palette_property_len (regionClass->locked_region (),
+                                                 regionClass->blockId (index))
+                != 0;
+          ui->propertyBtn->setEnabled (blockHasProperties
+                                       && !regionClass->locked ());
           auto be
               = region_get_block_entity (regionClass->locked_region (), index);
           if (be)
@@ -289,17 +450,17 @@ BlockReaderUI::setText ()
 void
 BlockReaderUI::listBtn_clicked ()
 {
-  auto blui
-      = new BlockListUI (regionClass->locked_region (), translationReady);
+  blui = new BlockListUI (regionClass, translationReady);
   blui->updateBlockList ();
   blui->setAttribute (Qt::WA_DeleteOnClose);
   blui->show ();
   connect (blui, &BlockListUI::stopProcess, this,
-           [&, blui]
+           [this]
              {
                QMessageBox::critical (this, _ ("Error!"),
                                       _ ("Out of memory!"));
-               blui->close ();
+               if (blui)
+                 blui->close ();
              });
 }
 
@@ -308,8 +469,7 @@ typedef void *(*NewFunc) (void *);
 void
 BlockReaderUI::entityBtn_clicked ()
 {
-  auto nrui = new NbtReaderUI (nbt, false);
-  connect (this, &BlockReaderUI::windowClosed, nrui, &NbtReaderUI::close);
+  nrui = new NbtReaderUI (nbt, false);
   nrui->setAttribute (Qt::WA_DeleteOnClose);
   nrui->show ();
 }
@@ -317,8 +477,9 @@ BlockReaderUI::entityBtn_clicked ()
 void
 BlockReaderUI::propertyBtn_clicked ()
 {
-  /* RegionClass owns the region lock now, and it is re-entrant, so the dialog
-   * can write while this reader keeps holding `locker`. */
+  /* Writing goes through RegionClass, which refuses while a loading or saving
+   * job holds the region. Opening a reader does not hold that lock, so the
+   * dialog works normally. */
   auto *pmui
       = new PropertyModifyUI (regionClass, ui->xEdit->text ().toInt (),
                               ui->yEdit->text ().toInt (),
@@ -335,9 +496,9 @@ BlockReaderUI::showBtn_clicked ()
   if (!bsui)
     {
       bsui = new BlockShowUI (regionClass->locked_region (), translationReady);
-      connect (this, &BlockReaderUI::windowClosed, bsui, &BlockShowUI::close);
       connect (this, &BlockReaderUI::finishLoadingTranslation, bsui,
                &BlockShowUI::updateUI);
+      bsui->setAttribute (Qt::WA_DeleteOnClose);
     }
   bsui->show ();
 }

@@ -64,6 +64,16 @@ public:
    * The dialog takes ownership of the item. */
   void addItem (DhSettingItem *item, const DhSettingsTemplateCreator &creator);
 
+  /* Folds the settings added after this call into a section headed by a
+   * toggle that starts collapsed: a plugin with many options then does not
+   * push the next one off the page. The section lasts until the next
+   * `addSection ()` or `addGroup ()`.
+   *
+   * `level` nests a section under the last one of the level below, so a plugin
+   * can be folded as a whole and opened to one fold per direction. A section
+   * at a lower level closes every section opened before it. */
+  void addSection (const QString &title, int level = 0);
+
   /* The control used for a `DhSettingItem::Type` no item-specific creator was
    * registered for. */
   void addTemplateByType (DhSettingItem::Type type,
@@ -113,10 +123,20 @@ Q_SIGNALS:
 private:
   void addWidget (DhSettingItem *item, QVBoxLayout *layout);
 
+  /* One collapsible group: where in the page's item list it starts, what its
+   * toggle says and how deep it sits. */
+  struct Section
+  {
+    QString title;
+    qsizetype firstItem;
+    int level;
+  };
+
   QString pathText;
   QString currentGroup;
   QList<QString> groupOrder;
   QHash<QString, QList<DhSettingItem *>> itemsByGroup;
+  QHash<QString, QList<Section>> sectionsByGroup;
   QMap<DhSettingItem *, DhSettingsTemplateCreator> itemCreators;
   QMap<int, DhSettingsTemplateCreator> typeCreators;
   std::vector<std::unique_ptr<DhSettingsTemplate>> templates;

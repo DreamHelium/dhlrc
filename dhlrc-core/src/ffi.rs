@@ -11,7 +11,7 @@ use crate::config::{
 };
 use crate::modules::Modules;
 use crate::notification::Level;
-use crate::resource::{ResourceEnvironment, ResourceSet};
+use crate::resource::{Identifier, ResourceEnvironment, ResourceSet};
 use std::ffi::{CStr, CString, c_char, c_void};
 use std::path::PathBuf;
 use std::ptr;
@@ -735,6 +735,113 @@ pub extern "C" fn dhlrc_core_bundled_resource(
     }
 }
 
+/// The material list of a region: every palette entry counted once, mapped to
+/// the item(s) a player has to prepare, and summed per item. `region` is a
+/// handle from the region module (`region_new`), borrowed for the call.
+///
+/// Returns an owned JSON object (free it with `dhlrc_string_free`), or NULL
+/// when `region` is NULL. The shape is documented on `crate::material`.
+#[unsafe(no_mangle)]
+pub extern "C" fn dhlrc_core_material_list(region: *const common_rs::region::Region) -> *mut c_char {
+    let Some(region) = (unsafe { region.as_ref() }) else {
+        return ptr::null_mut();
+    };
+    CString::new(crate::material::material_json(region))
+        .map(CString::into_raw)
+        .unwrap_or(ptr::null_mut())
+}
+
+/// The PNG bytes of an item's icon, for a frontend that shows a material list
+/// or an ingredient panel. Looked up through the resource set: the item's own
+/// texture, then the block texture of the same name, then the first texture the
+/// block model names (which is how a stair or a door gets an icon).
+///
+/// `length` receives the byte count (it may be NULL). The bytes are owned; free
+/// them with `dhlrc_core_bytes_free`. NULL when the resources are not configured
+/// or nothing was found.
+#[unsafe(no_mangle)]
+pub extern "C" fn dhlrc_core_item_texture(
+    core: *const DhlrcCore,
+    item: *const c_char,
+    length: *mut usize,
+) -> *mut u8 {
+    let Some(core) = (unsafe { core.as_ref() }) else {
+        return ptr::null_mut();
+    };
+    let Some(item) = from_c(item) else {
+        return ptr::null_mut();
+    };
+    let Some(bytes) = with_resources(core, |set| item_texture(set, &item)).flatten() else {
+        return ptr::null_mut();
+    };
+    let mut boxed = bytes.into_boxed_slice();
+    let len = boxed.len();
+    let pointer = boxed.as_mut_ptr();
+    std::mem::forget(boxed);
+    if !length.is_null() {
+        unsafe { *length = len };
+    }
+    pointer
+}
+
+/// Frees bytes returned by `dhlrc_core_item_texture`.
+#[unsafe(no_mangle)]
+pub extern "C" fn dhlrc_core_bytes_free(bytes: *mut u8, length: usize) {
+    if bytes.is_null() {
+        return;
+    }
+    let slice = ptr::slice_from_raw_parts_mut(bytes, length);
+    drop(unsafe { Box::from_raw(slice) });
+}
+
+/// The icon bytes for `item`, trying the place a texture usually lives in
+/// before falling back to the block model that names one.
+fn item_texture(set: &ResourceSet, item: &str) -> Option<Vec<u8>> {
+    let (namespace, path) = item.split_once(':').unwrap_or(("minecraft", item));
+    for candidate in [
+        format!("{namespace}:textures/item/{path}.png"),
+        format!("{namespace}:textures/block/{path}.png"),
+    ] {
+        if let Some(bytes) = set.get_bytes(&Identifier::parse(&candidate)) {
+            return Some(bytes);
+        }
+    }
+
+    // A stair, a slab or a door has no texture of its own name: its block model
+    // lists one under `textures`. A bed or a two-block flower is modelled as an
+    // item instead, so that model is the next place to look.
+    for model in [
+        format!("{namespace}:models/block/{path}.json"),
+        format!("{namespace}:models/item/{path}.json"),
+    ] {
+        if let Some(bytes) = model_texture(set, &model) {
+            return Some(bytes);
+        }
+    }
+    None
+}
+
+/// The first texture a model names, as the PNG it points at.
+fn model_texture(set: &ResourceSet, model: &str) -> Option<Vec<u8>> {
+    let model = set.get_json(&Identifier::parse(model))?;
+    for reference in model.get("textures")?.as_object()?.values() {
+        let Some(reference) = reference.as_str() else {
+            continue;
+        };
+        let reference = if reference.contains(':') {
+            reference.to_string()
+        } else {
+            format!("minecraft:{reference}")
+        };
+        // `minecraft:block/oak_planks` -> `minecraft:textures/block/oak_planks.png`
+        let texture = reference.replacen(':', ":textures/", 1) + ".png";
+        if let Some(bytes) = set.get_bytes(&Identifier::parse(&texture)) {
+            return Some(bytes);
+        }
+    }
+    None
+}
+
 /// Points the core at its resource files: the cache directory the downloader
 /// filled, the version whose client jar to use (`version` may be NULL), and
 /// `pack_count` resource packs / mod jars, highest priority first (`packs` may
@@ -1393,5 +1500,41 @@ fn show_to_int(option: ShowOption) -> i32 {
     match option {
         ShowOption::Palette => SHOW_PALETTE,
         ShowOption::Name => SHOW_NAME,
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::item_texture;
+    use crate::resource::ResourceEnvironment;
+    use std::path::PathBuf;
+
+    /// Exercises the icon lookup against a real client jar when the machine has
+    /// one, so the texture names and model fallbacks are checked against actual
+    /// resource files instead of a stub. Skipped when no jar is cached.
+    #[test]
+    fn an_item_icon_comes_from_the_client_jar() {
+        let Some(home) = std::env::var_os("HOME") else {
+            return;
+        };
+        let cache_dir = PathBuf::from(home).join(".cache/dhlrc");
+        let Some(version) = ["1.21.5", "1.21.4", "1.21"]
+            .into_iter()
+            .find(|version| crate::resource::cache::client_jar(&cache_dir, version).exists())
+        else {
+            return;
+        };
+        let set = ResourceEnvironment {
+            cache_dir,
+            version: Some(version.to_string()),
+            packs: vec![],
+        }
+        .resource_set();
+        assert!(item_texture(&set, "minecraft:stick").is_some());
+        // A stair has no texture named after it; the block model names one.
+        assert!(item_texture(&set, "minecraft:oak_stairs").is_some());
+        // A bed is modelled as an item.
+        assert!(item_texture(&set, "minecraft:red_bed").is_some());
+        assert!(item_texture(&set, "minecraft:not_a_real_item").is_none());
     }
 }

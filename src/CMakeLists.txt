@@ -2,6 +2,12 @@ cmake_minimum_required(VERSION 3.17)
 
 project(dhlrc_qt LANGUAGES CXX)
 
+if (WIN32)
+  # The executable's icon is a Windows resource script, so the RC language is
+  # needed (CMake only enables it when asked).
+  enable_language(RC)
+endif ()
+
 add_subdirectory(dhsettingsdialog)
 
 find_package(Intl)
@@ -48,8 +54,10 @@ set(TEMP_PROJECT_SOURCES
         blockreaderui.cpp blockreaderui.h
         propertymodifyui.cpp propertymodifyui.h
         utility.cpp utility.h
+        windowsappid.cpp windowsappid.h
         regionmodifyui.cpp regionmodifyui.h
         blocklistui.cpp blocklistui.h
+        materiallistui.cpp materiallistui.h
         blockshowui.cpp blockshowui.h
         palettelistui.cpp palettelistui.h
         nbtreaderui.cpp
@@ -85,9 +93,9 @@ set(TEMP_PROJECT_SOURCES
         resourcegetter.h
         resourcegetter.cpp
         dhrenderui.h dhrenderui.cpp
+        regionchangesui.h regionchangesui.cpp
         dhrenderwidget.h dhrenderwidget.cpp
         dhgpuwidget.h dhgpuwidget.cpp
-        dhpreview.h dhpreview.cpp
         dhwidget.h dhwidget.cpp
         dhcore.h dhcore.cpp
 )
@@ -98,6 +106,21 @@ if(DH_ENABLE_DEBUG)
     dhdebugwidget.h
     dhdebugwidget.cpp)
 endif()
+
+if(DH_BUILD_RENDER_CHECK)
+  set(TEMP_PROJECT_SOURCES
+    ${TEMP_PROJECT_SOURCES}
+    dhpreview.h
+    dhpreview.cpp)
+endif()
+
+if (WIN32)
+  # Windows takes the programme's icon (Explorer, taskbar, Alt+Tab) from a
+  # resource; the .ico sits next to the .rc, which windres finds through this
+  # include directory.
+  list(APPEND TEMP_PROJECT_SOURCES ${CMAKE_SOURCE_DIR}/resources/dhlrc.rc)
+  set(CMAKE_RC_FLAGS "${CMAKE_RC_FLAGS} -I${CMAKE_SOURCE_DIR}/resources")
+endif ()
 
 ki18n_wrap_ui(TEMP_PROJECT_SOURCES ${ui_files})
 
@@ -128,6 +151,12 @@ target_link_libraries(dhlrc_qt PRIVATE Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VER
  KF6::ColorScheme
  KF6::ConfigWidgets KF6::I18n KF6::I18nLocaleData region_rs dhlrc_core Qt6::Concurrent ${Intl_LIBRARIES}
  dhsettingsdialog KF6::WidgetsAddons KF6::CoreAddons KF6::IconThemes)
+
+if (WIN32)
+  # SetCurrentProcessExplicitAppUserModelID and the registry call behind the
+  # notification sender id (see windowsappid.cpp).
+  target_link_libraries(dhlrc_qt PRIVATE shell32 advapi32)
+endif ()
 
 # The GPU path of the 3D view needs Qt's OpenGL widgets, which a Qt built
 # without OpenGL does not have. Where the module is missing the view keeps the

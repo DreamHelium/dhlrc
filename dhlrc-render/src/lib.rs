@@ -38,7 +38,10 @@ pub mod tint;
 pub use camera::{Camera, Mat4, Vec3};
 pub use image::Image;
 pub use raster::{Renderer, render};
-pub use scene::{Highlight, Scene, SceneQuad, VoxelBlock, Voxels, build as build_scene};
+pub use scene::{
+    Highlight, Scene, SceneQuad, VoxelBlock, Voxels, build as build_scene,
+    build_model, build_reported as build_scene_reported,
+};
 pub use texture::{Alpha, Texture, Textures, texture_asset};
 pub use tint::{Colormaps, Tint};
 

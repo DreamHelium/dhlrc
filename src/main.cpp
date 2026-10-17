@@ -1,8 +1,11 @@
 #include "dhcore.h"
+#ifdef DH_RENDER_CHECK
 #include "dhpreview.h"
+#endif
 #include "mainwindow.h"
 #include "utility.h"
 #include "version.h"
+#include "windowsappid.h"
 #include <KIconTheme>
 #include <KLocalizedString>
 #include <QApplication>
@@ -15,6 +18,11 @@
 int
 main (int argc, char *argv[])
 {
+  /* Windows names a toast after the process's AppUserModelID; set it — and the
+   * name/icon Windows shows — before any window exists, so the notifications are
+   * from dhlrc rather than from PowerShell. */
+  applyWindowsAppUserModelID ();
+
   KIconTheme::initTheme ();
   QApplication a (argc, argv);
 
@@ -26,11 +34,32 @@ main (int argc, char *argv[])
 
   auto dir = dh::getTranslationDir ();
 
-  bindtextdomain ("dhlrc", dir.toUtf8 ().constData ());
+  /* Both catalogues are bound here; which one is used is decided below, once
+   * the configuration says whether the cute pack is on. The plain one is the
+   * provisional choice, so anything said before that point is normal. */
+  const QByteArray localeDir = dir.toUtf8 ();
+  bindtextdomain ("dhlrc", localeDir.constData ());
   bind_textdomain_codeset ("dhlrc", "UTF-8");
+  bindtextdomain ("dhlrc-cute", localeDir.constData ());
+  bind_textdomain_codeset ("dhlrc-cute", "UTF-8");
   textdomain ("dhlrc");
   KLocalizedString::setApplicationDomain ("dhlrc");
   KLocalizedString::addDomainLocaleDir ("dhlrc", dir);
+  KLocalizedString::addDomainLocaleDir ("dhlrc-cute", dir);
+
+  /* The configuration decides which catalogue is in use. It is read when the
+   * program starts, so turning the cute pack on takes a restart — hence the
+   * setting says so. This has to happen before the window and the command-line
+   * help are built, because they are the first things that speak. */
+  DhCore::init (&a);
+  if (DhCore::instance ()
+      && DhCore::instance ()->settingValue (QStringLiteral ("CuteLanguagePack"))
+             == QLatin1String ("true"))
+    {
+      textdomain ("dhlrc-cute");
+      KLocalizedString::setApplicationDomain ("dhlrc-cute");
+    }
+
   QApplication::setApplicationName ("dhlrc");
   QApplication::setApplicationDisplayName (
       i18n ("Minecraft Structure Modifier"));
@@ -48,10 +77,12 @@ main (int argc, char *argv[])
   parser.addHelpOption ();
   parser.addVersionOption ();
 
-  /* The headless preview. It draws one picture of a file and exits, which is
-   * how both backends of the 3D view are checked without a display: the same
-   * command with `--backend cpu` and `--backend gpu` has to give the same
-   * picture. */
+#ifdef DH_RENDER_CHECK
+  /* The headless preview, a development tool rather than something a user
+   * needs: it draws one picture of a file and exits, which is how both
+   * backends of the 3D view are checked without a display (the same command
+   * with `--backend cpu` and `--backend gpu` has to give the same picture).
+   * It is only built with `-DDH_BUILD_RENDER_CHECK=ON`. */
   QCommandLineOption previewOption (
       QStringLiteral ("preview"),
       i18n ("Draw one picture of a region file and exit; needs --png"),
@@ -102,15 +133,13 @@ main (int argc, char *argv[])
   parser.addOption (jarOption);
   parser.addOption (resourcesOption);
   parser.addOption (versionOption);
+#endif
 
   parser.process (a);
 
   QApplication::setStyle ("breeze");
 
-  /* Opens the configuration and starts watching it; the notifications it
-   * produces are shown once the window exists. */
-  DhCore::init (&a);
-
+#ifdef DH_RENDER_CHECK
   /* A preview never opens the main window: it loads the file, draws one
    * picture and exits. */
   if (parser.isSet (previewOption))
@@ -128,6 +157,7 @@ main (int argc, char *argv[])
       options.version = parser.value (versionOption);
       return dhRunPreview (options);
     }
+#endif
 
   MainWindow w;
   w.show ();

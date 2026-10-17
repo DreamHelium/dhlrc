@@ -1,0 +1,7 @@
+/* Windows resource script: the icon Explorer, the taskbar and Alt+Tab show for
+ * dhlrc_qt.exe, and the one the installer uses. The `.ico` lives next to this
+ * file; CMake puts that directory on windres' include path (see
+ * `src/CMakeLists.txt`). */
+#include <windows.h>
+
+IDI_ICON1 ICON "dhlrc.ico"

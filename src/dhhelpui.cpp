@@ -1,4 +1,5 @@
 #include "dhhelpui.h"
+#include "mainwindow.h"
 
 #include <libintl.h>
 #define _(str) gettext (str)
@@ -168,6 +169,7 @@ topicForLink (const QString &link)
 
 DhHelpUI::DhHelpUI (QWidget *parent) : QWidget (parent)
 {
+  MainWindow::ownWindow (this);
   setWindowTitle (_ ("Help"));
   /* So the window is recognisable in the task bar and on the frame; the same
    * theme icon the `Help` menu entry uses. */

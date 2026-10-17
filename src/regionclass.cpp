@@ -45,11 +45,7 @@ RegionClass::RegionClass (void *region_, const QString &displayName,
 {
 }
 
-RegionClass::~RegionClass ()
-{
-  /* Keep consumers of locked_region () alive until the object is gone. */
-  std::lock_guard<std::recursive_mutex> guard (internalLock->mutex);
-}
+RegionClass::~RegionClass () = default;
 
 void
 RegionClass::lock ()
@@ -85,12 +81,6 @@ RegionClass::locked () const
   return internalLock->locked.load ();
 }
 
-int
-RegionClass::lockCount () const
-{
-  return internalLock->count.load ();
-}
-
 const QString &
 RegionClass::uuid () const
 {
@@ -101,36 +91,6 @@ const QDateTime &
 RegionClass::dateTime () const
 {
   return dateTimeValue;
-}
-
-std::mutex &
-RegionClass::get_lock ()
-{
-  /* Compatibility shim: the real lock is re-entrant and tracked by lock ().
-   * Callers should use AutoLocker instead of locking this mutex by hand. */
-  static std::mutex dummy;
-  return dummy;
-}
-
-bool
-RegionClass::get_lock_status ()
-{
-  return locked ();
-}
-
-void
-RegionClass::change_lock_status (bool status)
-{
-  if (status)
-    lock ();
-  else
-    unlock ();
-}
-
-const QString &
-RegionClass::get_display_name ()
-{
-  return displayNameString;
 }
 
 const QString &
@@ -148,18 +108,6 @@ RegionClass::setDisplayName (const QString &newDisplayName)
     return false;
   displayNameString = newDisplayName;
   return true;
-}
-
-const QString &
-RegionClass::get_uuid ()
-{
-  return uuid ();
-}
-
-const QDateTime &
-RegionClass::get_date_time ()
-{
-  return dateTime ();
 }
 
 void *
@@ -199,6 +147,7 @@ RegionClass::get_region ()
         string_free (msg);                                                    \
         return false;                                                         \
       }                                                                       \
+    Q_EMIT changed ();                                                        \
     return true;                                                              \
   }
 
@@ -214,6 +163,8 @@ DH_REGION_STRING_SETTER_ONLY (setAuthor, region_set_author)
 bool
 RegionClass::setTime (const QDateTime &createTime, const QDateTime &modifyTime)
 {
+  if (locked ())
+    return false;
   Guard guard (*this);
   auto *msg = region_set_time (region.get (), createTime.toMSecsSinceEpoch (),
                                modifyTime.toMSecsSinceEpoch ());
@@ -222,6 +173,7 @@ RegionClass::setTime (const QDateTime &createTime, const QDateTime &modifyTime)
       string_free (msg);
       return false;
     }
+  Q_EMIT changed ();
   return true;
 }
 
@@ -283,18 +235,26 @@ RegionClass::offsetZ () const
   return region_get_offset_z (region.get ());
 }
 
-void
+bool
 RegionClass::setSize (qint32 x, qint32 y, qint32 z)
 {
+  if (locked ())
+    return false;
   Guard guard (*this);
   region_set_size (region.get (), x, y, z);
+  Q_EMIT changed ();
+  return true;
 }
 
-void
+bool
 RegionClass::setOffset (qint32 x, qint32 y, qint32 z)
 {
+  if (locked ())
+    return false;
   Guard guard (*this);
   region_set_offset (region.get (), x, y, z);
+  Q_EMIT changed ();
+  return true;
 }
 
 quint32
@@ -304,11 +264,15 @@ RegionClass::dataVersion () const
   return region_get_data_version (region.get ());
 }
 
-void
+bool
 RegionClass::setDataVersion (quint32 version)
 {
+  if (locked ())
+    return false;
   Guard guard (*this);
   region_set_data_version (region.get (), version);
+  Q_EMIT changed ();
+  return true;
 }
 
 qint32
@@ -367,6 +331,8 @@ bool
 RegionClass::setPaletteProperty (quint32 id, qsizetype index,
                                  const QString &name, const QString &data)
 {
+  if (locked ())
+    return false;
   Guard guard (*this);
   auto nameBytes = name.toUtf8 ();
   auto dataBytes = data.toUtf8 ();
@@ -377,6 +343,7 @@ RegionClass::setPaletteProperty (quint32 id, qsizetype index,
       string_free (msg);
       return false;
     }
+  Q_EMIT changed ();
   return true;
 }
 
@@ -384,7 +351,7 @@ bool
 RegionClass::setBlockProperties (qsizetype index, const QStringList &names,
                                  const QStringList &datas, quint32 *outId)
 {
-  if (names.size () != datas.size ())
+  if (locked () || names.size () != datas.size ())
     return false;
   /* Keep the UTF-8 data alive while the C ABI copies it out of the arrays. */
   QList<QByteArray> nameBytes;
@@ -412,7 +379,51 @@ RegionClass::setBlockProperties (qsizetype index, const QStringList &names,
     }
   if (outId)
     *outId = newId;
+  Q_EMIT changed ();
   return true;
+}
+
+void
+RegionClass::recordChange (const QString &description, const QString &detail,
+                           std::function<bool (RegionClass &)> undo)
+{
+  changeList.append (Change{ description, detail,
+                             QDateTime::currentDateTime (), std::move (undo) });
+  Q_EMIT changesChanged ();
+}
+
+const QVector<RegionClass::Change> &
+RegionClass::changes () const
+{
+  return changeList;
+}
+
+bool
+RegionClass::revertChange (qsizetype index)
+{
+  if (index < 0 || index >= changeList.size ())
+    return false;
+  /* The undo has to work; when it does not (the region is locked by a job, or
+   * the write is refused) the entry stays so nothing silently disappears from
+   * the list. */
+  if (!changeList[index].undo (*this))
+    return false;
+  changeList.removeAt (index);
+  Q_EMIT changesChanged ();
+  return true;
+}
+
+qsizetype
+RegionClass::revertAllChanges ()
+{
+  qsizetype reverted = 0;
+  while (!changeList.isEmpty ())
+    {
+      if (!revertChange (changeList.size () - 1))
+        break;
+      ++reverted;
+    }
+  return reverted;
 }
 
 AutoLocker::AutoLocker (RegionClass &region_class_)

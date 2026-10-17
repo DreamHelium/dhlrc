@@ -60,6 +60,8 @@
 #include <KActionMenu>
 #include <KColorSchemeManager>
 #include <KColorSchemeMenu>
+#include <QCursor>
+#include <QMenu>
 #include <QMenuBar>
 
 using DownloaderList
@@ -781,6 +783,22 @@ MainWindow::MainWindow (QWidget *parent) : QMainWindow (parent)
   palette.setColor (listView->viewport ()->backgroundRole (), Qt::transparent);
   listView->setPalette (palette);
   listView->setEditTriggers (QAbstractItemView::NoEditTriggers);
+  /* Each row is a navigation target rather than a selection, and its icon slot
+   * is reserved by the icon size below, so adding an icon later does not move
+   * the text. The rows are padded and highlighted like buttons. */
+  listView->setIconSize (QSize (22, 22));
+  listView->setSpacing (2);
+  listView->setUniformItemSizes (true);
+  listView->setVerticalScrollMode (QAbstractItemView::ScrollPerPixel);
+  /* The labels are sized to fit, so a horizontal scrollbar would only cover
+   * the last row. */
+  listView->setHorizontalScrollBarPolicy (Qt::ScrollBarAlwaysOff);
+  listView->setStyleSheet (
+      "QListView { background: transparent; }"
+      "QListView::item { padding: 5px 6px; border-radius: 5px; }"
+      "QListView::item:hover { background: palette(midlight); }"
+      "QListView::item:selected { background: palette(highlight);"
+      " color: palette(highlighted-text); }");
 
   leftLayout->addWidget (lineEdit);
   leftLayout->addWidget (listView);
@@ -821,7 +839,7 @@ MainWindow::MainWindow (QWidget *parent) : QMainWindow (parent)
 
   auto externalReaderBtn = new QPushButton (_ ("NBT Reader"));
   connect (externalReaderBtn, &QPushButton::clicked, this,
-           &MainWindow::openExternalNbtReader);
+           &MainWindow::showNbtReaderMenu);
   tabLayout->addWidget (externalReaderBtn);
   auto addBtn = new QPushButton (_ ("Add Files to Regions"));
   connect (addBtn, &QPushButton::clicked, this,
@@ -844,32 +862,48 @@ MainWindow::MainWindow (QWidget *parent) : QMainWindow (parent)
   splitter->setStretchFactor (1, 1);
   model = new QStandardItemModel (this);
 
-  /* One row per sidebar entry, each carrying the action it opens. */
-  const auto addRow = [this] (SidebarAction action, const QString &text)
+  /* One row per sidebar entry, each carrying the action it opens and an icon.
+   * The icon is looked up in the theme with a generic fallback, so a row never
+   * shifts when the theme lacks one. */
+  const auto addRow = [this] (SidebarAction action, const QString &text,
+                              const QString &iconName)
     {
       auto *item = new QStandardItem (text);
       item->setData (static_cast<int> (action), sidebarActionRole);
       item->setEditable (false);
+      item->setIcon (QIcon::fromTheme (iconName,
+                                      QIcon::fromTheme ("text-x-generic")));
       model->appendRow (item);
     };
-  addRow (SidebarAction::NbtReader, _ ("NBT File Reader"));
-  addRow (SidebarAction::ManageRegion, _ ("Manage Region"));
-  addRow (SidebarAction::RegionReader, _ ("Region Reader/Modifier"));
-  addRow (SidebarAction::Settings, _ ("Settings"));
-  addRow (SidebarAction::ProgramDirectories, _ ("Program Directories"));
+  addRow (SidebarAction::NbtReader, _ ("NBT File Reader"),
+          QStringLiteral ("text-x-generic"));
+  addRow (SidebarAction::ManageRegion, _ ("Manage Region"),
+          QStringLiteral ("view-list-details"));
+  addRow (SidebarAction::RegionReader, _ ("Region Reader/Modifier"),
+          QStringLiteral ("document-preview"));
+  addRow (SidebarAction::Settings, _ ("Settings"),
+          QStringLiteral ("settings-configure"));
+  addRow (SidebarAction::ProgramDirectories, _ ("Program Directories"),
+          QStringLiteral ("folder-open"));
 #ifdef DH_DEBUG_IN_IDE
-  addRow (SidebarAction::Debug, QStringLiteral ("Debug"));
+  addRow (SidebarAction::Debug, QStringLiteral ("Debug"),
+          QStringLiteral ("applications-development"));
 #endif
   auto maxLen = 0;
   auto rows = model->rowCount ();
+  const QFontMetrics metrics (listView->font ());
   for (int i = 0; i < rows; i++)
     {
       auto str = model->item (i)->data (Qt::DisplayRole).toString ();
-      maxLen = std::max (
-          maxLen,
-          QFontMetrics (QFont ()).size (Qt::TextSingleLine, str).width ());
+      maxLen = std::max (maxLen, metrics.horizontalAdvance (str));
     }
-  splitter->setSizes ({ maxLen + 20, width () - maxLen - 20 });
+  /* Room for the icon, its padding and the row spacing, so the sidebar fits
+   * the widest label without a horizontal scrollbar or an elided entry. */
+  /* The icon, the gap after it, the row padding on both sides and a little
+   * room for the scrollbar. */
+  const auto rowExtras = listView->iconSize ().width () + 56;
+  leftWidget->setMinimumWidth (maxLen + rowExtras);
+  splitter->setSizes ({ maxLen + rowExtras, width () - maxLen - rowExtras });
   proxyModel = new QSortFilterProxyModel (this);
   proxyModel->setSourceModel (model);
   listView->setModel (proxyModel);
@@ -881,6 +915,7 @@ MainWindow::MainWindow (QWidget *parent) : QMainWindow (parent)
   auto *core = DhCore::instance ();
 
   settingsDialog = new DhSettingsDialog (this);
+  ownWindow (settingsDialog);
   settingsDialog->setPathText (core ? core->configPath () : QString ());
 
   /* One item per setting the core describes, so adding a setting is one entry
@@ -945,12 +980,23 @@ MainWindow::MainWindow (QWidget *parent) : QMainWindow (parent)
     }
 
   /* The plugin options are discovered at run time, so they are added here
-   * rather than described by the core's schema. */
+   * rather than described by the core's schema. One plugin and direction is
+   * folded into a section that starts collapsed, so a plugin with many
+   * options does not push the next one off the page. */
   settingsDialog->addGroup (_ ("Manage"));
   {
     auto *plugins = PluginOptionsConfig::instance ();
     for (const auto &plugin : plugins->plugins ())
       {
+        /* A module folds as a whole; opening it shows one fold per direction,
+         * so the module's reading and writing options stay together while
+         * still being told apart. A module with nothing in it gets no
+         * header. */
+        if (!plugins->hasOptions (plugin.type, ConfigObjectItems::Kind::Input)
+            && !plugins->hasOptions (plugin.type,
+                                     ConfigObjectItems::Kind::Output))
+          continue;
+        settingsDialog->addSection (plugin.type, 0);
         for (auto kind : { ConfigObjectItems::Kind::Input,
                            ConfigObjectItems::Kind::Output })
           {
@@ -959,12 +1005,17 @@ MainWindow::MainWindow (QWidget *parent) : QMainWindow (parent)
             const QString direction = kind == ConfigObjectItems::Kind::Input
                                           ? _ ("reading")
                                           : _ ("writing");
+            settingsDialog->addSection (direction, 1);
             auto *useItem = new DhSettingItem (
                 pluginUseKey (plugin.type, kind), DhSettingItem::Type::Bool,
                 plugins->useConfigured (plugin.type, kind));
             useItem->setLabel (
                 QString (_ ("Use saved options for %1 (%2) instead of asking"))
                     .arg (plugin.type, direction));
+            useItem->setToolTip (
+                QString (_ ("Use the options below for every %1 operation "
+                            "instead of asking each time."))
+                    .arg (direction));
             settingsDialog->addItem (useItem, {});
 
             const auto &options = kind == ConfigObjectItems::Kind::Input
@@ -980,6 +1031,7 @@ MainWindow::MainWindow (QWidget *parent) : QMainWindow (parent)
                            : DhSettingItem::Type::Int,
                     plugins->optionValue (plugin.type, kind, option));
                 optionItem->setLabel (option.label);
+                optionItem->setToolTip (option.description);
                 settingsDialog->addItem (optionItem, {});
               }
           }
@@ -1000,78 +1052,12 @@ MainWindow::MainWindow (QWidget *parent) : QMainWindow (parent)
   connect (lineEdit, &QLineEdit::textChanged, this,
            [&] (const QString &pattern)
              { proxyModel->setFilterRegularExpression (pattern); });
-  connect (
-      listView, &QListView::doubleClicked, this,
-      [this] (const QModelIndex &index)
-        {
-          /* The action is read from the row, not from its position: the search
-           * box filters the list, so a position means a different entry as
-           * soon as something is typed. */
-          switch (static_cast<SidebarAction> (
-              index.data (sidebarActionRole).toInt ()))
-            {
-            case SidebarAction::NbtReader:
-              {
-                openExternalNbtReader ();
-                break;
-              }
-            case SidebarAction::ManageRegion:
-              ensureTab (ManageRegionUI::instance (), _ ("Manage Region"));
-              break;
-            case SidebarAction::RegionReader:
-              {
-                auto region
-                    = dh::getRegion (this, ManageRegionUI::instance (), false);
-                if (region != -1)
-                  {
-                    auto downloader = std::make_shared<DhDownloader> ();
-                    auto brui = new BlockReaderUI (region, downloader);
-                    downloaderList->emplace_back (
-                        qobject_cast<QWidget *> (brui), downloader);
-                    auto tabIndex = tabWidget->addTab (
-                        brui, _ ("Region Reader/Modifier"));
-                    tabWidget->setCurrentIndex (tabIndex);
-                    connect (brui, &BlockReaderUI::windowClosed, this,
-                             [] (QWidget *win)
-                               {
-                                 for (const auto &i : *downloaderList)
-                                   {
-                                     if (i.first == win)
-                                       {
-                                         i.second->stop ();
-                                         downloaderList->removeOne (i);
-                                       }
-                                   }
-                               });
-                  }
-                break;
-              }
-            case SidebarAction::Settings:
-              {
-                if (settingsDialog)
-                  {
-                    settingsDialog->raise ();
-                    settingsDialog->activateWindow ();
-                    settingsDialog->show ();
-                  }
-                break;
-              }
-            case SidebarAction::ProgramDirectories:
-              openProgramDirectories ();
-              break;
-#ifdef DH_DEBUG_IN_IDE
-            case SidebarAction::Debug:
-              {
-                auto widget = new DhDebugWidget;
-                widget->setAttribute (Qt::WA_DeleteOnClose);
-                widget->show ();
-              }
-              break;
-#endif
-            default:
-              break;
-            }
-        });
+  /* One click opens the entry; Enter does the same for keyboard use. Both go
+   * through one function, so the two paths cannot drift apart. */
+  connect (listView, &QListView::clicked, this,
+           [this] (const QModelIndex &index) { openSidebarEntry (index); });
+  connect (listView, &QListView::activated, this,
+           [this] (const QModelIndex &index) { openSidebarEntry (index); });
   connect (tabWidget, &QTabWidget::tabCloseRequested, this,
            [this] (int index)
              {
@@ -1113,11 +1099,134 @@ MainWindow::MainWindow (QWidget *parent) : QMainWindow (parent)
 }
 
 void
-MainWindow::openExternalNbtReader ()
+MainWindow::openSidebarEntry (const QModelIndex &index)
 {
-  auto enui = new ExternalNbtReaderUI ();
-  auto tabIndex = tabWidget->addTab (enui, _ ("NBT Reader"));
-  tabWidget->setCurrentIndex (tabIndex);
+  /* The action is read from the row, not from its position: the search box
+   * filters the list, so a position means a different entry as soon as
+   * something is typed. */
+  switch (static_cast<SidebarAction> (
+      index.data (sidebarActionRole).toInt ()))
+    {
+    case SidebarAction::NbtReader:
+      showNbtReaderMenu ();
+      break;
+    case SidebarAction::ManageRegion:
+      ensureTab (ManageRegionUI::instance (), _ ("Manage Region"));
+      break;
+    case SidebarAction::RegionReader:
+      showRegionReaderMenu ();
+      break;
+    case SidebarAction::Settings:
+      {
+        if (settingsDialog)
+          {
+            settingsDialog->raise ();
+            settingsDialog->activateWindow ();
+            settingsDialog->show ();
+          }
+        break;
+      }
+    case SidebarAction::ProgramDirectories:
+      openProgramDirectories ();
+      break;
+#ifdef DH_DEBUG_IN_IDE
+    case SidebarAction::Debug:
+      {
+        auto widget = new DhDebugWidget;
+        widget->setAttribute (Qt::WA_DeleteOnClose);
+        widget->show ();
+      }
+      break;
+#endif
+    default:
+      break;
+    }
+}
+
+void
+MainWindow::openExternalNbtReader (bool newWindow)
+{
+  auto *reader = new ExternalNbtReaderUI ();
+  const auto index = tabWidget->addTab (reader, reader->title ());
+  tabWidget->setCurrentIndex (index);
+  /* The title follows the file the reader loads, in its tab or in its window. */
+  connect (reader, &ExternalNbtReaderUI::titleChanged, this,
+           [this, reader] (const QString &title)
+             {
+               if (const auto i = tabWidget->indexOf (reader); i >= 0)
+                 tabWidget->setTabText (i, title);
+               else if (const auto i = indexOfFloating (reader); i >= 0)
+                 if (auto *window = floatingPages[i].window.data ())
+                   window->setWindowTitle (title);
+             });
+  if (newWindow)
+    tearOffTab (index);
+  raise ();
+  activateWindow ();
+}
+
+void
+MainWindow::showNbtReaderMenu ()
+{
+  /* Everything the popup needs: the readers open now, in tabs or in windows. */
+  QList<ExternalNbtReaderUI *> readers;
+  for (int i = 0; i < tabWidget->count (); ++i)
+    if (auto *reader
+        = qobject_cast<ExternalNbtReaderUI *> (tabWidget->widget (i)))
+      readers << reader;
+  for (const auto &entry : floatingPages)
+    if (auto *reader
+        = qobject_cast<ExternalNbtReaderUI *> (entry.page.data ()))
+      readers << reader;
+
+  QMenu menu (this);
+  if (readers.isEmpty ())
+    {
+      auto *empty = menu.addAction (_ ("No NBT readers are open yet."));
+      empty->setEnabled (false);
+      menu.addSeparator ();
+    }
+  else
+    {
+      for (auto *reader : readers)
+        {
+          auto *entry = menu.addAction (reader->title ());
+          /* A check mark says which reader is on screen. */
+          entry->setCheckable (true);
+          if (const auto i = tabWidget->indexOf (reader); i >= 0)
+            entry->setChecked (tabWidget->currentWidget () == reader);
+          else if (const auto i = indexOfFloating (reader); i >= 0)
+            if (auto *window = floatingPages[i].window.data ())
+              entry->setChecked (window->isActiveWindow ());
+          connect (entry, &QAction::triggered, this,
+                   [this, reader] { showNbtReader (reader); });
+        }
+      menu.addSeparator ();
+    }
+  auto *newTab = menu.addAction (_ ("New Reader Tab"));
+  connect (newTab, &QAction::triggered, this,
+           [this] { openExternalNbtReader (false); });
+  auto *newWindow = menu.addAction (_ ("New Reader Window"));
+  connect (newWindow, &QAction::triggered, this,
+           [this] { openExternalNbtReader (true); });
+  /* Under the pointer, which is where the click on the sidebar row happened. */
+  menu.exec (QCursor::pos ());
+}
+
+void
+MainWindow::showNbtReader (ExternalNbtReaderUI *reader)
+{
+  if (const auto i = tabWidget->indexOf (reader); i >= 0)
+    tabWidget->setCurrentIndex (i);
+  else if (const auto i = indexOfFloating (reader); i >= 0)
+    if (auto *window = floatingPages[i].window.data ())
+      {
+        window->show ();
+        window->raise ();
+        window->activateWindow ();
+      }
+  raise ();
+  activateWindow ();
 }
 
 void
@@ -1416,11 +1525,167 @@ MainWindow::refreshTopAreaRows ()
 void
 MainWindow::addWidgetToTab (QWidget *widget, const QString &title)
 {
-  if (mainWindow)
+  addKeyedTab (widget, title, QString ());
+}
+
+void
+MainWindow::addKeyedTab (QWidget *widget, const QString &title,
+                         const QString &key)
+{
+  if (!mainWindow)
     {
-      auto tabIndex = mainWindow->tabWidget->addTab (widget, title);
-      mainWindow->tabWidget->setCurrentIndex (tabIndex);
+      widget->deleteLater ();
+      return;
     }
+  if (!key.isEmpty ())
+    {
+      /* A page that is already open is shown instead of being opened twice. */
+      if (auto *page = keyedTab (key))
+        {
+          widget->deleteLater ();
+          showTab (page, title);
+          return;
+        }
+      widget->setProperty ("dhTabKey", key);
+    }
+  auto tabIndex = mainWindow->tabWidget->addTab (widget, title);
+  mainWindow->tabWidget->setCurrentIndex (tabIndex);
+}
+
+void
+MainWindow::showRegionReaderMenu ()
+{
+  const auto regions = ManageRegionUI::getRegions ();
+  QMenu menu (this);
+  if (regions.empty ())
+    {
+      auto *empty = menu.addAction (_ ("No regions have been loaded yet."));
+      empty->setEnabled (false);
+    }
+  else
+    {
+      for (std::size_t i = 0; i < regions.size (); ++i)
+        {
+          const auto &region = regions[i];
+          auto *entry = menu.addAction (region->displayName ());
+          /* A check mark says the reader is open; picking the entry brings
+           * that tab forward instead of opening a second one. */
+          entry->setCheckable (true);
+          entry->setChecked (
+              keyedTab (QStringLiteral ("region-reader:") + region->uuid ())
+              != nullptr);
+          connect (entry, &QAction::triggered, this,
+                   [this, i]
+                   { openRegionReader (static_cast<int> (i)); });
+        }
+    }
+  /* Under the pointer, which is where the click on the sidebar row happened. */
+  menu.exec (QCursor::pos ());
+}
+
+QWidget *
+MainWindow::keyedTab (const QString &key)
+{
+  if (!mainWindow || key.isEmpty ())
+    return nullptr;
+  for (int i = 0; i < mainWindow->tabWidget->count (); ++i)
+    {
+      auto *page = mainWindow->tabWidget->widget (i);
+      if (page && page->property ("dhTabKey").toString () == key)
+        return page;
+    }
+  /* A page the user tore off into its own window is not in the tab bar. */
+  for (const auto &entry : mainWindow->floatingPages)
+    {
+      auto *page = entry.page.data ();
+      if (page && page->property ("dhTabKey").toString () == key)
+        return page;
+    }
+  return nullptr;
+}
+
+void
+MainWindow::showTab (QWidget *page, const QString &title)
+{
+  if (!mainWindow || !page)
+    return;
+  /* `ensureTab ()` docks a torn-off page back and selects it. */
+  mainWindow->ensureTab (page, title);
+  mainWindow->raise ();
+  mainWindow->activateWindow ();
+}
+
+void
+MainWindow::closeTab (QWidget *widget)
+{
+  if (!mainWindow || !widget)
+    return;
+  /* A page torn off into its own window is taken down with that window. */
+  if (mainWindow->indexOfFloating (widget) >= 0)
+    {
+      mainWindow->discardFloatingPage (widget);
+      return;
+    }
+  const int index = mainWindow->tabWidget->indexOf (widget);
+  if (index < 0)
+    return;
+  mainWindow->tabWidget->removeTab (index);
+  if (isPersistentPage (widget))
+    {
+      /* Kept for the life of the window, exactly as closing its tab by hand
+       * does with it. */
+      return;
+    }
+  /* `close ()` runs the page's own close handling (a reader closes what it
+   * opened); tabs are not `WA_DeleteOnClose` unless they were torn off, so the
+   * page is deleted here. */
+  widget->close ();
+  widget->deleteLater ();
+}
+
+void
+MainWindow::openRegionReader (int index)
+{
+  auto region = ManageRegionUI::getRegion (index);
+  if (!region || !mainWindow)
+    return;
+
+  /* One reader per region. The key is the region's UUID, so a request for a
+   * reader that is already open brings that page forward instead of adding a
+   * second one for the same region. */
+  const QString key = QStringLiteral ("region-reader:") + region->uuid ();
+  const QString title
+      = QString (_ ("Region Reader/Modifier: %1")).arg (region->displayName ());
+  if (auto *page = keyedTab (key))
+    {
+      showTab (page, title);
+      return;
+    }
+
+  auto downloader = std::make_shared<DhDownloader> ();
+  auto *reader = new BlockReaderUI (index, downloader);
+  reader->setWindowTitle (title);
+  downloaderList->emplace_back (reader, downloader);
+  addKeyedTab (reader, title, key);
+
+  /* The reader downloads its language file. Nothing shows the progress once
+   * its page is gone, so the download is stopped with it. */
+  connect (reader, &BlockReaderUI::windowClosed, mainWindow,
+           [] (QWidget *win)
+             {
+               /* Collected first: removeOne () invalidates the iteration. */
+               DownloaderList stops;
+               for (const auto &entry : *downloaderList)
+                 {
+                   if (entry.first == win)
+                     stops.append (entry);
+                 }
+               for (const auto &entry : stops)
+                 {
+                   entry.second->stop ();
+                   downloaderList->removeOne (entry);
+                 }
+             });
 }
 
 qsizetype
@@ -1637,6 +1902,22 @@ void
 MainWindow::closeEvent (QCloseEvent *event)
 {
   closing = true;
+  /* Every window the program opened listens to this signal (see
+   * `ownWindow ()`), and closes itself; the windows a reader opened are closed
+   * by the reader's own close handling, and the tabs by the window's
+   * destruction. Closing the main window therefore takes the whole tree with
+   * it without anything here having to know which windows exist. */
   Q_EMIT windowClosed ();
   QMainWindow::closeEvent (event);
+}
+
+void
+MainWindow::ownWindow (QWidget *window)
+{
+  if (!mainWindow || !window || window == mainWindow)
+    return;
+  /* `UniqueConnection` makes a second call harmless, and Qt drops the
+   * connection when either end is destroyed. */
+  QObject::connect (mainWindow, &MainWindow::windowClosed, window,
+                    &QWidget::close, Qt::UniqueConnection);
 }

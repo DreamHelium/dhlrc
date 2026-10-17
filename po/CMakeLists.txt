@@ -58,3 +58,21 @@ foreach( _currentPoFile_F ${FIRST_PO_FILES} )
         COMMENT "Updating translation ${_currentPoFile_F} of ${FIRST_POT_NAME}"
     )
 endforeach()
+
+# The playful catalogue: the same messages with cute endings, installed as its
+# own domain so the program can switch to it (the "Cute Language Pack"
+# setting). It is generated from the plain catalogue by `make_cute.py`, which
+# `make_po.sh` runs.
+file(GLOB CUTE_PO_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "dhlrc-cute/*.po")
+foreach( _currentPoFile_F ${CUTE_PO_FILES} )
+  get_filename_component(_lang ${_currentPoFile_F} NAME_WE)
+  set( _moFile ${OUTPUT_LANG_POS}/${_lang}/LC_MESSAGES/${FIRST_POT_NAME}-cute.mo )
+  if(NOT EXISTS ${OUTPUT_LANG_POS}/${_lang}/LC_MESSAGES)
+    file(MAKE_DIRECTORY ${OUTPUT_LANG_POS}/${_lang}/LC_MESSAGES)
+  endif()
+
+  add_custom_target( dhlrc_update_cute_po ALL
+    COMMAND ${GETTEXT_MSGFMT_EXECUTABLE} -o ${_moFile} ${CMAKE_CURRENT_SOURCE_DIR}/${_currentPoFile_F}
+    COMMENT "Compiling the playful translation ${_currentPoFile_F}"
+    )
+endforeach()
