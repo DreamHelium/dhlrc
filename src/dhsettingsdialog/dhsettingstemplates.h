@@ -85,7 +85,7 @@ private:
   bool longText = false;
 };
 
-class DhPathSettingTemplate : public DhSettingsTemplate
+class DHSETTINGSDIALOG_EXPORT DhPathSettingTemplate : public DhSettingsTemplate
 {
 public:
   DhPathSettingTemplate (DhSettingItem *item, QVBoxLayout *layout,

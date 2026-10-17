@@ -1,5 +1,5 @@
 #include "regionmodifyui.h"
-
+#include <libintl.h>
 #include "regionclass.h"
 #include "resourcegetter.h"
 #include "ui_regionmodifyui.h"

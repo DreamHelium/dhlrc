@@ -46,7 +46,8 @@ BlockReaderUI::BlockReaderUI (int index,
   version = regionClass->dataVersion ();
   /* One small button opens the actions as a popup menu, so the page keeps its
    * size in any language. The menu entries click the buttons themselves, so
-   * every handler stays wired where it was. */
+   * every handler stays wired where it was. The buttons are kept out of the
+   * page: the grid below the Tools button would only repeat the menu. */
   auto *toolsMenu = new QMenu (this);
   for (auto *button : { ui->modifyBtn, ui->changesBtn, ui->materialBtn,
                         ui->entityBtn_2, ui->propertyBtn, ui->entityBtn,
@@ -54,6 +55,7 @@ BlockReaderUI::BlockReaderUI (int index,
     {
       auto *action = toolsMenu->addAction (button->text ());
       connect (action, &QAction::triggered, button, &QPushButton::click);
+      button->hide ();
     }
   connect (ui->toolsBtn, &QPushButton::clicked, this,
            [this, toolsMenu]
