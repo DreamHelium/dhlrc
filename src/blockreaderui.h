@@ -60,6 +60,9 @@ public:
   void showEntityList ();
   void showEntityNbt ();
   void modifyProperty ();
+  /* Opens the block chooser for the coordinate the form names: replacing the
+   * block there, or adding one above it. */
+  void addBlock ();
   void showBlockList ();
   void showBlockView ();
   void showPreview ();
@@ -73,6 +76,10 @@ public:
   [[nodiscard]] bool canModifyProperty () const
   {
     return canModifyRegion () && blockHasProperties;
+  }
+  [[nodiscard]] bool canAddBlock () const
+  {
+    return canModifyRegion () && blockPositionValid;
   }
   [[nodiscard]] bool hasBlockEntity () const { return nbt != nullptr; }
   [[nodiscard]] bool hasEntities () const;
@@ -103,6 +110,9 @@ private:
   /* Whether the block the coordinates name has properties, so the property
    * button can stay disabled while a job holds the region. */
   bool blockHasProperties = false;
+  /* Whether the coordinates name a cell inside the region, so the block
+   * chooser only opens on a position it can write. */
+  bool blockPositionValid = false;
   bool translationReady = false;
   std::shared_ptr<DhDownloader> downloader;
   int version;

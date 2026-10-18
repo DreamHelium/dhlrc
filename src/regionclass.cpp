@@ -3,6 +3,10 @@
 #include "manageregionui.h"
 #include "region.h"
 
+#include <libintl.h>
+
+#define _(str) gettext (str)
+
 /* RAII guard returned by RegionClass::locked_region (); it keeps the region
  * locked until the pointer it handed out is no longer used. */
 class RegionClass::Guard
@@ -279,7 +283,15 @@ qint32
 RegionClass::index (qint32 x, qint32 y, qint32 z) const
 {
   Guard guard (*const_cast<RegionClass *> (this));
-  return region_get_index (region.get (), x, y, z);
+  /* `region_get_index ()` is plain arithmetic and wraps coordinates outside
+   * the region into other cells, so the bounds are checked here: a caller that
+   * gets a position from a view or a form must be able to tell "outside" from
+   * a cell index. */
+  void *raw = region.get ();
+  if (x < 0 || y < 0 || z < 0 || x >= region_get_x (raw)
+      || y >= region_get_y (raw) || z >= region_get_z (raw))
+    return -1;
+  return region_get_index (raw, x, y, z);
 }
 
 quint32
@@ -381,6 +393,96 @@ RegionClass::setBlockProperties (qsizetype index, const QStringList &names,
     *outId = newId;
   Q_EMIT changed ();
   return true;
+}
+
+RegionClass::BlockState
+RegionClass::blockState (qint32 x, qint32 y, qint32 z) const
+{
+  BlockState state;
+  /* One lock for the whole read: the position and the palette entry it names
+   * have to belong to the same region state. */
+  Guard guard (*const_cast<RegionClass *> (this));
+  void *raw = region.get ();
+  if (x < 0 || y < 0 || z < 0 || x >= region_get_x (raw)
+      || y >= region_get_y (raw) || z >= region_get_z (raw))
+    return state;
+  const qint32 blockIndex = region_get_index (raw, x, y, z);
+
+  const quint32 id = region_get_block_id_by_index (region.get (), blockIndex);
+  auto *rawName = region_get_palette_id_name (region.get (), id);
+  if (rawName)
+    {
+      state.name = QString::fromUtf8 (rawName);
+      string_free (rawName);
+    }
+  const qsizetype len = region_get_palette_property_len (region.get (), id);
+  state.properties.reserve (len);
+  for (qsizetype i = 0; i < len; i++)
+    {
+      auto *propertyName
+          = region_get_palette_property_name (region.get (), id, i);
+      auto *propertyData
+          = region_get_palette_property_data (region.get (), id, i);
+      if (propertyName && propertyData)
+        state.properties.append ({ QString::fromUtf8 (propertyName),
+                                   QString::fromUtf8 (propertyData) });
+      string_free (propertyName);
+      string_free (propertyData);
+    }
+  return state;
+}
+
+QString
+RegionClass::setBlockState (qint32 x, qint32 y, qint32 z, const QString &name,
+                            const QList<QPair<QString, QString>> &properties)
+{
+  /* A refused write has to say why: the dialog keeps itself open and shows the
+   * message, so it must not be a bare false. */
+  if (locked ())
+    return _ ("The region is being used by a background task; "
+              "editing is paused until it finishes.");
+  if (name.isEmpty ())
+    return _ ("No block was chosen.");
+
+  /* Keep the UTF-8 data alive while the C ABI copies it out of the arrays. */
+  QList<QByteArray> nameBytes;
+  QList<QByteArray> dataBytes;
+  for (const auto &property : properties)
+    {
+      nameBytes.append (property.first.toUtf8 ());
+      dataBytes.append (property.second.toUtf8 ());
+    }
+  QList<const char *> namePtrs;
+  QList<const char *> dataPtrs;
+  for (const auto &bytes : nameBytes)
+    namePtrs.append (bytes.constData ());
+  for (const auto &bytes : dataBytes)
+    dataPtrs.append (bytes.constData ());
+  auto nameUtf8 = name.toUtf8 ();
+
+  Guard guard (*this);
+  /* The bounds check and the write happen under the same lock, so the index
+   * names the cell it was computed for even if a job wanted the region. */
+  void *raw = region.get ();
+  if (x < 0 || y < 0 || z < 0 || x >= region_get_x (raw)
+      || y >= region_get_y (raw) || z >= region_get_z (raw))
+    return QString (_ ("The position (%1, %2, %3) is outside the region."))
+        .arg (x)
+        .arg (y)
+        .arg (z);
+  const qint32 blockIndex = region_get_index (raw, x, y, z);
+  quint32 id = 0;
+  auto *msg = region_set_block_state (
+      region.get (), static_cast<size_t> (blockIndex), nameUtf8.constData (),
+      namePtrs.constData (), dataPtrs.constData (), namePtrs.size (), &id);
+  if (msg)
+    {
+      QString error = QString::fromUtf8 (msg);
+      string_free (msg);
+      return error;
+    }
+  Q_EMIT changed ();
+  return {};
 }
 
 void

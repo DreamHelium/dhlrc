@@ -50,6 +50,12 @@ extern "C"
                                                DhlrcProgressFunc progress,
                                                void *user);
 
+  /* Like `dhlrc_render_scene_new`, of one horizontal slice of the region: only
+   * blocks whose `y` is between `y_low` and `y_high`, both included, are drawn,
+   * and the view is framed around them. `y_low` above `y_high` draws nothing. */
+  DhlrcScene *dhlrc_render_scene_new_slice (void *core, const void *region,
+                                            int32_t y_low, int32_t y_high);
+
   /* Frees a scene built by `dhlrc_render_scene_new`. NULL is allowed. */
   void dhlrc_render_scene_free (DhlrcScene *scene);
 
@@ -171,13 +177,20 @@ extern "C"
   int32_t dhlrc_render_scene_block_box (const DhlrcScene *scene, int32_t x,
                                         int32_t y, int32_t z, float *block);
 
-  /* How many quads the outline is made of, or 0 when nothing is highlighted. */
-  size_t dhlrc_render_scene_highlight_count (const DhlrcScene *scene);
+  /* Shows, or hides, the box the region is drawn in — the whole region, or the
+   * slice being drawn — with the same six floats as the highlight above. It is
+   * drawn in its own colour, apart from the box under the pointer. Returns 1
+   * when a box was set and 0 when it was cleared. */
+  int32_t dhlrc_render_scene_set_bounds (DhlrcScene *scene, const float *block);
 
-  /* One quad of the outline, in the same shape as a scene quad. Returns 1, or
+  /* How many quads the boxes drawn over the scene come to — the region's extent
+   * and the block under the pointer together — or 0 when neither is shown. */
+  size_t dhlrc_render_scene_overlay_count (const DhlrcScene *scene);
+
+  /* One quad of those boxes, in the same shape as a scene quad. Returns 1, or
    * 0 for an index past the end. */
-  int32_t dhlrc_render_scene_highlight_quad (const DhlrcScene *scene,
-                                             size_t index, DhlrcQuad *quad);
+  int32_t dhlrc_render_scene_overlay_quad (const DhlrcScene *scene,
+                                           size_t index, DhlrcQuad *quad);
 
 #ifdef __cplusplus
 }

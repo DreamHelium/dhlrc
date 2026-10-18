@@ -28,6 +28,12 @@ struct DhPreviewOptions
    * The block's info text — what the tooltip would show — is printed on
    * stderr, which is how the hover path is checked without a mouse. */
   QString hover;
+  /* `Y1:Y2`, both ends included: draw only that horizontal range of the
+   * region. Empty draws the whole region. */
+  QString slice;
+  /* Whether to draw the box around the region being drawn — its Y clamped to
+   * the slice when one is set — in the scene's own overlay colour. */
+  bool bounds = false;
   /* Where the resources come from: a client jar to read the block models and
    * textures from (`--jar`), the cache directory to look in (`--resources`),
    * and the version id whose client jar to use (`--version`). Empty means what

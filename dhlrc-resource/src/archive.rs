@@ -62,6 +62,25 @@ impl ZipSource {
 }
 
 impl Source for ZipSource {
+    fn list(&self, prefix: &str) -> Vec<Identifier> {
+        /* An archive entry is `assets/<namespace>/<path>`; keep the ones under
+         * the prefix and give back the id each names. */
+        let mut found = Vec::new();
+        for name in self.names() {
+            let Some(rest) = name.strip_prefix("assets/") else {
+                continue;
+            };
+            let Some((namespace, path)) = rest.split_once('/') else {
+                continue;
+            };
+            if path.starts_with(prefix) {
+                found.push(Identifier::new(namespace.to_owned(), path.to_owned()));
+            }
+        }
+        found.sort_by(|a, b| (&a.namespace, &a.path).cmp(&(&b.namespace, &b.path)));
+        found
+    }
+
     fn get(&self, id: &Identifier) -> Option<Vec<u8>> {
         self.read(&id.asset_path())
     }

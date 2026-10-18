@@ -18,7 +18,7 @@ use dhlrc_resource::{Identifier, Source};
 use dhlrc_model::{BlockModel, Direction, Quad, Variant, quads, resolve_model, resolve_parts};
 
 use crate::camera::{Hit, Ray, Vec3, cross, dot, sub};
-use crate::texture::{Alpha, Textures};
+use crate::texture::{Alpha, Texture, Textures};
 use crate::tint::{Colormaps, Tint};
 
 /// A block a palette entry names.
@@ -84,6 +84,25 @@ pub struct Highlight {
 /// exactly on the faces they trace and fight with them for the depth buffer.
 const HIGHLIGHT_OFFSET: f32 = 0.002;
 
+/// The texture the outline quads sample: a single white texel every scene
+/// carries at this index, so that what an outline is drawn in is exactly its
+/// tint. The missing-texture checker at index 0 would tint wrongly — its
+/// magenta and black texels multiply into the colour.
+const OVERLAY_TEXTURE: usize = 1;
+
+/// The colour the box under the pointer is drawn in: black, as the game does.
+const HIGHLIGHT_COLOUR: [u8; 3] = [0, 0, 0];
+
+/// The colour the region's own extent is drawn in, chosen to stand out from
+/// both the blocks and the dark background.
+const BOUNDS_COLOUR: [u8; 3] = [0, 200, 255];
+
+/// The colour the region's extent is drawn in, for a renderer that checks what
+/// actually came out.
+pub fn bounds_colour() -> [u8; 3] {
+    BOUNDS_COLOUR
+}
+
 /// How thick the outline's lines are, in blocks: a block is 1 across, so this
 /// is a thirty-second of it — about a pixel in a view of a few dozen blocks.
 const HIGHLIGHT_THICKNESS: f32 = 1.0 / 32.0;
@@ -92,9 +111,9 @@ const HIGHLIGHT_THICKNESS: f32 = 1.0 / 32.0;
 ///
 /// They fit the scene's own quads so that both renderers draw the same outline
 /// without either learning a new kind of geometry: the texture is never seen
-/// because the tint is black, which leaves the texel black wherever it is
-/// sampled.
-pub fn outline(highlight: Highlight) -> Vec<SceneQuad> {
+/// because the tint is the colour, which leaves the texel that colour wherever
+/// it is sampled.
+pub fn outline(highlight: Highlight, colour: [u8; 3]) -> Vec<SceneQuad> {
     let min = highlight.min.map(|value| value - HIGHLIGHT_OFFSET);
     let max = highlight.max.map(|value| value + HIGHLIGHT_OFFSET);
     let thickness = HIGHLIGHT_THICKNESS;
@@ -130,7 +149,7 @@ pub fn outline(highlight: Highlight) -> Vec<SceneQuad> {
                     low[other] = start[other] - thickness;
                     high[other] = start[other] + thickness;
                 }
-                boxed(low, high, &mut quads);
+                boxed(low, high, colour, &mut quads);
             }
         }
     }
@@ -138,17 +157,15 @@ pub fn outline(highlight: Highlight) -> Vec<SceneQuad> {
 }
 
 /// Pushes the six faces of a box as quads, all of them wound outwards.
-fn boxed(low: Vec3, high: Vec3, out: &mut Vec<SceneQuad>) {
+fn boxed(low: Vec3, high: Vec3, colour: [u8; 3], out: &mut Vec<SceneQuad>) {
     for direction in Direction::ALL {
         out.push(SceneQuad {
             positions: face_corners(direction, low, high),
-            /* The texel is never seen: this texture is the missing-texture
-             * checker every scene carries at index 0, and the black tint below
-             * makes whichever texel is sampled come out black. */
+            /* A white texel, so the tint below is the colour it comes out. */
             uv: [[0.0, 0.0]; 4],
-            texture: 0,
+            texture: OVERLAY_TEXTURE,
             alpha: Alpha::Opaque,
-            tint: Some([0, 0, 0]),
+            tint: Some(colour),
             shade: false,
             light: 1.0,
         });
@@ -213,9 +230,13 @@ pub struct Scene {
     pub max: Vec3,
     /// Blocks that could not be resolved, each once, for a frontend to report.
     pub skipped: Vec<String>,
-    /// The outline of the block a view points at, drawn over the scene and
-    /// after it. Empty when nothing is highlighted.
-    pub highlight: Vec<SceneQuad>,
+    /// The box the region is drawn in, when a view is showing its extent.
+    pub bounds: Option<Highlight>,
+    /// The block a view is pointing at, when there is one.
+    pub highlight: Option<Highlight>,
+    /// What both of those come to: the quads drawn over the scene and after it.
+    /// Empty when neither is set.
+    pub overlay: Vec<SceneQuad>,
 }
 
 impl Scene {
@@ -258,10 +279,26 @@ impl Scene {
     /// so the software rasteriser and a GPU read it from the same place and
     /// draw the same box.
     pub fn set_highlight(&mut self, highlight: Option<Highlight>) {
-        self.highlight = match highlight {
-            Some(highlight) => outline(highlight),
-            None => Vec::new(),
-        };
+        self.highlight = highlight;
+        self.rebuild_overlay();
+    }
+
+    /// Shows, or hides, the box the whole region is drawn in.
+    pub fn set_bounds(&mut self, bounds: Option<Highlight>) {
+        self.bounds = bounds;
+        self.rebuild_overlay();
+    }
+
+    /// The two boxes are kept apart so either can change on its own; what a
+    /// renderer draws is this one list.
+    fn rebuild_overlay(&mut self) {
+        self.overlay.clear();
+        if let Some(bounds) = self.bounds {
+            self.overlay.extend(outline(bounds, BOUNDS_COLOUR));
+        }
+        if let Some(highlight) = self.highlight {
+            self.overlay.extend(outline(highlight, HIGHLIGHT_COLOUR));
+        }
     }
 }
 
@@ -270,13 +307,19 @@ impl Scene {
     pub fn empty() -> Self {
         Self {
             quads: Vec::new(),
-            textures: Textures::new(),
+            textures: {
+                let mut textures = Textures::new();
+                textures.push(Texture::solid([255, 255, 255, 255]));
+                textures
+            },
             center: [0.0; 3],
             radius: 1.0,
             min: [0.0; 3],
             max: [1.0; 3],
             skipped: Vec::new(),
-            highlight: Vec::new(),
+            bounds: None,
+            highlight: None,
+            overlay: Vec::new(),
         }
     }
 
@@ -361,7 +404,20 @@ struct Entry {
 
 /// Builds the scene of `voxels`, reading models and textures through `source`.
 pub fn build(source: &dyn Source, voxels: &dyn Voxels) -> Scene {
-    build_reported(source, voxels, &mut |_| {})
+    build_slice(source, voxels, None)
+}
+
+/// `build`, of one horizontal slice of the region: only blocks whose `y` is in
+/// `slice` (both ends included) are drawn, and the scene is framed around them.
+///
+/// A big region is often edited a layer at a time, and a view that shows one
+/// layer is both clearer and cheaper to draw.
+pub fn build_slice(
+    source: &dyn Source,
+    voxels: &dyn Voxels,
+    slice: Option<(i32, i32)>,
+) -> Scene {
+    build_reported_slice(source, voxels, slice, &mut |_| {})
 }
 
 /// `build`, reporting how far it is in percent: 0 when it starts, then once per
@@ -372,8 +428,19 @@ pub fn build_reported(
     voxels: &dyn Voxels,
     report: &mut dyn FnMut(i32),
 ) -> Scene {
+    build_reported_slice(source, voxels, None, report)
+}
+
+/// `build_reported`, of one horizontal slice of the region.
+pub fn build_reported_slice(
+    source: &dyn Source,
+    voxels: &dyn Voxels,
+    slice: Option<(i32, i32)>,
+    report: &mut dyn FnMut(i32),
+) -> Scene {
     report(0);
     let mut textures = Textures::new();
+    textures.push(Texture::solid([255, 255, 255, 255]));
     let colormaps = Colormaps::load(source);
     let mut skipped = Vec::new();
 
@@ -410,23 +477,34 @@ pub fn build_reported(
     }
 
     let size = voxels.size();
+    /* The slice decides what is drawn and what the view is framed around. */
+    let (low_y, high_y) = match slice {
+        Some((low, high)) => (low.max(0), high.min(size[1].saturating_sub(1))),
+        None => (0, size[1].saturating_sub(1)),
+    };
+    let drawn_height = (high_y - low_y + 1).max(0) as f32;
     let mut scene = Scene {
         quads: Vec::new(),
         textures,
-        center: [size[0] as f32 / 2.0, size[1] as f32 / 2.0, size[2] as f32 / 2.0],
-        radius: 0.5
-            * ((size[0] * size[0] + size[1] * size[1] + size[2] * size[2]) as f32).sqrt(),
-        min: [0.0; 3],
-        max: [
-            size[0] as f32,
-            size[1] as f32,
-            size[2] as f32,
+        center: [
+            size[0] as f32 / 2.0,
+            low_y as f32 + drawn_height / 2.0,
+            size[2] as f32 / 2.0,
         ],
+        radius: 0.5
+            * ((size[0] * size[0]) as f32
+                + drawn_height * drawn_height
+                + (size[2] * size[2]) as f32)
+                .sqrt(),
+        min: [0.0, low_y as f32, 0.0],
+        max: [size[0] as f32, (high_y + 1) as f32, size[2] as f32],
         skipped,
-        highlight: Vec::new(),
+        bounds: None,
+        highlight: None,
+        overlay: Vec::new(),
     };
 
-    for y in 0..size[1] {
+    for y in low_y..=high_y {
         for z in 0..size[2] {
             for x in 0..size[0] {
                 let Some(index) = voxels.block(x, y, z) else {
@@ -462,6 +540,7 @@ pub fn build_reported(
 /// parent is `item/generated`) yields a scene with no quads.
 pub fn build_model(source: &dyn Source, model: &Identifier, block: &Identifier) -> Scene {
     let mut textures = Textures::new();
+    textures.push(Texture::solid([255, 255, 255, 255]));
     let colormaps = Colormaps::load(source);
     let Ok(resolved) = resolve_model(source, model) else {
         return Scene::empty();
@@ -493,7 +572,9 @@ pub fn build_model(source: &dyn Source, model: &Identifier, block: &Identifier) 
         min: [0.0; 3],
         max: [1.0; 3],
         skipped: Vec::new(),
-        highlight: Vec::new(),
+        bounds: None,
+        highlight: None,
+        overlay: Vec::new(),
     };
     if !scene.quads.is_empty() {
         let mut min = [f32::INFINITY; 3];
@@ -784,7 +865,11 @@ mod tests {
     fn a_lone_block_draws_all_six_faces() {
         let scene = build(&cube_source(), &Solid { size: [1, 1, 1] });
         assert_eq!(scene.quads.len(), 6);
-        assert_eq!(scene.texture_count(), 2, "the checker and the block's texture");
+        assert_eq!(
+            scene.texture_count(),
+            3,
+            "the checker, the outline's white texel, and the block's texture"
+        );
         assert!(scene.skipped.is_empty());
     }
 
@@ -925,7 +1010,7 @@ mod tests {
             min: [2.0, 1.0, 3.0],
             max: [3.0, 2.0, 4.0],
         };
-        let outline = super::outline(highlight);
+        let outline = super::outline(highlight, super::HIGHLIGHT_COLOUR);
         /* Twelve edges, and each is a box of six faces. */
         assert_eq!(outline.len(), 12 * 6);
 
@@ -955,7 +1040,11 @@ mod tests {
                 }
             }
             assert_eq!(quad.tint, Some([0, 0, 0]), "the outline is black");
-            assert_eq!(quad.texture, 0, "the checker at index 0, made black");
+            assert_eq!(
+                quad.texture,
+                super::OVERLAY_TEXTURE,
+                "the white texel the tint is drawn with"
+            );
         }
     }
 
@@ -985,17 +1074,81 @@ mod tests {
     }
 
     #[test]
+    fn a_slice_draws_only_the_layers_it_names() {
+        let source = cube_source();
+        let voxels = Solid { size: [2, 4, 2] };
+        let whole = build(&source, &voxels);
+        let middle = super::build_slice(&source, &voxels, Some((1, 2)));
+
+        assert!(!middle.quads.is_empty());
+        assert!(middle.quads.len() < whole.quads.len());
+        for quad in &middle.quads {
+            for corner in quad.positions {
+                assert!(
+                    (1.0 - 1e-3..=3.0 + 1e-3).contains(&corner[1]),
+                    "a corner at {corner:?} is outside the slice"
+                );
+            }
+        }
+        /* The view is framed around the slice, not around the whole region. */
+        assert_eq!(middle.min[1], 1.0);
+        assert_eq!(middle.max[1], 3.0);
+        assert_eq!(
+            middle.center[1],
+            2.0,
+            "the middle of the two layers drawn"
+        );
+
+        /* A slice with nothing in it draws nothing. */
+        let empty = super::build_slice(&source, &voxels, Some((3, 1)));
+        assert!(empty.quads.is_empty());
+    }
+
+    #[test]
+    fn the_region_box_and_the_highlight_share_the_overlay() {
+        let mut scene = super::Scene::empty();
+        let region = super::Highlight {
+            min: [0.0, 0.0, 0.0],
+            max: [4.0, 4.0, 4.0],
+        };
+        let block = super::Highlight {
+            min: [1.0, 1.0, 1.0],
+            max: [2.0, 2.0, 2.0],
+        };
+
+        scene.set_bounds(Some(region));
+        assert_eq!(scene.overlay.len(), 12 * 6);
+        assert_eq!(scene.overlay[0].tint, Some(super::BOUNDS_COLOUR));
+
+        scene.set_highlight(Some(block));
+        assert_eq!(scene.overlay.len(), 2 * 12 * 6, "both boxes are drawn");
+        assert_eq!(
+            scene.overlay[12 * 6].tint,
+            Some(super::HIGHLIGHT_COLOUR),
+            "the box under the pointer comes after the region's"
+        );
+
+        /* Each can go away without taking the other with it. */
+        scene.set_bounds(None);
+        assert_eq!(scene.overlay.len(), 12 * 6);
+        assert_eq!(scene.overlay[0].tint, Some(super::HIGHLIGHT_COLOUR));
+        scene.set_highlight(None);
+        assert!(scene.overlay.is_empty());
+    }
+
+    #[test]
     fn setting_a_highlight_builds_and_clears_it() {
         let mut scene = super::Scene::empty();
-        assert!(scene.highlight.is_empty());
+        assert!(scene.overlay.is_empty());
 
         scene.set_highlight(Some(super::Highlight {
             min: [0.0, 0.0, 0.0],
             max: [1.0, 1.0, 1.0],
         }));
-        assert_eq!(scene.highlight.len(), 12 * 6);
+        assert_eq!(scene.overlay.len(), 12 * 6);
+        assert_eq!(scene.highlight, Some(super::Highlight { min: [0.0, 0.0, 0.0], max: [1.0, 1.0, 1.0] }));
 
         scene.set_highlight(None);
-        assert!(scene.highlight.is_empty());
+        assert!(scene.overlay.is_empty());
     }
 }

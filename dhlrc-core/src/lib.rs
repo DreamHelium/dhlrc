@@ -12,6 +12,7 @@
  * off by default so a frontend that never draws does not carry the geometry.
  */
 
+pub mod catalog;
 pub mod config;
 #[cfg(feature = "desktop-notifications")]
 pub mod desktop;

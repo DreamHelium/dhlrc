@@ -12,6 +12,7 @@
 #include "regionmodifyui.h"
 
 #include "blocklistui.h"
+#include "blockpickerui.h"
 #include "blockshowui.h"
 #include "generalchoosedialog.h"
 #include "nbtreaderui.h"
@@ -85,6 +86,8 @@ BlockReaderUI::BlockReaderUI (int index,
                toolsMenu->exec (ui->toolsBtn->mapToGlobal (
                    QPoint (0, ui->toolsBtn->height ())));
              });
+  connect (ui->addBlockBtn, &QPushButton::clicked, this,
+           &BlockReaderUI::addBlock);
   connect (this, &BlockReaderUI::toolsChanged, this,
            &BlockReaderUI::updateToolActions);
   updateToolActions ();
@@ -218,10 +221,13 @@ BlockReaderUI::closeChildren ()
 void
 BlockReaderUI::textChanged_cb ()
 {
+  /* Assigned in every branch: the add button follows the position, and it must
+   * go away as soon as the form stops naming a cell inside the region. */
+  blockPositionValid = false;
+  QString infos;
   if (!ui->xEdit->text ().isEmpty () && !ui->yEdit->text ().isEmpty ()
       && !ui->zEdit->text ().isEmpty ())
     {
-      QString infos;
       int pos = 0;
       QString xText = ui->xEdit->text ();
       QString yText = ui->yEdit->text ();
@@ -233,24 +239,43 @@ BlockReaderUI::textChanged_cb ()
           && ui->zEdit->validator ()->validate (zText, pos)
                  == QValidator::Acceptable)
         {
-          int index = regionClass->index (xText.toInt (), yText.toInt (),
-                                          zText.toInt ());
-          infos = getBlockInfo (regionClass->locked_region (), index,
-                                translationReady);
-          const char *transName = nullptr;
-
-          blockHasProperties
-              = region_get_palette_property_len (regionClass->locked_region (),
-                                                 regionClass->blockId (index))
-                != 0;
-          nbt = region_get_block_entity (regionClass->locked_region (), index);
+          const qint32 index = regionClass->index (
+              xText.toInt (), yText.toInt (), zText.toInt ());
+          if (index >= 0)
+            {
+              blockPositionValid = true;
+              infos = getBlockInfo (regionClass->locked_region (), index,
+                                    translationReady);
+              blockHasProperties = region_get_palette_property_len (
+                                       regionClass->locked_region (),
+                                       regionClass->blockId (index))
+                                   != 0;
+              nbt = region_get_block_entity (regionClass->locked_region (),
+                                             index);
+            }
+          else
+            {
+              /* The ABI indexes the block array with the position, so a cell
+               * outside the region is not looked up at all. */
+              blockHasProperties = false;
+              nbt = nullptr;
+              infos = _ ("Not valid!");
+            }
         }
       else
         infos = _ ("Not valid!");
       ui->infoLabel->setText (infos);
-      /* The tools menu follows the block under the coordinates. */
-      Q_EMIT toolsChanged ();
     }
+  else
+    {
+      /* An empty form names nothing: the block-specific tools go away with
+       * it. */
+      blockHasProperties = false;
+      nbt = nullptr;
+      ui->infoLabel->setText (QString ());
+    }
+  /* The tools menu follows the block under the coordinates. */
+  Q_EMIT toolsChanged ();
 }
 
 QString
@@ -353,6 +378,8 @@ BlockReaderUI::updateToolActions ()
     entityListAction->setEnabled (hasEntities ());
   if (entityNbtAction)
     entityNbtAction->setEnabled (hasBlockEntity ());
+  if (ui->addBlockBtn)
+    ui->addBlockBtn->setEnabled (canAddBlock ());
 }
 
 bool
@@ -409,6 +436,22 @@ BlockReaderUI::modifyProperty ()
   connect (pmui, &PropertyModifyUI::propertiesModified, this,
            &BlockReaderUI::textChanged_cb);
   pmui->exec ();
+}
+
+void
+BlockReaderUI::addBlock ()
+{
+  /* The dialog writes through RegionClass, which refuses while a job holds the
+   * region; the button is already disabled in that case. */
+  const qint32 x = ui->xEdit->text ().toInt ();
+  const qint32 y = ui->yEdit->text ().toInt ();
+  const qint32 z = ui->zEdit->text ().toInt ();
+  BlockPickerUI picker (regionClass, x, y, z, this);
+  /* The write emits RegionClass::changed, which already refreshes the page;
+   * the explicit hook keeps the info text right even if that changes. */
+  connect (&picker, &BlockPickerUI::blockModified, this,
+           &BlockReaderUI::textChanged_cb);
+  picker.exec ();
 }
 
 void

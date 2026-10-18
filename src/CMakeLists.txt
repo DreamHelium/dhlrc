@@ -38,6 +38,7 @@ set(ui_files
         blocklistui.ui
         blockreaderui.ui
         blockshowui.ui
+        blockpickerui.ui
         regionmodifyui.ui
         palettelistui.ui
         propertymodifyui.ui
@@ -52,6 +53,7 @@ set(TEMP_PROJECT_SOURCES
         ../resources/dhlrc.qrc
         generalchoosedialog.cpp generalchoosedialog.h
         blockreaderui.cpp blockreaderui.h
+        blockpickerui.cpp blockpickerui.h
         propertymodifyui.cpp propertymodifyui.h
         utility.cpp utility.h
         windowsappid.cpp windowsappid.h

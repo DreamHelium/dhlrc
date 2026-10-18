@@ -5,6 +5,7 @@ xgettext -k_ -kN_ \
 -ki18n:1 -ki18nc:1c,2 -ki18np:1,2 -ki18ncp:1c,2,3 -ki18nd:2 \
 -kki18n:1 -kki18nc:1c,2 -kki18np:1,2 -kki18ncp:1c,2,3 \
 -kkli18n:1 -kkli18nc:1c,2 -kkli18np:1,2 -kkli18ncp:1c,2,3 \
+--from-code=UTF-8 \
 --default-domain=dhlrc --package-name=dhlrc \
 --output=dhlrc.pot ../../src/*.cpp rc.cpp ../../*/src/*.rs ../../src/*.h ../../src/dhsettingsdialog/*.cpp ../../src/dhsettingsdialog/*.h
 echo "Extract the po source file"

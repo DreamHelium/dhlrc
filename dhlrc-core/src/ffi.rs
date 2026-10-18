@@ -171,6 +171,9 @@ pub struct DhlrcCore {
     /// The stacked resource sources; built on demand or by
     /// `dhlrc_core_resources_configure`.
     resources: Mutex<Option<ResourceSet>>,
+    /// The blocks those resources have, built on first use and dropped when the
+    /// resources are configured again.
+    catalog: Mutex<Option<Arc<crate::catalog::Catalog>>>,
 }
 
 #[unsafe(no_mangle)]
@@ -223,6 +226,7 @@ pub extern "C" fn dhlrc_core_open(
         watch: Mutex::new(None),
         modules: Mutex::new(None),
         resources: Mutex::new(None),
+        catalog: Mutex::new(None),
     });
     Box::into_raw(core)
 }
@@ -846,6 +850,143 @@ fn model_texture(set: &ResourceSet, model: &str) -> Option<Vec<u8>> {
 /// filled, the version whose client jar to use (`version` may be NULL), and
 /// `pack_count` resource packs / mod jars, highest priority first (`packs` may
 /// be NULL). Replaces any previous set. Returns 0, or -1 on a bad handle.
+/// The blocks the configured resources have, built on first use.
+fn catalog_of(core: &DhlrcCore) -> Option<Arc<crate::catalog::Catalog>> {
+    if let Ok(guard) = core.catalog.lock()
+        && let Some(cached) = guard.as_ref()
+    {
+        return Some(Arc::clone(cached));
+    }
+    let built = with_resources(core, |resources| {
+        let source: &dyn dhlrc_resource::Source = resources;
+        crate::catalog::Catalog::build(source)
+    })?;
+    if let Ok(mut guard) = core.catalog.lock() {
+        *guard = Some(Arc::clone(&built));
+    }
+    Some(built)
+}
+
+/// Looks one block up, with its properties, for the getters below.
+fn block_of(
+    core: *mut DhlrcCore,
+    index: usize,
+) -> Option<Arc<crate::catalog::Catalog>> {
+    let core = unsafe { core.as_ref() }?;
+    let catalog = catalog_of(core)?;
+    (index < catalog.blocks.len()).then_some(catalog)
+}
+
+/// How many blocks the configured resources have, or 0 when there are none yet
+/// (nothing configured, or a version whose jar is not there).
+///
+/// The strings the getters below return are borrowed from the core and stay
+/// valid until the resources are configured again; they are not to be freed.
+///
+/// # Safety
+///
+/// `core` must be a pointer this library returned.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn dhlrc_core_block_count(core: *mut DhlrcCore) -> usize {
+    unsafe { core.as_ref() }
+        .and_then(catalog_of)
+        .map_or(0, |catalog| catalog.blocks.len())
+}
+
+/// The id of the block at `index` (`minecraft:oak_stairs`), or null.
+///
+/// # Safety
+///
+/// `core` must be a pointer this library returned.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn dhlrc_core_block_name(
+    core: *mut DhlrcCore,
+    index: usize,
+) -> *const c_char {
+    let Some(catalog) = block_of(core, index) else {
+        return ptr::null();
+    };
+    catalog.blocks[index].name.as_ptr()
+}
+
+/// How many properties the block at `index` takes.
+///
+/// # Safety
+///
+/// `core` must be a pointer this library returned.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn dhlrc_core_block_property_count(
+    core: *mut DhlrcCore,
+    index: usize,
+) -> usize {
+    block_of(core, index)
+        .map_or(0, |catalog| catalog.blocks[index].properties.len())
+}
+
+/// The name of one property of the block at `index`, or null.
+///
+/// # Safety
+///
+/// `core` must be a pointer this library returned.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn dhlrc_core_block_property_name(
+    core: *mut DhlrcCore,
+    index: usize,
+    property: usize,
+) -> *const c_char {
+    let Some(catalog) = block_of(core, index) else {
+        return ptr::null();
+    };
+    match catalog.blocks[index].properties.get(property) {
+        Some((name, _)) => name.as_ptr(),
+        None => ptr::null(),
+    }
+}
+
+/// How many values a property of the block at `index` takes.
+///
+/// # Safety
+///
+/// `core` must be a pointer this library returned.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn dhlrc_core_block_property_value_count(
+    core: *mut DhlrcCore,
+    index: usize,
+    property: usize,
+) -> usize {
+    let Some(catalog) = block_of(core, index) else {
+        return 0;
+    };
+    match catalog.blocks[index].properties.get(property) {
+        Some((_, values)) => values.len(),
+        None => 0,
+    }
+}
+
+/// One value a property of the block at `index` takes, or null.
+///
+/// # Safety
+///
+/// `core` must be a pointer this library returned.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn dhlrc_core_block_property_value(
+    core: *mut DhlrcCore,
+    index: usize,
+    property: usize,
+    value: usize,
+) -> *const c_char {
+    let Some(catalog) = block_of(core, index) else {
+        return ptr::null();
+    };
+    match catalog.blocks[index].properties.get(property) {
+        Some((_, values)) => match values.get(value) {
+            Some(text) => text.as_ptr(),
+            None => ptr::null(),
+        },
+        None => ptr::null(),
+    }
+}
+
 #[unsafe(no_mangle)]
 pub extern "C" fn dhlrc_core_resources_configure(
     core: *mut DhlrcCore,
@@ -865,6 +1006,10 @@ pub extern "C" fn dhlrc_core_resources_configure(
     match core.resources.lock() {
         Ok(mut guard) => {
             *guard = Some(environment.resource_set());
+            /* A different jar is a different set of blocks. */
+            if let Ok(mut catalog) = core.catalog.lock() {
+                *catalog = None;
+            }
             0
         }
         Err(_) => -1,
@@ -908,6 +1053,9 @@ pub extern "C" fn dhlrc_core_resources_configure_for_data_version(
     match core.resources.lock() {
         Ok(mut guard) => {
             *guard = Some(environment.resource_set());
+            if let Ok(mut catalog) = core.catalog.lock() {
+                *catalog = None;
+            }
             0
         }
         Err(_) => -1,

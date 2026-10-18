@@ -27,6 +27,7 @@
 #include <QRegularExpression>
 #include <QStringList>
 #include <QThread>
+#include <algorithm>
 #include <cmath>
 #include <cstdio>
 #include <map>
@@ -110,6 +111,31 @@ parseHover (const QString &text, int *x, int *y, QString *error)
     }
   *x = parsedX;
   *y = parsedY;
+  return true;
+}
+
+/* `Y1:Y2`, as `--slice` spells a range of layers. Both ends are included. */
+bool
+parseSlice (const QString &text, int *low, int *high, QString *error)
+{
+  const QStringList parts
+      = text.split (QRegularExpression (QStringLiteral ("\\s*:\\s*")));
+  bool ok = parts.size () == 2;
+  int parsedLow = 0;
+  int parsedHigh = 0;
+  if (ok)
+    {
+      parsedLow = parts[0].toInt (&ok);
+      if (ok)
+        parsedHigh = parts[1].toInt (&ok);
+    }
+  if (!ok)
+    {
+      *error = QString (_ ("%1 is not a Y range; write it as Y1:Y2")).arg (text);
+      return false;
+    }
+  *low = parsedLow;
+  *high = parsedHigh;
   return true;
 }
 
@@ -365,12 +391,14 @@ renderCpu (DhlrcScene *scene, const DhlrcCamera &camera, int width, int height,
  * framebuffer is read back, which is the only way a headless run can see what a
  * GPU path drew.
  *
- * `highlight` is the box `--hover` set, or NULL; with one, the frames after the
- * first are used to prove the outline's own buffer is re-read when it changes,
- * which is the path a real hover takes. */
+ * `highlight` is the box `--hover` set and `bounds` the box `--bounds` set, or
+ * NULL; with one, the frame is taken, the box is taken out and put back through
+ * `highlightChanged ()` alone, and the frame has to change and then come back
+ * exactly. That is the path a real hover or bounds toggle takes — the overlay's
+ * own small buffer is re-read, never the scene's. */
 int
 renderGpu (DhlrcScene *scene, const DhlrcCamera &camera, int width, int height,
-           const QString &png, const float *highlight)
+           const QString &png, const float *highlight, const float *bounds)
 {
   if (!DhGpuWidget::available ())
     return fail (_ ("this machine cannot give a desktop OpenGL 3.3 context"));
@@ -433,30 +461,30 @@ renderGpu (DhlrcScene *scene, const DhlrcCamera &camera, int width, int height,
               .arg (elapsed)
               .arg (static_cast<double> (elapsed) / GPU_FRAMES, 0, 'f', 1));
 
+  /* Both kinds of box are the scene's overlay, so the frame is taken once and
+   * each box is then taken out and put back through `highlightChanged ()`
+   * alone; the scene's own buffers must not be rebuilt for either.
+   *
+   * `grabFramebuffer ()` renders by itself, so no event loop is pumped here: on
+   * this bare X server more event processing can resize the window under the
+   * check and make the two frames incomparable. */
+  const QImage baseline = widget.grabFramebuffer ();
+
   if (highlight != nullptr)
     {
-      /* A hover only rewrites the outline's own buffer. Clearing it and
-       * putting it back through `highlightChanged ()` has to take the outline
-       * out of the picture and then put the first frame back exactly.
-       *
-       * `grabFramebuffer ()` renders by itself, so no event loop is pumped
-       * here: on this bare X server more event processing can resize the
-       * window under the check and make the two frames incomparable. */
-      const QImage withOutline = widget.grabFramebuffer ();
-
       dhlrc_render_scene_set_highlight (scene, nullptr);
       widget.highlightChanged ();
-      QImage without = widget.grabFramebuffer ();
-      if (without == withOutline)
+      const QImage without = widget.grabFramebuffer ();
+      if (without == baseline)
         return fail (_ ("hover: clearing the highlight did not change the "
                         "OpenGL picture"));
 
       dhlrc_render_scene_set_highlight (scene, const_cast<float *> (highlight));
       widget.highlightChanged ();
       const QImage again = widget.grabFramebuffer ();
-      if (again != withOutline)
+      if (again != baseline)
         {
-          QImage d1 = withOutline.convertToFormat (QImage::Format_RGB32);
+          QImage d1 = baseline.convertToFormat (QImage::Format_RGB32);
           QImage d2 = again.convertToFormat (QImage::Format_RGB32);
           quint64 changed = 0;
           for (int y = 0; y < d1.height (); ++y)
@@ -473,6 +501,40 @@ renderGpu (DhlrcScene *scene, const DhlrcCamera &camera, int width, int height,
                   .arg (changed));
         }
       report (_ ("hover: the OpenGL outline follows highlightChanged () alone"));
+    }
+
+  if (bounds != nullptr)
+    {
+      dhlrc_render_scene_set_bounds (scene, nullptr);
+      widget.highlightChanged ();
+      const QImage without = widget.grabFramebuffer ();
+      if (without == baseline)
+        return fail (_ ("bounds: clearing the region box did not change the "
+                        "OpenGL picture"));
+
+      dhlrc_render_scene_set_bounds (scene, const_cast<float *> (bounds));
+      widget.highlightChanged ();
+      const QImage again = widget.grabFramebuffer ();
+      if (again != baseline)
+        {
+          QImage d1 = baseline.convertToFormat (QImage::Format_RGB32);
+          QImage d2 = again.convertToFormat (QImage::Format_RGB32);
+          quint64 changed = 0;
+          for (int y = 0; y < d1.height (); ++y)
+            {
+              for (int x = 0; x < d1.width (); ++x)
+                {
+                  if (d1.pixel (x, y) != d2.pixel (x, y))
+                    ++changed;
+                }
+            }
+          return fail (
+              QString (_ ("bounds: setting the region box again did not put the "
+                          "OpenGL picture back (%1 pixels differ)"))
+                  .arg (changed));
+        }
+      report (_ ("bounds: the OpenGL region box follows highlightChanged () "
+                 "alone"));
     }
   return 0;
 }
@@ -492,6 +554,13 @@ dhRunPreview (const DhPreviewOptions &options)
   int height = 0;
   QString error;
   if (!parseSize (options.size, &width, &height, &error))
+    return fail (error);
+
+  /* `--slice` limits the picture to one range of Y; both ends are included. */
+  int sliceLow = 0;
+  int sliceHigh = 0;
+  const bool sliced = !options.slice.isEmpty ();
+  if (sliced && !parseSlice (options.slice, &sliceLow, &sliceHigh, &error))
     return fail (error);
 
   /* `cpu` and `gpu` are the two named backends; without one the GPU is used
@@ -514,11 +583,18 @@ dhRunPreview (const DhPreviewOptions &options)
   DhlrcCore *core = DhCore::instance ()->handle ();
   DhlrcScene *scene = nullptr;
   uint32_t dataVersion = 0;
+  /* The region's size in blocks, which the bounds box wraps and the slice is
+   * clamped to. */
+  int32_t regionSize[3] = { 0, 0, 0 };
   {
     /* Everything the scene needs is copied out of the region while it is
      * locked, exactly as the 3D window builds one. */
     AutoLocker locker (*regionClass);
+    void *region = regionClass->get_region ();
     dataVersion = regionClass->dataVersion ();
+    regionSize[0] = region_get_x (region);
+    regionSize[1] = region_get_y (region);
+    regionSize[2] = region_get_z (region);
 
     ResourcePaths paths;
     if (!resolveResources (core, dataVersion, options, &paths, &error))
@@ -527,7 +603,12 @@ dhRunPreview (const DhPreviewOptions &options)
     if (!applyResources (core, paths, &error))
       return fail (error);
 
-    scene = dhlrc_render_scene_new (core, regionClass->get_region ());
+    /* A slice is a scene of its own: the core leaves the other layers out and
+     * frames the view around the ones that stay. */
+    if (sliced)
+      scene = dhlrc_render_scene_new_slice (core, region, sliceLow, sliceHigh);
+    else
+      scene = dhlrc_render_scene_new (core, region);
   }
   if (!scene)
     return fail (_ ("the scene could not be built"));
@@ -539,8 +620,15 @@ dhRunPreview (const DhPreviewOptions &options)
               .arg (quads)
               .arg (static_cast<quint64> (dhlrc_render_scene_skipped (scene))));
   if (quads == 0)
-    report (_ ("nothing could be drawn: the block models and textures of this "
-               "region's version were not found"));
+    {
+      /* Nothing at all is different from nothing in this range: a slice above
+       * the last layer just draws no block. */
+      if (sliced)
+        report (_ ("the slice draws no block"));
+      else
+        report (_ ("nothing could be drawn: the block models and textures of "
+                   "this region's version were not found"));
+    }
 
   /* The camera the 3D view opens with, framed against the picture's own
    * size; both backends are given this very struct. */
@@ -616,7 +704,7 @@ dhRunPreview (const DhPreviewOptions &options)
                   .arg (block[1])
                   .arg (block[2])
                   .arg (static_cast<quint64> (
-                      dhlrc_render_scene_highlight_count (scene))));
+                      dhlrc_render_scene_overlay_count (scene))));
 
           QString info;
           {
@@ -645,11 +733,63 @@ dhRunPreview (const DhPreviewOptions &options)
         }
     }
 
+  /* `--bounds` shows the box around the region being drawn: the whole region,
+   * or its Y clamped to the slice. The box is the scene's overlay, drawn in its
+   * own colour, so it is set after the hover box — that leaves the overlay
+   * count in the hover's report meaning what it always did. */
+  float boundsBox[6] = { 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f };
+  const float *bounds = nullptr;
+  if (options.bounds)
+    {
+      int low = 0;
+      int high = regionSize[1];
+      bool shown = regionSize[0] > 0 && regionSize[1] > 0 && regionSize[2] > 0;
+      if (sliced)
+        {
+          /* A layer occupies the cell between its Y and the next one, and a
+           * low above the high draws nothing, so there is nothing to box. */
+          if (sliceLow > sliceHigh)
+            shown = false;
+          else
+            {
+              low = std::max (0, sliceLow);
+              high = std::min (regionSize[1], sliceHigh + 1);
+              shown = low < high;
+            }
+        }
+      if (!shown)
+        {
+          report (_ ("bounds: this slice draws no layer, so there is no box to "
+                     "show"));
+        }
+      else
+        {
+          boundsBox[0] = 0.0f;
+          boundsBox[1] = static_cast<float> (low);
+          boundsBox[2] = 0.0f;
+          boundsBox[3] = static_cast<float> (regionSize[0]);
+          boundsBox[4] = static_cast<float> (high);
+          boundsBox[5] = static_cast<float> (regionSize[2]);
+          bounds = boundsBox;
+          dhlrc_render_scene_set_bounds (scene, boundsBox);
+          report (QString (_ ("bounds: the box is (%1, %2, %3)..(%4, %5, %6), "
+                              "%7 overlay quads in all"))
+                      .arg (boundsBox[0])
+                      .arg (boundsBox[1])
+                      .arg (boundsBox[2])
+                      .arg (boundsBox[3])
+                      .arg (boundsBox[4])
+                      .arg (boundsBox[5])
+                      .arg (static_cast<quint64> (
+                          dhlrc_render_scene_overlay_count (scene))));
+        }
+    }
+
   report (QString (_ ("drawing with %1")).arg (
       useGpu ? QString (_ ("OpenGL")) : QString (_ ("the CPU"))));
 
   const int result = useGpu ? renderGpu (scene, camera, width, height,
-                                         options.png, hoverBox)
+                                         options.png, hoverBox, bounds)
                             : renderCpu (scene, camera, width, height,
                                          options.png);
   dhlrc_render_scene_free (scene);

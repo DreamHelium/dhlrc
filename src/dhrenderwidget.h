@@ -8,6 +8,8 @@
 #include <QString>
 #include <QWidget>
 #include <memory>
+#include <optional>
+#include <utility>
 
 class DhGpuWidget;
 class QLabel;
@@ -35,6 +37,12 @@ class QLabel;
  * beside the cursor. The outline is the core's own: the scene is told the box
  * and the rasteriser draws it, while the GL child uploads the quads the core
  * hands out for the same box.
+ *
+ * The picture can also be limited to a horizontal slice of the region, and the
+ * extent of the region being drawn — its box, its Y clamped to the slice — can
+ * be shown around it in another colour. Both are the core's own too: the slice
+ * is a scene built from the range and the box is one more box the scene draws,
+ * so the two backends need no special case for either.
  */
 class DhRenderWidget : public QWidget
 {
@@ -59,6 +67,36 @@ public:
 
   /* Whether a scene could be built; `problem ()` says why when it could not. */
   [[nodiscard]] bool ready () const { return scene != nullptr; }
+
+  /* Draws only the blocks whose Y is between the pair's two values, both
+   * included, and frames the view around them; nothing means the whole region.
+   * The pair is in the region's own coordinates, and a low above a high draws
+   * nothing.
+   *
+   * A scene this widget built itself (the blocking constructor and
+   * `rebuild ()`) is taken again here, so the caller must hold the region's
+   * lock around this call, as it does for the constructor. A scene handed in
+   * through `setScene ()` came from a builder that holds the region, so this
+   * only records the range and `sliceChanged ()` asks that owner for a fresh
+   * picture; building it here would freeze the GUI for as long as a big region
+   * takes. */
+  void setSlice (const std::optional<std::pair<int, int>> &slice);
+  [[nodiscard]] std::optional<std::pair<int, int>> slice () const
+  {
+    return sliceRange;
+  }
+
+  /* Shows or hides the box around the region being drawn, clamped to the
+   * slice when one is active. The box is part of the scene's overlay, so a
+   * toggle needs no new scene: the next picture reads it. */
+  void setBoundsVisible (bool visible);
+  [[nodiscard]] bool boundsVisible () const { return showBounds; }
+
+  /* The size in blocks of the region being drawn, which the box above wraps.
+   * The box's other coordinates are scene space, where the region starts at
+   * (0, 0, 0). */
+  void setRegionExtent (qint32 x, qint32 y, qint32 z);
+
   [[nodiscard]] const QString &problem () const { return problemText; }
 
   /* How many quads the scene holds and how many blocks were left out. */
@@ -71,7 +109,9 @@ public:
   [[nodiscard]] bool usingGl () const { return useGpu; }
 
   /* Replaces the scene with one built from `region`, as the constructor does,
-   * and frames it again. */
+   * and frames it again. The current slice is applied, so this is also what a
+   * caller that lets the widget build uses to change from one slice to
+   * another. */
   void rebuild (void *core, void *region);
 
   /* Frames the whole region again. */
@@ -94,6 +134,9 @@ Q_SIGNALS:
   /* The backend changed, so a status line saying which one is in use is
    * stale. */
   void backendChanged ();
+  /* Another slice was asked for on a scene this widget did not build, so the
+   * owner that holds the region has to build the fresh one. */
+  void sliceChanged ();
 
 protected:
   void paintEvent (QPaintEvent *event) override;
@@ -106,6 +149,18 @@ protected:
   void keyPressEvent (QKeyEvent *event) override;
 
 private:
+  /* The implementation shared by `setScene ()` and the widget's own builds. */
+  void adoptScene (std::shared_ptr<DhlrcScene> next);
+  /* Builds the scene here from the region `rebuild ()` stored, with the
+   * current slice. */
+  void buildOwnScene ();
+  /* Hands the scene the bounds box the current state asks for: the region's
+   * extent, its Y clamped to the slice, or nothing when no box is shown. */
+  void applyBounds ();
+  /* Fills `box` with the six floats of that box. False when there is nothing
+   * to show a box around — no extent yet, or a slice that draws no layer. */
+  [[nodiscard]] bool boundsBox (float *box) const;
+
   void pickAt (const QPoint &at);
   /* Points the highlight at the block under `at`, clearing it when the pointer
    * is off the scene. Nothing is touched when the same block is still under
@@ -128,6 +183,22 @@ private:
   std::shared_ptr<DhlrcScene> scene;
   DhlrcCamera camera{};
   QString problemText;
+  /* The Y range being drawn, empty for the whole region, and whether the box
+   * around it is shown. */
+  std::optional<std::pair<int, int>> sliceRange;
+  bool showBounds = false;
+  /* The region's size in blocks, so the bounds box can wrap it. */
+  qint32 extent[3] = { 0, 0, 0 };
+  /* What the scene was built from, when this widget built it: a slice change
+   * can then take a fresh scene here. `ownScene` says whether that is still
+   * the case or the scene arrived through `setScene ()`. */
+  void *sceneCore = nullptr;
+  void *sceneRegion = nullptr;
+  bool ownScene = false;
+  /* Whether the next scene should be framed again rather than kept at the
+   * camera the user left. A slice draws a different extent, so it needs its
+   * own framing; a plain reload of the same region does not. */
+  bool refitPending = false;
   /* The OpenGL child, when this machine can give a context, and whether it is
    * the one drawing. */
   DhGpuWidget *gpu = nullptr;

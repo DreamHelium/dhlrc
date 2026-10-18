@@ -110,6 +110,14 @@ main (int argc, char *argv[])
       i18n ("Preview: highlight the block under this picture pixel (X,Y) and "
             "print the tooltip text"),
       QStringLiteral ("X,Y"));
+  QCommandLineOption sliceOption (
+      QStringLiteral ("slice"),
+      i18n ("Preview: draw only the layers from Y1 to Y2, both included"),
+      QStringLiteral ("Y1:Y2"));
+  QCommandLineOption boundsOption (
+      QStringLiteral ("bounds"),
+      i18n ("Preview: draw the box around the region being drawn, clamped to "
+            "the slice when one is set"));
   QCommandLineOption jarOption (
       QStringLiteral ("jar"),
       i18n (
@@ -130,6 +138,8 @@ main (int argc, char *argv[])
   parser.addOption (yawOption);
   parser.addOption (pitchOption);
   parser.addOption (hoverOption);
+  parser.addOption (sliceOption);
+  parser.addOption (boundsOption);
   parser.addOption (jarOption);
   parser.addOption (resourcesOption);
   parser.addOption (versionOption);
@@ -152,6 +162,8 @@ main (int argc, char *argv[])
       options.yaw = parser.value (yawOption);
       options.pitch = parser.value (pitchOption);
       options.hover = parser.value (hoverOption);
+      options.slice = parser.value (sliceOption);
+      options.bounds = parser.isSet (boundsOption);
       options.jar = parser.value (jarOption);
       options.resources = parser.value (resourcesOption);
       options.version = parser.value (versionOption);

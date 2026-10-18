@@ -1,17 +1,13 @@
 name: MSYS2 build
 
 on:
+  # A tag is the release trigger: building and packaging on every push or pull
+  # request spent Windows runner time and artifact storage for nothing, so
+  # those events no longer start a run. Push a tag (the tag names are dates) to
+  # get a build with the portable archive and the installer.
   push:
-    branches: [main, master]
-    paths-ignore:
-      - "**/*.md"
-      - "dev-doc/**"
-      - "temp/**"
-  pull_request:
-    paths-ignore:
-      - "**/*.md"
-      - "dev-doc/**"
-      - "temp/**"
+    tags: ['*']
+  # Manual runs stay as an escape hatch: the checkbox also packages.
   workflow_dispatch:
     inputs:
       package:
@@ -80,7 +76,9 @@ jobs:
 
       - name: Build
         env:
-          PACKAGE: ${{ inputs.package }}
+          # A tag push is a release: it packages without being asked. A manual
+          # run packages only when the box was ticked.
+          PACKAGE: ${{ (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')) || inputs.package }}
         run: |
           set -euo pipefail
           args=(--yes)
@@ -100,7 +98,7 @@ jobs:
           ./build-ucrt64/dhlrc_qt.exe --version
 
       - name: Upload packages
-        if: ${{ inputs.package }}
+        if: ${{ (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')) || inputs.package }}
         uses: actions/upload-artifact@v4
         with:
           name: dhlrc-ucrt64

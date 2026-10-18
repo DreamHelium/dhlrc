@@ -10,6 +10,8 @@ toml = "1"
 serde_json = "1"
 common-rs = { path = "../common-rs" }
 dhlrc-resource = { path = "../dhlrc-resource" }
+# A version's blockstates, for the block chooser a frontend offers.
+dhlrc-model = { path = "../dhlrc-model" }
 formatx = "0.2.4"
 notify = "8"
 # Opens the plugin libraries (`region_module/`, `load_module/`).

@@ -106,6 +106,22 @@ impl Source for ResourceSet {
         }
         found
     }
+
+    fn list(&self, prefix: &str) -> Vec<Identifier> {
+        /* A pack overrides the file it shadows, so a name seen in an earlier
+         * source is not taken from a later one. */
+        let mut found: Vec<Identifier> = Vec::new();
+        let mut seen = std::collections::HashSet::new();
+        for source in &self.sources {
+            for id in source.list(prefix) {
+                if seen.insert(id.clone()) {
+                    found.push(id);
+                }
+            }
+        }
+        found.sort_by(|a, b| (&a.namespace, &a.path).cmp(&(&b.namespace, &b.path)));
+        found
+    }
 }
 
 #[cfg(test)]

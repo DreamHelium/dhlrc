@@ -19,7 +19,9 @@ use std::slice;
 use common_rs::region::Region;
 use crate::ffi::DhlrcCore;
 use dhlrc_render::camera::{Hit, Ray};
-use dhlrc_render::scene::{VoxelBlock, Voxels, build, build_reported};
+use dhlrc_render::scene::{
+    VoxelBlock, Voxels, build, build_reported, build_reported_slice, build_slice,
+};
 use dhlrc_render::texture::Alpha;
 use dhlrc_render::{Camera, Renderer, build_model, render as render_image};
 use crate::resource::{Identifier, ResourceSet};
@@ -391,6 +393,35 @@ pub unsafe extern "C" fn dhlrc_render_scene_new_reported(
     progress: Option<DhlrcProgressFunc>,
     user: *mut c_void,
 ) -> *mut DhlrcScene {
+    unsafe { build_scene(core, region, None, progress, user) }
+}
+
+/// Like [`dhlrc_render_scene_new`], of one horizontal slice of the region: only
+/// blocks whose `y` is between `y_low` and `y_high` (both included) are drawn,
+/// and the view is framed around them. A caller draws a region a layer at a time
+/// this way — `y_low` above `y_high` draws nothing at all.
+///
+/// # Safety
+///
+/// Same as [`dhlrc_render_scene_new`].
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn dhlrc_render_scene_new_slice(
+    core: *mut c_void,
+    region: *const c_void,
+    y_low: i32,
+    y_high: i32,
+) -> *mut DhlrcScene {
+    unsafe { build_scene(core, region, Some((y_low, y_high)), None, ptr::null_mut()) }
+}
+
+/// The work behind the three scene builders.
+unsafe fn build_scene(
+    core: *mut c_void,
+    region: *const c_void,
+    slice: Option<(i32, i32)>,
+    progress: Option<DhlrcProgressFunc>,
+    user: *mut c_void,
+) -> *mut DhlrcScene {
     if core.is_null() || region.is_null() {
         return ptr::null_mut();
     }
@@ -404,11 +435,13 @@ pub unsafe extern "C" fn dhlrc_render_scene_new_reported(
             }
         };
         let scene = core
-            .resources(|source| build_reported(source, &RegionVoxels(region), &mut report))
+            .resources(|source| {
+                build_reported_slice(source, &RegionVoxels(region), slice, &mut report)
+            })
             /* A core with no resource set at all still draws: every block then
              * asks for a texture the empty set does not have and comes out as
              * the missing-texture checker. */
-            .unwrap_or_else(|| build(&Empty, &RegionVoxels(region)));
+            .unwrap_or_else(|| build_slice(&Empty, &RegionVoxels(region), slice));
         Box::into_raw(Box::new(DhlrcScene::new(scene)))
     }))
     .unwrap_or(ptr::null_mut())
@@ -653,8 +686,8 @@ fn fill_quad(source: &dhlrc_render::SceneQuad, out: &mut DhlrcQuad) {
 /// `block` is six floats — the low corner then the high one, in block space, so
 /// one block is `x, y, z, x + 1, y + 1, z + 1` — or null to clear the
 /// highlight. The outline is drawn by `dhlrc_render_image`, and a GPU can read
-/// the very same quads with `dhlrc_render_scene_highlight_count` and
-/// `dhlrc_render_scene_highlight_quad`, so both draw the same box. Returns 1
+/// the very same quads with `dhlrc_render_scene_overlay_count` and
+/// `dhlrc_render_scene_overlay_quad`, so both draw the same box. Returns 1
 /// when a box was set and 0 when it was cleared.
 ///
 /// # Safety
@@ -713,15 +746,43 @@ pub unsafe extern "C" fn dhlrc_render_scene_block_box(
     1
 }
 
-/// How many quads the highlight outline is made of, or 0 when nothing is
-/// highlighted.
+/// Shows, or hides, the box the whole region is drawn in: `block` is six
+/// floats as [`dhlrc_render_scene_set_highlight`] takes, or null to clear it.
+/// Returns 1 when a box was set and 0 when it was cleared.
+///
+/// # Safety
+///
+/// `scene` must be a pointer this library returned, and `block` readable for
+/// six `float`s when it is not null.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn dhlrc_render_scene_set_bounds(
+    scene: *mut DhlrcScene,
+    block: *const f32,
+) -> i32 {
+    let Some(scene) = (unsafe { scene.as_mut() }) else {
+        return 0;
+    };
+    if block.is_null() {
+        scene.scene.set_bounds(None);
+        return 0;
+    }
+    let box6 = unsafe { slice::from_raw_parts(block, 6) };
+    scene.scene.set_bounds(Some(dhlrc_render::Highlight {
+        min: [box6[0], box6[1], box6[2]],
+        max: [box6[3], box6[4], box6[5]],
+    }));
+    1
+}
+
+/// How many quads the boxes drawn over the scene come to — the region's extent
+/// and the block under the pointer together — or 0 when neither is shown.
 ///
 /// # Safety
 ///
 /// `scene` must be a pointer this library returned.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn dhlrc_render_scene_highlight_count(scene: *const DhlrcScene) -> usize {
-    unsafe { scene.as_ref() }.map_or(0, |scene| scene.scene.highlight.len())
+pub unsafe extern "C" fn dhlrc_render_scene_overlay_count(scene: *const DhlrcScene) -> usize {
+    unsafe { scene.as_ref() }.map_or(0, |scene| scene.scene.overlay.len())
 }
 
 /// One quad of the highlight outline, in the same shape as a scene quad.
@@ -731,7 +792,7 @@ pub unsafe extern "C" fn dhlrc_render_scene_highlight_count(scene: *const DhlrcS
 ///
 /// `scene` must be a pointer this library returned and `quad` writable.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn dhlrc_render_scene_highlight_quad(
+pub unsafe extern "C" fn dhlrc_render_scene_overlay_quad(
     scene: *const DhlrcScene,
     index: usize,
     quad: *mut DhlrcQuad,
@@ -739,7 +800,7 @@ pub unsafe extern "C" fn dhlrc_render_scene_highlight_quad(
     let (Some(scene), Some(out)) = (unsafe { scene.as_ref() }, unsafe { quad.as_mut() }) else {
         return 0;
     };
-    let Some(source) = scene.scene.highlight.get(index) else {
+    let Some(source) = scene.scene.overlay.get(index) else {
         return 0;
     };
     fill_quad(source, out);
@@ -908,6 +969,8 @@ mod tests {
     /// so the marshalling can be checked without a region and a core.
     fn scene() -> DhlrcScene {
         let mut textures = Textures::new();
+        /* Index 1 is the white texel every scene carries for its outline. */
+        textures.push(Texture::solid([255, 255, 255, 255]));
         let index = textures.push(Texture::solid([10, 20, 30, 255]));
         DhlrcScene::new(dhlrc_render::Scene {
             quads: vec![SceneQuad {
@@ -925,7 +988,9 @@ mod tests {
             min: [0.0; 3],
             max: [1.0; 3],
             skipped: Vec::new(),
-            highlight: Vec::new(),
+            bounds: None,
+            highlight: None,
+            overlay: Vec::new(),
         })
     }
 
@@ -968,14 +1033,14 @@ mod tests {
     #[test]
     fn a_highlight_is_set_and_read_back() {
         let mut scene = scene();
-        assert_eq!(unsafe { dhlrc_render_scene_highlight_count(&scene) }, 0);
+        assert_eq!(unsafe { dhlrc_render_scene_overlay_count(&scene) }, 0);
 
         let block = [2.0f32, 1.0, 3.0, 3.0, 2.0, 4.0];
         assert_eq!(
             unsafe { dhlrc_render_scene_set_highlight(&mut scene, block.as_ptr()) },
             1
         );
-        assert_eq!(unsafe { dhlrc_render_scene_highlight_count(&scene) }, 12 * 6);
+        assert_eq!(unsafe { dhlrc_render_scene_overlay_count(&scene) }, 12 * 6);
 
         let mut quad = DhlrcQuad {
             positions: [[0.0; 3]; 4],
@@ -986,7 +1051,7 @@ mod tests {
             alpha: -1,
         };
         assert_eq!(
-            unsafe { dhlrc_render_scene_highlight_quad(&scene, 0, &mut quad) },
+            unsafe { dhlrc_render_scene_overlay_quad(&scene, 0, &mut quad) },
             1
         );
         assert_eq!(quad.tint, [0.0, 0.0, 0.0], "the outline is black");
@@ -1000,14 +1065,14 @@ mod tests {
 
         /* Past the end is a miss, and clearing takes the outline away. */
         assert_eq!(
-            unsafe { dhlrc_render_scene_highlight_quad(&scene, 999, &mut quad) },
+            unsafe { dhlrc_render_scene_overlay_quad(&scene, 999, &mut quad) },
             0
         );
         assert_eq!(
             unsafe { dhlrc_render_scene_set_highlight(&mut scene, ptr::null()) },
             0
         );
-        assert_eq!(unsafe { dhlrc_render_scene_highlight_count(&scene) }, 0);
+        assert_eq!(unsafe { dhlrc_render_scene_overlay_count(&scene) }, 0);
     }
 
     #[test]

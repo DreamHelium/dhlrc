@@ -65,9 +65,11 @@ public:
   void setScene (const DhlrcScene *scene);
   void setCamera (const DhlrcCamera &camera);
 
-  /* Says the scene's highlight outline has changed, so the next frame reads it
-   * again. Only the outline's own small buffer is rebuilt; the scene's buffers
-   * and textures are left alone, which is what keeps a hover cheap. */
+  /* Says the boxes the scene draws over itself — the region's extent and the
+   * block under the pointer — have changed, so the next frame reads them
+   * again. Only those boxes' own small buffer is rebuilt; the scene's buffers
+   * and textures are left alone, which is what keeps a bounds toggle and a
+   * hover cheap. */
   void highlightChanged ();
 
   /* Whether the last draw really drew, rather than giving up over a shader or
@@ -112,9 +114,9 @@ private:
   /* Draws one pass, binding each batch's texture and setting its alpha rule. */
   void drawBatches (const std::vector<Batch> &batches);
   /* Points the bound vertex array's attributes at the bound vertex buffer.
-   * The layout is the same for the scene and for the highlight outline. */
+   * The layout is the same for the scene and for the overlay boxes. */
   void bindQuadLayout ();
-  /* Reads the highlight's quads through the ABI into their own buffer. */
+  /* Reads the overlay boxes' quads through the ABI into their own buffer. */
   void rebuildHighlight ();
 
   const DhlrcScene *scene = nullptr;
@@ -132,7 +134,8 @@ private:
   int cutoutLocation = -1;
   unsigned int vao = 0;
   unsigned int vbo = 0;
-  /* The outline's own small buffer, so a hover never rebuilds the scene. */
+  /* The overlay boxes' own small buffer, so a bounds toggle or a hover never
+   * rebuilds the scene. */
   unsigned int highlightVao = 0;
   unsigned int highlightVbo = 0;
   int highlightVertices = 0;

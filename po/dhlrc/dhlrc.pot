@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-18 17:48+0800\n"
+"POT-Creation-Date: 2026-10-18 19:43+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -37,16 +37,16 @@ msgstr ""
 msgid "Block Name"
 msgstr ""
 
-#: ../../src/blocklistui.cpp:65 ../../src/blocklistui.cpp:68 rc.cpp:27
+#: ../../src/blocklistui.cpp:65 ../../src/blocklistui.cpp:68 rc.cpp:42
 msgid "x"
 msgstr ""
 
-#: ../../src/blocklistui.cpp:66 ../../src/blocklistui.cpp:68 rc.cpp:30
-#: rc.cpp:45
+#: ../../src/blocklistui.cpp:66 ../../src/blocklistui.cpp:68 rc.cpp:45
+#: rc.cpp:63
 msgid "y"
 msgstr ""
 
-#: ../../src/blocklistui.cpp:66 ../../src/blocklistui.cpp:68 rc.cpp:33
+#: ../../src/blocklistui.cpp:66 ../../src/blocklistui.cpp:68 rc.cpp:48
 msgid "z"
 msgstr ""
 
@@ -55,108 +55,42 @@ msgstr ""
 msgid "Palette"
 msgstr ""
 
-#: ../../src/blockreaderui.cpp:52
-msgid "&Modify Region"
-msgstr ""
-
-#: ../../src/blockreaderui.cpp:55
-msgid "&Change History"
-msgstr ""
-
-#: ../../src/blockreaderui.cpp:58
-msgid "&Material List"
-msgstr ""
-
-#: ../../src/blockreaderui.cpp:62
-msgid "Show &All Entities"
-msgstr ""
-
-#: ../../src/blockreaderui.cpp:65 ../../src/blockshowui.cpp:84
-msgid "&Show Entity NBT"
-msgstr ""
-
-#: ../../src/blockreaderui.cpp:68 ../../src/blockshowui.cpp:95
-msgid "&Modify Property"
-msgstr ""
-
-#: ../../src/blockreaderui.cpp:72
-msgid "&List blocks"
-msgstr ""
-
-#: ../../src/blockreaderui.cpp:75 rc.cpp:90
-msgid "&Show blocks"
-msgstr ""
-
-#: ../../src/blockreaderui.cpp:78
-msgid "3D &Preview"
-msgstr ""
-
-#: ../../src/blockreaderui.cpp:122
-msgid "The region this reader shows"
-msgstr ""
-
-#: ../../src/blockreaderui.cpp:249
-msgid "Not valid!"
-msgstr ""
-
-#: ../../src/blockreaderui.cpp:266
+#: ../../src/blockpickerui.cpp:96 ../../src/propertymodifyui.cpp:28
+#: ../../src/regionclass.cpp:442 ../../src/regionmodifyui.cpp:21
 msgid ""
-"Name: %1\n"
-"Translation Name: %2\n"
-"Index: %3\n"
-"Palette: %4\n"
-"Properties:\n"
+"The region is being used by a background task; editing is paused until it "
+"finishes."
 msgstr ""
 
-#: ../../src/blockreaderui.cpp:279
+#: ../../src/blockpickerui.cpp:108
+msgid "Position:"
+msgstr ""
+
+#: ../../src/blockpickerui.cpp:255
 msgid ""
-"Name: %1\n"
-"Index: %2\n"
-"Palette: %3\n"
-"Properties:\n"
+"The block list of this version is not available. Make sure this version's "
+"client jar is downloaded in the settings."
 msgstr ""
 
-#: ../../src/blockreaderui.cpp:318 ../../src/regionmodifyui.cpp:217
-msgid "Unknown"
+#: ../../src/blockpickerui.cpp:385 ../../src/blockpickerui.cpp:419 rc.cpp:27
+msgid "Properties of the chosen block:"
 msgstr ""
 
-#: ../../src/blockreaderui.cpp:322
-msgid "Size: (%1, %2, %3)"
+#: ../../src/blockpickerui.cpp:437
+msgid "Writes to (%1, %2, %3), one block above."
 msgstr ""
 
-#: ../../src/blockreaderui.cpp:324
-msgid "DataVersion: %1, version %2"
+#: ../../src/blockpickerui.cpp:444
+msgid ""
+"(%1, %2, %3) is outside the region, so there is no space above this block."
 msgstr ""
 
-#: ../../src/blockreaderui.cpp:328
-msgid "Created time: %1"
+#: ../../src/blockpickerui.cpp:451
+msgid "Writes to (%1, %2, %3)."
 msgstr ""
 
-#: ../../src/blockreaderui.cpp:332
-msgid "Modified time: %1"
-msgstr ""
-
-#: ../../src/blockreaderui.cpp:335
-msgid "Author: %1"
-msgstr ""
-
-#: ../../src/blockreaderui.cpp:336
-msgid "Name: %1"
-msgstr ""
-
-#: ../../src/blockreaderui.cpp:337
-msgid "Description: %1"
-msgstr ""
-
-#: ../../src/blockreaderui.cpp:378
-msgid "Select an Index"
-msgstr ""
-
-#: ../../src/blockreaderui.cpp:378
-msgid "Please select an index."
-msgstr ""
-
-#: ../../src/blockreaderui.cpp:424 ../../src/externalnbtreaderui.cpp:107
+#: ../../src/blockpickerui.cpp:490 ../../src/blockpickerui.cpp:513
+#: ../../src/blockreaderui.cpp:467 ../../src/externalnbtreaderui.cpp:107
 #: ../../src/externalnbtreaderui.cpp:114 ../../src/manageregionui.cpp:263
 #: ../../src/manageregionui.cpp:296 ../../src/manageregionui.cpp:621
 #: ../../src/propertymodifyui.cpp:251 ../../src/regionchangesui.cpp:86
@@ -165,7 +99,120 @@ msgstr ""
 msgid "Error!"
 msgstr ""
 
-#: ../../src/blockreaderui.cpp:425 ../../common-rs/src/util.rs:45
+#: ../../src/blockpickerui.cpp:491
+msgid "The target position is outside the region."
+msgstr ""
+
+#: ../../src/blockpickerui.cpp:523
+msgid "Block added at %1"
+msgstr ""
+
+#: ../../src/blockpickerui.cpp:524
+msgid "Block replaced at %1"
+msgstr ""
+
+#: ../../src/blockreaderui.cpp:53
+msgid "&Modify Region"
+msgstr ""
+
+#: ../../src/blockreaderui.cpp:56
+msgid "&Change History"
+msgstr ""
+
+#: ../../src/blockreaderui.cpp:59
+msgid "&Material List"
+msgstr ""
+
+#: ../../src/blockreaderui.cpp:63
+msgid "Show &All Entities"
+msgstr ""
+
+#: ../../src/blockreaderui.cpp:66 ../../src/blockshowui.cpp:84
+msgid "&Show Entity NBT"
+msgstr ""
+
+#: ../../src/blockreaderui.cpp:69 ../../src/blockshowui.cpp:95
+msgid "&Modify Property"
+msgstr ""
+
+#: ../../src/blockreaderui.cpp:73
+msgid "&List blocks"
+msgstr ""
+
+#: ../../src/blockreaderui.cpp:76 rc.cpp:108
+msgid "&Show blocks"
+msgstr ""
+
+#: ../../src/blockreaderui.cpp:79
+msgid "3D &Preview"
+msgstr ""
+
+#: ../../src/blockreaderui.cpp:125
+msgid "The region this reader shows"
+msgstr ""
+
+#: ../../src/blockreaderui.cpp:262 ../../src/blockreaderui.cpp:266
+msgid "Not valid!"
+msgstr ""
+
+#: ../../src/blockreaderui.cpp:291
+msgid ""
+"Name: %1\n"
+"Translation Name: %2\n"
+"Index: %3\n"
+"Palette: %4\n"
+"Properties:\n"
+msgstr ""
+
+#: ../../src/blockreaderui.cpp:304
+msgid ""
+"Name: %1\n"
+"Index: %2\n"
+"Palette: %3\n"
+"Properties:\n"
+msgstr ""
+
+#: ../../src/blockreaderui.cpp:343 ../../src/regionmodifyui.cpp:217
+msgid "Unknown"
+msgstr ""
+
+#: ../../src/blockreaderui.cpp:347
+msgid "Size: (%1, %2, %3)"
+msgstr ""
+
+#: ../../src/blockreaderui.cpp:349
+msgid "DataVersion: %1, version %2"
+msgstr ""
+
+#: ../../src/blockreaderui.cpp:353
+msgid "Created time: %1"
+msgstr ""
+
+#: ../../src/blockreaderui.cpp:357
+msgid "Modified time: %1"
+msgstr ""
+
+#: ../../src/blockreaderui.cpp:360
+msgid "Author: %1"
+msgstr ""
+
+#: ../../src/blockreaderui.cpp:361
+msgid "Name: %1"
+msgstr ""
+
+#: ../../src/blockreaderui.cpp:362
+msgid "Description: %1"
+msgstr ""
+
+#: ../../src/blockreaderui.cpp:405
+msgid "Select an Index"
+msgstr ""
+
+#: ../../src/blockreaderui.cpp:405
+msgid "Please select an index."
+msgstr ""
+
+#: ../../src/blockreaderui.cpp:468 ../../common-rs/src/util.rs:45
 msgid "Out of memory!"
 msgstr ""
 
@@ -173,8 +220,8 @@ msgstr ""
 msgid "The block is in (%1, %2, %3), information is:\n"
 msgstr ""
 
-#: ../../src/blockshowui.cpp:82 ../../src/generalchoosedialog.cpp:45 rc.cpp:84
-#: rc.cpp:147
+#: ../../src/blockshowui.cpp:82 ../../src/generalchoosedialog.cpp:45 rc.cpp:102
+#: rc.cpp:165
 msgid "&OK"
 msgstr ""
 
@@ -198,7 +245,7 @@ msgstr ""
 msgid "&Continue"
 msgstr ""
 
-#: ../../src/configobjectui.cpp:125 ../../src/dhrenderui.cpp:303
+#: ../../src/configobjectui.cpp:125 ../../src/dhrenderui.cpp:404
 #: ../../src/generalchoosedialog.cpp:46
 msgid "&Cancel"
 msgstr ""
@@ -418,256 +465,336 @@ msgstr ""
 msgid "Continue"
 msgstr ""
 
-#: ../../src/dhpreview.cpp:83
+#: ../../src/dhpreview.cpp:84
 msgid "%1 is not a size; write it as WxH"
 msgstr ""
 
-#: ../../src/dhpreview.cpp:108
+#: ../../src/dhpreview.cpp:109
 msgid "%1 is not a pixel; write it as X,Y"
 msgstr ""
 
-#: ../../src/dhpreview.cpp:127
+#: ../../src/dhpreview.cpp:134
+msgid "%1 is not a Y range; write it as Y1:Y2"
+msgstr ""
+
+#: ../../src/dhpreview.cpp:153
 msgid "the core could not be opened"
 msgstr ""
 
-#: ../../src/dhpreview.cpp:166
+#: ../../src/dhpreview.cpp:192
 msgid "the file held no region that could be read"
 msgstr ""
 
-#: ../../src/dhpreview.cpp:209
+#: ../../src/dhpreview.cpp:235
 msgid "the region's data version names no known version; pass --version"
 msgstr ""
 
-#: ../../src/dhpreview.cpp:226 ../../src/dhpreview.cpp:489
+#: ../../src/dhpreview.cpp:252 ../../src/dhpreview.cpp:551
 msgid "%1 is not a file"
 msgstr ""
 
-#: ../../src/dhpreview.cpp:234
+#: ../../src/dhpreview.cpp:260
 msgid "%1 is not a zip archive"
 msgstr ""
 
-#: ../../src/dhpreview.cpp:253
+#: ../../src/dhpreview.cpp:279
 msgid "the client jar of %1 is not in %2"
 msgstr ""
 
-#: ../../src/dhpreview.cpp:257
+#: ../../src/dhpreview.cpp:283
 msgid "%1; pass --jar or point --resources at one"
 msgstr ""
 
-#: ../../src/dhpreview.cpp:266
+#: ../../src/dhpreview.cpp:292
 msgid "%1; pass --jar, or let it be downloaded (the DownloadClientJar setting)"
 msgstr ""
 
-#: ../../src/dhpreview.cpp:272
+#: ../../src/dhpreview.cpp:298
 msgid "downloading the client jar of %1 (about 30 MB)"
 msgstr ""
 
-#: ../../src/dhpreview.cpp:280
+#: ../../src/dhpreview.cpp:306
 msgid "the client jar could not be downloaded: %1"
 msgstr ""
 
-#: ../../src/dhpreview.cpp:282
+#: ../../src/dhpreview.cpp:308
 msgid "unknown error"
 msgstr ""
 
-#: ../../src/dhpreview.cpp:289
+#: ../../src/dhpreview.cpp:315
 msgid "downloaded %1"
 msgstr ""
 
-#: ../../src/dhpreview.cpp:309
+#: ../../src/dhpreview.cpp:335
 msgid "the resource set could not be configured"
 msgstr ""
 
-#: ../../src/dhpreview.cpp:325
+#: ../../src/dhpreview.cpp:351
 msgid "%1 is not a number for %2"
 msgstr ""
 
-#: ../../src/dhpreview.cpp:340
+#: ../../src/dhpreview.cpp:366
 msgid "the CPU renderer returned no picture"
 msgstr ""
 
-#: ../../src/dhpreview.cpp:350 ../../src/dhpreview.cpp:423
+#: ../../src/dhpreview.cpp:376 ../../src/dhpreview.cpp:451
 msgid "%1 could not be written"
 msgstr ""
 
-#: ../../src/dhpreview.cpp:357
+#: ../../src/dhpreview.cpp:383
 msgid "cpu: %1 frames in %2 ms (%3 ms/frame)"
 msgstr ""
 
-#: ../../src/dhpreview.cpp:376
+#: ../../src/dhpreview.cpp:404
 msgid "this machine cannot give a desktop OpenGL 3.3 context"
 msgstr ""
 
-#: ../../src/dhpreview.cpp:410
+#: ../../src/dhpreview.cpp:438
 msgid "the OpenGL frame could not be drawn: %1"
 msgstr ""
 
-#: ../../src/dhpreview.cpp:413
+#: ../../src/dhpreview.cpp:441
 msgid "the OpenGL frame came back empty"
 msgstr ""
 
-#: ../../src/dhpreview.cpp:415
+#: ../../src/dhpreview.cpp:443
 msgid "the OpenGL framebuffer is %1x%2, not %3x%4 (the screen scale is %5)"
 msgstr ""
 
-#: ../../src/dhpreview.cpp:424
+#: ../../src/dhpreview.cpp:452
 msgid "gpu: first frame in %1 ms"
 msgstr ""
 
-#: ../../src/dhpreview.cpp:431
+#: ../../src/dhpreview.cpp:459
 msgid "gpu: %1 frames in %2 ms (%3 ms/frame)"
 msgstr ""
 
-#: ../../src/dhpreview.cpp:451
+#: ../../src/dhpreview.cpp:479
 msgid "hover: clearing the highlight did not change the OpenGL picture"
 msgstr ""
 
-#: ../../src/dhpreview.cpp:471
+#: ../../src/dhpreview.cpp:499
 msgid ""
 "hover: setting the highlight again did not put the OpenGL picture back (%1 "
 "pixels differ)"
 msgstr ""
 
-#: ../../src/dhpreview.cpp:475
+#: ../../src/dhpreview.cpp:503
 msgid "hover: the OpenGL outline follows highlightChanged () alone"
 msgstr ""
 
-#: ../../src/dhpreview.cpp:485
+#: ../../src/dhpreview.cpp:512
+msgid "bounds: clearing the region box did not change the OpenGL picture"
+msgstr ""
+
+#: ../../src/dhpreview.cpp:532
+msgid ""
+"bounds: setting the region box again did not put the OpenGL picture back (%1 "
+"pixels differ)"
+msgstr ""
+
+#: ../../src/dhpreview.cpp:536
+msgid "bounds: the OpenGL region box follows highlightChanged () alone"
+msgstr ""
+
+#: ../../src/dhpreview.cpp:547
 msgid "--preview needs the region file to draw"
 msgstr ""
 
-#: ../../src/dhpreview.cpp:487
+#: ../../src/dhpreview.cpp:549
 msgid "--preview needs --png to say where the picture goes"
 msgstr ""
 
-#: ../../src/dhpreview.cpp:507
+#: ../../src/dhpreview.cpp:576
 msgid "%1 is not a backend; use cpu or gpu"
 msgstr ""
 
-#: ../../src/dhpreview.cpp:533
+#: ../../src/dhpreview.cpp:614
 msgid "the scene could not be built"
 msgstr ""
 
-#: ../../src/dhpreview.cpp:537
+#: ../../src/dhpreview.cpp:618
 msgid "%1: %2 quads, %3 palette entries not drawn"
 msgstr ""
 
-#: ../../src/dhpreview.cpp:542
+#: ../../src/dhpreview.cpp:627
+msgid "the slice draws no block"
+msgstr ""
+
+#: ../../src/dhpreview.cpp:629
 msgid ""
 "nothing could be drawn: the block models and textures of this region's "
 "version were not found"
 msgstr ""
 
-#: ../../src/dhpreview.cpp:587
+#: ../../src/dhpreview.cpp:675
 msgid "hover: the pick took %1 ms"
 msgstr ""
 
-#: ../../src/dhpreview.cpp:592
+#: ../../src/dhpreview.cpp:680
 msgid "hover: pixel %1,%2 is the background; nothing is highlighted"
 msgstr ""
 
-#: ../../src/dhpreview.cpp:611
+#: ../../src/dhpreview.cpp:699
 msgid "hover: pixel %1,%2 picks block (%3, %4, %5); the outline is %6 quads"
 msgstr ""
 
-#: ../../src/dhpreview.cpp:631
+#: ../../src/dhpreview.cpp:719
 msgid "hover: the tooltip would say:"
 msgstr ""
 
-#: ../../src/dhpreview.cpp:648
+#: ../../src/dhpreview.cpp:762
+msgid "bounds: this slice draws no layer, so there is no box to show"
+msgstr ""
+
+#: ../../src/dhpreview.cpp:775
+msgid "bounds: the box is (%1, %2, %3)..(%4, %5, %6), %7 overlay quads in all"
+msgstr ""
+
+#: ../../src/dhpreview.cpp:788
 msgid "drawing with %1"
 msgstr ""
 
-#: ../../src/dhpreview.cpp:649
+#: ../../src/dhpreview.cpp:789
 msgid "OpenGL"
 msgstr ""
 
-#: ../../src/dhpreview.cpp:649
+#: ../../src/dhpreview.cpp:789
 msgid "the CPU"
 msgstr ""
 
-#: ../../src/dhrenderui.cpp:37
+#: ../../src/dhrenderui.cpp:41
 msgid "3D Preview - %1"
 msgstr ""
 
-#: ../../src/dhrenderui.cpp:48
+#: ../../src/dhrenderui.cpp:52
 msgid "Downloading the client jar: %1%"
 msgstr ""
 
-#: ../../src/dhrenderui.cpp:60
+#: ../../src/dhrenderui.cpp:66
 msgid "&Fit"
 msgstr ""
 
-#: ../../src/dhrenderui.cpp:61
+#: ../../src/dhrenderui.cpp:67
 msgid "&Orthographic"
 msgstr ""
 
-#: ../../src/dhrenderui.cpp:63
+#: ../../src/dhrenderui.cpp:69
+msgid "&Slice"
+msgstr ""
+
+#: ../../src/dhrenderui.cpp:72
+msgid "Draw only the blocks in this range of Y"
+msgstr ""
+
+#: ../../src/dhrenderui.cpp:76
+msgid "Lowest Y drawn"
+msgstr ""
+
+#: ../../src/dhrenderui.cpp:80
+msgid "Highest Y drawn"
+msgstr ""
+
+#: ../../src/dhrenderui.cpp:82
+msgid "Region &box"
+msgstr ""
+
+#: ../../src/dhrenderui.cpp:85
+msgid "Show the box around the region being drawn"
+msgstr ""
+
+#: ../../src/dhrenderui.cpp:100
 #: ../../src/dhsettingsdialog/dhsettingsdialog.cpp:105
 msgid "&Reload"
 msgstr ""
 
-#: ../../src/dhrenderui.cpp:65 ../../src/dhrenderui.cpp:303
+#: ../../src/dhrenderui.cpp:102 ../../src/dhrenderui.cpp:404
 msgid "Get &Resources"
 msgstr ""
 
-#: ../../src/dhrenderui.cpp:66
+#: ../../src/dhrenderui.cpp:103
 msgid "&Modify Properties..."
 msgstr ""
 
-#: ../../src/dhrenderui.cpp:89 ../../src/dhrenderui.cpp:196
+#: ../../src/dhrenderui.cpp:104
+msgid "&Replace Block..."
+msgstr ""
+
+#: ../../src/dhrenderui.cpp:105
+msgid "&Add Block..."
+msgstr ""
+
+#: ../../src/dhrenderui.cpp:118
+msgid "Change the properties of the block that was clicked"
+msgstr ""
+
+#: ../../src/dhrenderui.cpp:120
+msgid "Put another block in place of the block that was clicked"
+msgstr ""
+
+#: ../../src/dhrenderui.cpp:122
+msgid ""
+"Put a block into a cell: type its position, or tick \"one block above\" to "
+"drop it on top of what was clicked"
+msgstr ""
+
+#: ../../src/dhrenderui.cpp:142 ../../src/dhrenderui.cpp:293
 msgid "Building the 3D scene..."
 msgstr ""
 
-#: ../../src/dhrenderui.cpp:294
+#: ../../src/dhrenderui.cpp:395
 msgid "The client jar could not be downloaded: %1"
 msgstr ""
 
-#: ../../src/dhrenderui.cpp:323
+#: ../../src/dhrenderui.cpp:455
 msgid "drawn with OpenGL"
 msgstr ""
 
-#: ../../src/dhrenderui.cpp:324
+#: ../../src/dhrenderui.cpp:456
 msgid "drawn by the CPU"
 msgstr ""
 
-#: ../../src/dhrenderui.cpp:325
+#: ../../src/dhrenderui.cpp:458
 msgid "%1 x %2 x %3, %4 quads, %5 blocks not drawn, %6"
 msgstr ""
 
-#: ../../src/dhrenderui.cpp:339
+#: ../../src/dhrenderui.cpp:469
+msgid "Slice Y%1-%2. %3"
+msgstr ""
+
+#: ../../src/dhrenderui.cpp:480
 msgid ""
 "Drag with the left button to turn, with the middle or right button to move, "
 "and use the wheel to zoom. A click names the block under it."
 msgstr ""
 
-#: ../../src/dhrenderui.cpp:351
+#: ../../src/dhrenderui.cpp:492
 msgid ""
 "Nothing could be drawn: the block models and textures of this region's "
 "version could not be placed, and the version is not one the client jar table "
 "knows."
 msgstr ""
 
-#: ../../src/dhrenderui.cpp:356
+#: ../../src/dhrenderui.cpp:497
 msgid ""
 "Nothing could be drawn. The block models and textures of a version live in "
 "its client jar, which belongs at %1. Press \"Get Resources\" to download it "
 "(about 30 MB)."
 msgstr ""
 
-#: ../../src/dhrenderui.cpp:370
+#: ../../src/dhrenderui.cpp:513
 msgid "(%1, %2, %3) is outside the region"
 msgstr ""
 
-#: ../../src/dhrenderui.cpp:386
+#: ../../src/dhrenderui.cpp:528
 msgid "Block (%1, %2, %3): %4"
 msgstr ""
 
-#: ../../src/dhrenderui.cpp:436
+#: ../../src/dhrenderui.cpp:630
 msgid "Block (%1, %2, %3)"
 msgstr ""
 
-#: ../../src/dhrenderwidget.cpp:109
+#: ../../src/dhrenderwidget.cpp:140
 msgid ""
 "The region could not be drawn: no block in it could be resolved. Check that "
 "the resource files for this version have been downloaded in the settings."
@@ -745,15 +872,25 @@ msgid ""
 "tooltip text"
 msgstr ""
 
-#: ../../src/main.cpp:116
-msgid "Preview: read the block models and textures from this client jar"
+#: ../../src/main.cpp:115
+msgid "Preview: draw only the layers from Y1 to Y2, both included"
 msgstr ""
 
-#: ../../src/main.cpp:120
-msgid "Preview: read resources from this cache directory"
+#: ../../src/main.cpp:119
+msgid ""
+"Preview: draw the box around the region being drawn, clamped to the slice "
+"when one is set"
 msgstr ""
 
 #: ../../src/main.cpp:124
+msgid "Preview: read the block models and textures from this client jar"
+msgstr ""
+
+#: ../../src/main.cpp:128
+msgid "Preview: read resources from this cache directory"
+msgstr ""
+
+#: ../../src/main.cpp:132
 msgid "Preview: use the client jar of this game version"
 msgstr ""
 
@@ -900,7 +1037,7 @@ msgstr ""
 msgid "&Select"
 msgstr ""
 
-#: ../../src/manageregionui.cpp:174 rc.cpp:78
+#: ../../src/manageregionui.cpp:174 rc.cpp:96
 msgid "&Add"
 msgstr ""
 
@@ -1117,12 +1254,6 @@ msgstr ""
 msgid "Data"
 msgstr ""
 
-#: ../../src/propertymodifyui.cpp:28 ../../src/regionmodifyui.cpp:21
-msgid ""
-"The region is being used by a background task; editing is paused until it "
-"finishes."
-msgstr ""
-
 #: ../../src/propertymodifyui.cpp:166
 msgid "Looking for blocks with these properties..."
 msgstr ""
@@ -1181,6 +1312,14 @@ msgid ""
 "in a moment."
 msgstr ""
 
+#: ../../src/regionclass.cpp:445
+msgid "No block was chosen."
+msgstr ""
+
+#: ../../src/regionclass.cpp:469
+msgid "The position (%1, %2, %3) is outside the region."
+msgstr ""
+
 #: ../../src/regionmodifyui.cpp:120
 msgid "Failed to set the time."
 msgstr ""
@@ -1193,7 +1332,7 @@ msgstr ""
 msgid "Failed to set the description."
 msgstr ""
 
-#: ../../src/regionmodifyui.cpp:138 ../../src/regionmodifyui.cpp:139 rc.cpp:126
+#: ../../src/regionmodifyui.cpp:138 ../../src/regionmodifyui.cpp:139 rc.cpp:144
 msgid "Description"
 msgstr ""
 
@@ -1201,7 +1340,7 @@ msgstr ""
 msgid "Failed to set the author."
 msgstr ""
 
-#: ../../src/regionmodifyui.cpp:151 ../../src/regionmodifyui.cpp:152 rc.cpp:132
+#: ../../src/regionmodifyui.cpp:151 ../../src/regionmodifyui.cpp:152 rc.cpp:150
 msgid "Author"
 msgstr ""
 
@@ -1217,7 +1356,7 @@ msgstr ""
 msgid "Failed to set the offset."
 msgstr ""
 
-#: ../../src/regionmodifyui.cpp:187 ../../src/regionmodifyui.cpp:188 rc.cpp:129
+#: ../../src/regionmodifyui.cpp:187 ../../src/regionmodifyui.cpp:188 rc.cpp:147
 msgid "Offset"
 msgstr ""
 
@@ -1334,135 +1473,155 @@ msgstr ""
 msgid "Search block name"
 msgstr ""
 
-#: rc.cpp:12 rc.cpp:72
+#: rc.cpp:12 rc.cpp:90
 msgid "&Close"
 msgstr ""
 
 #: rc.cpp:15
-msgid "Read Blocks"
+msgid "Add/Replace Block"
 msgstr ""
 
 #: rc.cpp:18
-msgid "Translation loading progress:"
+msgid "Choose a block of this version:"
 msgstr ""
 
 #: rc.cpp:21
-msgid "Region information:"
+msgid "Search by name or id"
 msgstr ""
 
 #: rc.cpp:24
-msgid "Please enter the coordination of the block:"
+msgid "Place one block above (add instead of replace)"
+msgstr ""
+
+#: rc.cpp:30
+msgid "Read Blocks"
+msgstr ""
+
+#: rc.cpp:33
+msgid "Translation loading progress:"
 msgstr ""
 
 #: rc.cpp:36
-msgid "The information is:"
+msgid "Region information:"
 msgstr ""
 
 #: rc.cpp:39
-msgid "&Tools"
-msgstr ""
-
-#: rc.cpp:42
-msgid "Show Blocks"
-msgstr ""
-
-#: rc.cpp:48
-msgid "Mode"
+msgid "Please enter the coordination of the block:"
 msgstr ""
 
 #: rc.cpp:51
-msgid "&List/Modify Palette"
+msgid "The information is:"
 msgstr ""
 
 #: rc.cpp:54
-msgid "Modify &Block"
+msgid "&Add/Replace Block..."
 msgstr ""
 
 #: rc.cpp:57
-msgid "NBT Viewer"
+msgid "&Tools"
 msgstr ""
 
 #: rc.cpp:60
-msgid "Type:"
-msgstr ""
-
-#: rc.cpp:63
-msgid "Key:"
+msgid "Show Blocks"
 msgstr ""
 
 #: rc.cpp:66
-msgid "Value:"
+msgid "Mode"
 msgstr ""
 
 #: rc.cpp:69
-msgid "&Export"
+msgid "&List/Modify Palette"
+msgstr ""
+
+#: rc.cpp:72
+msgid "Modify &Block"
 msgstr ""
 
 #: rc.cpp:75
-msgid "Add Palette Entry"
+msgid "NBT Viewer"
+msgstr ""
+
+#: rc.cpp:78
+msgid "Type:"
 msgstr ""
 
 #: rc.cpp:81
-msgid "&Remove"
+msgid "Key:"
+msgstr ""
+
+#: rc.cpp:84
+msgid "Value:"
 msgstr ""
 
 #: rc.cpp:87
-msgid "Palette List"
+msgid "&Export"
 msgstr ""
 
 #: rc.cpp:93
-msgid "Modify Property of Block(s)"
-msgstr ""
-
-#: rc.cpp:96
-msgid "Modify the property of the block in:"
+msgid "Add Palette Entry"
 msgstr ""
 
 #: rc.cpp:99
-msgid "Only this block"
-msgstr ""
-
-#: rc.cpp:102
-msgid "Every block with this palette entry"
+msgid "&Remove"
 msgstr ""
 
 #: rc.cpp:105
-msgid "Properties:"
-msgstr ""
-
-#: rc.cpp:108
-msgid "Region Modifier"
+msgid "Palette List"
 msgstr ""
 
 #: rc.cpp:111
-msgid "Modify the infomation of the Region."
+msgid "Modify Property of Block(s)"
 msgstr ""
 
 #: rc.cpp:114
-msgid "Create Time"
+msgid "Modify the property of the block in:"
 msgstr ""
 
-#: rc.cpp:117 rc.cpp:123
-msgid "yyyy/MM/dd HH:mm:ss.zzz"
+#: rc.cpp:117
+msgid "Only this block"
 msgstr ""
 
 #: rc.cpp:120
+msgid "Every block with this palette entry"
+msgstr ""
+
+#: rc.cpp:123
+msgid "Properties:"
+msgstr ""
+
+#: rc.cpp:126
+msgid "Region Modifier"
+msgstr ""
+
+#: rc.cpp:129
+msgid "Modify the infomation of the Region."
+msgstr ""
+
+#: rc.cpp:132
+msgid "Create Time"
+msgstr ""
+
+#: rc.cpp:135 rc.cpp:141
+msgid "yyyy/MM/dd HH:mm:ss.zzz"
+msgstr ""
+
+#: rc.cpp:138
 msgid "Modify Time"
 msgstr ""
 
-#: rc.cpp:135
+#: rc.cpp:153
 msgid "Base Name"
 msgstr ""
 
-#: rc.cpp:138 ../../dhlrc-core/src/schema.rs:190
+#: rc.cpp:156 ../../dhlrc-core/src/schema.rs:190
 msgid "Region Name"
 msgstr ""
 
-#: rc.cpp:141
+#: rc.cpp:159
 msgid "Data Version"
 msgstr ""
 
-#: rc.cpp:144
+#: rc.cpp:162
 msgid "Version"
 msgstr ""
 
@@ -2075,19 +2234,20 @@ msgid "Uncompress finished."
 msgstr ""
 
 #: ../../region-rs/src/lib.rs:150 ../../region-rs/src/lib.rs:191
+#: ../../region-rs/src/lib.rs:266
 msgid "The region is null."
 msgstr ""
 
 #: ../../region-rs/src/lib.rs:163 ../../region-rs/src/lib.rs:167
-#: ../../region-rs/src/lib.rs:204
+#: ../../region-rs/src/lib.rs:204 ../../region-rs/src/lib.rs:276
 msgid "The index is out of range."
 msgstr ""
 
-#: ../../region-rs/src/lib.rs:194
+#: ../../region-rs/src/lib.rs:194 ../../region-rs/src/lib.rs:269
 msgid "The output pointer is null."
 msgstr ""
 
-#: ../../region-rs/src/lib.rs:197
+#: ../../region-rs/src/lib.rs:197 ../../region-rs/src/lib.rs:272
 msgid "The property list is null."
 msgstr ""
 
@@ -2097,6 +2257,10 @@ msgstr ""
 
 #: ../../region-rs/src/lib.rs:208
 msgid "The palette index is out of range."
+msgstr ""
+
+#: ../../region-rs/src/lib.rs:283
+msgid "No block name is given."
 msgstr ""
 
 #: ../../region-schem-rs/src/config.rs:38

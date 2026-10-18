@@ -148,6 +148,13 @@
         </spacer>
        </item>
        <item>
+        <widget class="QPushButton" name="addBlockBtn">
+         <property name="text">
+          <string>&amp;Add/Replace Block...</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QPushButton" name="toolsBtn">
          <property name="text">
           <string>&amp;Tools</string>

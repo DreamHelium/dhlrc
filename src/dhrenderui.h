@@ -15,6 +15,7 @@
 #include <atomic>
 #include <memory>
 
+class QSpinBox;
 class DhRenderWidget;
 
 /* A window showing one region in three dimensions.
@@ -47,10 +48,24 @@ private:
   void setBuilding (bool building);
   void rebuild ();
   void updateSummary ();
+  /* Hands the toolbar's slice controls to the view: the two spin boxes when
+   * "Slice" is on, the whole region when it is off. The picture follows at
+   * once, without another Reload. */
+  void applySlice ();
+  /* Points the spin boxes at the region's own height; a region that was
+   * resized gets its old range clamped into the new one. */
+  void updateSliceRange ();
   void describe (int x, int y, int z);
   /* Opens the property dialog for the block that was last clicked, and takes a
    * fresh look at the region when something was written. */
   void modifyPicked ();
+  /* Opens the block chooser on the clicked block; `above` writes into the cell
+   * above it instead, which is how a block is added — an empty cell is hard to
+   * click on in a 3D view, a block you can see is not. */
+  void pickBlock (bool above);
+  /* Whether the buttons that write into the region are usable right now: a
+   * block was clicked and no job holds the region. */
+  void updateEditButtons ();
   /* Builds the text the tooltip shows for the block under the pointer and
    * hands it to the view, which puts it beside the cursor. The bottom labels
    * are not touched by a hover. */
@@ -78,8 +93,19 @@ private:
   QTimer *buildProgressTimer = nullptr;
   std::shared_ptr<std::atomic<int>> buildProgress;
   QPushButton *reloadButton = nullptr;
+  /* The slice and the region box the view draws, and the two ends of the slice
+   * as the toolbar shows them. */
+  QPushButton *sliceButton = nullptr;
+  QSpinBox *sliceLowSpin = nullptr;
+  QSpinBox *sliceHighSpin = nullptr;
+  QPushButton *boundsButton = nullptr;
+  /* Whether the spin boxes have been given the region's range yet: the first
+   * one offers the whole region, a later reload only clamps them. */
+  bool sliceRangeKnown = false;
   QPushButton *fetchButton = nullptr;
   QPushButton *modifyButton = nullptr;
+  QPushButton *replaceButton = nullptr;
+  QPushButton *addButton = nullptr;
   QFutureWatcher<std::shared_ptr<DhlrcScene>> *sceneWatcher = nullptr;
   bool building = false;
   /* A reload requested while a build is running, done right after it. */
@@ -90,6 +116,14 @@ private:
   qint32 pickedX = 0;
   qint32 pickedY = 0;
   qint32 pickedZ = 0;
+  /* The region's height, kept here because the buttons' enabled state follows
+   * it and refreshing them must not take the region's lock: taking it emits
+   * `lockedChanged`, which is what asks for the refresh — a lock-taking getter
+   * in here recurses until the stack runs out. */
+  qint32 regionWidth = 0;
+  qint32 regionHeight = 0;
+  qint32 regionDepth = 0;
+  bool updatingButtons = false;
   std::shared_ptr<DhDownloader> downloader;
   bool fetching = false;
 };

@@ -244,6 +244,92 @@ pub extern "C" fn region_set_block_properties(
     null()
 }
 
+/// Sets the block at `index` to the state `name` with the given properties,
+/// which is how a block is added or replaced.
+///
+/// The palette is looked through first: a state it already has is pointed at
+/// rather than appended, so placing the same block a thousand times does not
+/// grow the file. `count` may be 0 — most blocks take no properties at all — and
+/// then `names` and `datas` may be null. Returns NULL on success and an error
+/// message on failure; the palette id used is written to `out_id`.
+#[unsafe(no_mangle)]
+pub extern "C" fn region_set_block_state(
+    region: *mut Region,
+    index: usize,
+    name: *const c_char,
+    names: *const *const c_char,
+    datas: *const *const c_char,
+    count: usize,
+    out_id: *mut u32,
+) -> *const c_char {
+    if region.is_null() {
+        return string_to_ptr_fail_to_null(i18n("The region is null."));
+    }
+    if out_id.is_null() {
+        return string_to_ptr_fail_to_null(i18n("The output pointer is null."));
+    }
+    if count > 0 && (names.is_null() || datas.is_null()) {
+        return string_to_ptr_fail_to_null(i18n("The property list is null."));
+    }
+    let r = unsafe { &mut *region };
+    if index >= r.block_array.len() {
+        return string_to_ptr_fail_to_null(i18n("The index is out of range."));
+    }
+    let real_name = match cstr_to_str(name) {
+        Ok(text) => text,
+        Err(err) => return string_to_ptr_fail_to_null(&err.to_string()),
+    };
+    if real_name.is_empty() {
+        return string_to_ptr_fail_to_null(i18n("No block name is given."));
+    }
+
+    /* Build the state first, so a bad pair leaves the region as it was. */
+    let mut property: Vec<(String, String)> = Vec::with_capacity(count);
+    for i in 0..count {
+        let name_ptr = unsafe { *names.add(i) };
+        let data_ptr = unsafe { *datas.add(i) };
+        let real_property_name = match cstr_to_str(name_ptr) {
+            Ok(text) => text,
+            Err(err) => return string_to_ptr_fail_to_null(&err.to_string()),
+        };
+        let real_data = match cstr_to_str(data_ptr) {
+            Ok(text) => text,
+            Err(err) => return string_to_ptr_fail_to_null(&err.to_string()),
+        };
+        property.push((real_property_name, real_data));
+    }
+
+    let id = match r
+        .palette_array
+        .iter()
+        .position(|palette| palette.id_name == real_name && same_properties(&palette.property, &property))
+    {
+        Some(id) => id,
+        None => {
+            r.palette_array.push(Palette {
+                id_name: real_name,
+                property,
+            });
+            r.palette_array.len() - 1
+        }
+    };
+    r.block_array[index] = id as u32;
+    unsafe { *out_id = id as u32 };
+    null()
+}
+
+/// Whether two property lists say the same thing, whatever order they are in.
+fn same_properties(one: &[(String, String)], other: &[(String, String)]) -> bool {
+    if one.len() != other.len() {
+        return false;
+    }
+    let mut one: Vec<&(String, String)> = one.iter().collect();
+    let mut other: Vec<&(String, String)> = other.iter().collect();
+    one.sort();
+    other.sort();
+    one == other
+}
+
 #[unsafe(no_mangle)]
 pub extern "C" fn vec_free(vec: *mut Vec<u8>) {
     unsafe {
@@ -520,6 +606,104 @@ mod tests {
             assert_eq!((*region).palette_array.len(), 1);
             assert_eq!((*region).block_array, vec![0, 0, 0, 0]);
         }
+        region_free(region);
+    }
+
+    #[test]
+    fn setting_a_block_state_reuses_a_palette_entry_it_already_has() {
+        let region = test_region();
+        let name = std::ffi::CString::new("minecraft:oak_slab").unwrap();
+        let mut id = 0u32;
+
+        /* The same state as the palette entry already holds, written in the
+         * other order: no new entry. */
+        let names = [std::ffi::CString::new("waterlogged").unwrap(),
+                     std::ffi::CString::new("type").unwrap()];
+        let datas = [std::ffi::CString::new("false").unwrap(),
+                     std::ffi::CString::new("bottom").unwrap()];
+        let name_ptrs: Vec<*const c_char> = names.iter().map(|s| s.as_ptr()).collect();
+        let data_ptrs: Vec<*const c_char> = datas.iter().map(|s| s.as_ptr()).collect();
+        let message = unsafe {
+            region_set_block_state(region, 1, name.as_ptr(), name_ptrs.as_ptr(),
+                                   data_ptrs.as_ptr(), 2, &mut id)
+        };
+        assert_eq!(take_message(message), None);
+        assert_eq!(id, 0);
+        let r = unsafe { &*region };
+        assert_eq!(r.palette_array.len(), 1, "the palette must not grow");
+        assert_eq!(r.block_array[1], 0);
+        region_free(region);
+    }
+
+    #[test]
+    fn setting_a_block_state_adds_an_entry_when_the_state_is_new() {
+        let region = test_region();
+        let name = std::ffi::CString::new("minecraft:oak_stairs").unwrap();
+        let names = [std::ffi::CString::new("facing").unwrap()];
+        let datas = [std::ffi::CString::new("east").unwrap()];
+        let name_ptrs: Vec<*const c_char> = names.iter().map(|s| s.as_ptr()).collect();
+        let data_ptrs: Vec<*const c_char> = datas.iter().map(|s| s.as_ptr()).collect();
+        let mut id = 0u32;
+        let message = unsafe {
+            region_set_block_state(region, 2, name.as_ptr(), name_ptrs.as_ptr(),
+                                   data_ptrs.as_ptr(), 1, &mut id)
+        };
+        assert_eq!(take_message(message), None);
+        assert_eq!(id, 1);
+        let r = unsafe { &*region };
+        assert_eq!(r.palette_array.len(), 2);
+        assert_eq!(r.palette_array[1].id_name, "minecraft:oak_stairs");
+        assert_eq!(r.palette_array[1].property, [("facing".to_string(), "east".to_string())]);
+        assert_eq!(r.block_array[2], 1);
+        /* The neighbours are untouched. */
+        assert_eq!(&r.block_array[..2], &[0, 0]);
+        region_free(region);
+    }
+
+    #[test]
+    fn a_block_with_no_properties_can_be_set() {
+        let region = test_region();
+        let name = std::ffi::CString::new("minecraft:stone").unwrap();
+        let mut id = 0u32;
+        let message = unsafe {
+            region_set_block_state(region, 0, name.as_ptr(), std::ptr::null(),
+                                   std::ptr::null(), 0, &mut id)
+        };
+        assert_eq!(take_message(message), None);
+        let r = unsafe { &*region };
+        assert_eq!(r.palette_array[id as usize].id_name, "minecraft:stone");
+        assert!(r.palette_array[id as usize].property.is_empty());
+        region_free(region);
+    }
+
+    #[test]
+    fn setting_a_block_state_rejects_what_it_cannot_do() {
+        let region = test_region();
+        let name = std::ffi::CString::new("minecraft:stone").unwrap();
+        let mut id = 0u32;
+        /* Past the end of the region. */
+        let message = unsafe {
+            region_set_block_state(region, 99, name.as_ptr(), std::ptr::null(),
+                                   std::ptr::null(), 0, &mut id)
+        };
+        assert!(take_message(message).is_some());
+        /* No name at all. */
+        let empty = std::ffi::CString::new("").unwrap();
+        let message = unsafe {
+            region_set_block_state(region, 0, empty.as_ptr(), std::ptr::null(),
+                                   std::ptr::null(), 0, &mut id)
+        };
+        assert!(take_message(message).is_some());
+        /* A property count with no arrays to read. */
+        let message = unsafe {
+            region_set_block_state(region, 0, name.as_ptr(), std::ptr::null(),
+                                   std::ptr::null(), 2, &mut id)
+        };
+        assert!(take_message(message).is_some());
+        /* Nothing was changed. */
+        let r = unsafe { &*region };
+        assert_eq!(r.palette_array.len(), 1);
+        assert_eq!(r.block_array, [0, 0, 0, 0]);
         region_free(region);
     }
 

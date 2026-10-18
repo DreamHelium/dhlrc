@@ -146,7 +146,7 @@ DhGpuWidget::setScene (const DhlrcScene *value)
   scene = value;
   /* The old scene's GL objects are dropped on the next frame, where the
    * context is current; only the reference changes here. A new scene carries
-   * no highlight, so the outline's buffer is read again too. */
+   * no overlay boxes, so their buffer is read again too. */
   sceneDirty = true;
   highlightDirty = true;
   update ();
@@ -198,8 +198,8 @@ DhGpuWidget::initializeGL ()
   glBindBuffer (GL_ARRAY_BUFFER, vbo);
   bindQuadLayout ();
 
-  /* The outline gets its own vertex array and buffer: a hover then rewrites a
-   * few kilobytes instead of the whole scene. */
+  /* The overlay boxes get their own vertex array and buffer: a bounds toggle
+   * or a hover then rewrites a few kilobytes instead of the whole scene. */
   glGenVertexArrays (1, &highlightVao);
   glBindVertexArray (highlightVao);
   glGenBuffers (1, &highlightVbo);
@@ -260,7 +260,8 @@ DhGpuWidget::paintGL ()
       Q_EMIT frameDrawn (false);
       return;
     }
-  /* Read the outline only when it changed, which is what a hover does. */
+  /* Read the overlay boxes only when they changed, which is what a bounds
+   * toggle or a hover does. */
   if (highlightDirty)
     rebuildHighlight ();
 
@@ -294,10 +295,10 @@ DhGpuWidget::paintGL ()
         }
       if (highlightVertices > 0 && !textures.empty ())
         {
-          /* The outline's quads are ordinary quads: the shared shader with the
-           * scene's own black tint draws them. They go last, so where they lie
-           * on the face they trace they win the depth test, exactly as the
-           * rasteriser draws them. */
+          /* The overlay's quads are ordinary quads: the shared shader draws
+           * them with the tint the core gave each box. They go last, so where
+           * they lie on the face they trace they win the depth test, exactly
+           * as the rasteriser draws them. */
           glBindVertexArray (highlightVao);
           glBindTexture (GL_TEXTURE_2D, textures[0]);
           glUniform1i (cutoutLocation, 0);
@@ -474,16 +475,17 @@ DhGpuWidget::rebuildHighlight ()
   if (scene == nullptr || highlightVbo == 0)
     return;
 
-  /* The outline's quads come out of the scene in the same shape as its own,
-   * so they are unpacked exactly as `rebuildScene ()` unpacks the scene. */
-  const size_t count = dhlrc_render_scene_highlight_count (scene);
+  /* The overlay boxes' quads come out of the scene in the same shape as its
+   * own, so they are unpacked exactly as `rebuildScene ()` unpacks the
+   * scene. */
+  const size_t count = dhlrc_render_scene_overlay_count (scene);
   std::vector<float> vertices;
   vertices.reserve (count * 6 * 9);
   const int corners[6] = { 0, 1, 2, 0, 2, 3 };
   for (size_t index = 0; index < count; ++index)
     {
       DhlrcQuad quad{};
-      if (dhlrc_render_scene_highlight_quad (scene, index, &quad) == 0)
+      if (dhlrc_render_scene_overlay_quad (scene, index, &quad) == 0)
         continue;
       for (int corner : corners)
         {
@@ -538,7 +540,7 @@ DhGpuWidget::releaseScene ()
   textures.clear ();
   solidBatches.clear ();
   blendedBatches.clear ();
-  /* The highlight's buffer is rebuilt against whatever scene is set next. */
+  /* The overlay buffer is rebuilt against whatever scene is set next. */
   highlightDirty = true;
   highlightVertices = 0;
 }

@@ -43,6 +43,14 @@ use std::path::PathBuf;
 pub trait Source: Send + Sync {
     /// The bytes of `id`, or `None` when this source does not have it.
     fn get(&self, id: &Identifier) -> Option<Vec<u8>>;
+
+    /// Every resource this source holds under `prefix`, a resource path such as
+    /// `blockstates/` — what a chooser needs in order to know what a version
+    /// has. A source that can only answer by name returns nothing; one backed
+    /// by a zip or a directory can look through what it holds.
+    fn list(&self, _prefix: &str) -> Vec<Identifier> {
+        Vec::new()
+    }
 }
 
 /// A directory laid out like a resource pack (or an unpacked client jar):
@@ -60,6 +68,31 @@ impl DirSource {
 impl Source for DirSource {
     fn get(&self, id: &Identifier) -> Option<Vec<u8>> {
         std::fs::read(self.root.join(id.asset_path())).ok()
+    }
+
+    fn list(&self, prefix: &str) -> Vec<Identifier> {
+        /* An unpacked pack or jar: walk `assets/<namespace>/<prefix>` and turn
+         * every file found there into an id. */
+        let assets = self.root.join("assets");
+        let Ok(namespaces) = std::fs::read_dir(&assets) else {
+            return Vec::new();
+        };
+        let mut found = Vec::new();
+        for namespace in namespaces.flatten() {
+            let namespace_name = namespace.file_name().to_string_lossy().to_string();
+            let Ok(entries) = std::fs::read_dir(namespace.path().join(prefix)) else {
+                continue;
+            };
+            for entry in entries.flatten() {
+                if !entry.path().is_file() {
+                    continue;
+                }
+                let path = format!("{prefix}{}", entry.file_name().to_string_lossy());
+                found.push(Identifier::new(namespace_name.clone(), path));
+            }
+        }
+        found.sort_by(|a, b| (&a.namespace, &a.path).cmp(&(&b.namespace, &b.path)));
+        found
     }
 }
 

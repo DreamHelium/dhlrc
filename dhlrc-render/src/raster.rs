@@ -149,7 +149,7 @@ impl Renderer {
     /// same depth as a face it wins — it is the thing the view is pointing at.
     fn prepare_quads(&mut self, scene: &Scene, matrix: &Mat4, eye: Vec3, width: u32, height: u32) {
         self.triangles.clear();
-        for quads in [&scene.quads, &scene.highlight] {
+        for quads in [&scene.quads, &scene.overlay] {
             if quads.is_empty() {
                 continue;
             }
@@ -540,6 +540,8 @@ mod tests {
     /// A scene with one texture and the quads given, looking at `[0.5, 0.5, 0]`.
     fn scene(quads: Vec<SceneQuad>, color: [u8; 4]) -> Scene {
         let mut textures = Textures::new();
+        /* Index 1 is the white texel an outline's tint is drawn with. */
+        textures.push(Texture::solid([255, 255, 255, 255]));
         let index = textures.push(Texture::solid(color));
         Scene {
             quads: quads
@@ -555,7 +557,9 @@ mod tests {
             min: [0.0; 3],
             max: [1.0; 3],
             skipped: Vec::new(),
-            highlight: Vec::new(),
+            bounds: None,
+            highlight: None,
+            overlay: Vec::new(),
         }
     }
 
@@ -571,6 +575,8 @@ mod tests {
     /// away: the quads reach every corner of the picture.
     fn wide_scene(quads: Vec<SceneQuad>, color: [u8; 4]) -> Scene {
         let mut textures = Textures::new();
+        /* Index 1 is the white texel an outline's tint is drawn with. */
+        textures.push(Texture::solid([255, 255, 255, 255]));
         let index = textures.push(Texture::solid(color));
         Scene {
             quads: quads
@@ -586,7 +592,9 @@ mod tests {
             min: [-8.0; 3],
             max: [8.0; 3],
             skipped: Vec::new(),
-            highlight: Vec::new(),
+            bounds: None,
+            highlight: None,
+            overlay: Vec::new(),
         }
     }
 
@@ -696,6 +704,25 @@ mod tests {
         /* Clearing it gives the plain picture back. */
         scene.set_highlight(None);
         assert_eq!(render(&scene, &camera(), 64, 64).pixels, plain.pixels);
+    }
+
+    #[test]
+    fn the_region_box_is_drawn_in_its_own_colour() {
+        use crate::scene::Highlight;
+
+        /* The outline's tint must survive the texture: a box drawn through the
+         * missing-texture checker would come out in the checker's colours. */
+        let mut scene = scene(vec![quad(0.0, 0, Alpha::Opaque, None)], [200, 60, 60, 255]);
+        scene.set_bounds(Some(Highlight {
+            min: [0.0, 0.0, 0.0],
+            max: [1.0, 1.0, 0.0],
+        }));
+        let image = render(&scene, &camera(), 64, 64);
+        let wanted = crate::scene::bounds_colour();
+        let found = image.pixels.chunks(4).any(|pixel| {
+            pixel[0] == wanted[0] && pixel[1] == wanted[1] && pixel[2] == wanted[2]
+        });
+        assert!(found, "the region box was not drawn in {wanted:?}");
     }
 
     #[test]

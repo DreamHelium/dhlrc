@@ -306,6 +306,38 @@ extern "C"
       DhlrcCore *core, int32_t data_version, const char *const *packs,
       size_t pack_count);
 
+  /* ---- The blocks a version has -------------------------------------------
+   *
+   * What a block chooser is built from: the block names come from the version's
+   * blockstates, and each block's properties — with every value they take — from
+   * the variant keys and multipart conditions in them. The list is read out of
+   * the configured resources on first use and cached. The strings below are
+   * borrowed from the core and stay valid until the resources are configured
+   * again; do not free them.
+   */
+
+  /* How many blocks the configured resources have, or 0 when there are none
+   * yet (nothing configured, or the version's jar is not there). */
+  size_t dhlrc_core_block_count (DhlrcCore *core);
+
+  /* The id of the block at `index` (`minecraft:oak_stairs`), or NULL. */
+  const char *dhlrc_core_block_name (DhlrcCore *core, size_t index);
+
+  /* How many properties the block at `index` takes. */
+  size_t dhlrc_core_block_property_count (DhlrcCore *core, size_t index);
+
+  /* The name of one property, or NULL. */
+  const char *dhlrc_core_block_property_name (DhlrcCore *core, size_t index,
+                                              size_t property);
+
+  /* How many values a property takes. */
+  size_t dhlrc_core_block_property_value_count (DhlrcCore *core, size_t index,
+                                                size_t property);
+
+  /* One of the values a property takes (`east`, `bottom`, `true`), or NULL. */
+  const char *dhlrc_core_block_property_value (DhlrcCore *core, size_t index,
+                                               size_t property, size_t value);
+
   /* The localized name of a block or item (`minecraft:oak_log`) in `locale`
    * (`zh_cn`), looked up through the resource set. Owned; free it with
    * `dhlrc_string_free`. NULL when there is no name for it. The set is built

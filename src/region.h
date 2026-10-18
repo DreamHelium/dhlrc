@@ -55,6 +55,17 @@ extern "C"
   /* Assigns the given (name, data) pairs to a single block: its palette entry
    * is copied, changed and only that block is pointed at the copy. Returns
    * nullptr on success or an error message (free it with string_free ()). */
+  /* Sets the block at `index` to the state `name` with the given (name, data)
+   * pairs, which is how a block is added or replaced. A state the palette
+   * already holds is reused rather than appended. `count` may be 0 — most
+   * blocks take no properties — and then `names`/`datas` may be NULL. Returns
+   * nullptr on success or an error message (free it with string_free ()), and
+   * writes the palette id used to `out_id`. */
+  const char *region_set_block_state (void *region, size_t index,
+                                      const char *name,
+                                      const char *const *names,
+                                      const char *const *datas, size_t count,
+                                      uint32_t *out_id);
   const char *region_set_block_properties (void *region, size_t index,
                                            const char *const *names,
                                            const char *const *datas,

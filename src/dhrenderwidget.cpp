@@ -90,12 +90,43 @@ DhRenderWidget::discard ()
 void
 DhRenderWidget::rebuild (void *core, void *region)
 {
-  setScene (std::shared_ptr<DhlrcScene> (dhlrc_render_scene_new (core, region),
-                                         dhlrc_render_scene_free));
+  /* Remembering what the scene came from lets a later slice change take a
+   * fresh one without asking the caller, which is what the blocking
+   * constructor's callers expect. */
+  sceneCore = core;
+  sceneRegion = region;
+  buildOwnScene ();
+}
+
+void
+DhRenderWidget::buildOwnScene ()
+{
+  if (sceneCore == nullptr || sceneRegion == nullptr)
+    {
+      ownScene = false;
+      return;
+    }
+  DhlrcScene *raw = nullptr;
+  if (sliceRange)
+    raw = dhlrc_render_scene_new_slice (sceneCore, sceneRegion,
+                                        sliceRange->first, sliceRange->second);
+  else
+    raw = dhlrc_render_scene_new (sceneCore, sceneRegion);
+  adoptScene (std::shared_ptr<DhlrcScene> (raw, dhlrc_render_scene_free));
+  /* Only now: `adoptScene ()` is also the path an outside builder's scene
+   * takes, where this widget must not build again. */
+  ownScene = true;
 }
 
 void
 DhRenderWidget::setScene (std::shared_ptr<DhlrcScene> next)
+{
+  ownScene = false;
+  adoptScene (std::move (next));
+}
+
+void
+DhRenderWidget::adoptScene (std::shared_ptr<DhlrcScene> next)
 {
   /* The outline belongs to the old scene, and a tooltip naming one of its
    * blocks must not stay up. */
@@ -111,6 +142,14 @@ DhRenderWidget::setScene (std::shared_ptr<DhlrcScene> next)
                                   "resource files for this version have been "
                                   "downloaded in the settings."));
   framed = false;
+  /* A different slice draws a different extent, so it is framed again; a plain
+   * reload of the same region keeps the camera where the user left it. */
+  if (refitPending && scene != nullptr && width () > 1 && height () > 1)
+    {
+      dhlrc_render_fit (scene.get (), &camera, width (), height ());
+      framed = true;
+    }
+  refitPending = false;
   if (gpu)
     {
       gpu->setScene (scene.get ());
@@ -124,10 +163,96 @@ DhRenderWidget::setScene (std::shared_ptr<DhlrcScene> next)
       else
         gpu->hide ();
     }
+  /* A fresh scene carries no boxes, so the region's box is put on it here; the
+   * pointer's outline follows through `rehover ()`. */
+  applyBounds ();
   update ();
   /* A reload of the same region keeps the pointer where it was, so the block
    * under it is found again on the fresh scene. */
   rehover ();
+}
+
+void
+DhRenderWidget::setSlice (const std::optional<std::pair<int, int>> &next)
+{
+  if (next == sliceRange)
+    return;
+  sliceRange = next;
+  refitPending = true;
+  if (ownScene)
+    {
+      /* This widget has the region, so the fresh scene can be taken here; its
+       * construction blocks for as long as the build takes, which is what the
+       * blocking constructor's callers already accept. */
+      buildOwnScene ();
+      return;
+    }
+  /* The box already follows the slice; the scene itself comes from the builder
+   * that holds the region, so it is only asked for. */
+  applyBounds ();
+  Q_EMIT sliceChanged ();
+}
+
+void
+DhRenderWidget::setBoundsVisible (bool visible)
+{
+  if (visible == showBounds)
+    return;
+  showBounds = visible;
+  applyBounds ();
+}
+
+void
+DhRenderWidget::setRegionExtent (qint32 x, qint32 y, qint32 z)
+{
+  if (x == extent[0] && y == extent[1] && z == extent[2])
+    return;
+  extent[0] = x;
+  extent[1] = y;
+  extent[2] = z;
+  applyBounds ();
+}
+
+bool
+DhRenderWidget::boundsBox (float *box) const
+{
+  if (extent[0] <= 0 || extent[1] <= 0 || extent[2] <= 0)
+    return false;
+  int low = 0;
+  int high = extent[1];
+  if (sliceRange)
+    {
+      /* A low above the high draws no block at all, and a layer occupies the
+       * cell between its own Y and the next one. */
+      if (sliceRange->first > sliceRange->second)
+        return false;
+      low = std::max (0, sliceRange->first);
+      high = std::min (extent[1], sliceRange->second + 1);
+      if (low >= high)
+        return false;
+    }
+  box[0] = 0.0f;
+  box[1] = static_cast<float> (low);
+  box[2] = 0.0f;
+  box[3] = static_cast<float> (extent[0]);
+  box[4] = static_cast<float> (high);
+  box[5] = static_cast<float> (extent[2]);
+  return true;
+}
+
+void
+DhRenderWidget::applyBounds ()
+{
+  if (!scene)
+    return;
+  float box[6] = { 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f };
+  const bool shown = showBounds && boundsBox (box);
+  dhlrc_render_scene_set_bounds (scene.get (), shown ? box : nullptr);
+  /* Both boxes share the overlay's own small buffer, so the GL child is told
+   * the box changed; its scene buffers are not touched. */
+  if (gpu && useGpu)
+    gpu->highlightChanged ();
+  update ();
 }
 
 void

@@ -14,12 +14,14 @@
  */
 
 mod blockstate;
+pub mod catalog;
 pub mod direction;
 pub mod mesh;
 mod model;
 mod resolve;
 
 pub use blockstate::{BlockState, Condition, Multipart, Variant, properties_map, property_key};
+pub use catalog::{BlockDef, catalog};
 pub use direction::Direction;
 pub use mesh::{Quad, quads};
 pub use model::{Axis, Element, ElementRotation, Face, Model};

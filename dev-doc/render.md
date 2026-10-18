@@ -257,6 +257,26 @@ the copy — or for every block that shares the entry. A write goes through the
 region's own lock (`RegionClass`), and the view takes a fresh snapshot
 afterwards, so the change is visible at once.
 
+**Replace Block…** and **Add Block…** open the block chooser: every block the
+region's version has, read out of the version's blockstates, with one dropdown
+per property and every value that blockstate uses (the value can be typed too).
+The list is built once per version from the configured resources and cached on
+the core (`dhlrc_core_block_*`). *Replace* puts the chosen block in place of the
+clicked one — a block of the same kind keeps the properties it shares with its
+replacement, so turning oak stairs into stone stairs keeps their facing. *Add* is
+always available, because an empty cell cannot be clicked in a 3D view: the
+dialog has its own **position** fields, and "place one block above" drops the
+block on top of whatever was clicked. Both go through `region_set_block_state`,
+which reuses a palette entry the file already has, and the palette only grows for
+a state it has never held.
+
+**Slice** draws one range of Y — two spin boxes, both ends included — and the
+scene is built for that range alone (`dhlrc_render_scene_new_slice`), so only
+those layers are drawn and only their blocks can be pointed at; the framing
+follows the slice. **Region box** draws the cyan box around what is being drawn,
+clamped to the slice when one is active, which is how the extent of a region is
+seen while working inside it.
+
 Without a GUI, the same view can draw one picture of a file and exit — this is
 what the two backends are checked with, and it needs a display for the GL one
 (`Xvfb` is enough). This check is a development tool rather than a user feature:

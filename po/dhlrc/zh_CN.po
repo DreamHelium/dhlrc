@@ -16,7 +16,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-18 17:47+0800\n"
+"POT-Creation-Date: 2026-10-18 19:41+0800\n"
 "PO-Revision-Date: 2026-10-16 15:39+0800\n"
 "Last-Translator: 孟小骇 <48383878+DreamHelium@users.noreply.github.com>\n"
 "Language-Team: Chinese <kde-i18n-doc@kde.org>\n"
@@ -49,16 +49,16 @@ msgstr "id名称"
 msgid "Block Name"
 msgstr "方块名称"
 
-#: ../../src/blocklistui.cpp:65 ../../src/blocklistui.cpp:68 rc.cpp:27
+#: ../../src/blocklistui.cpp:65 ../../src/blocklistui.cpp:68 rc.cpp:42
 msgid "x"
 msgstr "x"
 
-#: ../../src/blocklistui.cpp:66 ../../src/blocklistui.cpp:68 rc.cpp:30
-#: rc.cpp:45
+#: ../../src/blocklistui.cpp:66 ../../src/blocklistui.cpp:68 rc.cpp:45
+#: rc.cpp:63
 msgid "y"
 msgstr "y"
 
-#: ../../src/blocklistui.cpp:66 ../../src/blocklistui.cpp:68 rc.cpp:33
+#: ../../src/blocklistui.cpp:66 ../../src/blocklistui.cpp:68 rc.cpp:48
 msgid "z"
 msgstr "z"
 
@@ -67,51 +67,107 @@ msgstr "z"
 msgid "Palette"
 msgstr "偏移码"
 
-#: ../../src/blockreaderui.cpp:52
+#: ../../src/blockpickerui.cpp:96 ../../src/propertymodifyui.cpp:28
+#: ../../src/regionclass.cpp:442 ../../src/regionmodifyui.cpp:21
+msgid ""
+"The region is being used by a background task; editing is paused until it "
+"finishes."
+msgstr "区域正被后台任务使用，任务结束前无法编辑。"
+
+#: ../../src/blockpickerui.cpp:108
+msgid "Position:"
+msgstr "位置："
+
+#: ../../src/blockpickerui.cpp:255
+msgid ""
+"The block list of this version is not available. Make sure this version's "
+"client jar is downloaded in the settings."
+msgstr "此版本的方块列表不可用。请确保已在设置中下载该版本的客户端 jar。"
+
+#: ../../src/blockpickerui.cpp:385 ../../src/blockpickerui.cpp:419 rc.cpp:27
+msgid "Properties of the chosen block:"
+msgstr "所选方块的属性："
+
+#: ../../src/blockpickerui.cpp:437
+msgid "Writes to (%1, %2, %3), one block above."
+msgstr "写入 (%1, %2, %3)，即上方一格。"
+
+#: ../../src/blockpickerui.cpp:444
+msgid ""
+"(%1, %2, %3) is outside the region, so there is no space above this block."
+msgstr "(%1, %2, %3) 在区域之外，这个方块上方没有空间。"
+
+#: ../../src/blockpickerui.cpp:451
+msgid "Writes to (%1, %2, %3)."
+msgstr "写入 (%1, %2, %3)。"
+
+#: ../../src/blockpickerui.cpp:490 ../../src/blockpickerui.cpp:513
+#: ../../src/blockreaderui.cpp:467 ../../src/externalnbtreaderui.cpp:107
+#: ../../src/externalnbtreaderui.cpp:114 ../../src/manageregionui.cpp:263
+#: ../../src/manageregionui.cpp:296 ../../src/manageregionui.cpp:621
+#: ../../src/propertymodifyui.cpp:251 ../../src/regionchangesui.cpp:86
+#: ../../src/regionchangesui.cpp:164 ../../src/regionmodifyui.cpp:101
+#: ../../src/utility.cpp:51 ../../src/utility.cpp:72 ../../src/utility.cpp:80
+msgid "Error!"
+msgstr "错误！"
+
+#: ../../src/blockpickerui.cpp:491
+msgid "The target position is outside the region."
+msgstr "目标位置在区域之外。"
+
+#: ../../src/blockpickerui.cpp:523
+msgid "Block added at %1"
+msgstr "已在 %1 添加方块"
+
+#: ../../src/blockpickerui.cpp:524
+msgid "Block replaced at %1"
+msgstr "已在 %1 替换方块"
+
+#: ../../src/blockreaderui.cpp:53
 msgid "&Modify Region"
 msgstr "修改区域(&M)"
 
-#: ../../src/blockreaderui.cpp:55
+#: ../../src/blockreaderui.cpp:56
 msgid "&Change History"
 msgstr "修改历史(&C)"
 
-#: ../../src/blockreaderui.cpp:58
+#: ../../src/blockreaderui.cpp:59
 msgid "&Material List"
 msgstr "材料清单(&M)"
 
-#: ../../src/blockreaderui.cpp:62
+#: ../../src/blockreaderui.cpp:63
 msgid "Show &All Entities"
 msgstr "展示所有实体(&A)"
 
-#: ../../src/blockreaderui.cpp:65 ../../src/blockshowui.cpp:84
+#: ../../src/blockreaderui.cpp:66 ../../src/blockshowui.cpp:84
 msgid "&Show Entity NBT"
 msgstr "展示实体NBT(&S)"
 
-#: ../../src/blockreaderui.cpp:68 ../../src/blockshowui.cpp:95
+#: ../../src/blockreaderui.cpp:69 ../../src/blockshowui.cpp:95
 msgid "&Modify Property"
 msgstr "修改属性(&M)"
 
-#: ../../src/blockreaderui.cpp:72
+#: ../../src/blockreaderui.cpp:73
 msgid "&List blocks"
 msgstr "列出方块(&L)"
 
-#: ../../src/blockreaderui.cpp:75 rc.cpp:90
+#: ../../src/blockreaderui.cpp:76 rc.cpp:108
 msgid "&Show blocks"
 msgstr "展示方块 (&S)"
 
-#: ../../src/blockreaderui.cpp:78
+#: ../../src/blockreaderui.cpp:79
 msgid "3D &Preview"
 msgstr "3D 预览(&P)"
 
-#: ../../src/blockreaderui.cpp:122
+#: ../../src/blockreaderui.cpp:125
 msgid "The region this reader shows"
 msgstr "此阅读器显示的区域"
 
-#: ../../src/blockreaderui.cpp:249
+#: ../../src/blockreaderui.cpp:262 ../../src/blockreaderui.cpp:266
 msgid "Not valid!"
 msgstr "无效！"
 
-#: ../../src/blockreaderui.cpp:266
+#: ../../src/blockreaderui.cpp:291
 msgid ""
 "Name: %1\n"
 "Translation Name: %2\n"
@@ -125,7 +181,7 @@ msgstr ""
 "调色板：%4\n"
 "属性：\n"
 
-#: ../../src/blockreaderui.cpp:279
+#: ../../src/blockreaderui.cpp:304
 msgid ""
 "Name: %1\n"
 "Index: %2\n"
@@ -137,56 +193,47 @@ msgstr ""
 "偏移量：%3\n"
 "属性：\n"
 
-#: ../../src/blockreaderui.cpp:318 ../../src/regionmodifyui.cpp:217
+#: ../../src/blockreaderui.cpp:343 ../../src/regionmodifyui.cpp:217
 msgid "Unknown"
 msgstr "未知"
 
-#: ../../src/blockreaderui.cpp:322
+#: ../../src/blockreaderui.cpp:347
 msgid "Size: (%1, %2, %3)"
 msgstr "大小：(%1, %2, %3)"
 
-#: ../../src/blockreaderui.cpp:324
+#: ../../src/blockreaderui.cpp:349
 msgid "DataVersion: %1, version %2"
 msgstr "数据版本：%1，版本 %2"
 
-#: ../../src/blockreaderui.cpp:328
+#: ../../src/blockreaderui.cpp:353
 msgid "Created time: %1"
 msgstr "创建时间：%1"
 
-#: ../../src/blockreaderui.cpp:332
+#: ../../src/blockreaderui.cpp:357
 msgid "Modified time: %1"
 msgstr "修改时间：%1"
 
-#: ../../src/blockreaderui.cpp:335
+#: ../../src/blockreaderui.cpp:360
 msgid "Author: %1"
 msgstr "作者：%1"
 
-#: ../../src/blockreaderui.cpp:336
+#: ../../src/blockreaderui.cpp:361
 msgid "Name: %1"
 msgstr "名字：%1"
 
-#: ../../src/blockreaderui.cpp:337
+#: ../../src/blockreaderui.cpp:362
 msgid "Description: %1"
 msgstr "描述：%1"
 
-#: ../../src/blockreaderui.cpp:378
+#: ../../src/blockreaderui.cpp:405
 msgid "Select an Index"
 msgstr "选择一个索引"
 
-#: ../../src/blockreaderui.cpp:378
+#: ../../src/blockreaderui.cpp:405
 msgid "Please select an index."
 msgstr "请选择一个索引。"
 
-#: ../../src/blockreaderui.cpp:424 ../../src/externalnbtreaderui.cpp:107
-#: ../../src/externalnbtreaderui.cpp:114 ../../src/manageregionui.cpp:263
-#: ../../src/manageregionui.cpp:296 ../../src/manageregionui.cpp:621
-#: ../../src/propertymodifyui.cpp:251 ../../src/regionchangesui.cpp:86
-#: ../../src/regionchangesui.cpp:164 ../../src/regionmodifyui.cpp:101
-#: ../../src/utility.cpp:51 ../../src/utility.cpp:72 ../../src/utility.cpp:80
-msgid "Error!"
-msgstr "错误！"
-
-#: ../../src/blockreaderui.cpp:425 ../../common-rs/src/util.rs:45
+#: ../../src/blockreaderui.cpp:468 ../../common-rs/src/util.rs:45
 msgid "Out of memory!"
 msgstr "内存不足！"
 
@@ -194,8 +241,8 @@ msgstr "内存不足！"
 msgid "The block is in (%1, %2, %3), information is:\n"
 msgstr "方块在(%1, %2, %3)，信息是：\n"
 
-#: ../../src/blockshowui.cpp:82 ../../src/generalchoosedialog.cpp:45 rc.cpp:84
-#: rc.cpp:147
+#: ../../src/blockshowui.cpp:82 ../../src/generalchoosedialog.cpp:45 rc.cpp:102
+#: rc.cpp:165
 msgid "&OK"
 msgstr "确定(&O)"
 
@@ -219,7 +266,7 @@ msgstr "设置选项："
 msgid "&Continue"
 msgstr "继续(&C)"
 
-#: ../../src/configobjectui.cpp:125 ../../src/dhrenderui.cpp:303
+#: ../../src/configobjectui.cpp:125 ../../src/dhrenderui.cpp:404
 #: ../../src/generalchoosedialog.cpp:46
 msgid "&Cancel"
 msgstr "取消(&C)"
@@ -445,230 +492,310 @@ msgstr "已结束处理了%2个中的%1个（%3%）。"
 msgid "Continue"
 msgstr "继续"
 
-#: ../../src/dhpreview.cpp:83
+#: ../../src/dhpreview.cpp:84
 msgid "%1 is not a size; write it as WxH"
 msgstr "%1 不是尺寸；请写成 WxH"
 
-#: ../../src/dhpreview.cpp:108
+#: ../../src/dhpreview.cpp:109
 msgid "%1 is not a pixel; write it as X,Y"
 msgstr "%1 不是像素坐标；请写成 X,Y"
 
-#: ../../src/dhpreview.cpp:127
+#: ../../src/dhpreview.cpp:134
+msgid "%1 is not a Y range; write it as Y1:Y2"
+msgstr "%1 不是 Y 范围；请写成 Y1:Y2"
+
+#: ../../src/dhpreview.cpp:153
 msgid "the core could not be opened"
 msgstr "无法打开核心"
 
-#: ../../src/dhpreview.cpp:166
+#: ../../src/dhpreview.cpp:192
 msgid "the file held no region that could be read"
 msgstr "文件中没有可读取的区域"
 
-#: ../../src/dhpreview.cpp:209
+#: ../../src/dhpreview.cpp:235
 msgid "the region's data version names no known version; pass --version"
 msgstr "该区域的数据版本没有对应的已知版本；请传入 --version"
 
-#: ../../src/dhpreview.cpp:226 ../../src/dhpreview.cpp:489
+#: ../../src/dhpreview.cpp:252 ../../src/dhpreview.cpp:551
 msgid "%1 is not a file"
 msgstr "%1 不是文件"
 
-#: ../../src/dhpreview.cpp:234
+#: ../../src/dhpreview.cpp:260
 msgid "%1 is not a zip archive"
 msgstr "%1 不是 zip 压缩包"
 
-#: ../../src/dhpreview.cpp:253
+#: ../../src/dhpreview.cpp:279
 msgid "the client jar of %1 is not in %2"
 msgstr "%1 的客户端 jar 不在 %2 中"
 
-#: ../../src/dhpreview.cpp:257
+#: ../../src/dhpreview.cpp:283
 msgid "%1; pass --jar or point --resources at one"
 msgstr "%1；请传入 --jar，或用 --resources 指向一个"
 
-#: ../../src/dhpreview.cpp:266
+#: ../../src/dhpreview.cpp:292
 msgid "%1; pass --jar, or let it be downloaded (the DownloadClientJar setting)"
 msgstr "%1；请传入 --jar，或允许自动下载（DownloadClientJar 设置）"
 
-#: ../../src/dhpreview.cpp:272
+#: ../../src/dhpreview.cpp:298
 msgid "downloading the client jar of %1 (about 30 MB)"
 msgstr "正在下载 %1 的客户端 jar（约 30 MB）"
 
-#: ../../src/dhpreview.cpp:280
+#: ../../src/dhpreview.cpp:306
 msgid "the client jar could not be downloaded: %1"
 msgstr "客户端 jar 下载失败：%1"
 
-#: ../../src/dhpreview.cpp:282
+#: ../../src/dhpreview.cpp:308
 msgid "unknown error"
 msgstr "未知错误"
 
-#: ../../src/dhpreview.cpp:289
+#: ../../src/dhpreview.cpp:315
 msgid "downloaded %1"
 msgstr "已下载 %1"
 
-#: ../../src/dhpreview.cpp:309
+#: ../../src/dhpreview.cpp:335
 msgid "the resource set could not be configured"
 msgstr "无法配置资源集"
 
-#: ../../src/dhpreview.cpp:325
+#: ../../src/dhpreview.cpp:351
 msgid "%1 is not a number for %2"
 msgstr "%1 不是 %2 的数字"
 
-#: ../../src/dhpreview.cpp:340
+#: ../../src/dhpreview.cpp:366
 msgid "the CPU renderer returned no picture"
 msgstr "CPU 渲染器没有返回画面"
 
-#: ../../src/dhpreview.cpp:350 ../../src/dhpreview.cpp:423
+#: ../../src/dhpreview.cpp:376 ../../src/dhpreview.cpp:451
 msgid "%1 could not be written"
 msgstr "无法写入 %1"
 
-#: ../../src/dhpreview.cpp:357
+#: ../../src/dhpreview.cpp:383
 msgid "cpu: %1 frames in %2 ms (%3 ms/frame)"
 msgstr "cpu：%1 帧耗时 %2 毫秒（每帧 %3 毫秒）"
 
-#: ../../src/dhpreview.cpp:376
+#: ../../src/dhpreview.cpp:404
 msgid "this machine cannot give a desktop OpenGL 3.3 context"
 msgstr "此机器无法提供桌面 OpenGL 3.3 上下文"
 
-#: ../../src/dhpreview.cpp:410
+#: ../../src/dhpreview.cpp:438
 msgid "the OpenGL frame could not be drawn: %1"
 msgstr "无法绘制 OpenGL 画面：%1"
 
-#: ../../src/dhpreview.cpp:413
+#: ../../src/dhpreview.cpp:441
 msgid "the OpenGL frame came back empty"
 msgstr "OpenGL 画面为空"
 
-#: ../../src/dhpreview.cpp:415
+#: ../../src/dhpreview.cpp:443
 msgid "the OpenGL framebuffer is %1x%2, not %3x%4 (the screen scale is %5)"
 msgstr "OpenGL 帧缓冲为 %1x%2，而不是 %3x%4（屏幕缩放为 %5）"
 
-#: ../../src/dhpreview.cpp:424
+#: ../../src/dhpreview.cpp:452
 msgid "gpu: first frame in %1 ms"
 msgstr "gpu：首帧耗时 %1 毫秒"
 
-#: ../../src/dhpreview.cpp:431
+#: ../../src/dhpreview.cpp:459
 msgid "gpu: %1 frames in %2 ms (%3 ms/frame)"
 msgstr "gpu：%1 帧耗时 %2 毫秒（每帧 %3 毫秒）"
 
-#: ../../src/dhpreview.cpp:451
+#: ../../src/dhpreview.cpp:479
 msgid "hover: clearing the highlight did not change the OpenGL picture"
 msgstr "hover：清除高亮没有改变 OpenGL 画面"
 
-#: ../../src/dhpreview.cpp:471
+#: ../../src/dhpreview.cpp:499
 msgid ""
 "hover: setting the highlight again did not put the OpenGL picture back (%1 "
 "pixels differ)"
 msgstr "hover：重新设置高亮没有恢复 OpenGL 画面（有 %1 个像素不同）"
 
-#: ../../src/dhpreview.cpp:475
+#: ../../src/dhpreview.cpp:503
 msgid "hover: the OpenGL outline follows highlightChanged () alone"
 msgstr "hover：OpenGL 轮廓只由 highlightChanged () 驱动"
 
-#: ../../src/dhpreview.cpp:485
+#: ../../src/dhpreview.cpp:512
+msgid "bounds: clearing the region box did not change the OpenGL picture"
+msgstr "bounds：隐藏区域框没有改变 OpenGL 画面"
+
+#: ../../src/dhpreview.cpp:532
+msgid ""
+"bounds: setting the region box again did not put the OpenGL picture back (%1 "
+"pixels differ)"
+msgstr "bounds：重新设置区域框没有恢复 OpenGL 画面（有 %1 个像素不同）"
+
+#: ../../src/dhpreview.cpp:536
+msgid "bounds: the OpenGL region box follows highlightChanged () alone"
+msgstr "bounds：OpenGL 区域框只由 highlightChanged () 驱动"
+
+#: ../../src/dhpreview.cpp:547
 msgid "--preview needs the region file to draw"
 msgstr "--preview 需要给出要绘制的区域文件"
 
-#: ../../src/dhpreview.cpp:487
+#: ../../src/dhpreview.cpp:549
 msgid "--preview needs --png to say where the picture goes"
 msgstr "--preview 需要 --png 指定图片输出位置"
 
-#: ../../src/dhpreview.cpp:507
+#: ../../src/dhpreview.cpp:576
 msgid "%1 is not a backend; use cpu or gpu"
 msgstr "%1 不是可用的后端；请使用 cpu 或 gpu"
 
-#: ../../src/dhpreview.cpp:533
+#: ../../src/dhpreview.cpp:614
 msgid "the scene could not be built"
 msgstr "无法构建场景"
 
-#: ../../src/dhpreview.cpp:537
+#: ../../src/dhpreview.cpp:618
 msgid "%1: %2 quads, %3 palette entries not drawn"
 msgstr "%1：%2 个面，%3 个调色板条目未绘制"
 
-#: ../../src/dhpreview.cpp:542
+#: ../../src/dhpreview.cpp:627
+msgid "the slice draws no block"
+msgstr "切片没有绘制任何方块"
+
+#: ../../src/dhpreview.cpp:629
 msgid ""
 "nothing could be drawn: the block models and textures of this region's "
 "version were not found"
 msgstr "无法绘制任何内容：找不到该区域版本对应的方块模型与纹理"
 
-#: ../../src/dhpreview.cpp:587
+#: ../../src/dhpreview.cpp:675
 msgid "hover: the pick took %1 ms"
 msgstr "hover：拾取耗时 %1 毫秒"
 
-#: ../../src/dhpreview.cpp:592
+#: ../../src/dhpreview.cpp:680
 msgid "hover: pixel %1,%2 is the background; nothing is highlighted"
 msgstr "hover：像素 %1,%2 是背景，未高亮任何方块"
 
-#: ../../src/dhpreview.cpp:611
+#: ../../src/dhpreview.cpp:699
 msgid "hover: pixel %1,%2 picks block (%3, %4, %5); the outline is %6 quads"
 msgstr "hover：像素 %1,%2 拾取到方块 (%3, %4, %5)；轮廓共 %6 个面"
 
-#: ../../src/dhpreview.cpp:631
+#: ../../src/dhpreview.cpp:719
 msgid "hover: the tooltip would say:"
 msgstr "hover：提示框将显示："
 
-#: ../../src/dhpreview.cpp:648
+#: ../../src/dhpreview.cpp:762
+msgid "bounds: this slice draws no layer, so there is no box to show"
+msgstr "bounds：此切片没有任何层，因此没有可显示的框"
+
+#: ../../src/dhpreview.cpp:775
+msgid "bounds: the box is (%1, %2, %3)..(%4, %5, %6), %7 overlay quads in all"
+msgstr "bounds：框为 (%1, %2, %3)..(%4, %5, %6)，共 %7 个覆盖层四边形"
+
+#: ../../src/dhpreview.cpp:788
 msgid "drawing with %1"
 msgstr "使用 %1 绘制"
 
-#: ../../src/dhpreview.cpp:649
+#: ../../src/dhpreview.cpp:789
 msgid "OpenGL"
 msgstr "OpenGL"
 
-#: ../../src/dhpreview.cpp:649
+#: ../../src/dhpreview.cpp:789
 msgid "the CPU"
 msgstr "CPU"
 
-#: ../../src/dhrenderui.cpp:37
+#: ../../src/dhrenderui.cpp:41
 msgid "3D Preview - %1"
 msgstr "3D 预览 - %1"
 
-#: ../../src/dhrenderui.cpp:48
+#: ../../src/dhrenderui.cpp:52
 msgid "Downloading the client jar: %1%"
 msgstr "正在下载客户端 jar：%1%"
 
-#: ../../src/dhrenderui.cpp:60
+#: ../../src/dhrenderui.cpp:66
 msgid "&Fit"
 msgstr "适应视图(&F)"
 
-#: ../../src/dhrenderui.cpp:61
+#: ../../src/dhrenderui.cpp:67
 msgid "&Orthographic"
 msgstr "正交投影(&O)"
 
-#: ../../src/dhrenderui.cpp:63
+#: ../../src/dhrenderui.cpp:69
+msgid "&Slice"
+msgstr "切片(&S)"
+
+#: ../../src/dhrenderui.cpp:72
+msgid "Draw only the blocks in this range of Y"
+msgstr "只绘制此 Y 范围内的方块"
+
+#: ../../src/dhrenderui.cpp:76
+msgid "Lowest Y drawn"
+msgstr "绘制的最低 Y"
+
+#: ../../src/dhrenderui.cpp:80
+msgid "Highest Y drawn"
+msgstr "绘制的最高 Y"
+
+#: ../../src/dhrenderui.cpp:82
+msgid "Region &box"
+msgstr "区域框(&B)"
+
+#: ../../src/dhrenderui.cpp:85
+msgid "Show the box around the region being drawn"
+msgstr "显示正在绘制的区域的边框"
+
+#: ../../src/dhrenderui.cpp:100
 #: ../../src/dhsettingsdialog/dhsettingsdialog.cpp:105
 msgid "&Reload"
 msgstr "重新加载(&R)"
 
-#: ../../src/dhrenderui.cpp:65 ../../src/dhrenderui.cpp:303
+#: ../../src/dhrenderui.cpp:102 ../../src/dhrenderui.cpp:404
 msgid "Get &Resources"
 msgstr "获取资源(&R)"
 
-#: ../../src/dhrenderui.cpp:66
+#: ../../src/dhrenderui.cpp:103
 msgid "&Modify Properties..."
 msgstr "修改属性(&M)..."
 
-#: ../../src/dhrenderui.cpp:89 ../../src/dhrenderui.cpp:196
+#: ../../src/dhrenderui.cpp:104
+msgid "&Replace Block..."
+msgstr "替换方块(&R)..."
+
+#: ../../src/dhrenderui.cpp:105
+msgid "&Add Block..."
+msgstr "添加方块(&A)..."
+
+#: ../../src/dhrenderui.cpp:118
+msgid "Change the properties of the block that was clicked"
+msgstr "更改点击的方块的属性"
+
+#: ../../src/dhrenderui.cpp:120
+msgid "Put another block in place of the block that was clicked"
+msgstr "用另一个方块替换点击的方块"
+
+#: ../../src/dhrenderui.cpp:122
+msgid ""
+"Put a block into a cell: type its position, or tick \"one block above\" to "
+"drop it on top of what was clicked"
+msgstr ""
+
+#: ../../src/dhrenderui.cpp:142 ../../src/dhrenderui.cpp:293
 msgid "Building the 3D scene..."
 msgstr "正在构建三维场景……"
 
-#: ../../src/dhrenderui.cpp:294
+#: ../../src/dhrenderui.cpp:395
 msgid "The client jar could not be downloaded: %1"
 msgstr "客户端 jar 下载失败：%1"
 
-#: ../../src/dhrenderui.cpp:323
+#: ../../src/dhrenderui.cpp:455
 msgid "drawn with OpenGL"
 msgstr "使用 OpenGL 绘制"
 
-#: ../../src/dhrenderui.cpp:324
+#: ../../src/dhrenderui.cpp:456
 msgid "drawn by the CPU"
 msgstr "由 CPU 绘制"
 
-#: ../../src/dhrenderui.cpp:325
+#: ../../src/dhrenderui.cpp:458
 msgid "%1 x %2 x %3, %4 quads, %5 blocks not drawn, %6"
 msgstr "%1 x %2 x %3，%4 个面，%5 个方块未绘制，%6"
 
-#: ../../src/dhrenderui.cpp:339
+#: ../../src/dhrenderui.cpp:469
+msgid "Slice Y%1-%2. %3"
+msgstr "切片 Y%1-%2。%3"
+
+#: ../../src/dhrenderui.cpp:480
 msgid ""
 "Drag with the left button to turn, with the middle or right button to move, "
 "and use the wheel to zoom. A click names the block under it."
 msgstr "左键拖动旋转，中键或右键拖动平移，滚轮缩放。单击可显示指针下的方块。"
 
-#: ../../src/dhrenderui.cpp:351
+#: ../../src/dhrenderui.cpp:492
 msgid ""
 "Nothing could be drawn: the block models and textures of this region's "
 "version could not be placed, and the version is not one the client jar table "
@@ -677,7 +804,7 @@ msgstr ""
 "无法绘制内容：无法确定该区域版本所需的方块模型与材质，且该数据版本不在客户端 "
 "jar 对照表中。"
 
-#: ../../src/dhrenderui.cpp:356
+#: ../../src/dhrenderui.cpp:497
 msgid ""
 "Nothing could be drawn. The block models and textures of a version live in "
 "its client jar, which belongs at %1. Press \"Get Resources\" to download it "
@@ -686,19 +813,19 @@ msgstr ""
 "无法绘制内容。某个版本的方块模型与材质存放在该版本的客户端 jar 中，其位置应"
 "为 %1。点击“获取资源”可下载（约 30 MB）。"
 
-#: ../../src/dhrenderui.cpp:370
+#: ../../src/dhrenderui.cpp:513
 msgid "(%1, %2, %3) is outside the region"
 msgstr "(%1, %2, %3) 不在区域范围内"
 
-#: ../../src/dhrenderui.cpp:386
+#: ../../src/dhrenderui.cpp:528
 msgid "Block (%1, %2, %3): %4"
 msgstr "方块 (%1, %2, %3)：%4"
 
-#: ../../src/dhrenderui.cpp:436
+#: ../../src/dhrenderui.cpp:630
 msgid "Block (%1, %2, %3)"
 msgstr "方块 (%1, %2, %3)"
 
-#: ../../src/dhrenderwidget.cpp:109
+#: ../../src/dhrenderwidget.cpp:140
 msgid ""
 "The region could not be drawn: no block in it could be resolved. Check that "
 "the resource files for this version have been downloaded in the settings."
@@ -778,15 +905,25 @@ msgid ""
 "tooltip text"
 msgstr "预览：高亮此图像像素 (X,Y) 处的方块并输出提示框文本"
 
-#: ../../src/main.cpp:116
+#: ../../src/main.cpp:115
+msgid "Preview: draw only the layers from Y1 to Y2, both included"
+msgstr "预览：只绘制从 Y1 到 Y2 的层（含两端）"
+
+#: ../../src/main.cpp:119
+msgid ""
+"Preview: draw the box around the region being drawn, clamped to the slice "
+"when one is set"
+msgstr "预览：绘制正在绘制的区域的边框，设置切片时裁剪到该切片"
+
+#: ../../src/main.cpp:124
 msgid "Preview: read the block models and textures from this client jar"
 msgstr "预览：从此客户端 jar 读取方块模型与材质"
 
-#: ../../src/main.cpp:120
+#: ../../src/main.cpp:128
 msgid "Preview: read resources from this cache directory"
 msgstr "预览：从此缓存目录读取资源"
 
-#: ../../src/main.cpp:124
+#: ../../src/main.cpp:132
 msgid "Preview: use the client jar of this game version"
 msgstr "预览：使用此游戏版本的客户端 jar"
 
@@ -938,7 +1075,7 @@ msgstr "还没有载入任何区域。"
 msgid "&Select"
 msgstr "选择(&S)"
 
-#: ../../src/manageregionui.cpp:174 rc.cpp:78
+#: ../../src/manageregionui.cpp:174 rc.cpp:96
 msgid "&Add"
 msgstr "添加(&A)"
 
@@ -1163,12 +1300,6 @@ msgstr "请输入数据。"
 msgid "Data"
 msgstr "数据"
 
-#: ../../src/propertymodifyui.cpp:28 ../../src/regionmodifyui.cpp:21
-msgid ""
-"The region is being used by a background task; editing is paused until it "
-"finishes."
-msgstr "区域正被后台任务使用，任务结束前无法编辑。"
-
 #: ../../src/propertymodifyui.cpp:166
 msgid "Looking for blocks with these properties..."
 msgstr "正在查找具有这些属性的方块……"
@@ -1227,6 +1358,14 @@ msgid ""
 "in a moment."
 msgstr "无法撤回该修改。撤回需要区域空闲，请稍后再试。"
 
+#: ../../src/regionclass.cpp:445
+msgid "No block was chosen."
+msgstr "未选择方块。"
+
+#: ../../src/regionclass.cpp:469
+msgid "The position (%1, %2, %3) is outside the region."
+msgstr "位置 (%1, %2, %3) 在区域之外。"
+
 #: ../../src/regionmodifyui.cpp:120
 msgid "Failed to set the time."
 msgstr "设置时间失败。"
@@ -1239,7 +1378,7 @@ msgstr "时间"
 msgid "Failed to set the description."
 msgstr "设置描述失败。"
 
-#: ../../src/regionmodifyui.cpp:138 ../../src/regionmodifyui.cpp:139 rc.cpp:126
+#: ../../src/regionmodifyui.cpp:138 ../../src/regionmodifyui.cpp:139 rc.cpp:144
 msgid "Description"
 msgstr "描述"
 
@@ -1247,7 +1386,7 @@ msgstr "描述"
 msgid "Failed to set the author."
 msgstr "设置作者失败。"
 
-#: ../../src/regionmodifyui.cpp:151 ../../src/regionmodifyui.cpp:152 rc.cpp:132
+#: ../../src/regionmodifyui.cpp:151 ../../src/regionmodifyui.cpp:152 rc.cpp:150
 msgid "Author"
 msgstr "作者"
 
@@ -1263,7 +1402,7 @@ msgstr "设置区域名称失败。"
 msgid "Failed to set the offset."
 msgstr "设置偏移量失败。"
 
-#: ../../src/regionmodifyui.cpp:187 ../../src/regionmodifyui.cpp:188 rc.cpp:129
+#: ../../src/regionmodifyui.cpp:187 ../../src/regionmodifyui.cpp:188 rc.cpp:147
 msgid "Offset"
 msgstr "偏移"
 
@@ -1388,135 +1527,155 @@ msgstr "方块在下列出："
 msgid "Search block name"
 msgstr "搜索方块名称"
 
-#: rc.cpp:12 rc.cpp:72
+#: rc.cpp:12 rc.cpp:90
 msgid "&Close"
 msgstr "关闭(&C)"
 
 #: rc.cpp:15
+msgid "Add/Replace Block"
+msgstr "添加/替换方块"
+
+#: rc.cpp:18
+msgid "Choose a block of this version:"
+msgstr "选择此版本中的一个方块："
+
+#: rc.cpp:21
+msgid "Search by name or id"
+msgstr "按名称或 id 搜索"
+
+#: rc.cpp:24
+msgid "Place one block above (add instead of replace)"
+msgstr "在上方一格放置（添加而非替换）"
+
+#: rc.cpp:30
 msgid "Read Blocks"
 msgstr "读取方块"
 
-#: rc.cpp:18
+#: rc.cpp:33
 msgid "Translation loading progress:"
 msgstr "翻译加载进度："
 
-#: rc.cpp:21
+#: rc.cpp:36
 msgid "Region information:"
 msgstr "区域信息："
 
-#: rc.cpp:24
+#: rc.cpp:39
 msgid "Please enter the coordination of the block:"
 msgstr "请输入方块的坐标："
 
-#: rc.cpp:36
+#: rc.cpp:51
 msgid "The information is:"
 msgstr "信息为："
 
-#: rc.cpp:39
+#: rc.cpp:54
+msgid "&Add/Replace Block..."
+msgstr "添加/替换方块(&A)..."
+
+#: rc.cpp:57
 msgid "&Tools"
 msgstr "工具(&T)"
 
-#: rc.cpp:42
+#: rc.cpp:60
 msgid "Show Blocks"
 msgstr "显示方块"
 
-#: rc.cpp:48
+#: rc.cpp:66
 msgid "Mode"
 msgstr "模式"
 
-#: rc.cpp:51
+#: rc.cpp:69
 msgid "&List/Modify Palette"
 msgstr "列出/修改调色板(&L)"
 
-#: rc.cpp:54
+#: rc.cpp:72
 msgid "Modify &Block"
 msgstr "修改方块(&B)"
 
-#: rc.cpp:57
+#: rc.cpp:75
 msgid "NBT Viewer"
 msgstr "NBT 查看器"
 
-#: rc.cpp:60
+#: rc.cpp:78
 msgid "Type:"
 msgstr "类型："
 
-#: rc.cpp:63
+#: rc.cpp:81
 msgid "Key:"
 msgstr "键："
 
-#: rc.cpp:66
+#: rc.cpp:84
 msgid "Value:"
 msgstr "值："
 
-#: rc.cpp:69
+#: rc.cpp:87
 msgid "&Export"
 msgstr "导出(&E)"
 
-#: rc.cpp:75
+#: rc.cpp:93
 msgid "Add Palette Entry"
 msgstr "添加调色板"
 
-#: rc.cpp:81
+#: rc.cpp:99
 msgid "&Remove"
 msgstr "移除(&R)"
 
-#: rc.cpp:87
+#: rc.cpp:105
 msgid "Palette List"
 msgstr "调色板列表"
 
-#: rc.cpp:93
+#: rc.cpp:111
 msgid "Modify Property of Block(s)"
 msgstr "修改方块的属性"
 
-#: rc.cpp:96
+#: rc.cpp:114
 msgid "Modify the property of the block in:"
 msgstr "更改在此的方块属性："
 
-#: rc.cpp:99
+#: rc.cpp:117
 msgid "Only this block"
 msgstr "仅此方块"
 
-#: rc.cpp:102
+#: rc.cpp:120
 msgid "Every block with this palette entry"
 msgstr "所有使用此调色板项的方块"
 
-#: rc.cpp:105
+#: rc.cpp:123
 msgid "Properties:"
 msgstr "属性："
 
-#: rc.cpp:108
+#: rc.cpp:126
 msgid "Region Modifier"
 msgstr "区域修改器"
 
-#: rc.cpp:111
+#: rc.cpp:129
 msgid "Modify the infomation of the Region."
 msgstr "修改区域的信息。"
 
-#: rc.cpp:114
+#: rc.cpp:132
 msgid "Create Time"
 msgstr "创建时间"
 
-#: rc.cpp:117 rc.cpp:123
+#: rc.cpp:135 rc.cpp:141
 msgid "yyyy/MM/dd HH:mm:ss.zzz"
 msgstr "yyyy/MM/dd HH:mm:ss.zzz"
 
-#: rc.cpp:120
+#: rc.cpp:138
 msgid "Modify Time"
 msgstr "修改时间"
 
-#: rc.cpp:135
+#: rc.cpp:153
 msgid "Base Name"
 msgstr "基础名称"
 
-#: rc.cpp:138 ../../dhlrc-core/src/schema.rs:190
+#: rc.cpp:156 ../../dhlrc-core/src/schema.rs:190
 msgid "Region Name"
 msgstr "区域名称"
 
-#: rc.cpp:141
+#: rc.cpp:159
 msgid "Data Version"
 msgstr "数据版本"
 
-#: rc.cpp:144
+#: rc.cpp:162
 msgid "Version"
 msgstr "版本"
 
@@ -2145,19 +2304,20 @@ msgid "Uncompress finished."
 msgstr "解压完成。"
 
 #: ../../region-rs/src/lib.rs:150 ../../region-rs/src/lib.rs:191
+#: ../../region-rs/src/lib.rs:266
 msgid "The region is null."
 msgstr "区域为空。"
 
 #: ../../region-rs/src/lib.rs:163 ../../region-rs/src/lib.rs:167
-#: ../../region-rs/src/lib.rs:204
+#: ../../region-rs/src/lib.rs:204 ../../region-rs/src/lib.rs:276
 msgid "The index is out of range."
 msgstr "索引超出范围。"
 
-#: ../../region-rs/src/lib.rs:194
+#: ../../region-rs/src/lib.rs:194 ../../region-rs/src/lib.rs:269
 msgid "The output pointer is null."
 msgstr "输出指针为空。"
 
-#: ../../region-rs/src/lib.rs:197
+#: ../../region-rs/src/lib.rs:197 ../../region-rs/src/lib.rs:272
 msgid "The property list is null."
 msgstr "属性列表为空。"
 
@@ -2168,6 +2328,10 @@ msgstr "没有给出任何属性。"
 #: ../../region-rs/src/lib.rs:208
 msgid "The palette index is out of range."
 msgstr "调色板索引超出范围。"
+
+#: ../../region-rs/src/lib.rs:283
+msgid "No block name is given."
+msgstr "没有给出方块名称。"
 
 #: ../../region-schem-rs/src/config.rs:38
 msgid ""
@@ -2351,6 +2515,9 @@ msgstr "写出被取消。"
 msgid "Getting Palette."
 msgstr "获取调色板。"
 
+#~ msgid "&Add Above..."
+#~ msgstr "在上方添加(&A)..."
+
 #~ msgid "With DataVersion %4, version %5."
 #~ msgstr "数据版本%4，版本%5。"
 
@@ -2371,3 +2538,5 @@ msgstr "获取调色板。"
 
 #~ msgid "Material List: %1"
 #~ msgstr "材料清单：%1"
+
+

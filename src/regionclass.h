@@ -2,7 +2,9 @@
 #define DHLRC_REGIONCLASS_H
 
 #include <QDateTime>
+#include <QList>
 #include <QObject>
+#include <QPair>
 #include <QString>
 #include <QStringList>
 #include <QVector>
@@ -131,6 +133,26 @@ public:
   bool setBlockProperties (qsizetype index, const QStringList &names,
                            const QStringList &datas,
                            quint32 *outId = nullptr);
+
+  /* A whole block state: its palette name and its properties with their
+   * values, in the palette entry's order. */
+  struct BlockState
+  {
+    QString name;
+    QList<QPair<QString, QString>> properties;
+  };
+
+  /* The block at a position, for prefilling a block chooser. The name is empty
+   * when the position is outside the region. */
+  [[nodiscard]] BlockState blockState (qint32 x, qint32 y, qint32 z) const;
+
+  /* Replaces the block at a position, adding the palette entry when the region
+   * does not have that state yet. Returns an empty string on success, or the
+   * reason the write was refused (the region is locked, the position is
+   * outside, the ABI rejected the state), which the caller can show as it
+   * is. */
+  QString setBlockState (qint32 x, qint32 y, qint32 z, const QString &name,
+                         const QList<QPair<QString, QString>> &properties);
 
 Q_SIGNALS:
   void lockedChanged (bool locked);
