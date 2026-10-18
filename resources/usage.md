@@ -12,7 +12,7 @@ The left side lists the program's pages, in this order:
 | --- | --- |
 | NBT File Reader | A popup listing the open NBT readers (named after the file each read) with an option to open a new reader tab or a new reader window. |
 | Manage Region | Opens the list of regions loaded in memory. |
-| Region Reader/Modifier | Picks one region and opens a reader for it. |
+| Region Reader/Modifier | Picks one region and opens its workspace: one tab holding the reader as well as the region's modifier, change history and material list. |
 | Settings | Opens the settings dialog. |
 | Program Directories | Lists the directories the program uses. |
 
@@ -22,7 +22,8 @@ as a tab on the right. Tabs can be closed and dragged to reorder, and
 double-clicking a tab title tears the page off into a window of its own (the
 "Return to tabs" button in that window puts the page back). Closing the last tab
 brings the "Welcome!" page back; it offers "Quick Start", "Program Directories",
-"NBT Reader" and "Add Files to Regions".
+"NBT Reader", "Add Files to Regions" and "Load Example Projection". Files can
+also be dropped straight onto the welcome page.
 
 ## Reading an NBT File
 
@@ -46,8 +47,11 @@ The "Manage Region" tab holds the regions loaded in memory. Nothing is written
 back to your files until you save.
 
 - Add files with "Add", with "Add Files to Regions" on the welcome page, or by
-  dropping files onto the window. The file dialog is "Select Files"; loading
-  runs in the background.
+  dropping files onto the window. "Load Example Projection" loads the projection
+  that ships with the program, so the reader can be tried without finding a
+  file first. The file dialog is "Select Files"; loading runs in the background.
+- A file that holds only one region is loaded directly: the "choose the
+  regions" step only appears when there is something to choose.
 - Each row shows a display name, a grey UUID, "Added: ...", and reader, rename,
   remove and save buttons. The reader button opens the region reader (see
   below); asking for it again shows the tab that is already open for that
@@ -71,32 +75,40 @@ back to your files until you save.
 
 1. Click "Region Reader/Modifier" for a popup listing the regions loaded in
    memory, or press the reader button on a region's row. The popup marks the
-   regions whose reader is already open with a check mark; picking one opens
-   its reader, or brings the open one forward.
-2. The region opens in a tab named after it — "Region Reader/Modifier: <name>" —
-   so several readers can be told apart, and the page repeats the name and UUID
-   at the top. Asking for the same region again brings that tab forward instead
-   of opening a second one. The reader first downloads that version's language
-   file.
+   regions whose workspace is already open with a check mark; picking one opens
+   its workspace, or brings the open one forward.
+2. The region opens in one tab named after it, with its reader, modifier,
+   change history and material list as sub-tabs of that page — one tab per
+   region, however many of its tools are used, so several open regions stay
+   told apart. The page repeats the region's name and UUID at the top. Asking
+   for the same region again brings that tab forward instead of opening a
+   second one. The reader first downloads that version's language file.
 3. The top shows the region's base data: size and coordinates, DataVersion,
    version name, create and modify time, author, name and description.
 4. Type x, y and z under "Please enter the coordination of the block:". When all
    three are valid, "The information is:" lists the block's name, translation
    name, index, palette entry and properties.
-5. "Modify Region" opens a "Region Modifier" tab for editing time, description,
-   offset, author, base name, region name and DataVersion. "Show All Entities"
-   and "Show Entity NBT" open NBT views, "List blocks" and "Show blocks" open
-   the block list and the block view, and "3D Preview" opens the 3D view.
-   "Modify Property" is available for blocks with properties. Choosing "Every
-   block with this palette entry" lists the blocks that would be changed; the
-   list is looked up only when that option is selected, because finding it means
-   reading every block of the region.
-6. Everything opened from a reader belongs to it: closing the reader closes the
-   block list, the block view, the entity NBT view, the 3D view, the "Region
-   Modifier" tab and the "Change History" tab as well. Keeping a reader open
-   does not lock the region — "Locked!" only means a loading or saving job is
-   working on it.
-7. "Change History" opens a "Change History: <name>" tab listing the changes
+5. The "Tools" button at the bottom right opens the reader's tools: "Modify
+   Region" opens the "Modifier" sub-tab of the same page for editing time,
+   description, offset, author, base name, region name and DataVersion. "Show
+   All Entities" and "Show Entity NBT" open NBT views, "List blocks" and "Show
+   blocks" open the block list and the block view, and "3D Preview" opens the
+   3D view. "Modify Property" is available for blocks with properties. While a
+   loading or saving job holds the region, the tools that would write ("Modify
+   Region", "Modify Property") are greyed out. Choosing "Every block with this
+   palette entry" lists the blocks that would be changed; the list is looked up
+   only when that option is selected, because finding it means reading every
+   block of the region.
+6. Everything opened from a reader belongs to it: closing the workspace closes
+   the block list, the block view, the entity NBT view and the 3D view too.
+   Keeping a workspace open does not lock the region — "Locked!" only means a
+   loading or saving job is working on it.
+7. The workspace's pages (Reader, Modifier, Change History, Material List) can
+   be reordered by dragging their titles, closed with their close button, and
+   torn off into a window by double-clicking a title; the window's "Return to
+   tabs" button puts the page back. One tab of the main window still stands for
+   the whole region.
+8. "Change History" opens the "Change History" sub-tab, listing the changes
    made to this region, newest first: base data fields, the region's own name,
    and block or palette properties. Selecting one shows its details underneath:
    the time and the old and new values ("facing: east -> west"). "Undo Selected"

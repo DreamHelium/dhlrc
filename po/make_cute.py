@@ -68,6 +68,11 @@ KEEP = {
 
 QUOTED = re.compile(r'"((?:[^"\\]|\\.)*)"')
 
+# A file dialog's name filter is syntax, not prose: "Sponge Schematic
+# (*.schem)". A cute ending after the closing bracket would turn the pattern
+# into something Qt cannot match, so these stay as they are.
+FILTER = re.compile(r"\(\*[^)]*\)\s*$")
+
 
 def piece_text(lines):
     """The message text of a run of `msgstr "..."` lines, as po-escaped text."""
@@ -152,6 +157,8 @@ def main():
             and msgstr_text not in KEEP
             and len(msgstr_text.strip("\n ")) > 1
             and not msgid_text.startswith("Project-Id")
+            and not FILTER.search(msgid_text)
+            and not FILTER.search(msgstr_text)
         ):
             msgstr_text = cute(msgstr_text, SUFFIXES[added % len(SUFFIXES)])
             added += 1

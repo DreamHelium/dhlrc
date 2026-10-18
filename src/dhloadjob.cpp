@@ -387,7 +387,12 @@ DhLoadJob::loadMultiRegion (MultiModuleBase *multiBase, void *object,
         regionList.append (name);
       string_free (name);
     }
-  if (!DhCore::instance ()->config ().selectAllRegionsInLoading)
+  /* A file with one region has nothing to choose: reading it directly is what
+   * the user asked for, and a single-region file in a batch no longer stops
+   * every load for a question with one possible answer. */
+  const bool nothingToChoose = num == 1;
+  if (!nothingToChoose && !loadAllRegions
+      && !DhCore::instance ()->config ().selectAllRegionsInLoading)
     {
 
       Q_EMIT infoMessage (this, _ ("Please click `Continue` to choose "
@@ -495,8 +500,9 @@ DhLoadJob::collectWarnings (ModuleBase *base, bool matched,
     }
 }
 
-DhAllLoadJob::DhAllLoadJob (QStringList list, QObject *parent)
-    : KCompositeJob (parent)
+DhAllLoadJob::DhAllLoadJob (QStringList list, bool loadAllRegions,
+                            QObject *parent)
+    : KCompositeJob (parent), loadAllRegions (loadAllRegions)
 {
   connect (this, &DhAllLoadJob::cancel, this,
            [&]
@@ -576,7 +582,8 @@ DhAllLoadJob::DhAllLoadJob (QStringList list, QObject *parent)
           return;
         }
 
-      auto job = new DhLoadJob (filename, fileFlag, inputConfigs);
+      auto job
+          = new DhLoadJob (filename, fileFlag, inputConfigs, loadAllRegions);
       job->setAutoDelete (true);
       KCompositeJob::addSubjob (job);
       connect (job, &DhLoadJob::result, this,

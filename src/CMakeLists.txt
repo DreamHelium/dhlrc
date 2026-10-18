@@ -94,6 +94,8 @@ set(TEMP_PROJECT_SOURCES
         resourcegetter.cpp
         dhrenderui.h dhrenderui.cpp
         regionchangesui.h regionchangesui.cpp
+        regionworkspace.h regionworkspace.cpp
+        detachabletabwidget.h detachabletabwidget.cpp
         dhrenderwidget.h dhrenderwidget.cpp
         dhgpuwidget.h dhgpuwidget.cpp
         dhwidget.h dhwidget.cpp

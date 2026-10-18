@@ -46,11 +46,13 @@ public:
   static QWidget *keyedTab (const QString &key);
   /* Brings an existing page forward, docking it back if it was torn off. */
   static void showTab (QWidget *page, const QString &title);
+  /* Sets the title of a page that is in the tab bar or torn off into a window. */
+  static void setPageTitle (QWidget *page, const QString &title);
   /* Removes the tab holding `widget` and deletes it; does nothing when the
    * widget is not one of the tabs. */
   static void closeTab (QWidget *widget);
-  /* Opens the reader of the region at `index`, or brings the reader that is
-   * already open for that region forward. */
+  /* Opens the workspace of the region at `index` on its reader page, or
+   * brings the workspace that is open for that region forward. */
   static void openRegionReader (int index);
   static MainWindow *instance ();
 

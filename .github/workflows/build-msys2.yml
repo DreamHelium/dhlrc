@@ -1,0 +1,112 @@
+name: MSYS2 build
+
+on:
+  push:
+    branches: [ main, master ]
+    paths-ignore:
+      - '**/*.md'
+      - 'dev-doc/**'
+      - 'temp/**'
+  pull_request:
+    paths-ignore:
+      - '**/*.md'
+      - 'dev-doc/**'
+      - 'temp/**'
+  workflow_dispatch:
+    inputs:
+      package:
+        description: Also build the portable archive and the installer
+        type: boolean
+        default: false
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+    name: UCRT64 build
+    runs-on: windows-latest
+    timeout-minutes: 90
+    defaults:
+      run:
+        shell: msys2 {0}
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+
+      - name: Set up MSYS2
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: UCRT64
+          install: >-
+            git
+            mingw-w64-ucrt-x86_64-gcc
+            mingw-w64-ucrt-x86_64-cmake
+            mingw-w64-ucrt-x86_64-ninja
+            mingw-w64-ucrt-x86_64-rust
+            mingw-w64-ucrt-x86_64-gettext-runtime
+            mingw-w64-ucrt-x86_64-gettext-tools
+            mingw-w64-ucrt-x86_64-extra-cmake-modules
+            mingw-w64-ucrt-x86_64-qt6-base
+            mingw-w64-ucrt-x86_64-qt6-svg
+            mingw-w64-ucrt-x86_64-qt6-tools
+            mingw-w64-ucrt-x86_64-kcolorscheme
+            mingw-w64-ucrt-x86_64-kconfigwidgets
+            mingw-w64-ucrt-x86_64-kcoreaddons
+            mingw-w64-ucrt-x86_64-kwidgetsaddons
+            mingw-w64-ucrt-x86_64-kiconthemes
+            mingw-w64-ucrt-x86_64-ki18n
+            mingw-w64-ucrt-x86_64-nsis
+
+      - name: Cache cargo
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            build-ucrt64/cargo_build
+          key: ${{ runner.os }}-cargo-${{ hashFiles('Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-
+
+      - name: Rust tests
+        run: cargo test --workspace --locked
+
+      - name: Build
+        env:
+          PACKAGE: ${{ inputs.package }}
+        run: |
+          set -euo pipefail
+          args=(--yes)
+          # A manual run can also produce the distributable package.
+          if [ "${PACKAGE:-false}" = "true" ]; then
+            args+=(--package)
+          fi
+          ./build-msys2.sh "${args[@]}"
+
+      - name: Smoke test
+        env:
+          QT_QPA_PLATFORM: offscreen
+        run: |
+          set -euo pipefail
+          # The terminal frontend first: it needs no window station.
+          ./build-ucrt64/cargo_build/release/dhlrc-tui.exe --version
+          ./build-ucrt64/dhlrc_qt.exe --version
+
+      - name: Upload packages
+        if: ${{ inputs.package }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: dhlrc-ucrt64
+          path: |
+            build-ucrt64/dhlrc-*.zip
+            build-ucrt64/dhlrc-*.exe
+            build-ucrt64/dhlrc-*.tar.gz
+          if-no-files-found: error

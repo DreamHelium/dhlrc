@@ -61,11 +61,14 @@ class DhLoadJob : public KJob
 {
   Q_OBJECT
 public:
+  /* `loadAllRegions` reads every region of a multi-region file without asking
+   * which ones to load (the example projection is loaded that way, so one
+   * click shows the whole thing). */
   explicit DhLoadJob (QString &filename, const void *cancel_flag,
                       const std::map<QString, void *> &inputConfigs,
-                      QObject *parent = nullptr)
+                      bool loadAllRegions = false, QObject *parent = nullptr)
       : KJob (parent), filename (filename), cancel_flag (cancel_flag),
-        inputConfigs (inputConfigs),
+        inputConfigs (inputConfigs), loadAllRegions (loadAllRegions),
         helper_struct (helper_struct_new (
                            setFunc, this, cancel_flag,
                            DhCore::instance ()->config ().elapsedMilliseconds,
@@ -129,6 +132,7 @@ private:
    * them. The job picks the entry for whichever plugin ends up reading the
    * file, so it does not matter that the winner is unknown at this point. */
   std::map<QString, void *> inputConfigs;
+  bool loadAllRegions = false;
   std::mutex mutex;
   std::condition_variable cv;
   QStringList regionList;
@@ -147,7 +151,8 @@ class DhAllLoadJob : public KCompositeJob
 {
   Q_OBJECT
 public:
-  explicit DhAllLoadJob (QStringList list, QObject *parent = nullptr);
+  explicit DhAllLoadJob (QStringList list, bool loadAllRegions = false,
+                         QObject *parent = nullptr);
   ~DhAllLoadJob () override;
   void start () override;
   bool eventFilter (QObject *watched, QEvent *event) override;
@@ -170,6 +175,7 @@ private:
   void freeInputConfig ();
 
   KMessageWidget *messageWidget;
+  bool loadAllRegions = false;
   int jobNums;
   int finishedJobs = 0;
   /* One cancel flag per file, so a single file can be aborted on its own.

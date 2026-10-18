@@ -11,7 +11,10 @@
 #include "utility.h"
 #include <QCheckBox>
 #include <QDateTime>
+#include <QDir>
+#include <QFile>
 #include <QFileDialog>
+#include <QStandardPaths>
 #include <QFontDatabase>
 #include <QInputDialog>
 #include <QMessageBox>
@@ -27,6 +30,7 @@
 #include <qcoreapplication.h>
 #include <qevent.h>
 #include <qglobalstatic.h>
+#include <qlogging.h>
 #include <qmimedata.h>
 #include <qnamespace.h>
 #include <stdexcept>
@@ -160,6 +164,13 @@ ManageRegionUI::ManageRegionUI (QWidget *parent) : DhWidget (parent)
   selectButton->setIcon (QIcon::fromTheme ("edit-select"));
 
   btnLayout->addWidget (selectButton);
+  /* The projection shipped with the program: a way to try the reader without
+   * finding a file first. */
+  auto *exampleButton = new QPushButton (_ ("Load Example Projection"));
+  exampleButton->setIcon (QIcon::fromTheme ("document-open"));
+  connect (exampleButton, &QPushButton::clicked, this,
+           [this] { loadExampleRegion (this); });
+  btnLayout->addWidget (exampleButton);
   addButton = new QPushButton (_ ("&Add"));
   addButton->setIcon (QIcon::fromTheme ("list-add"));
   btnLayout->addStretch ();
@@ -251,10 +262,47 @@ ManageRegionUI::addFilesToRegions (QWidget *parent)
   if (dirs.isEmpty ())
     QMessageBox::critical (parent, _ ("Error!"), _ ("No file selected!"));
   else
+    loadFiles (dirs);
+}
+
+void
+ManageRegionUI::loadFiles (const QStringList &files, bool allRegions)
+{
+  if (files.isEmpty ())
+    return;
+  auto *job = new DhAllLoadJob (files, allRegions);
+  job->start ();
+}
+
+void
+ManageRegionUI::loadExampleRegion (QWidget *parent)
+{
+  static QString extractedPath;
+  if (extractedPath.isEmpty ())
     {
-      auto job = new DhAllLoadJob (dirs);
-      job->start ();
+      /* The core opens the file by path, which a `QFile` in the resource
+       * system cannot give it, so the example is written out once. */
+      QFile source (QStringLiteral (":/cn/dh/dhlrc/station.litematic"));
+      const QString path
+          = QDir (QStandardPaths::writableLocation (
+                      QStandardPaths::TempLocation))
+                .filePath (QStringLiteral ("dhlrc-station.litematic"));
+      QFile target (path);
+      if (!source.open (QIODevice::ReadOnly)
+          || !target.open (QIODevice::WriteOnly | QIODevice::Truncate)
+          || target.write (source.readAll ()) < 0)
+        {
+          QMessageBox::critical (
+              parent, _ ("Error!"),
+              _ ("The example projection could not be extracted."));
+          return;
+        }
+      target.close ();
+      extractedPath = path;
     }
+  /* The example is multi-region: one click shows the whole thing rather than
+   * asking which of its regions to load. */
+  loadFiles ({ extractedPath }, true);
 }
 
 void
@@ -341,18 +389,13 @@ ManageRegionUI::removeRegions (const QList<int> &indexes)
     }
   if (removed > 0)
     {
-      /* A reader belongs to its region, so removing the region closes it — and
-       * with it everything the reader opened — as well as its modifier page.
-       * Left open they would keep showing a region the list no longer has. */
+      /* The workspace belongs to its region, so removing the region closes it
+       * — and with it the reader and the tools the reader opened. Left open
+       * it would keep showing a region the list no longer has. */
       for (const auto &uuid : removedUuids)
-        {
-          if (auto *page = MainWindow::keyedTab (
-                  QStringLiteral ("region-reader:") + uuid))
-            MainWindow::closeTab (page);
-          if (auto *page = MainWindow::keyedTab (
-                  QStringLiteral ("region-modifier:") + uuid))
-            MainWindow::closeTab (page);
-        }
+        if (auto *page = MainWindow::keyedTab (
+                QStringLiteral ("region-workspace:") + uuid))
+          MainWindow::closeTab (page);
       Q_EMIT regionChanged ();
     }
   return removed;
@@ -626,8 +669,7 @@ ManageRegionUI::dropEvent (QDropEvent *event)
       if (url.isLocalFile ())
         filenames << url.toLocalFile ();
     }
-  auto jobs = new DhAllLoadJob (filenames);
-  jobs->start ();
+  loadFiles (filenames);
   event->acceptProposedAction ();
 }
 

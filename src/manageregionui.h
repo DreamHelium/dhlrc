@@ -228,6 +228,13 @@ public:
   static std::shared_ptr<RegionClass> getRegion (qsizetype index);
   static QStringList getRegionNames ();
   static void addFilesToRegions (QWidget *parent);
+  /* Loads `files` into the region list; the one path every drop area and the
+   * example loader share. `allRegions` reads every region of a multi-region
+   * file instead of asking which ones to load. */
+  static void loadFiles (const QStringList &files, bool allRegions = false);
+  /* Loads the example projection that ships with the program. The core reads
+   * real files, so the Qt resource is written out to a temporary file first. */
+  static void loadExampleRegion (QWidget *parent);
   void save (const QList<int> &list);
   bool selectButtonIsDown ();
   /* Removes every region whose index is in `indexes`, skipping locked ones,

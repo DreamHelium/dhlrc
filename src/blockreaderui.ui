@@ -44,7 +44,7 @@
          <item>
           <widget class="QLabel" name="label">
            <property name="text">
-            <string>The sizes of the region is:</string>
+            <string>Region information:</string>
            </property>
           </widget>
          </item>
@@ -153,77 +153,6 @@
           <string>&amp;Tools</string>
          </property>
         </widget>
-       </item>
-      </layout>
-     </item>
-     <item>
-      <layout class="QVBoxLayout" name="toolsPanelLayout">
-       <item>
-        <layout class="QGridLayout" name="toolsGrid">
-         <item row="0" column="0">
-          <widget class="QPushButton" name="modifyBtn">
-           <property name="text">
-            <string>&amp;Modify Region</string>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="1">
-          <widget class="QPushButton" name="changesBtn">
-           <property name="text">
-            <string>&amp;Change History</string>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="2">
-          <widget class="QPushButton" name="materialBtn">
-           <property name="text">
-            <string>&amp;Material List</string>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="0">
-          <widget class="QPushButton" name="entityBtn_2">
-           <property name="text">
-            <string>Show &amp;All Entities</string>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="1">
-          <widget class="QPushButton" name="propertyBtn">
-           <property name="text">
-            <string>&amp;Modify Property</string>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="2">
-          <widget class="QPushButton" name="entityBtn">
-           <property name="text">
-            <string>&amp;Show Entity NBT</string>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="0">
-          <widget class="QPushButton" name="listBtn">
-           <property name="text">
-            <string>&amp;List blocks</string>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="1">
-          <widget class="QPushButton" name="showBtn">
-           <property name="text">
-            <string>&amp;Show blocks</string>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="2">
-          <widget class="QPushButton" name="previewBtn">
-           <property name="text">
-            <string>3D &amp;Preview</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
        </item>
       </layout>
      </item>

@@ -6,6 +6,7 @@
 #include "dhwidget.h"
 #include "manageregionui.h"
 #include "resourcegetter.h"
+#include <QApplication>
 #include <kcolorschememenu.h>
 #include <kicontheme.h>
 #include <libintl.h>
@@ -41,10 +42,14 @@
 #include "dhdirectoryui.h"
 #include "dhgameconfigui.h"
 #include "externalnbtreaderui.h"
+#include "regionworkspace.h"
 #include "utility.h"
 #include <QComboBox>
 #include <QDesktopServices>
+#include <QDragEnterEvent>
+#include <QDropEvent>
 #include <QGuiApplication>
+#include <QMimeData>
 #include <QIcon>
 #include <QLineEdit>
 #include <QResizeEvent>
@@ -64,10 +69,7 @@
 #include <QMenu>
 #include <QMenuBar>
 
-using DownloaderList
-    = QList<std::pair<QWidget *, std::shared_ptr<DhDownloader>>>;
 static MainWindow *mainWindow = nullptr;
-Q_GLOBAL_STATIC (DownloaderList, downloaderList)
 
 /* What a sidebar row opens.
  *
@@ -803,9 +805,12 @@ MainWindow::MainWindow (QWidget *parent) : QMainWindow (parent)
   leftLayout->addWidget (lineEdit);
   leftLayout->addWidget (listView);
 
-  tabWidget = new QTabWidget ();
 
   welcomeWidget = new QWidget ();
+  /* Files can be dropped on the welcome page, the way they can be dropped on
+   * the region list. */
+  welcomeWidget->setAcceptDrops (true);
+  welcomeWidget->installEventFilter (this);
   tabLayout = new QVBoxLayout ();
   tabLayout->setAlignment (Qt::AlignCenter);
   welcomeWidget->setLayout (tabLayout);
@@ -850,6 +855,19 @@ MainWindow::MainWindow (QWidget *parent) : QMainWindow (parent)
              });
   tabLayout->addWidget (addBtn);
 
+  /* The projection that ships with the program, one click away: the quickest
+   * way to try the reader, and a ready-made file for a first look. */
+  auto *exampleBtn = new QPushButton (_ ("Load Example Projection"));
+  exampleBtn->setIcon (QIcon::fromTheme ("document-open"));
+  connect (exampleBtn, &QPushButton::clicked, this,
+           [this]
+             {
+               ensureTab (ManageRegionUI::instance (), _ ("Manage Region"));
+               ManageRegionUI::loadExampleRegion (this);
+             });
+  tabLayout->addWidget (exampleBtn);
+
+  tabWidget = new QTabWidget ();
   tabWidget->setTabsClosable (true);
   /* Tabs can be dragged along the bar to reorder them freely. */
   tabWidget->setMovable (true);
@@ -1572,7 +1590,7 @@ MainWindow::showRegionReaderMenu ()
            * that tab forward instead of opening a second one. */
           entry->setCheckable (true);
           entry->setChecked (
-              keyedTab (QStringLiteral ("region-reader:") + region->uuid ())
+              keyedTab (QStringLiteral ("region-workspace:") + region->uuid ())
               != nullptr);
           connect (entry, &QAction::triggered, this,
                    [this, i]
@@ -1602,6 +1620,19 @@ MainWindow::keyedTab (const QString &key)
         return page;
     }
   return nullptr;
+}
+
+void
+MainWindow::setPageTitle (QWidget *page, const QString &title)
+{
+  if (!mainWindow || !page)
+    return;
+  if (const int index = mainWindow->tabWidget->indexOf (page); index >= 0)
+    mainWindow->tabWidget->setTabText (index, title);
+  else if (const qsizetype index = mainWindow->indexOfFloating (page);
+           index >= 0)
+    if (auto *window = mainWindow->floatingPages[index].window.data ())
+      window->setWindowTitle (title);
 }
 
 void
@@ -1650,42 +1681,31 @@ MainWindow::openRegionReader (int index)
   if (!region || !mainWindow)
     return;
 
-  /* One reader per region. The key is the region's UUID, so a request for a
-   * reader that is already open brings that page forward instead of adding a
-   * second one for the same region. */
-  const QString key = QStringLiteral ("region-reader:") + region->uuid ();
-  const QString title
-      = QString (_ ("Region Reader/Modifier: %1")).arg (region->displayName ());
+  /* One workspace per region: its reader, modifier, change history and
+   * material list are pages inside it, so several regions cost one tab each
+   * instead of a row of tabs per region. The key is the region's UUID, so a
+   * request for a region that is already open brings its workspace forward. */
+  const QString key = QStringLiteral ("region-workspace:") + region->uuid ();
+  const QString title = region->displayName ();
   if (auto *page = keyedTab (key))
     {
       showTab (page, title);
+      if (auto *workspace = qobject_cast<RegionWorkspace *> (page))
+        workspace->showReader ();
       return;
     }
 
   auto downloader = std::make_shared<DhDownloader> ();
-  auto *reader = new BlockReaderUI (index, downloader);
-  reader->setWindowTitle (title);
-  downloaderList->emplace_back (reader, downloader);
-  addKeyedTab (reader, title, key);
-
-  /* The reader downloads its language file. Nothing shows the progress once
-   * its page is gone, so the download is stopped with it. */
-  connect (reader, &BlockReaderUI::windowClosed, mainWindow,
-           [] (QWidget *win)
-             {
-               /* Collected first: removeOne () invalidates the iteration. */
-               DownloaderList stops;
-               for (const auto &entry : *downloaderList)
-                 {
-                   if (entry.first == win)
-                     stops.append (entry);
-                 }
-               for (const auto &entry : stops)
-                 {
-                   entry.second->stop ();
-                   downloaderList->removeOne (entry);
-                 }
-             });
+  auto *workspace = new RegionWorkspace (index, downloader);
+  workspace->setWindowTitle (title);
+  /* A rename follows the region, in the tab bar or in a torn-off window. */
+  connect (workspace, &RegionWorkspace::titleChanged, mainWindow,
+           [workspace] (const QString &next)
+             { setPageTitle (workspace, next); });
+  addKeyedTab (workspace, title, key);
+  /* A new workspace opens on its reader page; the other pages are built when
+   * one of the reader's tools asks for them. */
+  workspace->showReader ();
 }
 
 qsizetype
@@ -1831,6 +1851,37 @@ MainWindow::tryShrinkTopWidget ()
 bool
 MainWindow::eventFilter (QObject *object, QEvent *event)
 {
+  /* The welcome page is a drop area too: files dropped on it are loaded like
+   * files dropped on the region list, and the list is brought to the front so
+   * the progress is visible. */
+  if (object == welcomeWidget)
+    {
+      if (event->type () == QEvent::DragEnter || event->type () == QEvent::DragMove)
+        {
+          auto *drag = static_cast<QDragMoveEvent *> (event);
+          if (drag->mimeData ()->hasUrls ())
+            {
+              drag->acceptProposedAction ();
+              return true;
+            }
+        }
+      else if (event->type () == QEvent::Drop)
+        {
+          auto *drop = static_cast<QDropEvent *> (event);
+          QStringList files;
+          for (const auto &url : drop->mimeData ()->urls ())
+            if (url.isLocalFile ())
+              files << url.toLocalFile ();
+          if (!files.isEmpty ())
+            {
+              drop->acceptProposedAction ();
+              ensureTab (ManageRegionUI::instance (), _ ("Manage Region"));
+              ManageRegionUI::loadFiles (files);
+              return true;
+            }
+        }
+    }
+
   if (auto *row = qobject_cast<QWidget *> (object);
       row && topLayout && topLayout->indexOf (row) >= 0)
     {

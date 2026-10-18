@@ -11,5 +11,6 @@
         <file>usage.zh_CN.md</file>
         <file>bilibili.svg</file>
         <file>github.svg</file>
+        <file>station.litematic</file>
     </qresource>
 </RCC>

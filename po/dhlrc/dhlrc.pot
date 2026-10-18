@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-17 16:10+0800\n"
+"POT-Creation-Date: 2026-10-18 17:48+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -42,7 +42,7 @@ msgid "x"
 msgstr ""
 
 #: ../../src/blocklistui.cpp:66 ../../src/blocklistui.cpp:68 rc.cpp:30
-#: rc.cpp:72
+#: rc.cpp:45
 msgid "y"
 msgstr ""
 
@@ -55,35 +55,51 @@ msgstr ""
 msgid "Palette"
 msgstr ""
 
-#: ../../src/blockreaderui.cpp:94
+#: ../../src/blockreaderui.cpp:52
+msgid "&Modify Region"
+msgstr ""
+
+#: ../../src/blockreaderui.cpp:55
+msgid "&Change History"
+msgstr ""
+
+#: ../../src/blockreaderui.cpp:58
+msgid "&Material List"
+msgstr ""
+
+#: ../../src/blockreaderui.cpp:62
+msgid "Show &All Entities"
+msgstr ""
+
+#: ../../src/blockreaderui.cpp:65 ../../src/blockshowui.cpp:84
+msgid "&Show Entity NBT"
+msgstr ""
+
+#: ../../src/blockreaderui.cpp:68 ../../src/blockshowui.cpp:95
+msgid "&Modify Property"
+msgstr ""
+
+#: ../../src/blockreaderui.cpp:72
+msgid "&List blocks"
+msgstr ""
+
+#: ../../src/blockreaderui.cpp:75 rc.cpp:90
+msgid "&Show blocks"
+msgstr ""
+
+#: ../../src/blockreaderui.cpp:78
+msgid "3D &Preview"
+msgstr ""
+
+#: ../../src/blockreaderui.cpp:122
 msgid "The region this reader shows"
 msgstr ""
 
-#: ../../src/blockreaderui.cpp:167
-msgid "Select an Index"
-msgstr ""
-
-#: ../../src/blockreaderui.cpp:167
-msgid "Please select an index."
-msgstr ""
-
-#: ../../src/blockreaderui.cpp:184
-msgid "Change History: %1"
-msgstr ""
-
-#: ../../src/blockreaderui.cpp:201
-msgid "Material List: %1"
-msgstr ""
-
-#: ../../src/blockreaderui.cpp:223 ../../src/blockreaderui.cpp:240 rc.cpp:135
-msgid "Region Modifier"
-msgstr ""
-
-#: ../../src/blockreaderui.cpp:355
+#: ../../src/blockreaderui.cpp:249
 msgid "Not valid!"
 msgstr ""
 
-#: ../../src/blockreaderui.cpp:370
+#: ../../src/blockreaderui.cpp:266
 msgid ""
 "Name: %1\n"
 "Translation Name: %2\n"
@@ -92,7 +108,7 @@ msgid ""
 "Properties:\n"
 msgstr ""
 
-#: ../../src/blockreaderui.cpp:383
+#: ../../src/blockreaderui.cpp:279
 msgid ""
 "Name: %1\n"
 "Index: %2\n"
@@ -100,32 +116,56 @@ msgid ""
 "Properties:\n"
 msgstr ""
 
-#: ../../src/blockreaderui.cpp:422
-msgid "With DataVersion %4, version %5."
-msgstr ""
-
-#: ../../src/blockreaderui.cpp:424
-msgid "Created time: %6, Modified time: %7, Author: %8, Name: %9"
-msgstr ""
-
-#: ../../src/blockreaderui.cpp:426
-msgid "Description: %10"
-msgstr ""
-
-#: ../../src/blockreaderui.cpp:429 ../../src/regionmodifyui.cpp:217
+#: ../../src/blockreaderui.cpp:318 ../../src/regionmodifyui.cpp:217
 msgid "Unknown"
 msgstr ""
 
-#: ../../src/blockreaderui.cpp:460 ../../src/externalnbtreaderui.cpp:107
-#: ../../src/externalnbtreaderui.cpp:114 ../../src/manageregionui.cpp:252
-#: ../../src/manageregionui.cpp:578 ../../src/propertymodifyui.cpp:251
-#: ../../src/regionchangesui.cpp:86 ../../src/regionchangesui.cpp:164
-#: ../../src/regionmodifyui.cpp:101 ../../src/utility.cpp:51
-#: ../../src/utility.cpp:72 ../../src/utility.cpp:80
+#: ../../src/blockreaderui.cpp:322
+msgid "Size: (%1, %2, %3)"
+msgstr ""
+
+#: ../../src/blockreaderui.cpp:324
+msgid "DataVersion: %1, version %2"
+msgstr ""
+
+#: ../../src/blockreaderui.cpp:328
+msgid "Created time: %1"
+msgstr ""
+
+#: ../../src/blockreaderui.cpp:332
+msgid "Modified time: %1"
+msgstr ""
+
+#: ../../src/blockreaderui.cpp:335
+msgid "Author: %1"
+msgstr ""
+
+#: ../../src/blockreaderui.cpp:336
+msgid "Name: %1"
+msgstr ""
+
+#: ../../src/blockreaderui.cpp:337
+msgid "Description: %1"
+msgstr ""
+
+#: ../../src/blockreaderui.cpp:378
+msgid "Select an Index"
+msgstr ""
+
+#: ../../src/blockreaderui.cpp:378
+msgid "Please select an index."
+msgstr ""
+
+#: ../../src/blockreaderui.cpp:424 ../../src/externalnbtreaderui.cpp:107
+#: ../../src/externalnbtreaderui.cpp:114 ../../src/manageregionui.cpp:263
+#: ../../src/manageregionui.cpp:296 ../../src/manageregionui.cpp:621
+#: ../../src/propertymodifyui.cpp:251 ../../src/regionchangesui.cpp:86
+#: ../../src/regionchangesui.cpp:164 ../../src/regionmodifyui.cpp:101
+#: ../../src/utility.cpp:51 ../../src/utility.cpp:72 ../../src/utility.cpp:80
 msgid "Error!"
 msgstr ""
 
-#: ../../src/blockreaderui.cpp:461 ../../common-rs/src/util.rs:45
+#: ../../src/blockreaderui.cpp:425 ../../common-rs/src/util.rs:45
 msgid "Out of memory!"
 msgstr ""
 
@@ -133,20 +173,12 @@ msgstr ""
 msgid "The block is in (%1, %2, %3), information is:\n"
 msgstr ""
 
-#: ../../src/blockshowui.cpp:82 ../../src/generalchoosedialog.cpp:45 rc.cpp:111
-#: rc.cpp:174
+#: ../../src/blockshowui.cpp:82 ../../src/generalchoosedialog.cpp:45 rc.cpp:84
+#: rc.cpp:147
 msgid "&OK"
 msgstr ""
 
-#: ../../src/blockshowui.cpp:84 rc.cpp:57
-msgid "&Show Entity NBT"
-msgstr ""
-
-#: ../../src/blockshowui.cpp:95 rc.cpp:54
-msgid "&Modify Property"
-msgstr ""
-
-#: ../../src/blockshowui.cpp:102 ../../src/manageregionui.cpp:231
+#: ../../src/blockshowui.cpp:102 ../../src/manageregionui.cpp:242
 msgid "Warning!"
 msgstr ""
 
@@ -171,11 +203,15 @@ msgstr ""
 msgid "&Cancel"
 msgstr ""
 
+#: ../../src/detachabletabwidget.cpp:54 ../../src/mainwindow.cpp:1764
+msgid "Return to tabs"
+msgstr ""
+
 #: ../../src/dhaboutui.cpp:38
 msgid "About dhlrc"
 msgstr ""
 
-#: ../../src/dhaboutui.cpp:56 ../../src/main.cpp:59
+#: ../../src/dhaboutui.cpp:56 ../../src/main.cpp:65
 msgid "Minecraft Structure Modifier"
 msgstr ""
 
@@ -196,8 +232,8 @@ msgid "%1 item(s)"
 msgstr ""
 
 #: ../../src/dhdirectoryui.cpp:89 ../../src/dhdirectoryui.cpp:280
-#: ../../src/mainwindow.cpp:835 ../../src/mainwindow.cpp:886
-#: ../../src/mainwindow.cpp:1241
+#: ../../src/mainwindow.cpp:840 ../../src/mainwindow.cpp:904
+#: ../../src/mainwindow.cpp:1259
 msgid "Program Directories"
 msgstr ""
 
@@ -289,7 +325,7 @@ msgid ""
 "it needs again."
 msgstr ""
 
-#: ../../src/dhhelpui.cpp:46 ../../src/mainwindow.cpp:831
+#: ../../src/dhhelpui.cpp:46 ../../src/mainwindow.cpp:836
 msgid "Quick Start"
 msgstr ""
 
@@ -301,7 +337,7 @@ msgstr ""
 msgid "Help"
 msgstr ""
 
-#: ../../src/dhhelpui.cpp:187 ../../src/mainwindow.cpp:773
+#: ../../src/dhhelpui.cpp:187 ../../src/mainwindow.cpp:775
 msgid "Search..."
 msgstr ""
 
@@ -309,7 +345,7 @@ msgstr ""
 msgid "The article could not be read (%1)."
 msgstr ""
 
-#: ../../src/dhloadjob.cpp:26 ../../src/dhloadjob.cpp:423
+#: ../../src/dhloadjob.cpp:26 ../../src/dhloadjob.cpp:428
 msgid "Loading region type %1"
 msgstr ""
 
@@ -353,31 +389,31 @@ msgstr ""
 msgid "The file holds no region this module can read."
 msgstr ""
 
-#: ../../src/dhloadjob.cpp:393
+#: ../../src/dhloadjob.cpp:398
 msgid "Please click `Continue` to choose the region(s) to load."
 msgstr ""
 
-#: ../../src/dhloadjob.cpp:458
+#: ../../src/dhloadjob.cpp:463
 msgid "The file extension points at %1, but the file was read as %2."
 msgstr ""
 
-#: ../../src/dhloadjob.cpp:471
+#: ../../src/dhloadjob.cpp:476
 msgid "The file is not compressed, but the %1 format expects %2."
 msgstr ""
 
-#: ../../src/dhloadjob.cpp:477
+#: ../../src/dhloadjob.cpp:482
 msgid "The file is %1-compressed, but the %2 format expects %3."
 msgstr ""
 
-#: ../../src/dhloadjob.cpp:491
+#: ../../src/dhloadjob.cpp:496
 msgid "The file was decoded as %1, but the %2 format declares %3."
 msgstr ""
 
-#: ../../src/dhloadjob.cpp:530 ../../src/dhloadjob.cpp:537
+#: ../../src/dhloadjob.cpp:536 ../../src/dhloadjob.cpp:543
 msgid "Finish processing %1 of %2 (%3%)."
 msgstr ""
 
-#: ../../src/dhloadjob.cpp:682 ../../src/saveregionjob.cpp:457
+#: ../../src/dhloadjob.cpp:689 ../../src/saveregionjob.cpp:457
 #: ../../src/saveregionjob.cpp:559
 msgid "Continue"
 msgstr ""
@@ -638,7 +674,7 @@ msgid ""
 msgstr ""
 
 #: ../../src/externalnbtreaderui.cpp:31 ../../src/externalnbtreaderui.cpp:47
-#: ../../src/externalnbtreaderui.cpp:275 ../../src/mainwindow.cpp:840
+#: ../../src/externalnbtreaderui.cpp:275 ../../src/mainwindow.cpp:845
 msgid "NBT Reader"
 msgstr ""
 
@@ -678,114 +714,114 @@ msgstr ""
 msgid "&All"
 msgstr ""
 
-#: ../../src/main.cpp:82
+#: ../../src/main.cpp:88
 msgid "Draw one picture of a region file and exit; needs --png"
 msgstr ""
 
-#: ../../src/main.cpp:86
+#: ../../src/main.cpp:92
 msgid "Where the preview writes its PNG picture"
 msgstr ""
 
-#: ../../src/main.cpp:90
+#: ../../src/main.cpp:96
 msgid ""
 "Preview backend: cpu or gpu (the default is the GPU when OpenGL is available)"
 msgstr ""
 
-#: ../../src/main.cpp:94
+#: ../../src/main.cpp:100
 msgid "Preview picture size"
 msgstr ""
 
-#: ../../src/main.cpp:97
+#: ../../src/main.cpp:103
 msgid "Preview camera yaw in degrees"
 msgstr ""
 
-#: ../../src/main.cpp:100
+#: ../../src/main.cpp:106
 msgid "Preview camera pitch in degrees"
 msgstr ""
 
-#: ../../src/main.cpp:104
+#: ../../src/main.cpp:110
 msgid ""
 "Preview: highlight the block under this picture pixel (X,Y) and print the "
 "tooltip text"
 msgstr ""
 
-#: ../../src/main.cpp:110
+#: ../../src/main.cpp:116
 msgid "Preview: read the block models and textures from this client jar"
 msgstr ""
 
-#: ../../src/main.cpp:114
+#: ../../src/main.cpp:120
 msgid "Preview: read resources from this cache directory"
 msgstr ""
 
-#: ../../src/main.cpp:118
+#: ../../src/main.cpp:124
 msgid "Preview: use the client jar of this game version"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:314 ../../dhlrc-core/src/schema.rs:202
+#: ../../src/mainwindow.cpp:316 ../../dhlrc-core/src/schema.rs:202
 msgid "Multi-Region Display Name"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:319
+#: ../../src/mainwindow.cpp:321
 msgid "Name pattern:"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:323
+#: ../../src/mainwindow.cpp:325
 msgid "Insert a placeholder:"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:326
+#: ../../src/mainwindow.cpp:328
 msgid "File name"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:329 ../../src/regionmodifyui.cpp:174
+#: ../../src/mainwindow.cpp:331 ../../src/regionmodifyui.cpp:174
 #: ../../src/regionmodifyui.cpp:175
 msgid "Region name"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:333
+#: ../../src/mainwindow.cpp:335
 msgid "Preview with these sample values:"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:337
+#: ../../src/mainwindow.cpp:339
 msgid "Sample file name"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:341
+#: ../../src/mainwindow.cpp:343
 msgid "Sample region name"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:350
+#: ../../src/mainwindow.cpp:352
 msgid ""
 "${file} is replaced with the file name, ${region} with the region name "
 "inside the file. They can be used in any order and repeated. Anything else "
 "is kept as written."
 msgstr ""
 
-#: ../../src/mainwindow.cpp:485
+#: ../../src/mainwindow.cpp:487
 msgid "Pre&view..."
 msgstr ""
 
-#: ../../src/mainwindow.cpp:712
+#: ../../src/mainwindow.cpp:714
 msgid "Config"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:713
+#: ../../src/mainwindow.cpp:715
 msgid "Icon Theme"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:731 ../../src/mainwindow.cpp:733
+#: ../../src/mainwindow.cpp:733 ../../src/mainwindow.cpp:735
 msgid "&Help"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:732
+#: ../../src/mainwindow.cpp:734
 msgid "&About"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:813
+#: ../../src/mainwindow.cpp:818
 msgid "Welcome!"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:822
+#: ../../src/mainwindow.cpp:827
 msgid ""
 "If you don't know how to use, we provide some helps. Just click \"Help -> "
 "Help\" to see them.\n"
@@ -793,169 +829,170 @@ msgid ""
 "Also we provide some quick start to help you use."
 msgstr ""
 
-#: ../../src/mainwindow.cpp:844
+#: ../../src/mainwindow.cpp:849
 msgid "Add Files to Regions"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:848 ../../src/mainwindow.cpp:880
-#: ../../src/mainwindow.cpp:1114
+#: ../../src/mainwindow.cpp:853 ../../src/mainwindow.cpp:865
+#: ../../src/mainwindow.cpp:898 ../../src/mainwindow.cpp:1132
+#: ../../src/mainwindow.cpp:1878
 msgid "Manage Region"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:878
+#: ../../src/mainwindow.cpp:860 ../../src/manageregionui.cpp:169
+msgid "Load Example Projection"
+msgstr ""
+
+#: ../../src/mainwindow.cpp:896
 msgid "NBT File Reader"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:882
+#: ../../src/mainwindow.cpp:900
 msgid "Region Reader/Modifier"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:884
+#: ../../src/mainwindow.cpp:902
 msgid "Settings"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:977
+#: ../../src/mainwindow.cpp:995
 msgid "Select Cache Directory"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:986
+#: ../../src/mainwindow.cpp:1004
 msgid "Manage"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:1006
+#: ../../src/mainwindow.cpp:1024
 msgid "reading"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:1007
+#: ../../src/mainwindow.cpp:1025
 msgid "writing"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:1013
+#: ../../src/mainwindow.cpp:1031
 msgid "Use saved options for %1 (%2) instead of asking"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:1016
+#: ../../src/mainwindow.cpp:1034
 msgid ""
 "Use the options below for every %1 operation instead of asking each time."
 msgstr ""
 
-#: ../../src/mainwindow.cpp:1185
+#: ../../src/mainwindow.cpp:1203
 msgid "No NBT readers are open yet."
 msgstr ""
 
-#: ../../src/mainwindow.cpp:1206
+#: ../../src/mainwindow.cpp:1224
 msgid "New Reader Tab"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:1209
+#: ../../src/mainwindow.cpp:1227
 msgid "New Reader Window"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:1562
+#: ../../src/mainwindow.cpp:1580
 msgid "No regions have been loaded yet."
 msgstr ""
 
-#: ../../src/mainwindow.cpp:1658
-msgid "Region Reader/Modifier: %1"
-msgstr ""
-
-#: ../../src/mainwindow.cpp:1744
-msgid "Return to tabs"
-msgstr ""
-
-#: ../../src/manageregionui.cpp:159
+#: ../../src/manageregionui.cpp:163
 msgid "&Select"
 msgstr ""
 
-#: ../../src/manageregionui.cpp:163 rc.cpp:105
+#: ../../src/manageregionui.cpp:174 rc.cpp:78
 msgid "&Add"
 msgstr ""
 
-#: ../../src/manageregionui.cpp:176
+#: ../../src/manageregionui.cpp:187
 msgid "Select &All"
 msgstr ""
 
-#: ../../src/manageregionui.cpp:183
+#: ../../src/manageregionui.cpp:194
 msgid "&Remove Selected"
 msgstr ""
 
-#: ../../src/manageregionui.cpp:187
+#: ../../src/manageregionui.cpp:198
 msgid "&Save Selected"
 msgstr ""
 
-#: ../../src/manageregionui.cpp:232
+#: ../../src/manageregionui.cpp:243
 msgid "Locked regions were kept."
 msgstr ""
 
-#: ../../src/manageregionui.cpp:249
+#: ../../src/manageregionui.cpp:260
 msgid "Select Files"
 msgstr ""
 
-#: ../../src/manageregionui.cpp:252
+#: ../../src/manageregionui.cpp:263
 msgid "No file selected!"
 msgstr ""
 
-#: ../../src/manageregionui.cpp:402
+#: ../../src/manageregionui.cpp:297
+msgid "The example projection could not be extracted."
+msgstr ""
+
+#: ../../src/manageregionui.cpp:445
 msgid "%1 region(s) selected"
 msgstr ""
 
-#: ../../src/manageregionui.cpp:456 ../../src/utility.cpp:109
+#: ../../src/manageregionui.cpp:499 ../../src/utility.cpp:109
 msgid "Locked"
 msgstr ""
 
-#: ../../src/manageregionui.cpp:500
+#: ../../src/manageregionui.cpp:543
 msgid "Select Save Format"
 msgstr ""
 
-#: ../../src/manageregionui.cpp:500
+#: ../../src/manageregionui.cpp:543
 msgid "Please select the format to save to."
 msgstr ""
 
-#: ../../src/manageregionui.cpp:526
+#: ../../src/manageregionui.cpp:569
 msgid "Use MultiFunc?"
 msgstr ""
 
-#: ../../src/manageregionui.cpp:527
+#: ../../src/manageregionui.cpp:570
 msgid "This type supports regions to save as one file, do you want to use it?"
 msgstr ""
 
-#: ../../src/manageregionui.cpp:543
+#: ../../src/manageregionui.cpp:586
 msgid "Select File"
 msgstr ""
 
-#: ../../src/manageregionui.cpp:579
+#: ../../src/manageregionui.cpp:622
 msgid "This type cannot save a single region."
 msgstr ""
 
-#: ../../src/manageregionui.cpp:584
+#: ../../src/manageregionui.cpp:627
 msgid "Select Directory"
 msgstr ""
 
-#: ../../src/manageregionui.cpp:707 ../../src/manageregionui.cpp:875
+#: ../../src/manageregionui.cpp:749 ../../src/manageregionui.cpp:917
 msgid "Locked!"
 msgstr ""
 
-#: ../../src/manageregionui.cpp:721
+#: ../../src/manageregionui.cpp:763
 msgid "Region identifier"
 msgstr ""
 
-#: ../../src/manageregionui.cpp:724
+#: ../../src/manageregionui.cpp:766
 msgid "Added: %1"
 msgstr ""
 
-#: ../../src/manageregionui.cpp:740
+#: ../../src/manageregionui.cpp:782
 msgid "Open the region reader"
 msgstr ""
 
-#: ../../src/manageregionui.cpp:775
+#: ../../src/manageregionui.cpp:817
 msgid "Input a New Name"
 msgstr ""
 
-#: ../../src/manageregionui.cpp:776
+#: ../../src/manageregionui.cpp:818
 msgid "Please input a new name for the region."
 msgstr ""
 
-#: ../../src/manageregionui.cpp:784 ../../src/manageregionui.cpp:786
+#: ../../src/manageregionui.cpp:826 ../../src/manageregionui.cpp:828
 #: ../../src/regionmodifyui.cpp:163
 msgid "Base name"
 msgstr ""
@@ -1156,7 +1193,7 @@ msgstr ""
 msgid "Failed to set the description."
 msgstr ""
 
-#: ../../src/regionmodifyui.cpp:138 ../../src/regionmodifyui.cpp:139 rc.cpp:153
+#: ../../src/regionmodifyui.cpp:138 ../../src/regionmodifyui.cpp:139 rc.cpp:126
 msgid "Description"
 msgstr ""
 
@@ -1164,7 +1201,7 @@ msgstr ""
 msgid "Failed to set the author."
 msgstr ""
 
-#: ../../src/regionmodifyui.cpp:151 ../../src/regionmodifyui.cpp:152 rc.cpp:159
+#: ../../src/regionmodifyui.cpp:151 ../../src/regionmodifyui.cpp:152 rc.cpp:132
 msgid "Author"
 msgstr ""
 
@@ -1180,7 +1217,7 @@ msgstr ""
 msgid "Failed to set the offset."
 msgstr ""
 
-#: ../../src/regionmodifyui.cpp:187 ../../src/regionmodifyui.cpp:188 rc.cpp:156
+#: ../../src/regionmodifyui.cpp:187 ../../src/regionmodifyui.cpp:188 rc.cpp:129
 msgid "Offset"
 msgstr ""
 
@@ -1190,6 +1227,22 @@ msgstr ""
 
 #: ../../src/regionmodifyui.cpp:202 ../../src/regionmodifyui.cpp:203
 msgid "Data version"
+msgstr ""
+
+#: ../../src/regionworkspace.cpp:92 ../../dhlrc-core/src/schema.rs:66
+msgid "Reader"
+msgstr ""
+
+#: ../../src/regionworkspace.cpp:158
+msgid "Modifier"
+msgstr ""
+
+#: ../../src/regionworkspace.cpp:172
+msgid "Change History"
+msgstr ""
+
+#: ../../src/regionworkspace.cpp:190
+msgid "Material List"
 msgstr ""
 
 #: ../../src/resourcegetter.cpp:83 ../../src/resourcegetter.cpp:112
@@ -1281,7 +1334,7 @@ msgstr ""
 msgid "Search block name"
 msgstr ""
 
-#: rc.cpp:12 rc.cpp:99
+#: rc.cpp:12 rc.cpp:72
 msgid "&Close"
 msgstr ""
 
@@ -1294,7 +1347,7 @@ msgid "Translation loading progress:"
 msgstr ""
 
 #: rc.cpp:21
-msgid "The sizes of the region is:"
+msgid "Region information:"
 msgstr ""
 
 #: rc.cpp:24
@@ -1310,130 +1363,106 @@ msgid "&Tools"
 msgstr ""
 
 #: rc.cpp:42
-msgid "&Modify Region"
-msgstr ""
-
-#: rc.cpp:45
-msgid "&Change History"
-msgstr ""
-
-#: rc.cpp:48
-msgid "&Material List"
-msgstr ""
-
-#: rc.cpp:51
-msgid "Show &All Entities"
-msgstr ""
-
-#: rc.cpp:60
-msgid "&List blocks"
-msgstr ""
-
-#: rc.cpp:63 rc.cpp:117
-msgid "&Show blocks"
-msgstr ""
-
-#: rc.cpp:66
-msgid "3D &Preview"
-msgstr ""
-
-#: rc.cpp:69
 msgid "Show Blocks"
 msgstr ""
 
-#: rc.cpp:75
+#: rc.cpp:48
 msgid "Mode"
 msgstr ""
 
-#: rc.cpp:78
+#: rc.cpp:51
 msgid "&List/Modify Palette"
 msgstr ""
 
-#: rc.cpp:81
+#: rc.cpp:54
 msgid "Modify &Block"
 msgstr ""
 
-#: rc.cpp:84
+#: rc.cpp:57
 msgid "NBT Viewer"
 msgstr ""
 
-#: rc.cpp:87
+#: rc.cpp:60
 msgid "Type:"
 msgstr ""
 
-#: rc.cpp:90
+#: rc.cpp:63
 msgid "Key:"
 msgstr ""
 
-#: rc.cpp:93
+#: rc.cpp:66
 msgid "Value:"
 msgstr ""
 
-#: rc.cpp:96
+#: rc.cpp:69
 msgid "&Export"
 msgstr ""
 
-#: rc.cpp:102
+#: rc.cpp:75
 msgid "Add Palette Entry"
 msgstr ""
 
-#: rc.cpp:108
+#: rc.cpp:81
 msgid "&Remove"
 msgstr ""
 
-#: rc.cpp:114
+#: rc.cpp:87
 msgid "Palette List"
 msgstr ""
 
-#: rc.cpp:120
+#: rc.cpp:93
 msgid "Modify Property of Block(s)"
 msgstr ""
 
-#: rc.cpp:123
+#: rc.cpp:96
 msgid "Modify the property of the block in:"
 msgstr ""
 
-#: rc.cpp:126
+#: rc.cpp:99
 msgid "Only this block"
 msgstr ""
 
-#: rc.cpp:129
+#: rc.cpp:102
 msgid "Every block with this palette entry"
 msgstr ""
 
-#: rc.cpp:132
+#: rc.cpp:105
 msgid "Properties:"
 msgstr ""
 
-#: rc.cpp:138
+#: rc.cpp:108
+msgid "Region Modifier"
+msgstr ""
+
+#: rc.cpp:111
 msgid "Modify the infomation of the Region."
 msgstr ""
 
-#: rc.cpp:141
+#: rc.cpp:114
 msgid "Create Time"
 msgstr ""
 
-#: rc.cpp:144 rc.cpp:150
+#: rc.cpp:117 rc.cpp:123
 msgid "yyyy/MM/dd HH:mm:ss.zzz"
 msgstr ""
 
-#: rc.cpp:147
+#: rc.cpp:120
 msgid "Modify Time"
 msgstr ""
 
-#: rc.cpp:162
+#: rc.cpp:135
 msgid "Base Name"
 msgstr ""
 
-#: rc.cpp:165 ../../dhlrc-core/src/schema.rs:190
+#: rc.cpp:138 ../../dhlrc-core/src/schema.rs:190
 msgid "Region Name"
 msgstr ""
 
-#: rc.cpp:168
+#: rc.cpp:141
 msgid "Data Version"
 msgstr ""
 
-#: rc.cpp:171
+#: rc.cpp:144
 msgid "Version"
 msgstr ""
 
@@ -1469,29 +1498,29 @@ msgstr ""
 msgid "${file} - ${region}"
 msgstr ""
 
-#: ../../dhlrc-core/src/config.rs:358
+#: ../../dhlrc-core/src/config.rs:380
 msgid "Configuration reloaded"
 msgstr ""
 
-#: ../../dhlrc-core/src/config.rs:360
+#: ../../dhlrc-core/src/config.rs:382
 #, rust-format
 msgid "The configuration was reloaded from {}."
 msgstr ""
 
-#: ../../dhlrc-core/src/config.rs:396
+#: ../../dhlrc-core/src/config.rs:418
 msgid "Configuration created"
 msgstr ""
 
-#: ../../dhlrc-core/src/config.rs:398
+#: ../../dhlrc-core/src/config.rs:420
 #, rust-format
 msgid "A new configuration file was created at {}."
 msgstr ""
 
-#: ../../dhlrc-core/src/config.rs:406
+#: ../../dhlrc-core/src/config.rs:428
 msgid "Configuration could not be read"
 msgstr ""
 
-#: ../../dhlrc-core/src/config.rs:409
+#: ../../dhlrc-core/src/config.rs:431
 #, rust-format
 msgid ""
 "The configuration file could not be read ({}). It was moved aside and a new "
@@ -1532,10 +1561,6 @@ msgstr ""
 
 #: ../../dhlrc-core/src/schema.rs:65
 msgid "Game"
-msgstr ""
-
-#: ../../dhlrc-core/src/schema.rs:66
-msgid "Reader"
 msgstr ""
 
 #: ../../dhlrc-core/src/schema.rs:67
