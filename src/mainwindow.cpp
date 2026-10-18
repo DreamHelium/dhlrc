@@ -8,7 +8,6 @@
 #include "resourcegetter.h"
 #include <QApplication>
 #include <kcolorschememenu.h>
-#include <kicontheme.h>
 #include <libintl.h>
 #include <memory>
 #include <qaction.h>
@@ -712,21 +711,12 @@ MainWindow::MainWindow (QWidget *parent) : QMainWindow (parent)
   mainWindow = this;
   resize (800, 800);
   auto menu = new QMenu (_ ("Config"));
-  auto iconMenu = new QMenu (_ ("Icon Theme"));
+  /* Only the colour scheme is offered here. The Breeze icon engine recolours
+   * the icons to match the active colour scheme — that is what keeps them
+   * readable in dark mode — so a separate icon-theme choice would either do
+   * nothing or break that coupling (see KIconTheme::initTheme() in main.cpp). */
   menu->addAction (
       KColorSchemeMenu::createMenu (KColorSchemeManager::instance ()));
-  menu->addMenu (iconMenu);
-  for (const auto &i : KIconTheme::list ())
-    {
-      auto action = new QAction (i);
-      iconMenu->addAction (action);
-      connect (action, &QAction::triggered, action,
-               [action]
-                 {
-                   auto str = action->text ();
-                   QIcon::setThemeName (str);
-                 });
-    }
 
   menuBar ()->addMenu (menu);
 

@@ -11,9 +11,131 @@
 #include <QApplication>
 #include <QCommandLineParser>
 #include <QDir>
+#include <QLibraryInfo>
+#include <QLocale>
+#include <QStandardPaths>
 #include <QTranslator>
 #include <QWidget>
 #include <qcoreapplication.h>
+
+namespace
+{
+/* The language directories to try, most specific first: KDE ships its
+ * catalogues for `zh_CN` while Qt's locale names may carry the script
+ * (`zh_Hans_CN`), so both forms are offered. */
+QStringList
+translationLanguages ()
+{
+  const QLocale locale = QLocale::system ();
+  QStringList languages{ locale.name () };
+  for (const QString &ui : locale.uiLanguages ())
+    languages << QString (ui).replace (QLatin1Char ('-'), QLatin1Char ('_'));
+  languages << locale.name ().section (QLatin1Char ('_'), 0, 0);
+  languages.removeAll (QString ());
+  languages.removeDuplicates ();
+  return languages;
+}
+
+/* Root directories holding KDE-style catalogues, i.e. the ones whose children
+ * are language directories: <root>/<language>/LC_MESSAGES/<domain>.mo. An
+ * MSYS2 installation keeps them under bin/data because KF6 is built for the
+ * Windows layout; a package carries the same tree beside the executable. */
+QStringList
+kdeLocaleRoots ()
+{
+  const QString appDir = QCoreApplication::applicationDirPath ();
+  const QString prefix = QLibraryInfo::path (QLibraryInfo::PrefixPath);
+  QStringList roots;
+  roots << appDir + QStringLiteral ("/data/locale");
+  roots << prefix + QStringLiteral ("/bin/data/locale");
+  roots << prefix + QStringLiteral ("/share/locale");
+  roots += QStandardPaths::locateAll (QStandardPaths::GenericDataLocation,
+                                     QStringLiteral ("locale"),
+                                     QStandardPaths::LocateDirectory);
+  roots.removeDuplicates ();
+  return roots;
+}
+
+/* Qt's own catalogue: the standard dialog buttons ("OK", "Restore Defaults"),
+ * the command-line help and the like come from here, not from the program's
+ * catalogue or from KF6. Qt never loads it by itself, so it is loaded here. */
+void
+installQtTranslations ()
+{
+  QStringList dirs;
+  /* A package keeps it next to the executable; a development build finds it
+   * in the Qt installation QLibraryInfo knows about. */
+  dirs << QCoreApplication::applicationDirPath ()
+              + QStringLiteral ("/translations");
+  const QString installed
+      = QLibraryInfo::path (QLibraryInfo::TranslationsPath);
+  if (!installed.isEmpty ())
+    dirs << installed;
+
+  for (const QString &dir : dirs)
+    {
+      if (!QDir (dir).exists ())
+        continue;
+      bool loaded = false;
+      /* `qtbase` holds the widgets' strings; `qt` is the older combined
+       * catalogue some distributions still ship. */
+      for (const auto &catalog :
+           { QStringLiteral ("qtbase"), QStringLiteral ("qt") })
+        {
+          auto *translator = new QTranslator (qApp);
+          if (translator->load (QLocale::system (), catalog,
+                                QStringLiteral ("_"), dir))
+            {
+              QCoreApplication::installTranslator (translator);
+              loaded = true;
+            }
+          else
+            {
+              delete translator;
+            }
+        }
+      if (loaded)
+        break;
+    }
+}
+
+/* KF6's own catalogues: KDE ships them as gettext `.mo` files (which ki18n
+ * reads) plus `*_qt.qm` counterparts for strings the frameworks translate
+ * through Qt's `tr()`. Registering the directory with ki18n is what makes the
+ * gettext side work in a development tree, where QStandardPaths does not see
+ * the MSYS2 `bin/data` directory. */
+void
+installKdeTranslations ()
+{
+  const QStringList languages = translationLanguages ();
+  for (const QString &root : kdeLocaleRoots ())
+    {
+      for (const QString &language : languages)
+        {
+          const QDir messages (root + QLatin1Char ('/') + language
+                               + QStringLiteral ("/LC_MESSAGES"));
+          if (!messages.exists ())
+            continue;
+          for (const QString &name :
+               messages.entryList ({ QStringLiteral ("*.mo") },
+                                   QDir::Files))
+            KLocalizedString::addDomainLocaleDir (
+                name.section (QLatin1Char ('.'), 0, 0).toUtf8 (), root);
+          for (const QString &name :
+               messages.entryList ({ QStringLiteral ("*_qt.qm") },
+                                   QDir::Files))
+            {
+              auto *translator = new QTranslator (qApp);
+              if (translator->load (messages.absoluteFilePath (name)))
+                QCoreApplication::installTranslator (translator);
+              else
+                delete translator;
+            }
+          return;
+        }
+    }
+}
+} // namespace
 
 int
 main (int argc, char *argv[])
@@ -46,6 +168,13 @@ main (int argc, char *argv[])
   KLocalizedString::setApplicationDomain ("dhlrc");
   KLocalizedString::addDomainLocaleDir ("dhlrc", dir);
   KLocalizedString::addDomainLocaleDir ("dhlrc-cute", dir);
+
+  /* The program's own catalogue covers only its own strings. The strings it
+   * gets from Qt (the standard dialog buttons first of all) and from KF6 (the
+   * colour-scheme menu title, for instance) live in their own catalogues,
+   * which nothing else loads on Windows. */
+  installQtTranslations ();
+  installKdeTranslations ();
 
   /* The configuration decides which catalogue is in use. It is read when the
    * program starts, so turning the cute pack on takes a restart — hence the

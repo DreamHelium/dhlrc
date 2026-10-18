@@ -106,6 +106,9 @@ if [ "$gui" = ON ]; then
     mingw-w64-ucrt-x86_64-qt6-svg
     # windeployqt, used to bundle the Qt runtime into a package.
     mingw-w64-ucrt-x86_64-qt6-tools
+    # Qt's own translations: the standard dialog buttons ("OK", "Restore
+    # Defaults", ...) and the command line help come from this catalogue.
+    mingw-w64-ucrt-x86_64-qt6-translations
     mingw-w64-ucrt-x86_64-kcolorscheme
     # The widget style the program selects by name; the packaging step copies
     # its plugin and theme files into the bundle.

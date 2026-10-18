@@ -150,14 +150,19 @@ Section "Graphical interface (dhlrc_qt)" SecGui
   SetOutPath "$INSTDIR\iconengines"
   File "${RUNTIME_GUI}\iconengines\*.*"
 
-  ; The Breeze theme's description and colour schemes. The package that brings
-  ; the style plugin also brings these files; when it is missing the directory
-  ; is empty (the runtime script then warns and the application falls back to
-  ; Fusion), so only copy it when there is something to copy.
-  ${If} ${FileExists} "${RUNTIME_GUI}\data\kstyle\themes\breeze.themerc"
-    SetOutPath "$INSTDIR\data"
-    File /r "${RUNTIME_GUI}\data\*.*"
-  ${EndIf}
+  ; KIconEngine is the icon engine that makes the icons follow the active
+  ; colour scheme; KIconTheme::initTheme() looks for it under kiconthemes6.
+  SetOutPath "$INSTDIR\kiconthemes6\iconengines"
+  File /nonfatal "${RUNTIME_GUI}\kiconthemes6\iconengines\*.*"
+
+  ; Qt's own catalogue: the standard dialog buttons and the command line help.
+  SetOutPath "$INSTDIR\translations"
+  File /nonfatal "${RUNTIME_GUI}\translations\*.*"
+
+  ; Breeze's theme description and colour schemes, and KF6's catalogues (the
+  ; program looks for the latter under data/locale).
+  SetOutPath "$INSTDIR\data"
+  File /nonfatal /r "${RUNTIME_GUI}\data\*.*"
 
   ${If} $StartMenuState == ${BST_CHECKED}
     CreateDirectory "$SMPROGRAMS\dhlrc"
@@ -247,6 +252,9 @@ Section "Uninstall"
   RMDir /r "$INSTDIR\styles"
   RMDir /r "$INSTDIR\imageformats"
   RMDir /r "$INSTDIR\iconengines"
+  RMDir /r "$INSTDIR\kiconthemes6"
+  RMDir /r "$INSTDIR\translations"
+  RMDir /r "$INSTDIR\data"
   RMDir /r "$INSTDIR\load_module"
   RMDir /r "$INSTDIR\region_module"
   RMDir /r "$INSTDIR\locale"

@@ -53,6 +53,7 @@ jobs:
             mingw-w64-ucrt-x86_64-qt6-base
             mingw-w64-ucrt-x86_64-qt6-svg
             mingw-w64-ucrt-x86_64-qt6-tools
+            mingw-w64-ucrt-x86_64-qt6-translations
             mingw-w64-ucrt-x86_64-kcolorscheme
             mingw-w64-ucrt-x86_64-breeze
             mingw-w64-ucrt-x86_64-kconfigwidgets
@@ -99,7 +100,7 @@ jobs:
           ./build-ucrt64/cargo_build/release/dhlrc-tui.exe --version
           ./build-ucrt64/dhlrc_qt.exe --version
 
-      - name: Check the packaged theme
+      - name: Check the packaged runtime
         if: ${{ (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')) || inputs.package }}
         run: |
           set -euo pipefail
@@ -108,14 +109,32 @@ jobs:
           ls -l build-ucrt64/runtime-gui/styles
           unzip -l build-ucrt64/dhlrc-*.zip | grep -q 'styles/breeze6.dll'
           unzip -l build-ucrt64/dhlrc-*.zip | grep -q 'kstyle/themes/breeze.themerc'
+          # The icon engine is what makes the icons follow the colour scheme
+          # (dark mode); without it they stay dark on a dark window.
+          unzip -l build-ucrt64/dhlrc-*.zip | grep -q 'kiconthemes6/iconengines/KIconEnginePlugin.dll'
+          # Qt's own catalogue translates the standard dialog buttons, KF6's
+          # the framework strings.
+          unzip -l build-ucrt64/dhlrc-*.zip | grep -q 'translations/qtbase_zh_CN.qm'
+          unzip -l build-ucrt64/dhlrc-*.zip | grep -q 'data/locale/zh_CN/LC_MESSAGES/kwidgetsaddons6_qt.qm'
 
-      - name: Upload packages
+      # One artifact per deliverable, so the portable archive and the installer
+      # can be downloaded separately from the run page instead of as one
+      # archive containing both.
+      - name: Upload portable archive
         if: ${{ (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')) || inputs.package }}
         uses: actions/upload-artifact@v4
         with:
-          name: dhlrc-ucrt64
-          path: |
-            build-ucrt64/dhlrc-*.zip
-            build-ucrt64/dhlrc-*.exe
-            build-ucrt64/dhlrc-*.tar.gz
+          name: dhlrc-ucrt64-portable
+          path: build-ucrt64/dhlrc-*.zip
+          if-no-files-found: error
+
+      - name: Upload installer
+        if: ${{ (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')) || inputs.package }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: dhlrc-ucrt64-installer
+          # The installer's own file name (see DH_OUTFILE_NATIVE in
+          # CMakeLists.txt). A broad `dhlrc-*.exe` would also pick up
+          # `dhlrc-tui.exe`, which lives in the same directory.
+          path: build-ucrt64/dhlrc-*-win64-setup.exe
           if-no-files-found: error

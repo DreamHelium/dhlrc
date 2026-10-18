@@ -84,6 +84,76 @@ else
   done
 fi
 
+# KIconEngine is the icon engine that recolours the icon theme to match the
+# active colour scheme; without it Breeze's monochrome icons stay black when a
+# dark scheme is chosen. It is a Qt plugin, and windeployqt knows nothing about
+# it, so it is copied by hand. KIconTheme::initTheme() adds
+# <libraryPath>/kiconthemes6 to the plugin search path, which is why the plugin
+# goes into a `kiconthemes6/iconengines` directory beside the executable.
+icon_engine_found=OFF
+for plugin_root in "$prefix/share/qt6/plugins" "$prefix/lib/qt6/plugins" \
+  /ucrt64/share/qt6/plugins; do
+  if [ -f "$plugin_root/kiconthemes6/iconengines/KIconEnginePlugin.dll" ]; then
+    mkdir -p "$gui_dir/kiconthemes6/iconengines"
+    cp -f "$plugin_root/kiconthemes6/iconengines/"*.dll \
+      "$gui_dir/kiconthemes6/iconengines/"
+    icon_engine_found=ON
+    break
+  fi
+done
+if [ "$icon_engine_found" = OFF ]; then
+  echo "warning: the KIconEngine plugin was not found; the packaged window gets" >&2
+  echo "         plain icons that do not follow the colour scheme (they stay" >&2
+  echo "         dark in dark mode). Install mingw-w64-ucrt-x86_64-kiconthemes" >&2
+  echo "         before packaging." >&2
+fi
+
+# KF6's own data. The catalogues for KF6's strings (gettext .mo as well as the
+# *_qt.qm Qt uses) live in <prefix>/bin/data/locale on Windows, and the program
+# looks for them in <exe>/data/locale. Only the languages the program itself is
+# translated into are needed; the English source strings are the fallback.
+languages=()
+kde_locale_found=OFF
+for locale_dir in "$build_dir"/locale/*/; do
+  [ -d "$locale_dir" ] || continue
+  language=$(basename "$locale_dir")
+  if [ -d "$prefix/bin/data/locale/$language/LC_MESSAGES" ]; then
+    mkdir -p "$gui_dir/data/locale/$language"
+    cp -rf "$prefix/bin/data/locale/$language/LC_MESSAGES" \
+      "$gui_dir/data/locale/$language/"
+    languages+=("$language")
+    kde_locale_found=ON
+  fi
+done
+if [ "${#languages[@]}" -gt 0 ] && [ "$kde_locale_found" = OFF ]; then
+  echo "warning: KF6's translation catalogues were not found; the packaged" >&2
+  echo "         window keeps KF6's own strings (menu titles and the like) in" >&2
+  echo "         English. They live in <prefix>/bin/data/locale; install" >&2
+  echo "         mingw-w64-ucrt-x86_64-ki18n and its dependencies." >&2
+fi
+
+# Qt's own catalogue. It holds the standard dialog buttons ("OK", "Restore
+# Defaults", ...) and the command-line help; the program loads it explicitly
+# from <exe>/translations. Qt installs it under share/qt6/translations.
+qt_found=OFF
+if [ "${#languages[@]}" -gt 0 ] && [ -d "$prefix/share/qt6/translations" ]; then
+  mkdir -p "$gui_dir/translations"
+  for language in "${languages[@]}"; do
+    for catalog in qtbase qt; do
+      if [ -f "$prefix/share/qt6/translations/${catalog}_${language}.qm" ]; then
+        cp -f "$prefix/share/qt6/translations/${catalog}_${language}.qm" \
+          "$gui_dir/translations/"
+        qt_found=ON
+      fi
+    done
+  done
+fi
+if [ "${#languages[@]}" -gt 0 ] && [ "$qt_found" = OFF ]; then
+  echo "warning: Qt's translations were not found; the packaged window keeps" >&2
+  echo "         Qt's own strings (the standard dialog buttons) in English." >&2
+  echo "         Install mingw-w64-ucrt-x86_64-qt6-translations before packaging." >&2
+fi
+
 # Every MSYS2 library the given files import, directly or not. `ldd` prints the
 # MSYS2 ones as POSIX paths (`/ucrt64/...`) and everything else — system
 # libraries, and this project's own output — under the `/c/` mount, so keeping
@@ -115,7 +185,8 @@ gui_libs=$(closure_of "$exe" \
                       "$gui_dir"/platforms/*.dll \
                       "$gui_dir"/styles/*.dll \
                       "$gui_dir"/imageformats/*.dll \
-                      "$gui_dir"/iconengines/*.dll)
+                      "$gui_dir"/iconengines/*.dll \
+                      "$gui_dir"/kiconthemes6/iconengines/*.dll)
 
 copy_into "$base_dir" $base_libs
 # Everything the GUI needs on top of the base goes next to the Qt libraries.
