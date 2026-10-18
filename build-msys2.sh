@@ -107,6 +107,9 @@ if [ "$gui" = ON ]; then
     # windeployqt, used to bundle the Qt runtime into a package.
     mingw-w64-ucrt-x86_64-qt6-tools
     mingw-w64-ucrt-x86_64-kcolorscheme
+    # The widget style the program selects by name; the packaging step copies
+    # its plugin and theme files into the bundle.
+    mingw-w64-ucrt-x86_64-breeze
     mingw-w64-ucrt-x86_64-kconfigwidgets
     mingw-w64-ucrt-x86_64-kcoreaddons
     mingw-w64-ucrt-x86_64-kwidgetsaddons

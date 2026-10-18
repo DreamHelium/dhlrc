@@ -150,6 +150,15 @@ Section "Graphical interface (dhlrc_qt)" SecGui
   SetOutPath "$INSTDIR\iconengines"
   File "${RUNTIME_GUI}\iconengines\*.*"
 
+  ; The Breeze theme's description and colour schemes. The package that brings
+  ; the style plugin also brings these files; when it is missing the directory
+  ; is empty (the runtime script then warns and the application falls back to
+  ; Fusion), so only copy it when there is something to copy.
+  ${If} ${FileExists} "${RUNTIME_GUI}\data\kstyle\themes\breeze.themerc"
+    SetOutPath "$INSTDIR\data"
+    File /r "${RUNTIME_GUI}\data\*.*"
+  ${EndIf}
+
   ${If} $StartMenuState == ${BST_CHECKED}
     CreateDirectory "$SMPROGRAMS\dhlrc"
     CreateShortCut "$SMPROGRAMS\dhlrc\${APP_NAME}.lnk" "$INSTDIR\dhlrc_qt.exe"

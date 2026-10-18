@@ -47,6 +47,11 @@ rm -rf "$gui_dir/tls" "$gui_dir/networkinformation" "$gui_dir/generic"
 # Breeze by name (`QApplication::setStyle ("breeze")` in src/main.cpp), so its
 # plugin is copied in as well; its own dependencies — Qt Quick and OpenGL among
 # them — then come in through the closure below.
+#
+# The package that provides it is `mingw-w64-ucrt-x86_64-breeze`; without it
+# there is no Breeze style anywhere, so say so instead of silently shipping a
+# package that falls back to the platform style.
+breeze_found=OFF
 for plugin_root in "$prefix/share/qt6/plugins" "$prefix/lib/qt6/plugins" \
   /ucrt64/share/qt6/plugins; do
   if [ -d "$plugin_root/styles" ]; then
@@ -54,11 +59,30 @@ for plugin_root in "$prefix/share/qt6/plugins" "$prefix/lib/qt6/plugins" \
       if [ -f "$plugin_root/styles/$style" ]; then
         mkdir -p "$gui_dir/styles"
         cp -f "$plugin_root/styles/$style" "$gui_dir/styles/"
+        breeze_found=ON
       fi
     done
-    break
+    if [ "$breeze_found" = ON ]; then
+      break
+    fi
   fi
 done
+if [ "$breeze_found" = OFF ]; then
+  echo "warning: the Breeze style plugin was not found; the packaged window" >&2
+  echo "         falls back to the platform style. Install" >&2
+  echo "         mingw-w64-ucrt-x86_64-breeze before packaging." >&2
+else
+  # The style reads its theme description and colour schemes from the data
+  # directory; copy them beside the executable, so the layout is the same as in
+  # an MSYS2 installation.
+  for data_file in "kstyle/themes/breeze.themerc" "color-schemes/BreezeLight.colors" \
+    "color-schemes/BreezeDark.colors" "color-schemes/BreezeClassic.colors"; do
+    if [ -f "$prefix/bin/data/$data_file" ]; then
+      mkdir -p "$gui_dir/data/$(dirname "$data_file")"
+      cp -f "$prefix/bin/data/$data_file" "$gui_dir/data/$data_file"
+    fi
+  done
+fi
 
 # Every MSYS2 library the given files import, directly or not. `ldd` prints the
 # MSYS2 ones as POSIX paths (`/ucrt64/...`) and everything else — system
