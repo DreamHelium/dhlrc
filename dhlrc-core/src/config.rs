@@ -16,10 +16,18 @@ use std::thread::JoinHandle;
 use std::time::Duration;
 
 /// Bumped when the on-disk shape changes in a way older builds cannot read.
-pub const CONFIG_VERSION: u32 = 2;
+pub const CONFIG_VERSION: u32 = 4;
 
 fn config_version() -> u32 {
     CONFIG_VERSION
+}
+
+/// A file written before the `version` field existed reads as version 1, so the
+/// migration brings it up like any other old file. Its absence used to mean
+/// "whatever this build writes", which skipped the migration and showed the old
+/// byte count as if it were a number in the chosen unit.
+fn legacy_config_version() -> u32 {
+    1
 }
 
 /// Brings a configuration written by an older build up to the current shape.
@@ -30,14 +38,77 @@ fn config_version() -> u32 {
 /// asks to be prompted, so those are turned on here once; a value the user had
 /// already set to `true` stays on. Writing keeps asking, since the format is
 /// picked on purpose there.
-fn migrate(config: &mut Config) {
+fn migrate(config: &mut Config, had_memory_limit: bool) {
     if config.version >= CONFIG_VERSION {
         return;
     }
-    for plugin in config.plugins.values_mut() {
-        plugin.input.use_configured = true;
+    if config.version < 2 {
+        for plugin in config.plugins.values_mut() {
+            plugin.input.use_configured = true;
+        }
+    }
+    if config.version < 3 {
+        if had_memory_limit {
+            migrate_memory_limit(config);
+        } else {
+            /* The file never set a limit, so the value in `config` is today's
+             * default, not an old byte count: give it the new default pair
+             * rather than mistaking 500 for 500 bytes. */
+            let defaults = General::default();
+            config.general.memory_limit = defaults.memory_limit;
+            config.general.limit_unit = defaults.limit_unit;
+        }
     }
     config.version = CONFIG_VERSION;
+}
+
+/// Up to version 2 the limit was stored in bytes and the unit was only a display
+/// choice; from version 3 the number is in the unit. Convert the old byte count
+/// to the largest unit that divides it exactly, so nothing is rounded away.
+fn migrate_memory_limit(config: &mut Config) {
+    let bytes = config.general.memory_limit.max(0.0).round() as u64;
+    let mut unit = Unit::Bytes;
+    let mut value = bytes as f64;
+    for candidate in [Unit::Gib, Unit::Mib, Unit::Kib] {
+        let factor = candidate.factor();
+        if bytes != 0 && bytes % factor == 0 {
+            unit = candidate;
+            value = (bytes / factor) as f64;
+            break;
+        }
+    }
+    config.general.memory_limit = value;
+    config.general.limit_unit = unit;
+}
+
+/// Reads the memory limit from either a TOML integer (older files) or a float.
+fn deserialize_limit_number<'de, D>(deserializer: D) -> Result<f64, D::Error>
+where
+    D: serde::Deserializer<'de>,
+{
+    struct NumberVisitor;
+
+    impl serde::de::Visitor<'_> for NumberVisitor {
+        type Value = f64;
+
+        fn expecting(&self, formatter: &mut std::fmt::Formatter) -> std::fmt::Result {
+            formatter.write_str("an integer or a float")
+        }
+
+        fn visit_i64<E: serde::de::Error>(self, value: i64) -> Result<f64, E> {
+            Ok(value as f64)
+        }
+
+        fn visit_u64<E: serde::de::Error>(self, value: u64) -> Result<f64, E> {
+            Ok(value as f64)
+        }
+
+        fn visit_f64<E: serde::de::Error>(self, value: f64) -> Result<f64, E> {
+            Ok(value)
+        }
+    }
+
+    deserializer.deserialize_any(NumberVisitor)
 }
 
 /// The unit a memory limit is expressed in (old `LimitUnit`).
@@ -52,6 +123,18 @@ pub enum Unit {
     Kib,
     #[serde(rename = "Bytes")]
     Bytes,
+}
+
+impl Unit {
+    /// How many bytes one of this unit is.
+    pub const fn factor(self) -> u64 {
+        match self {
+            Self::Gib => 1 << 30,
+            Self::Mib => 1 << 20,
+            Self::Kib => 1 << 10,
+            Self::Bytes => 1,
+        }
+    }
 }
 
 /// The block information shown by the reader (old `DefaultShowOption`).
@@ -122,7 +205,12 @@ impl Default for PluginConfig {
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(default)]
 pub struct General {
-    pub memory_limit: u32,
+    /// The memory limit the application may use, counted in `limit_unit`. It
+     /// may have a fractional part (`1.5` GiB), so the file stores it as a
+     /// number rather than a byte count.
+    #[serde(deserialize_with = "deserialize_limit_number")]
+    pub memory_limit: f64,
+    /// The unit `memory_limit` is counted in.
     pub limit_unit: Unit,
     pub elapsed_milliseconds: u32,
     pub select_all_regions_in_loading: bool,
@@ -142,8 +230,8 @@ pub struct General {
 impl Default for General {
     fn default() -> Self {
         Self {
-            memory_limit: 524_288_000,
-            limit_unit: Unit::default(),
+            memory_limit: 500.0,
+            limit_unit: Unit::Mib,
             elapsed_milliseconds: 500,
             select_all_regions_in_loading: false,
             fail_then_retry: true,
@@ -156,6 +244,14 @@ impl Default for General {
 }
 
 impl General {
+    /// The memory limit in bytes: the number the user set times its unit,
+    /// rounded to the nearest byte (a fractional limit such as 0.5 GiB is
+    /// exact, 0.1 GiB rounds).
+    pub fn memory_limit_bytes(&self) -> u64 {
+        let bytes = self.memory_limit.max(0.0) * self.limit_unit.factor() as f64;
+        bytes.round().min(u64::MAX as f64) as u64
+    }
+
     /// The directory the downloader fills and the resource layer reads: the
     /// configured one, or the platform's default when unset. Going through here
     /// (rather than the raw field) is what lets both frontends and the resource
@@ -327,7 +423,7 @@ fn default_app_id() -> Option<String> {
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(default)]
 pub struct Config {
-    #[serde(default = "config_version")]
+    #[serde(default = "legacy_config_version")]
     pub version: u32,
     pub general: General,
     pub defaults: Defaults,
@@ -512,7 +608,21 @@ pub fn load_or_create(paths: &ConfigPaths) -> io::Result<ConfigInit> {
         let text = fs::read_to_string(&paths.file)?;
         return match toml::from_str::<Config>(&text) {
             Ok(mut config) => {
-                migrate(&mut config);
+                /* Whether the file itself set a memory limit: the default fills
+                 * the field in when it did not, and the migration must not
+                 * mistake that default for an old byte count. */
+                let had_memory_limit = toml::from_str::<toml::Value>(&text)
+                    .ok()
+                    .and_then(|value| value.get("general").cloned())
+                    .is_some_and(|general| general.get("memory_limit").is_some());
+                let version_before = config.version;
+                migrate(&mut config, had_memory_limit);
+                if config.version != version_before {
+                    /* Write the migrated file once, so the next start does not
+                     * migrate again and an old byte count is not left on disk
+                     * looking like the current value. */
+                    let _ = write_config(&paths.file, &config);
+                }
                 Ok(ConfigInit {
                     config,
                     paths: paths.clone(),
@@ -759,6 +869,54 @@ mod tests {
         let text = serialize(&config);
         let parsed: Config = toml::from_str(&text).unwrap();
         assert_eq!(config, parsed);
+    }
+
+    #[test]
+    fn migration_converts_the_old_byte_memory_limit() {
+        let paths = temp_paths("migrate-memory");
+        fs::create_dir_all(paths.file.parent().unwrap()).unwrap();
+        /* Version 2 stored bytes; the unit was only a display choice. */
+        let old = "version = 2\n\n[general]\nmemory_limit = 524288000\n\
+                   limit_unit = \"GiB\"\n";
+        fs::write(&paths.file, old).unwrap();
+        let init = load_or_create(&paths).unwrap();
+        assert_eq!(init.config.version, CONFIG_VERSION);
+        /* 524288000 bytes divides exactly by MiB (500 of them), so nothing is
+         * rounded away. */
+        assert_eq!(init.config.general.memory_limit, 500.0);
+        assert_eq!(init.config.general.limit_unit, Unit::Mib);
+
+        /* A byte count that no larger unit divides stays in bytes. */
+        fs::write(
+            &paths.file,
+            "version = 2\n\n[general]\nmemory_limit = 500000001\n\
+             limit_unit = \"MiB\"\n",
+        )
+        .unwrap();
+        let init = load_or_create(&paths).unwrap();
+        assert_eq!(init.config.general.memory_limit, 500_000_001.0);
+        assert_eq!(init.config.general.limit_unit, Unit::Bytes);
+        cleanup(&paths);
+    }
+
+    #[test]
+    fn a_file_without_a_version_field_is_migrated() {
+        let paths = temp_paths("migrate-unversioned");
+        fs::create_dir_all(paths.file.parent().unwrap()).unwrap();
+        /* A build old enough not to write `version` at all: the memory limit
+         * is a byte count, and skipping the migration would show it as if it
+         * were 524288000 MiB. */
+        let old = "[general]\nmemory_limit = 524288000\nlimit_unit = \"GiB\"\n";
+        fs::write(&paths.file, old).unwrap();
+        let init = load_or_create(&paths).unwrap();
+        assert_eq!(init.config.version, CONFIG_VERSION);
+        assert_eq!(init.config.general.memory_limit, 500.0);
+        assert_eq!(init.config.general.limit_unit, Unit::Mib);
+        /* The migrated file was written back, so the next start does not have
+         * to migrate again. */
+        let text = fs::read_to_string(&paths.file).unwrap();
+        assert!(text.contains("version = 4"), "config was {text}");
+        cleanup(&paths);
     }
 
     #[test]

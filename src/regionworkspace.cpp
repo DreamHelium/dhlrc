@@ -2,6 +2,7 @@
 
 #include "blockreaderui.h"
 #include "detachabletabwidget.h"
+#include "dhrenderui.h"
 #include "manageregionui.h"
 #include "mainwindow.h"
 #include "materiallistui.h"
@@ -89,6 +90,15 @@ RegionWorkspace::reader ()
                &RegionWorkspace::showModifier);
       connect (readerUi, &BlockReaderUI::materialsRequested, this,
                &RegionWorkspace::showMaterials);
+      connect (readerUi, &BlockReaderUI::renderRequested, this,
+               &RegionWorkspace::showRender);
+      /* Names become translated while the page may already be open. */
+      connect (readerUi, &BlockReaderUI::finishLoadingTranslation, this,
+               [this]
+                 {
+                   if (materialUi)
+                     materialUi->setTranslationReady (true);
+                 });
       tabs->addTab (readerUi, _ ("Reader"));
     }
   return readerUi;
@@ -113,6 +123,8 @@ RegionWorkspace::closePage (QWidget *page)
     changesUi = nullptr;
   else if (materialUi && page == static_cast<QWidget *> (materialUi.data ()))
     materialUi = nullptr;
+  else if (renderUi && page == static_cast<QWidget *> (renderUi.data ()))
+    renderUi = nullptr;
   page->deleteLater ();
   if (tabs->count () > 0)
     tabs->setCurrentIndex (0);
@@ -172,6 +184,20 @@ RegionWorkspace::showChanges ()
       tabs->addTab (changesUi, _ ("Change History"));
     }
   tabs->setCurrentWidget (changesUi);
+}
+
+void
+RegionWorkspace::showRender ()
+{
+  if (!region)
+    return;
+  if (!renderUi)
+    {
+      renderUi = new DhRenderUI (region, this);
+      renderUi->setProperty ("dhlrcClosable", true);
+      tabs->addTab (renderUi, _ ("3D Preview"));
+    }
+  tabs->setCurrentWidget (renderUi);
 }
 
 void

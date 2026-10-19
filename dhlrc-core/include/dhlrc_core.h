@@ -83,8 +83,10 @@ extern "C"
    */
   struct DhlrcConfigView
   {
+    /* The memory limit in bytes (the number in `limit_unit` units has already
+     * been multiplied and rounded by the core). */
     int64_t memory_limit;
-    int32_t limit_unit; /* a DhlrcUnit */
+    int32_t limit_unit; /* a DhlrcUnit; the unit the number is shown in */
     int64_t elapsed_milliseconds;
     bool select_all_regions_in_loading;
     /* Try the other modules when the one the file extension points at fails. */

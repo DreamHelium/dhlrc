@@ -118,6 +118,13 @@ if(DH_BUILD_RENDER_CHECK)
     dhpreview.cpp)
 endif()
 
+if(DH_UI_CHECK)
+  set(TEMP_PROJECT_SOURCES
+    ${TEMP_PROJECT_SOURCES}
+    uicheck.h
+    uicheck.cpp)
+endif()
+
 if (WIN32)
   # Windows takes the programme's icon (Explorer, taskbar, Alt+Tab) from a
   # resource; the .ico sits next to the .rc, which windres finds through this
@@ -160,6 +167,10 @@ if (WIN32)
   # SetCurrentProcessExplicitAppUserModelID and the registry call behind the
   # notification sender id (see windowsappid.cpp).
   target_link_libraries(dhlrc_qt PRIVATE shell32 advapi32)
+endif ()
+
+if (DH_UI_CHECK)
+  target_compile_definitions(dhlrc_qt PRIVATE DH_UI_CHECK)
 endif ()
 
 # The GPU path of the 3D view needs Qt's OpenGL widgets, which a Qt built

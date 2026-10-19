@@ -106,7 +106,7 @@ impl ConfigViewData {
     fn new(config: &Config) -> Self {
         let mut strings: Vec<CString> = Vec::new();
         let view = DhlrcConfigView {
-            memory_limit: i64::from(config.general.memory_limit),
+            memory_limit: config.general.memory_limit_bytes() as i64,
             limit_unit: unit_to_int(config.general.limit_unit),
             elapsed_milliseconds: i64::from(config.general.elapsed_milliseconds),
             select_all_regions_in_loading: config.general.select_all_regions_in_loading,
@@ -1361,8 +1361,10 @@ fn from_c_required(pointer: *const c_char) -> String {
 /// carry (the plugin options) is kept.
 fn config_from_view(view: &DhlrcConfigView, base: &Config) -> Config {
     let mut config = base.clone();
-    config.general.memory_limit = view.memory_limit.max(0) as u32;
-    config.general.limit_unit = int_to_unit(view.limit_unit);
+    /* The view carries bytes; the file stores a number in a unit. A view has no
+     * fractional part, so it lands in the smallest unit. */
+    config.general.memory_limit = view.memory_limit.max(0) as f64;
+    config.general.limit_unit = Unit::Bytes;
     config.general.elapsed_milliseconds = view.elapsed_milliseconds.max(0) as u32;
     config.general.select_all_regions_in_loading = view.select_all_regions_in_loading;
     config.general.fail_then_retry = view.fail_then_retry;

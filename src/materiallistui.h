@@ -37,8 +37,13 @@ public:
                            bool translationReady, QWidget *parent = nullptr);
   ~MaterialListUI () override;
 
-private:
+  /* Whether block names are translated. The list is counted once; a later
+   * update lets the names appear without the page being rebuilt. */
+  void setTranslationReady (bool ready);
+  /* Re-reads the material list from the region. */
   void refresh ();
+
+private:
   /* Rebuilds the rows from `material` without asking the core again, so the
    * "show ignored blocks" switch is instant. */
   void populate ();

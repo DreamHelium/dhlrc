@@ -25,8 +25,19 @@ DhSettingsTemplate::addRow ()
   auto *label = new QLabel (item->label ());
   label->setToolTip (item->toolTip ());
   row->addWidget (label);
+  rowWidgets.append (label);
   layout->addLayout (row);
   return row;
+}
+
+void
+DhSettingsTemplate::setEnabled (bool enabled)
+{
+  for (auto &part : rowWidgets)
+    if (part)
+      part->setEnabled (enabled);
+  if (widget)
+    widget->setEnabled (enabled);
 }
 
 void
@@ -72,7 +83,7 @@ DhIntSettingTemplate::initWidget (QVBoxLayout *, DhSettingsDialog *)
   auto *row = addRow ();
   auto *spinBox = new QSpinBox ();
   spinBox->setToolTip (item->toolTip ());
-  spinBox->setRange (0, std::numeric_limits<int>::max ());
+  spinBox->setRange (item->minimum (), item->maximum ());
   spinBox->setValue (item->toInt ());
   row->addWidget (spinBox, 1);
   widget = spinBox;

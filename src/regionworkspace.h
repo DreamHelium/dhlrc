@@ -9,17 +9,18 @@
 
 class BlockReaderUI;
 class DetachableTabWidget;
+class DhRenderUI;
 class MaterialListUI;
 class RegionChangesUI;
 class RegionClass;
 class RegionModifyUI;
 class DhDownloader;
 
-/* One region in one tab: its reader, modifier, change history and material
- * list are pages of this workspace rather than tabs of their own, so opening
- * several regions does not flood the tab bar with a row of pages per region.
- * The tools that are windows (the 3D view, the block list, the NBT viewers)
- * stay windows, exactly as before.
+/* One region in one tab: its reader, modifier, change history, material list
+ * and 3D view are pages of this workspace rather than tabs or windows of their
+ * own, so opening several regions does not flood the tab bar with a row of
+ * pages per region. The tools that stay windows are the block list, the block
+ * view and the NBT viewers.
  *
  * The pages are built the first time they are asked for, so a workspace costs
  * nothing beyond its reader until one of the other pages is opened.
@@ -50,6 +51,7 @@ public:
   void showModifier ();
   void showChanges ();
   void showMaterials ();
+  void showRender ();
 
   /* What the tab or window is called: the region's display name. */
   [[nodiscard]] QString title () const;
@@ -74,6 +76,7 @@ private:
   QPointer<RegionModifyUI> modifierUi;
   QPointer<RegionChangesUI> changesUi;
   QPointer<MaterialListUI> materialUi;
+  QPointer<DhRenderUI> renderUi;
 };
 
 #endif // DHLRC_REGIONWORKSPACE_H

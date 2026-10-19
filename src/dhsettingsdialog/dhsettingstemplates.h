@@ -4,6 +4,8 @@
 #include "dhsettingitem.h"
 #include "dhsettingsdialog_export.h"
 
+#include <QList>
+#include <QPointer>
 #include <QWidget>
 #include <memory>
 
@@ -30,6 +32,10 @@ public:
   virtual ~DhSettingsTemplate () = default;
 
   virtual void initWidget (QVBoxLayout *layout, DhSettingsDialog *dialog) = 0;
+  /* Greys the row out. The dialog uses it for a setting that only means
+   * something while another one is switched on (a plugin's options are only
+   * read when the plugin is set to use them). */
+  virtual void setEnabled (bool enabled);
   virtual void applyChange () const = 0;
   [[nodiscard]] virtual bool detect () const = 0;
   virtual void setDefault () const = 0;
@@ -45,6 +51,10 @@ protected:
    * room to its right for the control. Returns the row so the caller can add
    * the control (and anything else it needs, like a browse button). */
   QHBoxLayout *addRow ();
+
+  /* The widgets of this row besides `widget`: the label, and for the rows with
+   * more than one control the rest. `setEnabled ()` walks them. */
+  QList<QPointer<QWidget>> rowWidgets;
 };
 
 class DhBoolSettingTemplate : public DhSettingsTemplate

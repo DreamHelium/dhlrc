@@ -4,6 +4,7 @@
 #include <QString>
 #include <QStringList>
 #include <QVariant>
+#include <limits>
 #include <utility>
 
 /* One setting the dialog edits: a value, how to label it, and (for an enum)
@@ -99,6 +100,26 @@ public:
     choiceNames = std::move (choices);
   }
 
+  /* Int only: the inclusive range the control may offer. A plugin advertises
+   * its own (a "Sponge format version" goes from 0 to 3), so a plain spin box
+   * must not let the user type beyond what the plugin accepts. */
+  void
+  setRange (int minimum, int maximum)
+  {
+    minimumValue = minimum;
+    maximumValue = maximum;
+  }
+  [[nodiscard]] int
+  minimum () const
+  {
+    return minimumValue;
+  }
+  [[nodiscard]] int
+  maximum () const
+  {
+    return maximumValue;
+  }
+
   [[nodiscard]] bool
   toBool () const
   {
@@ -123,6 +144,8 @@ private:
   QVariant current;
   QVariant fallback;
   QStringList choiceNames;
+  int minimumValue = 0;
+  int maximumValue = std::numeric_limits<int>::max ();
 };
 
 #endif // DHLRC_DHSETTINGITEM_H

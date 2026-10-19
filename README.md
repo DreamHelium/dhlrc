@@ -26,9 +26,8 @@ the commits to choose a usable version) which were written manually.
 
 ## Temporary Problem in this Commit (Manually Report)
 
-- Settings' logical problem.
-- No tests with modules.
-- External NBT Reader unexpectedly exits when file error sometimes.
+- Setting migration problem.
+- Render window push/pull will blank sometimes.
 
 ## Report Bugs and Errors
 

@@ -3,7 +3,6 @@
 
 #include "blocklistui.h"
 #include "blockshowui.h"
-#include "dhrenderui.h"
 #include "manageregionui.h"
 #include "nbtreaderui.h"
 #include "resourcegetter.h"
@@ -28,11 +27,12 @@ class QMenu;
  * entity NBT, the 3D view).
  *
  * The per-region pages that belong beside the reader (the modifier, the change
- * history and the material list) are pages of the workspace this reader lives
- * in, so the reader asks for them through signals instead of opening tabs of
- * its own. Every tool that is a window is tracked, so closing the reader
- * closes them too. The reader holds the region with a shared_ptr, so it also
- * survives the region being removed from the list while a tool is still open.
+ * history, the material list and the 3D view) are pages of the workspace this
+ * reader lives in, so the reader asks for them through signals instead of
+ * opening tabs or windows of its own. Every tool that is a window is tracked,
+ * so closing the reader closes them too. The reader holds the region with a
+ * shared_ptr, so it also survives the region being removed from the list while
+ * a tool is still open.
  */
 class BlockReaderUI : public DhWidget
 {
@@ -94,7 +94,6 @@ private:
   QPointer<BlockShowUI> bsui = nullptr;
   QPointer<BlockListUI> blui = nullptr;
   QPointer<NbtReaderUI> nrui = nullptr;
-  QPointer<DhRenderUI> renderUi = nullptr;
   /* The tools button opens this menu; its actions are greyed out while a job
    * holds the region, or when the block under the coordinates has nothing to
    * show. */
@@ -125,6 +124,7 @@ Q_SIGNALS:
   void changesRequested ();
   void modifierRequested ();
   void materialsRequested ();
+  void renderRequested ();
   /* Something the tools menu depends on changed (the lock, the block under
    * the coordinates, the translation), so its actions have to be re-checked. */
   void toolsChanged ();

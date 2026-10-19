@@ -45,6 +45,15 @@ BlockListUI::BlockListUI (std::shared_ptr<RegionClass> region,
   ui->tableView->setDND (false);
 }
 
+void
+BlockListUI::setTranslationReady (bool ready)
+{
+  if (translationReady == ready)
+    return;
+  translationReady = ready;
+  updateBlockList ();
+}
+
 BlockListUI::~BlockListUI ()
 {
   /* The scan may still be running; stop it and wait for the current block, so
@@ -60,6 +69,9 @@ BlockListUI::~BlockListUI ()
 void
 BlockListUI::updateBlockList ()
 {
+  /* A second scan (the names can arrive after the window opened) replaces the
+   * rows instead of adding to them. */
+  model->removeRows (0, model->rowCount ());
   QStringList stringList;
   if (translationReady)
     stringList << _ ("id") << _ ("id Name") << _ ("Block Name") << _ ("x")

@@ -62,9 +62,9 @@ fn open_read_watch_round_trip() {
     let view: *mut DhlrcConfigView = dhlrc_core_config_view(core);
     assert!(!view.is_null());
     let snapshot = unsafe { &*view };
-    assert_eq!(snapshot.memory_limit, 524_288_000);
+    assert_eq!(snapshot.memory_limit, 524_288_000); // bytes
     assert_eq!(snapshot.elapsed_milliseconds, 500);
-    assert_eq!(snapshot.limit_unit, 0); // GiB
+    assert_eq!(snapshot.limit_unit, 1); // MiB
     assert_eq!(snapshot.default_show_option, 0); // Palette
     let base_name = unsafe { CStr::from_ptr(snapshot.base_name) }
         .to_string_lossy()
@@ -142,7 +142,7 @@ fn apply_and_save_round_trips() {
 
     // A view-shaped set of values; NULL strings mean "unset".
     let mut values: DhlrcConfigView = unsafe { std::mem::zeroed() };
-    values.memory_limit = 524_288_000;
+    values.memory_limit = 734_003_200; // bytes: 700 MiB
     values.elapsed_milliseconds = 999;
     values.select_all_regions_in_loading = true;
     assert_eq!(dhlrc_core_apply(core, &values, &mut error), 0);
@@ -155,6 +155,10 @@ fn apply_and_save_round_trips() {
     let view = dhlrc_core_config_view(core);
     assert_eq!(unsafe { (*view).elapsed_milliseconds }, 999);
     assert!(unsafe { (*view).select_all_regions_in_loading });
+    assert_eq!(unsafe { (*view).memory_limit }, 734_003_200);
+    /* A view has no fractional part, so the core parks it in the smallest
+     * unit. */
+    assert_eq!(unsafe { (*view).limit_unit }, 3); // Bytes
     dhlrc_config_view_free(view);
     dhlrc_core_free(core);
     let _ = std::fs::remove_dir_all(&dir);
@@ -261,7 +265,7 @@ fn an_older_configuration_stops_asking_before_reading() {
     // The migrated version is what gets written back.
     assert_eq!(dhlrc_core_save(core, &mut error), 0);
     let text = std::fs::read_to_string(dir.join("config.toml")).unwrap();
-    assert!(text.contains("version = 2"), "config was {text}");
+    assert!(text.contains("version = 4"), "config was {text}");
 
     dhlrc_core_free(core);
     let _ = std::fs::remove_dir_all(&dir);

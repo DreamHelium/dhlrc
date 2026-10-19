@@ -43,14 +43,15 @@
 #include "externalnbtreaderui.h"
 #include "regionworkspace.h"
 #include "utility.h"
-#include <QComboBox>
 #include <QDesktopServices>
 #include <QDragEnterEvent>
 #include <QDropEvent>
 #include <QGuiApplication>
 #include <QMimeData>
 #include <QIcon>
+#include <QDoubleValidator>
 #include <QLineEdit>
+#include <QLocale>
 #include <QResizeEvent>
 #include <QScrollBar>
 #include <QSortFilterProxyModel>
@@ -99,161 +100,6 @@ isPersistentPage (QWidget *page)
          && (page == ManageRegionUI::instance ()
              || qobject_cast<DhDirectoryUI *> (page) != nullptr);
 }
-
-/* The memory limit and its unit are edited together, so they get one row
- * instead of two. The unit item is registered with a null control and written
- * here. */
-class DhMemorySettingTemplate : public DhSettingsTemplate
-{
-public:
-  using DhSettingsTemplate::DhSettingsTemplate;
-
-  void
-  initWidget (QVBoxLayout *layout, DhSettingsDialog *) override
-  {
-    auto *row = new QHBoxLayout ();
-    auto *label = new QLabel (item->label ());
-    label->setToolTip (item->toolTip ());
-    row->addWidget (label);
-    valueEdit = new QLineEdit ();
-    row->addWidget (valueEdit);
-    unitCombo = new QComboBox ();
-    /* The choices come from the `LimitUnit` item the core describes, so they
-     * are not repeated here. */
-    if (auto *unitItem = dialog->item (QStringLiteral ("LimitUnit")))
-      unitCombo->addItems (unitItem->choices ());
-    row->addWidget (unitCombo);
-    layout->addLayout (row);
-
-    changeConfig ();
-    QObject::connect (valueEdit, &QLineEdit::textChanged, dialog,
-                      &DhSettingsDialog::detect);
-    QObject::connect (unitCombo, &QComboBox::currentIndexChanged, dialog,
-                      &DhSettingsDialog::detect);
-  }
-
-  void
-  applyChange () const override
-  {
-    const int unit = unitCombo->currentIndex ();
-    item->setProperty (saveValue (valueEdit->text ().toDouble (), unit));
-    if (auto *unitItem = dialog->item (QStringLiteral ("LimitUnit")))
-      unitItem->setProperty (unit);
-  }
-
-  [[nodiscard]] bool
-  detect () const override
-  {
-    const int unit = unitCombo->currentIndex ();
-    int unitValue = 0;
-    if (auto *unitItem = dialog->item (QStringLiteral ("LimitUnit")))
-      unitValue = unitItem->toInt ();
-    if (unit != unitValue)
-      return true;
-    return saveValue (valueEdit->text ().toDouble (), unit) != item->toInt ();
-  }
-
-  void
-  setDefault () const override
-  {
-    int unit = 0;
-    if (auto *unitItem = dialog->item (QStringLiteral ("LimitUnit")))
-      unit = unitItem->getDefault ().toInt ();
-    unitCombo->setCurrentIndex (unit);
-    valueEdit->setText (format (item->getDefault ().toInt (), unit));
-  }
-
-  void
-  changeConfig () const override
-  {
-    int unit = 0;
-    if (auto *unitItem = dialog->item (QStringLiteral ("LimitUnit")))
-      unit = unitItem->toInt ();
-    unitCombo->setCurrentIndex (unit);
-    valueEdit->setText (format (item->toInt (), unit));
-  }
-
-private:
-  /* The text for `bytes` in `unit`: the shortest decimal that reads back as
-   * the same number of bytes. `QString::number`'s default six digits is not
-   * enough (500 MiB is 0.48828125 GiB), and a value that does not round-trip
-   * would be seen as an edit and written back rounded. */
-  static QString
-  format (int bytes, int unit)
-  {
-    const double shown = value (bytes, unit);
-    for (int precision = 1; precision <= 17; precision++)
-      {
-        auto text = QString::number (shown, 'g', precision);
-        if (saveValue (text.toDouble (), unit) == bytes)
-          return text;
-      }
-    return QString::number (shown, 'g', 17);
-  }
-
-  static double
-  value (int bytes, int unit)
-  {
-    switch (unit)
-      {
-      case 0:
-        return static_cast<double> (bytes) / 1024 / 1024 / 1024;
-      case 1:
-        return static_cast<double> (bytes) / 1024 / 1024;
-      case 2:
-        return static_cast<double> (bytes) / 1024;
-      default:
-        return static_cast<double> (bytes);
-      }
-  }
-  static int
-  saveValue (double value, int unit)
-  {
-    switch (unit)
-      {
-      case 0:
-        return static_cast<int> (value * 1024 * 1024 * 1024);
-      case 1:
-        return static_cast<int> (value * 1024 * 1024);
-      case 2:
-        return static_cast<int> (value * 1024);
-      default:
-        return static_cast<int> (value);
-      }
-  }
-
-  QLineEdit *valueEdit = nullptr;
-  QComboBox *unitCombo = nullptr;
-};
-
-/* A registered item with no control of its own (its value is written by
- * another template, like the memory unit above). */
-class DhNullSettingTemplate : public DhSettingsTemplate
-{
-public:
-  using DhSettingsTemplate::DhSettingsTemplate;
-  void
-  initWidget (QVBoxLayout *, DhSettingsDialog *) override
-  {
-  }
-  void
-  applyChange () const override
-  {
-  }
-  [[nodiscard]] bool
-  detect () const override
-  {
-    return false;
-  }
-  void
-  setDefault () const override
-  {
-  }
-  void
-  changeConfig () const override
-  {
-  }
-};
 
 /* A setting with no control of its own on the page, whose value is edited from
  * another dialog: the multi-region preview's sample values. `pending` stands
@@ -376,6 +222,11 @@ public:
     edit->setText (patternEdit->text ());
     writeSample ("NamePatternSampleFile", sampleFileEdit->text ());
     writeSample ("NamePatternSampleRegion", sampleRegionEdit->text ());
+    /* The samples have no control of their own, so writing them emits no
+     * signal; without this the Apply button would keep the state it had when
+     * the line edit was set (which can be "on" even after both values were
+     * put back). */
+    dialog->detect ();
   }
 
 private:
@@ -509,6 +360,63 @@ public:
   detect () const override
   {
     return qobject_cast<QLineEdit *> (widget)->text () != item->toString ();
+  }
+
+  void
+  setDefault () const override
+  {
+    qobject_cast<QLineEdit *> (widget)->setText (
+        item->getDefault ().toString ());
+  }
+
+  void
+  changeConfig () const override
+  {
+    qobject_cast<QLineEdit *> (widget)->setText (item->toString ());
+  }
+};
+
+/* The memory limit may have a fractional part (`1.5` GiB), and it is kept as
+ * the text the user typed: the number and its unit are two independent rows, so
+ * nothing is converted into a byte count for the display and nothing can
+ * round-trip badly. The line edit only accepts a number, with `.` as the
+ * decimal separator whatever the interface language is. */
+class DhDecimalSettingTemplate : public DhSettingsTemplate
+{
+public:
+  using DhSettingsTemplate::DhSettingsTemplate;
+
+  void
+  initWidget (QVBoxLayout *, DhSettingsDialog *dialog) override
+  {
+    auto *row = addRow ();
+    auto *edit = new QLineEdit (item->toString ());
+    edit->setToolTip (item->toolTip ());
+    auto *validator = new QDoubleValidator (0.0, 1.0e12, 6, edit);
+    validator->setNotation (QDoubleValidator::StandardNotation);
+    validator->setLocale (QLocale::c ());
+    edit->setValidator (validator);
+    row->addWidget (edit, 1);
+    widget = edit;
+    QObject::connect (edit, &QLineEdit::textChanged, dialog,
+                      &DhSettingsDialog::detect);
+  }
+
+  void
+  applyChange () const override
+  {
+    const QString text = qobject_cast<QLineEdit *> (widget)->text ().trimmed ();
+    /* An empty box keeps the old value rather than writing a text the core
+     * would have to ignore. */
+    if (!text.isEmpty ())
+      item->setProperty (text);
+  }
+
+  [[nodiscard]] bool
+  detect () const override
+  {
+    return qobject_cast<QLineEdit *> (widget)->text ().trimmed ()
+           != item->toString ();
   }
 
   void
@@ -964,13 +872,14 @@ MainWindow::MainWindow (QWidget *parent) : QMainWindow (parent)
       if (info.longText)
         settingsDialog->addLongTextItems (info.key);
 
+      /* The memory limit is two independent rows: the number (which may have a
+       * decimal part) and its unit. The number is what the user typed, so there
+       * is no byte count to convert for the display, and no rounding to go
+       * wrong. */
       DhSettingsTemplateCreator creator;
       if (info.key == QLatin1String ("MemoryLimit"))
         creator = [] (DhSettingItem *i, QVBoxLayout *l, DhSettingsDialog *d)
-          { return std::make_unique<DhMemorySettingTemplate> (i, l, d); };
-      else if (info.key == QLatin1String ("LimitUnit"))
-        creator = [] (DhSettingItem *i, QVBoxLayout *l, DhSettingsDialog *d)
-          { return std::make_unique<DhNullSettingTemplate> (i, l, d); };
+          { return std::make_unique<DhDecimalSettingTemplate> (i, l, d); };
       else if (info.key == QLatin1String ("MultiRegionNamePattern"))
         creator = [] (DhSettingItem *i, QVBoxLayout *l, DhSettingsDialog *d)
           { return std::make_unique<DhNamePatternSettingTemplate> (i, l, d); };
@@ -1040,7 +949,18 @@ MainWindow::MainWindow (QWidget *parent) : QMainWindow (parent)
                     plugins->optionValue (plugin.type, kind, option));
                 optionItem->setLabel (option.label);
                 optionItem->setToolTip (option.description);
+                /* The plugin advertises the range its setter accepts (the
+                 * Sponge format version is 0 to 3, for one), so the spin box
+                 * asks the plugin rather than allowing any int. */
+                if (!isBool)
+                  optionItem->setRange (option.minimum, option.maximum);
                 settingsDialog->addItem (optionItem, {});
+                /* Nothing in this option group is read while the plugin is set
+                 * to ask for its options, so grey the row out with the switch
+                 * above it. */
+                settingsDialog->setEnabledWhen (
+                    pluginOptionKey (plugin.type, kind, option.key),
+                    pluginUseKey (plugin.type, kind));
               }
           }
       }

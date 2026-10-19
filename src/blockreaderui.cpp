@@ -140,7 +140,17 @@ BlockReaderUI::BlockReaderUI (int index,
                     * resource set can find it; the lookup itself goes through
                     * the core, so only the "ready" flag is kept here. */
                    translationReady = true;
+                   /* The line above the bar says what the download did; the
+                    * block names below it are translated now, so the readout
+                    * and any tool that shows names are refreshed right away
+                    * instead of on the next coordinate change. */
+                   ui->progressLabel->setText (_ ("Downloading finished!"));
+                   ui->progressBar->setValue (100);
+                   if (blui)
+                     blui->setTranslationReady (true);
+                   textChanged_cb ();
                    Q_EMIT finishLoadingTranslation ();
+                   Q_EMIT toolsChanged ();
                    Q_EMIT changeVal (100);
                  }
                else
@@ -210,11 +220,6 @@ BlockReaderUI::closeChildren ()
     {
       nrui->close ();
       nrui = nullptr;
-    }
-  if (renderUi)
-    {
-      renderUi->close ();
-      renderUi = nullptr;
     }
 }
 
@@ -487,14 +492,9 @@ BlockReaderUI::showBlockView ()
 void
 BlockReaderUI::showPreview ()
 {
-  /* The 3D window copies what it needs out of the region, but it was opened
-   * from this page, so closing the page closes it. */
-  if (!renderUi)
-    renderUi = new DhRenderUI (regionClass);
-  renderUi->setAttribute (Qt::WA_DeleteOnClose);
-  renderUi->show ();
-  renderUi->activateWindow ();
-  renderUi->raise ();
+  /* The 3D view is a page of the workspace, beside the reader; it is built
+   * there because it needs no state from this page beyond the region. */
+  Q_EMIT renderRequested ();
 }
 
 void

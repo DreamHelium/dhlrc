@@ -3,6 +3,7 @@
 #include "dhsettingstemplates.h"
 
 #include <KLocalizedString>
+#include <QCheckBox>
 #include <QDesktopServices>
 #include <QDialogButtonBox>
 #include <QHBoxLayout>
@@ -117,11 +118,11 @@ DhSettingsDialog::DhSettingsDialog (QWidget *parent) : KPageDialog (parent)
   connect (button (QDialogButtonBox::Ok), &QPushButton::clicked, this,
            &DhSettingsDialog::apply);
   connect (button (QDialogButtonBox::Cancel), &QPushButton::clicked, this,
-           [this]
-             {
-               for (const auto &t : templates)
-                 t->changeConfig ();
-             });
+           &DhSettingsDialog::discardEdits);
+  /* Cancel is not the only way out: Esc and the window's close button reject
+   * the dialog as well, and both used to leave the edits (and the lit Apply
+   * button) behind for the next opening. */
+  connect (this, &QDialog::rejected, this, &DhSettingsDialog::discardEdits);
 }
 
 DhSettingsDialog::~DhSettingsDialog ()
@@ -166,6 +167,34 @@ void
 DhSettingsDialog::addLongTextItems (const QString &key)
 {
   longTextKeys.append (key);
+}
+
+void
+DhSettingsDialog::setEnabledWhen (const QString &key, const QString &masterKey)
+{
+  enabledWhen.append ({ key, masterKey });
+  if (built)
+    updateEnabledState ();
+}
+
+void
+DhSettingsDialog::updateEnabledState ()
+{
+  for (const auto &[key, masterKey] : enabledWhen)
+    {
+      auto *masterItem = item (masterKey);
+      auto *masterTemplate = templateFor (masterKey);
+      auto *dependent = templateFor (key);
+      if (!masterItem || !dependent)
+        continue;
+      /* The checkbox, not the item: the item is only written on Apply, and
+       * the rows have to follow the switch the moment it is clicked. */
+      bool on = masterItem->toBool ();
+      if (masterTemplate)
+        if (auto *box = qobject_cast<QCheckBox *> (masterTemplate->widget))
+          on = box->isChecked ();
+      dependent->setEnabled (on);
+    }
 }
 
 bool
@@ -351,12 +380,17 @@ DhSettingsDialog::build ()
     }
 
   built = true;
+  updateEnabledState ();
 }
 
 void
 DhSettingsDialog::show (const QString &group)
 {
   build ();
+  /* Recompute the button on every opening: a value may have been changed
+   * elsewhere (the config was reloaded, a plugin was switched), and the
+   * opening must never show a state that does not match the controls. */
+  detect ();
   if (!group.isEmpty ())
     {
       for (auto *page : pageItems)
@@ -381,8 +415,11 @@ DhSettingsDialog::apply ()
 }
 
 void
-DhSettingsDialog::detect () const
+DhSettingsDialog::detect ()
 {
+  /* One of the controls may be the switch another row's enable state hangs
+   * on, so the rows are re-checked before the Apply button decides. */
+  updateEnabledState ();
   bool enable = false;
   for (const auto &t : templates)
     if (t->detect ())
@@ -398,6 +435,8 @@ DhSettingsDialog::setDefaults ()
 {
   for (const auto &t : templates)
     t->setDefault ();
+  updateEnabledState ();
+  detect ();
 }
 
 void
@@ -414,4 +453,18 @@ DhSettingsDialog::refresh ()
 {
   for (const auto &t : templates)
     t->changeConfig ();
+  updateEnabledState ();
+  /* The controls now hold the items' values, so nothing is pending. Doing the
+   * check here means a refresh cannot leave a stale lit Apply button behind,
+   * whichever path asked for it (a reload, a config change, a cancelled
+   * edit). */
+  detect ();
+}
+
+void
+DhSettingsDialog::discardEdits ()
+{
+  /* `refresh ()` puts the controls back on the items and re-checks the button;
+   * this is the whole of "throw the typed values away". */
+  refresh ();
 }

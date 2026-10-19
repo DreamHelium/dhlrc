@@ -36,6 +36,10 @@ public:
                QWidget *parent = nullptr);
   ~BlockListUI ();
   void updateBlockList ();
+  /* Whether block names are translated. The list is built once; asking it to
+   * translate again rebuilds the rows so the names appear without the window
+   * being closed and opened. */
+  void setTranslationReady (bool ready);
 
 Q_SIGNALS:
   void setModel ();

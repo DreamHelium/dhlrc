@@ -12,6 +12,7 @@
  * caller can move off `DhConfig` one field at a time. */
 struct DhConfigData
 {
+  /* The limit in bytes; the jobs compare it against the free memory. */
   qint64 memoryLimit = 0;
   int limitUnit = 0;
   qint64 elapsedMilliseconds = 0;

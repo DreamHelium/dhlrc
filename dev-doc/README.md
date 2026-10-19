@@ -16,6 +16,7 @@ symbols by name.
 - [Create a region](region_create.md) — how a file is loaded and turned into a region
 - [Rendering](render.md) — how a block becomes pixels: the model, the renderer, and the C ABI the Qt view draws through
 - [Sponge schematic](schem.md) — the `.schem` format, its three versions, and how its entities are handled
+- [Interface self-check](uicheck.md) — the `--ui-check` mode: what it asserts about the window, and how to add a check
 
 # User-facing help
 

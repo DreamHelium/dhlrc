@@ -17,6 +17,10 @@ option(DH_DESKTOP_NOTIFICATIONS "Show the core's notifications as desktop notifi
 # The Qt Widgets GUI (`dhlrc_qt`). Turn it off for a headless build: the shared
 # libraries and the terminal frontend are still built, but Qt/KF6 are not needed.
 option(DH_BUILD_GUI "Build the Qt Widgets GUI (dhlrc_qt)" ON)
+# The built-in interface self-check (`--ui-check`), a development tool that
+# drives a real window and asserts what the interface does. Only built when
+# asked for, so normal builds carry neither the code nor the option.
+option(DH_UI_CHECK "Build the built-in interface self-check (--ui-check)" OFF)
 # The gettext catalogue: the `po/` targets (which need `xgettext`/`msgfmt`) and
 # the `locale/` directory they produce. Turn it off where those tools are not
 # installed and translations are not wanted, e.g. Termux without `gettext`; the

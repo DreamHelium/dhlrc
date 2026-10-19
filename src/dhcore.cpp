@@ -145,8 +145,9 @@ DhCore::refresh ()
   auto text = [] (const char *value)
     { return value ? QString::fromUtf8 (value) : QString (); };
 
-  cached.memoryLimit = view->memory_limit;
   cached.limitUnit = view->limit_unit;
+  /* The core already turned the number and its unit into bytes. */
+  cached.memoryLimit = view->memory_limit;
   cached.elapsedMilliseconds = view->elapsed_milliseconds;
   cached.selectAllRegionsInLoading = view->select_all_regions_in_loading;
   cached.failThenRetry = view->fail_then_retry;

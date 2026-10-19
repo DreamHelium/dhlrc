@@ -116,6 +116,15 @@ MaterialListUI::MaterialListUI (std::shared_ptr<RegionClass> region_,
 
 MaterialListUI::~MaterialListUI () = default;
 
+void
+MaterialListUI::setTranslationReady (bool ready)
+{
+  if (translationReady == ready)
+    return;
+  translationReady = ready;
+  refresh ();
+}
+
 QString
 MaterialListUI::displayName (const QString &id) const
 {

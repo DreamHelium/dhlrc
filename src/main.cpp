@@ -2,6 +2,9 @@
 #ifdef DH_RENDER_CHECK
 #include "dhpreview.h"
 #endif
+#ifdef DH_UI_CHECK
+#include "uicheck.h"
+#endif
 #include "mainwindow.h"
 #include "utility.h"
 #include "version.h"
@@ -14,6 +17,7 @@
 #include <QLibraryInfo>
 #include <QLocale>
 #include <QStandardPaths>
+#include <QTemporaryDir>
 #include <QTranslator>
 #include <QWidget>
 #include <qcoreapplication.h>
@@ -180,6 +184,39 @@ main (int argc, char *argv[])
    * program starts, so turning the cute pack on takes a restart — hence the
    * setting says so. This has to happen before the window and the command-line
    * help are built, because they are the first things that speak. */
+#ifdef DH_UI_CHECK
+  /* The self-check opens dialogs, toggles controls and saves settings, so a run
+   * must not touch the user's own configuration: point XDG at a throw-away
+   * directory before the core reads it. The directory lives until the process
+   * exits and keeps the report and the screenshots. */
+  if (a.arguments ().contains (QStringLiteral ("--ui-check")))
+    {
+      /* `DHLRC_UI_CHECK_DIR` names the directory a script or a CI job wants the
+       * report and the screenshots in. Without it the run gets a temporary one,
+       * kept after the run (the path is printed) so a failed check can be
+       * looked at. */
+      QString root = qEnvironmentVariable ("DHLRC_UI_CHECK_DIR");
+      if (root.isEmpty ())
+        {
+          static QTemporaryDir uiCheckDirectory;
+          uiCheckDirectory.setAutoRemove (false);
+          root = uiCheckDirectory.path ();
+        }
+      if (!root.isEmpty ())
+        {
+          QDir ().mkpath (root);
+          for (const QString &part :
+               { QStringLiteral ("config"), QStringLiteral ("cache"),
+                 QStringLiteral ("data") })
+            QDir ().mkpath (root + '/' + part);
+          qputenv ("XDG_CONFIG_HOME", (root + "/config").toUtf8 ());
+          qputenv ("XDG_CACHE_HOME", (root + "/cache").toUtf8 ());
+          qputenv ("XDG_DATA_HOME", (root + "/data").toUtf8 ());
+          dhSetUiCheckArtifactsDir (root);
+        }
+    }
+#endif
+
   DhCore::init (&a);
   if (DhCore::instance ()
       && DhCore::instance ()->settingValue (QStringLiteral ("CuteLanguagePack"))
@@ -274,9 +311,24 @@ main (int argc, char *argv[])
   parser.addOption (versionOption);
 #endif
 
+#ifdef DH_UI_CHECK
+  /* Development builds only: run the interface checks against a real window
+   * and exit; see uicheck.cpp. */
+  QCommandLineOption uiCheckOption (
+      QStringLiteral ("ui-check"),
+      i18n ("Run the built-in interface self-check and exit "
+            "(development builds only)"));
+  parser.addOption (uiCheckOption);
+#endif
+
   parser.process (a);
 
   QApplication::setStyle ("breeze");
+
+#ifdef DH_UI_CHECK
+  if (parser.isSet (uiCheckOption))
+    return dhRunUiCheck ();
+#endif
 
 #ifdef DH_RENDER_CHECK
   /* A preview never opens the main window: it loads the file, draws one

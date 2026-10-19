@@ -76,12 +76,12 @@ pub static SETTINGS: &[SettingDef] = &[
     SettingDef {
         key: "MemoryLimit",
         group: GENERAL,
-        kind: SettingType::Int,
+        kind: SettingType::String,
         label: i18n("Application Memory Limit"),
-        tooltip: i18n("The limit memory(bytes) for application."),
+        tooltip: i18n("The memory the application may use, counted in the unit below. Loading and saving stop while less than this is free. A decimal is allowed, for example 1.5."),
         choices: NO_CHOICES,
         long_text: false,
-        default: "524288000",
+        default: "500",
         get: get_memory_limit,
         set: set_memory_limit,
     },
@@ -89,11 +89,11 @@ pub static SETTINGS: &[SettingDef] = &[
         key: "LimitUnit",
         group: GENERAL,
         kind: SettingType::Enum,
-        label: "",
-        tooltip: "",
+        label: i18n("Memory Limit Unit"),
+        tooltip: i18n("The unit the memory limit is counted in."),
         choices: UNITS,
         long_text: false,
-        default: "0",
+        default: "1",
         get: get_limit_unit,
         set: set_limit_unit,
     },
@@ -453,11 +453,17 @@ fn set_optional_string(slot: &mut Option<String>, text: &str) {
 }
 
 fn get_memory_limit(config: &Config) -> String {
-    config.general.memory_limit.to_string()
+    /* Rust's Display gives the shortest text that reads back to the same
+     * number ("500", "1.5"), so a decimal typed in the dialog round-trips. */
+    format!("{}", config.general.memory_limit)
 }
 
 fn set_memory_limit(config: &mut Config, text: &str) {
-    set_uint(&mut config.general.memory_limit, text);
+    if let Ok(value) = text.trim().parse::<f64>() {
+        if value.is_finite() {
+            config.general.memory_limit = value.max(0.0);
+        }
+    }
 }
 
 fn get_limit_unit(config: &Config) -> String {

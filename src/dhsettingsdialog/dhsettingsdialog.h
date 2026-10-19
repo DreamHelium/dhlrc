@@ -83,6 +83,11 @@ public:
   void addLongTextItems (const QString &key);
   [[nodiscard]] bool isLongText (const QString &key) const;
 
+  /* Greys `key`'s row out while the bool setting `masterKey` is unchecked.
+   * The plugins use it: their options only matter when the plugin follows the
+   * saved values instead of being asked. */
+  void setEnabledWhen (const QString &key, const QString &masterKey);
+
   void addAssistant (std::unique_ptr<DhSettingsAssistant> &&assistant);
 
   /* Called on Reload, before the dialog pulls the values back into the
@@ -112,7 +117,7 @@ public:
 
 public Q_SLOTS:
   void apply ();
-  void detect () const;
+  void detect ();
   void setDefaults ();
   void reload ();
 
@@ -122,6 +127,12 @@ Q_SIGNALS:
 
 private:
   void addWidget (DhSettingItem *item, QVBoxLayout *layout);
+
+  /* Throws away what was typed since the last Apply: the controls go back to
+   * the items' saved values and the Apply button follows. Called for Cancel,
+   * for Esc and for the window's close button, so leaving the dialog without
+   * applying never leaves a pending change behind. */
+  void discardEdits ();
 
   /* One collapsible group: where in the page's item list it starts, what its
    * toggle says and how deep it sits. */
@@ -145,6 +156,10 @@ private:
   QList<DhSettingItem *> allItems;
   QList<KPageWidgetItem *> pageItems;
   QList<QString> longTextKeys;
+  /* The "this setting is grey while that bool is off" links, by key. */
+  QList<QPair<QString, QString>> enabledWhen;
+  /* Applies `enabledWhen`, once the controls exist. */
+  void updateEnabledState ();
   QPointer<QPushButton> reloadButton;
   std::function<void ()> reloadHandler;
   bool built = false;

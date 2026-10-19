@@ -78,8 +78,8 @@ back to your files until you save.
    regions whose workspace is already open with a check mark; picking one opens
    its workspace, or brings the open one forward.
 2. The region opens in one tab named after it, with its reader, modifier,
-   change history and material list as sub-tabs of that page — one tab per
-   region, however many of its tools are used, so several open regions stay
+   change history, material list and 3D view as sub-tabs of that page — one tab
+   per region, however many of its tools are used, so several open regions stay
    told apart. The page repeats the region's name and UUID at the top. Asking
    for the same region again brings that tab forward instead of opening a
    second one. The reader first downloads that version's language file.
@@ -87,26 +87,29 @@ back to your files until you save.
    version name, create and modify time, author, name and description.
 4. Type x, y and z under "Please enter the coordination of the block:". When all
    three are valid, "The information is:" lists the block's name, translation
-   name, index, palette entry and properties.
+   name, index, palette entry and properties. When the language file finishes
+   downloading, the readout and any open list refresh at once, so translated
+   names appear without the coordinates being typed again.
 5. The "Tools" button at the bottom right opens the reader's tools: "Modify
    Region" opens the "Modifier" sub-tab of the same page for editing time,
    description, offset, author, base name, region name and DataVersion. "Show
    All Entities" and "Show Entity NBT" open NBT views, "List blocks" and "Show
    blocks" open the block list and the block view, and "3D Preview" opens the
-   3D view. "Modify Property" is available for blocks with properties. While a
+   "3D Preview" sub-tab. "Modify Property" is available for blocks with properties. While a
    loading or saving job holds the region, the tools that would write ("Modify
    Region", "Modify Property") are greyed out. Choosing "Every block with this
    palette entry" lists the blocks that would be changed; the list is looked up
    only when that option is selected, because finding it means reading every
    block of the region.
 6. Everything opened from a reader belongs to it: closing the workspace closes
-   the block list, the block view, the entity NBT view and the 3D view too.
+   the block list, the block view and the entity NBT view too; the 3D view is a
+   page of the workspace and goes away with it.
    Keeping a workspace open does not lock the region — "Locked!" only means a
    loading or saving job is working on it.
-7. The workspace's pages (Reader, Modifier, Change History, Material List) can
-   be reordered by dragging their titles, closed with their close button, and
-   torn off into a window by double-clicking a title; the window's "Return to
-   tabs" button puts the page back. One tab of the main window still stands for
+7. The workspace's pages (Reader, Modifier, Change History, Material List and
+   3D Preview) can be reordered by dragging their titles, closed with their
+   close button, and torn off into a window by double-clicking a title; the
+   window's "Return to tabs" button puts the page back. One tab of the main window still stands for
    the whole region.
 8. "Change History" opens the "Change History" sub-tab, listing the changes
    made to this region, newest first: base data fields, the region's own name,
@@ -120,7 +123,10 @@ back to your files until you save.
 
 Click "Settings" for a page-based dialog with the pages "General",
 "Default", "Game", "Reader", "Notifications", "3D Preview" and "Manage". The
-last page holds options provided by the loaded modules. Each module is one
+last page holds options provided by the loaded modules, and each option is
+greyed out while its "Use saved options" switch is off; an integer option only
+accepts the range the module advertises (the Sponge format version, for one,
+goes from 0 to 3). Each module is one
 collapsed fold; opening it shows its "reading" and "writing" folds, which open
 to the options themselves, so a module with many options does not push the next
 one off the page. Every page shows the configuration file path and a button that
@@ -130,7 +136,9 @@ The buttons are "Restore Defaults", "Reload", "Apply", "OK" and "Cancel".
 "Reload" re-reads the file and discards your edits; "Apply" saves without
 closing the dialog. The settings you are most likely to want:
 
-- Application Memory Limit (with its unit), and Cache Directory.
+- Application Memory Limit and Memory Limit Unit: two separate rows, and the
+  limit is counted in the unit picked beside it (500 MiB by default). The limit
+  may have a decimal part, for example `1.5` GiB. Cache Directory.
 - Try Other Modules when Loading Fails: a file is read by the module its
   extension points at, and by the others when that fails. A file that loads as
   something other than what its name says is reported at the end instead of
