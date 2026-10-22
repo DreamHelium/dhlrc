@@ -24,14 +24,13 @@ mod modules;
 mod region;
 mod render;
 
-use clap::{CommandFactory, Parser};
-use cli::{Cli, Command};
+use cli::Command;
 use std::process::ExitCode;
 
 fn main() -> ExitCode {
     i18n::init();
 
-    let cli = Cli::parse();
+    let cli = cli::parse();
     match cli.command {
         Some(Command::Modules(args)) => modules::run(args),
         Some(Command::Render(args)) => render::run(args),
@@ -39,7 +38,7 @@ fn main() -> ExitCode {
         None => {
             /* The interactive UI will take this branch once it exists. Until
              * then, the help tells the user what is available. */
-            let mut command = Cli::command();
+            let mut command = cli::command();
             let _ = command.print_help();
             println!();
             println!(

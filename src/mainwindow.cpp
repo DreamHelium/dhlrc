@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "dhcore.h"
 #include "dhhelpui.h"
+#include "dhlog.h"
 #include "dhsettingsdialog/dhsettingsdialog.h"
 #include "dhsettingsdialog/dhsettingstemplates.h"
 #include "dhwidget.h"
@@ -640,7 +641,14 @@ MainWindow::MainWindow (QWidget *parent) : QMainWindow (parent)
            [this] { DhAboutUI::showAbout (this); });
   connect (helpAction, &QAction::triggered, this,
            [] { DhHelpUI::showHelp (QStringLiteral ("usage")); });
+  /* Where the program's log files are written; the directory is opened in the
+   * file manager so a report can be attached without hunting for it. */
+  auto *logFolderAction = new QAction (_ ("Open Log Folder"), this);
+  logFolderAction->setIcon (QIcon::fromTheme ("folder-open"));
+  connect (logFolderAction, &QAction::triggered, this,
+           [] { dh::log::openLogDirectory (); });
   helpMenu->addAction (helpAction);
+  helpMenu->addAction (logFolderAction);
   helpMenu->addAction (aboutAction);
   menuBar ()->addMenu (helpMenu);
 
@@ -844,7 +852,9 @@ MainWindow::MainWindow (QWidget *parent) : QMainWindow (parent)
     {
       if (info.group != currentGroup)
         {
-          settingsDialog->addGroup (_ (info.group.toUtf8 ()));
+          /* Raw msgid: the dialog translates the title, and `openSettings ()`
+           * needs the untranslated id to find the page. */
+          settingsDialog->addGroup (info.group);
           currentGroup = info.group;
         }
 
@@ -899,8 +909,9 @@ MainWindow::MainWindow (QWidget *parent) : QMainWindow (parent)
   /* The plugin options are discovered at run time, so they are added here
    * rather than described by the core's schema. One plugin and direction is
    * folded into a section that starts collapsed, so a plugin with many
-   * options does not push the next one off the page. */
-  settingsDialog->addGroup (_ ("Manage"));
+   * options does not push the next one off the page. The raw msgid merges
+   * this group with the schema's Manage page. */
+  settingsDialog->addGroup (QStringLiteral ("Manage"));
   {
     auto *plugins = PluginOptionsConfig::instance ();
     for (const auto &plugin : plugins->plugins ())
@@ -1045,15 +1056,8 @@ MainWindow::openSidebarEntry (const QModelIndex &index)
       showRegionReaderMenu ();
       break;
     case SidebarAction::Settings:
-      {
-        if (settingsDialog)
-          {
-            settingsDialog->raise ();
-            settingsDialog->activateWindow ();
-            settingsDialog->show ();
-          }
-        break;
-      }
+      openSettings ();
+      break;
     case SidebarAction::ProgramDirectories:
       openProgramDirectories ();
       break;
@@ -1237,6 +1241,13 @@ MainWindow::onConfigChanged ()
 
 MainWindow::~MainWindow ()
 {
+  /* The singleton goes first: the pages torn down below ask `instance ()` (via
+   * `ownWindow ()`, `ensureTab ()`, …) while this object is already on its way
+   * out, and a stale pointer there would be a crash rather than a nullptr the
+   * callers already check for. */
+  if (mainWindow == this)
+    mainWindow = nullptr;
+
   /* Torn-off pages live in windows of their own, not in the tab widget, so
    * neither the loop below nor Qt's own teardown reaches them. Take them down
    * here, while this object — and `floatingPages` — are still alive. */
@@ -1857,6 +1868,34 @@ MainWindow::instance ()
     return mainWindow;
   else
     return nullptr;
+}
+
+void
+MainWindow::openSettings (const QString &group)
+{
+  auto *window = instance ();
+  if (!window || !window->settingsDialog)
+    return;
+
+  auto *dialog = window->settingsDialog;
+  /* The dialog names its pages with the translated group string, so the
+   * untranslated id the schema and the callers use is translated here, the same
+   * way the dialog translates the groups it was built from. */
+  const QString page = group.isEmpty () ? QString () : _ (group.toUtf8 ());
+  dialog->show (page);
+  /* `show ()` only selects on an exact name and otherwise leaves the page that
+   * was open. A group the dialog does not know (the schema dropped it, or its
+   * translation changed) therefore falls back to the first page it added, not
+   * to whatever happened to be open. */
+  if (!page.isEmpty ()
+      && (!dialog->currentPage () || dialog->currentPage ()->name () != page))
+    {
+      const auto settings = DhCore::settings ();
+      if (!settings.isEmpty ())
+        dialog->show (_ (settings.front ().group.toUtf8 ()));
+    }
+  dialog->raise ();
+  dialog->activateWindow ();
 }
 
 void

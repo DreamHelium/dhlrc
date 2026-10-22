@@ -296,6 +296,42 @@ DhCore::save ()
   return ok;
 }
 
+bool
+DhCore::configNeedsReset () const
+{
+  /* Without a handle the core never read a configuration file, so there is
+   * nothing to reset (the open failure is reported separately). */
+  if (!core)
+    return false;
+  return dhlrc_core_config_needs_reset (core) == 1;
+}
+
+bool
+DhCore::resetConfig (QString *backupPath)
+{
+  if (backupPath)
+    backupPath->clear ();
+  if (!core)
+    return false;
+
+  char *backup = nullptr;
+  char *error = nullptr;
+  const bool ok = dhlrc_core_reset_config (core, &backup, &error) == 0;
+  if (!ok)
+    qWarning ("The old configuration could not be reset: %s",
+              error ? error : "unknown error");
+  else if (backupPath && backup)
+    *backupPath = QString::fromUtf8 (backup);
+  dhlrc_string_free (backup);
+  dhlrc_string_free (error);
+
+  /* The core applied the defaults in memory; refresh the cached snapshot so
+   * this process sees them immediately instead of waiting for the watcher. */
+  if (ok)
+    refresh ();
+  return ok;
+}
+
 void
 DhCore::setNotificationsEnabled (bool enabled)
 {

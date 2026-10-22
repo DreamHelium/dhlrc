@@ -14,6 +14,7 @@
 - [编译](#编译)
 - [功能](#功能)
 - [使用](#使用)
+- [日志](#日志)
 
 ---
 
@@ -54,7 +55,7 @@ cmake -B build
 cmake --build build
 ```
 
-若不需要 Qt 界面（只编译共享库与终端前端），加上 `-DDH_BUILD_GUI=OFF`，此时不再需要 Qt/KF6。再加上 `-DDH_TRANSLATIONS=OFF` 可跳过 gettext 目录（否则需要 `xgettext`/`msgfmt`），程序则一律显示英文。
+若不需要 Qt 界面（只编译共享库与终端前端），加上 `-DDH_BUILD_GUI=OFF`，此时不再需要 Qt/KF6；安装时也不会带上只有 Qt 前端才加载的 `libdhlrc_core`（终端前端静态链接核心）。再加上 `-DDH_TRANSLATIONS=OFF` 可跳过 gettext 目录（否则需要 `xgettext`/`msgfmt`），程序则一律显示英文。
 
 Termux/Android 上没有 `libintl`，Rust 侧的翻译层会自动失效（见 `gettext-shim`）：构建不再需要任何 C 库，字符串保持英文。在那里请一并加上 `-DDH_TRANSLATIONS=OFF`。
 
@@ -85,5 +86,14 @@ Termux/Android 上没有 `libintl`，Rust 侧的翻译层会自动失效（见 `
 `程序目录`会列出程序使用的各个目录，卸载前请在那里查看配置和缓存目录。
 
 tty支持可能已在计划中。
+
+## 日志
+
+Qt 前端会把日志按天写入`<缓存目录>/logs/dhlrc-YYYY-MM-DD.log`；缓存目录可在左侧列表的
+`程序目录`中查看，`帮助 -> 打开日志文件夹`可直接打开日志目录。
+
+只有不低于所设级别的消息才会写入，默认级别为`info`。级别可通过环境变量
+`DHLRC_LOG_LEVEL`（`debug`、`info`、`warning`、`critical`或`off`）或命令行选项
+`--log-level <级别>`设置，命令行选项优先；`off`只停写文件，终端输出保持不变。
 
 [commit]: https://github.com/DreamHelium/dhlrc/commit/38448728e647b9b6665f0c502d1f79c00d1d4afc

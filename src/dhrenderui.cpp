@@ -4,10 +4,13 @@
 
 #include "blockreaderui.h"
 #include "dhcore.h"
+#include "dhdownloadmanager.h"
 #include "dhrenderwidget.h"
+#include "mainwindow.h"
 #include "region.h"
 
 #include <QHBoxLayout>
+#include <QIcon>
 #include <QSignalBlocker>
 #include <QSpinBox>
 #include <algorithm>
@@ -41,21 +44,32 @@ DhRenderUI::DhRenderUI (std::shared_ptr<RegionClass> region, QWidget *parent)
       QString (_ ("3D Preview - %1")).arg (regionClass->displayName ()));
   resize (900, 640);
 
-  downloader = std::make_shared<DhDownloader> ();
-  connect (downloader.get (), &DhDownloader::finished, this,
-           &DhRenderUI::finishFetch);
-  connect (downloader.get (), &DhDownloader::progress, this,
-           [&] (int value)
+  /* The jar download is shared: the material list may already be fetching the
+   * very same file, and the manager holds one download per tag. Every signal is
+   * filtered by this window's tag, so a download for another version (or an
+   * object) does not move this window's status. */
+  auto *manager = DhDownloadManager::instance ();
+  connect (manager, &DhDownloadManager::progress, this,
+           [this] (const QString &tag, int value)
              {
-               if (fetching)
-                 summary->setText (
-                     QString (_ ("Downloading the client jar: %1%")).arg (value));
+               if (tag != jarDownloadTag () || !fetching)
+                 return;
+               summary->setText (
+                   QString (_ ("Downloading the client jar: %1%")).arg (value));
              });
-  connect (downloader.get (), &DhDownloader::info, this,
-           [&] (const QString &message)
+  connect (manager, &DhDownloadManager::info, this,
+           [this] (const QString &tag, const QString &message)
              {
-               if (fetching)
-                 picked->setText (message);
+               if (tag != jarDownloadTag () || !fetching)
+                 return;
+               picked->setText (message);
+             });
+  connect (manager, &DhDownloadManager::finished, this,
+           [this] (const QString &tag, const QString &error)
+             {
+               if (tag != jarDownloadTag ())
+                 return;
+               finishFetch (error);
              });
 
   auto layout = new QVBoxLayout (this);
@@ -83,6 +97,25 @@ DhRenderUI::DhRenderUI (std::shared_ptr<RegionClass> region, QWidget *parent)
   boundsButton->setObjectName ("boundsButton");
   boundsButton->setCheckable (true);
   boundsButton->setToolTip (_ ("Show the box around the region being drawn"));
+  /* The preview's own option lives in the settings dialog, which belongs to the
+   * main window. A render window built by the headless self-check has no main
+   * window, so there is no dialog to open and the button is left out. */
+  if (MainWindow::instance ())
+    {
+      auto *settingsButton = new QPushButton (_ ("Preview Settings..."), this);
+      settingsButton->setIcon (QIcon::fromTheme (QStringLiteral ("configure")));
+      settingsButton->setToolTip (
+          _ ("Open the 3D preview setting: whether a missing client jar is "
+             "downloaded automatically."));
+      connect (settingsButton, &QPushButton::clicked, this,
+               []
+                 {
+                   /* The main window may be gone by the time the button is
+                    * clicked; `openSettings ()` is a no-op then. */
+                   MainWindow::openSettings (QStringLiteral ("3D Preview"));
+                 });
+      controls->addWidget (settingsButton);
+    }
   summary = new QLabel (this);
   controls->addWidget (fitButton);
   controls->addWidget (orthoButton);
@@ -360,12 +393,23 @@ DhRenderUI::jarPath () const
   return text;
 }
 
+QString
+DhRenderUI::jarDownloadTag () const
+{
+  return DhDownloadManager::clientJarTag (
+      static_cast<int> (regionClass->dataVersion ()));
+}
+
 void
 DhRenderUI::toggleFetch ()
 {
   if (fetching)
     {
-      downloader->stop ();
+      /* The worker stops between blocks and reports the cancellation as the
+       * download's error, so the `finished` that reaches `finishFetch ()`
+       * puts the button back and says why. Another page that joined the same
+       * jar download hears that end as well. */
+      DhDownloadManager::instance ()->cancel (jarDownloadTag ());
       return;
     }
   startFetch ();
@@ -377,7 +421,10 @@ DhRenderUI::startFetch ()
   if (fetching || jarState () != 0)
     return;
   setFetching (true);
-  downloader->downloadClientJar (
+  /* A `false` means that download is already on its way (another window or the
+   * material list asked first): nothing is started here, and the progress and
+   * the finish still arrive through the manager. */
+  DhDownloadManager::instance ()->ensureClientJar (
       static_cast<int> (regionClass->dataVersion ()));
 }
 

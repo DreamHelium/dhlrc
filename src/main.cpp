@@ -1,4 +1,5 @@
 #include "dhcore.h"
+#include "dhlog.h"
 #ifdef DH_RENDER_CHECK
 #include "dhpreview.h"
 #endif
@@ -13,10 +14,13 @@
 #include <KLocalizedString>
 #include <QApplication>
 #include <QCommandLineParser>
+#include <QDebug>
 #include <QDir>
 #include <QLibraryInfo>
 #include <QLocale>
+#include <QMessageBox>
 #include <QStandardPaths>
+#include <QSysInfo>
 #include <QTemporaryDir>
 #include <QTranslator>
 #include <QWidget>
@@ -218,6 +222,47 @@ main (int argc, char *argv[])
 #endif
 
   DhCore::init (&a);
+
+  /* Old configurations are no longer migrated: when the file was written by an
+   * older version it is backed up as a fixed name and replaced with the
+   * current defaults. This has to happen before the language is chosen below,
+   * because resetting the configuration resets the language setting too. */
+  if (DhCore::instance () && DhCore::instance ()->configNeedsReset ())
+    {
+      const QString backupPathText
+          = dh::configDirectory () + QStringLiteral ("/config.toml.bak");
+      /* The command-line parser does not exist yet, so the arguments are
+       * inspected directly. A modal box would hang the headless runs: the
+       * `--ui-check` self-check drives the interface itself and the
+       * `DH_RENDER_CHECK` `--preview` path draws one picture and exits. Both
+       * still get the backup and the reset, only the notice is skipped. */
+      const bool silentReset
+          = a.arguments ().contains (QStringLiteral ("--ui-check"))
+            || a.arguments ().contains (QStringLiteral ("--preview"));
+      if (!silentReset)
+        QMessageBox::warning (
+            nullptr, i18n ("Old Configuration"),
+            i18n ("The configuration file comes from an older version and "
+                  "cannot be used as it is. It will be backed up as \"%1\" and "
+                  "replaced with the current default settings. Some settings "
+                  "take effect after a restart.",
+                  backupPathText),
+            QMessageBox::Ok);
+
+      QString backupPath;
+      if (DhCore::instance ()->resetConfig (&backupPath))
+        {
+          if (backupPath.isEmpty ())
+            qInfo ("Old configuration replaced with the current defaults.");
+          else
+            qInfo ("Old configuration backed up as \"%s\" and replaced with "
+                   "the current defaults.",
+                   qPrintable (backupPath));
+        }
+      else
+        qWarning ("The old configuration could not be replaced.");
+    }
+
   if (DhCore::instance ()
       && DhCore::instance ()->settingValue (QStringLiteral ("CuteLanguagePack"))
              == QLatin1String ("true"))
@@ -225,6 +270,14 @@ main (int argc, char *argv[])
       textdomain ("dhlrc-cute");
       KLocalizedString::setApplicationDomain ("dhlrc-cute");
     }
+
+  /* Logging starts here, once the core knows where the cache directory is:
+   * everything from this point on reaches both the terminal and
+   * `<cache directory>/logs/dhlrc-YYYY-MM-DD.log`. The environment variable is
+   * the default for the level; `--log-level` below overrides it. */
+  dh::log::initialize (dh::cacheDirectory ());
+  dh::log::setLevel (dh::log::levelFromString (
+      qEnvironmentVariable ("DHLRC_LOG_LEVEL"), dh::log::Level::Info));
 
   QApplication::setApplicationName ("dhlrc");
   QApplication::setApplicationDisplayName (
@@ -242,6 +295,16 @@ main (int argc, char *argv[])
   parser.setApplicationDescription (QApplication::applicationDisplayName ());
   parser.addHelpOption ();
   parser.addVersionOption ();
+
+  /* The minimum level written to the log file. The environment variable
+   * `DHLRC_LOG_LEVEL` sets the default before the parser runs, so the
+   * command-line option wins over it. */
+  QCommandLineOption logLevelOption (
+      QStringLiteral ("log-level"),
+      i18n ("Minimum level written to the log file: debug, info, warning, "
+            "critical or off"),
+      QStringLiteral ("level"));
+  parser.addOption (logLevelOption);
 
 #ifdef DH_RENDER_CHECK
   /* The headless preview, a development tool rather than something a user
@@ -322,6 +385,21 @@ main (int argc, char *argv[])
 #endif
 
   parser.process (a);
+
+  if (parser.isSet (logLevelOption))
+    dh::log::setLevel (dh::log::levelFromString (parser.value (logLevelOption),
+                                                dh::log::level ()));
+
+  /* One record saying what this run is: the fields a bug report needs. It is
+   * written after the level is settled, so `--log-level off` really leaves the
+   * file alone. */
+  qInfo ().noquote ()
+      << "dhlrc" << dh::versionString () << "Qt" << qVersion () << "on"
+      << QSysInfo::prettyProductName () << "config"
+      << (DhCore::instance () ? DhCore::instance ()->configPath ()
+                              : dh::configDirectory ())
+      << "cache" << dh::cacheDirectory () << "log"
+      << dh::log::currentLogFile ();
 
   QApplication::setStyle ("breeze");
 

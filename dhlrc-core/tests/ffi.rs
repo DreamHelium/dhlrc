@@ -1,11 +1,12 @@
 /*! Exercises the C ABI from Rust, the way a non-Rust frontend would use it. */
 
 use dhlrc_core::ffi::{
-    DhlrcConfigView, DhlrcCore, dhlrc_config_view_free, dhlrc_core_apply, dhlrc_core_config_path,
-    dhlrc_core_config_view, dhlrc_core_download_object, dhlrc_core_free, dhlrc_core_open,
-    dhlrc_core_plugin_get_bool, dhlrc_core_plugin_set_bool, dhlrc_core_plugin_set_use_configured,
-    dhlrc_core_plugin_use_configured, dhlrc_core_save, dhlrc_core_watch_start,
-    dhlrc_core_watch_stop, dhlrc_string_free,
+    DhlrcConfigView, DhlrcCore, dhlrc_config_view_free, dhlrc_core_apply,
+    dhlrc_core_config_needs_reset, dhlrc_core_config_path, dhlrc_core_config_view,
+    dhlrc_core_download_object, dhlrc_core_free, dhlrc_core_open, dhlrc_core_plugin_get_bool,
+    dhlrc_core_plugin_set_bool, dhlrc_core_plugin_set_use_configured,
+    dhlrc_core_plugin_use_configured, dhlrc_core_reset_config, dhlrc_core_save,
+    dhlrc_core_watch_start, dhlrc_core_watch_stop, dhlrc_string_free,
 };
 use std::ffi::{CStr, CString, c_char, c_void};
 use std::path::PathBuf;
@@ -233,40 +234,50 @@ fn plugin_options_round_trip() {
 }
 
 #[test]
-fn an_older_configuration_stops_asking_before_reading() {
-    let dir = temp_dir("migrate");
-    // A version 1 file, as the previous build wrote it: every plugin's reading
-    // options asked, because `use_configured` started false.
-    std::fs::write(
-        dir.join("config.toml"),
-        "version = 1\n\n[plugins.nbt.input]\nuse_configured = false\n\n[plugins.nbt.output]\nuse_configured = false\n",
-    )
-    .unwrap();
+fn an_older_configuration_is_reported_and_reset() {
+    let dir = temp_dir("reset");
+    /* A version 2 file, as an older build wrote it. An old value can mean
+     * something different in the current shape, so the core keeps the file and
+     * reports that a reset is needed rather than converting it. */
+    let old = "version = 2\n\n[general]\nmemory_limit = 1\nlimit_unit = \"GiB\"\n";
+    std::fs::write(dir.join("config.toml"), old).unwrap();
 
     let dir_c = CString::new(dir.to_string_lossy().to_string()).unwrap();
     let mut error: *mut c_char = ptr::null_mut();
     let core = dhlrc_core_open(dir_c.as_ptr(), None, ptr::null_mut(), &mut error);
     assert!(!core.is_null());
-
-    let type_name = CString::new("nbt").unwrap();
-    let input = 0i32;
-    let output = 1i32;
-    // Reading: that old default becomes the new one, so a load no longer asks.
+    assert_eq!(dhlrc_core_config_needs_reset(core), 1);
+    // The old file stays untouched until the frontend resets.
     assert_eq!(
-        dhlrc_core_plugin_use_configured(core, type_name.as_ptr(), input),
-        1
-    );
-    // Writing still asks, since the format is picked on purpose there.
-    assert_eq!(
-        dhlrc_core_plugin_use_configured(core, type_name.as_ptr(), output),
-        0
+        std::fs::read_to_string(dir.join("config.toml")).unwrap(),
+        old
     );
 
-    // The migrated version is what gets written back.
+    let mut backup: *mut c_char = ptr::null_mut();
+    assert_eq!(dhlrc_core_reset_config(core, &mut backup, &mut error), 0);
+    assert_eq!(dhlrc_core_config_needs_reset(core), 0);
+    assert!(!backup.is_null());
+    let backup_path = unsafe { CStr::from_ptr(backup) }
+        .to_string_lossy()
+        .into_owned();
+    assert_eq!(PathBuf::from(&backup_path), dir.join("config.toml.bak"));
+    assert_eq!(std::fs::read_to_string(&backup_path).unwrap(), old);
+    dhlrc_string_free(backup);
+
+    // The view carries the defaults now, and a save writes them.
+    let view = dhlrc_core_config_view(core);
+    assert!(!view.is_null());
+    assert_eq!(unsafe { (*view).memory_limit }, 524_288_000);
+    dhlrc_config_view_free(view);
     assert_eq!(dhlrc_core_save(core, &mut error), 0);
     let text = std::fs::read_to_string(dir.join("config.toml")).unwrap();
-    assert!(text.contains("version = 4"), "config was {text}");
+    assert!(text.contains("version = 5"), "config was {text}");
+    dhlrc_core_free(core);
 
+    // A file the current build wrote does not need a reset.
+    let core = dhlrc_core_open(dir_c.as_ptr(), None, ptr::null_mut(), &mut error);
+    assert!(!core.is_null());
+    assert_eq!(dhlrc_core_config_needs_reset(core), 0);
     dhlrc_core_free(core);
     let _ = std::fs::remove_dir_all(&dir);
 }

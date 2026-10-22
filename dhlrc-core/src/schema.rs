@@ -63,7 +63,9 @@ pub struct SettingDef {
 const GENERAL: &str = i18n("General");
 const DEFAULT: &str = i18n("Default");
 const GAME: &str = i18n("Game");
+const MANAGE: &str = i18n("Manage");
 const READER: &str = i18n("Reader");
+const MATERIAL: &str = i18n("Material List");
 const NOTIFICATIONS: &str = i18n("Notifications");
 const RENDER: &str = i18n("3D Preview");
 
@@ -112,30 +114,6 @@ pub static SETTINGS: &[SettingDef] = &[
         set: set_elapsed,
     },
     SettingDef {
-        key: "SelectAllRegionsInLoading",
-        group: GENERAL,
-        kind: SettingType::Bool,
-        label: i18n("Select All Regions In Loading"),
-        tooltip: i18n("If you check this, all regions will be loaded in the loading progress."),
-        choices: NO_CHOICES,
-        long_text: false,
-        default: "false",
-        get: get_select_all,
-        set: set_select_all,
-    },
-    SettingDef {
-        key: "FailThenRetry",
-        group: GENERAL,
-        kind: SettingType::Bool,
-        label: i18n("Try Other Modules when Loading Fails"),
-        tooltip: i18n("A file is first read by the module its extension points at; when that fails, the other modules are tried as well. Turn this off to make a file whose extension is wrong fail instead."),
-        choices: NO_CHOICES,
-        long_text: false,
-        default: "true",
-        get: get_fail_then_retry,
-        set: set_fail_then_retry,
-    },
-    SettingDef {
         key: "CuteLanguagePack",
         group: GENERAL,
         kind: SettingType::Bool,
@@ -172,6 +150,44 @@ pub static SETTINGS: &[SettingDef] = &[
         set: set_fail_use_cache,
     },
     SettingDef {
+        key: "SelectAllRegionsInLoading",
+        group: MANAGE,
+        kind: SettingType::Bool,
+        label: i18n("Select All Regions In Loading"),
+        tooltip: i18n("If you check this, all regions will be loaded in the loading progress."),
+        choices: NO_CHOICES,
+        long_text: false,
+        default: "false",
+        get: get_select_all,
+        set: set_select_all,
+    },
+    SettingDef {
+        key: "FailThenRetry",
+        group: MANAGE,
+        kind: SettingType::Bool,
+        label: i18n("Try Other Modules when Loading Fails"),
+        tooltip: i18n("A file is first read by the module its extension points at; when that fails, the other modules are tried as well. Turn this off to make a file whose extension is wrong fail instead."),
+        choices: NO_CHOICES,
+        long_text: false,
+        default: "true",
+        get: get_fail_then_retry,
+        set: set_fail_then_retry,
+    },
+    SettingDef {
+        key: "MultiRegionNamePattern",
+        group: MANAGE,
+        kind: SettingType::String,
+        label: i18n("Multi-Region Display Name"),
+        tooltip: i18n(
+            "The display name used for a region that comes from a multi-region file. Use ${file} for the file name and ${region} for the region name inside the file.",
+        ),
+        choices: NO_CHOICES,
+        long_text: false,
+        default: i18n("${file} - ${region}"),
+        get: get_multi_region_pattern,
+        set: set_multi_region_pattern,
+    },
+    SettingDef {
         key: "BaseName",
         group: DEFAULT,
         kind: SettingType::String,
@@ -194,20 +210,6 @@ pub static SETTINGS: &[SettingDef] = &[
         default: i18n("Unnamed"),
         get: get_region_name,
         set: set_region_name,
-    },
-    SettingDef {
-        key: "MultiRegionNamePattern",
-        group: DEFAULT,
-        kind: SettingType::String,
-        label: i18n("Multi-Region Display Name"),
-        tooltip: i18n(
-            "The display name used for a region that comes from a multi-region file. Use ${file} for the file name and ${region} for the region name inside the file.",
-        ),
-        choices: NO_CHOICES,
-        long_text: false,
-        default: i18n("${file} - ${region}"),
-        get: get_multi_region_pattern,
-        set: set_multi_region_pattern,
     },
     SettingDef {
         key: "NamePatternSampleFile",
@@ -312,6 +314,34 @@ pub static SETTINGS: &[SettingDef] = &[
         set: set_show_option,
     },
     SettingDef {
+        key: "DownloadClientJar",
+        group: RENDER,
+        kind: SettingType::Bool,
+        label: i18n("Download the Client Jar Automatically"),
+        tooltip: i18n(
+            "A block's models and textures are only in its version's client jar. When a 3D preview needs one the cache directory does not have, download it (about 30 MB) instead of drawing nothing.",
+        ),
+        choices: NO_CHOICES,
+        long_text: false,
+        default: "true",
+        get: get_download_client_jar,
+        set: set_download_client_jar,
+    },
+    SettingDef {
+        key: "DownloadClientJarForMaterials",
+        group: MATERIAL,
+        kind: SettingType::Bool,
+        label: i18n("Download the Client Jar for Item Names and Icons"),
+        tooltip: i18n(
+            "When the material list has no client jar for a version, fetch it automatically so item names and icons are available.",
+        ),
+        choices: NO_CHOICES,
+        long_text: false,
+        default: "true",
+        get: get_download_client_jar_for_materials,
+        set: set_download_client_jar_for_materials,
+    },
+    SettingDef {
         key: "NotificationAppId",
         group: NOTIFICATIONS,
         kind: SettingType::String,
@@ -352,20 +382,6 @@ pub static SETTINGS: &[SettingDef] = &[
         default: "true",
         get: get_suppress_when_active,
         set: set_suppress_when_active,
-    },
-    SettingDef {
-        key: "DownloadClientJar",
-        group: RENDER,
-        kind: SettingType::Bool,
-        label: i18n("Download the Client Jar Automatically"),
-        tooltip: i18n(
-            "A block's models and textures are only in its version's client jar. When a 3D preview needs one the cache directory does not have, download it (about 30 MB) instead of drawing nothing.",
-        ),
-        choices: NO_CHOICES,
-        long_text: false,
-        default: "true",
-        get: get_download_client_jar,
-        set: set_download_client_jar,
     },
 ];
 
@@ -485,19 +501,19 @@ fn set_elapsed(config: &mut Config, text: &str) {
 }
 
 fn get_select_all(config: &Config) -> String {
-    bool_text(config.general.select_all_regions_in_loading)
+    bool_text(config.manage.select_all_regions_in_loading)
 }
 
 fn set_select_all(config: &mut Config, text: &str) {
-    config.general.select_all_regions_in_loading = parse_bool(text);
+    config.manage.select_all_regions_in_loading = parse_bool(text);
 }
 
 fn get_fail_then_retry(config: &Config) -> String {
-    bool_text(config.general.fail_then_retry)
+    bool_text(config.manage.fail_then_retry)
 }
 
 fn set_fail_then_retry(config: &mut Config, text: &str) {
-    config.general.fail_then_retry = parse_bool(text);
+    config.manage.fail_then_retry = parse_bool(text);
 }
 
 fn get_cute_language_pack(config: &Config) -> String {
@@ -555,11 +571,11 @@ fn set_region_name(config: &mut Config, text: &str) {
 }
 
 fn get_multi_region_pattern(config: &Config) -> String {
-    config.defaults.multi_region_name_pattern()
+    config.manage.multi_region_name_pattern()
 }
 
 fn set_multi_region_pattern(config: &mut Config, text: &str) {
-    set_optional_string(&mut config.defaults.multi_region_name_pattern, text);
+    set_optional_string(&mut config.manage.multi_region_name_pattern, text);
 }
 
 fn get_sample_file(config: &Config) -> String {
@@ -652,6 +668,14 @@ fn set_download_client_jar(config: &mut Config, text: &str) {
     config.render.download_client_jar = parse_bool(text);
 }
 
+fn get_download_client_jar_for_materials(config: &Config) -> String {
+    bool_text(config.material.download_client_jar)
+}
+
+fn set_download_client_jar_for_materials(config: &mut Config, text: &str) {
+    config.material.download_client_jar = parse_bool(text);
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -684,10 +708,72 @@ mod tests {
     }
 
     #[test]
-    fn the_client_jar_setting_moves_the_configuration() {
+    fn the_pages_are_in_the_order_a_frontend_shows_them() {
+        let mut pages: Vec<&str> = Vec::new();
+        for def in SETTINGS {
+            if pages.last() != Some(&def.group) {
+                pages.push(def.group);
+            }
+        }
+        assert_eq!(
+            pages,
+            [
+                GENERAL,
+                MANAGE,
+                DEFAULT,
+                GAME,
+                READER,
+                MATERIAL,
+                NOTIFICATIONS,
+                RENDER,
+            ]
+        );
+
+        /* Within a page the entries follow the fields they edit, so a
+         * frontend's tab order is stable. */
+        let keys = |group: &'static str| -> Vec<&'static str> {
+            SETTINGS
+                .iter()
+                .filter(|def| def.group == group)
+                .map(|def| def.key)
+                .collect()
+        };
+        assert_eq!(
+            keys(GENERAL),
+            [
+                "MemoryLimit",
+                "LimitUnit",
+                "ElapsedMilliseconds",
+                "CuteLanguagePack",
+                "CacheDirectory",
+                "FailDownloadUseCache",
+            ]
+        );
+        assert_eq!(
+            keys(MANAGE),
+            [
+                "SelectAllRegionsInLoading",
+                "FailThenRetry",
+                "MultiRegionNamePattern",
+            ]
+        );
+    }
+
+    #[test]
+    fn the_client_jar_settings_move_the_configuration() {
         let mut config = Config::default();
         assert_eq!(config.setting("DownloadClientJar").as_deref(), Some("true"));
         assert!(config.set_setting("DownloadClientJar", "false"));
+        assert!(!config.render.download_client_jar);
+
+        /* The material list has its own toggle: turning it off leaves the
+         * preview's download on. */
+        assert_eq!(
+            config.setting("DownloadClientJarForMaterials").as_deref(),
+            Some("true")
+        );
+        assert!(config.set_setting("DownloadClientJarForMaterials", "false"));
+        assert!(!config.material.download_client_jar);
         assert!(!config.render.download_client_jar);
     }
 }

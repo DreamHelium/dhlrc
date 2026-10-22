@@ -16,72 +16,29 @@ use std::thread::JoinHandle;
 use std::time::Duration;
 
 /// Bumped when the on-disk shape changes in a way older builds cannot read.
-pub const CONFIG_VERSION: u32 = 4;
+///
+/// Version 5 moves the options that shape loading into `[manage]`, gives the
+/// material list its own download toggle in `[material]`, and drops the
+/// conversion code: an old file is not migrated but replaced with the defaults
+/// after a backup (see [`backup_and_reset`]), so every build reads one shape
+/// only. A file whose `version` is older than this one is loaded as written and
+/// flagged through [`ConfigInit::needs_reset`].
+pub const CONFIG_VERSION: u32 = 5;
 
-fn config_version() -> u32 {
-    CONFIG_VERSION
-}
-
-/// A file written before the `version` field existed reads as version 1, so the
-/// migration brings it up like any other old file. Its absence used to mean
-/// "whatever this build writes", which skipped the migration and showed the old
-/// byte count as if it were a number in the chosen unit.
+/// A file written before the `version` field existed reads as version 1.
+///
+/// The absence used to mean "whatever this build writes"; now it means an old
+/// file, so [`load_or_create`] reports that it needs the defaults rather than
+/// treating the old shape as current.
 fn legacy_config_version() -> u32 {
     1
 }
 
-/// Brings a configuration written by an older build up to the current shape.
+/// Reads the memory limit from either a TOML integer (old files stored a byte
+/// count) or a float (version 3 and later store the number in `limit_unit`).
 ///
-/// Version 1 asked before reading a file: every plugin's `use_configured`
-/// started `false`, so a `false` in the file is that old default rather than a
-/// choice the user made. Reading now uses the saved options unless the user
-/// asks to be prompted, so those are turned on here once; a value the user had
-/// already set to `true` stays on. Writing keeps asking, since the format is
-/// picked on purpose there.
-fn migrate(config: &mut Config, had_memory_limit: bool) {
-    if config.version >= CONFIG_VERSION {
-        return;
-    }
-    if config.version < 2 {
-        for plugin in config.plugins.values_mut() {
-            plugin.input.use_configured = true;
-        }
-    }
-    if config.version < 3 {
-        if had_memory_limit {
-            migrate_memory_limit(config);
-        } else {
-            /* The file never set a limit, so the value in `config` is today's
-             * default, not an old byte count: give it the new default pair
-             * rather than mistaking 500 for 500 bytes. */
-            let defaults = General::default();
-            config.general.memory_limit = defaults.memory_limit;
-            config.general.limit_unit = defaults.limit_unit;
-        }
-    }
-    config.version = CONFIG_VERSION;
-}
-
-/// Up to version 2 the limit was stored in bytes and the unit was only a display
-/// choice; from version 3 the number is in the unit. Convert the old byte count
-/// to the largest unit that divides it exactly, so nothing is rounded away.
-fn migrate_memory_limit(config: &mut Config) {
-    let bytes = config.general.memory_limit.max(0.0).round() as u64;
-    let mut unit = Unit::Bytes;
-    let mut value = bytes as f64;
-    for candidate in [Unit::Gib, Unit::Mib, Unit::Kib] {
-        let factor = candidate.factor();
-        if bytes != 0 && bytes % factor == 0 {
-            unit = candidate;
-            value = (bytes / factor) as f64;
-            break;
-        }
-    }
-    config.general.memory_limit = value;
-    config.general.limit_unit = unit;
-}
-
-/// Reads the memory limit from either a TOML integer (older files) or a float.
+/// Old files are not converted any more, only kept readable so the version check
+/// can run and the user can be offered a reset instead of a parse error.
 fn deserialize_limit_number<'de, D>(deserializer: D) -> Result<f64, D::Error>
 where
     D: serde::Deserializer<'de>,
@@ -213,9 +170,6 @@ pub struct General {
     /// The unit `memory_limit` is counted in.
     pub limit_unit: Unit,
     pub elapsed_milliseconds: u32,
-    pub select_all_regions_in_loading: bool,
-    /// Try the other modules when the one the file extension points at fails.
-    pub fail_then_retry: bool,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cache_directory: Option<PathBuf>,
     pub fail_download_use_cache: bool,
@@ -233,8 +187,6 @@ impl Default for General {
             memory_limit: 500.0,
             limit_unit: Unit::Mib,
             elapsed_milliseconds: 500,
-            select_all_regions_in_loading: false,
-            fail_then_retry: true,
             cache_directory: None,
             fail_download_use_cache: false,
             language: "zh_cn".to_owned(),
@@ -263,12 +215,51 @@ impl General {
     }
 }
 
+/// The `[manage]` options that shape how a file is loaded.
+///
+/// They live apart from `[general]` because they describe the *reading* step
+/// rather than the application: which regions are ticked when a file is opened,
+/// what happens when a module fails, and how a multi-region file is named. The
+/// settings page shows them under "Manage".
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(default)]
+pub struct Manage {
+    /// Tick every region when a file is opened, instead of the ones the file
+    /// names.
+    pub select_all_regions_in_loading: bool,
+    /// Try the other modules when the one the file extension points at fails.
+    pub fail_then_retry: bool,
+    /// The name pattern a multi-region file is saved with. Absent means the
+    /// localised default rather than a translation written into the file.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub multi_region_name_pattern: Option<String>,
+}
+
+impl Default for Manage {
+    fn default() -> Self {
+        Self {
+            select_all_regions_in_loading: false,
+            fail_then_retry: true,
+            multi_region_name_pattern: None,
+        }
+    }
+}
+
+impl Manage {
+    pub fn multi_region_name_pattern(&self) -> String {
+        self.multi_region_name_pattern
+            .clone()
+            .unwrap_or_else(|| gettext(i18n("${file} - ${region}")))
+    }
+}
+
 /// The `[defaults]` group (old `[Default]`).
 ///
-/// The three strings whose old default was an `i18n ()` call are `Option`s: an
+/// The two strings whose old default was an `i18n ()` call are `Option`s: an
 /// absent value means "use the localised default", so a translation is never
 /// written into the file and switching language keeps working. The accessors
-/// below resolve it.
+/// below resolve it. The multi-region name pattern lives in `[manage]` for the
+/// same reason.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(default)]
 pub struct Defaults {
@@ -276,8 +267,6 @@ pub struct Defaults {
     pub base_name: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub region_name: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub multi_region_name_pattern: Option<String>,
     pub name_pattern_sample_file: String,
     pub name_pattern_sample_region: String,
     pub description: String,
@@ -289,7 +278,6 @@ impl Default for Defaults {
         Self {
             base_name: None,
             region_name: None,
-            multi_region_name_pattern: None,
             name_pattern_sample_file: "house".to_owned(),
             name_pattern_sample_region: "main".to_owned(),
             description: String::new(),
@@ -309,12 +297,6 @@ impl Defaults {
         self.region_name
             .clone()
             .unwrap_or_else(|| gettext(i18n("Unnamed")))
-    }
-
-    pub fn multi_region_name_pattern(&self) -> String {
-        self.multi_region_name_pattern
-            .clone()
-            .unwrap_or_else(|| gettext(i18n("${file} - ${region}")))
     }
 }
 
@@ -362,6 +344,29 @@ pub struct Render {
 }
 
 impl Default for Render {
+    fn default() -> Self {
+        Self {
+            download_client_jar: true,
+        }
+    }
+}
+
+/// The `[material]` group: what the material list may fetch by itself.
+///
+/// The list reads item names and icons from the client jar, and a version the
+/// cache has no jar for shows raw keys until one is fetched. This toggle is
+/// separate from `[render]`'s because a user may want previews to download while
+/// a material list stays offline (or the other way round): both toggle the same
+/// file but at different moments, and the two features are used separately.
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(default)]
+pub struct Material {
+    /// Whether the client jar for a version is fetched automatically when the
+    /// material list has none.
+    pub download_client_jar: bool,
+}
+
+impl Default for Material {
     fn default() -> Self {
         Self {
             download_client_jar: true,
@@ -426,10 +431,12 @@ pub struct Config {
     #[serde(default = "legacy_config_version")]
     pub version: u32,
     pub general: General,
+    pub manage: Manage,
     pub defaults: Defaults,
     pub game: Game,
     pub reader: Reader,
     pub render: Render,
+    pub material: Material,
     pub notifications: Notifications,
     #[serde(skip_serializing_if = "map_is_empty")]
     pub plugins: BTreeMap<String, PluginConfig>,
@@ -440,10 +447,12 @@ impl Default for Config {
         Self {
             version: CONFIG_VERSION,
             general: General::default(),
+            manage: Manage::default(),
             defaults: Defaults::default(),
             game: Game::default(),
             reader: Reader::default(),
             render: Render::default(),
+            material: Material::default(),
             notifications: Notifications::default(),
             plugins: BTreeMap::new(),
         }
@@ -500,6 +509,11 @@ pub struct ConfigInit {
     pub config: Config,
     pub paths: ConfigPaths,
     pub origin: ConfigOrigin,
+    /// The file was written by an older build, so `config` is that old shape and
+    /// must not be used as if it were current. A frontend calls
+    /// [`backup_and_reset`] (after telling the user) and then starts from the
+    /// defaults; until it does, the core keeps the file as it was.
+    pub needs_reset: bool,
 }
 
 impl ConfigInit {
@@ -607,26 +621,18 @@ pub fn load_or_create(paths: &ConfigPaths) -> io::Result<ConfigInit> {
     if paths.file.is_file() {
         let text = fs::read_to_string(&paths.file)?;
         return match toml::from_str::<Config>(&text) {
-            Ok(mut config) => {
-                /* Whether the file itself set a memory limit: the default fills
-                 * the field in when it did not, and the migration must not
-                 * mistake that default for an old byte count. */
-                let had_memory_limit = toml::from_str::<toml::Value>(&text)
-                    .ok()
-                    .and_then(|value| value.get("general").cloned())
-                    .is_some_and(|general| general.get("memory_limit").is_some());
-                let version_before = config.version;
-                migrate(&mut config, had_memory_limit);
-                if config.version != version_before {
-                    /* Write the migrated file once, so the next start does not
-                     * migrate again and an old byte count is not left on disk
-                     * looking like the current value. */
-                    let _ = write_config(&paths.file, &config);
-                }
+            Ok(config) => {
+                /* No conversion: an old file is read as written and flagged, so
+                 * the frontend can tell the user before the file is replaced.
+                 * Converting here would have to guess what an old value meant
+                 * (a byte count? a count in another unit?) and would silently
+                 * turn it into a different setting. */
+                let needs_reset = config.version != CONFIG_VERSION;
                 Ok(ConfigInit {
                     config,
                     paths: paths.clone(),
                     origin: ConfigOrigin::Loaded,
+                    needs_reset,
                 })
             }
             Err(error) => {
@@ -640,6 +646,7 @@ pub fn load_or_create(paths: &ConfigPaths) -> io::Result<ConfigInit> {
                     config,
                     paths: paths.clone(),
                     origin: ConfigOrigin::RecreatedInvalid(error.to_string()),
+                    needs_reset: false,
                 })
             }
         };
@@ -651,7 +658,38 @@ pub fn load_or_create(paths: &ConfigPaths) -> io::Result<ConfigInit> {
         config,
         paths: paths.clone(),
         origin: ConfigOrigin::CreatedFresh,
+        needs_reset: false,
     })
+}
+
+/// The backup a reset keeps the replaced file under, next to the config file.
+///
+/// The name is fixed rather than derived from the file's name so a second reset
+/// overwrites the previous backup instead of leaving a pile of them; the newest
+/// old file is the one worth keeping.
+fn reset_backup_path(file: &Path) -> PathBuf {
+    file.parent()
+        .unwrap_or_else(|| Path::new(""))
+        .join("config.toml.bak")
+}
+
+/// Replaces `paths.file` with the default configuration, keeping the old file as
+/// `config.toml.bak` next to it.
+///
+/// This is what a frontend calls when [`ConfigInit::needs_reset`] is set. The old
+/// file is copied first and only then replaced, so a failed write leaves the
+/// original where it was. Returns the backup's path, or `None` when there was no
+/// file to keep.
+pub fn backup_and_reset(paths: &ConfigPaths) -> io::Result<Option<PathBuf>> {
+    let backup = if paths.file.is_file() {
+        let backup = reset_backup_path(&paths.file);
+        fs::copy(&paths.file, &backup)?;
+        Some(backup)
+    } else {
+        None
+    };
+    write_config(&paths.file, &Config::default())?;
+    Ok(backup)
 }
 
 /// Watches the configuration file so an edit made while the application runs is
@@ -872,50 +910,68 @@ mod tests {
     }
 
     #[test]
-    fn migration_converts_the_old_byte_memory_limit() {
-        let paths = temp_paths("migrate-memory");
+    fn an_older_file_is_reported_instead_of_converted() {
+        let paths = temp_paths("needs-reset");
         fs::create_dir_all(paths.file.parent().unwrap()).unwrap();
-        /* Version 2 stored bytes; the unit was only a display choice. */
+        /* Version 2 stored bytes and had no `[manage]` or `[material]`: the old
+         * file is kept exactly as it is, and the caller is told it is stale. */
         let old = "version = 2\n\n[general]\nmemory_limit = 524288000\n\
                    limit_unit = \"GiB\"\n";
         fs::write(&paths.file, old).unwrap();
         let init = load_or_create(&paths).unwrap();
-        assert_eq!(init.config.version, CONFIG_VERSION);
-        /* 524288000 bytes divides exactly by MiB (500 of them), so nothing is
-         * rounded away. */
-        assert_eq!(init.config.general.memory_limit, 500.0);
-        assert_eq!(init.config.general.limit_unit, Unit::Mib);
-
-        /* A byte count that no larger unit divides stays in bytes. */
-        fs::write(
-            &paths.file,
-            "version = 2\n\n[general]\nmemory_limit = 500000001\n\
-             limit_unit = \"MiB\"\n",
-        )
-        .unwrap();
-        let init = load_or_create(&paths).unwrap();
-        assert_eq!(init.config.general.memory_limit, 500_000_001.0);
-        assert_eq!(init.config.general.limit_unit, Unit::Bytes);
+        assert_eq!(init.origin, ConfigOrigin::Loaded);
+        assert!(init.needs_reset);
+        /* No migration: the number is still the old byte count, which is why the
+         * frontend must not use it. */
+        assert_eq!(init.config.version, 2);
+        assert_eq!(init.config.general.memory_limit, 524_288_000.0);
+        assert_eq!(fs::read_to_string(&paths.file).unwrap(), old);
         cleanup(&paths);
     }
 
     #[test]
-    fn a_file_without_a_version_field_is_migrated() {
-        let paths = temp_paths("migrate-unversioned");
+    fn a_file_without_a_version_field_needs_a_reset() {
+        let paths = temp_paths("needs-reset-unversioned");
         fs::create_dir_all(paths.file.parent().unwrap()).unwrap();
-        /* A build old enough not to write `version` at all: the memory limit
-         * is a byte count, and skipping the migration would show it as if it
-         * were 524288000 MiB. */
+        /* A build old enough not to write `version` at all reads as version 1,
+         * so it is as stale as any other old file. */
         let old = "[general]\nmemory_limit = 524288000\nlimit_unit = \"GiB\"\n";
         fs::write(&paths.file, old).unwrap();
         let init = load_or_create(&paths).unwrap();
-        assert_eq!(init.config.version, CONFIG_VERSION);
-        assert_eq!(init.config.general.memory_limit, 500.0);
-        assert_eq!(init.config.general.limit_unit, Unit::Mib);
-        /* The migrated file was written back, so the next start does not have
-         * to migrate again. */
+        assert!(init.needs_reset);
+        assert_eq!(init.config.version, legacy_config_version());
+        assert_eq!(fs::read_to_string(&paths.file).unwrap(), old);
+        cleanup(&paths);
+    }
+
+    #[test]
+    fn backup_and_reset_keeps_the_old_file_and_writes_the_defaults() {
+        let paths = temp_paths("backup-reset");
+        fs::create_dir_all(paths.file.parent().unwrap()).unwrap();
+        let old = "version = 4\n\n[general]\nelapsed_milliseconds = 250\n";
+        fs::write(&paths.file, old).unwrap();
+        assert!(load_or_create(&paths).unwrap().needs_reset);
+
+        let backup = backup_and_reset(&paths)
+            .unwrap()
+            .expect("an existing file is backed up");
+        assert_eq!(backup, paths.file.parent().unwrap().join("config.toml.bak"));
+        assert_eq!(fs::read_to_string(&backup).unwrap(), old);
         let text = fs::read_to_string(&paths.file).unwrap();
-        assert!(text.contains("version = 4"), "config was {text}");
+        assert!(text.contains("version = 5"), "config was {text}");
+
+        let init = load_or_create(&paths).unwrap();
+        assert!(!init.needs_reset);
+        assert_eq!(init.config, Config::default());
+        cleanup(&paths);
+    }
+
+    #[test]
+    fn backup_and_reset_without_a_file_just_writes_the_defaults() {
+        let paths = temp_paths("backup-reset-fresh");
+        assert_eq!(backup_and_reset(&paths).unwrap(), None);
+        assert!(paths.file.is_file());
+        assert!(!load_or_create(&paths).unwrap().needs_reset);
         cleanup(&paths);
     }
 
@@ -983,6 +1039,7 @@ mod tests {
 
         let init = load_or_create(&paths).unwrap();
         assert_eq!(init.origin, ConfigOrigin::Loaded);
+        assert!(!init.needs_reset);
         assert_eq!(init.config.general.elapsed_milliseconds, 250);
         assert!(init.notifications().is_empty());
         cleanup(&paths);

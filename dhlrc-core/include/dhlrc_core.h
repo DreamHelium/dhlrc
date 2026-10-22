@@ -122,6 +122,13 @@ extern "C"
   /* The path of the configuration file. Borrowed. */
   const char *dhlrc_core_config_path (const DhlrcCore *core);
 
+  /* 1 when the file was written by an older build and should be replaced with
+   * the defaults, 0 when it is current (a freshly created file is current),
+   * and -1 when the handle is bad. The core does not convert old files: an old
+   * value can mean something different in the current shape, so the frontend
+   * asks the user before calling `dhlrc_core_reset_config`. */
+  int32_t dhlrc_core_config_needs_reset (const DhlrcCore *core);
+
   /* Watches the file on a background thread, calling `on_change` on every
    * change. Any previous watch is stopped first. Returns 0 on success. */
   int32_t dhlrc_core_watch_start (DhlrcCore *core, DhlrcChangeFunc on_change,
@@ -140,6 +147,14 @@ extern "C"
                             char **error);
   /* Writes the current configuration back to the file. */
   int32_t dhlrc_core_save (const DhlrcCore *core, char **error);
+
+  /* Replaces the configuration file and the in-memory configuration with the
+   * defaults, keeping the old file as `config.toml.bak` next to it. When
+   * `backup` is not NULL it receives an owned string with the backup's path, or
+   * NULL when there was no file to keep (free it with `dhlrc_string_free`).
+   * Returns 0 on success, -1 with an owned `*error` otherwise. */
+  int32_t dhlrc_core_reset_config (DhlrcCore *core, char **backup,
+                                   char **error);
 
   /* Turns the desktop notifications on or off (on by default). A frontend
    * turns them off while its window is active, so the in-app message is

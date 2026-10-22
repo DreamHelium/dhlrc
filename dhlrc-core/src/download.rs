@@ -11,9 +11,11 @@
  * terminal frontend can run a download on a plain thread unchanged.
  */
 
+use std::collections::HashMap;
 use std::fs;
 use std::io::{Read, Write};
 use std::path::{Path, PathBuf};
+use std::sync::{Arc, Condvar, Mutex, OnceLock};
 use std::time::{Duration, SystemTime};
 
 use common_rs::i18n::i18n;
@@ -469,10 +471,130 @@ fn transport_error(error: ureq::Error) -> Error {
     }
 }
 
+/// The tag under which a concurrent download of one version's client jar
+/// collapses.
+///
+/// The string only identifies a [`claim`]: two requests that build the same tag
+/// wait for one another, and two different versions do not. A frontend that
+/// downloads from several threads uses the builders rather than making a tag up,
+/// so every caller of the same file agrees on the identity.
+pub fn client_jar_tag(data_version: i32) -> String {
+    format!("client_jar:{data_version}")
+}
+
+/// The tag under which a concurrent download of `object` (`minecraft/lang/zh_cn.json`)
+/// for `data_version` collapses.
+pub fn object_tag(data_version: i32, object: &str) -> String {
+    format!("object:{data_version}:{object}")
+}
+
+/// One tag's in-flight gate.
+struct Gate {
+    /// Set when the holder is done; waiters read it under `finished`.
+    done: Mutex<bool>,
+    /// Signals the waiters when `done` becomes true.
+    finished: Condvar,
+}
+
+/// The gates of every tag a download is running for right now.
+///
+/// The map is process-global (not per-[`Downloader`]) on purpose: the requests
+/// that have to collapse come from different threads with different downloaders,
+/// and a frontend never constructs one shared value before starting them.
+fn gates() -> &'static Mutex<HashMap<String, Arc<Gate>>> {
+    static GATES: OnceLock<Mutex<HashMap<String, Arc<Gate>>>> = OnceLock::new();
+    GATES.get_or_init(|| Mutex::new(HashMap::new()))
+}
+
+/// A claim on one download tag: hold it for as long as the work for the tag
+/// runs, and drop it when the work is done.
+///
+/// The first caller for a tag becomes its leader and runs the work. Every other
+/// caller blocks in [`claim`] until the leader drops its guard, then continues
+/// its own work — which for a downloader is the "the file is already there"
+/// early return, so the file is fetched once and the rest are cheap no-ops.
+pub struct TagGuard {
+    tag: String,
+    gate: Arc<Gate>,
+    leader: bool,
+}
+
+impl Drop for TagGuard {
+    fn drop(&mut self) {
+        if !self.leader {
+            return;
+        }
+        /* Release the waiters before removing the entry, so a request that
+         * arrives in between finds a finished gate (and thus a file) rather than
+         * waiting for nothing. A request after the removal starts over, which
+         * the downloader's "already there" check makes harmless. */
+        {
+            let mut done = self
+                .gate
+                .done
+                .lock()
+                .unwrap_or_else(|poisoned| poisoned.into_inner());
+            *done = true;
+        }
+        self.gate.finished.notify_all();
+        if let Ok(mut gates) = gates().lock() {
+            gates.remove(&self.tag);
+        }
+    }
+}
+
+/// Claims `tag`, returning once no other caller holds it.
+///
+/// Never blocks a caller that holds a different tag, so one thread may download
+/// two things in a row (a preview's object and then its jar), and two threads
+/// claiming different tags run in parallel.
+pub fn claim(tag: &str) -> TagGuard {
+    let mut gates = gates()
+        .lock()
+        .unwrap_or_else(|poisoned| poisoned.into_inner());
+    if let Some(gate) = gates.get(tag) {
+        let gate = Arc::clone(gate);
+        drop(gates);
+        let mut done = gate
+            .done
+            .lock()
+            .unwrap_or_else(|poisoned| poisoned.into_inner());
+        while !*done {
+            done = gate
+                .finished
+                .wait(done)
+                .unwrap_or_else(|poisoned| poisoned.into_inner());
+        }
+        drop(done);
+        TagGuard {
+            tag: tag.to_owned(),
+            gate,
+            leader: false,
+        }
+    } else {
+        let gate = Arc::new(Gate {
+            done: Mutex::new(false),
+            finished: Condvar::new(),
+        });
+        gates.insert(tag.to_owned(), Arc::clone(&gate));
+        TagGuard {
+            tag: tag.to_owned(),
+            gate,
+            leader: true,
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
-    use super::{Downloader, Error, Quiet, Never, file_name, is_a_file, json_text, temp_path, version_id, version_url};
+    use super::{
+        Downloader, Error, Never, Quiet, claim, client_jar_tag, file_name, is_a_file, json_text,
+        object_tag, temp_path, version_id, version_url,
+    };
     use std::path::Path;
+    use std::sync::Arc;
+    use std::sync::atomic::{AtomicUsize, Ordering};
+    use std::time::Duration;
 
     #[test]
     fn a_data_version_maps_to_its_id() {        /* The table is `id,data version`, newest first. */
@@ -566,6 +688,50 @@ mod tests {
         std::fs::write(&dest, b"").unwrap();
         assert!(!is_a_file(&dest));
         std::fs::remove_dir_all(&dir).ok();
+    }
+
+    #[test]
+    fn concurrent_claims_with_one_tag_download_once() {
+        /* Two threads asking for one object: the second waits for the first,
+         * finds the file and does not fetch anything. The download count stands
+         * in for the network requests a real download would make. */
+        let tag = object_tag(1, "minecraft/lang/test.json");
+        let dir = cache("tag-download");
+        let dest = dir.join("object.json");
+        let downloads = Arc::new(AtomicUsize::new(0));
+
+        let mut workers = Vec::new();
+        for _ in 0..2 {
+            let tag = tag.clone();
+            let dest = dest.clone();
+            let downloads = Arc::clone(&downloads);
+            workers.push(std::thread::spawn(move || {
+                let _gate = claim(&tag);
+                if !is_a_file(&dest) {
+                    downloads.fetch_add(1, Ordering::SeqCst);
+                    /* Keep the gate long enough for the other thread to have to
+                     * wait for it. */
+                    std::thread::sleep(Duration::from_millis(100));
+                    std::fs::write(&dest, b"object").unwrap();
+                }
+            }));
+        }
+        for worker in workers {
+            worker.join().unwrap();
+        }
+        assert_eq!(downloads.load(Ordering::SeqCst), 1);
+        assert!(is_a_file(&dest));
+        std::fs::remove_dir_all(&dir).ok();
+    }
+
+    #[test]
+    fn claiming_two_tags_on_one_thread_does_not_deadlock() {
+        /* A preview downloads an object and then its jar; different tags, so the
+         * second claim must not wait for the first. */
+        let first = claim(&object_tag(4189, "minecraft/lang/zh_cn.json"));
+        let second = claim(&client_jar_tag(4189));
+        drop(second);
+        drop(first);
     }
 
     #[test]

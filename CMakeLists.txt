@@ -107,9 +107,15 @@ add_custom_target(dhlrc_cargo_build ALL
         WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
 )
 
+# `region_rs` is opened by the modules and by the terminal frontend; the core
+# shared library is only loaded by `dhlrc_qt` (the terminal frontend links the
+# core statically), so a headless build neither stages nor installs it.
 set(DHLRC_BUILD_LIBRARIES
-  ${CARGO_TARGET_DIR}/${CARGO_TYPE}/${CARGO_LIB_PREFIX}region_rs${CARGO_LIB_SUFFIX}
-  ${CARGO_TARGET_DIR}/${CARGO_TYPE}/${CARGO_LIB_PREFIX}dhlrc_core${CARGO_LIB_SUFFIX})
+  ${CARGO_TARGET_DIR}/${CARGO_TYPE}/${CARGO_LIB_PREFIX}region_rs${CARGO_LIB_SUFFIX})
+if (DH_BUILD_GUI)
+  list(APPEND DHLRC_BUILD_LIBRARIES
+    ${CARGO_TARGET_DIR}/${CARGO_TYPE}/${CARGO_LIB_PREFIX}dhlrc_core${CARGO_LIB_SUFFIX})
+endif ()
 set(DHLRC_LOAD_LIBRARIES
   ${CARGO_TARGET_DIR}/${CARGO_TYPE}/${CARGO_LIB_PREFIX}nbt_component${CARGO_LIB_SUFFIX})
 set(DHLRC_MODULE_LIBRARIES
@@ -188,10 +194,11 @@ endif ()
 # ---------------------------------------------------------------------------
 # Install
 # ---------------------------------------------------------------------------
-# Everything the programme loads lives next to the executable: `region_rs` and
-# the core, the two module directories, and the catalogue. On Windows the whole
-# tree therefore goes into the prefix root; elsewhere the binaries go under the
-# usual `bin`, with the rest beside them so the layout stays together.
+# Everything the programme loads lives next to the executable: `region_rs` (and,
+# for the Qt frontend, the core), the two module directories, and the catalogue.
+# On Windows the whole tree therefore goes into the prefix root; elsewhere the
+# binaries go under the usual `bin`, with the rest beside them so the layout
+# stays together.
 if (WIN32)
   set(DH_INSTALL_DIR ".")
 else ()
@@ -204,11 +211,20 @@ if (DH_BUILD_GUI)
           LIBRARY DESTINATION "${DH_INSTALL_DIR}")
 endif ()
 
-install(FILES
+install(PROGRAMS
         "${DHLRC_TUI_BINARY}"
-        "${CARGO_TARGET_DIR}/${CARGO_TYPE}/${CARGO_LIB_PREFIX}region_rs${CARGO_LIB_SUFFIX}"
-        "${CARGO_TARGET_DIR}/${CARGO_TYPE}/${CARGO_LIB_PREFIX}dhlrc_core${CARGO_LIB_SUFFIX}"
         DESTINATION "${DH_INSTALL_DIR}")
+install(FILES
+        "${CARGO_TARGET_DIR}/${CARGO_TYPE}/${CARGO_LIB_PREFIX}region_rs${CARGO_LIB_SUFFIX}"
+        DESTINATION "${DH_INSTALL_DIR}")
+
+# Only `dhlrc_qt` loads the core shared library; the terminal frontend links it
+# statically, so a headless install does not carry the unused copy.
+if (DH_BUILD_GUI)
+  install(FILES
+          "${CARGO_TARGET_DIR}/${CARGO_TYPE}/${CARGO_LIB_PREFIX}dhlrc_core${CARGO_LIB_SUFFIX}"
+          DESTINATION "${DH_INSTALL_DIR}")
+endif ()
 
 install(DIRECTORY "${CMAKE_BINARY_DIR}/load_module/"
         DESTINATION "${DH_INSTALL_DIR}/load_module")

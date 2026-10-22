@@ -376,7 +376,12 @@ DhSettingsDialog::build ()
       footer->addWidget (openButton);
       layout->addLayout (footer);
 
-      pageItems.append (addPage (page, i18n (group.toUtf8 ())));
+      /* The title is translated by `i18n ()`, so the untranslated group id is
+       * kept on the item: `show ()` finds the page by that id whatever
+       * language the title is shown in. */
+      auto *item = addPage (page, i18n (group.toUtf8 ()));
+      item->setProperty ("groupName", group);
+      pageItems.append (item);
     }
 
   built = true;
@@ -394,7 +399,8 @@ DhSettingsDialog::show (const QString &group)
   if (!group.isEmpty ())
     {
       for (auto *page : pageItems)
-        if (page->name () == group)
+        if (page->property ("groupName").toString () == group
+            || page->name () == group)
           {
             setCurrentPage (page);
             break;

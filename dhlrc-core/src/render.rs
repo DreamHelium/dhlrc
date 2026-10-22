@@ -969,7 +969,8 @@ mod tests {
     /// so the marshalling can be checked without a region and a core.
     fn scene() -> DhlrcScene {
         let mut textures = Textures::new();
-        /* Index 1 is the white texel every scene carries for its outline. */
+        /* `Textures::new` starts with the missing-texture checker at index 0;
+         * index 1 is the white texel every scene carries for its outline. */
         textures.push(Texture::solid([255, 255, 255, 255]));
         let index = textures.push(Texture::solid([10, 20, 30, 255]));
         DhlrcScene::new(dhlrc_render::Scene {
@@ -1000,7 +1001,7 @@ mod tests {
         let pointer = &scene as *const DhlrcScene;
 
         assert_eq!(unsafe { dhlrc_render_scene_quad_count(pointer) }, 1);
-        assert_eq!(unsafe { dhlrc_render_scene_texture_count(pointer) }, 2);
+        assert_eq!(unsafe { dhlrc_render_scene_texture_count(pointer) }, 3);
 
         let mut quad = DhlrcQuad {
             positions: [[0.0; 3]; 4],
@@ -1011,7 +1012,7 @@ mod tests {
             alpha: -1,
         };
         assert_eq!(unsafe { dhlrc_render_scene_quad(pointer, 0, &mut quad) }, 1);
-        assert_eq!(quad.texture, 1);
+        assert_eq!(quad.texture, 2);
         assert_eq!(quad.alpha, ALPHA_CUTOUT);
         assert!((quad.light - 0.8).abs() < 1e-6);
         assert!((quad.tint[1] - 128.0 / 255.0).abs() < 1e-6);
@@ -1022,7 +1023,7 @@ mod tests {
         let mut pixels: *const u8 = ptr::null();
         let (mut width, mut height) = (0u32, 0u32);
         assert_eq!(
-            unsafe { dhlrc_render_scene_texture(pointer, 1, &mut pixels, &mut width, &mut height) },
+            unsafe { dhlrc_render_scene_texture(pointer, 2, &mut pixels, &mut width, &mut height) },
             1
         );
         assert_eq!((width, height), (1, 1));
@@ -1055,7 +1056,10 @@ mod tests {
             1
         );
         assert_eq!(quad.tint, [0.0, 0.0, 0.0], "the outline is black");
-        assert_eq!(quad.texture, 0, "the checker, which the tint blacks out");
+        assert_eq!(
+            quad.texture, 1,
+            "the white texel the tint colours as the outline"
+        );
         assert_eq!(quad.alpha, ALPHA_OPAQUE);
         for position in quad.positions {
             for axis in 0..3 {

@@ -4,7 +4,6 @@
 #include "dhlrc_render.h"
 #include "dhwidget.h"
 #include "regionclass.h"
-#include "resourcegetter.h"
 
 #include <QFutureWatcher>
 #include <QLabel>
@@ -28,9 +27,12 @@ class DhRenderWidget;
  * enough that building it here froze the whole window (and the application).
  *
  * A version's block models and textures are only in its client jar, so when the
- * cache does not have one the window fetches it itself — about 30 MB, once per
- * version — as long as the `DownloadClientJar` setting allows it. The button
- * fetches one on demand (and cancels a fetch that is running).
+ * cache does not have one the window fetches it — about 30 MB, once per version
+ * — as long as the `DownloadClientJar` setting allows it. The fetch goes
+ * through `DhDownloadManager`, so a page that already asked for the same jar
+ * (the material list does) leaves this one to share that download instead of
+ * starting a second. The button fetches one on demand (and cancels a fetch that
+ * is running).
  */
 class DhRenderUI : public DhWidget
 {
@@ -79,6 +81,9 @@ private:
   void startFetch ();
   void finishFetch (const QString &error);
   void setFetching (bool fetching);
+  /* The tag this window's version's client jar is shared under; every signal
+   * of the manager is filtered by it. */
+  QString jarDownloadTag () const;
 
   std::shared_ptr<RegionClass> regionClass;
   DhRenderWidget *view = nullptr;
@@ -124,7 +129,6 @@ private:
   qint32 regionHeight = 0;
   qint32 regionDepth = 0;
   bool updatingButtons = false;
-  std::shared_ptr<DhDownloader> downloader;
   bool fetching = false;
 };
 

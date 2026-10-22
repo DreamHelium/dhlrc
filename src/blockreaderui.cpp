@@ -2,9 +2,11 @@
 // #include "blocklistui.h"
 #include "dhrenderui.h"
 #include "dhwidget.h"
+#include "mainwindow.h"
 #include "resourcegetter.h"
 #include "ui_blockreaderui.h"
 #include <QFontDatabase>
+#include <QIcon>
 #include <QLabel>
 #include <QMenu>
 #include <QMessageBox>
@@ -91,6 +93,18 @@ BlockReaderUI::BlockReaderUI (int index,
   connect (this, &BlockReaderUI::toolsChanged, this,
            &BlockReaderUI::updateToolActions);
   updateToolActions ();
+
+  /* The reader's own settings (block-name language, the default show option)
+   * live in the settings dialog; this opens it on that page. It sits before
+   * "Tools", which stays the last button of the row. */
+  auto *settingsButton = new QPushButton (_ ("Reader Settings..."), this);
+  settingsButton->setIcon (QIcon::fromTheme (QStringLiteral ("configure")));
+  settingsButton->setToolTip (
+      _ ("Open the reader settings: block-name language and what the block "
+         "list shows by default."));
+  connect (settingsButton, &QPushButton::clicked, this,
+           [] { MainWindow::openSettings (QStringLiteral ("Reader")); });
+  ui->toolsRow->insertWidget (ui->toolsRow->count () - 1, settingsButton);
 
   /* The region can be written by any editor while this page stays open, and a
    * revert in the change history is a write too: keep the shown data current.

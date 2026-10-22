@@ -14,9 +14,8 @@
  * closed pipe, which is normal rather than an error.
  */
 
-use crate::cli::{Cli, CompletionsArgs};
+use crate::cli::CompletionsArgs;
 use crate::i18n::gettext;
-use clap::CommandFactory;
 use clap_complete::{Shell, generate};
 use formatx::formatx;
 use std::env;
@@ -26,7 +25,7 @@ use std::path::{Path, PathBuf};
 use std::process::ExitCode;
 
 pub fn run(args: CompletionsArgs) -> ExitCode {
-    let mut command = Cli::command();
+    let mut command = crate::cli::command();
     let name = command.get_name().to_string();
 
     let mut script = Vec::new();

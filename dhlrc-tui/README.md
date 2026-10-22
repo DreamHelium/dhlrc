@@ -77,3 +77,10 @@ to the executable, which the CMake build already satisfies for
 ```console
 $ LANG=zh_CN.UTF-8 ./build/dhlrc-tui modules
 ```
+
+`--help` is translated the same way. `src/cli.rs` puts every user-visible string
+in a small helper function that calls `gettext`, because `xgettext` only finds
+`gettext` calls in expression position; `make_po.sh` collects them from the Rust
+sources like the rest. The strings `clap` writes itself (the section headings,
+`Usage:`, the `-h`/`-V` descriptions and the `help` subcommand) are rewritten on
+the command built by `cli::command()`.

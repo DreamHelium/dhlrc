@@ -103,6 +103,16 @@ public:
   /* Persists the current configuration. */
   bool save ();
 
+  /* True when the loaded `config.toml` was written by an older version. Such a
+   * file is no longer migrated: the caller replaces it with the defaults
+   * through `resetConfig ()`. */
+  [[nodiscard]] bool configNeedsReset () const;
+  /* Backs the old `config.toml` up as the fixed name `config.toml.bak` (the
+   * previous backup is replaced) and writes the current defaults over it.
+   * `backupPath` receives the backup's path; it is left empty when there was
+   * no file to back up. Returns false and logs when the core fails. */
+  bool resetConfig (QString *backupPath = nullptr);
+
   /* Turns the desktop notifications on or off (on by default). */
   void setNotificationsEnabled (bool enabled);
 

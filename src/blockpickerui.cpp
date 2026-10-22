@@ -6,7 +6,6 @@
 #include "dhcore.h"
 #include "resourcegetter.h"
 
-#include <QApplication>
 #include <QComboBox>
 #include <QDialogButtonBox>
 #include <QLabel>
@@ -19,6 +18,7 @@
 #include <QPushButton>
 #include <QSignalBlocker>
 #include <libintl.h>
+#include <qtconcurrentrun.h>
 #include <utility>
 
 #define _(str) gettext (str)
@@ -138,15 +138,29 @@ BlockPickerUI::BlockPickerUI (std::shared_ptr<RegionClass> region, qint32 x,
   connect (ui->buttonBox, &QDialogButtonBox::rejected, this,
            &BlockPickerUI::close);
 
+  /* The catalog is either already cached, in which case the list fills now,
+   * or being built on a worker, in which case the list shows a placeholder
+   * until the build is here. */
   loadCatalog ();
-  populateBlockList ();
-  selectBlock (currentName);
+  if (!catalogLoading)
+    {
+      populateBlockList ();
+      selectBlock (currentName);
+    }
   showProperties ();
   updateTarget ();
   setEditable (!regionClass->locked ());
 }
 
-BlockPickerUI::~BlockPickerUI () { delete ui; }
+BlockPickerUI::~BlockPickerUI ()
+{
+  /* The build talks to the core only, never to the widgets, so it is safe to
+   * let it finish before the dialog goes away. It cannot be stopped halfway
+   * through a core call, but it is the same read a synchronous load did. */
+  if (catalogWatcher)
+    catalogWatcher->future ().waitForFinished ();
+  delete ui;
+}
 
 /* One axis of the cell to write, offering the region's own extent. */
 QSpinBox *
@@ -198,25 +212,115 @@ BlockPickerUI::setPlaceAbove (bool above)
   ui->aboveCheckBox->setChecked (above);
 }
 
+/* The catalogs read so far, one per data version. The core keeps its own copy,
+ * but that one is core-global and dropped whenever any page configures the
+ * resources again; this keeps reopening the dialog off that state. */
+BlockPickerUI::CatalogCache &
+BlockPickerUI::catalogCache ()
+{
+  static CatalogCache cache;
+  return cache;
+}
+
+/* Builds the version's block catalog inside the core. The strings the ABI
+ * lends out are copied by the GUI thread afterwards, not here: they are valid
+ * only until the resources are configured again, so a worker that kept them
+ * across an event loop turn could read freed memory if another page
+ * reconfigured the core meanwhile. Building is the slow part, copying is a
+ * moment. */
+BlockPickerUI::CatalogBuild
+BlockPickerUI::buildCatalog (DhlrcCore *core, quint32 dataVersion)
+{
+  CatalogBuild built;
+  if (!core)
+    return built;
+
+  /* One build at a time, across dialogs: the core's catalog is shared state. */
+  auto &cache = catalogCache ();
+  const std::lock_guard<std::mutex> lock (cache.mutex);
+
+  /* Point the core at this region's version only when it holds nothing yet, so
+   * a second dialog does not rebuild the list. */
+  if (dhlrc_core_block_count (core) == 0)
+    {
+      dhlrc_core_resources_configure_for_data_version (
+          core, static_cast<int32_t> (dataVersion), nullptr, 0);
+      built.configured = true;
+    }
+  built.count = dhlrc_core_block_count (core);
+  return built;
+}
+
 void
 BlockPickerUI::loadCatalog ()
 {
   auto *core = DhCore::instance ();
   if (!core || !core->handle ())
     return;
+
+  {
+    /* A catalog of this version was read before: fill from it. The list was
+     * built when the resources were this version's, so it cannot be stale. */
+    auto &cache = catalogCache ();
+    const std::lock_guard<std::mutex> lock (cache.mutex);
+    const auto cached = cache.blocks.constFind (regionClass->dataVersion ());
+    if (cached != cache.blocks.constEnd ())
+      {
+        blocks = cached.value ();
+        return;
+      }
+  }
+
+  /* Reading every blockstate of the version takes a noticeable moment the
+   * first time, so the build runs on a worker while the dialog is already
+   * up and usable. */
+  catalogLoading = true;
+  showCatalogPlaceholder ();
+
+  DhlrcCore *handle = core->handle ();
+  const quint32 dataVersion = regionClass->dataVersion ();
+  catalogWatcher = new QFutureWatcher<CatalogBuild> (this);
+  connect (catalogWatcher, &QFutureWatcher<CatalogBuild>::finished, this,
+           [this]
+           {
+             auto *done = catalogWatcher;
+             catalogWatcher = nullptr;
+             if (!done)
+               return;
+             const CatalogBuild built = done->result ();
+             done->deleteLater ();
+             catalogBuilt (built);
+           });
+  catalogWatcher->setFuture (QtConcurrent::run (
+      [handle, dataVersion] { return buildCatalog (handle, dataVersion); }));
+}
+
+/* The single "loading" row the list carries until the catalog is here. It is
+ * not a choice (its stored index is -1), so the accept button stays disabled
+ * and a filter never stops on it. */
+void
+BlockPickerUI::showCatalogPlaceholder ()
+{
+  QSignalBlocker blocker (ui->blockList);
+  ui->blockList->clear ();
+  auto *item = new QListWidgetItem (_ ("Loading block list..."),
+                                    ui->blockList);
+  item->setFlags (Qt::NoItemFlags);
+  item->setData (Qt::UserRole, QVariant::fromValue (qlonglong (-1)));
+}
+
+/* Copies the built catalog out of the core. A short loop on the GUI thread,
+ * right after the build finished, so the borrowed strings are consumed before
+ * any other page can configure the resources again. */
+void
+BlockPickerUI::copyCatalog ()
+{
+  blocks.clear ();
+  auto *core = DhCore::instance ();
+  if (!core || !core->handle ())
+    return;
   DhlrcCore *handle = core->handle ();
 
-  /* The catalog is built from the resources the core is configured with, and
-   * that is core-global state. Point it at this region's version only when it
-   * holds nothing yet, so a second dialog does not rebuild the list. */
-  if (dhlrc_core_block_count (handle) == 0)
-    dhlrc_core_resources_configure_for_data_version (
-        handle, static_cast<int32_t> (regionClass->dataVersion ()), nullptr,
-        0);
-
-  /* Reading the version's blockstates takes a noticeable moment the first
-   * time; the wait cursor says the window is not stuck. */
-  QApplication::setOverrideCursor (Qt::WaitCursor);
   const size_t count = dhlrc_core_block_count (handle);
   blocks.reserve (static_cast<qsizetype> (count));
   for (size_t i = 0; i < count; i++)
@@ -248,12 +352,43 @@ BlockPickerUI::loadCatalog ()
         }
       blocks.append (std::move (entry));
     }
-  QApplication::restoreOverrideCursor ();
+}
+
+/* The build is done: copy the catalog, show it, and pick up whatever the
+ * dialog had selected. */
+void
+BlockPickerUI::catalogBuilt (const CatalogBuild &built)
+{
+  catalogLoading = false;
+  copyCatalog ();
 
   if (blocks.isEmpty ())
-    ui->headerLabel->setText (
-        _ ("The block list of this version is not available. Make sure this "
-           "version's client jar is downloaded in the settings."));
+    {
+      ui->headerLabel->setText (
+          _ ("The block list of this version is not available. Make sure this "
+             "version's client jar is downloaded in the settings."));
+      QSignalBlocker blocker (ui->blockList);
+      ui->blockList->clear ();
+      updateTarget ();
+      return;
+    }
+
+  /* Only cache a list this dialog made the core build: a catalog the core
+   * already held may belong to another version the resources are set to. */
+  if (built.configured)
+    {
+      auto &cache = catalogCache ();
+      const std::lock_guard<std::mutex> lock (cache.mutex);
+      cache.blocks.insert (regionClass->dataVersion (), blocks);
+    }
+
+  populateBlockList ();
+  selectBlock (currentName);
+  /* A filter may have been typed while the build ran: the list that arrives
+   * has to obey it, and the selection may have to move to the first match. */
+  filterChanged_cb (ui->searchEdit->text ());
+  showProperties ();
+  updateTarget ();
 }
 
 void
@@ -290,8 +425,10 @@ BlockPickerUI::selectBlock (const QString &name)
         }
     }
   /* A state the catalog does not have (another version's block, a mod): the
-   * list still has to offer something, so start at the top. */
-  if (ui->blockList->count () > 0)
+   * list still has to offer something, so start at the top. While the catalog
+   * is still building the list only holds the placeholder, which is not a
+   * choice; `catalogBuilt ()` selects again once the real list is here. */
+  if (!catalogLoading && ui->blockList->count () > 0)
     ui->blockList->setCurrentRow (0);
 }
 
@@ -303,13 +440,18 @@ BlockPickerUI::filterChanged_cb (const QString &text)
   for (int row = 0; row < ui->blockList->count (); row++)
     {
       auto *item = ui->blockList->item (row);
+      /* The placeholder row carries index -1 and is not a block; it stays
+       * visible until the catalog arrives, and never becomes a match. */
+      const bool placeholder = item->data (Qt::UserRole).toLongLong () < 0;
       /* The item text carries both the translated name and the id, so one
        * match covers searching by either. */
       const bool matches
-          = needle.isEmpty ()
-            || item->text ().contains (needle, Qt::CaseInsensitive);
+          = placeholder ? needle.isEmpty ()
+                        : (needle.isEmpty ()
+                           || item->text ().contains (needle,
+                                                      Qt::CaseInsensitive));
       item->setHidden (!matches);
-      if (matches && firstVisible < 0)
+      if (matches && !placeholder && firstVisible < 0)
         firstVisible = row;
     }
 

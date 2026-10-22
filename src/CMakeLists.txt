@@ -56,6 +56,7 @@ set(TEMP_PROJECT_SOURCES
         blockpickerui.cpp blockpickerui.h
         propertymodifyui.cpp propertymodifyui.h
         utility.cpp utility.h
+        dhlog.cpp dhlog.h
         windowsappid.cpp windowsappid.h
         regionmodifyui.cpp regionmodifyui.h
         blocklistui.cpp blocklistui.h
@@ -94,6 +95,7 @@ set(TEMP_PROJECT_SOURCES
         dhbuttondelegate.h
         resourcegetter.h
         resourcegetter.cpp
+        dhdownloadmanager.h dhdownloadmanager.cpp
         dhrenderui.h dhrenderui.cpp
         regionchangesui.h regionchangesui.cpp
         regionworkspace.h regionworkspace.cpp
@@ -172,6 +174,11 @@ endif ()
 if (DH_UI_CHECK)
   target_compile_definitions(dhlrc_qt PRIVATE DH_UI_CHECK)
 endif ()
+
+# The log handler writes the source location of every message, which Qt only
+# puts into `QMessageLogContext` when this is defined for the translation units
+# that log (see dhlog.cpp). It costs one extra argument per message call.
+target_compile_definitions(dhlrc_qt PRIVATE QT_MESSAGELOGCONTEXT)
 
 # The GPU path of the 3D view needs Qt's OpenGL widgets, which a Qt built
 # without OpenGL does not have. Where the module is missing the view keeps the

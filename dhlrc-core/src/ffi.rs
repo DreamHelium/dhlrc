@@ -109,8 +109,10 @@ impl ConfigViewData {
             memory_limit: config.general.memory_limit_bytes() as i64,
             limit_unit: unit_to_int(config.general.limit_unit),
             elapsed_milliseconds: i64::from(config.general.elapsed_milliseconds),
-            select_all_regions_in_loading: config.general.select_all_regions_in_loading,
-            fail_then_retry: config.general.fail_then_retry,
+            /* The view keeps its old layout and field names; the values it
+             * carries now live in `[manage]`. */
+            select_all_regions_in_loading: config.manage.select_all_regions_in_loading,
+            fail_then_retry: config.manage.fail_then_retry,
             fail_download_use_cache: config.general.fail_download_use_cache,
             default_show_option: show_to_int(config.reader.default_show_option),
             override_setting: config.game.override_setting,
@@ -118,7 +120,7 @@ impl ConfigViewData {
             region_name: owned(&mut strings, &config.defaults.region_name()),
             multi_region_name_pattern: owned(
                 &mut strings,
-                &config.defaults.multi_region_name_pattern(),
+                &config.manage.multi_region_name_pattern(),
             ),
             name_pattern_sample_file: owned(
                 &mut strings,
@@ -164,6 +166,10 @@ pub struct DhlrcCore {
     /// Cached `paths.file`, returned by `dhlrc_core_config_path`.
     path: CString,
     paths: ConfigPaths,
+    /// Set when the file was written by an older build and has not been
+    /// replaced yet; read by `dhlrc_core_config_needs_reset` and cleared by
+    /// `dhlrc_core_reset_config`.
+    needs_reset: AtomicBool,
     shared: Arc<Shared>,
     watch: Mutex<Option<ConfigWatch>>,
     /// The plugins, loaded by `dhlrc_core_load_modules`.
@@ -215,9 +221,11 @@ pub extern "C" fn dhlrc_core_open(
         }
     }
 
+    let needs_reset = init.needs_reset;
     let path = CString::new(paths.file.to_string_lossy().to_string()).unwrap_or_default();
     let core = Box::new(DhlrcCore {
         path,
+        needs_reset: AtomicBool::new(needs_reset),
         shared: Arc::new(Shared {
             config: Mutex::new(init.config),
             notifications_enabled: AtomicBool::new(true),
@@ -250,6 +258,67 @@ pub extern "C" fn dhlrc_core_config_path(core: *const DhlrcCore) -> *const c_cha
         return ptr::null();
     }
     unsafe { (*core).path.as_ptr() }
+}
+
+/// 1 when the configuration file was written by an older build and should be
+/// replaced with the defaults, 0 when the loaded file is current (including a
+/// freshly created one), and -1 when the handle is bad.
+///
+/// The core does not convert old files: an old value can mean something quite
+/// different from the same value in the current shape. A frontend checks this
+/// once after opening, tells the user where the old file will be kept, and then
+/// calls `dhlrc_core_reset_config` before reading or saving any setting.
+#[unsafe(no_mangle)]
+pub extern "C" fn dhlrc_core_config_needs_reset(core: *const DhlrcCore) -> i32 {
+    let Some(core) = (unsafe { core.as_ref() }) else {
+        return -1;
+    };
+    i32::from(core.needs_reset.load(Ordering::Relaxed))
+}
+
+/// Replaces the configuration file with the defaults and the in-memory
+/// configuration with a fresh one, keeping the old file as `config.toml.bak`
+/// next to it.
+///
+/// `backup` receives an owned string with the backup's path, or NULL when there
+/// was no file to keep; free it with `dhlrc_string_free`. The file is written
+/// first, so a running watch reports the change the same way it reports a save.
+/// Returns 0 on success, or -1 with an owned `*error`.
+#[unsafe(no_mangle)]
+pub extern "C" fn dhlrc_core_reset_config(
+    core: *mut DhlrcCore,
+    backup: *mut *mut c_char,
+    error: *mut *mut c_char,
+) -> i32 {
+    if core.is_null() {
+        set_error(error, "dhlrc_core_reset_config: null core");
+        return -1;
+    }
+    let core = unsafe { &*core };
+    let kept = match crate::config::backup_and_reset(&core.paths) {
+        Ok(kept) => kept,
+        Err(err) => {
+            set_error(error, &err.to_string());
+            return -1;
+        }
+    };
+    if !backup.is_null() {
+        let pointer = kept
+            .as_ref()
+            .map(|path| path.to_string_lossy().into_owned())
+            .and_then(|text| CString::new(text).ok())
+            .map(CString::into_raw)
+            .unwrap_or(ptr::null_mut());
+        unsafe { *backup = pointer };
+    }
+    // A lock poisoned by a panicking reader still holds a `Config`, so the
+    // reset can put the defaults in place; the flag is what the frontend reads.
+    match core.shared.config.lock() {
+        Ok(mut guard) => *guard = Config::default(),
+        Err(poisoned) => *poisoned.into_inner() = Config::default(),
+    }
+    core.needs_reset.store(false, Ordering::Relaxed);
+    0
 }
 
 #[unsafe(no_mangle)]
@@ -1180,6 +1249,13 @@ pub extern "C" fn dhlrc_core_download_object(
         return -1;
     };
 
+    /* Two frontend threads can ask for the same object at the same time (a
+     * preview and a material list, say). Only the first actually fetches it;
+     * the others wait for it and then find the file in place, which the
+     * downloader's "already there" check turns into a cheap no-op. */
+    let tag = crate::download::object_tag(version, &object);
+    let _gate = crate::download::claim(&tag);
+
     let mut downloader = crate::download::Downloader::new(config.general.cache_dir());
     downloader.set_prefer_cache(config.general.fail_download_use_cache);
 
@@ -1282,6 +1358,10 @@ pub extern "C" fn dhlrc_core_download_client_jar(
         return -1;
     };
 
+    /* Collapse concurrent requests for the same jar, as for objects. */
+    let tag = crate::download::client_jar_tag(data_version);
+    let _gate = crate::download::claim(&tag);
+
     let mut downloader = crate::download::Downloader::new(config.general.cache_dir());
     downloader.set_prefer_cache(config.general.fail_download_use_cache);
 
@@ -1366,8 +1446,8 @@ fn config_from_view(view: &DhlrcConfigView, base: &Config) -> Config {
     config.general.memory_limit = view.memory_limit.max(0) as f64;
     config.general.limit_unit = Unit::Bytes;
     config.general.elapsed_milliseconds = view.elapsed_milliseconds.max(0) as u32;
-    config.general.select_all_regions_in_loading = view.select_all_regions_in_loading;
-    config.general.fail_then_retry = view.fail_then_retry;
+    config.manage.select_all_regions_in_loading = view.select_all_regions_in_loading;
+    config.manage.fail_then_retry = view.fail_then_retry;
     config.general.fail_download_use_cache = view.fail_download_use_cache;
     config.general.cache_directory = from_c(view.cache_directory)
         .filter(|value| !value.is_empty())
@@ -1377,7 +1457,7 @@ fn config_from_view(view: &DhlrcConfigView, base: &Config) -> Config {
     }
     config.defaults.base_name = from_c(view.base_name);
     config.defaults.region_name = from_c(view.region_name);
-    config.defaults.multi_region_name_pattern = from_c(view.multi_region_name_pattern);
+    config.manage.multi_region_name_pattern = from_c(view.multi_region_name_pattern);
     config.defaults.name_pattern_sample_file = from_c_required(view.name_pattern_sample_file);
     config.defaults.name_pattern_sample_region = from_c_required(view.name_pattern_sample_region);
     config.defaults.description = from_c_required(view.description);

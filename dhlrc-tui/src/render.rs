@@ -14,7 +14,7 @@
 use crate::cli::RenderArgs;
 use crate::i18n::gettext;
 use crate::region;
-use dhlrc_core::config::{Config, default_paths, load_or_create};
+use dhlrc_core::config::{Config, backup_and_reset, default_paths, load_or_create};
 use dhlrc_core::download::{Downloader, Never, Sink};
 use dhlrc_render::camera::Camera;
 use dhlrc_render::{Highlight, Image, build_scene, render};
@@ -255,9 +255,31 @@ fn configured(cache_dir: &Option<PathBuf>) -> (PathBuf, bool) {
     let mut download = Config::default().render.download_client_jar;
     let paths = default_paths();
     if paths.file.is_file() {
-        if let Ok(init) = load_or_create(&paths) {
-            directory = init.config.general.cache_dir();
-            download = init.config.render.download_client_jar;
+        match load_or_create(&paths) {
+            Ok(init) if init.needs_reset => {
+                /* There is no window here in which to ask, so the command
+                 * keeps the old file as a backup and carries on with the
+                 * defaults, saying so on standard error. */
+                match backup_and_reset(&paths) {
+                    Ok(Some(backup)) => eprintln!(
+                        "{}",
+                        formatx!(
+                            gettext("the configuration was written by an older version; it is kept as {} and the defaults are used"),
+                            backup.display().to_string()
+                        )
+                        .unwrap_or_default()
+                    ),
+                    _ => eprintln!(
+                        "{}",
+                        gettext("the configuration was written by an older version; the defaults are used")
+                    ),
+                }
+            }
+            Ok(init) => {
+                directory = init.config.general.cache_dir();
+                download = init.config.render.download_client_jar;
+            }
+            Err(_) => {}
         }
     }
     (cache_dir.clone().unwrap_or(directory), download)

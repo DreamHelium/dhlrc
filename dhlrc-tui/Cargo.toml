@@ -9,7 +9,9 @@ name = "dhlrc-tui"
 path = "src/main.rs"
 
 [dependencies]
-clap = { version = "4", features = ["derive"] }
+# `string` lets the translated help texts (gettext returns `String`) be passed
+# to clap's `help`/`about` builders.
+clap = { version = "4", features = ["derive", "string"] }
 clap_complete = "4"
 dhlrc-core = { path = "../dhlrc-core" }
 # The `render` command draws through the same software renderer the Qt view

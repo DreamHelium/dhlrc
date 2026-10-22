@@ -4,12 +4,15 @@
 #include "regionclass.h"
 
 #include <QDialog>
+#include <QFutureWatcher>
+#include <QHash>
 #include <QList>
 #include <QPair>
 #include <QString>
 #include <QStringList>
 #include <QVector>
 #include <memory>
+#include <mutex>
 
 QT_BEGIN_NAMESPACE
 namespace Ui
@@ -21,6 +24,7 @@ QT_END_NAMESPACE
 class QComboBox;
 class QLabel;
 class QSpinBox;
+struct DhlrcCore;
 
 /* Chooses a block out of the version's own block catalog and sets it at one
  * position, with its properties.
@@ -30,6 +34,13 @@ class QSpinBox;
  * and every property is offered with the values its blockstates use. The
  * strings are copied out at once: the ABI only lends them until the resources
  * are configured again.
+ *
+ * Building the catalog reads every blockstate of the version, which takes a
+ * noticeable moment the first time. That build runs on a worker while the
+ * dialog shows a placeholder, so the window opens at once; copying the finished
+ * list into the property combos is a short loop on the GUI thread, which keeps
+ * the borrowed strings from being held across an event loop turn. A built list
+ * is kept per data version, so reopening the dialog does not build it again.
  *
  * `x`, `y`, `z` is the cell the dialog writes by default, and the block there
  * is the state prefilled. "Place one block above" moves the write to `y + 1`,
@@ -52,7 +63,8 @@ public:
 
   /* The state the property values are carried over from. Must be called before
    * the dialog is shown; without it the block at `x`, `y`, `z` is used, which
-   * is what the block reader wants. */
+   * is what the block reader wants. A call made while the catalog is still
+   * loading is remembered: the block is selected once the list arrives. */
   void setCurrentState (const QString &name,
                         const QList<QPair<QString, QString>> &properties);
 
@@ -79,6 +91,26 @@ private:
     QList<QPair<QString, QStringList>> properties;
   };
 
+  /* What the catalog worker produced. `configured` says this dialog had to
+   * point the core at the version, which is the only case where the catalog is
+   * known to belong to the dialog's data version. */
+  struct CatalogBuild
+  {
+    size_t count = 0;
+    bool configured = false;
+  };
+
+  /* The catalogs read so far, per data version. The core keeps its own copy,
+   * but that one is core-global and is dropped whenever any page configures
+   * the resources again; this keeps reopening the dialog off that state. The
+   * mutex also makes the one build at a time rule explicit. */
+  struct CatalogCache
+  {
+    std::mutex mutex;
+    QHash<quint32, QVector<BlockEntry>> blocks;
+  };
+  static CatalogCache &catalogCache ();
+
   Ui::BlockPickerUI *ui;
   std::shared_ptr<RegionClass> regionClass;
   qint32 blockX;
@@ -102,10 +134,22 @@ private:
   QSpinBox *positionX = nullptr;
   QSpinBox *positionY = nullptr;
   QSpinBox *positionZ = nullptr;
+  /* While the catalog is being built the list holds a placeholder instead of
+   * blocks, and nothing counts as chosen yet. */
+  bool catalogLoading = false;
+  QFutureWatcher<CatalogBuild> *catalogWatcher = nullptr;
 
   /* One axis of the cell to write, offering the region's own extent. */
   QSpinBox *makePositionSpin (qint32 value, qint32 size);
   void loadCatalog ();
+  /* Shows the single "loading" row the list carries until the catalog is here. */
+  void showCatalogPlaceholder ();
+  /* Copies the built catalog out of the core; a short loop on the GUI thread. */
+  void copyCatalog ();
+  /* The catalog is ready: fill the list and select what the dialog had. */
+  void catalogBuilt (const CatalogBuild &built);
+  /* The worker: builds the version's catalog in the core, off the GUI thread. */
+  static CatalogBuild buildCatalog (DhlrcCore *core, quint32 dataVersion);
   void populateBlockList ();
   void selectBlock (const QString &name);
   void showProperties ();

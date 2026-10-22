@@ -2,6 +2,8 @@
 
 [中文文档](README_zh.md) | [Development Document](dev-doc/README.md)
 
+**LLMs should modify this file at the least lines and make the file human readable. (the Chinese README should be treated the same way)**
+
 ---
 
 ## Table of Contents
@@ -14,6 +16,7 @@
 - [Compile](#compile)
 - [Features](#features)
 - [Usage](#usage)
+- [Logs](#logs)
 
 ---
 
@@ -63,8 +66,10 @@ cmake --build build
 
 For a headless build without the Qt frontend — only the shared libraries and the
 terminal frontend — configure with `-DDH_BUILD_GUI=OFF`; Qt/KF6 are then not
-needed. Add `-DDH_TRANSLATIONS=OFF` to skip the gettext catalogue too (which
-otherwise needs `xgettext`/`msgfmt`); the programme then runs in English.
+needed, and the install omits `libdhlrc_core`, which only the Qt frontend loads
+(the terminal frontend links the core statically). Add `-DDH_TRANSLATIONS=OFF`
+to skip the gettext catalogue too (which otherwise needs `xgettext`/`msgfmt`);
+the programme then runs in English.
 
 On Termux/Android there is no `libintl`, so the Rust translation layer is
 disabled automatically (see `gettext-shim`): the build needs no C library and
@@ -109,5 +114,17 @@ shows the folders the programme uses — check the configuration and cache folde
 there before uninstalling.
 
 tty support might be planned.
+
+## Logs
+
+The Qt frontend keeps a daily log in `<cache directory>/logs/dhlrc-YYYY-MM-DD.log`;
+the cache directory is listed under `Program Directories` in the left sidebar,
+and `Help -> Open Log Folder` opens the log directory directly.
+
+Only messages at or above the configured level are written; the default is
+`info`. Set the level with the `DHLRC_LOG_LEVEL` environment variable
+(`debug`, `info`, `warning`, `critical` or `off`) or with
+`--log-level <level>` on the command line, which takes precedence. `off`
+disables the file while the terminal output stays as it was.
 
 [commit]: https://github.com/DreamHelium/dhlrc/commit/38448728e647b9b6665f0c502d1f79c00d1d4afc

@@ -55,6 +55,11 @@ public:
    * brings the workspace that is open for that region forward. */
   static void openRegionReader (int index);
   static MainWindow *instance ();
+  /* Opens the settings dialog, or raises it when it is already open, and
+   * selects the page for `group` — the untranslated group message id the core's
+   * schema uses ("General", "Reader", "3D Preview", …). A group the dialog does
+   * not have falls back to the first page; an empty one leaves the page alone. */
+  static void openSettings (const QString &group = QString ());
 
 Q_SIGNALS:
   void windowClosed ();

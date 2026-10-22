@@ -171,6 +171,17 @@ ManageRegionUI::ManageRegionUI (QWidget *parent) : DhWidget (parent)
   connect (exampleButton, &QPushButton::clicked, this,
            [this] { loadExampleRegion (this); });
   btnLayout->addWidget (exampleButton);
+  /* The loading options (memory limit, elapsed time, whether loading selects
+   * every region) are settings, not part of this page; this opens the dialog on
+   * the page they live on. */
+  auto *settingsButton = new QPushButton (_ ("Loading Settings..."));
+  settingsButton->setIcon (QIcon::fromTheme ("configure"));
+  settingsButton->setToolTip (
+      _ ("Open the loading settings: memory limit, elapsed time and whether "
+         "loading selects every region."));
+  connect (settingsButton, &QPushButton::clicked, this,
+           [] { MainWindow::openSettings (QStringLiteral ("General")); });
+  btnLayout->addWidget (settingsButton);
   addButton = new QPushButton (_ ("&Add"));
   addButton->setIcon (QIcon::fromTheme ("list-add"));
   btnLayout->addStretch ();
