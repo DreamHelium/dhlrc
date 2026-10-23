@@ -521,7 +521,7 @@ mod tests {
     use super::{Renderer, render};
     use crate::camera::Camera;
     use crate::image::Image;
-    use crate::scene::{Scene, SceneQuad};
+    use crate::scene::{BOUNDS_COLOUR, HIGHLIGHT_COLOUR, MARKER_COLOUR, Scene, SceneQuad};
     use crate::texture::{Alpha, Texture, Textures};
 
     /// A one-unit quad in the plane `z`, wound so its front looks along `+z`.
@@ -558,7 +558,11 @@ mod tests {
             max: [1.0; 3],
             skipped: Vec::new(),
             bounds: None,
-            highlight: None,
+            highlights: Vec::new(),
+            highlight_colour: HIGHLIGHT_COLOUR,
+            bounds_colour: BOUNDS_COLOUR,
+            marker: None,
+            marker_colour: MARKER_COLOUR,
             overlay: Vec::new(),
         }
     }
@@ -593,7 +597,11 @@ mod tests {
             max: [8.0; 3],
             skipped: Vec::new(),
             bounds: None,
-            highlight: None,
+            highlights: Vec::new(),
+            highlight_colour: HIGHLIGHT_COLOUR,
+            bounds_colour: BOUNDS_COLOUR,
+            marker: None,
+            marker_colour: MARKER_COLOUR,
             overlay: Vec::new(),
         }
     }

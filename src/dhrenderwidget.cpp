@@ -6,6 +6,7 @@
 #include <QLabel>
 #include <QMouseEvent>
 #include <QPainter>
+#include <QRect>
 #include <QResizeEvent>
 #include <QToolTip>
 #include <QWheelEvent>
@@ -18,12 +19,19 @@
 
 namespace
 {
-/* The panel behind the picture, so a transparent render is still readable. */
-const QColor BACKGROUND (0x20, 0x28, 0x30);
 /* How much of a degree one pixel of a turn is worth. */
 const double TURN_PER_PIXEL = 0.4;
 /* How much of the distance one wheel notch takes away. */
 const double ZOOM_PER_NOTCH = 0.88;
+
+/* The three 0..1 components the renderer's colour calls take. */
+void
+colourFloats (const QColor &colour, float *out)
+{
+  out[0] = static_cast<float> (colour.redF ());
+  out[1] = static_cast<float> (colour.greenF ());
+  out[2] = static_cast<float> (colour.blueF ());
+}
 } // namespace
 
 DhRenderWidget::DhRenderWidget (QWidget *parent) : QWidget (parent)
@@ -66,6 +74,9 @@ DhRenderWidget::DhRenderWidget (QWidget *parent) : QWidget (parent)
       gpu->hide ();
       connect (gpu, &DhGpuWidget::frameDrawn, this,
                &DhRenderWidget::onFrameDrawn);
+      /* The two backends must clear to the same colour, so the child starts
+       * from the one this view paints. */
+      gpu->setBackgroundColour (backgroundColour);
     }
 
 }
@@ -85,6 +96,8 @@ DhRenderWidget::discard ()
   if (gpu)
     gpu->setScene (nullptr);
   scene.reset ();
+  /* The boxes were the old scene's, six floats per selected cell. */
+  selectionBoxes.clear ();
 }
 
 void
@@ -163,10 +176,14 @@ DhRenderWidget::adoptScene (std::shared_ptr<DhlrcScene> next)
       else
         gpu->hide ();
     }
-  /* A fresh scene carries no boxes, so the region's box is put on it here; the
-   * pointer's outline follows through `rehover ()`. */
+  /* A fresh scene carries neither boxes nor colours, so both are put on it
+   * here: the region's box, the selected cells, the marker and the colours.
+   * The pointer's own outline follows through `rehover ()`. */
+  applyColours ();
+  applySelectionBoxes ();
   applyBounds ();
-  update ();
+  rebuildHighlights ();
+  applyMarker ();
   /* A reload of the same region keeps the pointer where it was, so the block
    * under it is found again on the fresh scene. */
   rehover ();
@@ -253,6 +270,198 @@ DhRenderWidget::applyBounds ()
   if (gpu && useGpu)
     gpu->highlightChanged ();
   update ();
+}
+
+void
+DhRenderWidget::applySelectionBoxes ()
+{
+  selectionBoxes.clear ();
+  if (!scene)
+    return;
+  selectionBoxes.reserve (selection.size () * 6);
+  for (const BlockCell &cell : selection)
+    {
+      /* The whole cell first: a cell the scene no longer draws leaves the box
+       * alone, and the selection still gets an outline rather than nothing. */
+      float box[6] = { static_cast<float> (cell[0]),
+                       static_cast<float> (cell[1]),
+                       static_cast<float> (cell[2]),
+                       static_cast<float> (cell[0] + 1),
+                       static_cast<float> (cell[1] + 1),
+                       static_cast<float> (cell[2] + 1) };
+      dhlrc_render_scene_block_box (scene.get (), cell[0], cell[1], cell[2],
+                                    box);
+      selectionBoxes.insert (selectionBoxes.end (), box, box + 6);
+    }
+}
+
+void
+DhRenderWidget::rebuildHighlights ()
+{
+  if (!scene)
+    return;
+  /* The whole set goes in one call, so a hover adds its box to the selected
+   * ones instead of replacing them. The selection's boxes were converted when
+   * it changed; only the hover box is worked out here. */
+  std::vector<float> boxes = selectionBoxes;
+  if (hovered)
+    {
+      float box[6] = { static_cast<float> (hoverBlock[0]),
+                       static_cast<float> (hoverBlock[1]),
+                       static_cast<float> (hoverBlock[2]),
+                       static_cast<float> (hoverBlock[0] + 1),
+                       static_cast<float> (hoverBlock[1] + 1),
+                       static_cast<float> (hoverBlock[2] + 1) };
+      /* The box the block is actually drawn in, so a slab gets half a cell and
+       * a pane a sliver of one; a block that drew nothing falls back to the
+       * whole cell. */
+      dhlrc_render_scene_block_box (scene.get (), hoverBlock[0], hoverBlock[1],
+                                    hoverBlock[2], box);
+      boxes.insert (boxes.end (), box, box + 6);
+    }
+  dhlrc_render_scene_set_highlights (scene.get (),
+                                     boxes.empty () ? nullptr : boxes.data (),
+                                     boxes.size () / 6);
+  /* The outlines share the overlay's own small buffer, so only that buffer is
+   * read again, never the scene's. */
+  if (gpu && useGpu)
+    gpu->highlightChanged ();
+  update ();
+}
+
+void
+DhRenderWidget::applyColours ()
+{
+  if (scene)
+    {
+      float rgb[3] = { 0.0f, 0.0f, 0.0f };
+      colourFloats (highlightColour, rgb);
+      dhlrc_render_scene_set_highlight_colour (scene.get (), rgb);
+      colourFloats (boundsColour, rgb);
+      dhlrc_render_scene_set_bounds_colour (scene.get (), rgb);
+      colourFloats (markerColour, rgb);
+      dhlrc_render_scene_set_marker_colour (scene.get (), rgb);
+      /* Every outline is the overlay the GL child keeps its own buffer for, so
+       * it is told to read it again. */
+      if (gpu && useGpu)
+        gpu->highlightChanged ();
+    }
+  if (gpu)
+    gpu->setBackgroundColour (backgroundColour);
+}
+
+void
+DhRenderWidget::setHighlightColour (const QColor &colour)
+{
+  if (colour == highlightColour)
+    return;
+  highlightColour = colour;
+  applyColours ();
+  update ();
+}
+
+void
+DhRenderWidget::setBoundsColour (const QColor &colour)
+{
+  if (colour == boundsColour)
+    return;
+  boundsColour = colour;
+  applyColours ();
+  update ();
+}
+
+void
+DhRenderWidget::setBackgroundColour (const QColor &colour)
+{
+  if (colour == backgroundColour)
+    return;
+  backgroundColour = colour;
+  /* The CPU fallback paints it and the GL child clears to it. */
+  if (gpu)
+    gpu->setBackgroundColour (backgroundColour);
+  update ();
+}
+
+void
+DhRenderWidget::setSelectMode (bool on)
+{
+  if (on == selectModeOn)
+    return;
+  selectModeOn = on;
+  /* The current selection stays; only what the next click does changes. */
+  setCursor (on ? Qt::CrossCursor : Qt::OpenHandCursor);
+}
+
+void
+DhRenderWidget::setMarkerCell (std::optional<std::array<int, 3>> cell)
+{
+  if (cell == marker)
+    return;
+  marker = std::move (cell);
+  /* The box belongs to the current scene; with no scene it waits, and the
+   * scene-adoption path puts it on the next one. */
+  applyMarker ();
+}
+
+void
+DhRenderWidget::setMarkerColour (const QColor &colour)
+{
+  if (colour == markerColour)
+    return;
+  markerColour = colour;
+  applyColours ();
+  update ();
+}
+
+void
+DhRenderWidget::applyMarker ()
+{
+  if (!scene)
+    return;
+  if (!marker)
+    {
+      /* A null box clears the marker. */
+      dhlrc_render_scene_set_marker (scene.get (), nullptr);
+    }
+  else
+    {
+      /* The whole cell first: a cell that drew nothing still gets its
+       * outline, exactly as a selected cell does. */
+      float box[6] = { static_cast<float> ((*marker)[0]),
+                       static_cast<float> ((*marker)[1]),
+                       static_cast<float> ((*marker)[2]),
+                       static_cast<float> ((*marker)[0] + 1),
+                       static_cast<float> ((*marker)[1] + 1),
+                       static_cast<float> ((*marker)[2] + 1) };
+      dhlrc_render_scene_block_box (scene.get (), (*marker)[0], (*marker)[1],
+                                    (*marker)[2], box);
+      dhlrc_render_scene_set_marker (scene.get (), box);
+    }
+  /* The marker is part of the same overlay buffer as the other boxes. */
+  if (gpu && useGpu)
+    gpu->highlightChanged ();
+  update ();
+}
+
+void
+DhRenderWidget::setSelectedCells (const QVector<BlockCell> &cells)
+{
+  if (cells == selection)
+    return;
+  selection = cells;
+  /* The boxes belong to the current scene, so they are converted here and
+   * again whenever a scene is adopted; with no scene the cells wait. */
+  applySelectionBoxes ();
+  rebuildHighlights ();
+  /* A programmatic change is the same change to the buttons that
+   * work on the selection as a click is. */
+  Q_EMIT selectionChanged ();
+}
+
+void
+DhRenderWidget::setBlockEnumerator (BlockEnumerator next)
+{
+  enumerator = std::move (next);
 }
 
 void
@@ -346,7 +555,7 @@ DhRenderWidget::paintEvent (QPaintEvent *)
     return;
 
   QPainter painter (this);
-  painter.fillRect (rect (), BACKGROUND);
+  painter.fillRect (rect (), backgroundColour);
   if (!scene)
     {
       painter.setPen (Qt::white);
@@ -424,11 +633,19 @@ void
 DhRenderWidget::mouseReleaseEvent (QMouseEvent *event)
 {
   const bool wasDragging = dragging;
+  const bool wasMoved = moved;
   dragging = false;
   dragButton = Qt::NoButton;
-  setCursor (Qt::OpenHandCursor);
-  if (wasDragging && !moved && event->button () == Qt::LeftButton)
-    pickAt (event->position ().toPoint ());
+  setCursor (selectModeOn ? Qt::CrossCursor : Qt::OpenHandCursor);
+  /* Only a click without a drag acts: in select mode it toggles the cell, and
+   * outside it only the cell is reported. */
+  if (wasDragging && !wasMoved && event->button () == Qt::LeftButton)
+    {
+      if (selectModeOn)
+        toggleCellAt (event->position ().toPoint ());
+      else
+        pickAt (event->position ().toPoint ());
+    }
   /* Where the button came up is where the pointer is, so the outline is put
    * back under it. */
   hoverAt (event->position ().toPoint ());
@@ -492,19 +709,60 @@ DhRenderWidget::keyPressEvent (QKeyEvent *event)
 }
 
 void
-DhRenderWidget::pickAt (const QPoint &at)
+DhRenderWidget::toggleCellAt (const QPoint &at)
+{
+  int32_t cell[3] = { 0, 0, 0 };
+  if (!cellAt (at, cell))
+    {
+      /* Empty space clears the selection, so a stray click is an easy way to
+       * start over. An empty set is already cleared: no signal. */
+      if (selection.isEmpty ())
+        return;
+      selection.clear ();
+      applySelectionBoxes ();
+      rebuildHighlights ();
+      Q_EMIT selectionChanged ();
+      return;
+    }
+  const BlockCell target{ cell[0], cell[1], cell[2] };
+  const auto found = std::find (selection.begin (), selection.end (), target);
+  if (found == selection.end ())
+    selection.push_back (target);
+  else
+    selection.erase (found);
+  applySelectionBoxes ();
+  rebuildHighlights ();
+  Q_EMIT selectionChanged ();
+}
+
+bool
+DhRenderWidget::cellAt (const QPoint &at, int32_t *cell) const
 {
   if (!scene)
-    return;
+    return false;
   /* The picture the ray is measured against is the full-size one in device
    * pixels, which is the same shape as the widget either way. */
   const qreal ratio = devicePixelRatioF ();
   const int pictureWidth = std::max (1, static_cast<int> (width () * ratio));
   const int pictureHeight = std::max (1, static_cast<int> (height () * ratio));
-  int32_t block[3] = { 0, 0, 0 };
-  if (dhlrc_render_pick (scene.get (), &camera, pictureWidth, pictureHeight,
-                         at.x () * ratio, at.y () * ratio, block))
-    Q_EMIT blockPicked (block[0], block[1], block[2]);
+  return dhlrc_render_pick (scene.get (), &camera, pictureWidth, pictureHeight,
+                            at.x () * ratio, at.y () * ratio, cell)
+         != 0;
+}
+
+void
+DhRenderWidget::pickAt (const QPoint &at)
+{
+  int32_t cell[3] = { 0, 0, 0 };
+  if (!cellAt (at, cell))
+    {
+      /* Empty space still names its cell, so the panel can clear whatever the
+       * last click described. */
+      Q_EMIT cellPicked (-1, -1, -1);
+      return;
+    }
+  Q_EMIT blockPicked (cell[0], cell[1], cell[2]);
+  Q_EMIT cellPicked (cell[0], cell[1], cell[2]);
 }
 
 void
@@ -560,22 +818,9 @@ DhRenderWidget::hoverAt (const QPoint &at)
   hoverBlock[0] = block[0];
   hoverBlock[1] = block[1];
   hoverBlock[2] = block[2];
-  /* The box the block is actually drawn in, so a slab gets half a cell and a
-   * pane a sliver of one. A block that drew nothing — culled away, or not
-   * there at all — falls back to the whole cell. */
-  float box[6] = { static_cast<float> (block[0]),
-                   static_cast<float> (block[1]),
-                   static_cast<float> (block[2]),
-                   static_cast<float> (block[0] + 1),
-                   static_cast<float> (block[1] + 1),
-                   static_cast<float> (block[2] + 1) };
-  dhlrc_render_scene_block_box (scene.get (), block[0], block[1], block[2], box);
-  dhlrc_render_scene_set_highlight (scene.get (), box);
-  /* The GL child keeps its own small buffer for the outline; only that buffer
-   * is read again, never the scene's. */
-  if (gpu && useGpu)
-    gpu->highlightChanged ();
-  update ();
+  /* The hover box joins the selected ones rather than replacing them; the box
+   * the block is actually drawn in is worked out there. */
+  rebuildHighlights ();
   Q_EMIT blockHovered (block[0], block[1], block[2]);
 }
 
@@ -589,13 +834,8 @@ DhRenderWidget::clearHover ()
   if (!hovered)
     return;
   hovered = false;
-  if (scene)
-    {
-      dhlrc_render_scene_set_highlight (scene.get (), nullptr);
-      if (gpu && useGpu)
-        gpu->highlightChanged ();
-      update ();
-    }
+  /* The selected cells stay outlined. */
+  rebuildHighlights ();
 }
 
 void

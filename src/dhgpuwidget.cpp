@@ -54,9 +54,6 @@ void main ()
   fragColor = vec4 (texel.rgb * vTint * vLight, texel.a);
 }
 )";
-
-/* The colour the CPU view paints behind its picture. */
-const float BACKGROUND[3] = { 0x20 / 255.0f, 0x28 / 255.0f, 0x30 / 255.0f };
 } // namespace
 
 DhGpuWidget::DhGpuWidget (QWidget *parent) : QOpenGLWidget (parent)
@@ -161,6 +158,17 @@ DhGpuWidget::setCamera (const DhlrcCamera &value)
 }
 
 void
+DhGpuWidget::setBackgroundColour (const QColor &colour)
+{
+  if (colour == background)
+    return;
+  background = colour;
+  /* The clear happens in `paintGL ()`; the frame is only queued here, so this
+   * is as cheap as any other redraw. */
+  update ();
+}
+
+void
 DhGpuWidget::highlightChanged ()
 {
   highlightDirty = true;
@@ -247,7 +255,9 @@ DhGpuWidget::paintGL ()
   const int pixelWidth = std::max (1, qRound (width () * ratio));
   const int pixelHeight = std::max (1, qRound (height () * ratio));
   glViewport (0, 0, pixelWidth, pixelHeight);
-  glClearColor (BACKGROUND[0], BACKGROUND[1], BACKGROUND[2], 1.0f);
+  glClearColor (static_cast<GLfloat> (background.redF ()),
+                static_cast<GLfloat> (background.greenF ()),
+                static_cast<GLfloat> (background.blueF ()), 1.0f);
   glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   if (!glReady || scene == nullptr)
@@ -300,7 +310,14 @@ DhGpuWidget::paintGL ()
            * they lie on the face they trace they win the depth test, exactly
            * as the rasteriser draws them. */
           glBindVertexArray (highlightVao);
-          glBindTexture (GL_TEXTURE_2D, textures[0]);
+          /* The tint is the whole colour, so the outline samples the white
+           * texel the core puts in every scene. Binding texture 0 (the
+           * missing-texture checker) multiplied the tint by its magenta and
+           * black texels and drew the boxes almost black. */
+          glBindTexture (GL_TEXTURE_2D,
+                         highlightTexture < textures.size ()
+                             ? textures[highlightTexture]
+                             : textures[0]);
           glUniform1i (cutoutLocation, 0);
           glDrawArrays (GL_TRIANGLES, 0, highlightVertices);
         }
@@ -472,6 +489,7 @@ DhGpuWidget::rebuildHighlight ()
 {
   highlightDirty = false;
   highlightVertices = 0;
+  highlightTexture = 0;
   if (scene == nullptr || highlightVbo == 0)
     return;
 
@@ -487,6 +505,10 @@ DhGpuWidget::rebuildHighlight ()
       DhlrcQuad quad{};
       if (dhlrc_render_scene_overlay_quad (scene, index, &quad) == 0)
         continue;
+      /* Every overlay quad samples the scene's white texel; taking the index
+       * from the first quad keeps the widget from assuming which texture the
+       * core reserves for it. */
+      highlightTexture = quad.texture;
       for (int corner : corners)
         {
           const float *position = quad.positions[corner];
@@ -562,6 +584,9 @@ DhGpuWidget::setScene (const DhlrcScene *) {}
 
 void
 DhGpuWidget::setCamera (const DhlrcCamera &) {}
+
+void
+DhGpuWidget::setBackgroundColour (const QColor &) {}
 
 void
 DhGpuWidget::highlightChanged () {}

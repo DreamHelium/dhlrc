@@ -14,7 +14,9 @@
 class DhSettingItem
 {
 public:
-  /* Which control a plain item gets when no creator was registered for it. */
+  /* Which control a plain item gets when no creator was registered for it.
+   * The values mirror `DhlrcSettingType` in dhlrc_core.h (`Bool` = 0 ...
+   * `Colour` = `DHLRC_SETTING_COLOUR` = 5); keep the two in sync. */
   enum class Type
   {
     Bool,
@@ -22,6 +24,8 @@ public:
     String,
     Path,
     Enum,
+    /* A "#rrggbb" string edited with a colour chooser. */
+    Colour,
   };
 
   DhSettingItem (QString key, Type type, QVariant value = {},

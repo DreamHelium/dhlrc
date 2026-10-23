@@ -3,7 +3,9 @@
 #include "dhsettingitem.h"
 #include "dhsettingsdialog.h"
 
+#include <KColorButton>
 #include <QCheckBox>
+#include <QColor>
 #include <QComboBox>
 #include <QDesktopServices>
 #include <QFileDialog>
@@ -286,4 +288,78 @@ void
 DhEnumSettingTemplate::changeConfig () const
 {
   comboBox->setCurrentIndex (item->toInt ());
+}
+
+QColor
+DhColourSettingTemplate::itemColour (const QString &text) const
+{
+  /* "#rrggbb" is the stored form; a named colour is accepted too because
+   * QColor parses both, and a setting edited by hand may hold one. */
+  auto parse = [] (const QString &value)
+  {
+    const QColor colour (value.trimmed ());
+    return colour.isValid () ? colour : QColor ();
+  };
+  QColor colour = parse (text);
+  if (!colour.isValid ())
+    colour = parse (item->getDefault ().toString ());
+  if (!colour.isValid ())
+    colour = QColor (Qt::black);
+  return colour;
+}
+
+QColor
+DhColourSettingTemplate::currentColour () const
+{
+  return colourButton ? colourButton->color () : itemColour (item->toString ());
+}
+
+void
+DhColourSettingTemplate::setColour (const QColor &colour) const
+{
+  if (colourButton)
+    colourButton->setColor (colour);
+}
+
+void
+DhColourSettingTemplate::initWidget (QVBoxLayout *, DhSettingsDialog *dialog)
+{
+  auto *row = addRow ();
+  /* The dialog starts from the saved colour; only a broken or empty value
+   * falls back to the item's default (then black). */
+  colourButton = new KColorButton (itemColour (item->toString ()), dialog);
+  colourButton->setToolTip (item->toolTip ());
+  row->addWidget (colourButton, 1);
+  widget = colourButton;
+  /* The picker never writes the item itself: like the other rows it only
+   * reports the pending change, and `applyChange ()` stores it, so Cancel and
+   * Reload can put the saved value back. */
+  QObject::connect (colourButton, &KColorButton::changed, dialog,
+                    &DhSettingsDialog::detect);
+}
+
+void
+DhColourSettingTemplate::applyChange () const
+{
+  item->setProperty (currentColour ().name (QColor::HexRgb).toLower ());
+}
+
+bool
+DhColourSettingTemplate::detect () const
+{
+  /* Colours are compared, not strings: the config may hold "#FFFFFF" while
+   * the item's normalised form is "#ffffff", and that is not an edit. */
+  return currentColour () != itemColour (item->toString ());
+}
+
+void
+DhColourSettingTemplate::setDefault () const
+{
+  setColour (itemColour (item->getDefault ().toString ()));
+}
+
+void
+DhColourSettingTemplate::changeConfig () const
+{
+  setColour (itemColour (item->toString ()));
 }

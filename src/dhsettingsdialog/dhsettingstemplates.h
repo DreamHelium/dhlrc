@@ -4,12 +4,14 @@
 #include "dhsettingitem.h"
 #include "dhsettingsdialog_export.h"
 
+#include <QColor>
 #include <QList>
 #include <QPointer>
 #include <QWidget>
 #include <memory>
 
 class DhSettingsDialog;
+class KColorButton;
 class QComboBox;
 class QHBoxLayout;
 class QLineEdit;
@@ -126,6 +128,29 @@ public:
 
 private:
   QComboBox *comboBox = nullptr;
+};
+
+/* A "#rrggbb" value edited with a colour chooser instead of a text field.
+ * The dialog stores the colour as the same lowercase hex string the config
+ * file uses, so the item needs no special-casing on save. */
+class DhColourSettingTemplate : public DhSettingsTemplate
+{
+public:
+  using DhSettingsTemplate::DhSettingsTemplate;
+  void initWidget (QVBoxLayout *layout, DhSettingsDialog *dialog) override;
+  void applyChange () const override;
+  [[nodiscard]] bool detect () const override;
+  void setDefault () const override;
+  void changeConfig () const override;
+
+private:
+  /* The item's text (or its default) as a colour; black when neither parses,
+   * so the button always has something sensible to show. */
+  [[nodiscard]] QColor itemColour (const QString &text) const;
+  [[nodiscard]] QColor currentColour () const;
+  void setColour (const QColor &colour) const;
+
+  KColorButton *colourButton = nullptr;
 };
 
 #endif // DHLRC_DHSETTINGSTEMPLATES_H

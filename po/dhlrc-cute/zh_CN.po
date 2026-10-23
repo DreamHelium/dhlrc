@@ -13,7 +13,7 @@
 # SPDX-FileCopyrightText: 2026 SPDX-FileCopyrightText :
 # SPDX-FileCopyrightText: 2026 SPDX-FileCopyrightText :
 msgid ""
-msgstr "Project-Id-Version: dhlrc\nReport-Msgid-Bugs-To: \nPOT-Creation-Date: 2026-10-22 21:23+0800\nPO-Revision-Date: 2026-10-16 15:39+0800\nLast-Translator: 孟小骇 <48383878+DreamHelium@users.noreply.github.com>\nLanguage-Team: Chinese <kde-i18n-doc@kde.org>\nLanguage: zh_CN\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=1; plural=0;\nX-Generator: Lokalize 26.08.1\nX-Language: zh_CN\nX-Source-Language: _CN\n"
+msgstr "Project-Id-Version: dhlrc\nReport-Msgid-Bugs-To: \nPOT-Creation-Date: 2026-10-23 23:13+0800\nPO-Revision-Date: 2026-10-16 15:39+0800\nLast-Translator: 孟小骇 <48383878+DreamHelium@users.noreply.github.com>\nLanguage-Team: Chinese <kde-i18n-doc@kde.org>\nLanguage: zh_CN\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=1; plural=0;\nX-Generator: Lokalize 26.08.1\nX-Language: zh_CN\nX-Source-Language: _CN\n"
 
 #: ../../src/blocklistui.cpp:30
 msgid "Ignore Air?"
@@ -49,11 +49,11 @@ msgid "z"
 msgstr "z"
 
 #: ../../src/blocklistui.cpp:78 ../../src/blocklistui.cpp:81
-#: ../../dhlrc-core/src/schema.rs:73
+#: ../../dhlrc-core/src/schema.rs:75
 msgid "Palette"
 msgstr "偏移码"
 
-#: ../../src/blockpickerui.cpp:96 ../../src/propertymodifyui.cpp:28
+#: ../../src/blockpickerui.cpp:96 ../../src/propertymodifyui.cpp:91
 #: ../../src/regionclass.cpp:442 ../../src/regionmodifyui.cpp:21
 msgid ""
 "The region is being used by a background task; editing is paused until it "
@@ -92,10 +92,11 @@ msgid "Writes to (%1, %2, %3)."
 msgstr "写入 (%1, %2, %3)(๑•̀ㅂ•́)و✧"
 
 #: ../../src/blockpickerui.cpp:632 ../../src/blockpickerui.cpp:655
-#: ../../src/blockreaderui.cpp:486 ../../src/externalnbtreaderui.cpp:107
+#: ../../src/blockreaderui.cpp:486 ../../src/dhrenderui.cpp:1132
+#: ../../src/dhrenderui.cpp:1164 ../../src/externalnbtreaderui.cpp:107
 #: ../../src/externalnbtreaderui.cpp:114 ../../src/manageregionui.cpp:274
 #: ../../src/manageregionui.cpp:307 ../../src/manageregionui.cpp:632
-#: ../../src/propertymodifyui.cpp:251 ../../src/regionchangesui.cpp:86
+#: ../../src/propertymodifyui.cpp:340 ../../src/regionchangesui.cpp:86
 #: ../../src/regionchangesui.cpp:164 ../../src/regionmodifyui.cpp:101
 #: ../../src/utility.cpp:51 ../../src/utility.cpp:72 ../../src/utility.cpp:80
 msgid "Error!"
@@ -262,12 +263,12 @@ msgstr "设置选项✨"
 msgid "&Continue"
 msgstr "继续喵~(&C)"
 
-#: ../../src/configobjectui.cpp:125 ../../src/dhrenderui.cpp:451
+#: ../../src/configobjectui.cpp:125 ../../src/dhrenderui.cpp:584
 #: ../../src/generalchoosedialog.cpp:46
 msgid "&Cancel"
 msgstr "取消捏~(&C)"
 
-#: ../../src/detachabletabwidget.cpp:54 ../../src/mainwindow.cpp:1685
+#: ../../src/detachabletabwidget.cpp:54 ../../src/mainwindow.cpp:1687
 msgid "Return to tabs"
 msgstr "返回选项卡喵呜~"
 
@@ -296,8 +297,8 @@ msgid "%1 item(s)"
 msgstr "%1 项喵~"
 
 #: ../../src/dhdirectoryui.cpp:89 ../../src/dhdirectoryui.cpp:280
-#: ../../src/mainwindow.cpp:746 ../../src/mainwindow.cpp:810
-#: ../../src/mainwindow.cpp:1173
+#: ../../src/mainwindow.cpp:748 ../../src/mainwindow.cpp:812
+#: ../../src/mainwindow.cpp:1175
 msgid "Program Directories"
 msgstr "程序目录捏~"
 
@@ -314,7 +315,7 @@ msgid "Double-click a directory to open it in the file manager."
 msgstr "双击目录即可在文件管理器中打开它(๑•̀ㅂ•́)و✧"
 
 #: ../../src/dhdirectoryui.cpp:113 ../../src/paletteaddui.cpp:68
-#: ../../dhlrc-core/src/schema.rs:73
+#: ../../dhlrc-core/src/schema.rs:75
 msgid "Name"
 msgstr "名称😺"
 
@@ -389,7 +390,7 @@ msgid ""
 "it needs again."
 msgstr "下载的客户端 jar（client_jar/）、资源包以及从其中读取的资源。删除此目录无害：程序会重新下载所需内容😺"
 
-#: ../../src/dhhelpui.cpp:46 ../../src/mainwindow.cpp:742
+#: ../../src/dhhelpui.cpp:46 ../../src/mainwindow.cpp:744
 msgid "Quick Start"
 msgstr "快速入门喵♪"
 
@@ -401,7 +402,7 @@ msgstr "创建区域(=^･ω･^=)"
 msgid "Help"
 msgstr "帮助✨"
 
-#: ../../src/dhhelpui.cpp:187 ../../src/mainwindow.cpp:681
+#: ../../src/dhhelpui.cpp:187 ../../src/mainwindow.cpp:683
 msgid "Search..."
 msgstr "搜索喵~……"
 
@@ -680,606 +681,665 @@ msgstr "OpenGL 喵呜~"
 msgid "the CPU"
 msgstr "CPU (๑•̀ㅂ•́)و✧"
 
-#: ../../src/dhrenderui.cpp:44
+#: ../../src/dhrenderui.cpp:66
 msgid "3D Preview - %1"
 msgstr "3D 预览 - %1 😺"
 
-#: ../../src/dhrenderui.cpp:58
+#: ../../src/dhrenderui.cpp:80
 msgid "Downloading the client jar: %1%"
 msgstr "正在下载客户端 jar：%1% 喵♪"
 
-#: ../../src/dhrenderui.cpp:80
+#: ../../src/dhrenderui.cpp:113
 msgid "&Fit"
 msgstr "适应视图(=^･ω･^=)(&F)"
 
-#: ../../src/dhrenderui.cpp:81
+#: ../../src/dhrenderui.cpp:114
 msgid "&Orthographic"
 msgstr "正交投影✨(&O)"
 
-#: ../../src/dhrenderui.cpp:83
+#: ../../src/dhrenderui.cpp:116
 msgid "&Slice"
 msgstr "切片喵~(&S)"
 
-#: ../../src/dhrenderui.cpp:86
+#: ../../src/dhrenderui.cpp:119
 msgid "Draw only the blocks in this range of Y"
 msgstr "只绘制此 Y 范围内的方块捏~"
 
-#: ../../src/dhrenderui.cpp:90
+#: ../../src/dhrenderui.cpp:123
 msgid "Lowest Y drawn"
 msgstr "绘制的最低 Y 喵呜~"
 
-#: ../../src/dhrenderui.cpp:94
+#: ../../src/dhrenderui.cpp:127
 msgid "Highest Y drawn"
 msgstr "绘制的最高 Y (๑•̀ㅂ•́)و✧"
 
-#: ../../src/dhrenderui.cpp:96
+#: ../../src/dhrenderui.cpp:129
 msgid "Region &box"
 msgstr "区域框😺(&B)"
 
-#: ../../src/dhrenderui.cpp:99
+#: ../../src/dhrenderui.cpp:132
 msgid "Show the box around the region being drawn"
 msgstr "显示正在绘制的区域的边框喵♪"
 
-#: ../../src/dhrenderui.cpp:105
+#: ../../src/dhrenderui.cpp:138
 msgid "Preview Settings..."
 msgstr "预览设置(=^･ω･^=)..."
 
-#: ../../src/dhrenderui.cpp:108
+#: ../../src/dhrenderui.cpp:141
 msgid ""
 "Open the 3D preview setting: whether a missing client jar is downloaded "
 "automatically."
 msgstr "打开 3D 预览设置：是否自动下载缺失的客户端 jar ✨"
 
-#: ../../src/dhrenderui.cpp:133
+#: ../../src/dhrenderui.cpp:155
+msgid "&Multi-select"
+msgstr "多选喵~(&M)"
+
+#: ../../src/dhrenderui.cpp:162
+msgid ""
+"Click blocks with the left button to add them to the selection or take them "
+"out; a click off the scene clears it. The middle and right buttons still "
+"move the view."
+msgstr "用左键点击方块把它加入选择或移出选择；点击场景外会清空选择。中键和右键仍然移动视图捏~"
+
+#: ../../src/dhrenderui.cpp:165 ../../src/dhrenderui.cpp:938
+msgid "No blocks selected"
+msgstr "未选择方块喵呜~"
+
+#: ../../src/dhrenderui.cpp:182
 #: ../../src/dhsettingsdialog/dhsettingsdialog.cpp:106
 msgid "&Reload"
-msgstr "重新加载喵~(&R)"
+msgstr "重新加载(๑•̀ㅂ•́)و✧(&R)"
 
-#: ../../src/dhrenderui.cpp:135 ../../src/dhrenderui.cpp:451
+#: ../../src/dhrenderui.cpp:184 ../../src/dhrenderui.cpp:584
 msgid "Get &Resources"
-msgstr "获取资源捏~(&R)"
+msgstr "获取资源😺(&R)"
 
-#: ../../src/dhrenderui.cpp:136
+#: ../../src/dhrenderui.cpp:185
 msgid "&Modify Properties..."
-msgstr "修改属性喵呜~(&M)..."
+msgstr "修改属性喵♪(&M)..."
 
-#: ../../src/dhrenderui.cpp:137
+#: ../../src/dhrenderui.cpp:186
 msgid "&Replace Block..."
-msgstr "替换方块(๑•̀ㅂ•́)و✧(&R)..."
+msgstr "替换方块(=^･ω･^=)(&R)..."
 
-#: ../../src/dhrenderui.cpp:138
+#: ../../src/dhrenderui.cpp:187
 msgid "&Add Block..."
-msgstr "添加方块😺(&A)..."
+msgstr "添加方块✨(&A)..."
 
-#: ../../src/dhrenderui.cpp:151
+#: ../../src/dhrenderui.cpp:188
+msgid "Clear &Selection"
+msgstr "清除选择喵~(&S)"
+
+#: ../../src/dhrenderui.cpp:191
+msgid "Drop the outline around the selected blocks"
+msgstr "取消选中方块的轮廓捏~"
+
+#: ../../src/dhrenderui.cpp:193
+msgid "Selected &Blocks..."
+msgstr "已选方块喵呜~(&B)..."
+
+#: ../../src/dhrenderui.cpp:196
+msgid "List the selected blocks and mark the one clicked in the list"
+msgstr "列出已选方块，并标记列表中点选的那一个(๑•̀ㅂ•́)و✧"
+
+#: ../../src/dhrenderui.cpp:211 ../../src/dhrenderui.cpp:775
 msgid "Change the properties of the block that was clicked"
-msgstr "更改点击的方块的属性喵♪"
+msgstr "更改点击的方块的属性😺"
 
-#: ../../src/dhrenderui.cpp:153
+#: ../../src/dhrenderui.cpp:213 ../../src/dhrenderui.cpp:785
 msgid "Put another block in place of the block that was clicked"
-msgstr "用另一个方块替换点击的方块(=^･ω･^=)"
+msgstr "用另一个方块替换点击的方块喵♪"
 
-#: ../../src/dhrenderui.cpp:155
+#: ../../src/dhrenderui.cpp:215
 msgid ""
 "Put a block into a cell: type its position, or tick \"one block above\" to "
 "drop it on top of what was clicked"
-msgstr "把方块放进某个格子：输入它的坐标，或勾选“上方一格”，把它放到所点击方块的上面✨"
+msgstr "把方块放进某个格子：输入它的坐标，或勾选“上方一格”，把它放到所点击方块的上面(=^･ω･^=)"
 
-#: ../../src/dhrenderui.cpp:175 ../../src/dhrenderui.cpp:326
+#: ../../src/dhrenderui.cpp:272 ../../src/dhrenderui.cpp:455
 msgid "Building the 3D scene..."
-msgstr "正在构建三维场景喵~……"
+msgstr "正在构建三维场景✨……"
 
-#: ../../src/dhrenderui.cpp:442 ../../src/materiallistui.cpp:183
+#: ../../src/dhrenderui.cpp:575 ../../src/materiallistui.cpp:183
 msgid "The client jar could not be downloaded: %1"
-msgstr "客户端 jar 下载失败：%1 捏~"
+msgstr "客户端 jar 下载失败：%1 喵~"
 
-#: ../../src/dhrenderui.cpp:502
+#: ../../src/dhrenderui.cpp:635
 msgid "drawn with OpenGL"
-msgstr "使用 OpenGL 绘制喵呜~"
+msgstr "使用 OpenGL 绘制捏~"
 
-#: ../../src/dhrenderui.cpp:503
+#: ../../src/dhrenderui.cpp:636
 msgid "drawn by the CPU"
-msgstr "由 CPU 绘制(๑•̀ㅂ•́)و✧"
+msgstr "由 CPU 绘制喵呜~"
 
-#: ../../src/dhrenderui.cpp:505
+#: ../../src/dhrenderui.cpp:638
 msgid "%1 x %2 x %3, %4 quads, %5 blocks not drawn, %6"
-msgstr "%1 x %2 x %3，%4 个面，%5 个方块未绘制，%6 😺"
+msgstr "%1 x %2 x %3，%4 个面，%5 个方块未绘制，%6 (๑•̀ㅂ•́)و✧"
 
-#: ../../src/dhrenderui.cpp:516
+#: ../../src/dhrenderui.cpp:649
 msgid "Slice Y%1-%2. %3"
-msgstr "切片 Y%1-%2。%3 喵♪"
+msgstr "切片 Y%1-%2。%3 😺"
 
-#: ../../src/dhrenderui.cpp:527
+#: ../../src/dhrenderui.cpp:660
 msgid ""
 "Drag with the left button to turn, with the middle or right button to move, "
 "and use the wheel to zoom. A click names the block under it."
-msgstr "左键拖动旋转，中键或右键拖动平移，滚轮缩放。单击可显示指针下的方块(=^･ω･^=)"
+msgstr "左键拖动旋转，中键或右键拖动平移，滚轮缩放。单击可显示指针下的方块喵♪"
 
-#: ../../src/dhrenderui.cpp:539
+#: ../../src/dhrenderui.cpp:672
 msgid ""
 "Nothing could be drawn: the block models and textures of this region's "
 "version could not be placed, and the version is not one the client jar table "
 "knows."
-msgstr "无法绘制内容：无法确定该区域版本所需的方块模型与材质，且该数据版本不在客户端 jar 对照表中✨"
+msgstr "无法绘制内容：无法确定该区域版本所需的方块模型与材质，且该数据版本不在客户端 jar 对照表中(=^･ω･^=)"
 
-#: ../../src/dhrenderui.cpp:544
+#: ../../src/dhrenderui.cpp:677
 msgid ""
 "Nothing could be drawn. The block models and textures of a version live in "
 "its client jar, which belongs at %1. Press \"Get Resources\" to download it "
 "(about 30 MB)."
-msgstr "无法绘制内容。某个版本的方块模型与材质存放在该版本的客户端 jar 中，其位置应为 %1。点击“获取资源”可下载（约 30 MB）喵~"
+msgstr "无法绘制内容。某个版本的方块模型与材质存放在该版本的客户端 jar 中，其位置应为 %1。点击“获取资源”可下载（约 30 MB）✨"
 
-#: ../../src/dhrenderui.cpp:560
+#: ../../src/dhrenderui.cpp:699
 msgid "(%1, %2, %3) is outside the region"
-msgstr "(%1, %2, %3) 不在区域范围内捏~"
+msgstr "(%1, %2, %3) 不在区域范围内喵~"
 
-#: ../../src/dhrenderui.cpp:575
+#: ../../src/dhrenderui.cpp:721
 msgid "Block (%1, %2, %3): %4"
-msgstr "方块 (%1, %2, %3)：%4 喵呜~"
+msgstr "方块 (%1, %2, %3)：%4 捏~"
 
-#: ../../src/dhrenderui.cpp:677
+#: ../../src/dhrenderui.cpp:774
+msgid "This block has no properties to change"
+msgstr "该方块没有可修改的属性喵呜~"
+
+#: ../../src/dhrenderui.cpp:784
+msgid "Put one block into every selected cell"
+msgstr "把一个方块放入每个选中的格子(๑•̀ㅂ•́)و✧"
+
+#: ../../src/dhrenderui.cpp:939
+msgid "%1 block(s) selected"
+msgstr "已选择 %1 个方块😺"
+
+#: ../../src/dhrenderui.cpp:966
+msgid "Selected Blocks"
+msgstr "已选方块喵♪"
+
+#: ../../src/dhrenderui.cpp:973
+msgid "Position"
+msgstr "位置(=^･ω･^=)"
+
+#: ../../src/dhrenderui.cpp:974
+msgid "Block"
+msgstr "方块✨"
+
+#: ../../src/dhrenderui.cpp:1137
+msgid "Replaced %1 block(s)"
+msgstr "已替换 %1 个方块喵~"
+
+#: ../../src/dhrenderui.cpp:1184
 msgid "Block (%1, %2, %3)"
-msgstr "方块 (%1, %2, %3)(๑•̀ㅂ•́)و✧"
+msgstr "方块 (%1, %2, %3)捏~"
 
-#: ../../src/dhrenderwidget.cpp:140
+#: ../../src/dhrenderwidget.cpp:153
 msgid ""
 "The region could not be drawn: no block in it could be resolved. Check that "
 "the resource files for this version have been downloaded in the settings."
-msgstr "无法绘制该区域：其中没有任何方块能被解析。请检查设置中是否已下载此版本所需的资源文件😺"
+msgstr "无法绘制该区域：其中没有任何方块能被解析。请检查设置中是否已下载此版本所需的资源文件喵呜~"
 
 #: ../../src/externalnbtreaderui.cpp:31 ../../src/externalnbtreaderui.cpp:47
-#: ../../src/externalnbtreaderui.cpp:275 ../../src/mainwindow.cpp:751
+#: ../../src/externalnbtreaderui.cpp:275 ../../src/mainwindow.cpp:753
 msgid "NBT Reader"
-msgstr "NBT 阅读器喵♪"
+msgstr "NBT 阅读器(๑•̀ㅂ•́)و✧"
 
 #: ../../src/externalnbtreaderui.cpp:66
 msgid "Drag file to read NBT."
-msgstr "拖动文件以阅读NBT (=^･ω･^=)"
+msgstr "拖动文件以阅读NBT 😺"
 
 #: ../../src/externalnbtreaderui.cpp:108
 msgid "Multiple files dropped!"
-msgstr "多个文件被拖入✨"
+msgstr "多个文件被拖入喵♪"
 
 #: ../../src/externalnbtreaderui.cpp:115
 msgid "Only local files can be read."
-msgstr "只能读取本地文件喵~"
+msgstr "只能读取本地文件(=^･ω･^=)"
 
 #: ../../src/externalnbtreaderui.cpp:143
 msgid "The NBT codec is not available."
-msgstr "NBT 编解码器不可用捏~"
+msgstr "NBT 编解码器不可用✨"
 
 #: ../../src/externalnbtreaderui.cpp:199 ../../src/externalnbtreaderui.cpp:209
 msgid "The file could not be read."
-msgstr "无法读取该文件喵呜~"
+msgstr "无法读取该文件喵~"
 
 #: ../../src/externalnbtreaderui.cpp:226 ../../src/externalnbtreaderui.cpp:256
 msgid "The file contains no NBT data."
-msgstr "该文件不含 NBT 数据(๑•̀ㅂ•́)و✧"
+msgstr "该文件不含 NBT 数据捏~"
 
 #: ../../src/externalnbtreaderui.cpp:276
 msgid "NBT Reader: %1"
-msgstr "NBT 阅读器：%1 😺"
+msgstr "NBT 阅读器：%1 喵呜~"
 
 #: ../../src/externalnbtreaderui.cpp:325
 msgid "Reading the file..."
-msgstr "正在读取文件喵♪……"
+msgstr "正在读取文件(๑•̀ㅂ•́)و✧……"
 
 #: ../../src/generalchoosedialog.cpp:32
 msgid "&All"
-msgstr "全选(=^･ω･^=) (&A)"
+msgstr "全选😺 (&A)"
 
 #: ../../src/main.cpp:244
 msgid "Old Configuration"
-msgstr "旧配置✨"
+msgstr "旧配置喵♪"
 
 #: ../../src/main.cpp:245
 msgid ""
 "The configuration file comes from an older version and cannot be used as it "
 "is. It will be backed up as \"%1\" and replaced with the current default "
 "settings. Some settings take effect after a restart."
-msgstr "配置文件来自较旧的版本，无法直接使用。它将被备份为“%1”，并替换为当前的默认设置。部分设置需要重启后生效喵~"
+msgstr "配置文件来自较旧的版本，无法直接使用。它将被备份为“%1”，并替换为当前的默认设置。部分设置需要重启后生效(=^･ω･^=)"
 
 #: ../../src/main.cpp:304
 msgid ""
 "Minimum level written to the log file: debug, info, warning, critical or off"
-msgstr "写入日志文件的最低等级：debug、info、warning、critical 或 off 捏~"
+msgstr "写入日志文件的最低等级：debug、info、warning、critical 或 off ✨"
 
 #: ../../src/main.cpp:317
 msgid "Draw one picture of a region file and exit; needs --png"
-msgstr "绘制区域文件的一张图片后退出；需要 --png 喵呜~"
+msgstr "绘制区域文件的一张图片后退出；需要 --png 喵~"
 
 #: ../../src/main.cpp:321
 msgid "Where the preview writes its PNG picture"
-msgstr "预览 PNG 图片的输出位置(๑•̀ㅂ•́)و✧"
+msgstr "预览 PNG 图片的输出位置捏~"
 
 #: ../../src/main.cpp:325
 msgid ""
 "Preview backend: cpu or gpu (the default is the GPU when OpenGL is available)"
-msgstr "预览后端：cpu 或 gpu（默认在可用时使用 GPU）😺"
+msgstr "预览后端：cpu 或 gpu（默认在可用时使用 GPU）喵呜~"
 
 #: ../../src/main.cpp:329
 msgid "Preview picture size"
-msgstr "预览图片尺寸喵♪"
+msgstr "预览图片尺寸(๑•̀ㅂ•́)و✧"
 
 #: ../../src/main.cpp:332
 msgid "Preview camera yaw in degrees"
-msgstr "预览相机偏航角（度）(=^･ω･^=)"
+msgstr "预览相机偏航角（度）😺"
 
 #: ../../src/main.cpp:335
 msgid "Preview camera pitch in degrees"
-msgstr "预览相机俯仰角（度）✨"
+msgstr "预览相机俯仰角（度）喵♪"
 
 #: ../../src/main.cpp:339
 msgid ""
 "Preview: highlight the block under this picture pixel (X,Y) and print the "
 "tooltip text"
-msgstr "预览：高亮此图像像素 (X,Y) 处的方块并输出提示框文本喵~"
+msgstr "预览：高亮此图像像素 (X,Y) 处的方块并输出提示框文本(=^･ω･^=)"
 
 #: ../../src/main.cpp:344
 msgid "Preview: draw only the layers from Y1 to Y2, both included"
-msgstr "预览：只绘制从 Y1 到 Y2 的层（含两端）捏~"
+msgstr "预览：只绘制从 Y1 到 Y2 的层（含两端）✨"
 
 #: ../../src/main.cpp:348
 msgid ""
 "Preview: draw the box around the region being drawn, clamped to the slice "
 "when one is set"
-msgstr "预览：绘制正在绘制的区域的边框，设置切片时裁剪到该切片喵呜~"
+msgstr "预览：绘制正在绘制的区域的边框，设置切片时裁剪到该切片喵~"
 
 #: ../../src/main.cpp:353
 msgid "Preview: read the block models and textures from this client jar"
-msgstr "预览：从此客户端 jar 读取方块模型与材质(๑•̀ㅂ•́)و✧"
+msgstr "预览：从此客户端 jar 读取方块模型与材质捏~"
 
 #: ../../src/main.cpp:357
 msgid "Preview: read resources from this cache directory"
-msgstr "预览：从此缓存目录读取资源😺"
+msgstr "预览：从此缓存目录读取资源喵呜~"
 
 #: ../../src/main.cpp:361
 msgid "Preview: use the client jar of this game version"
-msgstr "预览：使用此游戏版本的客户端 jar 喵♪"
+msgstr "预览：使用此游戏版本的客户端 jar (๑•̀ㅂ•́)و✧"
 
 #: ../../src/main.cpp:382
 msgid ""
 "Run the built-in interface self-check and exit (development builds only)"
-msgstr "运行内置界面自检并退出（仅限开发构建）(=^･ω･^=)"
+msgstr "运行内置界面自检并退出（仅限开发构建）😺"
 
-#: ../../src/mainwindow.cpp:162 ../../dhlrc-core/src/schema.rs:180
+#: ../../src/mainwindow.cpp:162 ../../dhlrc-core/src/schema.rs:182
 msgid "Multi-Region Display Name"
-msgstr "多区域显示名称✨"
+msgstr "多区域显示名称喵♪"
 
 #: ../../src/mainwindow.cpp:167
 msgid "Name pattern:"
-msgstr "名称格式喵~"
+msgstr "名称格式(=^･ω･^=)"
 
 #: ../../src/mainwindow.cpp:171
 msgid "Insert a placeholder:"
-msgstr "插入占位符捏~"
+msgstr "插入占位符✨"
 
 #: ../../src/mainwindow.cpp:174
 msgid "File name"
-msgstr "文件名喵呜~"
+msgstr "文件名喵~"
 
 #: ../../src/mainwindow.cpp:177 ../../src/regionmodifyui.cpp:174
 #: ../../src/regionmodifyui.cpp:175
 msgid "Region name"
-msgstr "区域名称(๑•̀ㅂ•́)و✧"
+msgstr "区域名称捏~"
 
 #: ../../src/mainwindow.cpp:181
 msgid "Preview with these sample values:"
-msgstr "使用这些示例值预览😺"
+msgstr "使用这些示例值预览喵呜~"
 
 #: ../../src/mainwindow.cpp:185
 msgid "Sample file name"
-msgstr "示例文件名喵♪"
+msgstr "示例文件名(๑•̀ㅂ•́)و✧"
 
 #: ../../src/mainwindow.cpp:189
 msgid "Sample region name"
-msgstr "示例区域名称(=^･ω･^=)"
+msgstr "示例区域名称😺"
 
 #: ../../src/mainwindow.cpp:198
 msgid ""
 "${file} is replaced with the file name, ${region} with the region name "
 "inside the file. They can be used in any order and repeated. Anything else "
 "is kept as written."
-msgstr "${file} 将被替换为文件名，${region} 将被替换为文件内的区域名称。它们可以以任意顺序使用且可重复使用。其它内容将按原样保留✨"
+msgstr "${file} 将被替换为文件名，${region} 将被替换为文件内的区域名称。它们可以以任意顺序使用且可重复使用。其它内容将按原样保留喵♪"
 
 #: ../../src/mainwindow.cpp:338 ../../src/uicheck.cpp:344
 msgid "Pre&view..."
-msgstr "预览喵~(&V)……"
+msgstr "预览(=^･ω･^=)(&V)……"
 
-#: ../../src/mainwindow.cpp:622
+#: ../../src/mainwindow.cpp:624
 msgid "Config"
-msgstr "配置捏~"
+msgstr "配置✨"
 
-#: ../../src/mainwindow.cpp:632 ../../src/mainwindow.cpp:634
+#: ../../src/mainwindow.cpp:634 ../../src/mainwindow.cpp:636
 msgid "&Help"
-msgstr "帮助喵呜~(&H)"
+msgstr "帮助喵~(&H)"
 
-#: ../../src/mainwindow.cpp:633
+#: ../../src/mainwindow.cpp:635
 msgid "&About"
-msgstr "关于(๑•̀ㅂ•́)و✧(&A)"
+msgstr "关于捏~(&A)"
 
-#: ../../src/mainwindow.cpp:646
+#: ../../src/mainwindow.cpp:648
 msgid "Open Log Folder"
-msgstr "打开日志文件夹😺"
+msgstr "打开日志文件夹喵呜~"
 
-#: ../../src/mainwindow.cpp:724
+#: ../../src/mainwindow.cpp:726
 msgid "Welcome!"
-msgstr "欢迎喵♪"
+msgstr "欢迎(๑•̀ㅂ•́)و✧"
 
-#: ../../src/mainwindow.cpp:733
+#: ../../src/mainwindow.cpp:735
 msgid ""
 "If you don't know how to use, we provide some helps. Just click \"Help -> "
 "Help\" to see them.\n"
 "\n"
 "Also we provide some quick start to help you use."
-msgstr "如果不知道如何使用，我们提供了一些帮助：点击\"帮助 -> 帮助\"即可查看。\n\n我们还提供了一些快速入门，帮助你上手(=^･ω･^=)"
+msgstr "如果不知道如何使用，我们提供了一些帮助：点击\"帮助 -> 帮助\"即可查看。\n\n我们还提供了一些快速入门，帮助你上手😺"
 
-#: ../../src/mainwindow.cpp:755
+#: ../../src/mainwindow.cpp:757
 msgid "Add Files to Regions"
-msgstr "添加文件至区域✨"
+msgstr "添加文件至区域喵♪"
 
-#: ../../src/mainwindow.cpp:759 ../../src/mainwindow.cpp:771
-#: ../../src/mainwindow.cpp:804 ../../src/mainwindow.cpp:1053
-#: ../../src/mainwindow.cpp:1799
+#: ../../src/mainwindow.cpp:761 ../../src/mainwindow.cpp:773
+#: ../../src/mainwindow.cpp:806 ../../src/mainwindow.cpp:1055
+#: ../../src/mainwindow.cpp:1801
 msgid "Manage Region"
-msgstr "管理区域喵~"
+msgstr "管理区域(=^･ω･^=)"
 
-#: ../../src/mainwindow.cpp:766 ../../src/manageregionui.cpp:169
+#: ../../src/mainwindow.cpp:768 ../../src/manageregionui.cpp:169
 msgid "Load Example Projection"
-msgstr "载入示例投影捏~"
+msgstr "载入示例投影✨"
 
-#: ../../src/mainwindow.cpp:802
+#: ../../src/mainwindow.cpp:804
 msgid "NBT File Reader"
-msgstr "NBT文件阅读器喵呜~"
-
-#: ../../src/mainwindow.cpp:806
-msgid "Region Reader/Modifier"
-msgstr "区域阅读器及修改器(๑•̀ㅂ•́)و✧"
+msgstr "NBT文件阅读器喵~"
 
 #: ../../src/mainwindow.cpp:808
+msgid "Region Reader/Modifier"
+msgstr "区域阅读器及修改器捏~"
+
+#: ../../src/mainwindow.cpp:810
 msgid "Settings"
-msgstr "设置😺"
+msgstr "设置喵呜~"
 
-#: ../../src/mainwindow.cpp:904
+#: ../../src/mainwindow.cpp:906
 msgid "Select Cache Directory"
-msgstr "选择缓存目录喵♪"
+msgstr "选择缓存目录(๑•̀ㅂ•́)و✧"
 
-#: ../../src/mainwindow.cpp:934
+#: ../../src/mainwindow.cpp:936
 msgid "reading"
-msgstr "读取(=^･ω･^=)"
+msgstr "读取😺"
 
-#: ../../src/mainwindow.cpp:935
+#: ../../src/mainwindow.cpp:937
 msgid "writing"
-msgstr "写入✨"
+msgstr "写入喵♪"
 
-#: ../../src/mainwindow.cpp:941
+#: ../../src/mainwindow.cpp:943
 msgid "Use saved options for %1 (%2) instead of asking"
-msgstr "对 %1（%2）使用已保存的选项而不询问喵~"
+msgstr "对 %1（%2）使用已保存的选项而不询问(=^･ω･^=)"
 
-#: ../../src/mainwindow.cpp:944
+#: ../../src/mainwindow.cpp:946
 msgid ""
 "Use the options below for every %1 operation instead of asking each time."
-msgstr "每次%1时都使用下面的选项，而不是每次都询问捏~"
+msgstr "每次%1时都使用下面的选项，而不是每次都询问✨"
 
-#: ../../src/mainwindow.cpp:1117
+#: ../../src/mainwindow.cpp:1119
 msgid "No NBT readers are open yet."
-msgstr "还没有打开任何 NBT 阅读器喵呜~"
+msgstr "还没有打开任何 NBT 阅读器喵~"
 
-#: ../../src/mainwindow.cpp:1138
+#: ../../src/mainwindow.cpp:1140
 msgid "New Reader Tab"
-msgstr "新建阅读器标签页(๑•̀ㅂ•́)و✧"
+msgstr "新建阅读器标签页捏~"
 
-#: ../../src/mainwindow.cpp:1141
+#: ../../src/mainwindow.cpp:1143
 msgid "New Reader Window"
-msgstr "新建阅读器窗口😺"
+msgstr "新建阅读器窗口喵呜~"
 
-#: ../../src/mainwindow.cpp:1501
+#: ../../src/mainwindow.cpp:1503
 msgid "No regions have been loaded yet."
-msgstr "还没有载入任何区域喵♪"
+msgstr "还没有载入任何区域(๑•̀ㅂ•́)و✧"
 
 #: ../../src/manageregionui.cpp:163
 msgid "&Select"
-msgstr "选择(=^･ω･^=)(&S)"
+msgstr "选择😺(&S)"
 
 #: ../../src/manageregionui.cpp:177
 msgid "Loading Settings..."
-msgstr "加载设置✨..."
+msgstr "加载设置喵♪..."
 
 #: ../../src/manageregionui.cpp:180
 msgid ""
 "Open the loading settings: memory limit, elapsed time and whether loading "
 "selects every region."
-msgstr "打开加载设置：内存上限、等待毫秒数以及加载时是否选中全部区域喵~"
+msgstr "打开加载设置：内存上限、等待毫秒数以及加载时是否选中全部区域(=^･ω･^=)"
 
 #: ../../src/manageregionui.cpp:185 rc.cpp:96
 msgid "&Add"
-msgstr "添加捏~(&A)"
+msgstr "添加✨(&A)"
 
 #: ../../src/manageregionui.cpp:198
 msgid "Select &All"
-msgstr "全选喵呜~(&A)"
+msgstr "全选喵~(&A)"
 
 #: ../../src/manageregionui.cpp:205
 msgid "&Remove Selected"
-msgstr "移除选中项(๑•̀ㅂ•́)و✧(&R)"
+msgstr "移除选中项捏~(&R)"
 
 #: ../../src/manageregionui.cpp:209
 msgid "&Save Selected"
-msgstr "保存选中项😺(&S)"
+msgstr "保存选中项喵呜~(&S)"
 
 #: ../../src/manageregionui.cpp:254
 msgid "Locked regions were kept."
-msgstr "已锁定的区域被保留喵♪"
+msgstr "已锁定的区域被保留(๑•̀ㅂ•́)و✧"
 
 #: ../../src/manageregionui.cpp:271
 msgid "Select Files"
-msgstr "选择文件(=^･ω･^=)"
+msgstr "选择文件😺"
 
 #: ../../src/manageregionui.cpp:274
 msgid "No file selected!"
-msgstr "没有文件被选中✨"
+msgstr "没有文件被选中喵♪"
 
 #: ../../src/manageregionui.cpp:308
 msgid "The example projection could not be extracted."
-msgstr "无法解出示例投影喵~"
+msgstr "无法解出示例投影(=^･ω･^=)"
 
 #: ../../src/manageregionui.cpp:456
 msgid "%1 region(s) selected"
-msgstr "已选中 %1 个区域捏~"
+msgstr "已选中 %1 个区域✨"
 
 #: ../../src/manageregionui.cpp:510 ../../src/utility.cpp:109
 msgid "Locked"
-msgstr "已锁定喵呜~"
+msgstr "已锁定喵~"
 
 #: ../../src/manageregionui.cpp:554
 msgid "Select Save Format"
-msgstr "选择保存格式(๑•̀ㅂ•́)و✧"
+msgstr "选择保存格式捏~"
 
 #: ../../src/manageregionui.cpp:554
 msgid "Please select the format to save to."
-msgstr "请选择要保存到的格式😺"
+msgstr "请选择要保存到的格式喵呜~"
 
 #: ../../src/manageregionui.cpp:580
 msgid "Use MultiFunc?"
-msgstr "使用多区域功能喵♪"
+msgstr "使用多区域功能(๑•̀ㅂ•́)و✧"
 
 #: ../../src/manageregionui.cpp:581
 msgid "This type supports regions to save as one file, do you want to use it?"
-msgstr "此类型支持将多个区域保存为一个文件，您想要使用它吗(=^･ω･^=)"
+msgstr "此类型支持将多个区域保存为一个文件，您想要使用它吗😺"
 
 #: ../../src/manageregionui.cpp:597
 msgid "Select File"
-msgstr "选择文件✨"
+msgstr "选择文件喵♪"
 
 #: ../../src/manageregionui.cpp:633
 msgid "This type cannot save a single region."
-msgstr "此类型无法保存单个区域喵~"
+msgstr "此类型无法保存单个区域(=^･ω･^=)"
 
 #: ../../src/manageregionui.cpp:638
 msgid "Select Directory"
-msgstr "选择目录捏~"
+msgstr "选择目录✨"
 
 #: ../../src/manageregionui.cpp:760 ../../src/manageregionui.cpp:928
 msgid "Locked!"
-msgstr "已锁定喵呜~"
+msgstr "已锁定喵~"
 
 #: ../../src/manageregionui.cpp:774
 msgid "Region identifier"
-msgstr "区域标识符(๑•̀ㅂ•́)و✧"
+msgstr "区域标识符捏~"
 
 #: ../../src/manageregionui.cpp:777
 msgid "Added: %1"
-msgstr "添加于：%1 😺"
+msgstr "添加于：%1 喵呜~"
 
 #: ../../src/manageregionui.cpp:793
 msgid "Open the region reader"
-msgstr "打开该区域的阅读器喵♪"
+msgstr "打开该区域的阅读器(๑•̀ㅂ•́)و✧"
 
 #: ../../src/manageregionui.cpp:828
 msgid "Input a New Name"
-msgstr "输入新名称(=^･ω･^=)"
+msgstr "输入新名称😺"
 
 #: ../../src/manageregionui.cpp:829
 msgid "Please input a new name for the region."
-msgstr "请输入此区域的新名称✨"
+msgstr "请输入此区域的新名称喵♪"
 
 #: ../../src/manageregionui.cpp:837 ../../src/manageregionui.cpp:839
 #: ../../src/regionmodifyui.cpp:163
 msgid "Base name"
-msgstr "基础名字喵~"
+msgstr "基础名字(=^･ω･^=)"
 
 #: ../../src/materiallistui.cpp:97
 msgid "Filter by item or block id"
-msgstr "按物品或方块 ID 筛选捏~"
+msgstr "按物品或方块 ID 筛选✨"
 
 #: ../../src/materiallistui.cpp:100
 msgid "Show &ignored blocks"
-msgstr "显示被忽略的方块喵呜~(&I)"
+msgstr "显示被忽略的方块喵~(&I)"
 
 #: ../../src/materiallistui.cpp:102
 msgid "Blocks that need nothing prepared, like air, fire or a portal."
-msgstr "不需要准备任何物品的方块，例如空气、火或传送门(๑•̀ㅂ•́)و✧"
+msgstr "不需要准备任何物品的方块，例如空气、火或传送门捏~"
 
 #: ../../src/materiallistui.cpp:104
 msgid "&Refresh"
-msgstr "刷新😺(&R)"
+msgstr "刷新喵呜~(&R)"
 
 #: ../../src/materiallistui.cpp:111
 msgid "Material List Settings..."
-msgstr "材料列表设置喵♪..."
+msgstr "材料列表设置(๑•̀ㅂ•́)و✧..."
 
 #: ../../src/materiallistui.cpp:114
 msgid ""
 "Open the material list setting: whether a missing client jar is downloaded "
 "for the item icons."
-msgstr "打开材料列表设置：是否为物品图标下载缺失的客户端 jar (=^･ω･^=)"
+msgstr "打开材料列表设置：是否为物品图标下载缺失的客户端 jar 😺"
 
 #: ../../src/materiallistui.cpp:152
 msgid "Select an item to see which blocks make it up."
-msgstr "选择一个物品，查看它由哪些方块构成✨"
+msgstr "选择一个物品，查看它由哪些方块构成喵♪"
 
 #: ../../src/materiallistui.cpp:233
 msgid "same id as the block"
-msgstr "与方块 ID 相同喵~"
+msgstr "与方块 ID 相同(=^･ω･^=)"
 
 #: ../../src/materiallistui.cpp:235
 msgid "exact row of the table"
-msgstr "表中的精确条目捏~"
+msgstr "表中的精确条目✨"
 
 #: ../../src/materiallistui.cpp:237
 msgid "pattern %1"
-msgstr "规则 %1 喵呜~"
+msgstr "规则 %1 喵~"
 
 #: ../../src/materiallistui.cpp:248 ../../src/materiallistui.cpp:440
 msgid "Loading the material list..."
-msgstr "正在加载材料列表(๑•̀ㅂ•́)و✧..."
+msgstr "正在加载材料列表捏~..."
 
 #: ../../src/materiallistui.cpp:319
 msgid "The core returned no material list."
-msgstr "核心没有返回材料清单😺"
+msgstr "核心没有返回材料清单喵呜~"
 
 #: ../../src/materiallistui.cpp:365
 msgid "Downloading the client jar for the item icons..."
-msgstr "正在下载用于物品图标的客户端 jar 喵♪..."
+msgstr "正在下载用于物品图标的客户端 jar (๑•̀ㅂ•́)و✧..."
 
 #: ../../src/materiallistui.cpp:434
 msgid "Item"
-msgstr "物品(=^･ω･^=)"
+msgstr "物品😺"
 
 #: ../../src/materiallistui.cpp:434
 msgid "ID"
-msgstr "ID ✨"
+msgstr "ID 喵♪"
 
 #: ../../src/materiallistui.cpp:434
 msgid "Count"
-msgstr "数量喵~"
+msgstr "数量(=^･ω･^=)"
 
 #: ../../src/materiallistui.cpp:442
 msgid "No material list."
-msgstr "没有材料清单捏~"
+msgstr "没有材料清单✨"
 
 #: ../../src/materiallistui.cpp:467
 msgid ""
 "Item: %1 (%2)\n"
 "Count: %3, from %4 block positions\n"
-msgstr "物品：%1（%2）\n数量：%3，来自 %4 个方块位置喵呜~\n"
+msgstr "物品：%1（%2）\n数量：%3，来自 %4 个方块位置喵~\n"
 
 #: ../../src/materiallistui.cpp:472
 msgid ""
 "Note: two block positions make one item here (a door, a bed, a tall plant).\n"
-msgstr "注意：这里两个方块位置合成一个物品（门、床、高植物）(๑•̀ㅂ•́)و✧\n"
+msgstr "注意：这里两个方块位置合成一个物品（门、床、高植物）捏~\n"
 
 #: ../../src/materiallistui.cpp:475
 msgid ""
 "Note: one block stands for several items here (a double slab, snow layers, "
 "candles).\n"
-msgstr "注意：这里一个方块代表多个物品（双层台阶、雪层、蜡烛）😺\n"
+msgstr "注意：这里一个方块代表多个物品（双层台阶、雪层、蜡烛）喵呜~\n"
 
 #: ../../src/materiallistui.cpp:477
 msgid ""
 "\n"
 "Sources:\n"
-msgstr "\n来源喵♪\n"
+msgstr "\n来源(๑•̀ㅂ•́)و✧\n"
 
 #: ../../src/materiallistui.cpp:513
 msgid ""
@@ -1287,407 +1347,407 @@ msgid ""
 "Count: %3\n"
 "\n"
 "This block needs nothing prepared: the block-to-item table ignores it."
-msgstr "方块：%1（%2）\n数量：%3\n\n这个方块不需要准备任何东西：方块→物品表将其忽略(=^･ω･^=)"
+msgstr "方块：%1（%2）\n数量：%3\n\n这个方块不需要准备任何东西：方块→物品表将其忽略😺"
 
 #: ../../src/materiallistui.cpp:541
 msgid "%1 items from %2 blocks; %3 ignored block kinds (%4 blocks)."
-msgstr "%1 种物品，来自 %2 个方块；忽略了 %3 种方块（共 %4 个）✨"
+msgstr "%1 种物品，来自 %2 个方块；忽略了 %3 种方块（共 %4 个）喵♪"
 
 #: ../../src/materiallistui.cpp:556
 msgid ""
 "Item icons need this version's client jar, which has not been downloaded yet."
-msgstr "物品图标需要该版本的客户端 jar，但尚未下载喵~"
+msgstr "物品图标需要该版本的客户端 jar，但尚未下载(=^･ω･^=)"
 
 #: ../../src/paletteaddui.cpp:19
 msgid "Please Enter a Block Name"
-msgstr "请输入方块名称捏~"
+msgstr "请输入方块名称✨"
 
 #: ../../src/paletteaddui.cpp:20
 msgid "Please enter a block name. (id name please)"
-msgstr "请输入方块名称。（请使用id名称）喵呜~"
+msgstr "请输入方块名称。（请使用id名称）喵~"
 
 #: ../../src/paletteaddui.cpp:25
 msgid "Enter Name"
-msgstr "输入名称(๑•̀ㅂ•́)و✧"
+msgstr "输入名称捏~"
 
 #: ../../src/paletteaddui.cpp:26
 msgid "Please enter a name."
-msgstr "请输入名称😺"
+msgstr "请输入名称喵呜~"
 
 #: ../../src/paletteaddui.cpp:27
 msgid "Enter Data"
-msgstr "输入数据喵♪"
+msgstr "输入数据(๑•̀ㅂ•́)و✧"
 
 #: ../../src/paletteaddui.cpp:28
 msgid "Please enter a data."
-msgstr "请输入数据(=^･ω･^=)"
+msgstr "请输入数据😺"
 
 #: ../../src/paletteaddui.cpp:68
 msgid "Data"
-msgstr "数据✨"
+msgstr "数据喵♪"
 
-#: ../../src/propertymodifyui.cpp:166
+#: ../../src/propertymodifyui.cpp:237
 msgid "Looking for blocks with these properties..."
-msgstr "正在查找具有这些属性的方块喵~……"
+msgstr "正在查找具有这些属性的方块(=^･ω･^=)……"
 
-#: ../../src/propertymodifyui.cpp:177
+#: ../../src/propertymodifyui.cpp:253
 msgid "%1 block(s) have these properties."
-msgstr "共有 %1 个方块具有这些属性捏~"
+msgstr "共有 %1 个方块具有这些属性✨"
 
-#: ../../src/propertymodifyui.cpp:181
+#: ../../src/propertymodifyui.cpp:257
 msgid "The first %1 are listed."
-msgstr "已列出前 %1 个喵呜~"
+msgstr "已列出前 %1 个喵~"
 
-#: ../../src/propertymodifyui.cpp:252
+#: ../../src/propertymodifyui.cpp:341
 msgid "Failed to modify the property."
-msgstr "修改属性失败(๑•̀ㅂ•́)و✧"
+msgstr "修改属性失败捏~"
 
-#: ../../src/propertymodifyui.cpp:275
+#: ../../src/propertymodifyui.cpp:364
 msgid "Block properties at %1"
-msgstr "%1 处的方块属性😺"
+msgstr "%1 处的方块属性喵呜~"
 
-#: ../../src/propertymodifyui.cpp:285
+#: ../../src/propertymodifyui.cpp:374
 msgid "Blocks with these properties: %1"
-msgstr "具有这些属性的方块：%1 喵♪"
+msgstr "具有这些属性的方块：%1 (๑•̀ㅂ•́)و✧"
 
-#: ../../src/propertymodifyui.cpp:288
+#: ../../src/propertymodifyui.cpp:377
 msgid "Palette properties of #%1"
-msgstr "调色板项 #%1 的属性(=^･ω･^=)"
+msgstr "调色板项 #%1 的属性😺"
 
 #: ../../src/regionchangesui.cpp:36
 msgid ""
 "The region is being used by a background task; undo is paused until it "
 "finishes."
-msgstr "区域正被后台任务使用，任务结束前无法撤回✨"
+msgstr "区域正被后台任务使用，任务结束前无法撤回喵♪"
 
 #: ../../src/regionchangesui.cpp:55
 msgid "Select a change to see what it changed."
-msgstr "选中一条修改即可查看它改动了什么喵~"
+msgstr "选中一条修改即可查看它改动了什么(=^･ω･^=)"
 
 #: ../../src/regionchangesui.cpp:59
 msgid "&Undo Selected"
-msgstr "撤回选中捏~(&U)"
+msgstr "撤回选中✨(&U)"
 
 #: ../../src/regionchangesui.cpp:62
 msgid "&Undo All"
-msgstr "全部撤回喵呜~(&A)"
+msgstr "全部撤回喵~(&A)"
 
 #: ../../src/regionchangesui.cpp:87
 msgid ""
 "Some changes could not be undone. The list keeps them; try again when the "
 "region is not in use."
-msgstr "有些修改无法撤回。它们仍保留在列表中，等区域空闲后可以再试(๑•̀ㅂ•́)و✧"
+msgstr "有些修改无法撤回。它们仍保留在列表中，等区域空闲后可以再试捏~"
 
 #: ../../src/regionchangesui.cpp:165
 msgid ""
 "That change could not be undone. Undo needs the region to be idle; try again "
 "in a moment."
-msgstr "无法撤回该修改。撤回需要区域空闲，请稍后再试😺"
+msgstr "无法撤回该修改。撤回需要区域空闲，请稍后再试喵呜~"
 
 #: ../../src/regionclass.cpp:445
 msgid "No block was chosen."
-msgstr "未选择方块喵♪"
+msgstr "未选择方块(๑•̀ㅂ•́)و✧"
 
 #: ../../src/regionclass.cpp:469
 msgid "The position (%1, %2, %3) is outside the region."
-msgstr "位置 (%1, %2, %3) 在区域之外(=^･ω･^=)"
+msgstr "位置 (%1, %2, %3) 在区域之外😺"
 
 #: ../../src/regionmodifyui.cpp:120
 msgid "Failed to set the time."
-msgstr "设置时间失败✨"
+msgstr "设置时间失败喵♪"
 
 #: ../../src/regionmodifyui.cpp:124 ../../src/regionmodifyui.cpp:125
 msgid "Time"
-msgstr "时间喵~"
+msgstr "时间(=^･ω･^=)"
 
 #: ../../src/regionmodifyui.cpp:134
 msgid "Failed to set the description."
-msgstr "设置描述失败捏~"
+msgstr "设置描述失败✨"
 
 #: ../../src/regionmodifyui.cpp:138 ../../src/regionmodifyui.cpp:139 rc.cpp:144
 msgid "Description"
-msgstr "描述喵呜~"
+msgstr "描述喵~"
 
 #: ../../src/regionmodifyui.cpp:147
 msgid "Failed to set the author."
-msgstr "设置作者失败(๑•̀ㅂ•́)و✧"
+msgstr "设置作者失败捏~"
 
 #: ../../src/regionmodifyui.cpp:151 ../../src/regionmodifyui.cpp:152 rc.cpp:150
 msgid "Author"
-msgstr "作者😺"
+msgstr "作者喵呜~"
 
 #: ../../src/regionmodifyui.cpp:159
 msgid "Failed to set the base name."
-msgstr "设置基础名称失败喵♪"
+msgstr "设置基础名称失败(๑•̀ㅂ•́)و✧"
 
 #: ../../src/regionmodifyui.cpp:170
 msgid "Failed to set the region name."
-msgstr "设置区域名称失败(=^･ω･^=)"
+msgstr "设置区域名称失败😺"
 
 #: ../../src/regionmodifyui.cpp:183
 msgid "Failed to set the offset."
-msgstr "设置偏移量失败✨"
+msgstr "设置偏移量失败喵♪"
 
 #: ../../src/regionmodifyui.cpp:187 ../../src/regionmodifyui.cpp:188 rc.cpp:147
 msgid "Offset"
-msgstr "偏移喵~"
+msgstr "偏移(=^･ω･^=)"
 
 #: ../../src/regionmodifyui.cpp:198
 msgid "Failed to set the data version."
-msgstr "设置 DataVersion 失败捏~"
+msgstr "设置 DataVersion 失败✨"
 
 #: ../../src/regionmodifyui.cpp:202 ../../src/regionmodifyui.cpp:203
 msgid "Data version"
 msgstr "DataVersion"
 
 #: ../../src/regionworkspace.cpp:102 ../../src/uicheck.cpp:433
-#: ../../dhlrc-core/src/schema.rs:67
+#: ../../dhlrc-core/src/schema.rs:69
 msgid "Reader"
-msgstr "阅读器喵呜~"
+msgstr "阅读器喵~"
 
 #: ../../src/regionworkspace.cpp:170
 msgid "Modifier"
-msgstr "修改器(๑•̀ㅂ•́)و✧"
+msgstr "修改器捏~"
 
 #: ../../src/regionworkspace.cpp:184
 msgid "Change History"
-msgstr "修改历史😺"
+msgstr "修改历史喵呜~"
 
 #: ../../src/regionworkspace.cpp:198 ../../src/uicheck.cpp:447
-#: ../../dhlrc-core/src/schema.rs:70
+#: ../../dhlrc-core/src/schema.rs:72
 msgid "3D Preview"
-msgstr "3D 预览喵♪"
+msgstr "3D 预览(๑•̀ㅂ•́)و✧"
 
 #: ../../src/regionworkspace.cpp:216 ../../src/uicheck.cpp:438
-#: ../../dhlrc-core/src/schema.rs:68
+#: ../../dhlrc-core/src/schema.rs:70
 msgid "Material List"
-msgstr "材料列表(=^･ω･^=)"
+msgstr "材料列表😺"
 
 #: ../../src/resourcegetter.cpp:83 ../../src/resourcegetter.cpp:112
 msgid "The download failed."
-msgstr "下载失败✨"
+msgstr "下载失败喵♪"
 
 #: ../../src/saveregionjob.cpp:40
 msgid "Saving %1..."
-msgstr "正在保存%1 喵~……"
+msgstr "正在保存%1 (=^･ω･^=)……"
 
 #: ../../src/saveregionjob.cpp:49
 msgid "Saving %1 (%2%)"
-msgstr "正在保存%1（%2%）捏~"
+msgstr "正在保存%1（%2%）✨"
 
 #: ../../src/saveregionjob.cpp:57
 msgid "Saving %1 (%2%): %3"
-msgstr "正在保存%1（%2%）：%3 喵呜~"
+msgstr "正在保存%1（%2%）：%3 喵~"
 
 #: ../../src/saveregionjob.cpp:220 ../../src/saveregionjob.cpp:432
 #: ../../src/saveregionjob.cpp:595
 msgid "Saved %1 of %2 (%3%)."
-msgstr "已保存 %1 / %2（%3%）(๑•̀ㅂ•́)و✧"
+msgstr "已保存 %1 / %2（%3%）捏~"
 
 #: ../../src/saveregionjob.cpp:416
 msgid ""
 "Region %1 could not be saved:\n"
 "\n"
 "%2"
-msgstr "区域%1无法保存：\n\n%2 😺"
+msgstr "区域%1无法保存：\n\n%2 喵呜~"
 
 #: ../../src/saveregionjob.cpp:454
 msgid "Ready to save %1. Click Continue to set the options."
-msgstr "已准备好保存 %1。点击“继续”以设置选项喵♪"
+msgstr "已准备好保存 %1。点击“继续”以设置选项(๑•̀ㅂ•́)و✧"
 
 #: ../../src/saveregionjob.cpp:556
 msgid "Ready to save %1 region(s). Click Continue to set the options."
-msgstr "已准备好保存 %1 个区域。点击“继续”以设置选项(=^･ω･^=)"
+msgstr "已准备好保存 %1 个区域。点击“继续”以设置选项😺"
 
 #: ../../src/saveregionjob.cpp:610
 msgid ""
 "The file %1 could not be written:\n"
 "\n"
 "%2"
-msgstr "无法写入文件 %1：\n\n%2 ✨"
+msgstr "无法写入文件 %1：\n\n%2 喵♪"
 
 #: ../../src/saveregionjob.cpp:652
 msgid "Saving %1 region(s)..."
-msgstr "正在保存 %1 个区域喵~……"
+msgstr "正在保存 %1 个区域(=^･ω･^=)……"
 
 #: ../../src/saveregionjob.cpp:661
 msgid "Saving %1 region(s) (%2%)"
-msgstr "正在保存 %1 个区域（%2%）捏~"
+msgstr "正在保存 %1 个区域（%2%）✨"
 
 #: ../../src/saveregionjob.cpp:670
 msgid "Saving %1 region(s) (%2%): %3"
-msgstr "正在保存 %1 个区域（%2%）：%3 喵呜~"
+msgstr "正在保存 %1 个区域（%2%）：%3 喵~"
 
 #: ../../src/uicheck.cpp:139 ../../src/uicheck.cpp:167
-#: ../../src/uicheck.cpp:205 ../../dhlrc-core/src/schema.rs:66
+#: ../../src/uicheck.cpp:205 ../../dhlrc-core/src/schema.rs:68
 msgid "Manage"
-msgstr "管理(๑•̀ㅂ•́)و✧"
+msgstr "管理捏~"
 
-#: ../../src/uicheck.cpp:394 ../../dhlrc-core/src/schema.rs:63
+#: ../../src/uicheck.cpp:394 ../../dhlrc-core/src/schema.rs:65
 msgid "General"
-msgstr "概况😺"
+msgstr "概况喵呜~"
 
 #: ../../src/utility.cpp:52
 msgid "Manage Region window is not initialized"
-msgstr "管理区域窗口尚未初始化喵♪"
+msgstr "管理区域窗口尚未初始化(๑•̀ㅂ•́)و✧"
 
 #: ../../src/utility.cpp:73
 msgid "Region is locked!"
-msgstr "区域被锁定(=^･ω･^=)"
+msgstr "区域被锁定😺"
 
 #: ../../src/utility.cpp:81
 msgid "No Region or no Region selected!"
-msgstr "没有区域或没有区域选中✨"
+msgstr "没有区域或没有区域选中喵♪"
 
 #: ../../src/utility.cpp:114
 msgid "%1 (%2)"
-msgstr "%1（%2）喵~"
+msgstr "%1（%2）(=^･ω･^=)"
 
 #: ../../src/version.cpp:15
 msgid ""
 "Open, inspect and modify Minecraft structure files, and convert them between "
 "the formats the installed region modules support."
-msgstr "打开、查看与修改 Minecraft 结构文件，并在已安装的区域模块所支持的格式之间进行转换捏~"
+msgstr "打开、查看与修改 Minecraft 结构文件，并在已安装的区域模块所支持的格式之间进行转换✨"
 
 #: rc.cpp:3
 msgid "Show Block Lists"
-msgstr "展示方块列表喵呜~"
+msgstr "展示方块列表喵~"
 
 #: rc.cpp:6
 msgid "The blocks are listed below:"
-msgstr "方块在下列出(๑•̀ㅂ•́)و✧"
+msgstr "方块在下列出捏~"
 
 #: rc.cpp:9
 msgid "Search block name"
-msgstr "搜索方块名称😺"
+msgstr "搜索方块名称喵呜~"
 
 #: rc.cpp:12 rc.cpp:90
 msgid "&Close"
-msgstr "关闭喵♪(&C)"
+msgstr "关闭(๑•̀ㅂ•́)و✧(&C)"
 
 #: rc.cpp:15
 msgid "Add/Replace Block"
-msgstr "添加/替换方块(=^･ω･^=)"
+msgstr "添加/替换方块😺"
 
 #: rc.cpp:18
 msgid "Choose a block of this version:"
-msgstr "选择此版本中的一个方块✨"
+msgstr "选择此版本中的一个方块喵♪"
 
 #: rc.cpp:21
 msgid "Search by name or id"
-msgstr "按名称或 id 搜索喵~"
+msgstr "按名称或 id 搜索(=^･ω･^=)"
 
 #: rc.cpp:24
 msgid "Place one block above (add instead of replace)"
-msgstr "在上方一格放置（添加而非替换）捏~"
+msgstr "在上方一格放置（添加而非替换）✨"
 
 #: rc.cpp:30
 msgid "Read Blocks"
-msgstr "读取方块喵呜~"
+msgstr "读取方块喵~"
 
 #: rc.cpp:33
 msgid "Translation loading progress:"
-msgstr "翻译加载进度(๑•̀ㅂ•́)و✧"
+msgstr "翻译加载进度捏~"
 
 #: rc.cpp:36
 msgid "Region information:"
-msgstr "区域信息😺"
+msgstr "区域信息喵呜~"
 
 #: rc.cpp:39
 msgid "Please enter the coordination of the block:"
-msgstr "请输入方块的坐标喵♪"
+msgstr "请输入方块的坐标(๑•̀ㅂ•́)و✧"
 
 #: rc.cpp:51
 msgid "The information is:"
-msgstr "信息为(=^･ω･^=)"
+msgstr "信息为😺"
 
 #: rc.cpp:54
 msgid "&Add/Replace Block..."
-msgstr "添加/替换方块✨(&A)..."
+msgstr "添加/替换方块喵♪(&A)..."
 
 #: rc.cpp:57
 msgid "&Tools"
-msgstr "工具喵~(&T)"
+msgstr "工具(=^･ω･^=)(&T)"
 
 #: rc.cpp:60
 msgid "Show Blocks"
-msgstr "显示方块捏~"
+msgstr "显示方块✨"
 
 #: rc.cpp:66
 msgid "Mode"
-msgstr "模式喵呜~"
+msgstr "模式喵~"
 
 #: rc.cpp:69
 msgid "&List/Modify Palette"
-msgstr "列出/修改调色板(๑•̀ㅂ•́)و✧(&L)"
+msgstr "列出/修改调色板捏~(&L)"
 
 #: rc.cpp:72
 msgid "Modify &Block"
-msgstr "修改方块😺(&B)"
+msgstr "修改方块喵呜~(&B)"
 
 #: rc.cpp:75
 msgid "NBT Viewer"
-msgstr "NBT 查看器喵♪"
+msgstr "NBT 查看器(๑•̀ㅂ•́)و✧"
 
 #: rc.cpp:78
 msgid "Type:"
-msgstr "类型(=^･ω･^=)"
+msgstr "类型😺"
 
 #: rc.cpp:81
 msgid "Key:"
-msgstr "键✨"
+msgstr "键喵♪"
 
 #: rc.cpp:84
 msgid "Value:"
-msgstr "值喵~"
+msgstr "值(=^･ω･^=)"
 
 #: rc.cpp:87
 msgid "&Export"
-msgstr "导出捏~(&E)"
+msgstr "导出✨(&E)"
 
 #: rc.cpp:93
 msgid "Add Palette Entry"
-msgstr "添加调色板喵呜~"
+msgstr "添加调色板喵~"
 
 #: rc.cpp:99
 msgid "&Remove"
-msgstr "移除(๑•̀ㅂ•́)و✧(&R)"
+msgstr "移除捏~(&R)"
 
 #: rc.cpp:105
 msgid "Palette List"
-msgstr "调色板列表😺"
+msgstr "调色板列表喵呜~"
 
 #: rc.cpp:111
 msgid "Modify Property of Block(s)"
-msgstr "修改方块的属性喵♪"
+msgstr "修改方块的属性(๑•̀ㅂ•́)و✧"
 
 #: rc.cpp:114
 msgid "Modify the property of the block in:"
-msgstr "更改在此的方块属性(=^･ω･^=)"
+msgstr "更改在此的方块属性😺"
 
 #: rc.cpp:117
 msgid "Only this block"
-msgstr "仅此方块✨"
+msgstr "仅此方块喵♪"
 
 #: rc.cpp:120
 msgid "Every block with this palette entry"
-msgstr "所有使用此调色板项的方块喵~"
+msgstr "所有使用此调色板项的方块(=^･ω･^=)"
 
 #: rc.cpp:123
 msgid "Properties:"
-msgstr "属性捏~"
+msgstr "属性✨"
 
 #: rc.cpp:126
 msgid "Region Modifier"
-msgstr "区域修改器喵呜~"
+msgstr "区域修改器喵~"
 
 #: rc.cpp:129
 msgid "Modify the infomation of the Region."
-msgstr "修改区域的信息(๑•̀ㅂ•́)و✧"
+msgstr "修改区域的信息捏~"
 
 #: rc.cpp:132
 msgid "Create Time"
-msgstr "创建时间😺"
+msgstr "创建时间喵呜~"
 
 #: rc.cpp:135 rc.cpp:141
 msgid "yyyy/MM/dd HH:mm:ss.zzz"
@@ -1695,699 +1755,739 @@ msgstr "yyyy/MM/dd HH:mm:ss.zzz"
 
 #: rc.cpp:138
 msgid "Modify Time"
-msgstr "修改时间喵♪"
+msgstr "修改时间(๑•̀ㅂ•́)و✧"
 
 #: rc.cpp:153
 msgid "Base Name"
-msgstr "基础名称(=^･ω･^=)"
+msgstr "基础名称😺"
 
-#: rc.cpp:156 ../../dhlrc-core/src/schema.rs:206
+#: rc.cpp:156 ../../dhlrc-core/src/schema.rs:208
 msgid "Region Name"
-msgstr "区域名称✨"
+msgstr "区域名称喵♪"
 
 #: rc.cpp:159
 msgid "Data Version"
-msgstr "数据版本喵~"
+msgstr "数据版本(=^･ω･^=)"
 
 #: rc.cpp:162
 msgid "Version"
-msgstr "版本捏~"
+msgstr "版本✨"
 
 #: ../../common-rs/src/util.rs:63 ../../region-schem-rs/src/output.rs:46
 msgid "Null pointer detected"
-msgstr "检测到空指针喵呜~"
+msgstr "检测到空指针喵~"
 
 #: ../../common-rs/src/util.rs:129 ../../region-rs/src/file.rs:79
 msgid "Uncompressing data."
-msgstr "解压数据中(๑•̀ㅂ•́)و✧"
+msgstr "解压数据中捏~"
 
 #: ../../common-rs/src/util.rs:130
 msgid "The compressing operation is cancelled."
-msgstr "压缩操作被取消😺"
+msgstr "压缩操作被取消喵呜~"
 
 #: ../../common-rs/src/util.rs:149
 msgid "Uncompress finish!"
-msgstr "解压完成喵♪"
+msgstr "解压完成(๑•̀ㅂ•́)و✧"
 
-#: ../../dhlrc-core/src/config.rs:252 ../../dhlrc-core/src/schema.rs:186
+#: ../../dhlrc-core/src/config.rs:252 ../../dhlrc-core/src/schema.rs:188
 #, rust-format
 msgid "${file} - ${region}"
-msgstr "${file} - ${region}(=^･ω･^=)"
+msgstr "${file} - ${region}😺"
 
-#: ../../dhlrc-core/src/config.rs:293 ../../dhlrc-core/src/schema.rs:198
+#: ../../dhlrc-core/src/config.rs:293 ../../dhlrc-core/src/schema.rs:200
 #: ../../region-rs/src/default.rs:62
 msgid "Converted"
-msgstr "已转换✨"
+msgstr "已转换喵♪"
 
-#: ../../dhlrc-core/src/config.rs:299 ../../dhlrc-core/src/schema.rs:210
+#: ../../dhlrc-core/src/config.rs:299 ../../dhlrc-core/src/schema.rs:212
 #: ../../region-litematic-rs/src/output.rs:396
 #: ../../region-rs/src/default.rs:64
 msgid "Unnamed"
-msgstr "未命名喵~"
+msgstr "未命名(=^･ω･^=)"
 
-#: ../../dhlrc-core/src/config.rs:485
+#: ../../dhlrc-core/src/config.rs:505
 msgid "Configuration reloaded"
-msgstr "配置已重载捏~"
+msgstr "配置已重载✨"
 
-#: ../../dhlrc-core/src/config.rs:487
+#: ../../dhlrc-core/src/config.rs:507
 #, rust-format
 msgid "The configuration was reloaded from {}."
-msgstr "配置已从 {} 重载喵呜~"
+msgstr "配置已从 {} 重载喵~"
 
-#: ../../dhlrc-core/src/config.rs:528
+#: ../../dhlrc-core/src/config.rs:548
 msgid "Configuration created"
-msgstr "已创建配置(๑•̀ㅂ•́)و✧"
+msgstr "已创建配置捏~"
 
-#: ../../dhlrc-core/src/config.rs:530
+#: ../../dhlrc-core/src/config.rs:550
 #, rust-format
 msgid "A new configuration file was created at {}."
-msgstr "已在 {} 创建新的配置文件😺"
+msgstr "已在 {} 创建新的配置文件喵呜~"
 
-#: ../../dhlrc-core/src/config.rs:538
+#: ../../dhlrc-core/src/config.rs:558
 msgid "Configuration could not be read"
-msgstr "无法读取配置喵♪"
+msgstr "无法读取配置(๑•̀ㅂ•́)و✧"
 
-#: ../../dhlrc-core/src/config.rs:541
+#: ../../dhlrc-core/src/config.rs:561
 #, rust-format
 msgid ""
 "The configuration file could not be read ({}). It was moved aside and a new "
 "one with the default values was created at {}."
-msgstr "配置文件无法读取（{}）。已将其移开，并在 {} 创建了一个使用默认值的新文件(=^･ω･^=)"
+msgstr "配置文件无法读取（{}）。已将其移开，并在 {} 创建了一个使用默认值的新文件😺"
 
 #: ../../dhlrc-core/src/download.rs:152 ../../dhlrc-core/src/download.rs:248
 msgid "Downloading manifest."
-msgstr "正在下载清单✨"
+msgstr "正在下载清单喵♪"
 
 #: ../../dhlrc-core/src/download.rs:161 ../../dhlrc-core/src/download.rs:256
 msgid "Downloading index json of this version."
-msgstr "正在下载此版本的索引json 喵~"
+msgstr "正在下载此版本的索引json (=^･ω･^=)"
 
 #: ../../dhlrc-core/src/download.rs:170
 msgid "Downloading asset index of this version."
-msgstr "正在下载此版本的资源索引捏~"
+msgstr "正在下载此版本的资源索引✨"
 
 #: ../../dhlrc-core/src/download.rs:181
 msgid "Downloading object."
-msgstr "正在下载对象喵呜~"
+msgstr "正在下载对象喵~"
 
 #: ../../dhlrc-core/src/download.rs:265
 msgid "Downloading the client jar of this version."
-msgstr "正在下载该版本的客户端 jar (๑•̀ㅂ•́)و✧"
+msgstr "正在下载该版本的客户端 jar 捏~"
 
-#: ../../dhlrc-core/src/schema.rs:64
+#: ../../dhlrc-core/src/schema.rs:66
 msgid "Default"
-msgstr "默认😺"
+msgstr "默认喵呜~"
 
-#: ../../dhlrc-core/src/schema.rs:65
+#: ../../dhlrc-core/src/schema.rs:67
 msgid "Game"
-msgstr "游戏喵♪"
+msgstr "游戏(๑•̀ㅂ•́)و✧"
 
-#: ../../dhlrc-core/src/schema.rs:69
+#: ../../dhlrc-core/src/schema.rs:71
 msgid "Notifications"
-msgstr "通知(=^･ω･^=)"
+msgstr "通知😺"
 
-#: ../../dhlrc-core/src/schema.rs:72
+#: ../../dhlrc-core/src/schema.rs:74
 msgid "GiB"
 msgstr "GiB"
 
-#: ../../dhlrc-core/src/schema.rs:72
+#: ../../dhlrc-core/src/schema.rs:74
 msgid "MiB"
 msgstr "MiB"
 
-#: ../../dhlrc-core/src/schema.rs:72
+#: ../../dhlrc-core/src/schema.rs:74
 msgid "KiB"
 msgstr "KiB"
 
-#: ../../dhlrc-core/src/schema.rs:72
+#: ../../dhlrc-core/src/schema.rs:74
 msgid "Bytes"
 msgstr "字节"
 
-#: ../../dhlrc-core/src/schema.rs:82
+#: ../../dhlrc-core/src/schema.rs:84
 msgid "Application Memory Limit"
-msgstr "应用内存限制✨"
+msgstr "应用内存限制喵♪"
 
-#: ../../dhlrc-core/src/schema.rs:83
+#: ../../dhlrc-core/src/schema.rs:85
 msgid ""
 "The memory the application may use, counted in the unit below. Loading and "
 "saving stop while less than this is free. A decimal is allowed, for example "
 "1.5."
-msgstr "应用可使用的内存上限，按下方单位计数；空闲内存低于该值时，加载和保存会停止。可以填小数，例如 1.5 喵~"
+msgstr "应用可使用的内存上限，按下方单位计数；空闲内存低于该值时，加载和保存会停止。可以填小数，例如 1.5 (=^･ω･^=)"
 
-#: ../../dhlrc-core/src/schema.rs:94
+#: ../../dhlrc-core/src/schema.rs:96
 msgid "Memory Limit Unit"
-msgstr "内存限制单位捏~"
+msgstr "内存限制单位✨"
 
-#: ../../dhlrc-core/src/schema.rs:95
+#: ../../dhlrc-core/src/schema.rs:97
 msgid "The unit the memory limit is counted in."
-msgstr "内存限制所用的单位喵呜~"
-
-#: ../../dhlrc-core/src/schema.rs:106
-msgid "Elapsed Milliseconds"
-msgstr "持续毫秒(๑•̀ㅂ•́)و✧"
+msgstr "内存限制所用的单位喵~"
 
 #: ../../dhlrc-core/src/schema.rs:108
+msgid "Elapsed Milliseconds"
+msgstr "持续毫秒捏~"
+
+#: ../../dhlrc-core/src/schema.rs:110
 msgid ""
 "The elapsed milliseconds for the progress bar, if set too small will affect "
 "the speed."
-msgstr "进度条的持续毫秒，如果设置太小将会影响速度😺"
+msgstr "进度条的持续毫秒，如果设置太小将会影响速度喵呜~"
 
-#: ../../dhlrc-core/src/schema.rs:120
+#: ../../dhlrc-core/src/schema.rs:122
 msgid "Cute Language Pack"
-msgstr "可爱语言包喵♪"
+msgstr "可爱语言包(๑•̀ㅂ•́)و✧"
 
-#: ../../dhlrc-core/src/schema.rs:121
+#: ../../dhlrc-core/src/schema.rs:123
 msgid ""
 "Use the playful catalogue (喵, 捏, kaomoji, emoji) instead of the plain one. "
 "It is read when the program starts, so a restart is needed."
-msgstr "使用带喵、捏、颜文字和 emoji 的俏皮语言包，而不是普通的翻译。它在程序启动时读取，因此需要重启才能生效(=^･ω･^=)"
+msgstr "使用带喵、捏、颜文字和 emoji 的俏皮语言包，而不是普通的翻译。它在程序启动时读取，因此需要重启才能生效😺"
 
-#: ../../dhlrc-core/src/schema.rs:132
+#: ../../dhlrc-core/src/schema.rs:134
 msgid "Cache Directory"
-msgstr "缓存目录✨"
+msgstr "缓存目录喵♪"
 
-#: ../../dhlrc-core/src/schema.rs:133
+#: ../../dhlrc-core/src/schema.rs:135
 msgid "The directory to store cache files."
-msgstr "存放缓存文件的目录喵~"
+msgstr "存放缓存文件的目录(=^･ω･^=)"
 
-#: ../../dhlrc-core/src/schema.rs:144
+#: ../../dhlrc-core/src/schema.rs:146
 msgid "Use Cached File when Downloading Failed"
-msgstr "在下载失败时使用缓存文件捏~"
+msgstr "在下载失败时使用缓存文件✨"
 
-#: ../../dhlrc-core/src/schema.rs:145
+#: ../../dhlrc-core/src/schema.rs:147
 msgid "When downloading failed, use the cached file."
-msgstr "当下载失败时，用缓存文件喵呜~"
+msgstr "当下载失败时，用缓存文件喵~"
 
-#: ../../dhlrc-core/src/schema.rs:156
+#: ../../dhlrc-core/src/schema.rs:158
 msgid "Select All Regions In Loading"
-msgstr "在加载时选择所有区域(๑•̀ㅂ•́)و✧"
+msgstr "在加载时选择所有区域捏~"
 
-#: ../../dhlrc-core/src/schema.rs:157
+#: ../../dhlrc-core/src/schema.rs:159
 msgid "If you check this, all regions will be loaded in the loading progress."
-msgstr "如果你选择此项，所有区域将在加载时载入😺"
+msgstr "如果你选择此项，所有区域将在加载时载入喵呜~"
 
-#: ../../dhlrc-core/src/schema.rs:168
+#: ../../dhlrc-core/src/schema.rs:170
 msgid "Try Other Modules when Loading Fails"
-msgstr "失败时尝试其它模块喵♪"
+msgstr "失败时尝试其它模块(๑•̀ㅂ•́)و✧"
 
-#: ../../dhlrc-core/src/schema.rs:169
+#: ../../dhlrc-core/src/schema.rs:171
 msgid ""
 "A file is first read by the module its extension points at; when that fails, "
 "the other modules are tried as well. Turn this off to make a file whose "
 "extension is wrong fail instead."
-msgstr "先由扩展名指向的模块读取文件；失败时再尝试其它模块。关闭后，扩展名与实际格式不符的文件会直接失败(=^･ω･^=)"
+msgstr "先由扩展名指向的模块读取文件；失败时再尝试其它模块。关闭后，扩展名与实际格式不符的文件会直接失败😺"
 
-#: ../../dhlrc-core/src/schema.rs:182
+#: ../../dhlrc-core/src/schema.rs:184
 #, rust-format
 msgid ""
 "The display name used for a region that comes from a multi-region file. Use $"
 "{file} for the file name and ${region} for the region name inside the file."
-msgstr "多区域文件中的区域所使用的显示名称。使用 ${file} 表示文件名，使用 ${region} 表示文件内的区域名称✨"
+msgstr "多区域文件中的区域所使用的显示名称。使用 ${file} 表示文件名，使用 ${region} 表示文件内的区域名称喵♪"
 
-#: ../../dhlrc-core/src/schema.rs:194
+#: ../../dhlrc-core/src/schema.rs:196
 msgid "Region Base Name"
-msgstr "区域基础名字喵~"
+msgstr "区域基础名字(=^･ω･^=)"
 
-#: ../../dhlrc-core/src/schema.rs:195
+#: ../../dhlrc-core/src/schema.rs:197
 msgid "The default base name for the region."
-msgstr "默认的区域基础名字捏~"
+msgstr "默认的区域基础名字✨"
 
-#: ../../dhlrc-core/src/schema.rs:207
+#: ../../dhlrc-core/src/schema.rs:209
 msgid "The default name for the region."
-msgstr "默认的区域名字喵呜~"
-
-#: ../../dhlrc-core/src/schema.rs:218
-msgid "Sample File Name"
-msgstr "示例文件名(๑•̀ㅂ•́)و✧"
+msgstr "默认的区域名字喵~"
 
 #: ../../dhlrc-core/src/schema.rs:220
+msgid "Sample File Name"
+msgstr "示例文件名捏~"
+
+#: ../../dhlrc-core/src/schema.rs:222
 msgid ""
 "The sample file name used by the preview of the multi-region display name. "
 "It should not include a file extension."
-msgstr "多区域显示名称预览所使用的示例文件名。不应包含文件扩展名😺"
-
-#: ../../dhlrc-core/src/schema.rs:232
-msgid "Sample Region Name"
-msgstr "示例区域名称喵♪"
+msgstr "多区域显示名称预览所使用的示例文件名。不应包含文件扩展名喵呜~"
 
 #: ../../dhlrc-core/src/schema.rs:234
+msgid "Sample Region Name"
+msgstr "示例区域名称(๑•̀ㅂ•́)و✧"
+
+#: ../../dhlrc-core/src/schema.rs:236
 msgid ""
 "The sample region name used by the preview of the multi-region display name."
-msgstr "多区域显示名称预览所使用的示例区域名称(=^･ω･^=)"
+msgstr "多区域显示名称预览所使用的示例区域名称😺"
 
-#: ../../dhlrc-core/src/schema.rs:246
+#: ../../dhlrc-core/src/schema.rs:248
 msgid "Region Description"
-msgstr "区域描述✨"
+msgstr "区域描述喵♪"
 
-#: ../../dhlrc-core/src/schema.rs:247
+#: ../../dhlrc-core/src/schema.rs:249
 msgid "The default description for the region."
-msgstr "默认的区域描述喵~"
+msgstr "默认的区域描述(=^･ω･^=)"
 
-#: ../../dhlrc-core/src/schema.rs:258
+#: ../../dhlrc-core/src/schema.rs:260
 msgid "Region Author"
-msgstr "区域作者捏~"
+msgstr "区域作者✨"
 
-#: ../../dhlrc-core/src/schema.rs:259
+#: ../../dhlrc-core/src/schema.rs:261
 msgid "The default author for the region."
-msgstr "默认的区域作者喵呜~"
+msgstr "默认的区域作者喵~"
 
-#: ../../dhlrc-core/src/schema.rs:270
+#: ../../dhlrc-core/src/schema.rs:272
 msgid "Override Settings"
-msgstr "覆盖设置(๑•̀ㅂ•́)و✧"
+msgstr "覆盖设置捏~"
 
-#: ../../dhlrc-core/src/schema.rs:271
+#: ../../dhlrc-core/src/schema.rs:273
 msgid "Whether to override setting or not."
-msgstr "是否覆盖设置😺"
+msgstr "是否覆盖设置喵呜~"
 
-#: ../../dhlrc-core/src/schema.rs:282
+#: ../../dhlrc-core/src/schema.rs:284
 msgid "Override Version"
-msgstr "覆盖版本喵♪"
+msgstr "覆盖版本(๑•̀ㅂ•́)و✧"
 
-#: ../../dhlrc-core/src/schema.rs:283
+#: ../../dhlrc-core/src/schema.rs:285
 msgid "The version to override in translation stage."
-msgstr "在翻译阶段覆盖的版本(=^･ω･^=)"
-
-#: ../../dhlrc-core/src/schema.rs:294
-msgid "Block Name Language"
-msgstr "方块名称语言✨"
+msgstr "在翻译阶段覆盖的版本😺"
 
 #: ../../dhlrc-core/src/schema.rs:296
+msgid "Block Name Language"
+msgstr "方块名称语言喵♪"
+
+#: ../../dhlrc-core/src/schema.rs:298
 msgid ""
 "The Minecraft locale (like zh_cn) block and item names are shown in. The "
 "language file is read from the downloaded assets, so it works as soon as "
 "that version's assets are there."
-msgstr "方块和物品名称显示时使用的 Minecraft 语言环境（如 zh_cn）。语言文件从已下载的资源中读取，因此只要该版本的资源已就绪即可生效喵~"
+msgstr "方块和物品名称显示时使用的 Minecraft 语言环境（如 zh_cn）。语言文件从已下载的资源中读取，因此只要该版本的资源已就绪即可生效(=^･ω･^=)"
 
-#: ../../dhlrc-core/src/schema.rs:308
+#: ../../dhlrc-core/src/schema.rs:310
 msgid "Default Show Option"
-msgstr "默认展示选项捏~"
+msgstr "默认展示选项✨"
 
-#: ../../dhlrc-core/src/schema.rs:309
+#: ../../dhlrc-core/src/schema.rs:311
 msgid "The default option of showing block information."
-msgstr "展示方块信息的默认选项喵呜~"
+msgstr "展示方块信息的默认选项喵~"
 
-#: ../../dhlrc-core/src/schema.rs:320
+#: ../../dhlrc-core/src/schema.rs:322
+msgid "Download the Client Jar Automatically"
+msgstr "自动下载客户端 jar 捏~"
+
+#: ../../dhlrc-core/src/schema.rs:324
+msgid ""
+"A block's models and textures are only in its version's client jar. When a "
+"3D preview needs one the cache directory does not have, download it (about "
+"30 MB) instead of drawing nothing."
+msgstr "方块的模型与材质只存在于其对应版本的客户端 jar 中。当 3D 预览需要而缓存目录中没有该 jar 时，自动下载它（约 30 MB），而不是什么都不画喵呜~"
+
+#: ../../dhlrc-core/src/schema.rs:336
+msgid "Highlight Colour"
+msgstr "高亮颜色(๑•̀ㅂ•́)و✧"
+
+#: ../../dhlrc-core/src/schema.rs:338
+msgid ""
+"The colour of the outline drawn around the selected blocks in the 3D "
+"preview, as #rrggbb."
+msgstr "3D 预览中选中方块外轮廓的颜色，格式为 #rrggbb 😺"
+
+#: ../../dhlrc-core/src/schema.rs:350
+msgid "Background Colour"
+msgstr "背景颜色喵♪"
+
+#: ../../dhlrc-core/src/schema.rs:352
+msgid ""
+"The colour behind the 3D preview, as #rrggbb. It does not affect the blocks "
+"themselves."
+msgstr "3D 预览背景的颜色，格式为 #rrggbb。不影响方块本身(=^･ω･^=)"
+
+#: ../../dhlrc-core/src/schema.rs:364
+msgid "Region Box Colour"
+msgstr "区域框颜色✨"
+
+#: ../../dhlrc-core/src/schema.rs:366
+msgid ""
+"The colour of the box drawn around the whole region in the 3D preview, as "
+"#rrggbb. It is kept apart from the highlight colour so both stay readable."
+msgstr "3D 预览中整个区域外框的颜色，格式为 #rrggbb。与高亮颜色分开，以便两者都清晰可辨喵~"
+
+#: ../../dhlrc-core/src/schema.rs:378 ../../dhlrc-core/src/schema.rs:935
+msgid "Selection Marker Colour"
+msgstr "选择标记颜色捏~"
+
+#: ../../dhlrc-core/src/schema.rs:380
+msgid ""
+"The colour of the box drawn around the cell chosen in the selected-blocks "
+"list, as #rrggbb."
+msgstr "3D 预览中围绕“已选方块”列表里所选格子的方框颜色，格式为 #rrggbb 喵呜~"
+
+#: ../../dhlrc-core/src/schema.rs:392
 msgid "Download the Client Jar for Item Names and Icons"
 msgstr "为物品名称与图标下载客户端 jar (๑•̀ㅂ•́)و✧"
 
-#: ../../dhlrc-core/src/schema.rs:322
+#: ../../dhlrc-core/src/schema.rs:394
 msgid ""
 "When the material list has no client jar for a version, fetch it "
 "automatically so item names and icons are available."
 msgstr "当材料列表没有某个版本的客户端 jar 时，自动下载它，以便显示物品名称与图标😺"
 
-#: ../../dhlrc-core/src/schema.rs:334
+#: ../../dhlrc-core/src/schema.rs:406
 msgid "Notification Application ID"
 msgstr "通知应用 ID 喵♪"
 
-#: ../../dhlrc-core/src/schema.rs:336
+#: ../../dhlrc-core/src/schema.rs:408
 msgid ""
 "The application a desktop notification is sent as: the Windows "
 "AppUserModelID, or the macOS bundle identifier. Windows needs it registered, "
 "or the toast may not show. Empty uses the platform default."
 msgstr "桌面通知以哪个应用的身份发送：Windows 的 AppUserModelID，或 macOS 的 bundle identifier。Windows 需要先注册它，否则通知可能不显示。留空则使用平台默认值(=^･ω･^=)"
 
-#: ../../dhlrc-core/src/schema.rs:348
+#: ../../dhlrc-core/src/schema.rs:420
 msgid "Notification Timeout (ms)"
 msgstr "通知超时（毫秒）✨"
 
-#: ../../dhlrc-core/src/schema.rs:350
+#: ../../dhlrc-core/src/schema.rs:422
 msgid ""
 "How long a notification stays before it disappears, in milliseconds. Zero "
 "leaves it to the platform."
 msgstr "通知消失前停留的时长，单位为毫秒。为零则交给平台决定喵~"
 
-#: ../../dhlrc-core/src/schema.rs:362
+#: ../../dhlrc-core/src/schema.rs:434
 msgid "Only Notify When Inactive"
 msgstr "仅在非激活时通知捏~"
 
-#: ../../dhlrc-core/src/schema.rs:364
+#: ../../dhlrc-core/src/schema.rs:436
 msgid ""
 "Do not show a desktop notification while the application is active; the in-"
 "app one is enough then."
 msgstr "应用处于激活状态时不显示桌面通知；此时应用内的提示已足够喵呜~"
 
-#: ../../dhlrc-core/src/schema.rs:376
-msgid "Download the Client Jar Automatically"
-msgstr "自动下载客户端 jar (๑•̀ㅂ•́)و✧"
-
-#: ../../dhlrc-core/src/schema.rs:378
-msgid ""
-"A block's models and textures are only in its version's client jar. When a "
-"3D preview needs one the cache directory does not have, download it (about "
-"30 MB) instead of drawing nothing."
-msgstr "方块的模型与材质只存在于其对应版本的客户端 jar 中。当 3D 预览需要而缓存目录中没有该 jar 时，自动下载它（约 30 MB），而不是什么都不画😺"
-
 #: ../../dhlrc-tui/src/cli.rs:27
 msgid "Open, inspect and modify Minecraft structure files (terminal frontend)"
-msgstr "打开、查看与修改 Minecraft 结构文件（终端前端）喵♪"
+msgstr "打开、查看与修改 Minecraft 结构文件（终端前端）(๑•̀ㅂ•́)و✧"
 
 #: ../../dhlrc-tui/src/cli.rs:31
 msgid "Analyse the modules installed next to the executable"
-msgstr "分析安装在可执行文件旁的模块(=^･ω･^=)"
+msgstr "分析安装在可执行文件旁的模块😺"
 
 #: ../../dhlrc-tui/src/cli.rs:35
 msgid "Load a structure file and write a rendered PNG"
-msgstr "加载结构文件并写出渲染后的 PNG ✨"
+msgstr "加载结构文件并写出渲染后的 PNG 喵♪"
 
 #: ../../dhlrc-tui/src/cli.rs:39
 msgid "Print a shell completion script"
-msgstr "输出 shell 补全脚本喵~"
+msgstr "输出 shell 补全脚本(=^･ω･^=)"
 
 #: ../../dhlrc-tui/src/cli.rs:44
 msgid ""
 "Directory holding the region modules (default: `region_module/` next to the "
 "executable)"
-msgstr "存放区域模块的目录（默认：可执行文件旁的 `region_module/`）捏~"
+msgstr "存放区域模块的目录（默认：可执行文件旁的 `region_module/`）✨"
 
 #: ../../dhlrc-tui/src/cli.rs:51
 msgid ""
 "Directory holding the object codecs (default: `load_module/` next to the "
 "executable)"
-msgstr "存放对象编解码器的目录（默认：可执行文件旁的 `load_module/`）喵呜~"
+msgstr "存放对象编解码器的目录（默认：可执行文件旁的 `load_module/`）喵~"
 
 #: ../../dhlrc-tui/src/cli.rs:58
 msgid ""
 "Which modules to report. `all` lists both region modules and object codecs, "
 "`region` only the region modules, and `load` only the object codecs; the "
 "default is `all`"
-msgstr "要报告哪些模块。`all` 列出区域模块与对象编解码器，`region` 只列区域模块，`load` 只列对象编解码器；默认为 `all`(๑•̀ㅂ•́)و✧"
+msgstr "要报告哪些模块。`all` 列出区域模块与对象编解码器，`region` 只列区域模块，`load` 只列对象编解码器；默认为 `all`捏~"
 
 #: ../../dhlrc-tui/src/cli.rs:65
 msgid "Also print the path of every library"
-msgstr "同时打印每个库的路径😺"
+msgstr "同时打印每个库的路径喵呜~"
 
 #: ../../dhlrc-tui/src/cli.rs:69
 msgid "The structure file to load and draw"
-msgstr "要加载并绘制的结构文件喵♪"
+msgstr "要加载并绘制的结构文件(๑•̀ㅂ•́)و✧"
 
 #: ../../dhlrc-tui/src/cli.rs:73
 msgid "Where to write the PNG (default: `render.png` next to the input)"
-msgstr "PNG 的写出位置（默认：输入文件旁的 `render.png`）(=^･ω･^=)"
+msgstr "PNG 的写出位置（默认：输入文件旁的 `render.png`）😺"
 
 #: ../../dhlrc-tui/src/cli.rs:77
 msgid "The picture's size in pixels (default: `960x540`)"
-msgstr "图片尺寸（像素，默认：`960x540`）✨"
+msgstr "图片尺寸（像素，默认：`960x540`）喵♪"
 
 #: ../../dhlrc-tui/src/cli.rs:81
 msgid "Degrees around the world's y axis; 0 looks from the south"
-msgstr "绕世界 y 轴的度数；0 表示从南侧观察喵~"
+msgstr "绕世界 y 轴的度数；0 表示从南侧观察(=^･ω･^=)"
 
 #: ../../dhlrc-tui/src/cli.rs:85
 msgid "Degrees above the horizon; 90 looks straight down"
-msgstr "地平线以上的度数；90 表示垂直向下观察捏~"
+msgstr "地平线以上的度数；90 表示垂直向下观察✨"
 
 #: ../../dhlrc-tui/src/cli.rs:90
 msgid ""
 "How far the camera stands from the region's middle, in blocks. Without it "
 "the region is framed to fill the picture"
-msgstr "相机与区域中心之间的距离（方块）。省略时自动取景，使区域填满图片喵呜~"
+msgstr "相机与区域中心之间的距离（方块）。省略时自动取景，使区域填满图片喵~"
 
 #: ../../dhlrc-tui/src/cli.rs:96
 msgid "Draw without perspective, so parallel lines stay parallel"
-msgstr "使用无透视投影，使平行线保持平行(๑•̀ㅂ•́)و✧"
+msgstr "使用无透视投影，使平行线保持平行捏~"
 
 #: ../../dhlrc-tui/src/cli.rs:101
 msgid ""
 "Put the block outline around the block at this region coordinate, the way "
 "the Qt view highlights the block the mouse is over (`X,Y,Z`)"
-msgstr "在此区域坐标的方块周围绘制轮廓，与 Qt 视图高亮鼠标所指方块的样式相同（`X,Y,Z`）😺"
+msgstr "在此区域坐标的方块周围绘制轮廓，与 Qt 视图高亮鼠标所指方块的样式相同（`X,Y,Z`）喵呜~"
 
 #: ../../dhlrc-tui/src/cli.rs:108
 msgid ""
 "A flat colour (`rrggbb`, with or without a leading `#`) to put behind the "
 "blocks. Without it the PNG keeps its transparent background"
-msgstr "置于方块之后的纯色（`rrggbb`，`#` 可有可无）。省略时 PNG 保持透明背景喵♪"
+msgstr "置于方块之后的纯色（`rrggbb`，`#` 可有可无）。省略时 PNG 保持透明背景(๑•̀ㅂ•́)و✧"
 
 #: ../../dhlrc-tui/src/cli.rs:115
 msgid ""
 "The `libregion_rs` library the region modules import `region_new` from. The "
 "default looks next to the executable and beside the region modules"
-msgstr "区域模块从中导入 `region_new` 的 `libregion_rs` 库。默认在可执行文件旁及区域模块旁查找(=^･ω･^=)"
+msgstr "区域模块从中导入 `region_new` 的 `libregion_rs` 库。默认在可执行文件旁及区域模块旁查找😺"
 
 #: ../../dhlrc-tui/src/cli.rs:122
 msgid ""
 "A client jar (or another zip laid out like one) to read blockstates, models "
 "and textures from"
-msgstr "用于读取方块状态、模型与纹理的客户端 jar（或布局相同的其他 zip）✨"
+msgstr "用于读取方块状态、模型与纹理的客户端 jar（或布局相同的其他 zip）喵♪"
 
 #: ../../dhlrc-tui/src/cli.rs:129
 msgid ""
 "The cache directory holding the client jar and the downloaded asset objects. "
 "Without it the configured cache directory is used"
-msgstr "存放客户端 jar 与已下载资源对象的缓存目录。省略时使用配置中的缓存目录喵~"
+msgstr "存放客户端 jar 与已下载资源对象的缓存目录。省略时使用配置中的缓存目录(=^･ω･^=)"
 
 #: ../../dhlrc-tui/src/cli.rs:135
 msgid "The version whose client jar under the cache directory to read"
-msgstr "要读取哪个版本的客户端 jar（位于缓存目录下）捏~"
+msgstr "要读取哪个版本的客户端 jar（位于缓存目录下）✨"
 
 #: ../../dhlrc-tui/src/cli.rs:140
 msgid ""
 "Never fetch a missing client jar, even when the configuration allows it. A "
 "version's block models and textures are only in that jar, so without one "
 "(here or as `--jar`) the picture comes out empty"
-msgstr "即使配置允许，也从不下载缺失的客户端 jar。某个版本的方块模型与纹理只存在于该 jar 中，因此没有它（此处或 `--jar`）时图片会是空的喵呜~"
+msgstr "即使配置允许，也从不下载缺失的客户端 jar。某个版本的方块模型与纹理只存在于该 jar 中，因此没有它（此处或 `--jar`）时图片会是空的喵~"
 
 #: ../../dhlrc-tui/src/cli.rs:148
 msgid ""
 "Which region of a multi-region file to draw, by index or by name. Without it "
 "the first region is used"
-msgstr "绘制多区域文件中的哪个区域（按索引或名称）。省略时使用第一个区域(๑•̀ㅂ•́)و✧"
+msgstr "绘制多区域文件中的哪个区域（按索引或名称）。省略时使用第一个区域捏~"
 
 #: ../../dhlrc-tui/src/cli.rs:155
 msgid ""
 "The shell to emit a completion script for: `bash`, `elvish`, `fish`, "
 "`powershell` or `zsh`"
-msgstr "为哪个 shell 生成补全脚本：`bash`、`elvish`、`fish`、`powershell` 或 `zsh`😺"
+msgstr "为哪个 shell 生成补全脚本：`bash`、`elvish`、`fish`、`powershell` 或 `zsh`喵呜~"
 
 #: ../../dhlrc-tui/src/cli.rs:162
 msgid ""
 "Install into this directory instead of the shell's own completion directory. "
 "The shell's conventional file name is used inside it"
-msgstr "安装到此目录，而不是 shell 自己的补全目录。目录内使用该 shell 惯用的文件名喵♪"
+msgstr "安装到此目录，而不是 shell 自己的补全目录。目录内使用该 shell 惯用的文件名(๑•̀ㅂ•́)و✧"
 
 #: ../../dhlrc-tui/src/cli.rs:168
 msgid "Print the script to standard output instead of installing it"
-msgstr "将脚本打印到标准输出，而不是安装它(=^･ω･^=)"
+msgstr "将脚本打印到标准输出，而不是安装它😺"
 
 #: ../../dhlrc-tui/src/cli.rs:173
 msgid "Usage:"
-msgstr "用法✨"
+msgstr "用法喵♪"
 
 #: ../../dhlrc-tui/src/cli.rs:177
 msgid "Arguments"
-msgstr "参数喵~"
+msgstr "参数(=^･ω･^=)"
 
 #: ../../dhlrc-tui/src/cli.rs:185
 msgid "Commands"
-msgstr "命令捏~"
+msgstr "命令✨"
 
 #: ../../dhlrc-tui/src/cli.rs:189
 msgid "Print help"
-msgstr "打印帮助喵呜~"
+msgstr "打印帮助喵~"
 
 #: ../../dhlrc-tui/src/cli.rs:193
 msgid "Print version"
-msgstr "打印版本(๑•̀ㅂ•́)و✧"
+msgstr "打印版本捏~"
 
 #: ../../dhlrc-tui/src/cli.rs:197
 msgid "Print this message or the help of the given subcommand(s)"
-msgstr "打印此消息或给定子命令的帮助😺"
+msgstr "打印此消息或给定子命令的帮助喵呜~"
 
 #: ../../dhlrc-tui/src/cli.rs:201
 msgid "Print help for the subcommand(s)"
-msgstr "打印子命令的帮助喵♪"
+msgstr "打印子命令的帮助(๑•̀ㅂ•́)و✧"
 
 #: ../../dhlrc-tui/src/completions.rs:48
 msgid ""
 "This shell has no standard completion directory, so the script was printed "
 "instead."
-msgstr "该 shell 没有标准的补全目录，因此改为打印脚本(=^･ω･^=)"
+msgstr "该 shell 没有标准的补全目录，因此改为打印脚本😺"
 
 #: ../../dhlrc-tui/src/completions.rs:61 ../../dhlrc-tui/src/completions.rs:163
 msgid "Could not write the completion script"
-msgstr "无法写入补全脚本✨"
+msgstr "无法写入补全脚本喵♪"
 
 #: ../../dhlrc-tui/src/completions.rs:69
 #, rust-format
 msgid "Wrote {}."
-msgstr "已写入 {}喵~"
+msgstr "已写入 {}(=^･ω･^=)"
 
 #: ../../dhlrc-tui/src/completions.rs:77
 #, rust-format
 msgid "If completions do not load, add {} to your fpath."
-msgstr "如果补全未生效，请将 {} 加入你的 fpath 捏~"
+msgstr "如果补全未生效，请将 {} 加入你的 fpath ✨"
 
 #: ../../dhlrc-tui/src/completions.rs:164
 msgid "standard output"
-msgstr "标准输出喵呜~"
+msgstr "标准输出喵~"
 
 #: ../../dhlrc-tui/src/main.rs:47
 msgid ""
 "The interactive terminal UI is not written yet; pick one of the commands "
 "above."
-msgstr "交互式终端界面尚未实现；请从上面的命令中选择一个(๑•̀ㅂ•́)و✧"
+msgstr "交互式终端界面尚未实现；请从上面的命令中选择一个捏~"
 
 #: ../../dhlrc-tui/src/modules.rs:54
 msgid "Region modules"
-msgstr "区域模块😺"
+msgstr "区域模块喵呜~"
 
 #: ../../dhlrc-tui/src/modules.rs:57 ../../dhlrc-tui/src/modules.rs:106
 msgid "none found"
-msgstr "未找到喵♪"
+msgstr "未找到(๑•̀ㅂ•́)و✧"
 
 #: ../../dhlrc-tui/src/modules.rs:63
 msgid "type"
-msgstr "类型(=^･ω･^=)"
+msgstr "类型😺"
 
 #: ../../dhlrc-tui/src/modules.rs:64
 msgid "suffix"
-msgstr "后缀✨"
+msgstr "后缀喵♪"
 
 #: ../../dhlrc-tui/src/modules.rs:65 ../../dhlrc-tui/src/modules.rs:110
 msgid "codec"
-msgstr "编解码器喵~"
+msgstr "编解码器(=^･ω･^=)"
 
 #: ../../dhlrc-tui/src/modules.rs:66
 msgid "regions"
-msgstr "区域捏~"
+msgstr "区域✨"
 
 #: ../../dhlrc-tui/src/modules.rs:67
 msgid "encoding"
-msgstr "编码喵呜~"
+msgstr "编码喵~"
 
 #: ../../dhlrc-tui/src/modules.rs:70 ../../dhlrc-tui/src/modules.rs:112
 msgid "file"
-msgstr "文件(๑•̀ㅂ•́)و✧"
+msgstr "文件捏~"
 
 #: ../../dhlrc-tui/src/modules.rs:84
 msgid "multi"
-msgstr "多区域😺"
+msgstr "多区域喵呜~"
 
 #: ../../dhlrc-tui/src/modules.rs:86
 msgid "single"
-msgstr "单区域喵♪"
+msgstr "单区域(๑•̀ㅂ•́)و✧"
 
 #: ../../dhlrc-tui/src/modules.rs:103
 msgid "Object codecs"
-msgstr "对象编解码器(=^･ω･^=)"
+msgstr "对象编解码器😺"
 
 #: ../../dhlrc-tui/src/modules.rs:161
 msgid "Warnings"
-msgstr "警告✨"
+msgstr "警告喵♪"
 
 #: ../../dhlrc-tui/src/modules.rs:167
 #, rust-format
 msgid "Region module \"{}\" needs codec \"{}\", which is not installed."
-msgstr "区域模块“{}”需要编解码器“{}”，但未安装喵~"
+msgstr "区域模块“{}”需要编解码器“{}”，但未安装(=^･ω･^=)"
 
 #: ../../dhlrc-tui/src/modules.rs:218
 msgid "big-endian"
-msgstr "大端序捏~"
+msgstr "大端序✨"
 
 #: ../../dhlrc-tui/src/modules.rs:219
 msgid "little-endian"
-msgstr "小端序喵呜~"
+msgstr "小端序喵~"
 
 #: ../../dhlrc-tui/src/modules.rs:220
 msgid "network little-endian"
-msgstr "网络小端序(๑•̀ㅂ•́)و✧"
+msgstr "网络小端序捏~"
 
 #: ../../dhlrc-tui/src/modules.rs:221
 msgid "any"
-msgstr "任意😺"
+msgstr "任意喵呜~"
 
 #: ../../dhlrc-tui/src/render.rs:105
 msgid "Nothing was drawn: check --jar/--resources and the region's palette."
-msgstr "没有绘制出任何内容：请检查 --jar/--resources 参数以及该区域的调色板喵♪"
+msgstr "没有绘制出任何内容：请检查 --jar/--resources 参数以及该区域的调色板(๑•̀ㅂ•́)و✧"
 
 #: ../../dhlrc-tui/src/render.rs:124
 #, rust-format
 msgid "{}x{}: {} quads, {} textures, {} skipped palette entries -> {}"
-msgstr "{}x{}：{} 个面，{} 个纹理，{} 个调色板项被跳过 -> {}(=^･ω･^=)"
+msgstr "{}x{}：{} 个面，{} 个纹理，{} 个调色板项被跳过 -> {}😺"
 
 #: ../../dhlrc-tui/src/render.rs:174
 #, rust-format
 msgid ""
 "the client jar of {} is not in {}: pass --jar, or let it be downloaded (the "
 "DownloadClientJar setting)"
-msgstr "{} 的客户端 jar 不在 {} 中：请传入 --jar，或允许自动下载（DownloadClientJar 设置）✨"
+msgstr "{} 的客户端 jar 不在 {} 中：请传入 --jar，或允许自动下载（DownloadClientJar 设置）喵♪"
 
 #: ../../dhlrc-tui/src/render.rs:206
 msgid ""
 "no resources to read models and textures from; pass --jar or --resources"
-msgstr "没有可读取模型与材质的资源；请传入 --jar 或 --resources 喵~"
+msgstr "没有可读取模型与材质的资源；请传入 --jar 或 --resources (=^･ω･^=)"
 
 #: ../../dhlrc-tui/src/render.rs:218
 #, rust-format
 msgid "downloading the client jar of {} (about 30 MB)"
-msgstr "正在下载 {} 的客户端 jar（约 30 MB）捏~"
+msgstr "正在下载 {} 的客户端 jar（约 30 MB）✨"
 
 #: ../../dhlrc-tui/src/render.rs:226
 #, rust-format
 msgid "downloaded {}"
-msgstr "已下载 {}喵呜~"
+msgstr "已下载 {}喵~"
 
 #: ../../dhlrc-tui/src/render.rs:229
 #, rust-format
 msgid "could not download the client jar: {}"
-msgstr "无法下载客户端 jar：{}(๑•̀ㅂ•́)و✧"
+msgstr "无法下载客户端 jar：{}捏~"
 
 #: ../../dhlrc-tui/src/render.rs:267
 #, rust-format
 msgid ""
 "the configuration was written by an older version; it is kept as {} and the "
 "defaults are used"
-msgstr "配置文件由较旧的版本写入；它已保存为 {}，并使用默认设置😺"
+msgstr "配置文件由较旧的版本写入；它已保存为 {}，并使用默认设置喵呜~"
 
 #: ../../dhlrc-tui/src/render.rs:274
 msgid ""
 "the configuration was written by an older version; the defaults are used"
-msgstr "配置文件由较旧的版本写入；将使用默认设置喵♪"
+msgstr "配置文件由较旧的版本写入；将使用默认设置(๑•̀ㅂ•́)و✧"
 
 #: ../../nbt-component/src/lib.rs:74
 msgid "Loading NBT"
-msgstr "加载NBT中(=^･ω･^=)"
+msgstr "加载NBT中😺"
 
 #: ../../nbt-component/src/lib.rs:75 ../../region-rs/src/file.rs:41
 msgid "The loading operation is cancelled."
-msgstr "加载操作被取消✨"
+msgstr "加载操作被取消喵♪"
 
 #: ../../nbt-component/src/lib.rs:177 ../../region-litematic-rs/src/lib.rs:404
 #: ../../region-nbt-rs/src/lib.rs:293 ../../region-schem-rs/src/lib.rs:131
 msgid "The region value is not provided."
-msgstr "未提供区域值喵~"
+msgstr "未提供区域值(=^･ω･^=)"
 
 #: ../../nbt-component/src/lib.rs:208
 msgid "Unknown object encoding."
-msgstr "未知的对象编码捏~"
+msgstr "未知的对象编码✨"
 
 #: ../../nbt-component/src/lib.rs:274
 #, rust-format
 msgid "The file is in the {} encoding, but the {} encoding is required."
-msgstr "该文件是 {} 编码，但需要的是 {} 编码喵呜~"
+msgstr "该文件是 {} 编码，但需要的是 {} 编码喵~"
 
 #: ../../nbt-component/src/lib.rs:322
 msgid "Reading NBT finished."
-msgstr "阅读NBT完成(๑•̀ㅂ•́)و✧"
+msgstr "阅读NBT完成捏~"
 
 #: ../../region-litematic-rs/src/config.rs:25
 #: ../../region-schem-rs/src/config.rs:36
 msgid "Ignore Base Data"
-msgstr "忽略基础数据😺"
+msgstr "忽略基础数据喵呜~"
 
 #: ../../region-litematic-rs/src/config.rs:26
 msgid "Do not read the metadata stored in the file"
-msgstr "不读取文件中所存储的元数据喵♪"
+msgstr "不读取文件中所存储的元数据(๑•̀ㅂ•́)و✧"
 
 #: ../../region-litematic-rs/src/config.rs:76
 msgid "Litematic Version"
-msgstr "投影文件版本(=^･ω･^=)"
+msgstr "投影文件版本😺"
 
 #: ../../region-litematic-rs/src/config.rs:78
 msgid ""
 "The format revision written into the file. Increase it only if the program "
 "you open the file with requires a newer one."
-msgstr "写入文件中的格式修订版本。仅当打开该文件的程序需要更新的版本时才提高它✨"
+msgstr "写入文件中的格式修订版本。仅当打开该文件的程序需要更新的版本时才提高它喵♪"
 
 #: ../../region-litematic-rs/src/lib.rs:66
 msgid "Litematic File (*.litematic)"
@@ -2396,57 +2496,57 @@ msgstr "投影文件 (*.litematic)"
 #: ../../region-litematic-rs/src/lib.rs:134 ../../region-nbt-rs/src/lib.rs:194
 #: ../../region-nbt-rs/src/lib.rs:215 ../../region-schem-rs/src/schem.rs:533
 msgid "Reading blocks is cancelled."
-msgstr "阅读方块被取消喵~"
+msgstr "阅读方块被取消(=^･ω･^=)"
 
 #: ../../region-litematic-rs/src/lib.rs:141
 #, rust-format
 msgid "Reading block id: {} / {}."
-msgstr "阅读方块索引：{} / {}捏~"
+msgstr "阅读方块索引：{} / {}✨"
 
 #: ../../region-litematic-rs/src/lib.rs:161
 msgid "Out of range!"
-msgstr "超出范围喵呜~"
+msgstr "超出范围喵~"
 
 #: ../../region-litematic-rs/src/lib.rs:175
 msgid "Reading blocks finished."
-msgstr "阅读方块完成(๑•̀ㅂ•́)و✧"
+msgstr "阅读方块完成捏~"
 
 #: ../../region-litematic-rs/src/lib.rs:246
 msgid "Wrong type of region."
-msgstr "错误的区域类型😺"
+msgstr "错误的区域类型喵呜~"
 
 #: ../../region-litematic-rs/src/output.rs:182
 msgid "Packing blocks"
-msgstr "正在打包方块喵♪"
+msgstr "正在打包方块(๑•̀ㅂ•́)و✧"
 
 #: ../../region-litematic-rs/src/output.rs:290
 msgid "There is no region to write."
-msgstr "没有可写入的区域(=^･ω･^=)"
+msgstr "没有可写入的区域😺"
 
 #: ../../region-litematic-rs/src/output.rs:391
 #: ../../region-litematic-rs/src/output.rs:426
 #: ../../region-litematic-rs/src/output.rs:433
 #: ../../region-nbt-rs/src/output.rs:221
 msgid "Nullptr detected!"
-msgstr "检测到空指针✨"
+msgstr "检测到空指针喵♪"
 
 #: ../../region-litematic-rs/src/output.rs:438
 #, rust-format
 msgid "Region {}"
-msgstr "区域 {}喵~"
+msgstr "区域 {}(=^･ω･^=)"
 
 #: ../../region-litematic-rs/src/output.rs:449
 #, rust-format
 msgid "{} ({})"
-msgstr "{}（{}）捏~"
+msgstr "{}（{}）✨"
 
 #: ../../region-nbt-rs/src/config.rs:23
 msgid "Ignore Air"
-msgstr "忽略空气喵呜~"
+msgstr "忽略空气喵~"
 
 #: ../../region-nbt-rs/src/config.rs:24
 msgid "There will be no air block in the output structure"
-msgstr "输出结构中不会有空气方块(๑•̀ㅂ•́)و✧"
+msgstr "输出结构中不会有空气方块捏~"
 
 #: ../../region-nbt-rs/src/lib.rs:67
 msgid "NBT File (*.nbt)"
@@ -2454,93 +2554,93 @@ msgstr "NBT文件 (*.nbt)"
 
 #: ../../region-nbt-rs/src/lib.rs:73 ../../region-nbt-rs/src/lib.rs:85
 msgid "The length of the size is wrong."
-msgstr "尺寸长度有误😺"
+msgstr "尺寸长度有误喵呜~"
 
 #: ../../region-nbt-rs/src/lib.rs:101 ../../region-schem-rs/src/schem.rs:596
 msgid "Reading entities is cancelled."
-msgstr "阅读实体被取消喵♪"
+msgstr "阅读实体被取消(๑•̀ㅂ•́)و✧"
 
 #: ../../region-nbt-rs/src/lib.rs:122
 msgid "Not a double value"
-msgstr "不是双精度浮点值(=^･ω･^=)"
+msgstr "不是双精度浮点值😺"
 
 #: ../../region-nbt-rs/src/lib.rs:134
 msgid "Wrong type of entity's pos!"
-msgstr "实体的坐标类型错误✨"
+msgstr "实体的坐标类型错误喵♪"
 
 #: ../../region-nbt-rs/src/lib.rs:222
 #, rust-format
 msgid "Processing blocks: {} / {}."
-msgstr "处理方块中：{} / {}喵~"
+msgstr "处理方块中：{} / {}(=^･ω･^=)"
 
 #: ../../region-nbt-rs/src/output.rs:130
 msgid "Adding blocks is cancelled."
-msgstr "添加方块被取消捏~"
+msgstr "添加方块被取消✨"
 
 #: ../../region-nbt-rs/src/output.rs:137
 #, rust-format
 msgid "Adding blocks to NBT: {} / {}."
-msgstr "添加方块至NBT：{}/{}喵呜~"
+msgstr "添加方块至NBT：{}/{}喵~"
 
 #: ../../region-nbt-rs/src/output.rs:242
 msgid "Pushing index."
-msgstr "推入索引中(๑•̀ㅂ•́)و✧"
+msgstr "推入索引中捏~"
 
 #: ../../region-nbt-rs/src/output.rs:243
 msgid "Pushing index is cancelled."
-msgstr "推入索引被取消😺"
+msgstr "推入索引被取消喵呜~"
 
 #: ../../region-rs/src/file.rs:40
 msgid "Loading file."
-msgstr "加载文件中喵♪"
+msgstr "加载文件中(๑•̀ㅂ•́)و✧"
 
 #: ../../region-rs/src/file.rs:80
 msgid "The uncompressing operation is cancelled."
-msgstr "解压操作被取消(=^･ω･^=)"
+msgstr "解压操作被取消😺"
 
 #: ../../region-rs/src/file.rs:95
 msgid "Uncompress finished."
-msgstr "解压完成✨"
+msgstr "解压完成喵♪"
 
 #: ../../region-rs/src/lib.rs:150 ../../region-rs/src/lib.rs:191
 #: ../../region-rs/src/lib.rs:266
 msgid "The region is null."
-msgstr "区域为空喵~"
+msgstr "区域为空(=^･ω･^=)"
 
 #: ../../region-rs/src/lib.rs:163 ../../region-rs/src/lib.rs:167
 #: ../../region-rs/src/lib.rs:204 ../../region-rs/src/lib.rs:276
 msgid "The index is out of range."
-msgstr "索引超出范围捏~"
+msgstr "索引超出范围✨"
 
 #: ../../region-rs/src/lib.rs:194 ../../region-rs/src/lib.rs:269
 msgid "The output pointer is null."
-msgstr "输出指针为空喵呜~"
+msgstr "输出指针为空喵~"
 
 #: ../../region-rs/src/lib.rs:197 ../../region-rs/src/lib.rs:272
 msgid "The property list is null."
-msgstr "属性列表为空(๑•̀ㅂ•́)و✧"
+msgstr "属性列表为空捏~"
 
 #: ../../region-rs/src/lib.rs:200
 msgid "No property is given."
-msgstr "没有给出任何属性😺"
+msgstr "没有给出任何属性喵呜~"
 
 #: ../../region-rs/src/lib.rs:208
 msgid "The palette index is out of range."
-msgstr "调色板索引超出范围喵♪"
+msgstr "调色板索引超出范围(๑•̀ㅂ•́)و✧"
 
 #: ../../region-rs/src/lib.rs:283
 msgid "No block name is given."
-msgstr "没有给出方块名称(=^･ω･^=)"
+msgstr "没有给出方块名称😺"
 
 #: ../../region-schem-rs/src/config.rs:38
 msgid ""
 "Keep the region's own name, author, description and time instead of taking "
 "them from the file"
-msgstr "保留区域自身的名称、作者、描述和时间，而不是从文件中读取✨"
+msgstr "保留区域自身的名称、作者、描述和时间，而不是从文件中读取喵♪"
 
 #: ../../region-schem-rs/src/config.rs:47
 msgid "Refuse Incomplete Entities"
-msgstr "拒绝不完整的实体喵~"
+msgstr "拒绝不完整的实体(=^･ω･^=)"
 
 #: ../../region-schem-rs/src/config.rs:49
 msgid ""
@@ -2548,11 +2648,11 @@ msgid ""
 "of being skipped. Off by default: WorldEdit does not store entities, so the "
 "files it writes have none, and one broken entry should not cost the whole "
 "schematic."
-msgstr "缺少位置或 id 的实体或方块实体将导致加载失败，而不是被跳过。默认关闭：WorldEdit 不保存实体，因此它写出的文件没有实体，而且不应因一条损坏的记录而放弃整个 schematic 捏~"
+msgstr "缺少位置或 id 的实体或方块实体将导致加载失败，而不是被跳过。默认关闭：WorldEdit 不保存实体，因此它写出的文件没有实体，而且不应因一条损坏的记录而放弃整个 schematic ✨"
 
 #: ../../region-schem-rs/src/config.rs:96
 msgid "Sponge Format Version"
-msgstr "Sponge 格式版本喵呜~"
+msgstr "Sponge 格式版本喵~"
 
 #: ../../region-schem-rs/src/config.rs:98
 msgid ""
@@ -2560,7 +2660,7 @@ msgid ""
 "that is unknown), 1 is the legacy layout, 2 is what WorldEdit 7 writes and 3 "
 "is the current one. Writing 2 from a version 3 file packs its per-block "
 "biomes into one per column."
-msgstr "写入哪个版本：0 保持文件读入时的版本（未知时为 2），1 是旧版布局，2 是 WorldEdit 7 写出的版本，3 是当前版本。将版本 3 的文件写为 2 时，会把逐方块的生物群系合并为每列一个(๑•̀ㅂ•́)و✧"
+msgstr "写入哪个版本：0 保持文件读入时的版本（未知时为 2），1 是旧版布局，2 是 WorldEdit 7 写出的版本，3 是当前版本。将版本 3 的文件写为 2 时，会把逐方块的生物群系合并为每列一个捏~"
 
 #: ../../region-schem-rs/src/lib.rs:72
 msgid "Sponge Schematic (*.schem)"
@@ -2569,142 +2669,159 @@ msgstr "Sponge 结构文件 (*.schem)"
 #: ../../region-schem-rs/src/lib.rs:97
 #, rust-format
 msgid "{} entities or block entities were incomplete and were skipped."
-msgstr "有 {} 个实体或方块实体不完整，已跳过😺"
+msgstr "有 {} 个实体或方块实体不完整，已跳过喵呜~"
 
 #: ../../region-schem-rs/src/schem.rs:275
 msgid "Reading the block palette."
-msgstr "阅读方块调色板中喵♪"
+msgstr "阅读方块调色板中(๑•̀ㅂ•́)و✧"
 
 #: ../../region-schem-rs/src/schem.rs:276
 msgid "Reading the block palette is cancelled."
-msgstr "阅读方块调色板被取消(=^･ω･^=)"
+msgstr "阅读方块调色板被取消😺"
 
 #: ../../region-schem-rs/src/schem.rs:287
 #, rust-format
 msgid "The palette entry for {} is not a number."
-msgstr "{} 的调色板条目不是数字✨"
+msgstr "{} 的调色板条目不是数字喵♪"
 
 #: ../../region-schem-rs/src/schem.rs:297
 #, rust-format
 msgid "The palette entry for {} is negative."
-msgstr "{} 的调色板条目是负数喵~"
+msgstr "{} 的调色板条目是负数(=^･ω･^=)"
 
 #: ../../region-schem-rs/src/schem.rs:328
 msgid "The block data ends in the middle of a number."
-msgstr "方块数据在一个数字中间结束捏~"
+msgstr "方块数据在一个数字中间结束✨"
 
 #: ../../region-schem-rs/src/schem.rs:341
 msgid "A number in the block data is too long."
-msgstr "方块数据中的数字过长喵呜~"
+msgstr "方块数据中的数字过长喵~"
 
 #: ../../region-schem-rs/src/schem.rs:442
 msgid "The file's root tag is not a compound."
-msgstr "文件的根标签不是复合标签(๑•̀ㅂ•́)و✧"
+msgstr "文件的根标签不是复合标签捏~"
 
 #: ../../region-schem-rs/src/schem.rs:458
 msgid "The schematic has no Width, Height and Length."
-msgstr "结构文件没有 Width、Height 和 Length 😺"
+msgstr "结构文件没有 Width、Height 和 Length 喵呜~"
 
 #: ../../region-schem-rs/src/schem.rs:465
 #, rust-format
 msgid "The schematic size {} x {} x {} is empty."
-msgstr "结构文件尺寸 {} x {} x {} 为空喵♪"
+msgstr "结构文件尺寸 {} x {} x {} 为空(๑•̀ㅂ•́)و✧"
 
 #: ../../region-schem-rs/src/schem.rs:493
 msgid ""
 "The schematic has no block palette. Without one the block ids would have to "
 "come from the game's own block registry, which this program does not have."
-msgstr "该 schematic 没有方块调色板。缺少它，方块 id 就只能来自游戏自身的方块注册表，而本程序没有该注册表(=^･ω･^=)"
+msgstr "该 schematic 没有方块调色板。缺少它，方块 id 就只能来自游戏自身的方块注册表，而本程序没有该注册表😺"
 
 #: ../../region-schem-rs/src/schem.rs:501
 msgid "The schematic has no block data."
-msgstr "结构文件没有方块数据✨"
+msgstr "结构文件没有方块数据喵♪"
 
 #: ../../region-schem-rs/src/schem.rs:514
 #, rust-format
 msgid "The block data holds {} blocks, but the size needs {}."
-msgstr "方块数据有 {} 个方块，但尺寸需要 {} 个喵~"
+msgstr "方块数据有 {} 个方块，但尺寸需要 {} 个(=^･ω･^=)"
 
 #: ../../region-schem-rs/src/schem.rs:529
 #, rust-format
 msgid "Reading blocks: {} / {}."
-msgstr "阅读方块中：{} / {}捏~"
+msgstr "阅读方块中：{} / {}✨"
 
 #: ../../region-schem-rs/src/schem.rs:539
 #, rust-format
 msgid ""
 "The block data refers to palette entry {}, which the palette does not have."
-msgstr "方块数据引用了调色板中没有的条目 {}喵呜~"
+msgstr "方块数据引用了调色板中没有的条目 {}喵~"
 
 #: ../../region-schem-rs/src/schem.rs:558
 #, rust-format
 msgid "Reading block entities: {} / {}."
-msgstr "阅读方块实体中：{} / {}(๑•̀ㅂ•́)و✧"
+msgstr "阅读方块实体中：{} / {}捏~"
 
 #: ../../region-schem-rs/src/schem.rs:562
 msgid "Reading block entities is cancelled."
-msgstr "阅读方块实体被取消😺"
+msgstr "阅读方块实体被取消喵呜~"
 
 #: ../../region-schem-rs/src/schem.rs:571
 #, rust-format
 msgid ""
 "Block entity {} has no position or no id, and skipping incomplete entities "
 "is off."
-msgstr "方块实体 {} 缺少位置或 id，而“跳过不完整的实体”已关闭喵♪"
+msgstr "方块实体 {} 缺少位置或 id，而“跳过不完整的实体”已关闭(๑•̀ㅂ•́)و✧"
 
 #: ../../region-schem-rs/src/schem.rs:592
 #, rust-format
 msgid "Reading entities: {} / {}."
-msgstr "阅读实体中：{} / {}(=^･ω･^=)"
+msgstr "阅读实体中：{} / {}😺"
 
 #: ../../region-schem-rs/src/schem.rs:605
 #, rust-format
 msgid ""
 "Entity {} has no position or no id, and skipping incomplete entities is off."
-msgstr "实体 {} 缺少位置或 id，而“跳过不完整的实体”已关闭✨"
+msgstr "实体 {} 缺少位置或 id，而“跳过不完整的实体”已关闭喵♪"
 
 #: ../../region-schem-rs/src/schem.rs:646
 #, rust-format
 msgid "The biome data holds {} entries, but the size needs {}."
-msgstr "生物群系数据有 {} 项，但尺寸需要 {} 项喵~"
+msgstr "生物群系数据有 {} 项，但尺寸需要 {} 项(=^･ω･^=)"
 
 #: ../../region-schem-rs/src/schem.rs:932
 #, rust-format
 msgid "The Sponge schematic version {} is not supported; use 1, 2 or 3."
-msgstr "不支持 Sponge 结构文件版本 {}；请使用 1、2 或 3 捏~"
+msgstr "不支持 Sponge 结构文件版本 {}；请使用 1、2 或 3 ✨"
 
 #: ../../region-schem-rs/src/schem.rs:942
 msgid "The region has no size to write."
-msgstr "区域没有可写出的尺寸喵呜~"
+msgstr "区域没有可写出的尺寸喵~"
 
 #: ../../region-schem-rs/src/schem.rs:948
 msgid ""
 "The region is larger than the format can describe: its size has to fit an "
 "unsigned 16 bit number."
-msgstr "区域比该格式能描述的上限还大：每个方向的尺寸必须能放进 16 位无符号数(๑•̀ㅂ•́)و✧"
+msgstr "区域比该格式能描述的上限还大：每个方向的尺寸必须能放进 16 位无符号数捏~"
 
 #: ../../region-schem-rs/src/schem.rs:958
 #, rust-format
 msgid "The region holds {} blocks, but its size needs {}."
-msgstr "区域有 {} 个方块，但尺寸需要 {} 个😺"
+msgstr "区域有 {} 个方块，但尺寸需要 {} 个喵呜~"
 
 #: ../../region-schem-rs/src/schem.rs:967
 msgid "The region has no block palette to write."
-msgstr "区域没有可写出的方块调色板喵♪"
+msgstr "区域没有可写出的方块调色板(๑•̀ㅂ•́)و✧"
 
 #: ../../region-schem-rs/src/schem.rs:1027
 #, rust-format
 msgid "Writing block entities: {} / {}."
-msgstr "写出方块实体中：{} / {}(=^･ω･^=)"
+msgstr "写出方块实体中：{} / {}😺"
 
 #: ../../region-schem-rs/src/schem.rs:1031
 #: ../../region-schem-rs/src/schem.rs:1037
 msgid "Writing is cancelled."
-msgstr "写出被取消✨"
+msgstr "写出被取消喵♪"
 
 #: ../../zurinbt-common/src/lib.rs:85
 msgid "Getting Palette."
-msgstr "获取调色板喵~"
+msgstr "获取调色板(=^･ω･^=)"
+
+#~ msgid ""
+#~ "Drag a band with the left button to select the blocks inside it; the "
+#~ "middle and right buttons still move the view."
+#~ msgstr "按住左键拖出一个矩形来选择其中的方块；中键和右键仍然用于移动视图。"
+
+#~ msgid "The colour of the outline around the selected and the hovered blocks"
+#~ msgstr "选中及悬停方块的轮廓颜色"
+
+#~ msgid "The colour behind the picture, not the blocks themselves"
+#~ msgstr "画面背景的颜色，不影响方块本身"
+
+#~ msgid "The colour of the box drawn around the whole region"
+#~ msgstr "整个区域外框的颜色"
+
+#~ msgid "Stop &selecting"
+#~ msgstr "停止选择(&S)"
 
 #~ msgid ""
 #~ "Item icons need this version's client jar; download it from the 3D "

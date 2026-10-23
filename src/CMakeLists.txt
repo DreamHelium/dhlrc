@@ -97,6 +97,7 @@ set(TEMP_PROJECT_SOURCES
         resourcegetter.cpp
         dhdownloadmanager.h dhdownloadmanager.cpp
         dhrenderui.h dhrenderui.cpp
+        flowlayout.h flowlayout.cpp
         regionchangesui.h regionchangesui.cpp
         regionworkspace.h regionworkspace.cpp
         detachabletabwidget.h detachabletabwidget.cpp

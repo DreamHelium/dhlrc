@@ -3,6 +3,7 @@
 
 #include "dhlrc_render.h"
 
+#include <QColor>
 #include <QString>
 
 /* The Qt OpenGL module is optional: a Qt built without it cannot make a
@@ -64,6 +65,11 @@ public:
    * the buffers and textures on the next frame. */
   void setScene (const DhlrcScene *scene);
   void setCamera (const DhlrcCamera &camera);
+
+  /* The colour cleared behind the picture. The CPU view paints the same colour,
+   * so a fallback frame and a GL frame look the same; the default is that
+   * view's own panel colour. */
+  void setBackgroundColour (const QColor &colour);
 
   /* Says the boxes the scene draws over itself — the region's extent and the
    * block under the pointer — have changed, so the next frame reads them
@@ -127,6 +133,8 @@ private:
   bool glReady = false;
   bool drewFrame = false;
   QString problemText;
+  /* The panel the frame is cleared to; `setBackgroundColour ()` replaces it. */
+  QColor background{ 0x20, 0x28, 0x30 };
 
   unsigned int program = 0;
   int mvpLocation = -1;
@@ -139,6 +147,10 @@ private:
   unsigned int highlightVao = 0;
   unsigned int highlightVbo = 0;
   int highlightVertices = 0;
+  /* The texture the overlay quads sample: the scene's single white texel, so
+   * the boxes come out in exactly the tint the core gave them. Zero when the
+   * last rebuild found no overlay. */
+  size_t highlightTexture = 0;
   std::vector<unsigned int> textures;
   /* Opaque and cutout quads, then the blended ones. */
   std::vector<Batch> solidBatches;

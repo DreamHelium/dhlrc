@@ -21,8 +21,8 @@ class PropertyModifyUI;
 }
 QT_END_NAMESPACE
 
+class QComboBox;
 class QLabel;
-class QLineEdit;
 class QWidget;
 
 class PropertyModifyUI : public QDialog
@@ -68,8 +68,13 @@ private:
   qint32 blockY = 0;
   qint32 blockZ = 0;
   quint32 paletteId = 0;
+  /* The palette entry's block id (`minecraft:oak_stairs`), used to find the
+   * values its properties may take in the version's catalogue. */
+  QString blockName;
   QStringList propertyNames;
-  QList<QLineEdit *> dataEdits;
+  /* An editable combo box per property row, so the values the version uses are
+   * one click away while any other value can still be typed in. */
+  QList<QComboBox *> dataCombos;
   QLabel *lockedHint = nullptr;
   QLabel *sharedLabel = nullptr;
   QListWidget *sharedList = nullptr;

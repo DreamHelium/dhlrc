@@ -1,10 +1,13 @@
 #include "propertymodifyui.h"
 #include "ui_propertymodifyui.h"
 
+#include "dhcore.h"
+
+#include <QComboBox>
 #include <QFontDatabase>
 #include <QFutureWatcher>
+#include <QHash>
 #include <QLabel>
-#include <QLineEdit>
 #include <QMessageBox>
 #include <QPushButton>
 #include <libintl.h>
@@ -12,6 +15,66 @@
 #include <region.h>
 #include <utility>
 #define _(str) gettext (str)
+
+namespace
+{
+/* The values the version's blockstates allow for each property of `blockName`,
+ * keyed by the property's raw name — the same lists the block chooser offers.
+ * Empty when the catalogue is not available: the version's client jar is not
+ * downloaded, or the block is not one the catalogue knows.
+ *
+ * This is read once per dialog, when its rows are built, and it is not cached
+ * here: the block chooser already caches the whole catalogue per version, and
+ * a second cache in a dialog that is opened once in a while would only keep
+ * memory alive for nothing. */
+QHash<QString, QStringList>
+catalogValues (const QString &blockName, quint32 dataVersion)
+{
+  QHash<QString, QStringList> result;
+  auto *core = DhCore::instance ();
+  DhlrcCore *handle = core ? core->handle () : nullptr;
+  if (!handle || blockName.isEmpty ())
+    return result;
+
+  /* The catalogue belongs to whatever version the core has its resources
+   * configured for. Point them at this region's version first, but only when
+   * the core holds no catalogue yet — the same rule the block chooser follows,
+   * so opening this dialog does not throw away a list another page built. */
+  if (dhlrc_core_block_count (handle) == 0)
+    dhlrc_core_resources_configure_for_data_version (
+        handle, static_cast<int32_t> (dataVersion), nullptr, 0);
+
+  const size_t blockCount = dhlrc_core_block_count (handle);
+  for (size_t i = 0; i < blockCount; i++)
+    {
+      const char *rawName = dhlrc_core_block_name (handle, i);
+      if (!rawName || blockName != QLatin1String (rawName))
+        continue;
+      const size_t propertyCount = dhlrc_core_block_property_count (handle, i);
+      for (size_t p = 0; p < propertyCount; p++)
+        {
+          const char *rawProperty
+              = dhlrc_core_block_property_name (handle, i, p);
+          if (!rawProperty)
+            continue;
+          QStringList values;
+          const size_t valueCount
+              = dhlrc_core_block_property_value_count (handle, i, p);
+          for (size_t v = 0; v < valueCount; v++)
+            {
+              const char *rawValue
+                  = dhlrc_core_block_property_value (handle, i, p, v);
+              if (rawValue)
+                values << QString::fromUtf8 (rawValue);
+            }
+          result.insert (QString::fromUtf8 (rawProperty), values);
+        }
+      break;
+    }
+  return result;
+}
+} // namespace
+
 
 PropertyModifyUI::PropertyModifyUI (std::shared_ptr<RegionClass> region,
                                     qint32 x, qint32 y, qint32 z, QWidget *parent)
@@ -63,6 +126,9 @@ PropertyModifyUI::PropertyModifyUI (std::shared_ptr<RegionClass> region,
     {
       blockIndex = regionClass->index (x, y, z);
       paletteId = regionClass->blockId (blockIndex);
+      /* Only to find the values this block's properties may take in the
+       * version's catalogue: the palette entry names the block state. */
+      blockName = regionClass->blockState (x, y, z).name;
     }
   else
     {
@@ -81,11 +147,16 @@ PropertyModifyUI::PropertyModifyUI (std::shared_ptr<RegionClass> region,
 void
 PropertyModifyUI::setEditable (bool editable)
 {
-  for (auto *edit : dataEdits)
-    edit->setEnabled (editable);
+  for (auto *combo : dataCombos)
+    combo->setEnabled (editable);
   ui->thisBlockRadio->setEnabled (editable);
   ui->allBlocksRadio->setEnabled (editable);
   ui->buttonBox->setEnabled (editable);
+  /* A block without properties has nothing to write: it never reaches this
+   * dialog through the 3D preview (the button is disabled there), but a caller
+   * that opened it anyway would only get a dialog that cannot do anything. */
+  ui->buttonBox->button (QDialogButtonBox::Ok)
+      ->setEnabled (editable && !propertyNames.isEmpty () && blockIndex >= 0);
   lockedHint->setVisible (!editable);
 }
 
@@ -166,6 +237,11 @@ PropertyModifyUI::setScanning (bool scanning)
                             ? _ ("Looking for blocks with these properties...")
                             : sharedLabel->text ());
   ui->buttonBox->setEnabled (!scanning && !regionClass->locked ());
+  /* The scan disables the box as a whole, which would otherwise turn OK back on
+   * for a block that has no property to write. */
+  ui->buttonBox->button (QDialogButtonBox::Ok)
+      ->setEnabled (!scanning && !regionClass->locked ()
+                    && !propertyNames.isEmpty ());
   if (scanning)
     sharedList->clear ();
 }
@@ -185,10 +261,17 @@ PropertyModifyUI::showSharedBlocks (const SharedBlocks &blocks)
 }
 
 /* One row per property of the block's palette entry: the (translated) name on
- * the left, an editable value on the right. */
+ * the left, an editable combo box on the right, carrying the values the
+ * version's blockstates use for that property. Editable is the point: the
+ * state a saved palette entry names may take values the blockstates of this
+ * version never mention, and typing one in has to stay possible. */
 void
 PropertyModifyUI::setPropertiesText ()
 {
+  /* Read once for the whole dialog: scanning the catalogue costs more than
+   * the rows do, and every property wants an answer from the same block. */
+  const QHash<QString, QStringList> values
+      = catalogValues (blockName, regionClass->dataVersion ());
   auto len = regionClass->palettePropertyLen (paletteId);
   for (qsizetype i = 0; i < len; i++)
     {
@@ -197,19 +280,25 @@ PropertyModifyUI::setPropertiesText ()
       /* The name goes to the ABI untranslated; only the label is localized. */
       propertyNames << name;
       auto *label = new QLabel (QString (_ (name.toUtf8 ().constData ())));
-      auto *edit = new QLineEdit (data);
+      auto *combo = new QComboBox (this);
+      combo->setEditable (true);
+      combo->addItems (values.value (name));
+      /* The current state's value is the starting point; a value the list does
+       * not hold is still shown, because an editable box takes its own text. */
+      combo->setCurrentText (data);
       ui->propertiesLayout->addWidget (label, i, 0);
-      ui->propertiesLayout->addWidget (edit, i, 1);
-      dataEdits << edit;
+      ui->propertiesLayout->addWidget (combo, i, 1);
+      dataCombos << combo;
     }
+  ui->propertiesLayout->setColumnStretch (1, 1);
 }
 
 bool
 PropertyModifyUI::writeProperties ()
 {
   QStringList datas;
-  for (const auto *edit : dataEdits)
-    datas << edit->text ();
+  for (const auto *combo : dataCombos)
+    datas << combo->currentText ();
 
   if (ui->thisBlockRadio->isChecked ())
     return regionClass->setBlockProperties (blockIndex, propertyNames, datas);
@@ -235,8 +324,8 @@ PropertyModifyUI::okBtn_clicked ()
   for (qsizetype i = 0; i < propertyNames.size (); i++)
     oldDatas << regionClass->palettePropertyData (paletteId, i);
   QStringList newDatas;
-  for (const auto *edit : dataEdits)
-    newDatas << edit->text ();
+  for (const auto *combo : dataCombos)
+    newDatas << combo->currentText ();
   QStringList oldNames = propertyNames;
 
   if (newDatas == oldDatas)

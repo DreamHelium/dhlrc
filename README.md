@@ -42,6 +42,8 @@ Before reporting, you should confirm that:
 To confirm your version, run `dhlrc_qt --version` or see `Help -> About` in the GUI. Then you can create
 a new issue, and attach the version and the bug/error description.
 
+Since we can't easily detect the bugs once at all, we made a file called [bugs](bugs.md) for a reference.
+
 ## License Problem
 
 I'm lazy to change the license, sorry for the inconvenience.

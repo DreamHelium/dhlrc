@@ -480,6 +480,8 @@ itemType (int type)
       return DhSettingItem::Type::Path;
     case DHLRC_SETTING_ENUM:
       return DhSettingItem::Type::Enum;
+    case DHLRC_SETTING_COLOUR:
+      return DhSettingItem::Type::Colour;
     case DHLRC_SETTING_BOOL:
     default:
       return DhSettingItem::Type::Bool;

@@ -3,13 +3,18 @@
 
 #include "dhlrc_render.h"
 
+#include <QColor>
 #include <QImage>
 #include <QPoint>
 #include <QString>
+#include <QVector>
 #include <QWidget>
+#include <array>
+#include <functional>
 #include <memory>
 #include <optional>
 #include <utility>
+#include <vector>
 
 class DhGpuWidget;
 class QLabel;
@@ -43,6 +48,21 @@ class QLabel;
  * be shown around it in another colour. Both are the core's own too: the slice
  * is a scene built from the range and the box is one more box the scene draws,
  * so the two backends need no special case for either.
+ *
+ * Cells can also be selected, and every selected cell is outlined like the one
+ * under the pointer. In select mode a click adds the cell under the pointer to
+ * the selection or takes it out again, and a click off the scene clears the
+ * selection. The outlines themselves are the core's, one box per selected
+ * cell, and the hover outline joins them in the same set rather than replacing
+ * it.
+ *
+ * A marker box can be shown around one cell, apart from the selection and in
+ * its own colour: the owner uses it for the one block a list has singled out,
+ * which must stay visible over the other boxes.
+ *
+ * The colours of the boxes and of the panel behind the picture can be chosen;
+ * they are kept here and applied again whenever a new scene is adopted,
+ * because a scene carries its own copy of the colours.
  */
 class DhRenderWidget : public QWidget
 {
@@ -125,9 +145,68 @@ public:
    * name comes from. */
   void setHoverInfo (const QString &text);
 
+  /* ---- Selecting cells ---------------------------------------------------
+   *
+   * A cell is a whole-numbered block position, the same coordinates
+   * `blockPicked ()` and `blockHovered ()` carry. */
+  using BlockCell = std::array<int, 3>;
+
+  /* The owner's way of visiting the region's cells: it calls the callback once
+   * for every existing cell. The click selection does not need it — a click
+   * already names its cell — but it is kept for owners that walk the region
+   * themselves. */
+  using BlockEnumerator
+      = std::function<void (const std::function<void (int, int, int)> &)>;
+
+  /* Whether a click selects cells rather than naming one. In select mode a
+   * click on a block toggles it in or out of the outlined set, and a click off
+   * the scene clears the set; outside it a click only reports its cell through
+   * `blockPicked ()` and `cellPicked ()`. Dragging turns the camera either way. */
+  void setSelectMode (bool on);
+  [[nodiscard]] bool selectMode () const { return selectModeOn; }
+
+  /* Replaces the outlined set. Called before a scene is adopted the cells are
+   * kept and outlined on that scene, so this works while the scene is still
+   * being built. */
+  void setSelectedCells (const QVector<BlockCell> &cells);
+  [[nodiscard]] const QVector<BlockCell> &selectedCells () const
+  {
+    return selection;
+  }
+
+  /* Hands the view the only way it can know which cells exist. Not needed for
+   * the click selection; kept for owners that visit the region themselves. */
+  void setBlockEnumerator (BlockEnumerator enumerator);
+
+  /* The colour of the outline around the selected and hovered cells, and of
+   * the box around the region being drawn. Applied to the scene now and kept
+   * for every scene adopted later. */
+  void setHighlightColour (const QColor &colour);
+  void setBoundsColour (const QColor &colour);
+
+  /* The colour painted behind the picture. The GL child clears to it too, so
+   * the two backends agree. */
+  void setBackgroundColour (const QColor &colour);
+
+  /* ---- Marking one cell -------------------------------------------------
+   *
+   * The marker is one box drawn apart from the selection and in its own
+   * colour, for the cell a list has singled out. It survives a scene rebuild
+   * like the selection does. */
+  void setMarkerCell (std::optional<std::array<int, 3>> cell);
+  [[nodiscard]] std::optional<std::array<int, 3>> markerCell () const
+  {
+    return marker;
+  }
+  void setMarkerColour (const QColor &colour);
+
 Q_SIGNALS:
   /* A click landed on a block, in the region's own coordinates. */
   void blockPicked (int x, int y, int z);
+  /* A click outside select mode names its cell, or says there is none with
+   * -1, -1, -1. The panel describes the block from this, so empty space can
+   * clear a description too. */
+  void cellPicked (int x, int y, int z);
   /* The pointer moved onto another block, in the region's own coordinates.
    * Sent only when the answer changes, never for a move within one block. */
   void blockHovered (int x, int y, int z);
@@ -137,6 +216,9 @@ Q_SIGNALS:
   /* Another slice was asked for on a scene this widget did not build, so the
    * owner that holds the region has to build the fresh one. */
   void sliceChanged ();
+  /* A click in select mode changed the outlined set. Not sent for
+   * `setSelectedCells ()`, which is the owner's own change. */
+  void selectionChanged ();
 
 protected:
   void paintEvent (QPaintEvent *event) override;
@@ -160,7 +242,27 @@ private:
   /* Fills `box` with the six floats of that box. False when there is nothing
    * to show a box around — no extent yet, or a slice that draws no layer. */
   [[nodiscard]] bool boundsBox (float *box) const;
+  /* Converts every selected cell to the box the scene draws it in, six floats
+   * each. Redone whenever a new scene is adopted, because the boxes belong to
+   * that scene. */
+  void applySelectionBoxes ();
+  /* Hands the scene the whole outline set — the selected cells and the cell
+   * under the pointer — through the multi-box call, so a hover adds its box to
+   * the selection instead of replacing it. */
+  void rebuildHighlights ();
+  /* Hands the scene the two outline colours, the marker's colour and the GL
+   * child its background, which is what a scene adopted later must be told
+   * again. */
+  void applyColours ();
+  /* Adds the cell under `at` to the selection or takes it out again; off the
+   * scene it clears the selection. */
+  void toggleCellAt (const QPoint &at);
+  /* Draws the marker box around `marker` on the current scene, or clears it. */
+  void applyMarker ();
 
+  /* The cell under `at`, in the region's own coordinates. False when no cell
+   * was hit or no scene is up. */
+  [[nodiscard]] bool cellAt (const QPoint &at, int32_t *cell) const;
   void pickAt (const QPoint &at);
   /* Points the highlight at the block under `at`, clearing it when the pointer
    * is off the scene. Nothing is touched when the same block is still under
@@ -219,6 +321,23 @@ private:
   /* Whether a move has ever been seen, so the camera cannot re-pick under a
    * pointer the widget never had. */
   bool pointerKnown = false;
+  /* The outlined set and the boxes it becomes on the current scene, six floats
+   * per cell. The boxes are kept so a hover only adds its own box instead of
+   * converting every selected cell again. */
+  QVector<BlockCell> selection;
+  std::vector<float> selectionBoxes;
+  BlockEnumerator enumerator;
+  /* Multi-select mode: whether a click toggles a cell or only reports it. */
+  bool selectModeOn = false;
+  /* The cell the marker box wraps, when one is shown. */
+  std::optional<std::array<int, 3>> marker;
+  /* The box colours and the panel behind the picture. The defaults are the
+   * core's own colours and the panel colour the CPU view always painted, so a
+   * view nobody configures looks exactly as it did. */
+  QColor highlightColour{ 0, 0, 0 };
+  QColor boundsColour{ 0, 200, 255 };
+  QColor backgroundColour{ 0x20, 0x28, 0x30 };
+  QColor markerColour{ 255, 32, 96 };
 };
 
 #endif /* DHRENDERWIDGET_H */

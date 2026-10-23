@@ -15,7 +15,7 @@ use common_rs::i18n::i18n;
 use std::path::PathBuf;
 
 /// Which control a setting wants. `to_int` yields the `DHLRC_SETTING_*` values
-/// the C header declares.
+/// the C header declares, ordered like `DhSettingItem::Type`.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SettingType {
     Bool,
@@ -23,6 +23,7 @@ pub enum SettingType {
     String,
     Path,
     Enum,
+    Colour,
 }
 
 impl SettingType {
@@ -33,6 +34,7 @@ impl SettingType {
             SettingType::String => 2,
             SettingType::Path => 3,
             SettingType::Enum => 4,
+            SettingType::Colour => 5,
         }
     }
 }
@@ -326,6 +328,62 @@ pub static SETTINGS: &[SettingDef] = &[
         default: "true",
         get: get_download_client_jar,
         set: set_download_client_jar,
+    },
+    SettingDef {
+        key: "HighlightColour",
+        group: RENDER,
+        kind: SettingType::Colour,
+        label: i18n("Highlight Colour"),
+        tooltip: i18n(
+            "The colour of the outline drawn around the selected blocks in the 3D preview, as #rrggbb.",
+        ),
+        choices: NO_CHOICES,
+        long_text: false,
+        default: "#000000",
+        get: get_highlight_colour,
+        set: set_highlight_colour,
+    },
+    SettingDef {
+        key: "BackgroundColour",
+        group: RENDER,
+        kind: SettingType::Colour,
+        label: i18n("Background Colour"),
+        tooltip: i18n(
+            "The colour behind the 3D preview, as #rrggbb. It does not affect the blocks themselves.",
+        ),
+        choices: NO_CHOICES,
+        long_text: false,
+        default: "#202830",
+        get: get_background_colour,
+        set: set_background_colour,
+    },
+    SettingDef {
+        key: "BoundsColour",
+        group: RENDER,
+        kind: SettingType::Colour,
+        label: i18n("Region Box Colour"),
+        tooltip: i18n(
+            "The colour of the box drawn around the whole region in the 3D preview, as #rrggbb. It is kept apart from the highlight colour so both stay readable.",
+        ),
+        choices: NO_CHOICES,
+        long_text: false,
+        default: "#00c8ff",
+        get: get_bounds_colour,
+        set: set_bounds_colour,
+    },
+    SettingDef {
+        key: "MarkerColour",
+        group: RENDER,
+        kind: SettingType::Colour,
+        label: i18n("Selection Marker Colour"),
+        tooltip: i18n(
+            "The colour of the box drawn around the cell chosen in the selected-blocks list, as #rrggbb.",
+        ),
+        choices: NO_CHOICES,
+        long_text: false,
+        default: "#ff2060",
+        get: get_marker_colour,
+        set: set_marker_colour,
     },
     SettingDef {
         key: "DownloadClientJarForMaterials",
@@ -668,6 +726,38 @@ fn set_download_client_jar(config: &mut Config, text: &str) {
     config.render.download_client_jar = parse_bool(text);
 }
 
+fn get_highlight_colour(config: &Config) -> String {
+    config.render.highlight_colour.clone()
+}
+
+fn set_highlight_colour(config: &mut Config, text: &str) {
+    config.render.highlight_colour = text.to_owned();
+}
+
+fn get_background_colour(config: &Config) -> String {
+    config.render.background_colour.clone()
+}
+
+fn set_background_colour(config: &mut Config, text: &str) {
+    config.render.background_colour = text.to_owned();
+}
+
+fn get_bounds_colour(config: &Config) -> String {
+    config.render.bounds_colour.clone()
+}
+
+fn set_bounds_colour(config: &mut Config, text: &str) {
+    config.render.bounds_colour = text.to_owned();
+}
+
+fn get_marker_colour(config: &Config) -> String {
+    config.render.marker_colour.clone()
+}
+
+fn set_marker_colour(config: &mut Config, text: &str) {
+    config.render.marker_colour = text.to_owned();
+}
+
 fn get_download_client_jar_for_materials(config: &Config) -> String {
     bool_text(config.material.download_client_jar)
 }
@@ -723,9 +813,9 @@ mod tests {
                 DEFAULT,
                 GAME,
                 READER,
+                RENDER,
                 MATERIAL,
                 NOTIFICATIONS,
-                RENDER,
             ]
         );
 
@@ -775,5 +865,74 @@ mod tests {
         assert!(config.set_setting("DownloadClientJarForMaterials", "false"));
         assert!(!config.material.download_client_jar);
         assert!(!config.render.download_client_jar);
+    }
+
+    #[test]
+    fn the_preview_colour_settings_have_defaults_and_move_the_configuration() {
+        let mut config = Config::default();
+        for (key, default) in [
+            ("HighlightColour", "#000000"),
+            ("BackgroundColour", "#202830"),
+            ("BoundsColour", "#00c8ff"),
+            ("MarkerColour", "#ff2060"),
+        ] {
+            assert_eq!(config.setting(key).as_deref(), Some(default), "{key}");
+        }
+
+        assert!(config.set_setting("HighlightColour", "#ff0000"));
+        assert!(config.set_setting("BackgroundColour", "#101010"));
+        assert!(config.set_setting("BoundsColour", "#00ff00"));
+        assert!(config.set_setting("MarkerColour", "#ffffff"));
+        assert_eq!(config.render.highlight_colour, "#ff0000");
+        assert_eq!(config.render.background_colour, "#101010");
+        assert_eq!(config.render.bounds_colour, "#00ff00");
+        assert_eq!(config.render.marker_colour, "#ffffff");
+        /* Each colour is its own field, so one does not move another. */
+        assert_eq!(
+            config.setting("HighlightColour").as_deref(),
+            Some("#ff0000")
+        );
+    }
+
+    #[test]
+    fn the_colour_settings_report_the_colour_kind() {
+        /* The colour pickers are a kind of their own: a frontend switches on 5
+         * to build one, and the renderer page keeps its place between Reader
+         * and Material List. */
+        assert_eq!(SettingType::Colour.to_int(), 5);
+        for key in [
+            "HighlightColour",
+            "BackgroundColour",
+            "BoundsColour",
+            "MarkerColour",
+        ] {
+            let def = SETTINGS
+                .iter()
+                .find(|def| def.key == key)
+                .expect("the colour setting is described");
+            assert_eq!(def.kind, SettingType::Colour, "{key}");
+        }
+
+        let keys: Vec<&str> = SETTINGS
+            .iter()
+            .filter(|def| def.group == RENDER)
+            .map(|def| def.key)
+            .collect();
+        assert_eq!(
+            keys,
+            [
+                "DownloadClientJar",
+                "HighlightColour",
+                "BackgroundColour",
+                "BoundsColour",
+                "MarkerColour",
+            ]
+        );
+        let marker = SETTINGS
+            .iter()
+            .find(|def| def.key == "MarkerColour")
+            .expect("the marker colour is described");
+        assert_eq!(marker.label, i18n("Selection Marker Colour"));
+        assert_eq!(marker.default, "#ff2060");
     }
 }

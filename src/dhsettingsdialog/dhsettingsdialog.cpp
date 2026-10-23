@@ -288,6 +288,10 @@ DhSettingsDialog::addWidget (DhSettingItem *item, QVBoxLayout *layout)
       templates.push_back (
           std::make_unique<DhEnumSettingTemplate> (item, layout, this));
       break;
+    case DhSettingItem::Type::Colour:
+      templates.push_back (
+          std::make_unique<DhColourSettingTemplate> (item, layout, this));
+      break;
     }
   templates.back ()->initWidget (layout, this);
   templatesByKey.insert (item->key (), templates.back ().get ());

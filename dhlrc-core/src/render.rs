@@ -714,6 +714,143 @@ pub unsafe extern "C" fn dhlrc_render_scene_set_highlight(
     1
 }
 
+/// Points the view at several blocks at once, each drawn as its own box.
+///
+/// `boxes` holds `count` boxes of six floats each, laid out exactly as one box
+/// is in [`dhlrc_render_scene_set_highlight`]: the low corner then the high one
+/// in block space. A count of zero — or a null `boxes` — clears every pick.
+/// The picks are drawn in the highlight colour, after the region's own box,
+/// which stays as [`dhlrc_render_scene_set_bounds`] left it. Returns how many
+/// boxes were set.
+///
+/// # Safety
+///
+/// `scene` must be a pointer this library returned, and `boxes` readable for
+/// `count * 6` `float`s when it is not null.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn dhlrc_render_scene_set_highlights(
+    scene: *mut DhlrcScene,
+    boxes: *const f32,
+    count: usize,
+) -> i32 {
+    let Some(scene) = (unsafe { scene.as_mut() }) else {
+        return 0;
+    };
+    if count == 0 || boxes.is_null() {
+        scene.scene.set_highlights(Vec::new());
+        return 0;
+    }
+    let values = unsafe { slice::from_raw_parts(boxes, count * 6) };
+    let highlights: Vec<dhlrc_render::Highlight> = values
+        .chunks_exact(6)
+        .map(|box6| dhlrc_render::Highlight {
+            min: [box6[0], box6[1], box6[2]],
+            max: [box6[3], box6[4], box6[5]],
+        })
+        .collect();
+    let set = highlights.len();
+    scene.scene.set_highlights(highlights);
+    i32::try_from(set).unwrap_or(i32::MAX)
+}
+
+/// Sets the colour the picked blocks' boxes are drawn in: `rgb` is three floats
+/// in `0..=1`, red first, clamped to that range. Null is ignored.
+///
+/// # Safety
+///
+/// `scene` must be a pointer this library returned, and `rgb` readable for
+/// three `float`s when it is not null.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn dhlrc_render_scene_set_highlight_colour(
+    scene: *mut DhlrcScene,
+    rgb: *const f32,
+) {
+    let Some(scene) = (unsafe { scene.as_mut() }) else {
+        return;
+    };
+    if rgb.is_null() {
+        return;
+    }
+    let rgb = unsafe { slice::from_raw_parts(rgb, 3) };
+    scene.scene.set_highlight_colour(colour_bytes(rgb));
+}
+
+/// Sets the colour the region's box is drawn in, with the same three clamped
+/// floats as [`dhlrc_render_scene_set_highlight_colour`]. Null is ignored.
+///
+/// # Safety
+///
+/// `scene` must be a pointer this library returned, and `rgb` readable for
+/// three `float`s when it is not null.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn dhlrc_render_scene_set_bounds_colour(
+    scene: *mut DhlrcScene,
+    rgb: *const f32,
+) {
+    let Some(scene) = (unsafe { scene.as_mut() }) else {
+        return;
+    };
+    if rgb.is_null() {
+        return;
+    }
+    let rgb = unsafe { slice::from_raw_parts(rgb, 3) };
+    scene.scene.set_bounds_colour(colour_bytes(rgb));
+}
+
+/// Marks the cell chosen in the selected-blocks list, or clears the marker.
+///
+/// `block` is six floats as [`dhlrc_render_scene_set_highlight`] takes, or null
+/// to clear the marker. The marker is drawn after the region's box and the
+/// picks, in its own colour, so the cell a list points at stays visible.
+///
+/// # Safety
+///
+/// `scene` must be a pointer this library returned, and `block` readable for
+/// six `float`s when it is not null.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn dhlrc_render_scene_set_marker(scene: *mut DhlrcScene, block: *const f32) {
+    let Some(scene) = (unsafe { scene.as_mut() }) else {
+        return;
+    };
+    if block.is_null() {
+        scene.scene.set_marker(None);
+        return;
+    }
+    let box6 = unsafe { slice::from_raw_parts(block, 6) };
+    scene.scene.set_marker(Some(dhlrc_render::Highlight {
+        min: [box6[0], box6[1], box6[2]],
+        max: [box6[3], box6[4], box6[5]],
+    }));
+}
+
+/// Sets the colour the marker's box is drawn in, with the same three clamped
+/// floats as [`dhlrc_render_scene_set_highlight_colour`]. Null is ignored.
+///
+/// # Safety
+///
+/// `scene` must be a pointer this library returned, and `rgb` readable for
+/// three `float`s when it is not null.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn dhlrc_render_scene_set_marker_colour(
+    scene: *mut DhlrcScene,
+    rgb: *const f32,
+) {
+    let Some(scene) = (unsafe { scene.as_mut() }) else {
+        return;
+    };
+    if rgb.is_null() {
+        return;
+    }
+    let rgb = unsafe { slice::from_raw_parts(rgb, 3) };
+    scene.scene.set_marker_colour(colour_bytes(rgb));
+}
+
+/// Three floats in `0..=1` as the bytes a scene draws with, so a value a colour
+/// picker sends slightly out of range still lands in gamut.
+fn colour_bytes(rgb: &[f32]) -> [u8; 3] {
+    [rgb[0], rgb[1], rgb[2]].map(|channel| (channel.clamp(0.0, 1.0) * 255.0).round() as u8)
+}
+
 /// The box the block at a whole-numbered position is drawn in, written to
 /// `block` as six floats like [`dhlrc_render_scene_set_highlight`] takes.
 ///
@@ -775,7 +912,7 @@ pub unsafe extern "C" fn dhlrc_render_scene_set_bounds(
 }
 
 /// How many quads the boxes drawn over the scene come to — the region's extent
-/// and the block under the pointer together — or 0 when neither is shown.
+/// and every picked block together — or 0 when nothing is shown.
 ///
 /// # Safety
 ///
@@ -990,7 +1127,11 @@ mod tests {
             max: [1.0; 3],
             skipped: Vec::new(),
             bounds: None,
-            highlight: None,
+            highlights: Vec::new(),
+            highlight_colour: [0, 0, 0],
+            bounds_colour: [0, 200, 255],
+            marker: None,
+            marker_colour: [0xff, 0x20, 0x60],
             overlay: Vec::new(),
         })
     }
@@ -1077,6 +1218,133 @@ mod tests {
             0
         );
         assert_eq!(unsafe { dhlrc_render_scene_overlay_count(&scene) }, 0);
+    }
+
+    #[test]
+    fn several_highlights_are_set_and_coloured() {
+        let mut scene = scene();
+        assert_eq!(unsafe { dhlrc_render_scene_overlay_count(&scene) }, 0);
+
+        /* Two consecutive six-float boxes, the layout the header promises. */
+        let boxes = [
+            0.0f32, 0.0, 0.0, 1.0, 1.0, 1.0, 2.0, 0.0, 0.0, 3.0, 1.0, 1.0,
+        ];
+        assert_eq!(
+            unsafe { dhlrc_render_scene_set_highlights(&mut scene, boxes.as_ptr(), 2) },
+            2
+        );
+        assert_eq!(
+            unsafe { dhlrc_render_scene_overlay_count(&scene) },
+            2 * 12 * 6
+        );
+
+        let mut quad = DhlrcQuad {
+            positions: [[0.0; 3]; 4],
+            uv: [[0.0; 2]; 4],
+            tint: [1.0; 3],
+            light: 0.0,
+            texture: 1,
+            alpha: -1,
+        };
+        let colour = [1.0f32, 0.0, 0.5];
+        unsafe { dhlrc_render_scene_set_highlight_colour(&mut scene, colour.as_ptr()) };
+        assert_eq!(
+            unsafe { dhlrc_render_scene_overlay_quad(&scene, 0, &mut quad) },
+            1
+        );
+        assert_eq!(quad.tint, [1.0, 0.0, 128.0 / 255.0]);
+
+        /* Floats outside 0..=1 are clamped rather than wrapping. */
+        let out_of_range = [1.5f32, -0.5, 2.0];
+        unsafe { dhlrc_render_scene_set_highlight_colour(&mut scene, out_of_range.as_ptr()) };
+        unsafe { dhlrc_render_scene_overlay_quad(&scene, 0, &mut quad) };
+        assert_eq!(quad.tint, [1.0, 0.0, 1.0]);
+
+        /* The region's box comes first and has a colour of its own. */
+        let region = [0.0f32, 0.0, 0.0, 8.0, 8.0, 8.0];
+        unsafe { dhlrc_render_scene_set_bounds(&mut scene, region.as_ptr()) };
+        let green = [0.0f32, 1.0, 0.0];
+        unsafe { dhlrc_render_scene_set_bounds_colour(&mut scene, green.as_ptr()) };
+        assert_eq!(
+            unsafe { dhlrc_render_scene_overlay_count(&scene) },
+            3 * 12 * 6
+        );
+        unsafe { dhlrc_render_scene_overlay_quad(&scene, 0, &mut quad) };
+        assert_eq!(quad.tint, [0.0, 1.0, 0.0], "the region box is drawn first");
+        unsafe { dhlrc_render_scene_overlay_quad(&scene, 12 * 6, &mut quad) };
+        assert_eq!(quad.tint, [1.0, 0.0, 1.0], "the picks keep their colour");
+
+        /* Setting one highlight still means one box; a null colour is ignored. */
+        assert_eq!(
+            unsafe { dhlrc_render_scene_set_highlight(&mut scene, boxes.as_ptr()) },
+            1
+        );
+        assert_eq!(
+            unsafe { dhlrc_render_scene_overlay_count(&scene) },
+            2 * 12 * 6
+        );
+        unsafe { dhlrc_render_scene_set_highlight_colour(&mut scene, ptr::null()) };
+        unsafe { dhlrc_render_scene_set_bounds_colour(&mut scene, ptr::null()) };
+        assert_eq!(
+            unsafe { dhlrc_render_scene_overlay_count(&scene) },
+            2 * 12 * 6
+        );
+
+        /* Clearing the picks leaves the region's box alone. */
+        assert_eq!(
+            unsafe { dhlrc_render_scene_set_highlights(&mut scene, ptr::null(), 0) },
+            0
+        );
+        assert_eq!(unsafe { dhlrc_render_scene_overlay_count(&scene) }, 12 * 6);
+        /* A null scene is a miss, not a crash. */
+        assert_eq!(
+            unsafe { dhlrc_render_scene_set_highlights(ptr::null_mut(), boxes.as_ptr(), 2) },
+            0
+        );
+    }
+
+    #[test]
+    fn a_marker_is_set_and_coloured_last() {
+        let mut scene = scene();
+        let marker = [4.0f32, 0.0, 4.0, 5.0, 1.0, 5.0];
+        unsafe { dhlrc_render_scene_set_marker(&mut scene, marker.as_ptr()) };
+        assert_eq!(unsafe { dhlrc_render_scene_overlay_count(&scene) }, 12 * 6);
+
+        let mut quad = DhlrcQuad {
+            positions: [[0.0; 3]; 4],
+            uv: [[0.0; 2]; 4],
+            tint: [1.0; 3],
+            light: 0.0,
+            texture: 1,
+            alpha: -1,
+        };
+        unsafe { dhlrc_render_scene_overlay_quad(&scene, 0, &mut quad) };
+        assert_eq!(
+            quad.tint,
+            [255.0 / 255.0, 32.0 / 255.0, 96.0 / 255.0],
+            "a fresh marker keeps the default colour"
+        );
+
+        /* The marker is drawn after the region's box and the picks. */
+        let region = [0.0f32, 0.0, 0.0, 8.0, 8.0, 8.0];
+        unsafe { dhlrc_render_scene_set_bounds(&mut scene, region.as_ptr()) };
+        let pick = [1.0f32, 0.0, 1.0, 2.0, 1.0, 2.0];
+        unsafe { dhlrc_render_scene_set_highlights(&mut scene, pick.as_ptr(), 1) };
+        let colour = [0.0f32, 0.0, 1.0];
+        unsafe { dhlrc_render_scene_set_marker_colour(&mut scene, colour.as_ptr()) };
+        assert_eq!(
+            unsafe { dhlrc_render_scene_overlay_count(&scene) },
+            3 * 12 * 6
+        );
+        unsafe { dhlrc_render_scene_overlay_quad(&scene, 2 * 12 * 6, &mut quad) };
+        assert_eq!(quad.tint, [0.0, 0.0, 1.0], "the marker is drawn last");
+
+        /* A null marker clears it; a null scene and colour are ignored. */
+        unsafe { dhlrc_render_scene_set_marker(&mut scene, ptr::null()) };
+        assert_eq!(unsafe { dhlrc_render_scene_overlay_count(&scene) }, 2 * 12 * 6);
+        unsafe { dhlrc_render_scene_set_marker(ptr::null_mut(), marker.as_ptr()) };
+        unsafe { dhlrc_render_scene_set_marker_colour(&mut scene, ptr::null()) };
+        assert_eq!(unsafe { dhlrc_render_scene_overlay_count(&scene) }, 2 * 12 * 6);
     }
 
     #[test]

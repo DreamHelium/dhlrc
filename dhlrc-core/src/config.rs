@@ -341,14 +341,34 @@ pub struct Render {
     /// fetched by itself when a preview needs one the cache does not have. Off,
     /// a preview of a version whose jar is missing draws nothing and says so.
     pub download_client_jar: bool,
+    /// The `#rrggbb` colour the outline of the selected blocks is drawn in.
+    pub highlight_colour: String,
+    /// The `#rrggbb` colour behind the 3D preview.
+    pub background_colour: String,
+    /// The `#rrggbb` colour the region's own box is drawn in.
+    pub bounds_colour: String,
+    /// The `#rrggbb` colour the marker's box is drawn in: the cell picked in
+    /// the selected-blocks list, which stays visible over the other boxes.
+    #[serde(default = "default_marker_colour")]
+    pub marker_colour: String,
 }
 
 impl Default for Render {
     fn default() -> Self {
         Self {
             download_client_jar: true,
+            highlight_colour: "#000000".to_owned(),
+            background_colour: "#202830".to_owned(),
+            bounds_colour: "#00c8ff".to_owned(),
+            marker_colour: default_marker_colour(),
         }
     }
+}
+
+/// Files written before the marker existed have no `marker_colour`; they read
+/// the default instead of failing to load, so a version 5 file stays loadable.
+fn default_marker_colour() -> String {
+    "#ff2060".to_owned()
 }
 
 /// The `[material]` group: what the material list may fetch by itself.
@@ -972,6 +992,25 @@ mod tests {
         assert_eq!(backup_and_reset(&paths).unwrap(), None);
         assert!(paths.file.is_file());
         assert!(!load_or_create(&paths).unwrap().needs_reset);
+        cleanup(&paths);
+    }
+
+    #[test]
+    fn a_version_five_file_without_marker_colour_still_loads() {
+        let paths = temp_paths("v5-colour");
+        fs::create_dir_all(paths.file.parent().unwrap()).unwrap();
+        /* Version 5 files written before the marker existed have no
+         * `marker_colour`; the field's serde default lets them load as they
+         * are, with no reset. */
+        let old = "version = 5\n\n[render]\nhighlight_colour = \"#000000\"\n\
+                   background_colour = \"#202830\"\n\
+                   bounds_colour = \"#00c8ff\"\n";
+        fs::write(&paths.file, old).unwrap();
+        let init = load_or_create(&paths).unwrap();
+        assert_eq!(init.origin, ConfigOrigin::Loaded);
+        assert!(!init.needs_reset);
+        assert_eq!(init.config.version, 5);
+        assert_eq!(init.config.render.marker_colour, "#ff2060");
         cleanup(&paths);
     }
 

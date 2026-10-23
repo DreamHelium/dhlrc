@@ -170,6 +170,35 @@ extern "C"
   int32_t dhlrc_render_scene_set_highlight (DhlrcScene *scene,
                                             const float *block);
 
+  /* Points the view at several blocks at once: `boxes` holds `count` boxes of
+   * six floats each, laid out as one box is for the highlight above — the low
+   * corner then the high one. A count of zero, or a null `boxes`, clears every
+   * pick. The picks are drawn in the highlight colour, after the region's box.
+   * Returns how many boxes were set. */
+  int32_t dhlrc_render_scene_set_highlights (DhlrcScene *scene,
+                                             const float *boxes, size_t count);
+
+  /* Sets the colour the picked blocks' boxes are drawn in: three floats, red
+   * first, each in 0..1 and clamped to it. NULL is ignored. */
+  void dhlrc_render_scene_set_highlight_colour (DhlrcScene *scene,
+                                                const float *rgb);
+
+  /* Sets the colour the region's box is drawn in, with the same three floats as
+   * the highlight colour. NULL is ignored. */
+  void dhlrc_render_scene_set_bounds_colour (DhlrcScene *scene,
+                                             const float *rgb);
+
+  /* Marks the cell chosen in the selected-blocks list, or clears the marker:
+   * `box` is the same six floats as the highlight takes, NULL clearing it. The
+   * marker is drawn after the region's box and the picks, in its own colour, so
+   * the cell a list points at stays visible. */
+  void dhlrc_render_scene_set_marker (DhlrcScene *scene, const float *box);
+
+  /* Sets the colour the marker's box is drawn in: three floats, red first, each
+   * in 0..1 and clamped to it. NULL is ignored. */
+  void dhlrc_render_scene_set_marker_colour (DhlrcScene *scene,
+                                             const float *rgb);
+
   /* The box the block at a whole-numbered position is drawn in, as the six
    * floats `dhlrc_render_scene_set_highlight` takes: a slab gives half a cell,
    * not the whole one. Returns 1, or 0 when the cell drew nothing (a block that
@@ -184,7 +213,7 @@ extern "C"
   int32_t dhlrc_render_scene_set_bounds (DhlrcScene *scene, const float *block);
 
   /* How many quads the boxes drawn over the scene come to — the region's extent
-   * and the block under the pointer together — or 0 when neither is shown. */
+   * and every picked block together — or 0 when nothing is shown. */
   size_t dhlrc_render_scene_overlay_count (const DhlrcScene *scene);
 
   /* One quad of those boxes, in the same shape as a scene quad. Returns 1, or

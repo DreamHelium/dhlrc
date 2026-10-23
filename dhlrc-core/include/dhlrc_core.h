@@ -239,6 +239,7 @@ extern "C"
     DHLRC_SETTING_STRING = 2,
     DHLRC_SETTING_PATH = 3,
     DHLRC_SETTING_ENUM = 4,
+    DHLRC_SETTING_COLOUR = 5,
   } DhlrcSettingType;
 
   /* One editable setting the core describes, so a frontend adds no per-setting

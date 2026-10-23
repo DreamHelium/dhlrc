@@ -91,11 +91,15 @@ const HIGHLIGHT_OFFSET: f32 = 0.002;
 const OVERLAY_TEXTURE: usize = 1;
 
 /// The colour the box under the pointer is drawn in: black, as the game does.
-const HIGHLIGHT_COLOUR: [u8; 3] = [0, 0, 0];
+pub(crate) const HIGHLIGHT_COLOUR: [u8; 3] = [0, 0, 0];
 
 /// The colour the region's own extent is drawn in, chosen to stand out from
 /// both the blocks and the dark background.
-const BOUNDS_COLOUR: [u8; 3] = [0, 200, 255];
+pub(crate) const BOUNDS_COLOUR: [u8; 3] = [0, 200, 255];
+
+/// The colour the marker's box is drawn in: a warm red-pink, chosen to differ
+/// from both the black picks and the cyan region outline.
+pub(crate) const MARKER_COLOUR: [u8; 3] = [0xff, 0x20, 0x60];
 
 /// The colour the region's extent is drawn in, for a renderer that checks what
 /// actually came out.
@@ -232,10 +236,20 @@ pub struct Scene {
     pub skipped: Vec<String>,
     /// The box the region is drawn in, when a view is showing its extent.
     pub bounds: Option<Highlight>,
-    /// The block a view is pointing at, when there is one.
-    pub highlight: Option<Highlight>,
-    /// What both of those come to: the quads drawn over the scene and after it.
-    /// Empty when neither is set.
+    /// The blocks a view has picked, each drawn as its own box. Empty when
+    /// nothing is picked.
+    pub highlights: Vec<Highlight>,
+    /// The colour every box of [`Scene::highlights`] is drawn in.
+    pub highlight_colour: [u8; 3],
+    /// The colour the region's own box is drawn in.
+    pub bounds_colour: [u8; 3],
+    /// The cell chosen in the selected-blocks list, drawn last so it stays
+    /// visible over every other box.
+    pub marker: Option<Highlight>,
+    /// The colour the marker's box is drawn in.
+    pub marker_colour: [u8; 3],
+    /// What all of those come to: the quads drawn over the scene and after it.
+    /// Empty when nothing is shown.
     pub overlay: Vec<SceneQuad>,
 }
 
@@ -277,9 +291,45 @@ impl Scene {
     ///
     /// The outline is part of the scene rather than something a renderer adds,
     /// so the software rasteriser and a GPU read it from the same place and
-    /// draw the same box.
+    /// draw the same box. This keeps one box; a view that picks several at once
+    /// hands them all over with [`Scene::set_highlights`].
     pub fn set_highlight(&mut self, highlight: Option<Highlight>) {
-        self.highlight = highlight;
+        self.set_highlights(highlight.into_iter().collect());
+    }
+
+    /// Points the view at several blocks at once, each drawn as its own box.
+    ///
+    /// An empty list clears them. A multi-select view keeps every pick here so
+    /// one rebuild draws all of them, in the order the picks were made.
+    pub fn set_highlights(&mut self, highlights: Vec<Highlight>) {
+        self.highlights = highlights;
+        self.rebuild_overlay();
+    }
+
+    /// The colour the picked blocks' boxes are drawn in.
+    pub fn set_highlight_colour(&mut self, colour: [u8; 3]) {
+        self.highlight_colour = colour;
+        self.rebuild_overlay();
+    }
+
+    /// The colour the region's box is drawn in.
+    pub fn set_bounds_colour(&mut self, colour: [u8; 3]) {
+        self.bounds_colour = colour;
+        self.rebuild_overlay();
+    }
+
+    /// Marks the cell chosen in the selected-blocks list, or clears the marker.
+    ///
+    /// The marker is drawn after the region's box and the picks, so the cell a
+    /// list points at stays visible even when it is also a picked block.
+    pub fn set_marker(&mut self, marker: Option<Highlight>) {
+        self.marker = marker;
+        self.rebuild_overlay();
+    }
+
+    /// The colour the marker's box is drawn in.
+    pub fn set_marker_colour(&mut self, colour: [u8; 3]) {
+        self.marker_colour = colour;
         self.rebuild_overlay();
     }
 
@@ -289,15 +339,21 @@ impl Scene {
         self.rebuild_overlay();
     }
 
-    /// The two boxes are kept apart so either can change on its own; what a
-    /// renderer draws is this one list.
+    /// The boxes are kept apart so either can change on its own; what a
+    /// renderer draws is this one list. The region's box comes first so the
+    /// picked blocks are drawn on top of it, and the marker last so it stays
+    /// visible over both.
     fn rebuild_overlay(&mut self) {
         self.overlay.clear();
         if let Some(bounds) = self.bounds {
-            self.overlay.extend(outline(bounds, BOUNDS_COLOUR));
+            self.overlay.extend(outline(bounds, self.bounds_colour));
         }
-        if let Some(highlight) = self.highlight {
-            self.overlay.extend(outline(highlight, HIGHLIGHT_COLOUR));
+        for highlight in &self.highlights {
+            self.overlay
+                .extend(outline(*highlight, self.highlight_colour));
+        }
+        if let Some(marker) = self.marker {
+            self.overlay.extend(outline(marker, self.marker_colour));
         }
     }
 }
@@ -318,7 +374,11 @@ impl Scene {
             max: [1.0; 3],
             skipped: Vec::new(),
             bounds: None,
-            highlight: None,
+            highlights: Vec::new(),
+            highlight_colour: HIGHLIGHT_COLOUR,
+            bounds_colour: BOUNDS_COLOUR,
+            marker: None,
+            marker_colour: MARKER_COLOUR,
             overlay: Vec::new(),
         }
     }
@@ -500,7 +560,11 @@ pub fn build_reported_slice(
         max: [size[0] as f32, (high_y + 1) as f32, size[2] as f32],
         skipped,
         bounds: None,
-        highlight: None,
+        highlights: Vec::new(),
+        highlight_colour: HIGHLIGHT_COLOUR,
+        bounds_colour: BOUNDS_COLOUR,
+        marker: None,
+        marker_colour: MARKER_COLOUR,
         overlay: Vec::new(),
     };
 
@@ -573,7 +637,11 @@ pub fn build_model(source: &dyn Source, model: &Identifier, block: &Identifier) 
         max: [1.0; 3],
         skipped: Vec::new(),
         bounds: None,
-        highlight: None,
+        highlights: Vec::new(),
+        highlight_colour: HIGHLIGHT_COLOUR,
+        bounds_colour: BOUNDS_COLOUR,
+        marker: None,
+        marker_colour: MARKER_COLOUR,
         overlay: Vec::new(),
     };
     if !scene.quads.is_empty() {
@@ -1146,9 +1214,124 @@ mod tests {
             max: [1.0, 1.0, 1.0],
         }));
         assert_eq!(scene.overlay.len(), 12 * 6);
-        assert_eq!(scene.highlight, Some(super::Highlight { min: [0.0, 0.0, 0.0], max: [1.0, 1.0, 1.0] }));
+        assert_eq!(
+            scene.highlights,
+            [super::Highlight {
+                min: [0.0, 0.0, 0.0],
+                max: [1.0, 1.0, 1.0]
+            }]
+        );
 
         scene.set_highlight(None);
         assert!(scene.overlay.is_empty());
+    }
+
+    #[test]
+    fn several_highlights_and_their_colours_all_share_the_overlay() {
+        let mut scene = super::Scene::empty();
+        assert_eq!(scene.highlight_colour, [0, 0, 0], "picked boxes are black");
+        assert_eq!(
+            scene.bounds_colour,
+            super::BOUNDS_COLOUR,
+            "the region box keeps its own colour"
+        );
+
+        let boxes = vec![
+            super::Highlight {
+                min: [0.0, 0.0, 0.0],
+                max: [1.0, 1.0, 1.0],
+            },
+            super::Highlight {
+                min: [2.0, 0.0, 0.0],
+                max: [3.0, 1.0, 1.0],
+            },
+            super::Highlight {
+                min: [4.0, 0.0, 0.0],
+                max: [5.0, 1.0, 1.0],
+            },
+        ];
+        scene.set_highlights(boxes.clone());
+        assert_eq!(scene.highlights, boxes);
+        assert_eq!(scene.overlay.len(), 3 * 12 * 6, "one box per pick");
+
+        /* Both colours are the scene's, and a change rebuilds the overlay. */
+        scene.set_highlight_colour([255, 0, 0]);
+        assert_eq!(scene.overlay[0].tint, Some([255, 0, 0]));
+        scene.set_bounds_colour([0, 255, 0]);
+        assert!(
+            scene
+                .overlay
+                .iter()
+                .all(|quad| quad.tint == Some([255, 0, 0]))
+        );
+
+        /* The region's box is drawn first, in its own colour, and the picks
+         * follow it in the order they were given. */
+        scene.set_bounds(Some(super::Highlight {
+            min: [0.0, 0.0, 0.0],
+            max: [8.0, 8.0, 8.0],
+        }));
+        assert_eq!(scene.overlay.len(), 4 * 12 * 6);
+        assert_eq!(scene.overlay[0].tint, Some([0, 255, 0]));
+        for (index, quad) in scene.overlay[12 * 6..].iter().enumerate() {
+            assert_eq!(
+                quad.tint,
+                Some([255, 0, 0]),
+                "picked box at chunk {index} is its own colour"
+            );
+        }
+
+        /* An empty list clears every pick without touching the region's box. */
+        scene.set_highlights(Vec::new());
+        assert!(scene.highlights.is_empty());
+        assert_eq!(scene.overlay.len(), 12 * 6);
+        assert_eq!(scene.overlay[0].tint, Some([0, 255, 0]));
+    }
+
+    #[test]
+    fn the_marker_is_drawn_last_in_its_own_colour() {
+        let mut scene = super::Scene::empty();
+        scene.set_marker(Some(super::Highlight {
+            min: [1.0, 0.0, 1.0],
+            max: [2.0, 1.0, 2.0],
+        }));
+        assert_eq!(scene.marker.unwrap().min, [1.0, 0.0, 1.0]);
+        assert_eq!(
+            scene.overlay.len(),
+            12 * 6,
+            "a marker is drawn as one box"
+        );
+        assert!(
+            scene.overlay.iter().all(|quad| quad.tint == Some([255, 32, 96])),
+            "a fresh marker keeps the default colour"
+        );
+
+        /* The marker is drawn after the region's box and every pick, so it
+         * stays visible even over a picked block. */
+        scene.set_bounds(Some(super::Highlight {
+            min: [0.0, 0.0, 0.0],
+            max: [8.0, 8.0, 8.0],
+        }));
+        scene.set_highlight(Some(super::Highlight {
+            min: [1.0, 0.0, 1.0],
+            max: [2.0, 1.0, 2.0],
+        }));
+        scene.set_marker_colour([0, 0, 255]);
+        assert_eq!(scene.overlay.len(), 3 * 12 * 6);
+        assert_eq!(scene.overlay[0].tint, Some(super::BOUNDS_COLOUR));
+        assert_eq!(
+            scene.overlay[12 * 6].tint,
+            Some(super::HIGHLIGHT_COLOUR)
+        );
+        assert_eq!(
+            scene.overlay[2 * 12 * 6].tint,
+            Some([0, 0, 255]),
+            "the marker's box comes last"
+        );
+
+        /* Clearing the marker removes its box and leaves the rest alone. */
+        scene.set_marker(None);
+        assert!(scene.marker.is_none());
+        assert_eq!(scene.overlay.len(), 2 * 12 * 6);
     }
 }
