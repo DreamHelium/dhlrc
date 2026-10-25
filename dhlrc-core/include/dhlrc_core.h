@@ -217,6 +217,10 @@ extern "C"
                                             const char *type, int32_t kind);
   void dhlrc_core_plugin_set_use_configured (DhlrcCore *core, const char *type,
                                              int32_t kind, bool value);
+  /* The value `dhlrc_core_plugin_use_configured` reports for a plugin with no
+   * saved switch: 1 for reading (saved options, no question), 0 for writing.
+   * A frontend's "restore defaults" uses it instead of guessing `false`. */
+  int32_t dhlrc_core_plugin_default_use_configured (int32_t kind);
   /* Reads one plugin option; returns 1 when it was set, 0 otherwise. */
   int32_t dhlrc_core_plugin_get_bool (const DhlrcCore *core, const char *type,
                                       int32_t kind, const char *key,

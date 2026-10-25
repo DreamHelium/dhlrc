@@ -49,6 +49,19 @@ pub fn quads(block: &BlockModel) -> Vec<Quad> {
     let mut quads = Vec::new();
     for element in &block.model.elements {
         for (direction, face) in &element.faces {
+            /* A flat model - a rail, a wire, a lily pad - is a plane with an
+             * up and a down face at the very same height. The down face is
+             * read first (the map orders `down` before `up`), so its darker,
+             * mirrored copy wins the depth test and the plane looks unlit,
+             * with textures running backwards on curves. The up face is the
+             * one the game shows; the plane still draws from below, because
+             * faces are not culled. */
+            if *direction == Direction::Down
+                && element.from[1] == element.to[1]
+                && element.faces.contains_key(&Direction::Up)
+            {
+                continue;
+            }
             quads.push(quad(&block.model, *direction, element, face, &block.variant));
         }
     }
@@ -858,5 +871,42 @@ mod tests {
         let mut us: Vec<f32> = up.uv.iter().map(|uv| uv[0]).collect();
         us.sort_by(f32::total_cmp);
         assert_eq!(us, [0.25, 0.25, 0.75, 0.75]);
+    }
+
+    #[test]
+    fn a_flat_plane_keeps_only_its_up_face() {
+        /* A rail is a plane with no thickness: the down and up faces are the
+         * same rectangle, and the down one comes first. Only the up face is
+         * kept, so the darker copy cannot win the depth test and make the
+         * plane look unlit. */
+        let mut faces = BTreeMap::new();
+        for direction in [Direction::Down, Direction::Up] {
+            faces.insert(
+                direction,
+                Face {
+                    texture: "#all".to_owned(),
+                    uv: None,
+                    cullface: None,
+                    rotation: 0,
+                    tint: None,
+                },
+            );
+        }
+        let model = ResolvedModel {
+            textures: BTreeMap::from([("all".to_owned(), "minecraft:block/rail".to_owned())]),
+            elements: vec![Element {
+                from: [0.0, 1.0, 0.0],
+                to: [16.0, 1.0, 16.0],
+                rotation: None,
+                shade: true,
+                faces,
+            }],
+            ambient_occlusion: false,
+            chain: Vec::new(),
+        };
+        let quads = quads(&block(model));
+        assert_eq!(quads.len(), 1, "one plane, drawn once");
+        let got = normal(&quads[0]);
+        assert!(got[1] > 0.9, "the up face is the one kept: {got:?}");
     }
 }

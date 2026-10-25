@@ -18,6 +18,7 @@
 
 class DhGpuWidget;
 class QLabel;
+class QTimer;
 
 /* Shows a region drawn in three dimensions, and lets the user turn it.
  *
@@ -178,9 +179,10 @@ public:
    * the click selection; kept for owners that visit the region themselves. */
   void setBlockEnumerator (BlockEnumerator enumerator);
 
-  /* The colour of the outline around the selected and hovered cells, and of
-   * the box around the region being drawn. Applied to the scene now and kept
-   * for every scene adopted later. */
+  /* The colour of the outline around the selected cells, and of the box
+   * around the region being drawn. Applied to the scene now and kept for every
+   * scene adopted later. The hover box picks its own colour from the
+   * background so a click on the hovered block changes the outline. */
   void setHighlightColour (const QColor &colour);
   void setBoundsColour (const QColor &colour);
 
@@ -315,6 +317,10 @@ private:
   /* The block the outline is around, and where the pointer was when it was
    * found, so the tooltip can follow a pointer that stays over it. */
   QLabel *tip = nullptr;
+  /* A single-shot timer that looks up what is under the pointer once a resize
+   * has stopped, so a drag of the window edge does not re-pick (and move the
+   * tooltip) on every step of it. */
+  QTimer *hoverSettle = nullptr;
   QPoint hoverPoint;
   int hoverBlock[3] = { 0, 0, 0 };
   bool hovered = false;

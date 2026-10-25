@@ -775,6 +775,55 @@ pub unsafe extern "C" fn dhlrc_render_scene_set_highlight_colour(
     scene.scene.set_highlight_colour(colour_bytes(rgb));
 }
 
+/// Points the view at the block under the pointer, or at nothing.
+///
+/// `block` is six floats as [`dhlrc_render_scene_set_highlight`] takes, or null
+/// to clear the hover box. The hover box is drawn before the picks and in its
+/// own colour, so a frontend can draw the pointer's box and the picked boxes
+/// separately; the Qt view drops the hover box once its cell is picked.
+///
+/// # Safety
+///
+/// `scene` must be a pointer this library returned, and `block` readable for
+/// six `float`s when it is not null.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn dhlrc_render_scene_set_hover(scene: *mut DhlrcScene, block: *const f32) {
+    let Some(scene) = (unsafe { scene.as_mut() }) else {
+        return;
+    };
+    if block.is_null() {
+        scene.scene.set_hover(None);
+        return;
+    }
+    let box6 = unsafe { slice::from_raw_parts(block, 6) };
+    scene.scene.set_hover(Some(dhlrc_render::Highlight {
+        min: [box6[0], box6[1], box6[2]],
+        max: [box6[3], box6[4], box6[5]],
+    }));
+}
+
+/// Sets the colour the hover box is drawn in, with the same three clamped
+/// floats as [`dhlrc_render_scene_set_highlight_colour`]. Null is ignored.
+///
+/// # Safety
+///
+/// `scene` must be a pointer this library returned, and `rgb` readable for
+/// three `float`s when it is not null.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn dhlrc_render_scene_set_hover_colour(
+    scene: *mut DhlrcScene,
+    rgb: *const f32,
+) {
+    let Some(scene) = (unsafe { scene.as_mut() }) else {
+        return;
+    };
+    if rgb.is_null() {
+        return;
+    }
+    let rgb = unsafe { slice::from_raw_parts(rgb, 3) };
+    scene.scene.set_hover_colour(colour_bytes(rgb));
+}
+
 /// Sets the colour the region's box is drawn in, with the same three clamped
 /// floats as [`dhlrc_render_scene_set_highlight_colour`]. Null is ignored.
 ///
@@ -1129,6 +1178,8 @@ mod tests {
             bounds: None,
             highlights: Vec::new(),
             highlight_colour: [0, 0, 0],
+            hover: None,
+            hover_colour: [255, 255, 255],
             bounds_colour: [0, 200, 255],
             marker: None,
             marker_colour: [0xff, 0x20, 0x60],
@@ -1202,9 +1253,11 @@ mod tests {
             "the white texel the tint colours as the outline"
         );
         assert_eq!(quad.alpha, ALPHA_OPAQUE);
+        /* The outline is a set of thin boxes around the cell: the offset keeps
+         * it off the block and the thickness reaches a little further out. */
         for position in quad.positions {
             for axis in 0..3 {
-                assert!((block[axis] - 0.05..=block[axis + 3] + 0.05).contains(&position[axis]));
+                assert!((block[axis] - 0.2..=block[axis + 3] + 0.2).contains(&position[axis]));
             }
         }
 

@@ -77,6 +77,25 @@ public:
    * "one block above" shift — so a caller can show what was written. */
   void target (qint32 *x, qint32 *y, qint32 *z) const;
 
+  /* Set before the dialog is shown when the caller will write one chosen state
+   * into `count` cells at once (the 3D view's multi-selection replace). The
+   * dialog then writes nothing itself: it hides the position controls and the
+   * "one block above" switch, because neither means anything for a batch, and
+   * the position label says how many cells are being replaced. The caller reads
+   * the state with `chosenState ()` after `exec ()` returned Accepted. */
+  void setBatchReplace (qsizetype count);
+  [[nodiscard]] bool
+  isBatchReplace () const
+  {
+    return batchCount > 0;
+  }
+
+  /* The chosen block and its property values; false when nothing is selected.
+   * For a batch replace this is the state the caller has to write, since the
+   * dialog does not write it. */
+  bool chosenState (QString *name,
+                    QList<QPair<QString, QString>> *properties) const;
+
 Q_SIGNALS:
   /* Emitted after a write succeeded, so the caller can refresh its view of the
    * block. The region's own `changed` fires as well. */
@@ -129,6 +148,12 @@ private:
   QString currentName;
   QList<QPair<QString, QString>> currentProperties;
   QLabel *lockedHint = nullptr;
+  /* The whole position row, in a widget of its own so a batch replace can hide
+   * it in one step. */
+  QWidget *positionRowWidget = nullptr;
+  /* Non-zero when this dialog chooses a state for that many cells; see
+   * `setBatchReplace ()`. */
+  qsizetype batchCount = 0;
   /* The cell can be typed as well as pointed at: an empty cell cannot be
    * clicked in a 3D view, and a block a few cells away is easier to name. */
   QSpinBox *positionX = nullptr;

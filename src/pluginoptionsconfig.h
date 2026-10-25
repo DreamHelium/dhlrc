@@ -49,6 +49,12 @@ public:
   [[nodiscard]] bool useConfigured (const QString &type,
                                     ConfigObjectItems::Kind kind) const;
 
+  /* What `useConfigured` reports when nothing has been saved for `type` yet:
+   * reading follows the saved options, writing asks. The settings dialog puts
+   * it into the item's default, so "restore defaults" does not flip reading
+   * back to asking. */
+  [[nodiscard]] static bool defaultUseConfigured (ConfigObjectItems::Kind kind);
+
   /* Writes the saved values of `type` into a plugin object the caller owns. */
   void apply (const QString &type, ConfigObjectItems::Kind kind,
               void *object) const;

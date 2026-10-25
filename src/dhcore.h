@@ -91,6 +91,10 @@ public:
   /* Plugin options. `kind` is 0 for input, 1 for output. */
   [[nodiscard]] bool pluginUseConfigured (const QString &type, int kind) const;
   void setPluginUseConfigured (const QString &type, int kind, bool value);
+  /* What `pluginUseConfigured` reports for a plugin that has no saved switch:
+   * true for reading (use the saved options), false for writing (ask). A
+   * settings dialog's "restore defaults" needs this value. Needs no instance. */
+  [[nodiscard]] static bool pluginDefaultUseConfigured (int kind);
   [[nodiscard]] bool pluginGetBool (const QString &type, int kind,
                                     const QString &key, bool *out) const;
   void pluginSetBool (const QString &type, int kind, const QString &key,
@@ -121,6 +125,11 @@ public:
 
   /* Re-reads the configuration from the core into the cache. */
   void refresh ();
+
+  /* Tells the open views that the configuration changed from this frontend
+   * (the settings dialog applied it). The watcher emits `configChanged` for a
+   * change made outside the program, so this is only for the local writer. */
+  void notifyConfigChanged ();
 
   /* The raw C handle, for the places that talk to the core directly (the
    * module libraries, for instance). */

@@ -8,6 +8,7 @@
 #include <QPainter>
 #include <QRect>
 #include <QResizeEvent>
+#include <QTimer>
 #include <QToolTip>
 #include <QWheelEvent>
 #include <libintl.h>
@@ -24,6 +25,14 @@ const double TURN_PER_PIXEL = 0.4;
 /* How much of the distance one wheel notch takes away. */
 const double ZOOM_PER_NOTCH = 0.88;
 
+/* How long the widget waits after the last resize before it looks up what is
+ * under the pointer again. A drag of the window edge sends a resize for every
+ * pixel, and the projection has to follow all of them, but the pick behind the
+ * outline and the tooltip only has to be right once the size has settled;
+ * doing it per step is what makes the outline and the tooltip wander while the
+ * picture is still changing size. */
+const int HOVER_SETTLE_MS = 120;
+
 /* The three 0..1 components the renderer's colour calls take. */
 void
 colourFloats (const QColor &colour, float *out)
@@ -31,6 +40,27 @@ colourFloats (const QColor &colour, float *out)
   out[0] = static_cast<float> (colour.redF ());
   out[1] = static_cast<float> (colour.greenF ());
   out[2] = static_cast<float> (colour.blueF ());
+}
+
+/* The colour the box under the pointer is drawn in.
+ *
+ * It has to stand out from the background, and from the picked colour too: a
+ * click picks exactly the block the pointer is already over, so if both boxes
+ * had the same colour the press would leave the outline looking unchanged. On
+ * the rare background where the contrasting black or white is the picked
+ * colour as well, a cyan takes over so the two stay apart. */
+QColor
+hoverColourFor (const QColor &background, const QColor &picked)
+{
+  const bool light = background.lightnessF () > 0.5;
+  const QColor contrast = light ? QColor (0, 0, 0) : QColor (255, 255, 255);
+  const int distance
+      = qMax (qAbs (contrast.red () - picked.red ()),
+              qMax (qAbs (contrast.green () - picked.green ()),
+                    qAbs (contrast.blue () - picked.blue ())));
+  if (distance < 96)
+    return light ? QColor (0, 150, 255) : QColor (0, 229, 255);
+  return contrast;
 }
 } // namespace
 
@@ -59,6 +89,13 @@ DhRenderWidget::DhRenderWidget (QWidget *parent) : QWidget (parent)
   tip->setAttribute (Qt::WA_TransparentForMouseEvents);
   tip->setAttribute (Qt::WA_ShowWithoutActivating);
   tip->hide ();
+
+  /* Looks the block under the pointer up again once a resize has stopped; see
+   * `resizeEvent ()`. */
+  hoverSettle = new QTimer (this);
+  hoverSettle->setSingleShot (true);
+  hoverSettle->setInterval (HOVER_SETTLE_MS);
+  connect (hoverSettle, &QTimer::timeout, this, [this] { rehover (); });
 
   /* The GPU child is the picture; the parent keeps the events, the CPU
    * fallback and the problem text. A machine that cannot give a context gets
@@ -300,11 +337,23 @@ DhRenderWidget::rebuildHighlights ()
 {
   if (!scene)
     return;
-  /* The whole set goes in one call, so a hover adds its box to the selected
-   * ones instead of replacing them. The selection's boxes were converted when
-   * it changed; only the hover box is worked out here. */
-  std::vector<float> boxes = selectionBoxes;
-  if (hovered)
+  /* The selection's boxes were converted when it changed; only the hover box
+   * is worked out here. The hover goes to its own call so the pointer's box and
+   * a picked box over the same cell keep their own colours. */
+  dhlrc_render_scene_set_highlights (
+      scene.get (), selectionBoxes.empty () ? nullptr : selectionBoxes.data (),
+      selectionBoxes.size () / 6);
+  /* A picked block is already outlined by its selection box; keeping the
+   * pointer's box as well would either hide it (both boxes have the same
+   * geometry, so the one drawn last loses the depth test) or paint over it, and
+   * the click would look like it did nothing. The selection's own colour takes
+   * over as soon as the block is picked. */
+  const BlockCell hoverCell{ hoverBlock[0], hoverBlock[1], hoverBlock[2] };
+  const bool hoverPicked
+      = hovered
+        && std::find (selection.begin (), selection.end (), hoverCell)
+               != selection.end ();
+  if (hovered && !hoverPicked)
     {
       float box[6] = { static_cast<float> (hoverBlock[0]),
                        static_cast<float> (hoverBlock[1]),
@@ -317,11 +366,10 @@ DhRenderWidget::rebuildHighlights ()
        * whole cell. */
       dhlrc_render_scene_block_box (scene.get (), hoverBlock[0], hoverBlock[1],
                                     hoverBlock[2], box);
-      boxes.insert (boxes.end (), box, box + 6);
+      dhlrc_render_scene_set_hover (scene.get (), box);
     }
-  dhlrc_render_scene_set_highlights (scene.get (),
-                                     boxes.empty () ? nullptr : boxes.data (),
-                                     boxes.size () / 6);
+  else
+    dhlrc_render_scene_set_hover (scene.get (), nullptr);
   /* The outlines share the overlay's own small buffer, so only that buffer is
    * read again, never the scene's. */
   if (gpu && useGpu)
@@ -337,6 +385,8 @@ DhRenderWidget::applyColours ()
       float rgb[3] = { 0.0f, 0.0f, 0.0f };
       colourFloats (highlightColour, rgb);
       dhlrc_render_scene_set_highlight_colour (scene.get (), rgb);
+      colourFloats (hoverColourFor (backgroundColour, highlightColour), rgb);
+      dhlrc_render_scene_set_hover_colour (scene.get (), rgb);
       colourFloats (boundsColour, rgb);
       dhlrc_render_scene_set_bounds_colour (scene.get (), rgb);
       colourFloats (markerColour, rgb);
@@ -376,9 +426,9 @@ DhRenderWidget::setBackgroundColour (const QColor &colour)
   if (colour == backgroundColour)
     return;
   backgroundColour = colour;
-  /* The CPU fallback paints it and the GL child clears to it. */
-  if (gpu)
-    gpu->setBackgroundColour (backgroundColour);
+  /* The hover colour follows the background, so the outline colours are
+   * applied again; that also hands the GL child its new clear colour. */
+  applyColours ();
   update ();
 }
 
@@ -542,20 +592,36 @@ DhRenderWidget::resizeEvent (QResizeEvent *event)
       dhlrc_render_fit (scene.get (), &camera, width (), height ());
       framed = true;
     }
-  applyCamera ();
+  /* The camera's projection is the widget's size, so it is handed over on
+   * every step. What sits under the pointer is not looked up per step: the
+   * picture is about to change size again, and a pick plus an outline rebuild
+   * (and a tooltip moved to a different corner) on every pixel of a drag is
+   * what makes resizing the view feel like it is shaking. Once the size has
+   * settled the block under the pointer is found again. */
+  if (gpu)
+    gpu->setCamera (camera);
+  update ();
+  if (hoverSettle)
+    hoverSettle->start ();
 }
 
 void
 DhRenderWidget::paintEvent (QPaintEvent *)
 {
+  /* The panel behind the picture is painted even while the GL child draws it:
+   * the child is a sibling window, so any moment it is absent — a fallback, a
+   * rebuilt context, a resize that has not reached it yet — the area it covers
+   * must show the renderer's own background rather than whatever the backing
+   * store happened to hold. It costs one fill of an area that is hidden again
+   * as soon as the child has a picture. */
+  QPainter painter (this);
+  painter.fillRect (rect (), backgroundColour);
+
   /* While the GL child is drawing it covers the whole widget, so the CPU
    * picture would only be painted over. This is also the fallback path: with
    * no scene, or after a GL frame failed, the rasteriser draws here. */
   if (useGpu && scene != nullptr)
     return;
-
-  QPainter painter (this);
-  painter.fillRect (rect (), backgroundColour);
   if (!scene)
     {
       painter.setPen (Qt::white);

@@ -1495,6 +1495,17 @@ fn default_use_configured(kind: i32) -> bool {
     kind != KIND_OUTPUT
 }
 
+/// The value [`dhlrc_core_plugin_use_configured`] reports for a plugin that has
+/// no saved switch yet.
+///
+/// A frontend's "restore defaults" needs it: resetting the switch to a
+/// hard-coded `false` would make reading ask again, which is the opposite of
+/// what a plugin that was never configured does.
+#[unsafe(no_mangle)]
+pub extern "C" fn dhlrc_core_plugin_default_use_configured(kind: i32) -> i32 {
+    i32::from(default_use_configured(kind))
+}
+
 /// One plugin's options for one direction, read-only.
 fn direction<'a>(config: &'a Config, type_name: &str, kind: i32) -> Option<&'a PluginDirection> {
     let entry = config.plugins.get(type_name)?;

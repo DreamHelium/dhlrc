@@ -116,8 +116,12 @@ BlockPickerUI::BlockPickerUI (std::shared_ptr<RegionClass> region, qint32 x,
   positionRow->addWidget (positionY);
   positionRow->addWidget (positionZ);
   positionRow->addStretch (1);
-  ui->verticalLayout->insertLayout (ui->verticalLayout->indexOf (ui->positionLabel),
-                                    positionRow);
+  /* The row lives in a widget of its own so a batch replace can hide the whole
+   * position choice: a batch has no single cell to type. */
+  positionRowWidget = new QWidget (this);
+  positionRowWidget->setLayout (positionRow);
+  ui->verticalLayout->insertWidget (ui->verticalLayout->indexOf (ui->positionLabel),
+                                    positionRowWidget);
   connect (regionClass.get (), &RegionClass::lockedChanged, this,
            [this] (bool locked) { setEditable (!locked); });
 
@@ -189,6 +193,35 @@ BlockPickerUI::target (qint32 *x, qint32 *y, qint32 *z) const
   *x = blockX;
   *y = blockY + (ui->aboveCheckBox->isChecked () ? 1 : 0);
   *z = blockZ;
+}
+
+void
+BlockPickerUI::setBatchReplace (qsizetype count)
+{
+  batchCount = std::max<qsizetype> (count, 0);
+  if (!isBatchReplace ())
+    return;
+  /* The caller writes one chosen state into a whole multi-selection, so the
+   * typed cell and the "one block above" shift mean nothing here; hiding them
+   * also keeps the position label free for the count. */
+  positionRowWidget->hide ();
+  ui->aboveCheckBox->hide ();
+  ui->positionLabel->setWordWrap (true);
+  updateTarget ();
+}
+
+bool
+BlockPickerUI::chosenState (
+    QString *name, QList<QPair<QString, QString>> *properties) const
+{
+  const auto *block = selectedBlock ();
+  if (!block)
+    return false;
+  if (name)
+    *name = block->name;
+  if (properties)
+    *properties = chosenProperties ();
+  return true;
 }
 
 void
@@ -565,6 +598,16 @@ BlockPickerUI::showProperties ()
 void
 BlockPickerUI::updateTarget ()
 {
+  if (isBatchReplace ())
+    {
+      ui->positionLabel->setText (
+          QString (_ ("Replaces the %1 selected blocks with the chosen state."))
+              .arg (batchCount));
+      ui->buttonBox->button (QDialogButtonBox::Ok)
+          ->setEnabled (selectedBlock () != nullptr && !regionClass->locked ());
+      return;
+    }
+
   const bool above = ui->aboveCheckBox->isChecked ();
   const qint32 targetY = blockY + (above ? 1 : 0);
   /* A plain bounds test against the cached size: this runs from the
@@ -621,6 +664,13 @@ BlockPickerUI::okBtn_clicked ()
   const auto *block = selectedBlock ();
   if (!block)
     return;
+  /* A batch replace only chooses the state; the caller writes it, so neither
+   * the typed cell nor the cell check applies. */
+  if (isBatchReplace ())
+    {
+      accept ();
+      return;
+    }
   /* The typed cell is the one written; the fields are read again here so the
    * write never depends on a signal having arrived first. */
   blockX = positionX->value ();

@@ -90,7 +90,17 @@ const HIGHLIGHT_OFFSET: f32 = 0.002;
 /// magenta and black texels multiply into the colour.
 const OVERLAY_TEXTURE: usize = 1;
 
-/// The colour the box under the pointer is drawn in: black, as the game does.
+/// The colour the box under the pointer is drawn in.
+///
+/// It is kept apart from [`Scene::highlight_colour`] because the two boxes are
+/// often over the same cell: a click picks the block the pointer already
+/// hovers, and a view that drew both in one colour gave no sign that anything
+/// had happened. A frontend sets this to whatever stands out from its
+/// background.
+pub(crate) const HOVER_COLOUR: [u8; 3] = [0xff, 0xff, 0xff];
+
+/// The colour the picked blocks' boxes are drawn in: black, as the game does.
+/// The hover box has its own, [`HOVER_COLOUR`].
 pub(crate) const HIGHLIGHT_COLOUR: [u8; 3] = [0, 0, 0];
 
 /// The colour the region's own extent is drawn in, chosen to stand out from
@@ -108,8 +118,11 @@ pub fn bounds_colour() -> [u8; 3] {
 }
 
 /// How thick the outline's lines are, in blocks: a block is 1 across, so this
-/// is a thirty-second of it — about a pixel in a view of a few dozen blocks.
-const HIGHLIGHT_THICKNESS: f32 = 1.0 / 32.0;
+/// is an eighth of it. An outline is only a few pixels wide in a view of a few
+/// dozen blocks, and the rasteriser drops a quad that misses every pixel
+/// centre, so thinner lines came and went with the camera instead of showing
+/// the pick.
+const HIGHLIGHT_THICKNESS: f32 = 1.0 / 8.0;
 
 /// The twelve edges of `highlight` as thin boxes, one quad per face.
 ///
@@ -241,6 +254,11 @@ pub struct Scene {
     pub highlights: Vec<Highlight>,
     /// The colour every box of [`Scene::highlights`] is drawn in.
     pub highlight_colour: [u8; 3],
+    /// The block under the pointer, drawn before the picks so a picked block
+    /// keeps its own colour when the two boxes are over the same cell.
+    pub hover: Option<Highlight>,
+    /// The colour [`Scene::hover`] is drawn in.
+    pub hover_colour: [u8; 3],
     /// The colour the region's own box is drawn in.
     pub bounds_colour: [u8; 3],
     /// The cell chosen in the selected-blocks list, drawn last so it stays
@@ -312,6 +330,23 @@ impl Scene {
         self.rebuild_overlay();
     }
 
+    /// Points the view at the block under the pointer, or at nothing.
+    ///
+    /// This is separate from [`Scene::set_highlight`] because a click picks
+    /// exactly the block that is already hovered: the two boxes are kept apart
+    /// so a frontend can show the pointer's box and the pick over the same cell
+    /// in different colours, or drop the hover box once the cell is picked.
+    pub fn set_hover(&mut self, hover: Option<Highlight>) {
+        self.hover = hover;
+        self.rebuild_overlay();
+    }
+
+    /// The colour the box under the pointer is drawn in.
+    pub fn set_hover_colour(&mut self, colour: [u8; 3]) {
+        self.hover_colour = colour;
+        self.rebuild_overlay();
+    }
+
     /// The colour the region's box is drawn in.
     pub fn set_bounds_colour(&mut self, colour: [u8; 3]) {
         self.bounds_colour = colour;
@@ -341,12 +376,16 @@ impl Scene {
 
     /// The boxes are kept apart so either can change on its own; what a
     /// renderer draws is this one list. The region's box comes first so the
-    /// picked blocks are drawn on top of it, and the marker last so it stays
-    /// visible over both.
+    /// picked blocks are drawn on top of it, the hover box before the picks so
+    /// a picked block keeps its own colour under the pointer, and the marker
+    /// last so it stays visible over both.
     fn rebuild_overlay(&mut self) {
         self.overlay.clear();
         if let Some(bounds) = self.bounds {
             self.overlay.extend(outline(bounds, self.bounds_colour));
+        }
+        if let Some(hover) = self.hover {
+            self.overlay.extend(outline(hover, self.hover_colour));
         }
         for highlight in &self.highlights {
             self.overlay
@@ -376,6 +415,8 @@ impl Scene {
             bounds: None,
             highlights: Vec::new(),
             highlight_colour: HIGHLIGHT_COLOUR,
+            hover: None,
+            hover_colour: HOVER_COLOUR,
             bounds_colour: BOUNDS_COLOUR,
             marker: None,
             marker_colour: MARKER_COLOUR,
@@ -562,6 +603,8 @@ pub fn build_reported_slice(
         bounds: None,
         highlights: Vec::new(),
         highlight_colour: HIGHLIGHT_COLOUR,
+        hover: None,
+        hover_colour: HOVER_COLOUR,
         bounds_colour: BOUNDS_COLOUR,
         marker: None,
         marker_colour: MARKER_COLOUR,
@@ -579,7 +622,7 @@ pub fn build_reported_slice(
                 };
                 for piece in &entry.pieces {
                     if let Some(direction) = piece.cullface {
-                        if hidden(voxels, &entries, x, y, z, direction) {
+                        if hidden(voxels, &entries, x, y, z, direction, low_y, high_y) {
                             continue;
                         }
                     }
@@ -639,6 +682,8 @@ pub fn build_model(source: &dyn Source, model: &Identifier, block: &Identifier) 
         bounds: None,
         highlights: Vec::new(),
         highlight_colour: HIGHLIGHT_COLOUR,
+        hover: None,
+        hover_colour: HOVER_COLOUR,
         bounds_colour: BOUNDS_COLOUR,
         marker: None,
         marker_colour: MARKER_COLOUR,
@@ -683,6 +728,12 @@ fn is_empty(name: &Identifier) -> bool {
 }
 
 /// Whether the block on the `direction` side of `(x, y, z)` hides the face.
+///
+/// Only layers `low_y..=high_y` are drawn, so a neighbour above or below that
+/// range is treated as air: the top layer of a slice shows its top faces and
+/// its bottom layer shows its bottom faces, whatever the region holds beyond
+/// the slice. Without this a slice of a solid region loses the very faces that
+/// show it as a slab, and `y` above the slice still "has something above it".
 fn hidden(
     voxels: &dyn Voxels,
     entries: &[Option<Entry>],
@@ -690,9 +741,15 @@ fn hidden(
     y: i32,
     z: i32,
     direction: Direction,
+    low_y: i32,
+    high_y: i32,
 ) -> bool {
     let [dx, dy, dz] = direction.offset();
-    let neighbour = [x + dx as i32, y + dy as i32, z + dz as i32];
+    let neighbour_y = y + dy as i32;
+    if neighbour_y < low_y || neighbour_y > high_y {
+        return false;
+    }
+    let neighbour = [x + dx as i32, neighbour_y, z + dz as i32];
     let Some(index) = voxels.block(neighbour[0], neighbour[1], neighbour[2]) else {
         return false;
     };
@@ -1096,11 +1153,11 @@ mod tests {
             }
             /* Nothing strays from the block it is drawn around: the box is
              * grown by the outline's own offset and line thickness, no more. */
+            let slack = super::HIGHLIGHT_OFFSET + super::HIGHLIGHT_THICKNESS + 0.02;
             for position in quad.positions {
                 for axis in 0..3 {
-                    /* The offset and half a line's thickness, with room over. */
-                    let low = highlight.min[axis] - 0.05;
-                    let high = highlight.max[axis] + 0.05;
+                    let low = highlight.min[axis] - slack;
+                    let high = highlight.max[axis] + slack;
                     assert!(
                         (low..=high).contains(&position[axis]),
                         "{position:?} at axis {axis}"
@@ -1170,6 +1227,43 @@ mod tests {
         /* A slice with nothing in it draws nothing. */
         let empty = super::build_slice(&source, &voxels, Some((3, 1)));
         assert!(empty.quads.is_empty());
+    }
+
+    #[test]
+    fn a_slice_shows_its_own_top_and_bottom_faces() {
+        /* Blocks beyond the slice must count as air when culling, or a slice
+         * of a solid region loses the faces that make its top and bottom
+         * layers read as a surface: the layer above the slice still has
+         * "something above it". */
+        let source = cube_source();
+        let voxels = Solid { size: [2, 4, 2] };
+        let middle = super::build_slice(&source, &voxels, Some((1, 2)));
+
+        let flat_at = |height: f32| {
+            middle
+                .quads
+                .iter()
+                .filter(|quad| quad.positions.iter().all(|corner| (corner[1] - height).abs() < 1e-3))
+                .count()
+        };
+        /* The bottom of the bottom layer and the top of the top layer, one
+         * face per block of a 2 by 2 layer. */
+        assert_eq!(flat_at(1.0), 4, "the slice's bottom layer has no bottom faces");
+        assert_eq!(flat_at(3.0), 4, "the slice's top layer has no top faces");
+
+        /* The whole region still culls the faces between layers: only its own
+         * top and bottom are drawn. */
+        let whole = build(&source, &voxels);
+        let flat_whole = |height: f32| {
+            whole
+                .quads
+                .iter()
+                .filter(|quad| quad.positions.iter().all(|corner| (corner[1] - height).abs() < 1e-3))
+                .count()
+        };
+        assert_eq!(flat_whole(0.0), 4);
+        assert_eq!(flat_whole(4.0), 4);
+        assert_eq!(flat_whole(1.0) + flat_whole(3.0), 0, "interior faces stay culled");
     }
 
     #[test]
@@ -1286,6 +1380,44 @@ mod tests {
         assert!(scene.highlights.is_empty());
         assert_eq!(scene.overlay.len(), 12 * 6);
         assert_eq!(scene.overlay[0].tint, Some([0, 255, 0]));
+    }
+
+    #[test]
+    fn the_hover_is_drawn_before_the_picks_in_its_own_colour() {
+        let mut scene = super::Scene::empty();
+        assert_eq!(scene.hover_colour, super::HOVER_COLOUR);
+        let cell = super::Highlight {
+            min: [1.0, 0.0, 1.0],
+            max: [2.0, 1.0, 2.0],
+        };
+        scene.set_hover_colour([255, 255, 255]);
+        scene.set_hover(Some(cell));
+        assert_eq!(scene.hover, Some(cell));
+        assert_eq!(scene.overlay.len(), 12 * 6);
+        assert!(
+            scene.overlay.iter().all(|quad| quad.tint == Some([255, 255, 255])),
+            "the hover box is drawn in the hover colour"
+        );
+
+        /* A click picks the cell already hovered: both boxes are in the
+         * overlay, the hover first, so a frontend can show the pick without
+         * losing the pointer's box. */
+        scene.set_highlights(vec![cell]);
+        assert_eq!(scene.overlay.len(), 2 * 12 * 6);
+        assert!(
+            scene.overlay[..12 * 6]
+                .iter()
+                .all(|quad| quad.tint == Some([255, 255, 255]))
+        );
+        assert!(
+            scene.overlay[12 * 6..]
+                .iter()
+                .all(|quad| quad.tint == Some(super::HIGHLIGHT_COLOUR))
+        );
+
+        scene.set_hover(None);
+        assert!(scene.hover.is_none());
+        assert_eq!(scene.overlay.len(), 12 * 6);
     }
 
     #[test]

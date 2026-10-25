@@ -168,6 +168,12 @@ DhCore::refresh ()
   dhlrc_config_view_free (view);
 }
 
+void
+DhCore::notifyConfigChanged ()
+{
+  Q_EMIT configChanged ();
+}
+
 QVector<DhCoreNotification>
 DhCore::takePendingNotifications ()
 {
@@ -228,6 +234,12 @@ DhCore::setPluginUseConfigured (const QString &type, int kind, bool value)
   const QByteArray typeUtf8 = type.toUtf8 ();
   dhlrc_core_plugin_set_use_configured (core, typeUtf8.constData (), kind,
                                         value);
+}
+
+bool
+DhCore::pluginDefaultUseConfigured (int kind)
+{
+  return dhlrc_core_plugin_default_use_configured (kind) != 0;
 }
 
 bool

@@ -71,6 +71,12 @@ PluginOptionsConfig::useConfigured (const QString &type,
   return core->pluginUseConfigured (type, kindIndex (kind));
 }
 
+bool
+PluginOptionsConfig::defaultUseConfigured (ConfigObjectItems::Kind kind)
+{
+  return DhCore::pluginDefaultUseConfigured (kindIndex (kind));
+}
+
 void
 PluginOptionsConfig::setUseConfigured (const QString &type,
                                        ConfigObjectItems::Kind kind,

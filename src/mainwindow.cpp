@@ -615,6 +615,10 @@ applySettingsFromDialog (DhSettingsDialog *dialog)
   dataFromPlugins (dialog);
   core->save ();
   core->refresh ();
+  /* The saved values are new to every open view; the watcher would report the
+   * file a moment later, but the settings dialog has already written them, so
+   * the picture and the readers can follow at once. */
+  core->notifyConfigChanged ();
 }
 
 MainWindow::MainWindow (QWidget *parent) : QMainWindow (parent)
@@ -938,7 +942,8 @@ MainWindow::MainWindow (QWidget *parent) : QMainWindow (parent)
             settingsDialog->addSection (direction, 1);
             auto *useItem = new DhSettingItem (
                 pluginUseKey (plugin.type, kind), DhSettingItem::Type::Bool,
-                plugins->useConfigured (plugin.type, kind));
+                plugins->useConfigured (plugin.type, kind),
+                PluginOptionsConfig::defaultUseConfigured (kind));
             useItem->setLabel (
                 QString (_ ("Use saved options for %1 (%2) instead of asking"))
                     .arg (plugin.type, direction));
@@ -959,7 +964,9 @@ MainWindow::MainWindow (QWidget *parent) : QMainWindow (parent)
                     pluginOptionKey (plugin.type, kind, option.key),
                     isBool ? DhSettingItem::Type::Bool
                            : DhSettingItem::Type::Int,
-                    plugins->optionValue (plugin.type, kind, option));
+                    plugins->optionValue (plugin.type, kind, option),
+                    isBool ? QVariant (option.defaultValue != 0)
+                           : QVariant (option.defaultValue));
                 optionItem->setLabel (option.label);
                 optionItem->setToolTip (option.description);
                 /* The plugin advertises the range its setter accepts (the
@@ -985,6 +992,11 @@ MainWindow::MainWindow (QWidget *parent) : QMainWindow (parent)
         {
           fillDialogFromSettings (settingsDialog);
           fillDialogFromPlugins (settingsDialog);
+          /* The views read their colours (and anything else a page keeps a
+           * copy of) from the core; a reload has to reach them too, or the
+           * picture keeps the old values. */
+          if (auto *core = DhCore::instance ())
+            core->notifyConfigChanged ();
         });
 
   connect (settingsDialog, &DhSettingsDialog::saved, this,

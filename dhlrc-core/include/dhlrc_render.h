@@ -183,6 +183,18 @@ extern "C"
   void dhlrc_render_scene_set_highlight_colour (DhlrcScene *scene,
                                                 const float *rgb);
 
+  /* Points the view at the block under the pointer, or at nothing: `box` is the
+   * same six floats as the highlight takes, NULL clearing it. The hover box is
+   * drawn before the picks and in its own colour, so a frontend can draw the
+   * pointer's box and the picked boxes separately; the Qt view drops the hover
+   * box once its cell is picked. */
+  void dhlrc_render_scene_set_hover (DhlrcScene *scene, const float *box);
+
+  /* Sets the colour the hover box is drawn in, with the same three floats as
+   * the highlight colour. NULL is ignored. */
+  void dhlrc_render_scene_set_hover_colour (DhlrcScene *scene,
+                                            const float *rgb);
+
   /* Sets the colour the region's box is drawn in, with the same three floats as
    * the highlight colour. NULL is ignored. */
   void dhlrc_render_scene_set_bounds_colour (DhlrcScene *scene,

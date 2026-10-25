@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-23 23:21+0800\n"
+"POT-Creation-Date: 2026-10-25 23:44+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -66,36 +66,40 @@ msgstr ""
 msgid "Position:"
 msgstr ""
 
-#: ../../src/blockpickerui.cpp:306
+#: ../../src/blockpickerui.cpp:339
 msgid "Loading block list..."
 msgstr ""
 
-#: ../../src/blockpickerui.cpp:368
+#: ../../src/blockpickerui.cpp:401
 msgid ""
 "The block list of this version is not available. Make sure this version's "
 "client jar is downloaded in the settings."
 msgstr ""
 
-#: ../../src/blockpickerui.cpp:527 ../../src/blockpickerui.cpp:561 rc.cpp:27
+#: ../../src/blockpickerui.cpp:560 ../../src/blockpickerui.cpp:594 rc.cpp:27
 msgid "Properties of the chosen block:"
 msgstr ""
 
-#: ../../src/blockpickerui.cpp:579
+#: ../../src/blockpickerui.cpp:604
+msgid "Replaces the %1 selected blocks with the chosen state."
+msgstr ""
+
+#: ../../src/blockpickerui.cpp:622
 msgid "Writes to (%1, %2, %3), one block above."
 msgstr ""
 
-#: ../../src/blockpickerui.cpp:586
+#: ../../src/blockpickerui.cpp:629
 msgid ""
 "(%1, %2, %3) is outside the region, so there is no space above this block."
 msgstr ""
 
-#: ../../src/blockpickerui.cpp:593
+#: ../../src/blockpickerui.cpp:636
 msgid "Writes to (%1, %2, %3)."
 msgstr ""
 
-#: ../../src/blockpickerui.cpp:632 ../../src/blockpickerui.cpp:655
-#: ../../src/blockreaderui.cpp:486 ../../src/dhrenderui.cpp:1132
-#: ../../src/dhrenderui.cpp:1164 ../../src/externalnbtreaderui.cpp:107
+#: ../../src/blockpickerui.cpp:682 ../../src/blockpickerui.cpp:705
+#: ../../src/blockreaderui.cpp:486 ../../src/dhrenderui.cpp:1127
+#: ../../src/dhrenderui.cpp:1159 ../../src/externalnbtreaderui.cpp:107
 #: ../../src/externalnbtreaderui.cpp:114 ../../src/manageregionui.cpp:274
 #: ../../src/manageregionui.cpp:307 ../../src/manageregionui.cpp:632
 #: ../../src/propertymodifyui.cpp:340 ../../src/regionchangesui.cpp:86
@@ -104,15 +108,15 @@ msgstr ""
 msgid "Error!"
 msgstr ""
 
-#: ../../src/blockpickerui.cpp:633
+#: ../../src/blockpickerui.cpp:683
 msgid "The target position is outside the region."
 msgstr ""
 
-#: ../../src/blockpickerui.cpp:665
+#: ../../src/blockpickerui.cpp:715
 msgid "Block added at %1"
 msgstr ""
 
-#: ../../src/blockpickerui.cpp:666
+#: ../../src/blockpickerui.cpp:716
 msgid "Block replaced at %1"
 msgstr ""
 
@@ -265,12 +269,12 @@ msgstr ""
 msgid "&Continue"
 msgstr ""
 
-#: ../../src/configobjectui.cpp:125 ../../src/dhrenderui.cpp:584
+#: ../../src/configobjectui.cpp:125 ../../src/dhrenderui.cpp:593
 #: ../../src/generalchoosedialog.cpp:46
 msgid "&Cancel"
 msgstr ""
 
-#: ../../src/detachabletabwidget.cpp:54 ../../src/mainwindow.cpp:1687
+#: ../../src/detachabletabwidget.cpp:54 ../../src/mainwindow.cpp:1699
 msgid "Return to tabs"
 msgstr ""
 
@@ -299,8 +303,8 @@ msgid "%1 item(s)"
 msgstr ""
 
 #: ../../src/dhdirectoryui.cpp:89 ../../src/dhdirectoryui.cpp:280
-#: ../../src/mainwindow.cpp:748 ../../src/mainwindow.cpp:812
-#: ../../src/mainwindow.cpp:1175
+#: ../../src/mainwindow.cpp:752 ../../src/mainwindow.cpp:816
+#: ../../src/mainwindow.cpp:1187
 msgid "Program Directories"
 msgstr ""
 
@@ -392,7 +396,7 @@ msgid ""
 "it needs again."
 msgstr ""
 
-#: ../../src/dhhelpui.cpp:46 ../../src/mainwindow.cpp:744
+#: ../../src/dhhelpui.cpp:46 ../../src/mainwindow.cpp:748
 msgid "Quick Start"
 msgstr ""
 
@@ -404,7 +408,7 @@ msgstr ""
 msgid "Help"
 msgstr ""
 
-#: ../../src/dhhelpui.cpp:187 ../../src/mainwindow.cpp:683
+#: ../../src/dhhelpui.cpp:187 ../../src/mainwindow.cpp:687
 msgid "Search..."
 msgstr ""
 
@@ -744,7 +748,7 @@ msgid ""
 "move the view."
 msgstr ""
 
-#: ../../src/dhrenderui.cpp:165 ../../src/dhrenderui.cpp:938
+#: ../../src/dhrenderui.cpp:165 ../../src/dhrenderui.cpp:947
 msgid "No blocks selected"
 msgstr ""
 
@@ -753,7 +757,7 @@ msgstr ""
 msgid "&Reload"
 msgstr ""
 
-#: ../../src/dhrenderui.cpp:184 ../../src/dhrenderui.cpp:584
+#: ../../src/dhrenderui.cpp:184 ../../src/dhrenderui.cpp:593
 msgid "Get &Resources"
 msgstr ""
 
@@ -785,11 +789,11 @@ msgstr ""
 msgid "List the selected blocks and mark the one clicked in the list"
 msgstr ""
 
-#: ../../src/dhrenderui.cpp:211 ../../src/dhrenderui.cpp:775
+#: ../../src/dhrenderui.cpp:211 ../../src/dhrenderui.cpp:784
 msgid "Change the properties of the block that was clicked"
 msgstr ""
 
-#: ../../src/dhrenderui.cpp:213 ../../src/dhrenderui.cpp:785
+#: ../../src/dhrenderui.cpp:213 ../../src/dhrenderui.cpp:794
 msgid "Put another block in place of the block that was clicked"
 msgstr ""
 
@@ -799,98 +803,98 @@ msgid ""
 "drop it on top of what was clicked"
 msgstr ""
 
-#: ../../src/dhrenderui.cpp:272 ../../src/dhrenderui.cpp:455
+#: ../../src/dhrenderui.cpp:272 ../../src/dhrenderui.cpp:464
 msgid "Building the 3D scene..."
 msgstr ""
 
-#: ../../src/dhrenderui.cpp:575 ../../src/materiallistui.cpp:183
+#: ../../src/dhrenderui.cpp:584 ../../src/materiallistui.cpp:183
 msgid "The client jar could not be downloaded: %1"
 msgstr ""
 
-#: ../../src/dhrenderui.cpp:635
+#: ../../src/dhrenderui.cpp:644
 msgid "drawn with OpenGL"
 msgstr ""
 
-#: ../../src/dhrenderui.cpp:636
+#: ../../src/dhrenderui.cpp:645
 msgid "drawn by the CPU"
 msgstr ""
 
-#: ../../src/dhrenderui.cpp:638
+#: ../../src/dhrenderui.cpp:647
 msgid "%1 x %2 x %3, %4 quads, %5 blocks not drawn, %6"
 msgstr ""
 
-#: ../../src/dhrenderui.cpp:649
+#: ../../src/dhrenderui.cpp:658
 msgid "Slice Y%1-%2. %3"
 msgstr ""
 
-#: ../../src/dhrenderui.cpp:660
+#: ../../src/dhrenderui.cpp:669
 msgid ""
 "Drag with the left button to turn, with the middle or right button to move, "
 "and use the wheel to zoom. A click names the block under it."
 msgstr ""
 
-#: ../../src/dhrenderui.cpp:672
+#: ../../src/dhrenderui.cpp:681
 msgid ""
 "Nothing could be drawn: the block models and textures of this region's "
 "version could not be placed, and the version is not one the client jar table "
 "knows."
 msgstr ""
 
-#: ../../src/dhrenderui.cpp:677
+#: ../../src/dhrenderui.cpp:686
 msgid ""
 "Nothing could be drawn. The block models and textures of a version live in "
 "its client jar, which belongs at %1. Press \"Get Resources\" to download it "
 "(about 30 MB)."
 msgstr ""
 
-#: ../../src/dhrenderui.cpp:699
+#: ../../src/dhrenderui.cpp:708
 msgid "(%1, %2, %3) is outside the region"
 msgstr ""
 
-#: ../../src/dhrenderui.cpp:721
+#: ../../src/dhrenderui.cpp:730
 msgid "Block (%1, %2, %3): %4"
 msgstr ""
 
-#: ../../src/dhrenderui.cpp:774
+#: ../../src/dhrenderui.cpp:783
 msgid "This block has no properties to change"
 msgstr ""
 
-#: ../../src/dhrenderui.cpp:784
+#: ../../src/dhrenderui.cpp:793
 msgid "Put one block into every selected cell"
 msgstr ""
 
-#: ../../src/dhrenderui.cpp:939
+#: ../../src/dhrenderui.cpp:948
 msgid "%1 block(s) selected"
 msgstr ""
 
-#: ../../src/dhrenderui.cpp:966
+#: ../../src/dhrenderui.cpp:975
 msgid "Selected Blocks"
 msgstr ""
 
-#: ../../src/dhrenderui.cpp:973
+#: ../../src/dhrenderui.cpp:982
 msgid "Position"
 msgstr ""
 
-#: ../../src/dhrenderui.cpp:974
+#: ../../src/dhrenderui.cpp:983
 msgid "Block"
 msgstr ""
 
-#: ../../src/dhrenderui.cpp:1137
+#: ../../src/dhrenderui.cpp:1132
 msgid "Replaced %1 block(s)"
 msgstr ""
 
-#: ../../src/dhrenderui.cpp:1184
+#: ../../src/dhrenderui.cpp:1179
 msgid "Block (%1, %2, %3)"
 msgstr ""
 
-#: ../../src/dhrenderwidget.cpp:153
+#: ../../src/dhrenderwidget.cpp:190
 msgid ""
 "The region could not be drawn: no block in it could be resolved. Check that "
 "the resource files for this version have been downloaded in the settings."
 msgstr ""
 
 #: ../../src/externalnbtreaderui.cpp:31 ../../src/externalnbtreaderui.cpp:47
-#: ../../src/externalnbtreaderui.cpp:275 ../../src/mainwindow.cpp:753
+#: ../../src/externalnbtreaderui.cpp:275 ../../src/mainwindow.cpp:757
 msgid "NBT Reader"
 msgstr ""
 
@@ -1048,27 +1052,27 @@ msgstr ""
 msgid "Pre&view..."
 msgstr ""
 
-#: ../../src/mainwindow.cpp:624
+#: ../../src/mainwindow.cpp:628
 msgid "Config"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:634 ../../src/mainwindow.cpp:636
+#: ../../src/mainwindow.cpp:638 ../../src/mainwindow.cpp:640
 msgid "&Help"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:635
+#: ../../src/mainwindow.cpp:639
 msgid "&About"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:648
+#: ../../src/mainwindow.cpp:652
 msgid "Open Log Folder"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:726
+#: ../../src/mainwindow.cpp:730
 msgid "Welcome!"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:735
+#: ../../src/mainwindow.cpp:739
 msgid ""
 "If you don't know how to use, we provide some helps. Just click \"Help -> "
 "Help\" to see them.\n"
@@ -1076,66 +1080,66 @@ msgid ""
 "Also we provide some quick start to help you use."
 msgstr ""
 
-#: ../../src/mainwindow.cpp:757
+#: ../../src/mainwindow.cpp:761
 msgid "Add Files to Regions"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:761 ../../src/mainwindow.cpp:773
-#: ../../src/mainwindow.cpp:806 ../../src/mainwindow.cpp:1055
-#: ../../src/mainwindow.cpp:1801
+#: ../../src/mainwindow.cpp:765 ../../src/mainwindow.cpp:777
+#: ../../src/mainwindow.cpp:810 ../../src/mainwindow.cpp:1067
+#: ../../src/mainwindow.cpp:1813
 msgid "Manage Region"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:768 ../../src/manageregionui.cpp:169
+#: ../../src/mainwindow.cpp:772 ../../src/manageregionui.cpp:169
 msgid "Load Example Projection"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:804
+#: ../../src/mainwindow.cpp:808
 msgid "NBT File Reader"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:808
+#: ../../src/mainwindow.cpp:812
 msgid "Region Reader/Modifier"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:810
+#: ../../src/mainwindow.cpp:814
 msgid "Settings"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:906
+#: ../../src/mainwindow.cpp:910
 msgid "Select Cache Directory"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:936
+#: ../../src/mainwindow.cpp:940
 msgid "reading"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:937
+#: ../../src/mainwindow.cpp:941
 msgid "writing"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:943
+#: ../../src/mainwindow.cpp:948
 msgid "Use saved options for %1 (%2) instead of asking"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:946
+#: ../../src/mainwindow.cpp:951
 msgid ""
 "Use the options below for every %1 operation instead of asking each time."
 msgstr ""
 
-#: ../../src/mainwindow.cpp:1119
+#: ../../src/mainwindow.cpp:1131
 msgid "No NBT readers are open yet."
 msgstr ""
 
-#: ../../src/mainwindow.cpp:1140
+#: ../../src/mainwindow.cpp:1152
 msgid "New Reader Tab"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:1143
+#: ../../src/mainwindow.cpp:1155
 msgid "New Reader Window"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:1503
+#: ../../src/mainwindow.cpp:1515
 msgid "No regions have been loaded yet."
 msgstr ""
 

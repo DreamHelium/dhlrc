@@ -343,6 +343,11 @@ DhRenderUI::DhRenderUI (std::shared_ptr<RegionClass> region, QWidget *parent)
   /* The colours belong to the settings page; the view keeps what it is given
    * here for every scene it adopts. */
   loadColourSettings ();
+  /* The settings page can change them while this page is already visible, so
+   * follow the core's report instead of waiting for the next show. */
+  if (auto *core = DhCore::instance ())
+    connect (core, &DhCore::configChanged, this,
+             [this] { loadColourSettings (); });
   updateSelectionStatus ();
 
   /* The worker reports progress into an atomic; the window polls it, so the
@@ -387,6 +392,10 @@ DhRenderUI::startSceneBuild ()
     }
   building = true;
   setBuilding (true);
+  /* The Reload button means "read the file and the settings again", so this
+   * path re-reads the colours as well; otherwise a colour changed while the
+   * scene stayed the same would keep the old background. */
+  loadColourSettings ();
   /* The resource layer has to name the version's jar before the scene is
    * built, and it is core-global state, so it is set here on the GUI thread. */
   configureResources ();
@@ -1049,33 +1058,19 @@ DhRenderUI::replaceSelection ()
       return;
     }
 
-  /* The chooser writes the cell it is pointed at, which is how the chosen
-   * state is spelled out; the batch below then puts that same state into every
-   * selected cell and records the whole operation once. */
-  const qint32 startX = hasPicked ? pickedX : cells.first ()[0];
-  const qint32 startY = hasPicked ? pickedY : cells.first ()[1];
-  const qint32 startZ = hasPicked ? pickedZ : cells.first ()[2];
-  BlockPickerUI dialog (regionClass, startX, startY, startZ, this);
-  const qsizetype changesBefore = regionClass->changes ().size ();
-  /* Accepting means a block was chosen and the target cell either got it or
-   * already held it — in both cases the state at the target is the one to
-   * paint. Cancelling writes nothing to paint. */
+  /* The chooser only chooses the state here. It has one target cell and one
+   * "place above" switch, neither of which means anything for a whole
+   * selection, so it is put in batch mode: it shows how many cells are being
+   * replaced and writes nothing itself. The batch below writes the state into
+   * every selected cell and records the whole operation once. */
+  BlockPickerUI dialog (regionClass, cells.first ()[0], cells.first ()[1],
+                        cells.first ()[2], this);
+  dialog.setBatchReplace (cells.size ());
   if (dialog.exec () != QDialog::Accepted)
     return;
-
-  /* Where the chooser really wrote, and the state it left there. */
-  qint32 x = startX;
-  qint32 y = startY;
-  qint32 z = startZ;
-  dialog.target (&x, &y, &z);
-  const RegionClass::BlockState state = regionClass->blockState (x, y, z);
-
-  /* If the chooser wrote its one cell it recorded that write; the batch is the
-   * one action the user asked for, so that entry is folded away and the single
-   * entry below covers the whole batch — the undo list stays one step for one
-   * action. */
-  if (regionClass->changes ().size () == changesBefore + 1)
-    regionClass->revertChange (changesBefore);
+  RegionClass::BlockState state;
+  if (!dialog.chosenState (&state.name, &state.properties))
+    return;
 
   /* The ABI copies the strings out of these arrays while the lock is held, so
    * they have to outlive the write loop. */
@@ -1158,7 +1153,7 @@ DhRenderUI::replaceSelection ()
   if (hasPicked)
     describe (pickedX, pickedY, pickedZ);
   else
-    describe (x, y, z);
+    describe (cells.first ()[0], cells.first ()[1], cells.first ()[2]);
 
   if (!error.isEmpty ())
     QMessageBox::critical (this, _ ("Error!"), error);
