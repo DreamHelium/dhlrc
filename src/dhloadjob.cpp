@@ -320,8 +320,10 @@ DhLoadJob::start ()
 bool
 DhLoadJob::doResume ()
 {
+  const auto config = DhCore::instance ()->config ();
   auto indexes = GeneralChooseDialog::getIndexes (
-      _ ("Select Region(s)"), _ ("Please select region(s)."), regionList);
+      _ ("Select Region(s)"), _ ("Please select region(s)."), regionList,
+      config.multiRegionOrder, config.multiRegionOrderRule);
   if (!indexes.isEmpty ())
     regionIndexes = indexes;
   cv.notify_one ();
@@ -403,16 +405,15 @@ DhLoadJob::loadMultiRegion (MultiModuleBase *multiBase, void *object,
                        loadingTypePrefix (multiBase->type ()));
       return false;
     }
-  /* The chooser shows the regions in this order; `regionOrder` maps each shown
-   * position back to the module's own region index. */
+  /* Keep the file's own names for the order preview in the settings, so a
+   * rule can be tried on the regions of the last multi-region file. */
+  dh::rememberMultiRegionNames (names);
   const auto config = DhCore::instance ()->config ();
-  const QList<int> order = dh::regionLoadingOrder (
-      names, config.multiRegionOrder, config.multiRegionOrderRule);
-  for (const auto &position : order)
-    {
-      regionList.append (names.at (position));
-      regionOrder.append (nameIndexes.at (position));
-    }
+  /* The chooser shows the regions in the file's own order and sorts them with
+   * the order picked in the dialog; `regionOrder` maps each shown position
+   * back to the module's own region index. */
+  regionList = names;
+  regionOrder = nameIndexes;
   /* A file with one region has nothing to choose: reading it directly is what
    * the user asked for, and a single-region file in a batch no longer stops
    * every load for a question with one possible answer. */
@@ -441,8 +442,11 @@ DhLoadJob::loadMultiRegion (MultiModuleBase *multiBase, void *object,
     }
   else
     {
-      for (int j = 0; j < regionList.size (); j++)
-        regionIndexes << j;
+      /* Loading every region follows the configured order. */
+      const auto order = dh::regionLoadingOrder (
+          regionList, config.multiRegionOrder, config.multiRegionOrderRule);
+      for (const auto &position : order)
+        regionIndexes << position;
     }
   /* The chooser returns positions in the list it showed; the loader takes the
    * module's own region indexes. */

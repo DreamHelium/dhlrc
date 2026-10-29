@@ -53,6 +53,8 @@ set(TEMP_PROJECT_SOURCES
         ../resources/dhlrc.qrc
         generalchoosedialog.cpp generalchoosedialog.h
         regionorder.cpp regionorder.h
+        regionorderpreviewdialog.cpp regionorderpreviewdialog.h
+        regionorderhelp.cpp regionorderhelp.h
         blockreaderui.cpp blockreaderui.h
         blockpickerui.cpp blockpickerui.h
         propertymodifyui.cpp propertymodifyui.h

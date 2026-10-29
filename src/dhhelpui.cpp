@@ -45,6 +45,7 @@ struct Topic
 constexpr Topic topics[] = {
   { "usage", N_ ("Quick Start"), "usage" },
   { "region-create", N_ ("Create Region"), "region_create" },
+  { "region-order-rule", N_ ("Region Loading Order"), "region_order_rule" },
 };
 
 /* Where the row stores the topic it stands for. */

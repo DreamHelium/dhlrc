@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-29 20:55+0800\n"
+"POT-Creation-Date: 2026-10-29 21:38+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -245,8 +245,8 @@ msgstr ""
 msgid "The block is in (%1, %2, %3), information is:\n"
 msgstr ""
 
-#: ../../src/blockshowui.cpp:82 ../../src/generalchoosedialog.cpp:45 rc.cpp:102
-#: rc.cpp:165
+#: ../../src/blockshowui.cpp:82 ../../src/generalchoosedialog.cpp:100
+#: rc.cpp:102 rc.cpp:165
 msgid "&OK"
 msgstr ""
 
@@ -271,11 +271,11 @@ msgid "&Continue"
 msgstr ""
 
 #: ../../src/configobjectui.cpp:125 ../../src/dhrenderui.cpp:644
-#: ../../src/generalchoosedialog.cpp:46
+#: ../../src/generalchoosedialog.cpp:101
 msgid "&Cancel"
 msgstr ""
 
-#: ../../src/detachabletabwidget.cpp:54 ../../src/mainwindow.cpp:1716
+#: ../../src/detachabletabwidget.cpp:54 ../../src/mainwindow.cpp:1764
 msgid "Return to tabs"
 msgstr ""
 
@@ -304,8 +304,8 @@ msgid "%1 item(s)"
 msgstr ""
 
 #: ../../src/dhdirectoryui.cpp:89 ../../src/dhdirectoryui.cpp:280
-#: ../../src/mainwindow.cpp:752 ../../src/mainwindow.cpp:816
-#: ../../src/mainwindow.cpp:1204
+#: ../../src/mainwindow.cpp:797 ../../src/mainwindow.cpp:861
+#: ../../src/mainwindow.cpp:1252
 msgid "Program Directories"
 msgstr ""
 
@@ -397,7 +397,7 @@ msgid ""
 "it needs again."
 msgstr ""
 
-#: ../../src/dhhelpui.cpp:46 ../../src/mainwindow.cpp:748
+#: ../../src/dhhelpui.cpp:46 ../../src/mainwindow.cpp:793
 msgid "Quick Start"
 msgstr ""
 
@@ -405,19 +405,23 @@ msgstr ""
 msgid "Create Region"
 msgstr ""
 
-#: ../../src/dhhelpui.cpp:173
+#: ../../src/dhhelpui.cpp:48
+msgid "Region Loading Order"
+msgstr ""
+
+#: ../../src/dhhelpui.cpp:174
 msgid "Help"
 msgstr ""
 
-#: ../../src/dhhelpui.cpp:187 ../../src/mainwindow.cpp:687
+#: ../../src/dhhelpui.cpp:188 ../../src/mainwindow.cpp:732
 msgid "Search..."
 msgstr ""
 
-#: ../../src/dhhelpui.cpp:288
+#: ../../src/dhhelpui.cpp:289
 msgid "The article could not be read (%1)."
 msgstr ""
 
-#: ../../src/dhloadjob.cpp:27 ../../src/dhloadjob.cpp:459
+#: ../../src/dhloadjob.cpp:27 ../../src/dhloadjob.cpp:463
 msgid "Loading region type %1"
 msgstr ""
 
@@ -449,43 +453,43 @@ msgstr ""
 msgid "Loading Object %1"
 msgstr ""
 
-#: ../../src/dhloadjob.cpp:324 ../../src/utility.cpp:58
+#: ../../src/dhloadjob.cpp:325 ../../src/utility.cpp:58
 msgid "Select Region(s)"
 msgstr ""
 
-#: ../../src/dhloadjob.cpp:324 ../../src/utility.cpp:58
+#: ../../src/dhloadjob.cpp:325 ../../src/utility.cpp:58
 msgid "Please select region(s)."
 msgstr ""
 
-#: ../../src/dhloadjob.cpp:381 ../../src/dhloadjob.cpp:402
+#: ../../src/dhloadjob.cpp:383 ../../src/dhloadjob.cpp:404
 msgid "The file holds no region this module can read."
 msgstr ""
 
-#: ../../src/dhloadjob.cpp:424
+#: ../../src/dhloadjob.cpp:425
 msgid "Please click `Continue` to choose the region(s) to load."
 msgstr ""
 
-#: ../../src/dhloadjob.cpp:494
+#: ../../src/dhloadjob.cpp:498
 msgid "The file extension points at %1, but the file was read as %2."
 msgstr ""
 
-#: ../../src/dhloadjob.cpp:507
+#: ../../src/dhloadjob.cpp:511
 msgid "The file is not compressed, but the %1 format expects %2."
 msgstr ""
 
-#: ../../src/dhloadjob.cpp:513
+#: ../../src/dhloadjob.cpp:517
 msgid "The file is %1-compressed, but the %2 format expects %3."
 msgstr ""
 
-#: ../../src/dhloadjob.cpp:527
+#: ../../src/dhloadjob.cpp:531
 msgid "The file was decoded as %1, but the %2 format declares %3."
 msgstr ""
 
-#: ../../src/dhloadjob.cpp:567 ../../src/dhloadjob.cpp:574
+#: ../../src/dhloadjob.cpp:571 ../../src/dhloadjob.cpp:578
 msgid "Finish processing %1 of %2 (%3%)."
 msgstr ""
 
-#: ../../src/dhloadjob.cpp:720 ../../src/saveregionjob.cpp:457
+#: ../../src/dhloadjob.cpp:724 ../../src/saveregionjob.cpp:457
 #: ../../src/saveregionjob.cpp:559
 msgid "Continue"
 msgstr ""
@@ -903,7 +907,7 @@ msgid ""
 msgstr ""
 
 #: ../../src/externalnbtreaderui.cpp:31 ../../src/externalnbtreaderui.cpp:47
-#: ../../src/externalnbtreaderui.cpp:275 ../../src/mainwindow.cpp:757
+#: ../../src/externalnbtreaderui.cpp:275 ../../src/mainwindow.cpp:802
 msgid "NBT Reader"
 msgstr ""
 
@@ -939,7 +943,37 @@ msgstr ""
 msgid "Reading the file..."
 msgstr ""
 
-#: ../../src/generalchoosedialog.cpp:32
+#: ../../src/generalchoosedialog.cpp:49
+msgid "Loading Order"
+msgstr ""
+
+#: ../../src/generalchoosedialog.cpp:51
+msgid "The order the regions are shown and loaded in for this file."
+msgstr ""
+
+#: ../../src/generalchoosedialog.cpp:53 ../../dhlrc-core/src/schema.rs:77
+msgid "File Order (Random)"
+msgstr ""
+
+#: ../../src/generalchoosedialog.cpp:53 ../../dhlrc-core/src/schema.rs:78
+msgid "Natural Order"
+msgstr ""
+
+#: ../../src/generalchoosedialog.cpp:54 ../../dhlrc-core/src/schema.rs:79
+msgid "Custom Rule"
+msgstr ""
+
+#: ../../src/generalchoosedialog.cpp:58
+msgid "Patterns such as 2*, 1*, *; used by Custom Rule"
+msgstr ""
+
+#: ../../src/generalchoosedialog.cpp:61
+msgid ""
+"Comma- or semicolon-separated wildcard patterns. Earlier patterns win; * "
+"matches any text, ? one character. Used for this load only."
+msgstr ""
+
+#: ../../src/generalchoosedialog.cpp:86
 msgid "&All"
 msgstr ""
 
@@ -1017,71 +1051,79 @@ msgid ""
 "Run the built-in interface self-check and exit (development builds only)"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:162 ../../dhlrc-core/src/schema.rs:187
+#: ../../src/mainwindow.cpp:94
+msgid "Preview..."
+msgstr ""
+
+#: ../../src/mainwindow.cpp:96
+msgid "Shows how the loading order and the rule sort sample names."
+msgstr ""
+
+#: ../../src/mainwindow.cpp:207 ../../dhlrc-core/src/schema.rs:187
 msgid "Multi-Region Display Name"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:167
+#: ../../src/mainwindow.cpp:212
 msgid "Name pattern:"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:171
+#: ../../src/mainwindow.cpp:216
 msgid "Insert a placeholder:"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:174
+#: ../../src/mainwindow.cpp:219
 msgid "File name"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:177 ../../src/regionmodifyui.cpp:174
+#: ../../src/mainwindow.cpp:222 ../../src/regionmodifyui.cpp:174
 #: ../../src/regionmodifyui.cpp:175
 msgid "Region name"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:181
+#: ../../src/mainwindow.cpp:226
 msgid "Preview with these sample values:"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:185
+#: ../../src/mainwindow.cpp:230
 msgid "Sample file name"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:189
+#: ../../src/mainwindow.cpp:234
 msgid "Sample region name"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:198
+#: ../../src/mainwindow.cpp:243
 msgid ""
 "${file} is replaced with the file name, ${region} with the region name "
 "inside the file. They can be used in any order and repeated. Anything else "
 "is kept as written."
 msgstr ""
 
-#: ../../src/mainwindow.cpp:338 ../../src/uicheck.cpp:344
+#: ../../src/mainwindow.cpp:383 ../../src/uicheck.cpp:344
 msgid "Pre&view..."
 msgstr ""
 
-#: ../../src/mainwindow.cpp:628
+#: ../../src/mainwindow.cpp:673
 msgid "Config"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:638 ../../src/mainwindow.cpp:640
+#: ../../src/mainwindow.cpp:683 ../../src/mainwindow.cpp:685
 msgid "&Help"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:639
+#: ../../src/mainwindow.cpp:684
 msgid "&About"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:652
+#: ../../src/mainwindow.cpp:697
 msgid "Open Log Folder"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:730
+#: ../../src/mainwindow.cpp:775
 msgid "Welcome!"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:739
+#: ../../src/mainwindow.cpp:784
 msgid ""
 "If you don't know how to use, we provide some helps. Just click \"Help -> "
 "Help\" to see them.\n"
@@ -1089,66 +1131,66 @@ msgid ""
 "Also we provide some quick start to help you use."
 msgstr ""
 
-#: ../../src/mainwindow.cpp:761
+#: ../../src/mainwindow.cpp:806
 msgid "Add Files to Regions"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:765 ../../src/mainwindow.cpp:777
-#: ../../src/mainwindow.cpp:810 ../../src/mainwindow.cpp:1084
-#: ../../src/mainwindow.cpp:1859
+#: ../../src/mainwindow.cpp:810 ../../src/mainwindow.cpp:822
+#: ../../src/mainwindow.cpp:855 ../../src/mainwindow.cpp:1132
+#: ../../src/mainwindow.cpp:1907
 msgid "Manage Region"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:772 ../../src/manageregionui.cpp:169
+#: ../../src/mainwindow.cpp:817 ../../src/manageregionui.cpp:169
 msgid "Load Example Projection"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:808
+#: ../../src/mainwindow.cpp:853
 msgid "NBT File Reader"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:812
+#: ../../src/mainwindow.cpp:857
 msgid "Region Reader/Modifier"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:814
+#: ../../src/mainwindow.cpp:859
 msgid "Settings"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:919
+#: ../../src/mainwindow.cpp:967
 msgid "Select Cache Directory"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:949
+#: ../../src/mainwindow.cpp:997
 msgid "reading"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:950
+#: ../../src/mainwindow.cpp:998
 msgid "writing"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:957
+#: ../../src/mainwindow.cpp:1005
 msgid "Use saved options for %1 (%2) instead of asking"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:960
+#: ../../src/mainwindow.cpp:1008
 msgid ""
 "Use the options below for every %1 operation instead of asking each time."
 msgstr ""
 
-#: ../../src/mainwindow.cpp:1148
+#: ../../src/mainwindow.cpp:1196
 msgid "No NBT readers are open yet."
 msgstr ""
 
-#: ../../src/mainwindow.cpp:1169
+#: ../../src/mainwindow.cpp:1217
 msgid "New Reader Tab"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:1172
+#: ../../src/mainwindow.cpp:1220
 msgid "New Reader Window"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:1532
+#: ../../src/mainwindow.cpp:1580
 msgid "No regions have been loaded yet."
 msgstr ""
 
@@ -1513,6 +1555,64 @@ msgstr ""
 
 #: ../../src/regionmodifyui.cpp:202 ../../src/regionmodifyui.cpp:203
 msgid "Data version"
+msgstr ""
+
+#: ../../src/regionorderhelp.cpp:36
+msgid ""
+"Custom rule syntax\n"
+"\n"
+"Patterns separated by commas or semicolons. A region name is compared "
+"against them in order, and the first one it matches decides its group; "
+"earlier groups come first, and names inside a group keep their natural "
+"order.\n"
+"\n"
+"* matches any run of characters, ? matches exactly one. Matching is case-"
+"sensitive and uses the region name without the file extension. Names that "
+"match no pattern follow the matched ones in natural order, so no region is "
+"lost. An empty rule falls back to natural order.\n"
+"\n"
+"Example: with 2*, 1* the regions 2b, 1a, 10c come out as 2b, 1a, 10c; with "
+"part* all part names come first."
+msgstr ""
+
+#: ../../src/regionorderhelp.cpp:64 ../../src/regionorderhelp.cpp:81
+msgid "Rule Syntax"
+msgstr ""
+
+#: ../../src/regionorderhelp.cpp:66
+msgid "Shows how the custom rule sorts region names, with examples."
+msgstr ""
+
+#: ../../src/regionorderpreviewdialog.cpp:21
+msgid "Preview Loading Order"
+msgstr ""
+
+#: ../../src/regionorderpreviewdialog.cpp:31
+msgid "Sample region names (one per line):"
+msgstr ""
+
+#: ../../src/regionorderpreviewdialog.cpp:33
+msgid "One region name per line"
+msgstr ""
+
+#: ../../src/regionorderpreviewdialog.cpp:41
+msgid "Sorted result:"
+msgstr ""
+
+#: ../../src/regionorderpreviewdialog.cpp:72
+msgid "Loading order: Natural Order"
+msgstr ""
+
+#: ../../src/regionorderpreviewdialog.cpp:77
+msgid "Loading order: Custom Rule (no patterns: natural order)"
+msgstr ""
+
+#: ../../src/regionorderpreviewdialog.cpp:78
+msgid "Loading order: Custom Rule (%1)"
+msgstr ""
+
+#: ../../src/regionorderpreviewdialog.cpp:83
+msgid "Loading order: File Order (the order the file reports)"
 msgstr ""
 
 #: ../../src/regionworkspace.cpp:102 ../../src/uicheck.cpp:433
@@ -1895,18 +1995,6 @@ msgstr ""
 
 #: ../../dhlrc-core/src/schema.rs:74
 msgid "Bytes"
-msgstr ""
-
-#: ../../dhlrc-core/src/schema.rs:77
-msgid "File Order (Random)"
-msgstr ""
-
-#: ../../dhlrc-core/src/schema.rs:78
-msgid "Natural Order"
-msgstr ""
-
-#: ../../dhlrc-core/src/schema.rs:79
-msgid "Custom Rule"
 msgstr ""
 
 #: ../../dhlrc-core/src/schema.rs:89

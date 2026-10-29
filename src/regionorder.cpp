@@ -120,6 +120,23 @@ dh::naturalCompare (const QString &left, const QString &right)
   return 0;
 }
 
+namespace
+{
+QStringList rememberedNames;
+}
+
+void
+dh::rememberMultiRegionNames (const QStringList &names)
+{
+  rememberedNames = names;
+}
+
+QStringList
+dh::lastMultiRegionNames ()
+{
+  return rememberedNames;
+}
+
 QList<int>
 dh::regionLoadingOrder (const QStringList &names, int order,
                         const QString &rule)

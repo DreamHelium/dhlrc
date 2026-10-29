@@ -1,17 +1,34 @@
 #include "generalchoosedialog.h"
+
+#include "regionorder.h"
+#include "regionorderhelp.h"
+
 #include <QCheckBox>
+#include <QComboBox>
+#include <QHBoxLayout>
 #include <QLabel>
+#include <QLineEdit>
 #include <QPushButton>
 #include <QRadioButton>
+#include <QSet>
 #include <libintl.h>
 #include <qcontainerfwd.h>
 #define _(str) gettext (str)
 
+/* The "All" switch's id. Region buttons carry the position of their name in
+ * the list they were built from, so re-sorting the display never changes what
+ * a returned index means. Negative ids are assigned automatically by
+ * QButtonGroup, so "All" needs a positive sentinel it cannot collide with. */
+static const int allButtonId = 2147483647;
+
 GeneralChooseDialog::GeneralChooseDialog (const QString &title,
                                           const QString &label,
                                           const QList<QString> &list,
-                                          bool needMulti, QWidget *parent)
-    : QDialog (parent), needMulti (needMulti)
+                                          bool needMulti, QWidget *parent,
+                                          int order, const QString &rule)
+    : QDialog (parent), names (list), needMulti (needMulti),
+      orderMode (order < 0 ? 0 : order), orderRule (rule),
+      showOrder (order >= 0)
 {
   allLayout = new QVBoxLayout (this);
   widget = new QWidget ();
@@ -26,22 +43,60 @@ GeneralChooseDialog::GeneralChooseDialog (const QString &title,
   layout->addWidget (contentLabel);
   widget->setLayout (layout);
   group = new QButtonGroup (this);
-  int index = 0;
+  if (showOrder)
+    {
+      auto *orderRow = new QHBoxLayout ();
+      auto *orderLabel = new QLabel (_ ("Loading Order"));
+      orderLabel->setToolTip (
+          _ ("The order the regions are shown and loaded in for this file."));
+      orderBox = new QComboBox ();
+      orderBox->addItems ({ _ ("File Order (Random)"), _ ("Natural Order"),
+                            _ ("Custom Rule") });
+      orderBox->setCurrentIndex (orderMode);
+      ruleEdit = new QLineEdit (orderRule);
+      ruleEdit->setPlaceholderText (
+          _ ("Patterns such as 2*, 1*, *; used by Custom Rule"));
+      ruleEdit->setEnabled (orderMode == 2);
+      ruleEdit->setToolTip (
+          _ ("Comma- or semicolon-separated wildcard patterns. Earlier "
+             "patterns win; * matches any text, ? one character. Used for this "
+             "load only."));
+      orderRow->addWidget (orderLabel);
+      orderRow->addWidget (orderBox);
+      orderRow->addWidget (ruleEdit, 1);
+      layout->addLayout (orderRow);
+      layout->addWidget (regionOrderHelpSection (this));
+      QObject::connect (orderBox, &QComboBox::currentIndexChanged, this,
+                        [this] (int index)
+                          {
+                            orderMode = index;
+                            ruleEdit->setEnabled (index == 2);
+                            applyOrder ();
+                          });
+      QObject::connect (ruleEdit, &QLineEdit::textChanged, this,
+                        [this] (const QString &text)
+                          {
+                            orderRule = text;
+                            if (orderMode == 2)
+                              applyOrder ();
+                          });
+    }
   if (needMulti)
     {
-      QCheckBox *checkBox = new QCheckBox (_ ("&All"));
+      allBox = new QCheckBox (_ ("&All"));
       group->setExclusive (false);
-      group->addButton (checkBox, index++);
-      layout->addWidget (checkBox);
-      connect (checkBox, &QCheckBox::clicked, this,
-               [&] (bool checked)
+      group->addButton (allBox, allButtonId);
+      layout->addWidget (allBox);
+      connect (allBox, &QCheckBox::clicked, this,
+               [this] (bool checked)
                  {
                    auto btns = group->buttons ();
-                   for (auto i : btns)
-                     i->setChecked (checked);
+                   for (auto *button : btns)
+                     if (group->id (button) != allButtonId)
+                       button->setChecked (checked);
                  });
     }
-  paintButtons (list, index);
+  paintButtons ();
   QPushButton *okBtn = new QPushButton (_ ("&OK"));
   QPushButton *cancelBtn = new QPushButton (_ ("&Cancel"));
   btnLayout = new QHBoxLayout ();
@@ -58,36 +113,91 @@ GeneralChooseDialog::GeneralChooseDialog (const QString &title,
 }
 
 void
-GeneralChooseDialog::paintButtons (const QStringList &list, int index)
+GeneralChooseDialog::paintButtons ()
 {
-  for (auto i : list)
+  /* Without the order row the list keeps the order it was given in. */
+  QList<int> display;
+  if (showOrder)
+    display = dh::regionLoadingOrder (names, orderMode, orderRule);
+  else
+    for (int i = 0; i < names.size (); i++)
+      display.append (i);
+  for (int position : display)
     {
       QAbstractButton *btn = nullptr;
       if (needMulti)
         {
-          btn = new QCheckBox (i);
+          btn = new QCheckBox (names.at (position));
           connect (btn, &QAbstractButton::clicked, this,
-                   [&] (bool checked)
+                   [this] (bool checked)
                      {
                        bool same = true;
                        auto btns = group->buttons ();
-                       for (int j = 1; j < btns.size (); j++)
+                       for (auto *button : btns)
                          {
-                           auto button = btns[j];
+                           if (group->id (button) == allButtonId)
+                             continue;
                            if (button->isChecked () != checked)
                              same = false;
                          }
-                       if (same)
-                         btns[0]->setChecked (checked);
-                       else
-                         btns[0]->setChecked (false);
+                       if (allBox)
+                         allBox->setChecked (same);
                      });
         }
       else
-        btn = new QRadioButton (i);
-      group->addButton (btn, index++);
+        btn = new QRadioButton (names.at (position));
+      group->addButton (btn, position);
       layout->addWidget (btn);
     }
+}
+
+void
+GeneralChooseDialog::applyOrder ()
+{
+  /* The buttons are kept and only re-ordered, so the checked regions (and the
+   * "All" switch) stay exactly as they were. */
+  QHash<int, QAbstractButton *> byId;
+  QList<QAbstractButton *> regionButtons;
+  for (auto *button : group->buttons ())
+    if (group->id (button) != allButtonId)
+      {
+        byId.insert (group->id (button), button);
+        regionButtons.append (button);
+      }
+  for (auto *button : regionButtons)
+    layout->removeWidget (button);
+  const QList<int> order
+      = dh::regionLoadingOrder (names, orderMode, orderRule);
+  for (const auto &position : order)
+    if (auto *button = byId.value (position))
+      {
+        layout->addWidget (button);
+        button->show ();
+      }
+}
+
+QStringList
+GeneralChooseDialog::displayedRegions () const
+{
+  QStringList result;
+  for (int i = 0; i < layout->count (); i++)
+    if (auto *button = qobject_cast<QAbstractButton *> (
+            layout->itemAt (i)->widget ()))
+      if (group->id (button) != allButtonId)
+        result.append (button->text ());
+  return result;
+}
+
+int
+GeneralChooseDialog::loadingOrder () const
+{
+  return orderMode;
+}
+
+QString
+GeneralChooseDialog::loadingRule () const
+{
+  return orderRule;
 }
 
 GeneralChooseDialog::~GeneralChooseDialog () {}
@@ -120,11 +230,40 @@ GeneralChooseDialog::getIndexes (const QString &title, const QString &label,
   if (ret == QDialog::Accepted)
     {
       QList<int> vals;
-      auto btns = gcd->group->buttons ();
-      for (int i = 1; i < btns.size (); i++)
+      for (auto *button : gcd->group->buttons ())
         {
-          if (btns[i]->isChecked ())
-            vals.append (i - 1);
+          if (gcd->group->id (button) != allButtonId
+              && button->isChecked ())
+            vals.append (gcd->group->id (button));
+        }
+      delete gcd;
+      return vals;
+    }
+  else
+    {
+      delete gcd;
+      return {};
+    }
+}
+
+QList<int>
+GeneralChooseDialog::getIndexes (const QString &title, const QString &label,
+                                 const QStringList &list, int order,
+                                 const QString &rule, QWidget *parent)
+{
+  auto gcd = new GeneralChooseDialog (title, label, list, true, parent, order,
+                                      rule);
+  int ret = gcd->exec ();
+  if (ret == QDialog::Accepted)
+    {
+      QList<int> vals;
+      /* In display order, so the loader reads the regions in the order the
+       * dialog previewed. */
+      for (auto *button : gcd->group->buttons ())
+        {
+          if (gcd->group->id (button) != allButtonId
+              && button->isChecked ())
+            vals.append (gcd->group->id (button));
         }
       delete gcd;
       return vals;
@@ -139,16 +278,13 @@ GeneralChooseDialog::getIndexes (const QString &title, const QString &label,
 void
 GeneralChooseDialog::repaint (const QStringList &list)
 {
-  int index = 0;
-  auto btns = group->buttons ();
-  if (needMulti)
+  names = list;
+  for (auto *button : group->buttons ())
     {
-      for (int i = 1; i < btns.length (); i++)
-        delete btns[i];
-      index = 1;
+      if (group->id (button) == allButtonId)
+        continue;
+      group->removeButton (button);
+      delete button;
     }
-  else
-    for (const auto &i : btns)
-      delete i;
-  paintButtons (list, index);
+  paintButtons ();
 }

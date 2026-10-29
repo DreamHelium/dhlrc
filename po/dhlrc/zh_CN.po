@@ -16,7 +16,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-29 20:49+0800\n"
+"POT-Creation-Date: 2026-10-29 21:28+0800\n"
 "PO-Revision-Date: 2026-10-16 15:39+0800\n"
 "Last-Translator: 孟小骇 <48383878+DreamHelium@users.noreply.github.com>\n"
 "Language-Team: Chinese <kde-i18n-doc@kde.org>\n"
@@ -266,8 +266,8 @@ msgstr "内存不足！"
 msgid "The block is in (%1, %2, %3), information is:\n"
 msgstr "方块在(%1, %2, %3)，信息是：\n"
 
-#: ../../src/blockshowui.cpp:82 ../../src/generalchoosedialog.cpp:45 rc.cpp:102
-#: rc.cpp:165
+#: ../../src/blockshowui.cpp:82 ../../src/generalchoosedialog.cpp:100
+#: rc.cpp:102 rc.cpp:165
 msgid "&OK"
 msgstr "确定(&O)"
 
@@ -292,11 +292,11 @@ msgid "&Continue"
 msgstr "继续(&C)"
 
 #: ../../src/configobjectui.cpp:125 ../../src/dhrenderui.cpp:644
-#: ../../src/generalchoosedialog.cpp:46
+#: ../../src/generalchoosedialog.cpp:101
 msgid "&Cancel"
 msgstr "取消(&C)"
 
-#: ../../src/detachabletabwidget.cpp:54 ../../src/mainwindow.cpp:1716
+#: ../../src/detachabletabwidget.cpp:54 ../../src/mainwindow.cpp:1764
 msgid "Return to tabs"
 msgstr "返回选项卡"
 
@@ -325,8 +325,8 @@ msgid "%1 item(s)"
 msgstr "%1 项"
 
 #: ../../src/dhdirectoryui.cpp:89 ../../src/dhdirectoryui.cpp:280
-#: ../../src/mainwindow.cpp:752 ../../src/mainwindow.cpp:816
-#: ../../src/mainwindow.cpp:1204
+#: ../../src/mainwindow.cpp:797 ../../src/mainwindow.cpp:861
+#: ../../src/mainwindow.cpp:1252
 msgid "Program Directories"
 msgstr "程序目录"
 
@@ -424,7 +424,7 @@ msgstr ""
 "下载的客户端 jar（client_jar/）、资源包以及从其中读取的资源。删除此目录无害："
 "程序会重新下载所需内容。"
 
-#: ../../src/dhhelpui.cpp:46 ../../src/mainwindow.cpp:748
+#: ../../src/dhhelpui.cpp:46 ../../src/mainwindow.cpp:793
 msgid "Quick Start"
 msgstr "快速入门"
 
@@ -432,19 +432,23 @@ msgstr "快速入门"
 msgid "Create Region"
 msgstr "创建区域"
 
-#: ../../src/dhhelpui.cpp:173
+#: ../../src/dhhelpui.cpp:48
+msgid "Region Loading Order"
+msgstr "区域加载顺序"
+
+#: ../../src/dhhelpui.cpp:174
 msgid "Help"
 msgstr "帮助"
 
-#: ../../src/dhhelpui.cpp:187 ../../src/mainwindow.cpp:687
+#: ../../src/dhhelpui.cpp:188 ../../src/mainwindow.cpp:732
 msgid "Search..."
 msgstr "搜索……"
 
-#: ../../src/dhhelpui.cpp:288
+#: ../../src/dhhelpui.cpp:289
 msgid "The article could not be read (%1)."
 msgstr "无法读取文章（%1）。"
 
-#: ../../src/dhloadjob.cpp:27 ../../src/dhloadjob.cpp:459
+#: ../../src/dhloadjob.cpp:27 ../../src/dhloadjob.cpp:463
 msgid "Loading region type %1"
 msgstr "加载区域类型%1"
 
@@ -476,43 +480,43 @@ msgstr "已取消。"
 msgid "Loading Object %1"
 msgstr "加载对象%1"
 
-#: ../../src/dhloadjob.cpp:324 ../../src/utility.cpp:58
+#: ../../src/dhloadjob.cpp:325 ../../src/utility.cpp:58
 msgid "Select Region(s)"
 msgstr "选择区域"
 
-#: ../../src/dhloadjob.cpp:324 ../../src/utility.cpp:58
+#: ../../src/dhloadjob.cpp:325 ../../src/utility.cpp:58
 msgid "Please select region(s)."
 msgstr "请选择区域。"
 
-#: ../../src/dhloadjob.cpp:381 ../../src/dhloadjob.cpp:402
+#: ../../src/dhloadjob.cpp:383 ../../src/dhloadjob.cpp:404
 msgid "The file holds no region this module can read."
 msgstr "文件中没有该模块能读取的区域。"
 
-#: ../../src/dhloadjob.cpp:424
+#: ../../src/dhloadjob.cpp:425
 msgid "Please click `Continue` to choose the region(s) to load."
 msgstr "请点击`继续`选择要加载的区域。"
 
-#: ../../src/dhloadjob.cpp:494
+#: ../../src/dhloadjob.cpp:498
 msgid "The file extension points at %1, but the file was read as %2."
 msgstr "文件扩展名指向 %1，但实际由 %2 读取。"
 
-#: ../../src/dhloadjob.cpp:507
+#: ../../src/dhloadjob.cpp:511
 msgid "The file is not compressed, but the %1 format expects %2."
 msgstr "文件未压缩，但 %1 格式要求 %2。"
 
-#: ../../src/dhloadjob.cpp:513
+#: ../../src/dhloadjob.cpp:517
 msgid "The file is %1-compressed, but the %2 format expects %3."
 msgstr "文件是 %1 压缩，但 %2 格式要求 %3。"
 
-#: ../../src/dhloadjob.cpp:527
+#: ../../src/dhloadjob.cpp:531
 msgid "The file was decoded as %1, but the %2 format declares %3."
 msgstr "文件按 %1 解码，但 %2 格式声明的是 %3。"
 
-#: ../../src/dhloadjob.cpp:567 ../../src/dhloadjob.cpp:574
+#: ../../src/dhloadjob.cpp:571 ../../src/dhloadjob.cpp:578
 msgid "Finish processing %1 of %2 (%3%)."
 msgstr "已结束处理了%2个中的%1个（%3%）。"
 
-#: ../../src/dhloadjob.cpp:720 ../../src/saveregionjob.cpp:457
+#: ../../src/dhloadjob.cpp:724 ../../src/saveregionjob.cpp:457
 #: ../../src/saveregionjob.cpp:559
 msgid "Continue"
 msgstr "继续"
@@ -940,7 +944,7 @@ msgstr ""
 "资源文件。"
 
 #: ../../src/externalnbtreaderui.cpp:31 ../../src/externalnbtreaderui.cpp:47
-#: ../../src/externalnbtreaderui.cpp:275 ../../src/mainwindow.cpp:757
+#: ../../src/externalnbtreaderui.cpp:275 ../../src/mainwindow.cpp:802
 msgid "NBT Reader"
 msgstr "NBT 阅读器"
 
@@ -976,7 +980,39 @@ msgstr "NBT 阅读器：%1"
 msgid "Reading the file..."
 msgstr "正在读取文件……"
 
-#: ../../src/generalchoosedialog.cpp:32
+#: ../../src/generalchoosedialog.cpp:49
+msgid "Loading Order"
+msgstr "加载顺序"
+
+#: ../../src/generalchoosedialog.cpp:51
+msgid "The order the regions are shown and loaded in for this file."
+msgstr "这个文件中区域的显示和加载顺序。"
+
+#: ../../src/generalchoosedialog.cpp:53 ../../dhlrc-core/src/schema.rs:77
+msgid "File Order (Random)"
+msgstr "文件顺序（随机）"
+
+#: ../../src/generalchoosedialog.cpp:53 ../../dhlrc-core/src/schema.rs:78
+msgid "Natural Order"
+msgstr "自然顺序"
+
+#: ../../src/generalchoosedialog.cpp:54 ../../dhlrc-core/src/schema.rs:79
+msgid "Custom Rule"
+msgstr "自定义规则"
+
+#: ../../src/generalchoosedialog.cpp:58
+msgid "Patterns such as 2*, 1*, *; used by Custom Rule"
+msgstr "类似 2*、1*、* 的模式，供自定义规则使用"
+
+#: ../../src/generalchoosedialog.cpp:61
+msgid ""
+"Comma- or semicolon-separated wildcard patterns. Earlier patterns win; * "
+"matches any text, ? one character. Used for this load only."
+msgstr ""
+"以逗号或分号分隔的通配符模式。靠前的模式优先；* 匹配任意文本，? 匹配一个字"
+"符。仅用于本次加载。"
+
+#: ../../src/generalchoosedialog.cpp:86
 msgid "&All"
 msgstr "全选 (&A)"
 
@@ -1056,40 +1092,48 @@ msgid ""
 "Run the built-in interface self-check and exit (development builds only)"
 msgstr "运行内置界面自检并退出（仅限开发构建）"
 
-#: ../../src/mainwindow.cpp:162 ../../dhlrc-core/src/schema.rs:187
+#: ../../src/mainwindow.cpp:94
+msgid "Preview..."
+msgstr "预览…"
+
+#: ../../src/mainwindow.cpp:96
+msgid "Shows how the loading order and the rule sort sample names."
+msgstr "显示加载顺序和规则怎样排列示例名称。"
+
+#: ../../src/mainwindow.cpp:207 ../../dhlrc-core/src/schema.rs:187
 msgid "Multi-Region Display Name"
 msgstr "多区域显示名称"
 
-#: ../../src/mainwindow.cpp:167
+#: ../../src/mainwindow.cpp:212
 msgid "Name pattern:"
 msgstr "名称格式："
 
-#: ../../src/mainwindow.cpp:171
+#: ../../src/mainwindow.cpp:216
 msgid "Insert a placeholder:"
 msgstr "插入占位符："
 
-#: ../../src/mainwindow.cpp:174
+#: ../../src/mainwindow.cpp:219
 msgid "File name"
 msgstr "文件名"
 
-#: ../../src/mainwindow.cpp:177 ../../src/regionmodifyui.cpp:174
+#: ../../src/mainwindow.cpp:222 ../../src/regionmodifyui.cpp:174
 #: ../../src/regionmodifyui.cpp:175
 msgid "Region name"
 msgstr "区域名称"
 
-#: ../../src/mainwindow.cpp:181
+#: ../../src/mainwindow.cpp:226
 msgid "Preview with these sample values:"
 msgstr "使用这些示例值预览："
 
-#: ../../src/mainwindow.cpp:185
+#: ../../src/mainwindow.cpp:230
 msgid "Sample file name"
 msgstr "示例文件名"
 
-#: ../../src/mainwindow.cpp:189
+#: ../../src/mainwindow.cpp:234
 msgid "Sample region name"
 msgstr "示例区域名称"
 
-#: ../../src/mainwindow.cpp:198
+#: ../../src/mainwindow.cpp:243
 msgid ""
 "${file} is replaced with the file name, ${region} with the region name "
 "inside the file. They can be used in any order and repeated. Anything else "
@@ -1098,31 +1142,31 @@ msgstr ""
 "${file} 将被替换为文件名，${region} 将被替换为文件内的区域名称。它们可以以任"
 "意顺序使用且可重复使用。其它内容将按原样保留。"
 
-#: ../../src/mainwindow.cpp:338 ../../src/uicheck.cpp:344
+#: ../../src/mainwindow.cpp:383 ../../src/uicheck.cpp:344
 msgid "Pre&view..."
 msgstr "预览(&V)……"
 
-#: ../../src/mainwindow.cpp:628
+#: ../../src/mainwindow.cpp:673
 msgid "Config"
 msgstr "配置"
 
-#: ../../src/mainwindow.cpp:638 ../../src/mainwindow.cpp:640
+#: ../../src/mainwindow.cpp:683 ../../src/mainwindow.cpp:685
 msgid "&Help"
 msgstr "帮助(&H)"
 
-#: ../../src/mainwindow.cpp:639
+#: ../../src/mainwindow.cpp:684
 msgid "&About"
 msgstr "关于(&A)"
 
-#: ../../src/mainwindow.cpp:652
+#: ../../src/mainwindow.cpp:697
 msgid "Open Log Folder"
 msgstr "打开日志文件夹"
 
-#: ../../src/mainwindow.cpp:730
+#: ../../src/mainwindow.cpp:775
 msgid "Welcome!"
 msgstr "欢迎！"
 
-#: ../../src/mainwindow.cpp:739
+#: ../../src/mainwindow.cpp:784
 msgid ""
 "If you don't know how to use, we provide some helps. Just click \"Help -> "
 "Help\" to see them.\n"
@@ -1133,66 +1177,66 @@ msgstr ""
 "\n"
 "我们还提供了一些快速入门，帮助你上手。"
 
-#: ../../src/mainwindow.cpp:761
+#: ../../src/mainwindow.cpp:806
 msgid "Add Files to Regions"
 msgstr "添加文件至区域"
 
-#: ../../src/mainwindow.cpp:765 ../../src/mainwindow.cpp:777
-#: ../../src/mainwindow.cpp:810 ../../src/mainwindow.cpp:1084
-#: ../../src/mainwindow.cpp:1859
+#: ../../src/mainwindow.cpp:810 ../../src/mainwindow.cpp:822
+#: ../../src/mainwindow.cpp:855 ../../src/mainwindow.cpp:1132
+#: ../../src/mainwindow.cpp:1907
 msgid "Manage Region"
 msgstr "管理区域"
 
-#: ../../src/mainwindow.cpp:772 ../../src/manageregionui.cpp:169
+#: ../../src/mainwindow.cpp:817 ../../src/manageregionui.cpp:169
 msgid "Load Example Projection"
 msgstr "载入示例投影"
 
-#: ../../src/mainwindow.cpp:808
+#: ../../src/mainwindow.cpp:853
 msgid "NBT File Reader"
 msgstr "NBT文件阅读器"
 
-#: ../../src/mainwindow.cpp:812
+#: ../../src/mainwindow.cpp:857
 msgid "Region Reader/Modifier"
 msgstr "区域阅读器及修改器"
 
-#: ../../src/mainwindow.cpp:814
+#: ../../src/mainwindow.cpp:859
 msgid "Settings"
 msgstr "设置"
 
-#: ../../src/mainwindow.cpp:919
+#: ../../src/mainwindow.cpp:967
 msgid "Select Cache Directory"
 msgstr "选择缓存目录"
 
-#: ../../src/mainwindow.cpp:949
+#: ../../src/mainwindow.cpp:997
 msgid "reading"
 msgstr "读取"
 
-#: ../../src/mainwindow.cpp:950
+#: ../../src/mainwindow.cpp:998
 msgid "writing"
 msgstr "写入"
 
-#: ../../src/mainwindow.cpp:957
+#: ../../src/mainwindow.cpp:1005
 msgid "Use saved options for %1 (%2) instead of asking"
 msgstr "对 %1（%2）使用已保存的选项而不询问"
 
-#: ../../src/mainwindow.cpp:960
+#: ../../src/mainwindow.cpp:1008
 msgid ""
 "Use the options below for every %1 operation instead of asking each time."
 msgstr "每次%1时都使用下面的选项，而不是每次都询问。"
 
-#: ../../src/mainwindow.cpp:1148
+#: ../../src/mainwindow.cpp:1196
 msgid "No NBT readers are open yet."
 msgstr "还没有打开任何 NBT 阅读器。"
 
-#: ../../src/mainwindow.cpp:1169
+#: ../../src/mainwindow.cpp:1217
 msgid "New Reader Tab"
 msgstr "新建阅读器标签页"
 
-#: ../../src/mainwindow.cpp:1172
+#: ../../src/mainwindow.cpp:1220
 msgid "New Reader Window"
 msgstr "新建阅读器窗口"
 
-#: ../../src/mainwindow.cpp:1532
+#: ../../src/mainwindow.cpp:1580
 msgid "No regions have been loaded yet."
 msgstr "还没有载入任何区域。"
 
@@ -1566,6 +1610,64 @@ msgstr "设置 DataVersion 失败。"
 #: ../../src/regionmodifyui.cpp:202 ../../src/regionmodifyui.cpp:203
 msgid "Data version"
 msgstr "DataVersion"
+
+#: ../../src/regionorderhelp.cpp:36
+msgid ""
+"Custom rule syntax\n"
+"\n"
+"Patterns separated by commas or semicolons. A region name is compared "
+"against them in order, and the first one it matches decides its group; "
+"earlier groups come first, and names inside a group keep their natural "
+"order.\n"
+"\n"
+"* matches any run of characters, ? matches exactly one. Matching is case-"
+"sensitive and uses the region name without the file extension. Names that "
+"match no pattern follow the matched ones in natural order, so no region is "
+"lost. An empty rule falls back to natural order.\n"
+"\n"
+"Example: with 2*, 1* the regions 2b, 1a, 10c come out as 2b, 1a, 10c; with "
+"part* all part names come first."
+msgstr ""
+
+#: ../../src/regionorderhelp.cpp:64 ../../src/regionorderhelp.cpp:81
+msgid "Rule Syntax"
+msgstr "规则语法"
+
+#: ../../src/regionorderhelp.cpp:66
+msgid "Shows how the custom rule sorts region names, with examples."
+msgstr "显示自定义规则如何排序区域名，并附带例子。"
+
+#: ../../src/regionorderpreviewdialog.cpp:21
+msgid "Preview Loading Order"
+msgstr "预览加载顺序"
+
+#: ../../src/regionorderpreviewdialog.cpp:31
+msgid "Sample region names (one per line):"
+msgstr "示例区域名称（每行一个）："
+
+#: ../../src/regionorderpreviewdialog.cpp:33
+msgid "One region name per line"
+msgstr "每行一个区域名称"
+
+#: ../../src/regionorderpreviewdialog.cpp:41
+msgid "Sorted result:"
+msgstr "排序结果："
+
+#: ../../src/regionorderpreviewdialog.cpp:72
+msgid "Loading order: Natural Order"
+msgstr "加载顺序：自然顺序"
+
+#: ../../src/regionorderpreviewdialog.cpp:77
+msgid "Loading order: Custom Rule (no patterns: natural order)"
+msgstr "加载顺序：自定义规则（没有模式时按自然顺序）"
+
+#: ../../src/regionorderpreviewdialog.cpp:78
+msgid "Loading order: Custom Rule (%1)"
+msgstr "加载顺序：自定义规则（%1）"
+
+#: ../../src/regionorderpreviewdialog.cpp:83
+msgid "Loading order: File Order (the order the file reports)"
+msgstr "加载顺序：文件顺序（文件报告的顺序）"
 
 #: ../../src/regionworkspace.cpp:102 ../../src/uicheck.cpp:433
 #: ../../dhlrc-core/src/schema.rs:69
@@ -1958,18 +2060,6 @@ msgstr "KiB"
 msgid "Bytes"
 msgstr "字节"
 
-#: ../../dhlrc-core/src/schema.rs:77
-msgid "File Order (Random)"
-msgstr "文件顺序（随机）"
-
-#: ../../dhlrc-core/src/schema.rs:78
-msgid "Natural Order"
-msgstr "自然顺序"
-
-#: ../../dhlrc-core/src/schema.rs:79
-msgid "Custom Rule"
-msgstr "自定义规则"
-
 #: ../../dhlrc-core/src/schema.rs:89
 msgid "Application Memory Limit"
 msgstr "应用内存限制"
@@ -2069,7 +2159,10 @@ msgid ""
 "formats keep their regions in a hash map, so the file order changes from one "
 "opening to the next; natural order sorts names with numbers compared by "
 "value, and the custom rule uses the pattern list below."
-msgstr "多区域文件中的区域加载和列出的顺序。部分格式把区域保存在哈希表中，因此每次打开时的文件顺序都可能不同；自然顺序按名字排序、数字按数值比较；自定义规则使用下方的模式列表。"
+msgstr ""
+"多区域文件中的区域加载和列出的顺序。部分格式把区域保存在哈希表中，因此每次打"
+"开时的文件顺序都可能不同；自然顺序按名字排序、数字按数值比较；自定义规则使用"
+"下方的模式列表。"
 
 #: ../../dhlrc-core/src/schema.rs:215
 msgid "Custom Region Order Rule"
@@ -2081,7 +2174,10 @@ msgid ""
 "separated wildcard patterns, for example `2*, 1*, *`: regions matching an "
 "earlier pattern come first, groups are sorted naturally, and regions that "
 "match no pattern come last. * matches any text, ? one character."
-msgstr "在加载顺序为“自定义规则”时使用。填写以逗号或分号分隔的通配符模式，例如 `2*, 1*, *`：匹配靠前模式的区域排在前面，组内按自然顺序排序，不匹配任何模式的区域排在最后。* 匹配任意文本，? 匹配单个字符。"
+msgstr ""
+"在加载顺序为“自定义规则”时使用。填写以逗号或分号分隔的通配符模式，例如 `2*, "
+"1*, *`：匹配靠前模式的区域排在前面，组内按自然顺序排序，不匹配任何模式的区域"
+"排在最后。* 匹配任意文本，? 匹配单个字符。"
 
 #: ../../dhlrc-core/src/schema.rs:229
 msgid "Region Base Name"

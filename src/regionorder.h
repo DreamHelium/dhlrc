@@ -22,6 +22,12 @@ QList<int> regionLoadingOrder (const QStringList &names, int order,
 /* Compares two names the way the natural order does: runs of digits compare
  * by value (so "part2" comes before "part10") and letters ignore case. */
 int naturalCompare (const QString &left, const QString &right);
+
+/* The region names the last multi-region file offered, so the settings page's
+ * preview button can sort real names instead of made-up ones. Empty until a
+ * multi-region file is read. */
+void rememberMultiRegionNames (const QStringList &names);
+QStringList lastMultiRegionNames ();
 }
 
 #endif

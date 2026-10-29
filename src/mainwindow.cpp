@@ -70,6 +70,51 @@
 #include <QMenu>
 #include <QMenuBar>
 
+#include "regionorder.h"
+#include "regionorderpreviewdialog.h"
+
+/* The custom-rule row: the line edit plus a button that shows how the rule
+ * sorts a set of sample names, so a pattern can be tried without loading a
+ * file. */
+class DhOrderRuleTemplate : public DhStringSettingTemplate
+{
+public:
+  using DhStringSettingTemplate::DhStringSettingTemplate;
+
+  void
+  initWidget (QVBoxLayout *l, DhSettingsDialog *d) override
+  {
+    DhStringSettingTemplate::initWidget (l, d);
+    if (l->count () == 0)
+      return;
+    auto *row
+        = qobject_cast<QHBoxLayout *> (l->itemAt (l->count () - 1)->layout ());
+    if (!row)
+      return;
+    auto *button = new QPushButton (_ ("Preview..."), widget);
+    button->setToolTip (
+        _ ("Shows how the loading order and the rule sort sample names."));
+    row->addWidget (button);
+    QObject::connect (button, &QPushButton::clicked, d,
+                      [this, d]
+                        {
+                          int order = 0;
+                          auto *orderTemplate = d->templateFor (
+                              QStringLiteral ("MultiRegionOrder"));
+                          if (auto *box = orderTemplate
+                                              ? qobject_cast<QComboBox *> (
+                                                    orderTemplate->widget)
+                                              : nullptr)
+                            order = box->currentIndex ();
+                          auto *edit = qobject_cast<QLineEdit *> (widget);
+                          RegionOrderPreviewDialog preview (
+                              order, edit ? edit->text () : QString (),
+                              dh::lastMultiRegionNames (), d);
+                          preview.exec ();
+                        });
+  }
+};
+
 static MainWindow *mainWindow = nullptr;
 
 /* What a sidebar row opens.
@@ -908,6 +953,9 @@ MainWindow::MainWindow (QWidget *parent) : QMainWindow (parent)
       else if (info.key == QLatin1String ("MultiRegionNamePattern"))
         creator = [] (DhSettingItem *i, QVBoxLayout *l, DhSettingsDialog *d)
           { return std::make_unique<DhNamePatternSettingTemplate> (i, l, d); };
+      else if (info.key == QLatin1String ("MultiRegionOrderRule"))
+        creator = [] (DhSettingItem *i, QVBoxLayout *l, DhSettingsDialog *d)
+          { return std::make_unique<DhOrderRuleTemplate> (i, l, d); };
       else if (info.key == QLatin1String ("NamePatternSampleFile")
                || info.key == QLatin1String ("NamePatternSampleRegion"))
         creator = [] (DhSettingItem *i, QVBoxLayout *l, DhSettingsDialog *d)
