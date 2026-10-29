@@ -16,6 +16,8 @@
 #include <atomic>
 #include <memory>
 #include <optional>
+#include <qpointer.h>
+#include <qwidget.h>
 
 class QResizeEvent;
 class QShowEvent;
@@ -32,13 +34,13 @@ class FlowLayout;
  * The scene is built on a worker thread: for a big region that takes long
  * enough that building it here froze the whole window (and the application).
  *
- * A version's block models and textures are only in its client jar, so when the
- * cache does not have one the window fetches it — about 30 MB, once per version
- * — as long as the `DownloadClientJar` setting allows it. The fetch goes
- * through `DhDownloadManager`, so a page that already asked for the same jar
- * (the material list does) leaves this one to share that download instead of
- * starting a second. The button fetches one on demand (and cancels a fetch that
- * is running).
+ * A version's block models and textures are only in its client jar, so when
+ * the cache does not have one the window fetches it — about 30 MB, once per
+ * version — as long as the `DownloadClientJar` setting allows it. The fetch
+ * goes through `DhDownloadManager`, so a page that already asked for the same
+ * jar (the material list does) leaves this one to share that download instead
+ * of starting a second. The button fetches one on demand (and cancels a fetch
+ * that is running).
  */
 class DhRenderUI : public DhWidget
 {
@@ -102,19 +104,23 @@ private:
   [[nodiscard]] QColor colourSetting (const QString &key,
                                       const QColor &fallback) const;
 
-  /* The cells a multi-selection may pick from: every cell of the region that is
-   * not air. The view holds no region, so this is the owner's part of the
+  /* The cells a multi-selection may pick from: every cell of the region that
+   * is not air. The view holds no region, so this is the owner's part of the
    * selection. */
   void enumerateCells (const std::function<void (int, int, int)> &visit);
-  /* Turns the view's click selection on or off and updates the row around it. */
+  /* Turns the view's click selection on or off and updates the row around it.
+   */
   void setSelectMode (bool on);
   void clearSelection ();
   /* The number of outlined cells, as the label beside the buttons says it. */
   void updateSelectionStatus ();
-  /* Lists the selected cells in a table; choosing a row marks that cell and
-   * describes it, so the buttons act on the block the user picked in the
-   * list. */
+  /* Shows the window listing the selected cells; choosing a row marks that
+   * cell and describes it, so the buttons act on the block the user picked in
+   * the list. The window stays in step with the selection while it is open. */
   void showSelectedBlocks ();
+  /* Fills the window's table from the current selection, closing it when the
+   * selection is empty. Does nothing while the window is closed. */
+  void refreshSelectedBlocks ();
   /* Marks `cell` in the view and makes it this panel's picked cell. */
   void selectCell (const std::array<int, 3> &cell);
   /* Replaces every selected cell with one block chosen in a single block
@@ -166,8 +172,8 @@ private:
    * one offers the whole region, a later reload only clamps them. */
   bool sliceRangeKnown = false;
   QPushButton *fetchButton = nullptr;
-  /* The multi-selection toggle, the button that empties the outline, the list of
-   * the cells it holds, and the count beside the buttons. */
+  /* The multi-selection toggle, the button that empties the outline, the list
+   * of the cells it holds, and the count beside the buttons. */
   QPushButton *selectButton = nullptr;
   QPushButton *clearSelectionButton = nullptr;
   QPushButton *selectedBlocksButton = nullptr;
@@ -204,6 +210,7 @@ private:
   qint32 regionDepth = 0;
   bool updatingButtons = false;
   bool fetching = false;
+  QPointer<QWidget> multiSelectWidget;
 };
 
 #endif /* DHRENDERUI_H */

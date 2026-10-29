@@ -9,28 +9,31 @@
 #include "flowlayout.h"
 #include "mainwindow.h"
 #include "region.h"
+#include "resourcegetter.h"
 
 #include <QDialog>
 #include <QDialogButtonBox>
 #include <QHeaderView>
 #include <QIcon>
 #include <QMessageBox>
+#include <QPushButton>
+#include <QResizeEvent>
 #include <QShowEvent>
 #include <QSignalBlocker>
 #include <QSpinBox>
 #include <QTableWidget>
-#include <algorithm>
-#include <cstring>
-#include <vector>
-#include <cstdint>
-#include <QPushButton>
-#include <QResizeEvent>
 #include <QTimer>
 #include <QVBoxLayout>
+#include <algorithm>
+#include <cstdint>
+#include <cstring>
 #include <libintl.h>
 #include <optional>
+#include <qnamespace.h>
 #include <qtconcurrentrun.h>
+#include <qwidget.h>
 #include <utility>
+#include <vector>
 
 #define _(str) gettext (str)
 
@@ -68,18 +71,19 @@ DhRenderUI::DhRenderUI (std::shared_ptr<RegionClass> region, QWidget *parent)
   resize (900, 640);
 
   /* The jar download is shared: the material list may already be fetching the
-   * very same file, and the manager holds one download per tag. Every signal is
-   * filtered by this window's tag, so a download for another version (or an
+   * very same file, and the manager holds one download per tag. Every signal
+   * is filtered by this window's tag, so a download for another version (or an
    * object) does not move this window's status. */
   auto *manager = DhDownloadManager::instance ();
-  connect (manager, &DhDownloadManager::progress, this,
-           [this] (const QString &tag, int value)
-             {
-               if (tag != jarDownloadTag () || !fetching)
-                 return;
-               summary->setText (
-                   QString (_ ("Downloading the client jar: %1%")).arg (value));
-             });
+  connect (
+      manager, &DhDownloadManager::progress, this,
+      [this] (const QString &tag, int value)
+        {
+          if (tag != jarDownloadTag () || !fetching)
+            return;
+          summary->setText (
+              QString (_ ("Downloading the client jar: %1%")).arg (value));
+        });
   connect (manager, &DhDownloadManager::info, this,
            [this] (const QString &tag, const QString &message)
              {
@@ -97,11 +101,11 @@ DhRenderUI::DhRenderUI (std::shared_ptr<RegionClass> region, QWidget *parent)
 
   auto layout = new QVBoxLayout (this);
 
-  /* The toolbar rows are FlowLayouts, not QHBoxLayouts: a row keeps its buttons
-   * on one line while the window is wide enough and wraps them onto further
-   * lines when it is not. A QHBoxLayout does the opposite — it never wraps and
-   * stops the window from becoming narrower than the sum of its buttons (see
-   * FlowLayout).
+  /* The toolbar rows are FlowLayouts, not QHBoxLayouts: a row keeps its
+   * buttons on one line while the window is wide enough and wraps them onto
+   * further lines when it is not. A QHBoxLayout does the opposite — it never
+   * wraps and stops the window from becoming narrower than the sum of its
+   * buttons (see FlowLayout).
    *
    * Every row sits in a widget of its own: a layout added to a layout is not
    * asked how tall it needs to be for a given width, while a widget's item is,
@@ -131,13 +135,14 @@ DhRenderUI::DhRenderUI (std::shared_ptr<RegionClass> region, QWidget *parent)
   boundsButton->setObjectName ("boundsButton");
   boundsButton->setCheckable (true);
   boundsButton->setToolTip (_ ("Show the box around the region being drawn"));
-  /* The preview's own option lives in the settings dialog, which belongs to the
-   * main window. A render window built by the headless self-check has no main
-   * window, so there is no dialog to open and the button is left out. */
+  /* The preview's own option lives in the settings dialog, which belongs to
+   * the main window. A render window built by the headless self-check has no
+   * main window, so there is no dialog to open and the button is left out. */
   if (MainWindow::instance ())
     {
       auto *settingsButton = new QPushButton (_ ("Preview Settings..."), this);
-      settingsButton->setIcon (QIcon::fromTheme (QStringLiteral ("configure")));
+      settingsButton->setIcon (
+          QIcon::fromTheme (QStringLiteral ("configure")));
       settingsButton->setToolTip (
           _ ("Open the 3D preview setting: whether a missing client jar is "
              "downloaded automatically."));
@@ -156,13 +161,13 @@ DhRenderUI::DhRenderUI (std::shared_ptr<RegionClass> region, QWidget *parent)
   selectButton = new QPushButton (_ ("&Multi-select"), this);
   selectButton->setObjectName ("selectButton");
   selectButton->setCheckable (true);
-  selectButton->setIcon (QIcon::fromTheme (
-      QStringLiteral ("select-rectangular"),
-      QIcon::fromTheme (QStringLiteral ("edit-select"))));
-  selectButton->setToolTip (
-      _ ("Click blocks with the left button to add them to the selection or "
-         "take them out; a click off the scene clears it. The middle and right "
-         "buttons still move the view."));
+  selectButton->setIcon (
+      QIcon::fromTheme (QStringLiteral ("select-rectangular"),
+                        QIcon::fromTheme (QStringLiteral ("edit-select"))));
+  selectButton->setToolTip (_ (
+      "Click blocks with the left button to add them to the selection or "
+      "take them out; a click off the scene clears it. The middle and right "
+      "buttons still move the view."));
   selectionLabel = new QLabel (QString (_ ("No blocks selected")), this);
   selectionLabel->setObjectName ("selectionLabel");
   viewRow->addWidget (fitButton);
@@ -252,7 +257,8 @@ DhRenderUI::DhRenderUI (std::shared_ptr<RegionClass> region, QWidget *parent)
    * keeps all of them where they were. */
   viewRowWidget->setFixedHeight (viewRowHeight);
   editRowWidget->setFixedHeight (editRowHeight);
-  const int rowsHeight = viewRowHeight + editRowHeight + rowsLayout->spacing ();
+  const int rowsHeight
+      = viewRowHeight + editRowHeight + rowsLayout->spacing ();
   rowsWidget->setFixedHeight (
       std::clamp (rowsHeight, 64, static_cast<int> (width () * 0.45)));
   setMinimumWidth (narrowWidth);
@@ -264,11 +270,11 @@ DhRenderUI::DhRenderUI (std::shared_ptr<RegionClass> region, QWidget *parent)
   /* The status lines are long texts, so they sit on lines of their own below
    * the rows: a wrapping row would push the buttons around as they change. */
   summary = new QLabel (this);
-  /* The status line can be longer than a narrow window, and a label asks for as
-   * much width as its text needs; letting that decide the window's minimum width
-   * would stop the panel from ever reaching the width the rows were measured
-   * at. Its width is ignored for the layout's minimum instead, so a long line
-   * is simply cut at the right edge. */
+  /* The status line can be longer than a narrow window, and a label asks for
+   * as much width as its text needs; letting that decide the window's minimum
+   * width would stop the panel from ever reaching the width the rows were
+   * measured at. Its width is ignored for the layout's minimum instead, so a
+   * long line is simply cut at the right edge. */
   summary->setMinimumWidth (0);
   summary->setSizePolicy (QSizePolicy::Ignored, QSizePolicy::Preferred);
   layout->addWidget (summary);
@@ -318,10 +324,12 @@ DhRenderUI::DhRenderUI (std::shared_ptr<RegionClass> region, QWidget *parent)
   connect (view, &DhRenderWidget::sliceChanged, this, &DhRenderUI::rebuild);
   connect (reloadButton, &QPushButton::clicked, this, &DhRenderUI::rebuild);
   connect (fetchButton, &QPushButton::clicked, this, &DhRenderUI::toggleFetch);
-  connect (modifyButton, &QPushButton::clicked, this, &DhRenderUI::modifyPicked);
+  connect (modifyButton, &QPushButton::clicked, this,
+           &DhRenderUI::modifyPicked);
   connect (replaceButton, &QPushButton::clicked, this,
            &DhRenderUI::replaceSelection);
-  connect (addButton, &QPushButton::clicked, this, [this] { pickBlock (true); });
+  connect (addButton, &QPushButton::clicked, this,
+           [this] { pickBlock (true); });
   /* A write is refused while a job holds the region, so the buttons that open
    * an editor are disabled then instead of failing afterwards. */
   connect (regionClass.get (), &RegionClass::lockedChanged, this,
@@ -436,7 +444,8 @@ DhRenderUI::startSceneBuild ()
    * scene stayed the same would keep the old background. */
   loadColourSettings ();
   /* The resource layer has to name the version's jar before the scene is
-   * built, and it is core-global state, so it is set here on the GUI thread. */
+   * built, and it is core-global state, so it is set here on the GUI thread.
+   */
   configureResources ();
   /* A reload is also what a changed region or slice comes through, so the
    * controls are brought up to date before the slice is read. Telling the view
@@ -468,18 +477,17 @@ DhRenderUI::startSceneBuild ()
   watcher->setFuture (QtConcurrent::run (
       [region, core, progress, slice] () -> std::shared_ptr<DhlrcScene>
         {
-          /* The region is locked while everything the scene needs is copied out
-           * of it: the GUI cannot change it under the build, and the copy runs
-           * off the GUI thread. */
+          /* The region is locked while everything the scene needs is copied
+           * out of it: the GUI cannot change it under the build, and the copy
+           * runs off the GUI thread. */
           AutoLocker locker (*region);
           DhlrcScene *raw = nullptr;
           if (slice)
             raw = dhlrc_render_scene_new_slice (core, region->get_region (),
                                                 slice->first, slice->second);
           else
-            raw = dhlrc_render_scene_new_reported (core, region->get_region (),
-                                                   &sceneProgress,
-                                                   progress.get ());
+            raw = dhlrc_render_scene_new_reported (
+                core, region->get_region (), &sceneProgress, progress.get ());
           return std::shared_ptr<DhlrcScene> (raw, dhlrc_render_scene_free);
         }));
   buildProgressTimer->start (100);
@@ -620,8 +628,8 @@ DhRenderUI::finishFetch (const QString &error)
       rebuild ();
       return;
     }
-  picked->setText (QString (_ ("The client jar could not be downloaded: %1"))
-                       .arg (error));
+  picked->setText (
+      QString (_ ("The client jar could not be downloaded: %1")).arg (error));
   updateSummary ();
 }
 
@@ -636,7 +644,8 @@ void
 DhRenderUI::rebuild ()
 {
   /* A fresh snapshot of the region, built off the GUI thread like the first
-   * one. `startSceneBuild ()` ignores a second request while one is running. */
+   * one. `startSceneBuild ()` ignores a second request while one is running.
+   */
   startSceneBuild ();
 }
 
@@ -644,8 +653,8 @@ void
 DhRenderUI::applySlice ()
 {
   if (sliceButton->isChecked ())
-    view->setSlice (std::make_pair (sliceLowSpin->value (),
-                                    sliceHighSpin->value ()));
+    view->setSlice (
+        std::make_pair (sliceLowSpin->value (), sliceHighSpin->value ()));
   else
     view->setSlice (std::nullopt);
 }
@@ -680,8 +689,8 @@ DhRenderUI::updateSummary ()
   /* Which backend is drawing is part of the status: the GPU path and the
    * rasteriser can give slightly different pictures, and a failed GL frame
    * changes the answer while the window is open. */
-  const QString backend = view->usingGl () ? _ ("drawn with OpenGL")
-                                           : _ ("drawn by the CPU");
+  const QString backend
+      = view->usingGl () ? _ ("drawn with OpenGL") : _ ("drawn by the CPU");
   QString text
       = QString (_ ("%1 x %2 x %3, %4 quads, %5 blocks not drawn, %6"))
             .arg (x)
@@ -722,9 +731,10 @@ DhRenderUI::updateSummary ()
            "the client jar table knows."));
   else
     picked->setText (
-        QString (_ ("Nothing could be drawn. The block models and textures of a "
-                    "version live in its client jar, which belongs at %1. "
-                    "Press \"Get Resources\" to download it (about 30 MB)."))
+        QString (
+            _ ("Nothing could be drawn. The block models and textures of a "
+               "version live in its client jar, which belongs at %1. "
+               "Press \"Get Resources\" to download it (about 30 MB)."))
             .arg (path));
 }
 
@@ -764,7 +774,8 @@ DhRenderUI::describe (int x, int y, int z)
   /* Whether the property dialog has anything to show for this block: a block
    * without properties, or one whose palette entry names none, cannot be
    * modified. */
-  pickedPropertyCount = static_cast<int> (regionClass->palettePropertyLen (id));
+  pickedPropertyCount
+      = static_cast<int> (regionClass->palettePropertyLen (id));
   const char *name = region_get_palette_id_name (raw, id);
   picked->setText (QString (_ ("Block (%1, %2, %3): %4"))
                        .arg (x)
@@ -830,7 +841,8 @@ DhRenderUI::updateEditButtons ()
       replaceButton->setToolTip (
           view && !view->selectedCells ().isEmpty ()
               ? _ ("Put one block into every selected cell")
-              : _ ("Put another block in place of the block that was clicked"));
+              : _ ("Put another block in place of the block that was "
+                   "clicked"));
     }
   /* Adding never needs a picked block: the position is typed into the dialog,
    * which is the only way to reach an empty cell. */
@@ -928,8 +940,8 @@ DhRenderUI::loadColourSettings ()
    * falls back to the default, so a hand-edited setting cannot make the
    * preview unreadable. The pickers themselves live on the settings page,
    * which writes these keys. */
-  highlightColour = colourSetting (QStringLiteral ("HighlightColour"),
-                                   QColor (0, 0, 0));
+  highlightColour
+      = colourSetting (QStringLiteral ("HighlightColour"), QColor (0, 0, 0));
   backgroundColor = colourSetting (QStringLiteral ("BackgroundColour"),
                                    QColor (0x20, 0x28, 0x30));
   boundsColour = colourSetting (QStringLiteral ("BoundsColour"),
@@ -982,9 +994,8 @@ DhRenderUI::updateSelectionStatus ()
 {
   const auto count = view->selectedCells ().size ();
   selectionLabel->setText (
-      count == 0
-          ? QString (_ ("No blocks selected"))
-          : QString (_ ("%1 block(s) selected")).arg (count));
+      count == 0 ? QString (_ ("No blocks selected"))
+                 : QString (_ ("%1 block(s) selected")).arg (count));
   /* The list is worth opening only when it would have rows. */
   selectedBlocksButton->setEnabled (count > 0);
   /* The buttons write into the region, and a selection does not change what
@@ -1006,26 +1017,94 @@ DhRenderUI::selectCell (const std::array<int, 3> &cell)
 void
 DhRenderUI::showSelectedBlocks ()
 {
-  const QVector<DhRenderWidget::BlockCell> cells = view->selectedCells ();
-  if (cells.isEmpty ())
+  if (view->selectedCells ().isEmpty ())
     return;
 
-  QDialog dialog (this);
-  dialog.setWindowTitle (QString (_ ("Selected Blocks")));
-  dialog.resize (380, 420);
-  auto *layout = new QVBoxLayout (&dialog);
+  if (!multiSelectWidget)
+    {
+      /* The list is its own top-level window, so the picture can still be
+       * used while it is open; the panel owns it, so it cannot outlive the
+       * panel. */
+      multiSelectWidget = new QWidget (this, Qt::Window);
+      multiSelectWidget->setWindowTitle (QString (_ ("Selected Blocks")));
+      multiSelectWidget->resize (380, 420);
+      auto *layout = new QVBoxLayout (multiSelectWidget);
 
-  auto *table = new QTableWidget (static_cast<int> (cells.size ()), 2,
-                                  &dialog);
-  table->setObjectName ("selectedBlocksTable");
-  table->setHorizontalHeaderLabels ({ QString (_ ("Position")),
-                                      QString (_ ("Block")) });
-  table->setEditTriggers (QAbstractItemView::NoEditTriggers);
-  table->setSelectionBehavior (QAbstractItemView::SelectRows);
-  table->setSelectionMode (QAbstractItemView::SingleSelection);
-  table->verticalHeader ()->setVisible (false);
-  table->horizontalHeader ()->setStretchLastSection (true);
+      auto *table = new QTableWidget (0, 2, multiSelectWidget);
+      table->setObjectName ("selectedBlocksTable");
+      table->setHorizontalHeaderLabels (
+          { QString (_ ("Position")), QString (_ ("Block")) });
+      table->setEditTriggers (QAbstractItemView::NoEditTriggers);
+      table->setSelectionBehavior (QAbstractItemView::SelectRows);
+      table->setSelectionMode (QAbstractItemView::SingleSelection);
+      table->verticalHeader ()->setVisible (false);
+      table->horizontalHeader ()->setStretchLastSection (true);
+      layout->addWidget (table);
 
+      auto *buttons = new QDialogButtonBox (QDialogButtonBox::Close,
+                                            multiSelectWidget);
+      connect (buttons, &QDialogButtonBox::rejected, multiSelectWidget,
+               &QDialog::close);
+      layout->addWidget (buttons);
+
+      /* The picture is the other way of changing the selection, so the list
+       * follows it while it is open. */
+      connect (view, &DhRenderWidget::selectionChanged, this,
+               &DhRenderUI::refreshSelectedBlocks);
+      /* A row carries its cell in the first item's data, so a click still
+       * names a cell after the list has been filled again. */
+      connect (table, &QTableWidget::cellClicked, this,
+               [this] (int row, int)
+                 {
+                   auto *table
+                       = multiSelectWidget
+                             ? multiSelectWidget->findChild<QTableWidget *> (
+                                   QStringLiteral ("selectedBlocksTable"))
+                             : nullptr;
+                   auto *item = table ? table->item (row, 0) : nullptr;
+                   if (!item)
+                     return;
+                   const QVariantList cell
+                       = item->data (Qt::UserRole).toList ();
+                   if (cell.size () != 3)
+                     return;
+                   selectCell ({ cell.at (0).toInt (), cell.at (1).toInt (),
+                                 cell.at (2).toInt () });
+                   /* The marker moved, so the row colour has to move too. */
+                   refreshSelectedBlocks ();
+                 });
+
+      multiSelectWidget->setAttribute (Qt::WA_DeleteOnClose);
+    }
+
+  refreshSelectedBlocks ();
+  multiSelectWidget->show ();
+  multiSelectWidget->raise ();
+  multiSelectWidget->activateWindow ();
+}
+
+void
+DhRenderUI::refreshSelectedBlocks ()
+{
+  auto *table
+      = multiSelectWidget
+            ? multiSelectWidget->findChild<QTableWidget *> (
+                  QStringLiteral ("selectedBlocksTable"))
+            : nullptr;
+  if (!table)
+    return;
+
+  const QVector<DhRenderWidget::BlockCell> cells = view->selectedCells ();
+  if (cells.isEmpty ())
+    {
+      /* A list of nothing has nothing to say; the selection's own handling
+       * disables the button that opens it. */
+      multiSelectWidget->close ();
+      return;
+    }
+
+  QSignalBlocker blocker (table);
+  table->setRowCount (static_cast<int> (cells.size ()));
   {
     /* The names come from the palette, which a background job may be
      * rewriting, so the table is filled under the region's lock. */
@@ -1034,6 +1113,13 @@ DhRenderUI::showSelectedBlocks ()
     for (qsizetype i = 0; i < cells.size (); i++)
       {
         const auto &cell = cells.at (i);
+        auto *position
+            = new QTableWidgetItem (QStringLiteral ("(%1, %2, %3)")
+                                        .arg (cell[0])
+                                        .arg (cell[1])
+                                        .arg (cell[2]));
+        position->setData (Qt::UserRole,
+                           QVariantList{ cell[0], cell[1], cell[2] });
         QString name;
         const qint32 index = regionClass->index (cell[0], cell[1], cell[2]);
         if (index >= 0 && raw)
@@ -1045,14 +1131,17 @@ DhRenderUI::showSelectedBlocks ()
             if (text)
               string_free (text);
           }
-        table->setItem (
-            static_cast<int> (i), 0,
-            new QTableWidgetItem (QStringLiteral ("(%1, %2, %3)")
-                                      .arg (cell[0])
-                                      .arg (cell[1])
-                                      .arg (cell[2])));
-        table->setItem (static_cast<int> (i), 1,
-                        new QTableWidgetItem (name));
+        /* The same wording as the block chooser: the translated name with the
+         * palette id beside it, since the id is what the file uses. */
+        const QString translated = get_translation_from_object (name);
+        auto *block = new QTableWidgetItem (
+            translated.isEmpty () || translated == name
+                ? name
+                : QStringLiteral ("%1 (%2)").arg (translated, name));
+        if (!translated.isEmpty ())
+          block->setToolTip (name);
+        table->setItem (static_cast<int> (i), 0, position);
+        table->setItem (static_cast<int> (i), 1, block);
       }
   }
   /* The row that the marker box in the picture belongs to carries the
@@ -1066,23 +1155,6 @@ DhRenderUI::showSelectedBlocks ()
             item->setBackground (QBrush (markerColour.lighter (150)));
 
   table->resizeColumnsToContents ();
-  layout->addWidget (table);
-
-  auto *buttons = new QDialogButtonBox (QDialogButtonBox::Close, &dialog);
-  connect (buttons, &QDialogButtonBox::rejected, &dialog, &QDialog::reject);
-  layout->addWidget (buttons);
-
-  /* The rows are a snapshot taken above, so a row index names its cell even if
-   * the selection changes while the list is open. */
-  connect (table, &QTableWidget::cellClicked, &dialog,
-           [this, cells] (int row, int)
-             {
-               if (row < 0 || row >= cells.size ())
-                 return;
-               selectCell (cells.at (row));
-             });
-
-  dialog.exec ();
 }
 
 void
@@ -1176,9 +1248,10 @@ DhRenderUI::replaceSelection ()
           for (qsizetype i = 0; i < cells.size (); i++)
             {
               const auto &cell = cells.at (i);
-              if (!region.setBlockState (cell[0], cell[1], cell[2],
-                                         states.at (i).name,
-                                         states.at (i).properties)
+              if (!region
+                       .setBlockState (cell[0], cell[1], cell[2],
+                                       states.at (i).name,
+                                       states.at (i).properties)
                        .isEmpty ())
                 return false;
             }
@@ -1215,6 +1288,7 @@ DhRenderUI::describeHover (int x, int y, int z)
    * where the block is. */
   const QString info
       = BlockReaderUI::getBlockInfo (raw, static_cast<quint32> (index), false);
-  view->setHoverInfo (QString (_ ("Block (%1, %2, %3)")).arg (x).arg (y).arg (z)
-                      + QLatin1Char ('\n') + info);
+  view->setHoverInfo (
+      QString (_ ("Block (%1, %2, %3)")).arg (x).arg (y).arg (z)
+      + QLatin1Char ('\n') + info);
 }

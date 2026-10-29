@@ -376,15 +376,25 @@ impl Scene {
     /// picked blocks are drawn on top of it, the hover box before the picks so
     /// a picked block keeps its own colour under the pointer, and the marker
     /// last so it stays visible over both.
+    ///
+    /// Boxes over the marker's own cell are left out: every box has the same
+    /// geometry, so the renderers' depth test would let whichever came first
+    /// win and hide the marker. Skipping them gives the cell the marker's
+    /// colour instead.
     fn rebuild_overlay(&mut self) {
         self.overlay.clear();
         if let Some(bounds) = self.bounds {
             self.overlay.extend(outline(bounds, self.bounds_colour));
         }
         if let Some(hover) = self.hover {
-            self.overlay.extend(outline(hover, self.hover_colour));
+            if self.marker != Some(hover) {
+                self.overlay.extend(outline(hover, self.hover_colour));
+            }
         }
         for highlight in &self.highlights {
+            if self.marker == Some(*highlight) {
+                continue;
+            }
             self.overlay
                 .extend(outline(*highlight, self.highlight_colour));
         }
@@ -1442,8 +1452,8 @@ mod tests {
             max: [8.0, 8.0, 8.0],
         }));
         scene.set_highlight(Some(super::Highlight {
-            min: [1.0, 0.0, 1.0],
-            max: [2.0, 1.0, 2.0],
+            min: [3.0, 0.0, 3.0],
+            max: [4.0, 1.0, 4.0],
         }));
         scene.set_marker_colour([0, 0, 255]);
         assert_eq!(scene.overlay.len(), 3 * 12 * 6);
@@ -1457,6 +1467,29 @@ mod tests {
             Some([0, 0, 255]),
             "the marker's box comes last"
         );
+
+        /* A pick over the marker's own cell is dropped instead of covering
+         * it: the two boxes have the same geometry, so the renderers would
+         * keep whichever came first and the marker would vanish. */
+        scene.set_highlight(Some(super::Highlight {
+            min: [1.0, 0.0, 1.0],
+            max: [2.0, 1.0, 2.0],
+        }));
+        assert_eq!(scene.overlay.len(), 2 * 12 * 6);
+        assert_eq!(
+            scene.overlay[12 * 6].tint,
+            Some([0, 0, 255]),
+            "the marked cell keeps the marker's colour"
+        );
+
+        /* The same for the hover box. */
+        scene.set_highlight(None);
+        scene.set_hover(Some(super::Highlight {
+            min: [1.0, 0.0, 1.0],
+            max: [2.0, 1.0, 2.0],
+        }));
+        assert_eq!(scene.overlay.len(), 2 * 12 * 6);
+        assert_eq!(scene.overlay[12 * 6].tint, Some([0, 0, 255]));
 
         /* Clearing the marker removes its box and leaves the rest alone. */
         scene.set_marker(None);
