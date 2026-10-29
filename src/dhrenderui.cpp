@@ -24,6 +24,7 @@
 #include <vector>
 #include <cstdint>
 #include <QPushButton>
+#include <QResizeEvent>
 #include <QTimer>
 #include <QVBoxLayout>
 #include <libintl.h>
@@ -108,8 +109,8 @@ DhRenderUI::DhRenderUI (std::shared_ptr<RegionClass> region, QWidget *parent)
 
   /* The first row changes what is drawn without touching the region: where the
    * camera looks and which part of the region is in the picture. */
-  auto *viewRowWidget = new QWidget (this);
-  auto *viewRow = new FlowLayout (viewRowWidget, 0, 6, 2);
+  viewRowWidget = new QWidget (this);
+  viewRow = new FlowLayout (viewRowWidget, 0, 6, 2);
   auto *fitButton = new QPushButton (_ ("&Fit"), this);
   auto *orthoButton = new QPushButton (_ ("&Orthographic"), this);
   orthoButton->setCheckable (true);
@@ -177,8 +178,8 @@ DhRenderUI::DhRenderUI (std::shared_ptr<RegionClass> region, QWidget *parent)
 
   /* The last row acts on the region itself: a fresh scene, its resources, and
    * what is written into it. */
-  auto *editRowWidget = new QWidget (this);
-  auto *editRow = new FlowLayout (editRowWidget, 0, 6, 2);
+  editRowWidget = new QWidget (this);
+  editRow = new FlowLayout (editRowWidget, 0, 6, 2);
   reloadButton = new QPushButton (_ ("&Reload"), this);
   reloadButton->setObjectName ("reloadButton");
   fetchButton = new QPushButton (_ ("Get &Resources"), this);
@@ -227,6 +228,7 @@ DhRenderUI::DhRenderUI (std::shared_ptr<RegionClass> region, QWidget *parent)
    * inside it, so the picture underneath never moves while the window is
    * dragged. */
   auto *rowsWidget = new QWidget (this);
+  rowsWidget->setObjectName ("renderRows");
   auto *rowsLayout = new QVBoxLayout (rowsWidget);
   rowsLayout->setContentsMargins (0, 0, 0, 0);
   rowsLayout->setSpacing (2);
@@ -241,12 +243,23 @@ DhRenderUI::DhRenderUI (std::shared_ptr<RegionClass> region, QWidget *parent)
    * than the measured width, so the rows always fit. */
   constexpr int narrowWidth = 420;
   rowsWidget->ensurePolished ();
-  const int rowsHeight = viewRow->heightForWidth (narrowWidth)
-                         + editRow->heightForWidth (narrowWidth)
-                         + rowsLayout->spacing ();
+  const int viewRowHeight = viewRow->heightForWidth (narrowWidth);
+  const int editRowHeight = editRow->heightForWidth (narrowWidth);
+  /* Each row is pinned to the height it needs at the narrowest width, too.
+   * The rows share the band, so a row whose line count changed while the
+   * window was dragged also changed its share of that band: every button
+   * moved up or down even when the wrap itself was left alone. A fixed height
+   * keeps all of them where they were. */
+  viewRowWidget->setFixedHeight (viewRowHeight);
+  editRowWidget->setFixedHeight (editRowHeight);
+  const int rowsHeight = viewRowHeight + editRowHeight + rowsLayout->spacing ();
   rowsWidget->setFixedHeight (
       std::clamp (rowsHeight, 64, static_cast<int> (width () * 0.45)));
   setMinimumWidth (narrowWidth);
+  rowsSettle = new QTimer (this);
+  rowsSettle->setSingleShot (true);
+  rowsSettle->setInterval (180);
+  connect (rowsSettle, &QTimer::timeout, this, [this] { rowsSettled (); });
 
   /* The status lines are long texts, so they sit on lines of their own below
    * the rows: a wrapping row would push the buttons around as they change. */
@@ -372,12 +385,38 @@ DhRenderUI::DhRenderUI (std::shared_ptr<RegionClass> region, QWidget *parent)
 void
 DhRenderUI::showEvent (QShowEvent *event)
 {
+  rowsShown = true;
   DhWidget::showEvent (event);
   /* The colours are set on the settings page, which may have been used while
    * this panel was hidden; reading them again on every show is cheap and makes
    * a change take effect as soon as the picture comes back. */
   if (view)
     loadColourSettings ();
+}
+
+void
+DhRenderUI::resizeEvent (QResizeEvent *event)
+{
+  DhWidget::resizeEvent (event);
+  if (!rowsShown || !viewRow || !editRow || !rowsSettle)
+    return;
+  /* Keep the rows where they are until the drag has stopped: re-wrapping on
+   * every pixel makes the buttons jump between lines and back while the
+   * window edge is moving. */
+  viewRow->setFrozen (true);
+  editRow->setFrozen (true);
+  rowsSettle->start ();
+}
+
+void
+DhRenderUI::rowsSettled ()
+{
+  if (!viewRow || !editRow || !viewRowWidget || !editRowWidget)
+    return;
+  viewRow->setFrozen (false);
+  editRow->setFrozen (false);
+  viewRow->setGeometry (viewRowWidget->rect ());
+  editRow->setGeometry (editRowWidget->rect ());
 }
 
 void

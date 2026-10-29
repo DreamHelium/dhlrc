@@ -118,11 +118,8 @@ pub fn bounds_colour() -> [u8; 3] {
 }
 
 /// How thick the outline's lines are, in blocks: a block is 1 across, so this
-/// is an eighth of it. An outline is only a few pixels wide in a view of a few
-/// dozen blocks, and the rasteriser drops a quad that misses every pixel
-/// centre, so thinner lines came and went with the camera instead of showing
-/// the pick.
-const HIGHLIGHT_THICKNESS: f32 = 1.0 / 8.0;
+/// is a thirty-second of it — about a pixel in a view of a few dozen blocks.
+const HIGHLIGHT_THICKNESS: f32 = 1.0 / 32.0;
 
 /// The twelve edges of `highlight` as thin boxes, one quad per face.
 ///

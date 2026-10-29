@@ -833,7 +833,16 @@ MainWindow::MainWindow (QWidget *parent) : QMainWindow (parent)
    * room for the scrollbar. */
   const auto rowExtras = listView->iconSize ().width () + 56;
   leftWidget->setMinimumWidth (maxLen + rowExtras);
-  splitter->setSizes ({ maxLen + rowExtras, width () - maxLen - rowExtras });
+  sidebarWidth = maxLen + rowExtras;
+  splitter->setSizes ({ sidebarWidth, width () - sidebarWidth });
+  /* The handle stays where the user leaves it: the width is remembered and put
+   * back after a resize or a page change, rather than being re-divided. */
+  connect (splitter, &QSplitter::splitterMoved, this,
+           [this] (int, int)
+             {
+               if (!restoringSidebar)
+                 sidebarWidth = splitter->sizes ().value (0);
+             });
   proxyModel = new QSortFilterProxyModel (this);
   proxyModel->setSourceModel (model);
   listView->setModel (proxyModel);
@@ -1033,6 +1042,14 @@ MainWindow::MainWindow (QWidget *parent) : QMainWindow (parent)
                  splitter->replaceWidget (1, tabWidget);
                else if (tabWidget->count () == 0)
                  splitter->replaceWidget (1, welcomeWidget);
+               /* Replacing the right-hand widget drops the stretch factors the
+                * constructor set, and without them the splitter divides extra
+                * space in proportion to the two sides: the sidebar then grows
+                * and shrinks with the window instead of staying put. Set them
+                * again before asking for the remembered width. */
+               splitter->setStretchFactor (0, 0);
+               splitter->setStretchFactor (1, 1);
+               QTimer::singleShot (0, this, &MainWindow::restoreSidebarWidth);
              });
 
   /* The core opened the configuration before the window existed; show what it
@@ -1771,6 +1788,35 @@ MainWindow::discardFloatingPage (QWidget *page)
       page->setParent (nullptr);
       window->deleteLater ();
     }
+}
+
+void
+MainWindow::restoreSidebarWidth ()
+{
+  if (!splitter || sidebarWidth <= 0 || splitter->count () < 2)
+    return;
+  const int total = splitter->width ();
+  if (total <= 0 || splitter->sizes ().value (0) == sidebarWidth)
+    return;
+  restoringSidebar = true;
+  /* The splitter clamps this itself when the window is too narrow for both
+   * sides' minimum widths; growing it again puts the remembered width back. */
+  splitter->setSizes ({ sidebarWidth, total - sidebarWidth });
+  restoringSidebar = false;
+}
+
+void
+MainWindow::resizeEvent (QResizeEvent *event)
+{
+  QMainWindow::resizeEvent (event);
+  /* The splitter gives the extra width to the side it stretches, but it
+   * rounds the two sides independently, so the handle can end up a pixel or
+   * two away from where it was and the page content moves sideways with it.
+   * Put the remembered width back before this resize is painted: a deferred
+   * call let one frame be drawn at the rounded width, which showed up as a
+   * sideways twitch of the page while a window edge was dragged fast. */
+  if (sidebarWidth > 0)
+    restoreSidebarWidth ();
 }
 
 void

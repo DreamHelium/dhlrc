@@ -46,3 +46,6 @@ target
 
 # dsh-linsys temp
 .dsh-linsys2
+
+# generated at build time from dhlrc/zh_CN.po
+po/dhlrc-cute/*.po

@@ -69,7 +69,21 @@ void
 FlowLayout::setGeometry (const QRect &rect)
 {
   QLayout::setGeometry (rect);
+  if (frozen)
+    return;
   doLayout (rect, false);
+}
+
+void
+FlowLayout::setFrozen (bool value)
+{
+  frozen = value;
+}
+
+bool
+FlowLayout::isFrozen () const
+{
+  return frozen;
 }
 
 QSize

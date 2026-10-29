@@ -348,11 +348,25 @@ pub extern "C" fn dhlrc_core_watch_start(
     let watcher = ConfigWatcher::from_config(core.paths.clone(), current);
 
     match watcher.spawn(move |config| {
+        // The watcher cannot tell the application's own save from someone
+        // else's edit, but the shared configuration can: saving writes exactly
+        // the configuration already in memory, so an unchanged one is this
+        // application's own write coming back. Reporting it as a reload would
+        // race a settings dialog that has just applied its edits and reset its
+        // controls to the just-saved values.
+        let unchanged = match shared.config.lock() {
+            Ok(mut guard) => {
+                let unchanged = *guard == config;
+                *guard = config.clone();
+                unchanged
+            }
+            Err(_) => false,
+        };
+        if unchanged {
+            return;
+        }
         let app_id = config.notifications.app_id.clone();
         let timeout_ms = config.notifications.timeout_ms;
-        if let Ok(mut guard) = shared.config.lock() {
-            *guard = config;
-        }
         // Tell the frontend what changed; the strings only live for the call.
         let note = paths.reloaded_notification();
         let enabled = shared.notifications_enabled.load(Ordering::Relaxed);

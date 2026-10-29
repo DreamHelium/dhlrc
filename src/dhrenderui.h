@@ -17,9 +17,11 @@
 #include <memory>
 #include <optional>
 
+class QResizeEvent;
 class QShowEvent;
 class QSpinBox;
 class DhRenderWidget;
+class FlowLayout;
 
 /* A window showing one region in three dimensions.
  *
@@ -50,8 +52,13 @@ protected:
    * after they were changed on the settings page, so they are read again every
    * time it comes back. */
   void showEvent (QShowEvent *event) override;
+  /* Freezes the toolbar rows while a window edge is dragged and wraps them
+   * once the drag has stopped. */
+  void resizeEvent (QResizeEvent *event) override;
 
 private:
+  void rowsSettled ();
+
   void configureResources ();
   /* Builds the scene on a worker thread and hands it to the view, which takes
    * over its ownership. */
@@ -126,6 +133,15 @@ private:
   /* The tag this window's version's client jar is shared under; every signal
    * of the manager is filtered by it. */
   QString jarDownloadTag () const;
+
+  /* The toolbar rows and the widgets that hold them. The rows are laid out
+   * by hand because they wrap; see rowsSettled (). */
+  FlowLayout *viewRow = nullptr;
+  FlowLayout *editRow = nullptr;
+  QWidget *viewRowWidget = nullptr;
+  QWidget *editRowWidget = nullptr;
+  QTimer *rowsSettle = nullptr;
+  bool rowsShown = false;
 
   std::shared_ptr<RegionClass> regionClass;
   DhRenderWidget *view = nullptr;

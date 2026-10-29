@@ -37,7 +37,15 @@ public:
   [[nodiscard]] QSize minimumSize () const override;
   [[nodiscard]] QSize sizeHint () const override;
 
+  /* While frozen the items keep the geometry they were last given. A window
+   * edge being dragged changes the width on every pixel, and wrapping the row
+   * again on each step makes buttons jump between lines under the pointer;
+   * the owner unfreezes once the drag has stopped. */
+  void setFrozen (bool value);
+  [[nodiscard]] bool isFrozen () const;
+
 private:
+  bool frozen = false;
   /* Places the items, or only measures the height they need when
    * `test_only` is set. Returns that height. */
   int doLayout (const QRect &rect, bool test_only) const;

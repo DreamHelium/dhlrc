@@ -80,6 +80,14 @@ private:
   QListView *listView;
   QLineEdit *lineEdit;
   QTabWidget *tabWidget;
+  /* The sidebar width the user last chose. The splitter is asked to keep it
+   * whenever the window is resized or the right-hand page changes, so the
+   * handle does not wander with the window or with a page being opened. */
+  int sidebarWidth = 0;
+  /* Set while the width is being put back, so the programmatic splitter move
+   * is not mistaken for the user dragging the handle. */
+  bool restoringSidebar = false;
+  void restoreSidebarWidth ();
   QStandardItemModel *model;
   QAction *actionSearch;
   QVBoxLayout *topLayout;
@@ -189,6 +197,9 @@ public:
 
 protected:
   void closeEvent (QCloseEvent *event) override;
+  /* Puts the remembered sidebar width back after the window width has
+   * changed, so the splitter's rounding cannot move the handle. */
+  void resizeEvent (QResizeEvent *event) override;
 };
 
 #endif // DHLRC_DEBUGLOADINGUI_H

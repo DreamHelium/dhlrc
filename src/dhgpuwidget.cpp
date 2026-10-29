@@ -5,6 +5,7 @@
 
 #ifdef DH_HAVE_OPENGL
 #include <QOffscreenSurface>
+#include <QPalette>
 #include <QOpenGLContext>
 #include <QOpenGLVersionFunctionsFactory>
 #include <QSurfaceFormat>
@@ -59,6 +60,13 @@ void main ()
 DhGpuWidget::DhGpuWidget (QWidget *parent) : QOpenGLWidget (parent)
 {
   setUpdateBehavior (QOpenGLWidget::NoPartialUpdate);
+  /* This widget is a window of its own. While it is being resized, the strip
+   * that has no frame yet is filled with the window's background colour; make
+   * that the colour the renderer would clear to, so a resize never shows the
+   * theme's white through the picture. */
+  QPalette window = palette ();
+  window.setColor (QPalette::Window, background);
+  setPalette (window);
 }
 
 DhGpuWidget::~DhGpuWidget ()
@@ -164,7 +172,11 @@ DhGpuWidget::setBackgroundColour (const QColor &colour)
     return;
   background = colour;
   /* The clear happens in `paintGL ()`; the frame is only queued here, so this
-   * is as cheap as any other redraw. */
+   * is as cheap as any other redraw. The window's own background follows for
+   * the moments it has no frame to show (see the constructor). */
+  QPalette window = palette ();
+  window.setColor (QPalette::Window, colour);
+  setPalette (window);
   update ();
 }
 

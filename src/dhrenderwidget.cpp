@@ -33,6 +33,15 @@ const double ZOOM_PER_NOTCH = 0.88;
  * picture is still changing size. */
 const int HOVER_SETTLE_MS = 120;
 
+/* How often the GL child is resized while a window edge is being dragged.
+ * The child is a window of its own, so every resize makes the window system
+ * lay out a new strip before the renderer's next frame arrives; at a pixel
+ * per event that is many more resizes than frames, and each one is a moment
+ * the strip can show the window background. Handing the size over at 30 Hz
+ * keeps the child at the display's own rate while the parent paints its
+ * background in the strip the child does not cover yet. */
+const int RESIZE_INTERVAL_MS = 33;
+
 /* The three 0..1 components the renderer's colour calls take. */
 void
 colourFloats (const QColor &colour, float *out)
@@ -42,25 +51,73 @@ colourFloats (const QColor &colour, float *out)
   out[2] = static_cast<float> (colour.blueF ());
 }
 
+/* The relative luminance of a colour, as WCAG defines it: the 0..1 value a
+ * black-and-white guide would give it. Two colours whose luminances are close
+ * look alike however far apart their channels are, so contrast is measured on
+ * this rather than on the largest channel difference. */
+double
+relativeLuminance (const QColor &colour)
+{
+  const auto channel = [] (int value) {
+    const double unit = value / 255.0;
+    return unit <= 0.03928
+               ? unit / 12.92
+               : std::pow ((unit + 0.055) / 1.055, 2.4);
+  };
+  return 0.2126 * channel (colour.red ()) + 0.7152 * channel (colour.green ())
+         + 0.0722 * channel (colour.blue ());
+}
+
+/* The WCAG contrast ratio of two colours: 1 for the same colour, 21 for black
+ * on white. A ratio of 3 is the floor for a graphic that has to be told apart
+ * from what is behind it. */
+double
+contrastRatio (const QColor &a, const QColor &b)
+{
+  const double first = relativeLuminance (a);
+  const double second = relativeLuminance (b);
+  return (qMax (first, second) + 0.05) / (qMin (first, second) + 0.05);
+}
+
+/* Black or white, whichever stands out more on `background`. The 0.179 is the
+ * luminance where the two contrast ratios are equal. */
+QColor
+contrastColourFor (const QColor &background)
+{
+  return relativeLuminance (background) > 0.179 ? QColor (0, 0, 0)
+                                                : QColor (255, 255, 255);
+}
+
+/* The colour the selection's outline is drawn in.
+ *
+ * It is the configured highlight colour when that stands out from the
+ * background, and otherwise black or white, whichever the background is not.
+ * The default highlight is black, and on the dark background it left the
+ * picked cell looking untouched: the hover box was already there, so a click
+ * that swapped it for an invisible box seemed to do nothing. */
+QColor
+highlightColourFor (const QColor &background, const QColor &configured)
+{
+  return contrastRatio (configured, background) >= 3.0
+             ? configured
+             : contrastColourFor (background);
+}
+
 /* The colour the box under the pointer is drawn in.
  *
  * It has to stand out from the background, and from the picked colour too: a
  * click picks exactly the block the pointer is already over, so if both boxes
  * had the same colour the press would leave the outline looking unchanged. On
- * the rare background where the contrasting black or white is the picked
- * colour as well, a cyan takes over so the two stay apart. */
+ * the background where the contrasting black or white is the picked colour as
+ * well, a saturated cyan takes over so the two stay apart. */
 QColor
 hoverColourFor (const QColor &background, const QColor &picked)
 {
-  const bool light = background.lightnessF () > 0.5;
-  const QColor contrast = light ? QColor (0, 0, 0) : QColor (255, 255, 255);
-  const int distance
-      = qMax (qAbs (contrast.red () - picked.red ()),
-              qMax (qAbs (contrast.green () - picked.green ()),
-                    qAbs (contrast.blue () - picked.blue ())));
-  if (distance < 96)
-    return light ? QColor (0, 150, 255) : QColor (0, 229, 255);
-  return contrast;
+  const QColor contrast = contrastColourFor (background);
+  if (contrastRatio (contrast, picked) >= 3.0)
+    return contrast;
+  return relativeLuminance (background) > 0.179 ? QColor (0, 100, 220)
+                                                : QColor (0, 229, 255);
 }
 } // namespace
 
@@ -96,6 +153,14 @@ DhRenderWidget::DhRenderWidget (QWidget *parent) : QWidget (parent)
   hoverSettle->setSingleShot (true);
   hoverSettle->setInterval (HOVER_SETTLE_MS);
   connect (hoverSettle, &QTimer::timeout, this, [this] { rehover (); });
+
+  /* Keeps the size handed to the GL child at a steady rate; see
+   * `resizeEvent ()`. */
+  resizeThrottle = new QTimer (this);
+  resizeThrottle->setSingleShot (true);
+  resizeThrottle->setInterval (RESIZE_INTERVAL_MS);
+  connect (resizeThrottle, &QTimer::timeout, this,
+           [this] { applyViewSize (); });
 
   /* The GPU child is the picture; the parent keeps the events, the CPU
    * fallback and the problem text. A machine that cannot give a context gets
@@ -383,9 +448,10 @@ DhRenderWidget::applyColours ()
   if (scene)
     {
       float rgb[3] = { 0.0f, 0.0f, 0.0f };
-      colourFloats (highlightColour, rgb);
+      const QColor picked = highlightColourFor (backgroundColour, highlightColour);
+      colourFloats (picked, rgb);
       dhlrc_render_scene_set_highlight_colour (scene.get (), rgb);
-      colourFloats (hoverColourFor (backgroundColour, highlightColour), rgb);
+      colourFloats (hoverColourFor (backgroundColour, picked), rgb);
       dhlrc_render_scene_set_hover_colour (scene.get (), rgb);
       colourFloats (boundsColour, rgb);
       dhlrc_render_scene_set_bounds_colour (scene.get (), rgb);
@@ -583,8 +649,6 @@ void
 DhRenderWidget::resizeEvent (QResizeEvent *event)
 {
   QWidget::resizeEvent (event);
-  if (gpu)
-    gpu->setGeometry (rect ());
   /* The first real size is what the region is framed against; until it is
    * known the widget is still the default 100 by 30. */
   if (scene && !framed && width () > 1 && height () > 1)
@@ -592,17 +656,39 @@ DhRenderWidget::resizeEvent (QResizeEvent *event)
       dhlrc_render_fit (scene.get (), &camera, width (), height ());
       framed = true;
     }
-  /* The camera's projection is the widget's size, so it is handed over on
-   * every step. What sits under the pointer is not looked up per step: the
-   * picture is about to change size again, and a pick plus an outline rebuild
-   * (and a tooltip moved to a different corner) on every pixel of a drag is
-   * what makes resizing the view feel like it is shaking. Once the size has
+  /* What sits under the pointer is not looked up per step: the picture is
+   * about to change size again, and a pick plus an outline rebuild (and a
+   * tooltip moved to a different corner) on every pixel of a drag is what
+   * makes resizing the view feel like it is shaking. Once the size has
    * settled the block under the pointer is found again. */
-  if (gpu)
-    gpu->setCamera (camera);
   update ();
   if (hoverSettle)
     hoverSettle->start ();
+  /* The GL child is a window of its own, and resizing it on every pixel of a
+   * drag makes the window system lay out a new area for each step — more
+   * often than the renderer can fill it. Handing it the new size at a steady
+   * rate leaves the strip that is not covered yet to the parent, which paints
+   * the renderer's background there; the running timer applies the last size
+   * as soon as the drag pauses. */
+  if (!resizeThrottle)
+    return;
+  if (!resizeThrottle->isActive ())
+    {
+      applyViewSize ();
+      resizeThrottle->start ();
+    }
+}
+
+void
+DhRenderWidget::applyViewSize ()
+{
+  if (!gpu)
+    {
+      update ();
+      return;
+    }
+  gpu->setGeometry (rect ());
+  gpu->setCamera (camera);
 }
 
 void
@@ -917,14 +1003,16 @@ DhRenderWidget::placeTip ()
   if (!tip || !hovered)
     return;
   const QRect area = rect ().adjusted (4, 4, -6, -6);
-  QPoint at = hoverPoint + QPoint (14, 18);
   const QSize size = tip->size ();
-  /* Beside the cursor, flipped to the other side rather than hanging off the
-   * widget. */
+  /* Above the pointer, where there is room: the tip must not cover the block
+   * it names, or the outline that shows the block was picked would be hidden
+   * under it exactly when the pick happens. Below it when the top of the view
+   * is too close. */
+  QPoint at = hoverPoint + QPoint (14, -size.height () - 14);
+  if (at.y () < area.top ())
+    at.setY (hoverPoint.y () + 18);
   if (at.x () + size.width () > area.right ())
     at.setX (hoverPoint.x () - size.width () - 12);
-  if (at.y () + size.height () > area.bottom ())
-    at.setY (hoverPoint.y () - size.height () - 12);
   at.setX (std::max (area.left (), at.x ()));
   at.setY (std::max (area.top (), at.y ()));
   tip->move (at);

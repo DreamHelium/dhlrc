@@ -280,6 +280,9 @@ private:
   /* Hands the camera to the GL child and repaints; every camera change goes
    * through here so the two backends never disagree. */
   void applyCamera ();
+  /* Gives the GL child the widget's current size and camera. Called at most
+   * once per `RESIZE_INTERVAL_MS` while the window is being resized. */
+  void applyViewSize ();
   /* The GL child reports whether its frame drew; a failure falls back to the
    * CPU picture rather than showing nothing. */
   void onFrameDrawn (bool ok);
@@ -321,6 +324,9 @@ private:
    * has stopped, so a drag of the window edge does not re-pick (and move the
    * tooltip) on every step of it. */
   QTimer *hoverSettle = nullptr;
+  /* A single-shot timer that keeps the GL child's size at a steady rate while
+   * a window edge is being dragged; see `resizeEvent ()`. */
+  QTimer *resizeThrottle = nullptr;
   QPoint hoverPoint;
   int hoverBlock[3] = { 0, 0, 0 };
   bool hovered = false;
