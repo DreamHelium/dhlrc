@@ -16,7 +16,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-29 20:17+0800\n"
+"POT-Creation-Date: 2026-10-29 20:31+0800\n"
 "PO-Revision-Date: 2026-10-16 15:39+0800\n"
 "Last-Translator: 孟小骇 <48383878+DreamHelium@users.noreply.github.com>\n"
 "Language-Team: Chinese <kde-i18n-doc@kde.org>\n"
@@ -110,13 +110,14 @@ msgid "Writes to (%1, %2, %3)."
 msgstr "写入 (%1, %2, %3)。"
 
 #: ../../src/blockpickerui.cpp:682 ../../src/blockpickerui.cpp:705
-#: ../../src/blockreaderui.cpp:486 ../../src/dhrenderui.cpp:1238
-#: ../../src/dhrenderui.cpp:1271 ../../src/externalnbtreaderui.cpp:107
-#: ../../src/externalnbtreaderui.cpp:114 ../../src/manageregionui.cpp:274
-#: ../../src/manageregionui.cpp:307 ../../src/manageregionui.cpp:632
-#: ../../src/propertymodifyui.cpp:340 ../../src/regionchangesui.cpp:86
-#: ../../src/regionchangesui.cpp:164 ../../src/regionmodifyui.cpp:101
-#: ../../src/utility.cpp:51 ../../src/utility.cpp:72 ../../src/utility.cpp:80
+#: ../../src/blockreaderui.cpp:486 ../../src/dhrenderui.cpp:894
+#: ../../src/dhrenderui.cpp:1337 ../../src/dhrenderui.cpp:1370
+#: ../../src/externalnbtreaderui.cpp:107 ../../src/externalnbtreaderui.cpp:114
+#: ../../src/manageregionui.cpp:274 ../../src/manageregionui.cpp:307
+#: ../../src/manageregionui.cpp:632 ../../src/propertymodifyui.cpp:340
+#: ../../src/regionchangesui.cpp:86 ../../src/regionchangesui.cpp:164
+#: ../../src/regionmodifyui.cpp:101 ../../src/utility.cpp:51
+#: ../../src/utility.cpp:72 ../../src/utility.cpp:80
 msgid "Error!"
 msgstr "错误！"
 
@@ -290,7 +291,7 @@ msgstr "设置选项："
 msgid "&Continue"
 msgstr "继续(&C)"
 
-#: ../../src/configobjectui.cpp:125 ../../src/dhrenderui.cpp:640
+#: ../../src/configobjectui.cpp:125 ../../src/dhrenderui.cpp:644
 #: ../../src/generalchoosedialog.cpp:46
 msgid "&Cancel"
 msgstr "取消(&C)"
@@ -777,7 +778,7 @@ msgstr ""
 "用左键点击方块把它加入选择或移出选择；点击场景外会清空选择。中键和右键仍然移"
 "动视图。"
 
-#: ../../src/dhrenderui.cpp:171 ../../src/dhrenderui.cpp:997
+#: ../../src/dhrenderui.cpp:171 ../../src/dhrenderui.cpp:1096
 msgid "No blocks selected"
 msgstr "未选择方块"
 
@@ -786,47 +787,47 @@ msgstr "未选择方块"
 msgid "&Reload"
 msgstr "重新加载(&R)"
 
-#: ../../src/dhrenderui.cpp:190 ../../src/dhrenderui.cpp:640
+#: ../../src/dhrenderui.cpp:190 ../../src/dhrenderui.cpp:644
 msgid "Get &Resources"
 msgstr "获取资源(&R)"
 
-#: ../../src/dhrenderui.cpp:191
+#: ../../src/dhrenderui.cpp:192
 msgid "&Modify Properties..."
 msgstr "修改属性(&M)..."
 
-#: ../../src/dhrenderui.cpp:192
+#: ../../src/dhrenderui.cpp:194
 msgid "&Replace Block..."
 msgstr "替换方块(&R)..."
 
-#: ../../src/dhrenderui.cpp:193
+#: ../../src/dhrenderui.cpp:196
 msgid "&Add Block..."
 msgstr "添加方块(&A)..."
 
-#: ../../src/dhrenderui.cpp:194
+#: ../../src/dhrenderui.cpp:198
 msgid "Clear &Selection"
 msgstr "清除选择(&S)"
 
-#: ../../src/dhrenderui.cpp:197
+#: ../../src/dhrenderui.cpp:201
 msgid "Drop the outline around the selected blocks"
 msgstr "取消选中方块的轮廓"
 
-#: ../../src/dhrenderui.cpp:199
+#: ../../src/dhrenderui.cpp:203
 msgid "Selected &Blocks..."
 msgstr "已选方块(&B)..."
 
-#: ../../src/dhrenderui.cpp:202
+#: ../../src/dhrenderui.cpp:206
 msgid "List the selected blocks and mark the one clicked in the list"
 msgstr "列出已选方块，并标记列表中点选的那一个"
 
-#: ../../src/dhrenderui.cpp:217 ../../src/dhrenderui.cpp:834
+#: ../../src/dhrenderui.cpp:221 ../../src/dhrenderui.cpp:929
 msgid "Change the properties of the block that was clicked"
 msgstr "更改点击的方块的属性"
 
-#: ../../src/dhrenderui.cpp:219 ../../src/dhrenderui.cpp:844
+#: ../../src/dhrenderui.cpp:223 ../../src/dhrenderui.cpp:939
 msgid "Put another block in place of the block that was clicked"
 msgstr "用另一个方块替换点击的方块"
 
-#: ../../src/dhrenderui.cpp:221
+#: ../../src/dhrenderui.cpp:225
 msgid ""
 "Put a block into a cell: type its position, or tick \"one block above\" to "
 "drop it on top of what was clicked"
@@ -834,37 +835,37 @@ msgstr ""
 "把方块放进某个格子：输入它的坐标，或勾选“上方一格”，把它放到所点击方块的上"
 "面。"
 
-#: ../../src/dhrenderui.cpp:291 ../../src/dhrenderui.cpp:511
+#: ../../src/dhrenderui.cpp:295 ../../src/dhrenderui.cpp:515
 msgid "Building the 3D scene..."
 msgstr "正在构建三维场景……"
 
-#: ../../src/dhrenderui.cpp:632 ../../src/materiallistui.cpp:183
+#: ../../src/dhrenderui.cpp:636 ../../src/materiallistui.cpp:183
 msgid "The client jar could not be downloaded: %1"
 msgstr "客户端 jar 下载失败：%1"
 
-#: ../../src/dhrenderui.cpp:693
+#: ../../src/dhrenderui.cpp:697
 msgid "drawn with OpenGL"
 msgstr "使用 OpenGL 绘制"
 
-#: ../../src/dhrenderui.cpp:693
+#: ../../src/dhrenderui.cpp:697
 msgid "drawn by the CPU"
 msgstr "由 CPU 绘制"
 
-#: ../../src/dhrenderui.cpp:695
+#: ../../src/dhrenderui.cpp:699
 msgid "%1 x %2 x %3, %4 quads, %5 blocks not drawn, %6"
 msgstr "%1 x %2 x %3，%4 个面，%5 个方块未绘制，%6"
 
-#: ../../src/dhrenderui.cpp:706
+#: ../../src/dhrenderui.cpp:710
 msgid "Slice Y%1-%2. %3"
 msgstr "切片 Y%1-%2。%3"
 
-#: ../../src/dhrenderui.cpp:717
+#: ../../src/dhrenderui.cpp:721
 msgid ""
 "Drag with the left button to turn, with the middle or right button to move, "
 "and use the wheel to zoom. A click names the block under it."
 msgstr "左键拖动旋转，中键或右键拖动平移，滚轮缩放。单击可显示指针下的方块。"
 
-#: ../../src/dhrenderui.cpp:729
+#: ../../src/dhrenderui.cpp:733
 msgid ""
 "Nothing could be drawn: the block models and textures of this region's "
 "version could not be placed, and the version is not one the client jar table "
@@ -873,7 +874,7 @@ msgstr ""
 "无法绘制内容：无法确定该区域版本所需的方块模型与材质，且该数据版本不在客户端 "
 "jar 对照表中。"
 
-#: ../../src/dhrenderui.cpp:735
+#: ../../src/dhrenderui.cpp:739
 msgid ""
 "Nothing could be drawn. The block models and textures of a version live in "
 "its client jar, which belongs at %1. Press \"Get Resources\" to download it "
@@ -882,43 +883,51 @@ msgstr ""
 "无法绘制内容。某个版本的方块模型与材质存放在该版本的客户端 jar 中，其位置应"
 "为 %1。点击“获取资源”可下载（约 30 MB）。"
 
-#: ../../src/dhrenderui.cpp:757
+#: ../../src/dhrenderui.cpp:761
 msgid "(%1, %2, %3) is outside the region"
 msgstr "(%1, %2, %3) 不在区域范围内"
 
-#: ../../src/dhrenderui.cpp:780
+#: ../../src/dhrenderui.cpp:784
 msgid "Block (%1, %2, %3): %4"
 msgstr "方块 (%1, %2, %3)：%4"
 
-#: ../../src/dhrenderui.cpp:833
+#: ../../src/dhrenderui.cpp:874
+msgid "Changed %1 block(s)"
+msgstr "修改了 %1 个方块"
+
+#: ../../src/dhrenderui.cpp:926
 msgid "This block has no properties to change"
 msgstr "该方块没有可修改的属性"
 
-#: ../../src/dhrenderui.cpp:843
+#: ../../src/dhrenderui.cpp:928
+msgid "Change the properties of every selected block"
+msgstr "修改所有选中方块的属性"
+
+#: ../../src/dhrenderui.cpp:938
 msgid "Put one block into every selected cell"
 msgstr "把一个方块放入每个选中的格子"
 
-#: ../../src/dhrenderui.cpp:998
+#: ../../src/dhrenderui.cpp:1097
 msgid "%1 block(s) selected"
 msgstr "已选择 %1 个方块"
 
-#: ../../src/dhrenderui.cpp:1029
+#: ../../src/dhrenderui.cpp:1128
 msgid "Selected Blocks"
 msgstr "已选方块"
 
-#: ../../src/dhrenderui.cpp:1036
+#: ../../src/dhrenderui.cpp:1135
 msgid "Position"
 msgstr "位置"
 
-#: ../../src/dhrenderui.cpp:1036
+#: ../../src/dhrenderui.cpp:1135
 msgid "Block"
 msgstr "方块"
 
-#: ../../src/dhrenderui.cpp:1243
+#: ../../src/dhrenderui.cpp:1342
 msgid "Replaced %1 block(s)"
 msgstr "已替换 %1 个方块"
 
-#: ../../src/dhrenderui.cpp:1292
+#: ../../src/dhrenderui.cpp:1391
 msgid "Block (%1, %2, %3)"
 msgstr "方块 (%1, %2, %3)"
 

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-29 20:20+0800\n"
+"POT-Creation-Date: 2026-10-29 20:33+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -98,13 +98,14 @@ msgid "Writes to (%1, %2, %3)."
 msgstr ""
 
 #: ../../src/blockpickerui.cpp:682 ../../src/blockpickerui.cpp:705
-#: ../../src/blockreaderui.cpp:486 ../../src/dhrenderui.cpp:1238
-#: ../../src/dhrenderui.cpp:1271 ../../src/externalnbtreaderui.cpp:107
-#: ../../src/externalnbtreaderui.cpp:114 ../../src/manageregionui.cpp:274
-#: ../../src/manageregionui.cpp:307 ../../src/manageregionui.cpp:632
-#: ../../src/propertymodifyui.cpp:340 ../../src/regionchangesui.cpp:86
-#: ../../src/regionchangesui.cpp:164 ../../src/regionmodifyui.cpp:101
-#: ../../src/utility.cpp:51 ../../src/utility.cpp:72 ../../src/utility.cpp:80
+#: ../../src/blockreaderui.cpp:486 ../../src/dhrenderui.cpp:894
+#: ../../src/dhrenderui.cpp:1337 ../../src/dhrenderui.cpp:1370
+#: ../../src/externalnbtreaderui.cpp:107 ../../src/externalnbtreaderui.cpp:114
+#: ../../src/manageregionui.cpp:274 ../../src/manageregionui.cpp:307
+#: ../../src/manageregionui.cpp:632 ../../src/propertymodifyui.cpp:340
+#: ../../src/regionchangesui.cpp:86 ../../src/regionchangesui.cpp:164
+#: ../../src/regionmodifyui.cpp:101 ../../src/utility.cpp:51
+#: ../../src/utility.cpp:72 ../../src/utility.cpp:80
 msgid "Error!"
 msgstr ""
 
@@ -269,7 +270,7 @@ msgstr ""
 msgid "&Continue"
 msgstr ""
 
-#: ../../src/configobjectui.cpp:125 ../../src/dhrenderui.cpp:640
+#: ../../src/configobjectui.cpp:125 ../../src/dhrenderui.cpp:644
 #: ../../src/generalchoosedialog.cpp:46
 msgid "&Cancel"
 msgstr ""
@@ -748,7 +749,7 @@ msgid ""
 "move the view."
 msgstr ""
 
-#: ../../src/dhrenderui.cpp:171 ../../src/dhrenderui.cpp:997
+#: ../../src/dhrenderui.cpp:171 ../../src/dhrenderui.cpp:1096
 msgid "No blocks selected"
 msgstr ""
 
@@ -757,133 +758,141 @@ msgstr ""
 msgid "&Reload"
 msgstr ""
 
-#: ../../src/dhrenderui.cpp:190 ../../src/dhrenderui.cpp:640
+#: ../../src/dhrenderui.cpp:190 ../../src/dhrenderui.cpp:644
 msgid "Get &Resources"
 msgstr ""
 
-#: ../../src/dhrenderui.cpp:191
+#: ../../src/dhrenderui.cpp:192
 msgid "&Modify Properties..."
 msgstr ""
 
-#: ../../src/dhrenderui.cpp:192
+#: ../../src/dhrenderui.cpp:194
 msgid "&Replace Block..."
 msgstr ""
 
-#: ../../src/dhrenderui.cpp:193
+#: ../../src/dhrenderui.cpp:196
 msgid "&Add Block..."
 msgstr ""
 
-#: ../../src/dhrenderui.cpp:194
+#: ../../src/dhrenderui.cpp:198
 msgid "Clear &Selection"
 msgstr ""
 
-#: ../../src/dhrenderui.cpp:197
+#: ../../src/dhrenderui.cpp:201
 msgid "Drop the outline around the selected blocks"
 msgstr ""
 
-#: ../../src/dhrenderui.cpp:199
+#: ../../src/dhrenderui.cpp:203
 msgid "Selected &Blocks..."
 msgstr ""
 
-#: ../../src/dhrenderui.cpp:202
+#: ../../src/dhrenderui.cpp:206
 msgid "List the selected blocks and mark the one clicked in the list"
 msgstr ""
 
-#: ../../src/dhrenderui.cpp:217 ../../src/dhrenderui.cpp:834
+#: ../../src/dhrenderui.cpp:221 ../../src/dhrenderui.cpp:929
 msgid "Change the properties of the block that was clicked"
 msgstr ""
 
-#: ../../src/dhrenderui.cpp:219 ../../src/dhrenderui.cpp:844
+#: ../../src/dhrenderui.cpp:223 ../../src/dhrenderui.cpp:939
 msgid "Put another block in place of the block that was clicked"
 msgstr ""
 
-#: ../../src/dhrenderui.cpp:221
+#: ../../src/dhrenderui.cpp:225
 msgid ""
 "Put a block into a cell: type its position, or tick \"one block above\" to "
 "drop it on top of what was clicked"
 msgstr ""
 
-#: ../../src/dhrenderui.cpp:291 ../../src/dhrenderui.cpp:511
+#: ../../src/dhrenderui.cpp:295 ../../src/dhrenderui.cpp:515
 msgid "Building the 3D scene..."
 msgstr ""
 
-#: ../../src/dhrenderui.cpp:632 ../../src/materiallistui.cpp:183
+#: ../../src/dhrenderui.cpp:636 ../../src/materiallistui.cpp:183
 msgid "The client jar could not be downloaded: %1"
 msgstr ""
 
-#: ../../src/dhrenderui.cpp:693
+#: ../../src/dhrenderui.cpp:697
 msgid "drawn with OpenGL"
 msgstr ""
 
-#: ../../src/dhrenderui.cpp:693
+#: ../../src/dhrenderui.cpp:697
 msgid "drawn by the CPU"
 msgstr ""
 
-#: ../../src/dhrenderui.cpp:695
+#: ../../src/dhrenderui.cpp:699
 msgid "%1 x %2 x %3, %4 quads, %5 blocks not drawn, %6"
 msgstr ""
 
-#: ../../src/dhrenderui.cpp:706
+#: ../../src/dhrenderui.cpp:710
 msgid "Slice Y%1-%2. %3"
 msgstr ""
 
-#: ../../src/dhrenderui.cpp:717
+#: ../../src/dhrenderui.cpp:721
 msgid ""
 "Drag with the left button to turn, with the middle or right button to move, "
 "and use the wheel to zoom. A click names the block under it."
 msgstr ""
 
-#: ../../src/dhrenderui.cpp:729
+#: ../../src/dhrenderui.cpp:733
 msgid ""
 "Nothing could be drawn: the block models and textures of this region's "
 "version could not be placed, and the version is not one the client jar table "
 "knows."
 msgstr ""
 
-#: ../../src/dhrenderui.cpp:735
+#: ../../src/dhrenderui.cpp:739
 msgid ""
 "Nothing could be drawn. The block models and textures of a version live in "
 "its client jar, which belongs at %1. Press \"Get Resources\" to download it "
 "(about 30 MB)."
 msgstr ""
 
-#: ../../src/dhrenderui.cpp:757
+#: ../../src/dhrenderui.cpp:761
 msgid "(%1, %2, %3) is outside the region"
 msgstr ""
 
-#: ../../src/dhrenderui.cpp:780
+#: ../../src/dhrenderui.cpp:784
 msgid "Block (%1, %2, %3): %4"
 msgstr ""
 
-#: ../../src/dhrenderui.cpp:833
+#: ../../src/dhrenderui.cpp:874
+msgid "Changed %1 block(s)"
+msgstr ""
+
+#: ../../src/dhrenderui.cpp:926
 msgid "This block has no properties to change"
 msgstr ""
 
-#: ../../src/dhrenderui.cpp:843
+#: ../../src/dhrenderui.cpp:928
+msgid "Change the properties of every selected block"
+msgstr ""
+
+#: ../../src/dhrenderui.cpp:938
 msgid "Put one block into every selected cell"
 msgstr ""
 
-#: ../../src/dhrenderui.cpp:998
+#: ../../src/dhrenderui.cpp:1097
 msgid "%1 block(s) selected"
 msgstr ""
 
-#: ../../src/dhrenderui.cpp:1029
+#: ../../src/dhrenderui.cpp:1128
 msgid "Selected Blocks"
 msgstr ""
 
-#: ../../src/dhrenderui.cpp:1036
+#: ../../src/dhrenderui.cpp:1135
 msgid "Position"
 msgstr ""
 
-#: ../../src/dhrenderui.cpp:1036
+#: ../../src/dhrenderui.cpp:1135
 msgid "Block"
 msgstr ""
 
-#: ../../src/dhrenderui.cpp:1243
+#: ../../src/dhrenderui.cpp:1342
 msgid "Replaced %1 block(s)"
 msgstr ""
 
-#: ../../src/dhrenderui.cpp:1292
+#: ../../src/dhrenderui.cpp:1391
 msgid "Block (%1, %2, %3)"
 msgstr ""
 

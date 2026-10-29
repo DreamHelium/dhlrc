@@ -188,9 +188,13 @@ DhRenderUI::DhRenderUI (std::shared_ptr<RegionClass> region, QWidget *parent)
   reloadButton = new QPushButton (_ ("&Reload"), this);
   reloadButton->setObjectName ("reloadButton");
   fetchButton = new QPushButton (_ ("Get &Resources"), this);
+  fetchButton->setObjectName ("fetchButton");
   modifyButton = new QPushButton (_ ("&Modify Properties..."), this);
+  modifyButton->setObjectName ("modifyButton");
   replaceButton = new QPushButton (_ ("&Replace Block..."), this);
+  replaceButton->setObjectName ("replaceButton");
   addButton = new QPushButton (_ ("&Add Block..."), this);
+  addButton->setObjectName ("addButton");
   clearSelectionButton = new QPushButton (_ ("Clear &Selection"), this);
   clearSelectionButton->setObjectName ("clearSelectionButton");
   clearSelectionButton->setToolTip (
@@ -789,13 +793,21 @@ DhRenderUI::describe (int x, int y, int z)
 void
 DhRenderUI::modifyPicked ()
 {
-  if (!hasPicked)
+  const QVector<DhRenderWidget::BlockCell> cells = view->selectedCells ();
+  if (!hasPicked && cells.isEmpty ())
     return;
+
+  /* A click gives the cell directly; without one the first selected cell is
+   * the block whose properties are shown, and the dialog's result is then
+   * copied to the whole selection below. */
+  const qint32 x = hasPicked ? pickedX : cells.first ()[0];
+  const qint32 y = hasPicked ? pickedY : cells.first ()[1];
+  const qint32 z = hasPicked ? pickedZ : cells.first ()[2];
 
   /* The dialog writes through the region and locks it itself. The picture is a
    * snapshot taken while the scene was built, so a change only shows once a
    * fresh one is taken — which is what `rebuild ()` does. */
-  PropertyModifyUI dialog (regionClass, pickedX, pickedY, pickedZ, this);
+  PropertyModifyUI dialog (regionClass, x, y, z, this);
   bool written = false;
   connect (&dialog, &PropertyModifyUI::propertiesModified, this,
            [&written] { written = true; });
@@ -803,9 +815,85 @@ DhRenderUI::modifyPicked ()
   if (!written)
     return;
 
-  const qint32 x = pickedX;
-  const qint32 y = pickedY;
-  const qint32 z = pickedZ;
+  /* The dialog changed one cell. With a multi-selection the same properties
+   * are put into every other selected cell as well, so "modify" means the
+   * same for one block and for a batch. */
+  if (!cells.isEmpty ())
+    {
+      QVector<DhRenderWidget::BlockCell> writtenCells;
+      QVector<RegionClass::BlockState> previousStates;
+      QString error;
+      {
+        AutoLocker locker (*regionClass);
+        void *raw = regionClass->get_region ();
+        if (!raw)
+          return;
+        const RegionClass::BlockState state
+            = regionClass->blockState (x, y, z);
+        QList<QByteArray> nameBytes;
+        QList<QByteArray> dataBytes;
+        for (const auto &property : state.properties)
+          {
+            nameBytes.append (property.first.toUtf8 ());
+            dataBytes.append (property.second.toUtf8 ());
+          }
+        QList<const char *> namePtrs;
+        QList<const char *> dataPtrs;
+        for (const auto &bytes : nameBytes)
+          namePtrs.append (bytes.constData ());
+        for (const auto &bytes : dataBytes)
+          dataPtrs.append (bytes.constData ());
+        const QByteArray nameUtf8 = state.name.toUtf8 ();
+        for (const auto &cell : cells)
+          {
+            if (cell[0] == x && cell[1] == y && cell[2] == z)
+              continue;
+            const qint32 index = regionClass->index (cell[0], cell[1], cell[2]);
+            if (index < 0)
+              continue;
+            previousStates.append (
+                regionClass->blockState (cell[0], cell[1], cell[2]));
+            quint32 id = 0;
+            const char *message = region_set_block_state (
+                raw, static_cast<size_t> (index), nameUtf8.constData (),
+                namePtrs.constData (), dataPtrs.constData (),
+                static_cast<size_t> (namePtrs.size ()), &id);
+            if (message)
+              {
+                error = QString::fromUtf8 (message);
+                string_free (message);
+                break;
+              }
+            writtenCells.append (cell);
+          }
+      }
+
+      if (!writtenCells.isEmpty ())
+        {
+          const QString description
+              = QString (_ ("Changed %1 block(s)")).arg (writtenCells.size ());
+          regionClass->recordChange (
+              description, QString (),
+              [cells = writtenCells, states = previousStates] (
+                  RegionClass &region)
+                {
+                  for (qsizetype i = 0; i < cells.size (); i++)
+                    {
+                      const auto &cell = cells.at (i);
+                      if (!region
+                               .setBlockState (cell[0], cell[1], cell[2],
+                                               states.at (i).name,
+                                               states.at (i).properties)
+                               .isEmpty ())
+                        return false;
+                    }
+                  return true;
+                });
+        }
+      if (!error.isEmpty ())
+        QMessageBox::critical (this, _ ("Error!"), error);
+    }
+
   rebuild ();
   describe (x, y, z);
 }
@@ -817,9 +905,14 @@ DhRenderUI::updateEditButtons ()
    * header. */
   const bool unlocked = !regionClass->locked ();
   const bool picked = hasPicked && unlocked;
+  /* A selection is all the batch operations need: they write into every
+   * selected cell and do not use the last clicked block. */
+  const bool selected = unlocked && view && !view->selectedCells ().isEmpty ();
   /* A block without properties has nothing to change, so the property dialog
-   * stays closed for it; replacing it still works. */
-  const bool modifiable = picked && pickedPropertyCount > 0;
+   * stays closed for it; replacing it still works. A selection always opens
+   * the dialog, because the cells may hold properties even if the clicked
+   * block does not. */
+  const bool modifiable = (picked && pickedPropertyCount > 0) || selected;
   if (updatingButtons)
     return;
   updatingButtons = true;
@@ -829,20 +922,22 @@ DhRenderUI::updateEditButtons ()
       /* Say why it cannot be used: a block state without properties has
        * nothing for the dialog to show. */
       modifyButton->setToolTip (
-          picked && pickedPropertyCount == 0
+          !modifiable && picked && pickedPropertyCount == 0
               ? _ ("This block has no properties to change")
-              : _ ("Change the properties of the block that was clicked"));
+              : selected
+                    ? _ ("Change the properties of every selected block")
+                    : _ ("Change the properties of the block that was "
+                         "clicked"));
     }
   if (replaceButton)
     {
-      replaceButton->setEnabled (picked);
+      replaceButton->setEnabled (unlocked && (picked || selected));
       /* With a multi-selection the button puts one block into every selected
        * cell, so its tooltip says so. */
       replaceButton->setToolTip (
-          view && !view->selectedCells ().isEmpty ()
-              ? _ ("Put one block into every selected cell")
-              : _ ("Put another block in place of the block that was "
-                   "clicked"));
+          selected ? _ ("Put one block into every selected cell")
+                   : _ ("Put another block in place of the block that was "
+                        "clicked"));
     }
   /* Adding never needs a picked block: the position is typed into the dialog,
    * which is the only way to reach an empty cell. */
@@ -984,6 +1079,10 @@ DhRenderUI::clearSelection ()
   /* Outside select mode the row is inactive with the rest of the feature. */
   if (!selectButton->isChecked ())
     return;
+  /* The marker is the other outline the picture can show; clearing the
+   * selection clears it too, or one box would stay behind and look like the
+   * selection never went away. */
+  view->setMarkerCell (std::nullopt);
   /* The view does not report this one: it is the owner's own change. */
   view->setSelectedCells ({});
   updateSelectionStatus ();
