@@ -6,8 +6,8 @@
  */
 
 use crate::config::{
-    Config, ConfigPaths, ConfigWatch, ConfigWatcher, OptionValue, PluginDirection, ShowOption,
-    Unit, default_paths, load_or_create, save_config,
+    Config, ConfigPaths, ConfigWatch, ConfigWatcher, MultiRegionOrder, OptionValue,
+    PluginDirection, ShowOption, Unit, default_paths, load_or_create, save_config,
 };
 use crate::modules::Modules;
 use crate::notification::Level;
@@ -32,6 +32,11 @@ const UNIT_BYTES: i32 = 3;
 /* Kept in sync with `DHLRC_SHOW_*`. */
 const SHOW_PALETTE: i32 = 0;
 const SHOW_NAME: i32 = 1;
+
+/* Kept in sync with `DHLRC_REGION_ORDER_*`. */
+const REGION_ORDER_FILE: i32 = 0;
+const REGION_ORDER_NATURAL: i32 = 1;
+const REGION_ORDER_CUSTOM: i32 = 2;
 
 /* Kept in sync with `DHLRC_KIND_*`: which symbol set an option belongs to. */
 const KIND_INPUT: i32 = 0;
@@ -85,6 +90,9 @@ pub struct DhlrcConfigView {
     pub base_name: *const c_char,
     pub region_name: *const c_char,
     pub multi_region_name_pattern: *const c_char,
+    /// A `DhlrcRegionOrder`; the rule below is only read for `Custom`.
+    pub multi_region_order: i32,
+    pub multi_region_order_rule: *const c_char,
     pub name_pattern_sample_file: *const c_char,
     pub name_pattern_sample_region: *const c_char,
     pub description: *const c_char,
@@ -122,6 +130,8 @@ impl ConfigViewData {
                 &mut strings,
                 &config.manage.multi_region_name_pattern(),
             ),
+            multi_region_order: region_order_to_int(config.manage.multi_region_order),
+            multi_region_order_rule: owned(&mut strings, &config.manage.multi_region_order_rule),
             name_pattern_sample_file: owned(
                 &mut strings,
                 &config.defaults.name_pattern_sample_file,
@@ -1472,6 +1482,8 @@ fn config_from_view(view: &DhlrcConfigView, base: &Config) -> Config {
     config.defaults.base_name = from_c(view.base_name);
     config.defaults.region_name = from_c(view.region_name);
     config.manage.multi_region_name_pattern = from_c(view.multi_region_name_pattern);
+    config.manage.multi_region_order = int_to_region_order(view.multi_region_order);
+    config.manage.multi_region_order_rule = from_c_required(view.multi_region_order_rule);
     config.defaults.name_pattern_sample_file = from_c_required(view.name_pattern_sample_file);
     config.defaults.name_pattern_sample_region = from_c_required(view.name_pattern_sample_region);
     config.defaults.description = from_c_required(view.description);
@@ -1488,6 +1500,22 @@ fn int_to_unit(value: i32) -> Unit {
         UNIT_KIB => Unit::Kib,
         UNIT_BYTES => Unit::Bytes,
         _ => Unit::Gib,
+    }
+}
+
+fn region_order_to_int(order: MultiRegionOrder) -> i32 {
+    match order {
+        MultiRegionOrder::File => REGION_ORDER_FILE,
+        MultiRegionOrder::Natural => REGION_ORDER_NATURAL,
+        MultiRegionOrder::Custom => REGION_ORDER_CUSTOM,
+    }
+}
+
+fn int_to_region_order(value: i32) -> MultiRegionOrder {
+    match value {
+        REGION_ORDER_NATURAL => MultiRegionOrder::Natural,
+        REGION_ORDER_CUSTOM => MultiRegionOrder::Custom,
+        _ => MultiRegionOrder::File,
     }
 }
 

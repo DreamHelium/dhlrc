@@ -157,6 +157,8 @@ DhCore::refresh ()
   cached.baseName = text (view->base_name);
   cached.regionName = text (view->region_name);
   cached.multiRegionNamePattern = text (view->multi_region_name_pattern);
+  cached.multiRegionOrder = view->multi_region_order;
+  cached.multiRegionOrderRule = text (view->multi_region_order_rule);
   cached.namePatternSampleFile = text (view->name_pattern_sample_file);
   cached.namePatternSampleRegion = text (view->name_pattern_sample_region);
   cached.description = text (view->description);

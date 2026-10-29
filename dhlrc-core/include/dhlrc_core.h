@@ -50,6 +50,14 @@ extern "C"
     DHLRC_SHOW_NAME = 1,
   } DhlrcShowOption;
 
+  /* The order the regions of a multi-region file are loaded in. */
+  typedef enum
+  {
+    DHLRC_REGION_ORDER_FILE = 0,
+    DHLRC_REGION_ORDER_NATURAL = 1,
+    DHLRC_REGION_ORDER_CUSTOM = 2,
+  } DhlrcRegionOrder;
+
   /* Called once per notification while opening, on the calling thread. Every
    * string is borrowed and only valid for the duration of the call. */
   typedef void (*DhlrcNotifyFunc) (void *user_data, int32_t level,
@@ -98,6 +106,8 @@ extern "C"
     const char *base_name;
     const char *region_name;
     const char *multi_region_name_pattern;
+    int32_t multi_region_order; /* a DhlrcRegionOrder */
+    const char *multi_region_order_rule;
     const char *name_pattern_sample_file;
     const char *name_pattern_sample_region;
     const char *description;

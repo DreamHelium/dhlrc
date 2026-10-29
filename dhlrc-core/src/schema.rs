@@ -10,7 +10,7 @@
  * with `_()`, a Rust one with `gettext`.
  */
 
-use crate::config::{Config, ShowOption, Unit};
+use crate::config::{Config, MultiRegionOrder, ShowOption, Unit};
 use common_rs::i18n::i18n;
 use std::path::PathBuf;
 
@@ -73,6 +73,11 @@ const RENDER: &str = i18n("3D Preview");
 
 const UNITS: &[&str] = &[i18n("GiB"), i18n("MiB"), i18n("KiB"), i18n("Bytes")];
 const SHOW_OPTIONS: &[&str] = &[i18n("Palette"), i18n("Name")];
+const REGION_ORDERS: &[&str] = &[
+    i18n("File Order (Random)"),
+    i18n("Natural Order"),
+    i18n("Custom Rule"),
+];
 const NO_CHOICES: &[&str] = &[];
 
 /// Every editable setting, in the order the pages should be shown.
@@ -188,6 +193,34 @@ pub static SETTINGS: &[SettingDef] = &[
         default: i18n("${file} - ${region}"),
         get: get_multi_region_pattern,
         set: set_multi_region_pattern,
+    },
+    SettingDef {
+        key: "MultiRegionOrder",
+        group: MANAGE,
+        kind: SettingType::Enum,
+        label: i18n("Multi-Region Loading Order"),
+        tooltip: i18n(
+            "The order the regions of a multi-region file are loaded and listed in. Some formats keep their regions in a hash map, so the file order changes from one opening to the next; natural order sorts names with numbers compared by value, and the custom rule uses the pattern list below.",
+        ),
+        choices: REGION_ORDERS,
+        long_text: false,
+        default: "0",
+        get: get_multi_region_order,
+        set: set_multi_region_order,
+    },
+    SettingDef {
+        key: "MultiRegionOrderRule",
+        group: MANAGE,
+        kind: SettingType::String,
+        label: i18n("Custom Region Order Rule"),
+        tooltip: i18n(
+            "Used when the loading order is Custom Rule. Write comma- or semicolon-separated wildcard patterns, for example `2*, 1*, *`: regions matching an earlier pattern come first, groups are sorted naturally, and regions that match no pattern come last. * matches any text, ? one character.",
+        ),
+        choices: NO_CHOICES,
+        long_text: false,
+        default: "",
+        get: get_multi_region_order_rule,
+        set: set_multi_region_order_rule,
     },
     SettingDef {
         key: "BaseName",
@@ -636,6 +669,31 @@ fn set_multi_region_pattern(config: &mut Config, text: &str) {
     set_optional_string(&mut config.manage.multi_region_name_pattern, text);
 }
 
+fn get_multi_region_order(config: &Config) -> String {
+    match config.manage.multi_region_order {
+        MultiRegionOrder::File => "0",
+        MultiRegionOrder::Natural => "1",
+        MultiRegionOrder::Custom => "2",
+    }
+    .to_owned()
+}
+
+fn set_multi_region_order(config: &mut Config, text: &str) {
+    config.manage.multi_region_order = match text.trim() {
+        "1" => MultiRegionOrder::Natural,
+        "2" => MultiRegionOrder::Custom,
+        _ => MultiRegionOrder::File,
+    };
+}
+
+fn get_multi_region_order_rule(config: &Config) -> String {
+    config.manage.multi_region_order_rule.clone()
+}
+
+fn set_multi_region_order_rule(config: &mut Config, text: &str) {
+    config.manage.multi_region_order_rule = text.trim().to_owned();
+}
+
 fn get_sample_file(config: &Config) -> String {
     config.defaults.name_pattern_sample_file.clone()
 }
@@ -845,6 +903,8 @@ mod tests {
                 "SelectAllRegionsInLoading",
                 "FailThenRetry",
                 "MultiRegionNamePattern",
+                "MultiRegionOrder",
+                "MultiRegionOrderRule",
             ]
         );
     }

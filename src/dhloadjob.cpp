@@ -12,6 +12,7 @@
 #include "mainwindow.h"
 #include "manageregionui.h"
 #include "region.h"
+#include "regionorder.h"
 #include "utility.h"
 #undef asprintf
 #include <QTimer>
@@ -369,6 +370,7 @@ DhLoadJob::loadMultiRegion (MultiModuleBase *multiBase, void *object,
   /* A previous attempt in the retry loop may have filled these; start clean so
    * the region list is not duplicated. */
   regionList.clear ();
+  regionOrder.clear ();
   regionIndexes.clear ();
 
   auto num = multiBase->numFunc (object);
@@ -380,17 +382,41 @@ DhLoadJob::loadMultiRegion (MultiModuleBase *multiBase, void *object,
                        loadingTypePrefix (multiBase->type ()));
       return false;
     }
+  /* Names and the file's own indexes are collected first: the order setting
+   * only changes the order they are shown and loaded in, never which region a
+   * name stands for. */
+  QStringList names;
+  QList<int> nameIndexes;
   for (int j = 0; j < num; j++)
     {
       auto name = multiBase->nameFunc (object, j);
       if (name)
-        regionList.append (name);
+        {
+          names.append (name);
+          nameIndexes.append (j);
+        }
       string_free (name);
+    }
+  if (names.isEmpty ())
+    {
+      err.appendError (_ ("The file holds no region this module can read."),
+                       loadingTypePrefix (multiBase->type ()));
+      return false;
+    }
+  /* The chooser shows the regions in this order; `regionOrder` maps each shown
+   * position back to the module's own region index. */
+  const auto config = DhCore::instance ()->config ();
+  const QList<int> order = dh::regionLoadingOrder (
+      names, config.multiRegionOrder, config.multiRegionOrderRule);
+  for (const auto &position : order)
+    {
+      regionList.append (names.at (position));
+      regionOrder.append (nameIndexes.at (position));
     }
   /* A file with one region has nothing to choose: reading it directly is what
    * the user asked for, and a single-region file in a batch no longer stops
    * every load for a question with one possible answer. */
-  const bool nothingToChoose = num == 1;
+  const bool nothingToChoose = regionList.size () == 1;
   if (!nothingToChoose && !loadAllRegions
       && !DhCore::instance ()->config ().selectAllRegionsInLoading)
     {
@@ -415,11 +441,16 @@ DhLoadJob::loadMultiRegion (MultiModuleBase *multiBase, void *object,
     }
   else
     {
-      for (int j = 0; j < num; j++)
+      for (int j = 0; j < regionList.size (); j++)
         regionIndexes << j;
     }
-  for (const auto &index : regionIndexes)
+  /* The chooser returns positions in the list it showed; the loader takes the
+   * module's own region indexes. */
+  for (const auto &position : regionIndexes)
     {
+      if (position < 0 || position >= regionOrder.size ())
+        continue;
+      const int index = regionOrder.at (position);
       void *singleRegion = nullptr;
       auto msg = multiBase->loadFunc (object, &singleRegion, index,
                                       helper_struct.get (), inputConfig);

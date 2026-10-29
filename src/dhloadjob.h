@@ -136,6 +136,9 @@ private:
   std::mutex mutex;
   std::condition_variable cv;
   QStringList regionList;
+  /* The module's own region index for every entry in `regionList`, in the same
+   * order; the loading order setting reorders the list but not the file. */
+  QList<int> regionOrder;
   QList<int> regionIndexes;
   static void setFunc (void *main_klass, int value, const char *text,
                        const char *arg);

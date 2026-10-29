@@ -24,6 +24,10 @@ struct DhConfigData
   QString baseName;
   QString regionName;
   QString multiRegionNamePattern;
+  /* The order the regions of a multi-region file are loaded in: one of
+   * DHLRC_REGION_ORDER_*, plus the pattern list the custom mode uses. */
+  int multiRegionOrder = 0;
+  QString multiRegionOrderRule;
   QString namePatternSampleFile;
   QString namePatternSampleRegion;
   QString description;

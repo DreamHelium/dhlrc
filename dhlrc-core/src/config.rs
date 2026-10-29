@@ -94,6 +94,43 @@ impl Unit {
     }
 }
 
+/// The order the regions of a multi-region file are loaded and listed in.
+///
+/// Some formats keep their regions in a hash map, so the order the reader
+/// enumerates them in is stable only for one file opening; the choice here
+/// makes it deterministic when that matters.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default, Serialize, Deserialize)]
+#[serde(rename_all = "kebab-case")]
+pub enum MultiRegionOrder {
+    /// Whatever the reader enumerates: the file's own (hash map) order.
+    #[default]
+    File,
+    /// Natural order: runs of digits compare by value, letters case-folded.
+    Natural,
+    /// The ordered wildcard rule in `multi_region_order_rule`.
+    Custom,
+}
+
+impl MultiRegionOrder {
+    /// The stored form, as the config file writes it.
+    pub const fn as_str(self) -> &'static str {
+        match self {
+            Self::File => "file",
+            Self::Natural => "natural",
+            Self::Custom => "custom",
+        }
+    }
+
+    /// Reads a stored form; anything unknown is the file order.
+    pub fn from_str(text: &str) -> Self {
+        match text.trim() {
+            "natural" => Self::Natural,
+            "custom" => Self::Custom,
+            _ => Self::File,
+        }
+    }
+}
+
 /// The block information shown by the reader (old `DefaultShowOption`).
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default, Serialize, Deserialize)]
 pub enum ShowOption {
@@ -233,6 +270,12 @@ pub struct Manage {
     /// localised default rather than a translation written into the file.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub multi_region_name_pattern: Option<String>,
+    /// The order the regions of a multi-region file are loaded in.
+    pub multi_region_order: MultiRegionOrder,
+    /// Ordered comma- or semicolon-separated wildcard patterns used when the
+    /// order is `Custom`: regions matching an earlier pattern come first,
+    /// everything else follows in natural order.
+    pub multi_region_order_rule: String,
 }
 
 impl Default for Manage {
@@ -241,6 +284,8 @@ impl Default for Manage {
             select_all_regions_in_loading: false,
             fail_then_retry: true,
             multi_region_name_pattern: None,
+            multi_region_order: MultiRegionOrder::File,
+            multi_region_order_rule: String::new(),
         }
     }
 }
@@ -919,6 +964,27 @@ mod tests {
         if let Some(parent) = paths.file.parent().and_then(Path::parent) {
             let _ = fs::remove_dir_all(parent);
         }
+    }
+
+    #[test]
+    fn the_region_order_and_its_rule_round_trip() {
+        let mut config = Config::default();
+        assert_eq!(config.manage.multi_region_order, MultiRegionOrder::File);
+        assert!(config.manage.multi_region_order_rule.is_empty());
+
+        config.manage.multi_region_order = MultiRegionOrder::Custom;
+        config.manage.multi_region_order_rule = "2*, 1*".to_owned();
+        let text = serialize(&config);
+        assert!(text.contains("multi_region_order = \"custom\""));
+        assert!(text.contains("multi_region_order_rule = \"2*, 1*\""));
+        let parsed: Config = toml::from_str(&text).unwrap();
+        assert_eq!(parsed.manage.multi_region_order, MultiRegionOrder::Custom);
+        assert_eq!(parsed.manage.multi_region_order_rule, "2*, 1*");
+
+        /* An older file without the keys keeps the file order. */
+        let old: Config =
+            toml::from_str("[manage]\nselect_all_regions_in_loading = true\n").unwrap();
+        assert_eq!(old.manage.multi_region_order, MultiRegionOrder::File);
     }
 
     #[test]

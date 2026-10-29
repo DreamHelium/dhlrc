@@ -16,7 +16,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-29 20:31+0800\n"
+"POT-Creation-Date: 2026-10-29 20:49+0800\n"
 "PO-Revision-Date: 2026-10-16 15:39+0800\n"
 "Last-Translator: 孟小骇 <48383878+DreamHelium@users.noreply.github.com>\n"
 "Language-Team: Chinese <kde-i18n-doc@kde.org>\n"
@@ -444,75 +444,75 @@ msgstr "搜索……"
 msgid "The article could not be read (%1)."
 msgstr "无法读取文章（%1）。"
 
-#: ../../src/dhloadjob.cpp:26 ../../src/dhloadjob.cpp:428
+#: ../../src/dhloadjob.cpp:27 ../../src/dhloadjob.cpp:459
 msgid "Loading region type %1"
 msgstr "加载区域类型%1"
 
-#: ../../src/dhloadjob.cpp:32
+#: ../../src/dhloadjob.cpp:33
 msgid "Failed when %1: %2"
 msgstr "当 %1 时失败：%2"
 
-#: ../../src/dhloadjob.cpp:113
+#: ../../src/dhloadjob.cpp:114
 msgid "gzip"
 msgstr "gzip"
 
-#: ../../src/dhloadjob.cpp:115
+#: ../../src/dhloadjob.cpp:116
 msgid "zlib"
 msgstr "zlib"
 
-#: ../../src/dhloadjob.cpp:117
+#: ../../src/dhloadjob.cpp:118
 msgid "no compression"
 msgstr "未压缩"
 
-#: ../../src/dhloadjob.cpp:158 ../../src/dhloadjob.cpp:168
+#: ../../src/dhloadjob.cpp:159 ../../src/dhloadjob.cpp:169
 msgid "Loading File"
 msgstr "加载文件"
 
-#: ../../src/dhloadjob.cpp:168
+#: ../../src/dhloadjob.cpp:169
 msgid "Cancelled."
 msgstr "已取消。"
 
-#: ../../src/dhloadjob.cpp:189
+#: ../../src/dhloadjob.cpp:190
 msgid "Loading Object %1"
 msgstr "加载对象%1"
 
-#: ../../src/dhloadjob.cpp:323 ../../src/utility.cpp:58
+#: ../../src/dhloadjob.cpp:324 ../../src/utility.cpp:58
 msgid "Select Region(s)"
 msgstr "选择区域"
 
-#: ../../src/dhloadjob.cpp:323 ../../src/utility.cpp:58
+#: ../../src/dhloadjob.cpp:324 ../../src/utility.cpp:58
 msgid "Please select region(s)."
 msgstr "请选择区域。"
 
-#: ../../src/dhloadjob.cpp:379
+#: ../../src/dhloadjob.cpp:381 ../../src/dhloadjob.cpp:402
 msgid "The file holds no region this module can read."
 msgstr "文件中没有该模块能读取的区域。"
 
-#: ../../src/dhloadjob.cpp:398
+#: ../../src/dhloadjob.cpp:424
 msgid "Please click `Continue` to choose the region(s) to load."
 msgstr "请点击`继续`选择要加载的区域。"
 
-#: ../../src/dhloadjob.cpp:463
+#: ../../src/dhloadjob.cpp:494
 msgid "The file extension points at %1, but the file was read as %2."
 msgstr "文件扩展名指向 %1，但实际由 %2 读取。"
 
-#: ../../src/dhloadjob.cpp:476
+#: ../../src/dhloadjob.cpp:507
 msgid "The file is not compressed, but the %1 format expects %2."
 msgstr "文件未压缩，但 %1 格式要求 %2。"
 
-#: ../../src/dhloadjob.cpp:482
+#: ../../src/dhloadjob.cpp:513
 msgid "The file is %1-compressed, but the %2 format expects %3."
 msgstr "文件是 %1 压缩，但 %2 格式要求 %3。"
 
-#: ../../src/dhloadjob.cpp:496
+#: ../../src/dhloadjob.cpp:527
 msgid "The file was decoded as %1, but the %2 format declares %3."
 msgstr "文件按 %1 解码，但 %2 格式声明的是 %3。"
 
-#: ../../src/dhloadjob.cpp:536 ../../src/dhloadjob.cpp:543
+#: ../../src/dhloadjob.cpp:567 ../../src/dhloadjob.cpp:574
 msgid "Finish processing %1 of %2 (%3%)."
 msgstr "已结束处理了%2个中的%1个（%3%）。"
 
-#: ../../src/dhloadjob.cpp:689 ../../src/saveregionjob.cpp:457
+#: ../../src/dhloadjob.cpp:720 ../../src/saveregionjob.cpp:457
 #: ../../src/saveregionjob.cpp:559
 msgid "Continue"
 msgstr "继续"
@@ -1056,7 +1056,7 @@ msgid ""
 "Run the built-in interface self-check and exit (development builds only)"
 msgstr "运行内置界面自检并退出（仅限开发构建）"
 
-#: ../../src/mainwindow.cpp:162 ../../dhlrc-core/src/schema.rs:182
+#: ../../src/mainwindow.cpp:162 ../../dhlrc-core/src/schema.rs:187
 msgid "Multi-Region Display Name"
 msgstr "多区域显示名称"
 
@@ -1836,7 +1836,7 @@ msgstr "修改时间"
 msgid "Base Name"
 msgstr "基础名称"
 
-#: rc.cpp:156 ../../dhlrc-core/src/schema.rs:208
+#: rc.cpp:156 ../../dhlrc-core/src/schema.rs:241
 msgid "Region Name"
 msgstr "区域名称"
 
@@ -1864,45 +1864,45 @@ msgstr "压缩操作被取消。"
 msgid "Uncompress finish!"
 msgstr "解压完成！"
 
-#: ../../dhlrc-core/src/config.rs:252 ../../dhlrc-core/src/schema.rs:188
+#: ../../dhlrc-core/src/config.rs:297 ../../dhlrc-core/src/schema.rs:193
 #, rust-format
 msgid "${file} - ${region}"
 msgstr "${file} - ${region}"
 
-#: ../../dhlrc-core/src/config.rs:293 ../../dhlrc-core/src/schema.rs:200
+#: ../../dhlrc-core/src/config.rs:338 ../../dhlrc-core/src/schema.rs:233
 #: ../../region-rs/src/default.rs:62
 msgid "Converted"
 msgstr "已转换"
 
-#: ../../dhlrc-core/src/config.rs:299 ../../dhlrc-core/src/schema.rs:212
+#: ../../dhlrc-core/src/config.rs:344 ../../dhlrc-core/src/schema.rs:245
 #: ../../region-litematic-rs/src/output.rs:396
 #: ../../region-rs/src/default.rs:64
 msgid "Unnamed"
 msgstr "未命名"
 
-#: ../../dhlrc-core/src/config.rs:505
+#: ../../dhlrc-core/src/config.rs:550
 msgid "Configuration reloaded"
 msgstr "配置已重载"
 
-#: ../../dhlrc-core/src/config.rs:507
+#: ../../dhlrc-core/src/config.rs:552
 #, rust-format
 msgid "The configuration was reloaded from {}."
 msgstr "配置已从 {} 重载。"
 
-#: ../../dhlrc-core/src/config.rs:548
+#: ../../dhlrc-core/src/config.rs:593
 msgid "Configuration created"
 msgstr "已创建配置"
 
-#: ../../dhlrc-core/src/config.rs:550
+#: ../../dhlrc-core/src/config.rs:595
 #, rust-format
 msgid "A new configuration file was created at {}."
 msgstr "已在 {} 创建新的配置文件。"
 
-#: ../../dhlrc-core/src/config.rs:558
+#: ../../dhlrc-core/src/config.rs:603
 msgid "Configuration could not be read"
 msgstr "无法读取配置"
 
-#: ../../dhlrc-core/src/config.rs:561
+#: ../../dhlrc-core/src/config.rs:606
 #, rust-format
 msgid ""
 "The configuration file could not be read ({}). It was moved aside and a new "
@@ -1958,11 +1958,23 @@ msgstr "KiB"
 msgid "Bytes"
 msgstr "字节"
 
-#: ../../dhlrc-core/src/schema.rs:84
+#: ../../dhlrc-core/src/schema.rs:77
+msgid "File Order (Random)"
+msgstr "文件顺序（随机）"
+
+#: ../../dhlrc-core/src/schema.rs:78
+msgid "Natural Order"
+msgstr "自然顺序"
+
+#: ../../dhlrc-core/src/schema.rs:79
+msgid "Custom Rule"
+msgstr "自定义规则"
+
+#: ../../dhlrc-core/src/schema.rs:89
 msgid "Application Memory Limit"
 msgstr "应用内存限制"
 
-#: ../../dhlrc-core/src/schema.rs:85
+#: ../../dhlrc-core/src/schema.rs:90
 msgid ""
 "The memory the application may use, counted in the unit below. Loading and "
 "saving stop while less than this is free. A decimal is allowed, for example "
@@ -1971,29 +1983,29 @@ msgstr ""
 "应用可使用的内存上限，按下方单位计数；空闲内存低于该值时，加载和保存会停止。"
 "可以填小数，例如 1.5。"
 
-#: ../../dhlrc-core/src/schema.rs:96
+#: ../../dhlrc-core/src/schema.rs:101
 msgid "Memory Limit Unit"
 msgstr "内存限制单位"
 
-#: ../../dhlrc-core/src/schema.rs:97
+#: ../../dhlrc-core/src/schema.rs:102
 msgid "The unit the memory limit is counted in."
 msgstr "内存限制所用的单位。"
 
-#: ../../dhlrc-core/src/schema.rs:108
+#: ../../dhlrc-core/src/schema.rs:113
 msgid "Elapsed Milliseconds"
 msgstr "持续毫秒"
 
-#: ../../dhlrc-core/src/schema.rs:110
+#: ../../dhlrc-core/src/schema.rs:115
 msgid ""
 "The elapsed milliseconds for the progress bar, if set too small will affect "
 "the speed."
 msgstr "进度条的持续毫秒，如果设置太小将会影响速度。"
 
-#: ../../dhlrc-core/src/schema.rs:122
+#: ../../dhlrc-core/src/schema.rs:127
 msgid "Cute Language Pack"
 msgstr "可爱语言包"
 
-#: ../../dhlrc-core/src/schema.rs:123
+#: ../../dhlrc-core/src/schema.rs:128
 msgid ""
 "Use the playful catalogue (喵, 捏, kaomoji, emoji) instead of the plain one. "
 "It is read when the program starts, so a restart is needed."
@@ -2001,35 +2013,35 @@ msgstr ""
 "使用带喵、捏、颜文字和 emoji 的俏皮语言包，而不是普通的翻译。它在程序启动时读"
 "取，因此需要重启才能生效。"
 
-#: ../../dhlrc-core/src/schema.rs:134
+#: ../../dhlrc-core/src/schema.rs:139
 msgid "Cache Directory"
 msgstr "缓存目录"
 
-#: ../../dhlrc-core/src/schema.rs:135
+#: ../../dhlrc-core/src/schema.rs:140
 msgid "The directory to store cache files."
 msgstr "存放缓存文件的目录。"
 
-#: ../../dhlrc-core/src/schema.rs:146
+#: ../../dhlrc-core/src/schema.rs:151
 msgid "Use Cached File when Downloading Failed"
 msgstr "在下载失败时使用缓存文件"
 
-#: ../../dhlrc-core/src/schema.rs:147
+#: ../../dhlrc-core/src/schema.rs:152
 msgid "When downloading failed, use the cached file."
 msgstr "当下载失败时，用缓存文件。"
 
-#: ../../dhlrc-core/src/schema.rs:158
+#: ../../dhlrc-core/src/schema.rs:163
 msgid "Select All Regions In Loading"
 msgstr "在加载时选择所有区域"
 
-#: ../../dhlrc-core/src/schema.rs:159
+#: ../../dhlrc-core/src/schema.rs:164
 msgid "If you check this, all regions will be loaded in the loading progress."
 msgstr "如果你选择此项，所有区域将在加载时载入。"
 
-#: ../../dhlrc-core/src/schema.rs:170
+#: ../../dhlrc-core/src/schema.rs:175
 msgid "Try Other Modules when Loading Fails"
 msgstr "失败时尝试其它模块"
 
-#: ../../dhlrc-core/src/schema.rs:171
+#: ../../dhlrc-core/src/schema.rs:176
 msgid ""
 "A file is first read by the module its extension points at; when that fails, "
 "the other modules are tried as well. Turn this off to make a file whose "
@@ -2038,7 +2050,7 @@ msgstr ""
 "先由扩展名指向的模块读取文件；失败时再尝试其它模块。关闭后，扩展名与实际格式"
 "不符的文件会直接失败。"
 
-#: ../../dhlrc-core/src/schema.rs:184
+#: ../../dhlrc-core/src/schema.rs:189
 #, rust-format
 msgid ""
 "The display name used for a region that comes from a multi-region file. Use $"
@@ -2047,74 +2059,98 @@ msgstr ""
 "多区域文件中的区域所使用的显示名称。使用 ${file} 表示文件名，使用 ${region} "
 "表示文件内的区域名称。"
 
-#: ../../dhlrc-core/src/schema.rs:196
+#: ../../dhlrc-core/src/schema.rs:201
+msgid "Multi-Region Loading Order"
+msgstr "多区域加载顺序"
+
+#: ../../dhlrc-core/src/schema.rs:203
+msgid ""
+"The order the regions of a multi-region file are loaded and listed in. Some "
+"formats keep their regions in a hash map, so the file order changes from one "
+"opening to the next; natural order sorts names with numbers compared by "
+"value, and the custom rule uses the pattern list below."
+msgstr "多区域文件中的区域加载和列出的顺序。部分格式把区域保存在哈希表中，因此每次打开时的文件顺序都可能不同；自然顺序按名字排序、数字按数值比较；自定义规则使用下方的模式列表。"
+
+#: ../../dhlrc-core/src/schema.rs:215
+msgid "Custom Region Order Rule"
+msgstr "自定义区域顺序规则"
+
+#: ../../dhlrc-core/src/schema.rs:217
+msgid ""
+"Used when the loading order is Custom Rule. Write comma- or semicolon-"
+"separated wildcard patterns, for example `2*, 1*, *`: regions matching an "
+"earlier pattern come first, groups are sorted naturally, and regions that "
+"match no pattern come last. * matches any text, ? one character."
+msgstr "在加载顺序为“自定义规则”时使用。填写以逗号或分号分隔的通配符模式，例如 `2*, 1*, *`：匹配靠前模式的区域排在前面，组内按自然顺序排序，不匹配任何模式的区域排在最后。* 匹配任意文本，? 匹配单个字符。"
+
+#: ../../dhlrc-core/src/schema.rs:229
 msgid "Region Base Name"
 msgstr "区域基础名字"
 
-#: ../../dhlrc-core/src/schema.rs:197
+#: ../../dhlrc-core/src/schema.rs:230
 msgid "The default base name for the region."
 msgstr "默认的区域基础名字"
 
-#: ../../dhlrc-core/src/schema.rs:209
+#: ../../dhlrc-core/src/schema.rs:242
 msgid "The default name for the region."
 msgstr "默认的区域名字"
 
-#: ../../dhlrc-core/src/schema.rs:220
+#: ../../dhlrc-core/src/schema.rs:253
 msgid "Sample File Name"
 msgstr "示例文件名"
 
-#: ../../dhlrc-core/src/schema.rs:222
+#: ../../dhlrc-core/src/schema.rs:255
 msgid ""
 "The sample file name used by the preview of the multi-region display name. "
 "It should not include a file extension."
 msgstr "多区域显示名称预览所使用的示例文件名。不应包含文件扩展名。"
 
-#: ../../dhlrc-core/src/schema.rs:234
+#: ../../dhlrc-core/src/schema.rs:267
 msgid "Sample Region Name"
 msgstr "示例区域名称"
 
-#: ../../dhlrc-core/src/schema.rs:236
+#: ../../dhlrc-core/src/schema.rs:269
 msgid ""
 "The sample region name used by the preview of the multi-region display name."
 msgstr "多区域显示名称预览所使用的示例区域名称。"
 
-#: ../../dhlrc-core/src/schema.rs:248
+#: ../../dhlrc-core/src/schema.rs:281
 msgid "Region Description"
 msgstr "区域描述"
 
-#: ../../dhlrc-core/src/schema.rs:249
+#: ../../dhlrc-core/src/schema.rs:282
 msgid "The default description for the region."
 msgstr "默认的区域描述"
 
-#: ../../dhlrc-core/src/schema.rs:260
+#: ../../dhlrc-core/src/schema.rs:293
 msgid "Region Author"
 msgstr "区域作者"
 
-#: ../../dhlrc-core/src/schema.rs:261
+#: ../../dhlrc-core/src/schema.rs:294
 msgid "The default author for the region."
 msgstr "默认的区域作者"
 
-#: ../../dhlrc-core/src/schema.rs:272
+#: ../../dhlrc-core/src/schema.rs:305
 msgid "Override Settings"
 msgstr "覆盖设置"
 
-#: ../../dhlrc-core/src/schema.rs:273
+#: ../../dhlrc-core/src/schema.rs:306
 msgid "Whether to override setting or not."
 msgstr "是否覆盖设置。"
 
-#: ../../dhlrc-core/src/schema.rs:284
+#: ../../dhlrc-core/src/schema.rs:317
 msgid "Override Version"
 msgstr "覆盖版本"
 
-#: ../../dhlrc-core/src/schema.rs:285
+#: ../../dhlrc-core/src/schema.rs:318
 msgid "The version to override in translation stage."
 msgstr "在翻译阶段覆盖的版本。"
 
-#: ../../dhlrc-core/src/schema.rs:296
+#: ../../dhlrc-core/src/schema.rs:329
 msgid "Block Name Language"
 msgstr "方块名称语言"
 
-#: ../../dhlrc-core/src/schema.rs:298
+#: ../../dhlrc-core/src/schema.rs:331
 msgid ""
 "The Minecraft locale (like zh_cn) block and item names are shown in. The "
 "language file is read from the downloaded assets, so it works as soon as "
@@ -2123,19 +2159,19 @@ msgstr ""
 "方块和物品名称显示时使用的 Minecraft 语言环境（如 zh_cn）。语言文件从已下载的"
 "资源中读取，因此只要该版本的资源已就绪即可生效。"
 
-#: ../../dhlrc-core/src/schema.rs:310
+#: ../../dhlrc-core/src/schema.rs:343
 msgid "Default Show Option"
 msgstr "默认展示选项"
 
-#: ../../dhlrc-core/src/schema.rs:311
+#: ../../dhlrc-core/src/schema.rs:344
 msgid "The default option of showing block information."
 msgstr "展示方块信息的默认选项。"
 
-#: ../../dhlrc-core/src/schema.rs:322
+#: ../../dhlrc-core/src/schema.rs:355
 msgid "Download the Client Jar Automatically"
 msgstr "自动下载客户端 jar"
 
-#: ../../dhlrc-core/src/schema.rs:324
+#: ../../dhlrc-core/src/schema.rs:357
 msgid ""
 "A block's models and textures are only in its version's client jar. When a "
 "3D preview needs one the cache directory does not have, download it (about "
@@ -2144,31 +2180,31 @@ msgstr ""
 "方块的模型与材质只存在于其对应版本的客户端 jar 中。当 3D 预览需要而缓存目录中"
 "没有该 jar 时，自动下载它（约 30 MB），而不是什么都不画。"
 
-#: ../../dhlrc-core/src/schema.rs:336
+#: ../../dhlrc-core/src/schema.rs:369
 msgid "Highlight Colour"
 msgstr "高亮颜色"
 
-#: ../../dhlrc-core/src/schema.rs:338
+#: ../../dhlrc-core/src/schema.rs:371
 msgid ""
 "The colour of the outline drawn around the selected blocks in the 3D "
 "preview, as #rrggbb."
 msgstr "3D 预览中选中方块外轮廓的颜色，格式为 #rrggbb。"
 
-#: ../../dhlrc-core/src/schema.rs:350
+#: ../../dhlrc-core/src/schema.rs:383
 msgid "Background Colour"
 msgstr "背景颜色"
 
-#: ../../dhlrc-core/src/schema.rs:352
+#: ../../dhlrc-core/src/schema.rs:385
 msgid ""
 "The colour behind the 3D preview, as #rrggbb. It does not affect the blocks "
 "themselves."
 msgstr "3D 预览背景的颜色，格式为 #rrggbb。不影响方块本身。"
 
-#: ../../dhlrc-core/src/schema.rs:364
+#: ../../dhlrc-core/src/schema.rs:397
 msgid "Region Box Colour"
 msgstr "区域框颜色"
 
-#: ../../dhlrc-core/src/schema.rs:366
+#: ../../dhlrc-core/src/schema.rs:399
 msgid ""
 "The colour of the box drawn around the whole region in the 3D preview, as "
 "#rrggbb. It is kept apart from the highlight colour so both stay readable."
@@ -2176,32 +2212,32 @@ msgstr ""
 "3D 预览中整个区域外框的颜色，格式为 #rrggbb。与高亮颜色分开，以便两者都清晰可"
 "辨。"
 
-#: ../../dhlrc-core/src/schema.rs:378 ../../dhlrc-core/src/schema.rs:935
+#: ../../dhlrc-core/src/schema.rs:411 ../../dhlrc-core/src/schema.rs:995
 msgid "Selection Marker Colour"
 msgstr "选择标记颜色"
 
-#: ../../dhlrc-core/src/schema.rs:380
+#: ../../dhlrc-core/src/schema.rs:413
 msgid ""
 "The colour of the box drawn around the cell chosen in the selected-blocks "
 "list, as #rrggbb."
 msgstr "3D 预览中围绕“已选方块”列表里所选格子的方框颜色，格式为 #rrggbb。"
 
-#: ../../dhlrc-core/src/schema.rs:392
+#: ../../dhlrc-core/src/schema.rs:425
 msgid "Download the Client Jar for Item Names and Icons"
 msgstr "为物品名称与图标下载客户端 jar"
 
-#: ../../dhlrc-core/src/schema.rs:394
+#: ../../dhlrc-core/src/schema.rs:427
 msgid ""
 "When the material list has no client jar for a version, fetch it "
 "automatically so item names and icons are available."
 msgstr ""
 "当材料列表没有某个版本的客户端 jar 时，自动下载它，以便显示物品名称与图标。"
 
-#: ../../dhlrc-core/src/schema.rs:406
+#: ../../dhlrc-core/src/schema.rs:439
 msgid "Notification Application ID"
 msgstr "通知应用 ID"
 
-#: ../../dhlrc-core/src/schema.rs:408
+#: ../../dhlrc-core/src/schema.rs:441
 msgid ""
 "The application a desktop notification is sent as: the Windows "
 "AppUserModelID, or the macOS bundle identifier. Windows needs it registered, "
@@ -2210,21 +2246,21 @@ msgstr ""
 "桌面通知以哪个应用的身份发送：Windows 的 AppUserModelID，或 macOS 的 bundle "
 "identifier。Windows 需要先注册它，否则通知可能不显示。留空则使用平台默认值。"
 
-#: ../../dhlrc-core/src/schema.rs:420
+#: ../../dhlrc-core/src/schema.rs:453
 msgid "Notification Timeout (ms)"
 msgstr "通知超时（毫秒）"
 
-#: ../../dhlrc-core/src/schema.rs:422
+#: ../../dhlrc-core/src/schema.rs:455
 msgid ""
 "How long a notification stays before it disappears, in milliseconds. Zero "
 "leaves it to the platform."
 msgstr "通知消失前停留的时长，单位为毫秒。为零则交给平台决定。"
 
-#: ../../dhlrc-core/src/schema.rs:434
+#: ../../dhlrc-core/src/schema.rs:467
 msgid "Only Notify When Inactive"
 msgstr "仅在非激活时通知"
 
-#: ../../dhlrc-core/src/schema.rs:436
+#: ../../dhlrc-core/src/schema.rs:469
 msgid ""
 "Do not show a desktop notification while the application is active; the in-"
 "app one is enough then."
