@@ -3,6 +3,7 @@ mod output;
 
 use config::InputConfig;
 
+use common_rs::estimate::{DhlrcEstimate, estimate_region_file};
 use common_rs::helper_struct::HelperStruct;
 use common_rs::i18n::i18n;
 use common_rs::my_error::MyError;
@@ -65,6 +66,39 @@ pub extern "C" fn region_compression() -> i32 {
 #[unsafe(no_mangle)]
 pub extern "C" fn region_file_type() -> *const c_char {
     string_to_ptr_fail_to_null(&gettext_text(i18n("NBT File (*.nbt)")))
+}
+
+/// The optional load-time estimate: read the NBT the module would receive and
+/// report the geometry and the block count. `blocks` being a list means the
+/// file names every block, so that count is exact; otherwise the bounding box
+/// volume is all we know, exactly like the loader allocates.
+#[unsafe(no_mangle)]
+pub extern "C" fn region_estimate(
+    filename: *const c_char,
+    out: *mut DhlrcEstimate,
+) -> i32 {
+    estimate_region_file(filename, out, |nbt, uncompressed_bytes| {
+        let view = nbt.data.view();
+        let size_view = view.at("size");
+        let NBTTag::List(size_list) = size_view.get()? else {
+            return None;
+        };
+        let (x, y, z) = get_size(&size_list.0).ok()?;
+        let (blocks, blocks_exact) = match view.at("blocks").get() {
+            Some(NBTTag::List(blocks)) => (blocks.0.len() as i64, 1),
+            _ => (x as i64 * y as i64 * z as i64, 0),
+        };
+        Some(DhlrcEstimate {
+            regions: 1,
+            blocks,
+            uncompressed_bytes: uncompressed_bytes as i64,
+            size_x: x,
+            size_y: y,
+            size_z: z,
+            blocks_exact,
+            ..DhlrcEstimate::unknown()
+        })
+    })
 }
 
 fn get_size(nbt: &Vec<NBTTag>) -> Result<(i32, i32, i32), Box<dyn Error>> {

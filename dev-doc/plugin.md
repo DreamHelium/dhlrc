@@ -98,6 +98,67 @@ extension named.
 
 `region-nbt-rs`, `region-litematic-rs` and `region-schem-rs` all declare `ObjectCompressionGZip` (1).
 
+### Estimating a load (optional)
+
+A frontend can tell the user what a file will cost before loading it. The format knowledge for that lives in the
+plugin, so a plugin may export one more optional symbol:
+
+```c++
+int32_t region_estimate (const char *filename, struct DhlrcEstimate *out);
+```
+
+It reads `filename` itself (the normal entry points only receive an already decoded object) and fills `out` with what
+the format knows. Return `0` when the estimate was written and `-1` when it was not; on failure the caller ignores the
+struct. The layout is the C mirror of `common_rs::estimate::DhlrcEstimate` and is declared in
+`dhlrc_core.h`:
+
+```c
+struct DhlrcEstimate
+{
+  int64_t regions;            /* regions in the file: 1 for single-region */
+  int64_t blocks;             /* blocks to load, or volume; -1 unknown */
+  int64_t uncompressed_bytes; /* bytes after decompression; -1 unknown */
+  int32_t size_x;             /* representative region extent, 0 unknown */
+  int32_t size_y;
+  int32_t size_z;
+  int32_t blocks_exact;       /* 0 or 1 */
+  int32_t ok;                 /* 0 or 1; set with the other fields */
+};
+```
+
+`blocks_exact` says whether `blocks` is the format's own set-block count (`1`) or only the bounding-box volume (`0`).
+For a multi-region file whose regions differ in size there is no single representative extent, so the three size
+fields stay `0`; the region count and total volume are still reported. `blocks` must be positive for the estimate to
+be used.
+
+The core (`dhlrc_core_region_estimate ()`, `Modules::region_estimate ()`) picks the plugin the same way the loader
+does: the one whose `region_file_suffix()` matches the file extension. If no plugin claims the suffix it offers the
+file to the other region modules that export the symbol, in load order. **The symbol is optional**: a module without
+it still loads and works normally, and the frontend then falls back to the decompressed or compressed file size.
+
+`common-rs` provides the shared half of an implementation, since every NBT format needs it and the module crates do
+not otherwise depend on a decompressor:
+
+```rust
+use common_rs::estimate::{DhlrcEstimate, estimate_region_file};
+
+#[unsafe(no_mangle)]
+pub extern "C" fn region_estimate (
+    filename: *const c_char,
+    out: *mut DhlrcEstimate,
+) -> i32 {
+    estimate_region_file (filename, out, |nbt, uncompressed_bytes| {
+        /* Interpret `nbt` with the format's own reader and return the numbers. */
+        Some (DhlrcEstimate { regions: 1, blocks: 42, /* ... */
+                              ..DhlrcEstimate::unknown () })
+    })
+}
+```
+
+`estimate_region_file ()` opens and decompresses gzip, zlib or plain bytes (the same detection as
+`file_try_uncompress ()`), decodes the NBT, and checks the pointers and `ok` handling. The module keeps only the
+format-specific interpretation. `region-nbt-rs`, `region-litematic-rs` and `region-schem-rs` implement it this way.
+
 ### Seeing the raw bytes
 
 The codec tries the supported NBT encodings itself and hands the plugin an already-decoded NBT tree, so a plugin never

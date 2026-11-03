@@ -25,27 +25,35 @@ pub fn run(args: ModulesArgs) -> ExitCode {
     let (default_region, default_load) = default_dirs();
     let region_dir = args.region_dir.unwrap_or(default_region);
     let load_dir = args.load_dir.unwrap_or(default_load);
+    print!(
+        "{}",
+        report(&region_dir, &load_dir, args.kind, args.verbose)
+    );
+    ExitCode::SUCCESS
+}
 
+/// The report as text, so the interactive page shows exactly what the command
+/// prints.
+pub fn report(region_dir: &Path, load_dir: &Path, kind: Kind, verbose: bool) -> String {
     /* Both directories are always opened, so the analysis below can compare the
      * two lists whatever the display filter is. */
-    let modules = Modules::load(&region_dir, &load_dir);
+    let modules = Modules::load(region_dir, load_dir);
 
     let mut sections = Vec::new();
-    if args.kind != Kind::Load {
-        sections.push(render_regions(&modules, &region_dir, args.verbose));
+    if kind != Kind::Load {
+        sections.push(render_regions(&modules, region_dir, verbose));
     }
-    if args.kind != Kind::Region {
-        sections.push(render_codecs(&modules, &load_dir, args.verbose));
+    if kind != Kind::Region {
+        sections.push(render_codecs(&modules, load_dir, verbose));
     }
-    if args.kind == Kind::All {
+    if kind == Kind::All {
         let analysis = render_analysis(&modules);
         if !analysis.is_empty() {
             sections.push(analysis);
         }
     }
 
-    print!("{}", sections.join("\n"));
-    ExitCode::SUCCESS
+    sections.join("\n")
 }
 
 fn render_regions(modules: &Modules, dir: &Path, verbose: bool) -> String {

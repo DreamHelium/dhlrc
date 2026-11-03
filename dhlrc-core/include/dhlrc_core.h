@@ -108,6 +108,9 @@ extern "C"
     const char *multi_region_name_pattern;
     int32_t multi_region_order; /* a DhlrcRegionOrder */
     const char *multi_region_order_rule;
+    /* The load limits; zero means no limit. */
+    int32_t max_load_seconds;
+    int32_t max_load_memory_mb;
     const char *name_pattern_sample_file;
     const char *name_pattern_sample_region;
     const char *description;
@@ -214,6 +217,68 @@ extern "C"
   void *dhlrc_core_load_module_symbol (const DhlrcCore *core, size_t index,
                                        const char *name);
 
+  /* What a region module can say about a file without building a region.
+   * `-1` means the module does not know that number; the struct is filled by
+   * the optional `region_estimate` module symbol (see dev-doc/plugin.md).
+   * `blocks_exact` is non-zero when `blocks` is the format's own set-block
+   * count rather than the bounding-box volume. */
+  struct DhlrcEstimate
+  {
+    int64_t regions;           /* regions in the file: 1 for single-region */
+    int64_t blocks;            /* blocks to load, or volume; -1 unknown */
+    int64_t uncompressed_bytes;/* bytes after decompression; -1 unknown */
+    int32_t size_x;            /* representative region extent, 0 unknown */
+    int32_t size_y;
+    int32_t size_z;
+    int32_t blocks_exact;      /* 0 or 1 */
+    int32_t ok;                /* 0 or 1; set with the other fields */
+  };
+
+  /* Asks the region module that matches `filename`'s suffix for an estimate of
+   * the load, without building a region. Fills `*estimate` and returns 0 when
+   * a module answered, or returns -1 with `*estimate` left "unknown" when none
+   * could: an old module without the optional `region_estimate` symbol, a
+   * suffix no module claims, or an unreadable/unsupported file. Frontends then
+   * fall back to the file size. */
+  int32_t dhlrc_core_region_estimate (const DhlrcCore *core,
+                                      const char *filename,
+                                      struct DhlrcEstimate *estimate);
+
+  /* What the load-time history says about one file. All times are
+   * milliseconds; `low` and `high` are equal to `millis` for an exact history
+   * hit. The memory fields are in bytes and always come from the model (the
+   * process's own cost plus the module's block count, or the file size when no
+   * module reported one), not from a measurement. `basis` says where the time
+   * came from:
+   * 0 = measured before, 1 = from this format, 2 = from other formats,
+   * 3 = no history (the built-in guess, or a region module's estimate).
+   * `samples` is the number of measured loads behind it (0 for a guess) and
+   * `ok` is 1 when the other fields are filled. */
+  struct DhlrcLoadPrediction
+  {
+    double millis;
+    double low;
+    double high;
+    double memory_bytes;
+    double memory_low;
+    double memory_high;
+    int32_t basis;
+    int32_t samples;
+    int32_t ok;
+  };
+
+  /* Predicts how long `filename` will take to load and how much memory it
+   * needs, from the history in the core's configured cache directory and, when
+   * the history has nothing to say, from the loaded region modules' optional
+   * `region_estimate`. Returns 0
+   * and fills `*prediction` on success, or -1 (with `ok` 0) for a null
+   * argument, an unreadable file, or a configuration lock failure. A file with
+   * no history and no matching module is still predicted from its size, so 0
+   * does not imply that the file was measured before. */
+  int32_t dhlrc_core_load_prediction (const DhlrcCore *core,
+                                      const char *filename,
+                                      struct DhlrcLoadPrediction *prediction);
+
   /* Which symbol set a plugin option belongs to. */
   typedef enum
   {
@@ -283,6 +348,11 @@ extern "C"
   /* Reads one setting as text; the result is owned, free it with
    * `dhlrc_string_free`. NULL when `key` is unknown. */
   char *dhlrc_core_setting_get (const DhlrcCore *core, const char *key);
+  /* A one-line, translated summary of the settings on `group` (its message
+   * id, e.g. "General"), for a page hint and its sidebar tooltip. Owned: free
+   * it with `dhlrc_string_free`. NULL for a null core/group or an unknown
+   * group. */
+  char *dhlrc_core_settings_summary (const DhlrcCore *core, const char *group);
   /* Writes one setting from text; returns 0, or -1 when `key` is unknown. */
   int32_t dhlrc_core_setting_set (DhlrcCore *core, const char *key,
                                   const char *value);

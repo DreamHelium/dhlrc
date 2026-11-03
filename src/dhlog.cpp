@@ -1,5 +1,6 @@
 #include "dhlog.h"
 
+#include <QCoreApplication>
 #include <QDate>
 #include <QDateTime>
 #include <QDesktopServices>
@@ -217,14 +218,25 @@ messageHandler (QtMsgType type, const QMessageLogContext &context,
     }
 
   insideHandler = true;
+
+  /* The in-app viewer keeps every message, whatever the file's minimum level
+   * is: the level only decides what reaches the daily file, and a user opening
+   * the log tab expects to see the warnings the terminal showed. */
+  dh::log::LogMessage record;
+  record.time = QDateTime::currentDateTime ();
+  record.level = messageLevel (type);
+  record.text = message;
+
   {
     LogState &logState = state ();
     QMutexLocker locker (&logState.mutex);
     if (logState.initialized && logState.minimumLevel != dh::log::Level::Off
-        && static_cast<int> (messageLevel (type))
+        && static_cast<int> (record.level)
                >= static_cast<int> (logState.minimumLevel))
       writeRecord (type, context, message);
   }
+
+  dh::log::store ()->append (record);
 
   forwardMessage (type, context, message);
   insideHandler = false;
@@ -234,6 +246,57 @@ messageHandler (QtMsgType type, const QMessageLogContext &context,
   if (type == QtFatalMsg)
     std::abort ();
 }
+}
+
+dh::log::LogStore *
+dh::log::store ()
+{
+  /* Created on first use. `initialize ()` is called from the GUI thread early
+   * in `main ()`, so that is where this normally happens; the move below only
+   * matters if something logged before then. */
+  static dh::log::LogStore *const instance = [] {
+    auto *result = new dh::log::LogStore;
+    qRegisterMetaType<dh::log::LogMessage> ("dh::log::LogMessage");
+    if (auto *application = QCoreApplication::instance ())
+      result->moveToThread (application->thread ());
+    return result;
+  } ();
+  return instance;
+}
+
+dh::log::LogStore::LogStore (QObject *parent) : QObject (parent)
+{
+}
+
+QVector<dh::log::LogMessage>
+dh::log::LogStore::messages () const
+{
+  QMutexLocker locker (&mutex);
+  return records;
+}
+
+int
+dh::log::LogStore::count () const
+{
+  QMutexLocker locker (&mutex);
+  return records.size ();
+}
+
+void
+dh::log::LogStore::append (const LogMessage &message)
+{
+  LogMessage stored = message;
+  {
+    QMutexLocker locker (&mutex);
+    stored.sequence = ++nextSequence;
+    records.append (stored);
+    if (records.size () > capacity)
+      records.removeFirst ();
+  }
+  /* Emitted outside the lock: a queued receiver only copies the argument, but
+   * a direct one must never be able to call back into the store while the
+   * lock is held. */
+  Q_EMIT messageAdded (stored);
 }
 
 dh::log::Level
@@ -258,6 +321,10 @@ dh::log::levelFromString (const QString &name, Level fallback)
 void
 dh::log::initialize (const QString &cacheDirectory)
 {
+  /* Make sure the in-memory store and its queued-signal metatype exist before
+   * the first message can arrive, and on the GUI thread. */
+  (void) store ();
+
   LogState &logState = state ();
   {
     QMutexLocker locker (&logState.mutex);

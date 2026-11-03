@@ -1,7 +1,12 @@
 #ifndef DHLOG_H
 #define DHLOG_H
 
+#include <QDateTime>
+#include <QMetaType>
+#include <QMutex>
+#include <QObject>
 #include <QString>
+#include <QVector>
 
 /* File logging for the Qt frontend.
  *
@@ -29,6 +34,62 @@ enum class Level
   Critical,
   Off
 };
+
+/* One message kept in memory, for the in-app log viewer. `sequence` grows with
+ * every accepted message, so a reader that takes a snapshot can tell the
+ * messages it already has from the ones that arrive later; it is assigned by
+ * `LogStore::append ()` and must be left at zero by callers. */
+struct LogMessage
+{
+  QDateTime time;
+  Level level = Level::Info;
+  QString text;
+  quint64 sequence = 0;
+};
+
+/* The in-memory tail of the log: the last `capacity` messages, in the order
+ * they were emitted.
+ *
+ * The installed message handler appends from whatever thread logged, so the
+ * buffer is behind a mutex. `messageAdded ()` is emitted after the record is
+ * stored, with the store's lock released, so a receiver can connect from the
+ * GUI thread and let Qt queue the delivery instead of touching the viewer
+ * from a worker thread. */
+class LogStore : public QObject
+{
+  Q_OBJECT
+public:
+  /* How many messages are kept. Older ones are dropped as new ones arrive. */
+  static constexpr int capacity = 2000;
+
+  /* A copy of the buffer, oldest first. Safe from any thread. */
+  QVector<LogMessage> messages () const;
+  /* How many messages the buffer currently holds, 0..`capacity`. */
+  int count () const;
+
+  /* Adds one message. The installed handler is the only caller; anything else
+   * would make the viewer show something that was never logged. Safe from any
+   * thread. */
+  void append (const LogMessage &message);
+
+Q_SIGNALS:
+  /* A message was stored. The signal may be emitted from a worker thread, so a
+   * GUI receiver should connect with `Qt::QueuedConnection`. */
+  void messageAdded (const dh::log::LogMessage &message);
+
+private:
+  explicit LogStore (QObject *parent = nullptr);
+
+  mutable QMutex mutex;
+  QVector<LogMessage> records;
+  quint64 nextSequence = 0;
+
+  friend LogStore *store ();
+};
+
+/* The one store, created on first use. It lives for the whole run so messages
+ * logged early are still available to the page that shows them. */
+LogStore *store ();
 
 /* Parses a level name (`debug`, `info`, `warning`, `critical`, `off`),
  * ignoring case and surrounding whitespace. Anything else — including an
@@ -68,5 +129,7 @@ QString currentLogFile ();
 void openLogDirectory ();
 }
 }
+
+Q_DECLARE_METATYPE (dh::log::LogMessage)
 
 #endif /* DHLOG_H */

@@ -60,6 +60,7 @@ set(TEMP_PROJECT_SOURCES
         propertymodifyui.cpp propertymodifyui.h
         utility.cpp utility.h
         dhlog.cpp dhlog.h
+        notificationcenterui.cpp notificationcenterui.h
         windowsappid.cpp windowsappid.h
         regionmodifyui.cpp regionmodifyui.h
         blocklistui.cpp blocklistui.h

@@ -1,6 +1,7 @@
 use std::ffi::{c_char, c_int, c_void};
 
 pub mod config;
+pub mod estimate;
 pub mod helper_struct;
 pub mod i18n;
 pub mod my_error;

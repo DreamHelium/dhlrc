@@ -159,6 +159,8 @@ DhCore::refresh ()
   cached.multiRegionNamePattern = text (view->multi_region_name_pattern);
   cached.multiRegionOrder = view->multi_region_order;
   cached.multiRegionOrderRule = text (view->multi_region_order_rule);
+  cached.maxLoadSeconds = view->max_load_seconds;
+  cached.maxLoadMemoryMB = view->max_load_memory_mb;
   cached.namePatternSampleFile = text (view->name_pattern_sample_file);
   cached.namePatternSampleRegion = text (view->name_pattern_sample_region);
   cached.description = text (view->description);
@@ -297,6 +299,30 @@ DhCore::pluginSetInt (const QString &type, int kind, const QString &key,
   const QByteArray keyUtf8 = key.toUtf8 ();
   dhlrc_core_plugin_set_int (core, typeUtf8.constData (), kind,
                              keyUtf8.constData (), value);
+}
+
+DhCore::LoadPrediction
+DhCore::loadPrediction (const QString &filename) const
+{
+  LoadPrediction prediction;
+  if (!core)
+    return prediction;
+
+  DhlrcLoadPrediction raw{};
+  if (dhlrc_core_load_prediction (core, filename.toUtf8 ().constData (), &raw)
+      != 0)
+    return prediction;
+
+  prediction.millis = raw.millis;
+  prediction.low = raw.low;
+  prediction.high = raw.high;
+  prediction.memoryBytes = raw.memory_bytes;
+  prediction.memoryLow = raw.memory_low;
+  prediction.memoryHigh = raw.memory_high;
+  prediction.basis = raw.basis;
+  prediction.samples = raw.samples;
+  prediction.ok = raw.ok != 0;
+  return prediction;
 }
 
 bool

@@ -213,9 +213,7 @@ impl RegionLib {
                 region_get_block_id_by_index: {
                     symbol(&library, &path, b"region_get_block_id_by_index\0")?
                 },
-                region_get_data_version: {
-                    symbol(&library, &path, b"region_get_data_version\0")?
-                },
+                region_get_data_version: { symbol(&library, &path, b"region_get_data_version\0")? },
                 region_free: symbol(&library, &path, b"region_free\0")?,
                 _library: library,
             })
@@ -708,12 +706,8 @@ fn open_process_wide(path: &Path) -> std::result::Result<Library, libloading::Er
     unsafe { Library::new(path) }
 }
 
-type FileTryUncompress = unsafe extern "C" fn(
-    *const c_char,
-    *mut c_void,
-    *mut c_int,
-    *mut c_int,
-) -> *mut c_void;
+type FileTryUncompress =
+    unsafe extern "C" fn(*const c_char, *mut c_void, *mut c_int, *mut c_int) -> *mut c_void;
 type VecFree = unsafe extern "C" fn(*mut c_void);
 type VecToCStr = unsafe extern "C" fn(*mut c_void) -> *mut c_char;
 type StringFree = unsafe extern "C" fn(*mut c_char);

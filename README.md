@@ -103,7 +103,10 @@ Run `./build-msys2.sh --help` for the other options (`--debug`, `--no-gui`,
 - Modify base data of the region.
 - A 3D preview that draws a region from its block models and textures, with
   turning, zooming and block picking (see the [developer document](dev-doc/render.md)).
-- Old-school GUI.
+- Old-school GUI, with notification centre and log view.
+- Restores the previous session at start: the open tabs, the active tab, the
+  window size and the sidebar width; regions that were loaded without an open
+  tab are loaded again too (turn it off in Settings -> General).
 
 ## Usage
 
@@ -114,6 +117,10 @@ start (also in `resources/usage.md`, with the Chinese translation next to it in
 `resources/usage.zh_CN.md`). The `Program Directories` entry in the left sidebar
 shows the folders the programme uses — check the configuration and cache folders
 there before uninstalling.
+
+`dhlrc-tui` is an interactive terminal frontend: run it without arguments for
+a mouse-capable settings page with a sidebar; `--help` lists the other
+subcommands.
 
 tty support might be planned.
 

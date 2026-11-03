@@ -4,6 +4,7 @@
 #include "dhsettingsdialog.h"
 
 #include <KColorButton>
+#include <KLocalizedString>
 #include <QCheckBox>
 #include <QColor>
 #include <QComboBox>
@@ -14,22 +15,153 @@
 #include <QLineEdit>
 #include <QPushButton>
 #include <QSpinBox>
+#include <QStyle>
 #include <QTextEdit>
+#include <QToolButton>
 #include <QVBoxLayout>
 #include <limits>
 #include <qicon.h>
 #include <qpushbutton.h>
 
 QHBoxLayout *
-DhSettingsTemplate::addRow ()
+DhSettingsTemplate::addRow (bool withLabel)
 {
-  auto *row = new QHBoxLayout ();
-  auto *label = new QLabel (item->label ());
-  label->setToolTip (item->toolTip ());
-  row->addWidget (label);
-  rowWidgets.append (label);
-  layout->addLayout (row);
-  return row;
+  rowLayout = new QHBoxLayout ();
+  if (withLabel)
+    {
+      auto *label = new QLabel (item->label ());
+      label->setToolTip (item->toolTip ());
+      rowLayout->addWidget (label);
+      rowWidgets.append (label);
+    }
+  layout->addLayout (rowLayout);
+  return rowLayout;
+}
+
+void
+DhSettingsTemplate::finishRow ()
+{
+  if (!rowLayout)
+    return;
+
+  /* The row layout was put on the page by `addRow ()`; move it into a plain
+   * container widget at the same position. Only a widget can be hidden as a
+   * whole by the search filter, and the dot and restore button belong to the
+   * same row. */
+  const int index = layout->indexOf (rowLayout);
+  if (index >= 0)
+    layout->removeItem (rowLayout);
+  rowContainer = new QWidget;
+  rowContainer->setLayout (rowLayout);
+  if (index >= 0)
+    layout->insertWidget (index, rowContainer);
+  else
+    layout->addWidget (rowContainer);
+
+  /* A small coloured dot marks a value that is not the built-in default; it
+   * takes very little room and reads as "changed" without a label. */
+  modifiedLabel = new QLabel (QStringLiteral ("\u25cf"));
+  modifiedLabel->setObjectName (QStringLiteral ("dhModifiedMarker"));
+  modifiedLabel->setToolTip (i18n ("Modified"));
+  modifiedLabel->setStyleSheet (
+      QStringLiteral ("color: #d68b00; font-weight: bold;"));
+  rowLayout->addWidget (modifiedLabel);
+
+  /* Per-row undo: the dialog-wide Restore Defaults still resets everything;
+   * this puts one value back without losing the other pending edits. */
+  restoreButton = new QToolButton;
+  restoreButton->setObjectName (QStringLiteral ("dhRestoreDefaultButton"));
+  restoreButton->setAutoRaise (true);
+  QIcon undoIcon = QIcon::fromTheme (QStringLiteral ("edit-undo"));
+  /* A theme without the action icons (or a bare offscreen session) would
+   * otherwise leave an invisible button that still takes clicks. */
+  if (undoIcon.isNull ())
+    undoIcon = restoreButton->style ()->standardIcon (QStyle::SP_BrowserReload);
+  restoreButton->setIcon (undoIcon);
+  restoreButton->setToolTip (i18n ("Restore Default"));
+  restoreButton->setToolButtonStyle (Qt::ToolButtonIconOnly);
+  rowLayout->addWidget (restoreButton);
+  rowWidgets.append (restoreButton);
+  QObject::connect (restoreButton, &QToolButton::clicked, restoreButton,
+                    [this] { restoreDefault (); });
+
+  updateModified ();
+}
+
+bool
+DhSettingsTemplate::isDefault () const
+{
+  /* The control's value, not the item's: items are only written on Apply, so
+   * while a row is being edited the item still holds the saved value. Reading
+   * the control keeps the marker live on every keystroke. */
+  const QVariant fallback = item->getDefault ();
+  if (auto *checkBox = qobject_cast<QCheckBox *> (widget))
+    return checkBox->isChecked () == fallback.toBool ();
+  if (auto *spinBox = qobject_cast<QSpinBox *> (widget))
+    return spinBox->value () == fallback.toInt ();
+  if (auto *edit = qobject_cast<QLineEdit *> (widget))
+    return edit->text () == fallback.toString ();
+  if (auto *textEdit = qobject_cast<QTextEdit *> (widget))
+    return textEdit->toPlainText () == fallback.toString ();
+  if (auto *comboBox = qobject_cast<QComboBox *> (widget))
+    return comboBox->currentIndex () == fallback.toInt ();
+  if (auto *colourButton = qobject_cast<KColorButton *> (widget))
+    {
+      /* Compared as colours: the default may be spelled "#FFFFFF" while the
+       * button normalises to "#ffffff", which is not an edit. */
+      const QColor wanted (fallback.toString ().trimmed ());
+      return wanted.isValid () && colourButton->color () == wanted;
+    }
+  /* A template without a visible control (the preview sample values) can only
+   * be judged by its item. */
+  return item->property () == fallback;
+}
+
+bool
+DhSettingsTemplate::updateModified ()
+{
+  /* Two different questions: the marker says "this value is not the built-in
+   * default", the undo button says "this row has an edit waiting for Apply".
+   * Most rows are not at their default, so tying the button to the default
+   * put one on nearly every row; tying it to the edit keeps the page quiet
+   * until the user changes something. */
+  const bool modified = !isDefault ();
+  if (modifiedLabel)
+    modifiedLabel->setVisible (modified);
+  if (restoreButton)
+    restoreButton->setVisible (detect ());
+  return modified;
+}
+
+void
+DhSettingsTemplate::restoreDefault ()
+{
+  /* Put the control back at its default and leave the item alone: `detect ()`
+   * compares the control with the saved item, so it reports the row as a
+   * pending edit and enables Apply. (Writing the item here first made
+   * `detect ()` see no change, which is why Apply stayed disabled.) */
+  setDefault ();
+  updateModified ();
+  if (dialog)
+    dialog->detect ();
+}
+
+bool
+DhSettingsTemplate::matches (const QString &needle) const
+{
+  const QString lower = needle.toLower ();
+  if (item->label ().toLower ().contains (lower))
+    return true;
+  if (item->toolTip ().toLower ().contains (lower))
+    return true;
+  if (item->key ().toLower ().contains (lower))
+    return true;
+  /* The choice text is optional in the spec, but it costs little and lets the
+   * user find "Bedrock" without knowing which setting it belongs to. */
+  for (const auto &choice : item->choices ())
+    if (choice.toLower ().contains (lower))
+      return true;
+  return false;
 }
 
 void
@@ -45,10 +177,12 @@ DhSettingsTemplate::setEnabled (bool enabled)
 void
 DhBoolSettingTemplate::initWidget (QVBoxLayout *, DhSettingsDialog *)
 {
+  /* The checkbox carries its own label, so it gets a row without one. */
+  auto *row = addRow (false);
   auto *checkBox = new QCheckBox (item->label ());
   checkBox->setToolTip (item->toolTip ());
   checkBox->setChecked (item->toBool ());
-  layout->addWidget (checkBox);
+  row->addWidget (checkBox, 1);
   widget = checkBox;
   QObject::connect (checkBox, &QCheckBox::toggled, dialog,
                     &DhSettingsDialog::detect);

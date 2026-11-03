@@ -16,6 +16,7 @@
  * allocator, so it is freed here the same way `string_free ()` frees one.
  */
 
+use common_rs::estimate::DhlrcEstimate;
 use libloading::{Library, Symbol};
 use std::ffi::{CStr, CString, c_char, c_void};
 use std::path::{Path, PathBuf};
@@ -96,6 +97,51 @@ impl Modules {
             Some(entry) => symbol_ptr(&entry.library, name),
             None => ptr::null_mut(),
         }
+    }
+
+    /// Asks the region module that matches `path` to estimate the load without
+    /// building a region. `None` when no module can (an old module without the
+    /// optional `region_estimate` symbol, a suffix nothing claims, or a file the
+    /// module does not understand); the caller then falls back to the file size.
+    ///
+    /// The module whose `region_file_suffix ()` matches the extension is the
+    /// one the file claims to be, so it is the only one tried — the same rule
+    /// the loader uses. A file whose suffix no module claims is offered to
+    /// every region module that exports the optional symbol, in load order.
+    pub fn region_estimate(&self, path: &Path) -> Option<DhlrcEstimate> {
+        let claiming = path.extension().and_then(|value| value.to_str()).and_then(
+            |extension| {
+                (0..self.region.len()).find(|&index| {
+                    self.region_info(index)
+                        .and_then(|info| info.file_suffix.as_ref())
+                        .is_some_and(|suffix| suffix.to_string_lossy() == extension)
+                })
+            },
+        );
+
+        if let Some(index) = claiming {
+            return self.call_region_estimate(index, path);
+        }
+
+        (0..self.region.len()).find_map(|index| self.call_region_estimate(index, path))
+    }
+
+    /// Calls `region_estimate` in module `index`, if it exports it.
+    fn call_region_estimate(&self, index: usize, path: &Path) -> Option<DhlrcEstimate> {
+        type EstimateFn = unsafe extern "C" fn(*const c_char, *mut DhlrcEstimate) -> i32;
+
+        let pointer = self.region_symbol(index, "region_estimate");
+        if pointer.is_null() {
+            return None;
+        }
+        let function: EstimateFn = unsafe { std::mem::transmute(pointer) };
+        let name = CString::new(path.to_string_lossy().as_bytes()).ok()?;
+        let mut estimate = DhlrcEstimate::unknown();
+        let status = unsafe { function(name.as_ptr(), &mut estimate) };
+        if status != 0 || estimate.ok == 0 {
+            return None;
+        }
+        Some(estimate)
     }
 }
 

@@ -42,9 +42,12 @@ RegionClass::hasLocked ()
 }
 
 RegionClass::RegionClass (void *region_, const QString &displayName,
-                          const QString &uuid, const QDateTime &dateTime)
+                          const QString &uuid, const QDateTime &dateTime,
+                          const QString &sourcePath,
+                          const QString &sourceRegion)
     : region (region_, region_free), displayNameString (displayName),
       uuidString (uuid), dateTimeValue (dateTime),
+      sourcePathString (sourcePath), sourceRegionString (sourceRegion),
       internalLock (std::make_unique<InternalLock> ())
 {
 }
@@ -89,6 +92,18 @@ const QString &
 RegionClass::uuid () const
 {
   return uuidString;
+}
+
+const QString &
+RegionClass::sourcePath () const
+{
+  return sourcePathString;
+}
+
+const QString &
+RegionClass::sourceRegion () const
+{
+  return sourceRegionString;
 }
 
 const QDateTime &

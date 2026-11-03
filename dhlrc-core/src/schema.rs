@@ -12,6 +12,7 @@
 
 use crate::config::{Config, MultiRegionOrder, ShowOption, Unit};
 use common_rs::i18n::i18n;
+use gettextrs::gettext;
 use std::path::PathBuf;
 
 /// Which control a setting wants. `to_int` yields the `DHLRC_SETTING_*` values
@@ -66,6 +67,7 @@ const GENERAL: &str = i18n("General");
 const DEFAULT: &str = i18n("Default");
 const GAME: &str = i18n("Game");
 const MANAGE: &str = i18n("Manage");
+const LOADING: &str = i18n("Loading");
 const READER: &str = i18n("Reader");
 const MATERIAL: &str = i18n("Material List");
 const NOTIFICATIONS: &str = i18n("Notifications");
@@ -145,6 +147,20 @@ pub static SETTINGS: &[SettingDef] = &[
         set: set_cache_directory,
     },
     SettingDef {
+        key: "RestoreSession",
+        group: GENERAL,
+        kind: SettingType::Bool,
+        label: i18n("Restore Last Session"),
+        tooltip: i18n(
+            "Reopen the regions, pages and window layout of the previous run when the program starts.",
+        ),
+        choices: NO_CHOICES,
+        long_text: false,
+        default: "true",
+        get: get_restore_session,
+        set: set_restore_session,
+    },
+    SettingDef {
         key: "FailDownloadUseCache",
         group: GENERAL,
         kind: SettingType::Bool,
@@ -222,7 +238,31 @@ pub static SETTINGS: &[SettingDef] = &[
         get: get_multi_region_order_rule,
         set: set_multi_region_order_rule,
     },
+
     SettingDef {
+        key: "LoadingMaxSeconds",
+        group: LOADING,
+        kind: SettingType::Int,
+        label: i18n("Load Time Limit"),
+        tooltip: i18n("Refuse to load a file whose estimated load time is longer than this many seconds. The estimate comes from earlier loads of the same file or similar ones, so it improves with use. 0 means no limit."),
+        choices: NO_CHOICES,
+        long_text: false,
+        default: "0",
+        get: get_loading_max_seconds,
+        set: set_loading_max_seconds,
+    },
+    SettingDef {
+        key: "LoadingMaxMemoryMB",
+        group: LOADING,
+        kind: SettingType::Int,
+        label: i18n("Load Memory Limit"),
+        tooltip: i18n("Refuse to load a file whose estimated memory use is larger than this many MiB. The estimate is a deliberately pessimistic guess from the file's size. 0 means no limit."),
+        choices: NO_CHOICES,
+        long_text: false,
+        default: "0",
+        get: get_loading_max_memory_mb,
+        set: set_loading_max_memory_mb,
+    },    SettingDef {
         key: "BaseName",
         group: DEFAULT,
         kind: SettingType::String,
@@ -476,6 +516,44 @@ pub static SETTINGS: &[SettingDef] = &[
     },
 ];
 
+/// A one-line, translated summary of the settings on `group`, for a settings
+/// page's hint label and its sidebar tooltip. Unknown groups give an empty
+/// text. The values are shown the way a person reads them (`On`/`Off`, an
+/// enum's label) rather than as their stored text.
+/// One line describing what a settings page configures, for the page header
+/// and its sidebar tooltip. It says what the page is about rather than
+/// repeating the current values, which the page itself already shows.
+pub fn settings_summary(group: &str) -> String {
+    let text = if group == GENERAL {
+        i18n(
+            "Global options: memory limit, timing, cache location, language \
+             pack, and session restore.",
+        )
+    } else if group == MANAGE {
+        i18n(
+            "Loading management: multi-region display names, loading order, \
+             select-all, and module fallback.",
+        )
+    } else if group == LOADING {
+        i18n("Load limits: files estimated to exceed the time or memory limit are skipped.")
+    } else if group == DEFAULT {
+        i18n("Default region details: name, description, and author for new regions.")
+    } else if group == GAME {
+        i18n("Game details: the region's target version and override settings.")
+    } else if group == READER {
+        i18n("Reader: block name language and the default block information shown.")
+    } else if group == RENDER {
+        i18n("3D preview: colours, the region box, and client resource downloads.")
+    } else if group == MATERIAL {
+        i18n("Material list: the client resources used for block names and icons.")
+    } else if group == NOTIFICATIONS {
+        i18n("Notifications: desktop notification identity, timeout, and quiet rules.")
+    } else {
+        return String::new();
+    };
+    gettext(text)
+}
+
 impl Config {
     /// The current value of `key` as text, or `None` when `key` is unknown.
     pub fn setting(&self, key: &str) -> Option<String> {
@@ -573,6 +651,26 @@ fn set_memory_limit(config: &mut Config, text: &str) {
     }
 }
 
+fn get_loading_max_seconds(config: &Config) -> String {
+    format!("{}", config.loading.max_seconds)
+}
+
+fn set_loading_max_seconds(config: &mut Config, text: &str) {
+    if let Ok(value) = text.trim().parse::<u32>() {
+        config.loading.max_seconds = value;
+    }
+}
+
+fn get_loading_max_memory_mb(config: &Config) -> String {
+    format!("{}", config.loading.max_memory_mb)
+}
+
+fn set_loading_max_memory_mb(config: &mut Config, text: &str) {
+    if let Ok(value) = text.trim().parse::<u32>() {
+        config.loading.max_memory_mb = value;
+    }
+}
+
 fn get_limit_unit(config: &Config) -> String {
     unit_index(config.general.limit_unit).to_string()
 }
@@ -613,6 +711,14 @@ fn get_cute_language_pack(config: &Config) -> String {
 
 fn set_cute_language_pack(config: &mut Config, text: &str) {
     config.general.cute_language_pack = parse_bool(text);
+}
+
+fn get_restore_session(config: &Config) -> String {
+    bool_text(config.general.restore_session)
+}
+
+fn set_restore_session(config: &mut Config, text: &str) {
+    config.general.restore_session = parse_bool(text);
 }
 
 fn get_fail_use_cache(config: &Config) -> String {
@@ -868,6 +974,7 @@ mod tests {
             [
                 GENERAL,
                 MANAGE,
+                LOADING,
                 DEFAULT,
                 GAME,
                 READER,
@@ -894,6 +1001,7 @@ mod tests {
                 "ElapsedMilliseconds",
                 "CuteLanguagePack",
                 "CacheDirectory",
+                "RestoreSession",
                 "FailDownloadUseCache",
             ]
         );

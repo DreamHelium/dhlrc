@@ -11,6 +11,7 @@ mod output;
 mod schem;
 
 use config::InputConfig;
+use common_rs::estimate::{DhlrcEstimate, estimate_region_file};
 use common_rs::helper_struct::HelperStruct;
 use common_rs::i18n::i18n;
 use common_rs::region::Region;
@@ -70,6 +71,16 @@ pub extern "C" fn region_compression() -> i32 {
 #[unsafe(no_mangle)]
 pub extern "C" fn region_file_type() -> *const c_char {
     string_to_ptr_fail_to_null(&gettext_text(i18n("Sponge Schematic (*.schem)")))
+}
+
+/// The optional load-time estimate: the format is a single region whose
+/// extent is `Width` x `Height` x `Length`, so no block data has to be decoded.
+#[unsafe(no_mangle)]
+pub extern "C" fn region_estimate(
+    filename: *const c_char,
+    out: *mut DhlrcEstimate,
+) -> i32 {
+    estimate_region_file(filename, out, schem::estimate)
 }
 
 fn region_create_from_bytes_internal(

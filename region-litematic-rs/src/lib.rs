@@ -1,3 +1,4 @@
+use common_rs::estimate::{DhlrcEstimate, estimate_region_file};
 use common_rs::helper_struct::HelperStruct;
 use common_rs::i18n::i18n;
 use common_rs::my_error::MyError;
@@ -97,6 +98,59 @@ fn region_name_index_real(region: *mut NBTRoot, index: i32) -> Result<String, Bo
         .keys()
         .collect::<Vec<&String>>()[index as usize]
         .clone())
+}
+
+/// The optional load-time estimate: every region names its extent, so the
+/// regions and the total volume are known without decoding the block data.
+/// A file whose regions differ in size has no single representative extent,
+/// and the three size fields stay zero.
+#[unsafe(no_mangle)]
+pub extern "C" fn region_estimate(
+    filename: *const c_char,
+    out: *mut DhlrcEstimate,
+) -> i32 {
+    estimate_region_file(filename, out, |nbt, uncompressed_bytes| {
+        let regions = nbt.data.view().at("Regions").compound().ok()?;
+        let mut count = 0i64;
+        let mut blocks = 0i64;
+        let mut extent: Option<(i32, i32, i32)> = None;
+        for (_, region) in regions.iter() {
+            let NBTTag::Compound(region) = region else {
+                return None;
+            };
+            let size = match region.get_key_value("Size").map(|(_, tag)| tag) {
+                Some(NBTTag::Compound(size)) => size,
+                _ => return None,
+            };
+            let dimension = |name: &str| match size.get_key_value(name).map(|(_, tag)| tag) {
+                Some(NBTTag::Int(value)) => Some(value.0.abs()),
+                _ => None,
+            };
+            let (x, y, z) = (dimension("x")?, dimension("y")?, dimension("z")?);
+            count += 1;
+            blocks += x as i64 * y as i64 * z as i64;
+            let this = (x, y, z);
+            extent = match extent {
+                None => Some(this),
+                Some(previous) if previous == this => Some(previous),
+                Some(_) => None,
+            };
+        }
+        if count == 0 {
+            return None;
+        }
+        let (size_x, size_y, size_z) = extent.unwrap_or((0, 0, 0));
+        Some(DhlrcEstimate {
+            regions: count,
+            blocks,
+            uncompressed_bytes: uncompressed_bytes as i64,
+            size_x,
+            size_y,
+            size_z,
+            blocks_exact: 0,
+            ..DhlrcEstimate::unknown()
+        })
+    })
 }
 
 #[unsafe(no_mangle)]

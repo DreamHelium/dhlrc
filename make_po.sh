@@ -7,7 +7,7 @@ xgettext -k_ -kN_ \
 -kkli18n:1 -kkli18nc:1c,2 -kkli18np:1,2 -kkli18ncp:1c,2,3 \
 --from-code=UTF-8 \
 --default-domain=dhlrc --package-name=dhlrc \
---output=dhlrc.pot ../../src/*.cpp rc.cpp ../../*/src/*.rs ../../src/*.h ../../src/dhsettingsdialog/*.cpp ../../src/dhsettingsdialog/*.h
+--output=dhlrc.pot ../../src/*.cpp rc.cpp ../../*/src/*.rs ../../dhlrc-tui/src/ui/*.rs ../../src/*.h ../../src/dhsettingsdialog/*.cpp ../../src/dhsettingsdialog/*.h
 echo "Extract the po source file"
 
 # The playful catalogue is generated from the plain one, so it never drifts

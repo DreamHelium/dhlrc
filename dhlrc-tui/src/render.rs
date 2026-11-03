@@ -223,10 +223,17 @@ fn fetch_client_jar(version: &str, cache_dir: &std::path::Path) -> Result<(), St
     let downloader = Downloader::new(cache_dir);
     match downloader.download_client_version(version, &Progress, &Never) {
         Ok(path) => {
-            eprintln!("{}", formatx!(gettext("downloaded {}"), path.display().to_string()).unwrap_or_default());
+            eprintln!(
+                "{}",
+                formatx!(gettext("downloaded {}"), path.display().to_string()).unwrap_or_default()
+            );
             Ok(())
         }
-        Err(error) => Err(formatx!(gettext("could not download the client jar: {}"), error.to_string()).unwrap_or_default()),
+        Err(error) => Err(formatx!(
+            gettext("could not download the client jar: {}"),
+            error.to_string()
+        )
+        .unwrap_or_default()),
     }
 }
 
@@ -301,7 +308,9 @@ fn output_path(args: &RenderArgs) -> PathBuf {
 fn highlight_cell(text: &str) -> Result<[i32; 3], String> {
     let parts: Vec<&str> = text.split(',').map(str::trim).collect();
     if parts.len() != 3 {
-        return Err(format!("{text} is not a block coordinate; write it as X,Y,Z"));
+        return Err(format!(
+            "{text} is not a block coordinate; write it as X,Y,Z"
+        ));
     }
     let mut cell = [0i32; 3];
     for (index, part) in parts.iter().enumerate() {

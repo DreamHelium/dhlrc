@@ -19,6 +19,7 @@
 #include "pluginoptionsconfig.h"
 
 class KMessageWidget;
+class QTimer;
 class DhSettingsDialog;
 class DhDirectoryUI;
 class ExternalNbtReaderUI;
@@ -103,6 +104,43 @@ private:
    * A guarded pointer, so a torn-off page that is closed for good leaves this
    * empty instead of dangling. */
   QPointer<DhDirectoryUI> directoriesPage;
+
+  /* Session save and restore: the open tabs, the tab that was active and the
+   * window layout are written next to the configuration, so the next start can
+   * reopen them. The RestoreSession setting controls it. Region tabs load in
+   * the background, so restore keeps the wanted tabs and opens each one when
+   * its region becomes available. */
+  QTimer *sessionTimer = nullptr;
+  /* Saves shortly after a tab is opened or closed, so a crash loses little;
+   * the periodic `sessionTimer` covers slower changes. */
+  QTimer *sessionSaveSoon = nullptr;
+  struct RestoredRegion
+  {
+    QString file;
+    QString region;
+    int page = 0;
+  };
+  /* One tab of the session, in the order the user had them. `widget` is filled
+   * as the page is opened, so the saved order can be put back once every page
+   * exists. */
+  struct RestoredTab
+  {
+    QString type;
+    QString file;
+    QString region;
+    int page = 0;
+    QPointer<QWidget> widget;
+  };
+  QList<RestoredRegion> restoredRegions;
+  QList<RestoredTab> restoredTabs;
+  QTimer *restoredOrderTimer = nullptr;
+  QString restoredActiveKey;
+  void scheduleSessionSave ();
+  void saveSession ();
+  void restoreSession ();
+  void openRestoredRegions ();
+  void applyRestoredTabOrder ();
+  [[nodiscard]] QString sessionPath () const;
 
 public Q_SLOTS:
   void tryShrinkTopWidget ();

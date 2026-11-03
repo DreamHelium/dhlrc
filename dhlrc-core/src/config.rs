@@ -216,6 +216,10 @@ pub struct General {
     /// Use the playful catalogue (`dhlrc-cute`) instead of the plain one. It is
     /// read when the program starts, so turning it on takes a restart.
     pub cute_language_pack: bool,
+    /// Reopen the regions, pages and window layout of the previous run when a
+    /// frontend that keeps a session starts. The session itself is written by
+    /// the frontend, not here: the core only owns the switch.
+    pub restore_session: bool,
 }
 
 impl Default for General {
@@ -228,6 +232,7 @@ impl Default for General {
             fail_download_use_cache: false,
             language: "zh_cn".to_owned(),
             cute_language_pack: false,
+            restore_session: true,
         }
     }
 }
@@ -295,6 +300,45 @@ impl Manage {
         self.multi_region_name_pattern
             .clone()
             .unwrap_or_else(|| gettext(i18n("${file} - ${region}")))
+    }
+}
+
+/// Limits applied before a structure is loaded, so a huge file cannot freeze
+/// the application by surprise. Both are zero for "no limit".
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(default)]
+pub struct LoadingLimits {
+    /// Refuse files whose estimated load time is longer than this, in seconds.
+    /// The estimate comes from the load-time history, so it improves as the
+    /// user opens files.
+    pub max_seconds: u32,
+    /// Refuse files whose estimated memory use is larger than this, in MiB.
+    pub max_memory_mb: u32,
+}
+
+impl Default for LoadingLimits {
+    fn default() -> Self {
+        Self {
+            max_seconds: 0,
+            max_memory_mb: 0,
+        }
+    }
+}
+
+impl LoadingLimits {
+    /// Whether any limit is set.
+    pub fn enabled(&self) -> bool {
+        self.max_seconds > 0 || self.max_memory_mb > 0
+    }
+
+    /// The time limit in milliseconds, or zero for none.
+    pub fn time_limit_millis(&self) -> u64 {
+        u64::from(self.max_seconds) * 1000
+    }
+
+    /// The memory limit in bytes, or zero for none.
+    pub fn memory_limit_bytes(&self) -> u64 {
+        u64::from(self.max_memory_mb) * 1024 * 1024
     }
 }
 
@@ -497,6 +541,9 @@ pub struct Config {
     pub version: u32,
     pub general: General,
     pub manage: Manage,
+    /// Limits applied before a structure is loaded (zero means no limit).
+    #[serde(default)]
+    pub loading: LoadingLimits,
     pub defaults: Defaults,
     pub game: Game,
     pub reader: Reader,
@@ -513,6 +560,7 @@ impl Default for Config {
             version: CONFIG_VERSION,
             general: General::default(),
             manage: Manage::default(),
+            loading: LoadingLimits::default(),
             defaults: Defaults::default(),
             game: Game::default(),
             reader: Reader::default(),
@@ -985,6 +1033,34 @@ mod tests {
         let old: Config =
             toml::from_str("[manage]\nselect_all_regions_in_loading = true\n").unwrap();
         assert_eq!(old.manage.multi_region_order, MultiRegionOrder::File);
+    }
+
+    #[test]
+    fn the_loading_limits_round_trip_and_default_to_off() {
+        let mut config = Config::default();
+        assert_eq!(config.loading.max_seconds, 0);
+        assert_eq!(config.loading.max_memory_mb, 0);
+        assert!(!config.loading.enabled());
+        assert_eq!(config.loading.time_limit_millis(), 0);
+        assert_eq!(config.loading.memory_limit_bytes(), 0);
+
+        config.loading.max_seconds = 30;
+        config.loading.max_memory_mb = 2048;
+        let text = serialize(&config);
+        assert!(text.contains("[loading]"));
+        assert!(text.contains("max_seconds = 30"));
+        assert!(text.contains("max_memory_mb = 2048"));
+        let parsed: Config = toml::from_str(&text).unwrap();
+        assert_eq!(parsed.loading.max_seconds, 30);
+        assert_eq!(parsed.loading.max_memory_mb, 2048);
+        assert!(parsed.loading.enabled());
+        assert_eq!(parsed.loading.time_limit_millis(), 30_000);
+        assert_eq!(parsed.loading.memory_limit_bytes(), 2048 * 1024 * 1024);
+
+        /* An older file without the section keeps the limits off. */
+        let old: Config = toml::from_str("version = 5\n").unwrap();
+        assert_eq!(old.loading.max_seconds, 0);
+        assert_eq!(old.loading.max_memory_mb, 0);
     }
 
     #[test]

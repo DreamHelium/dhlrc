@@ -28,6 +28,9 @@ struct DhConfigData
    * DHLRC_REGION_ORDER_*, plus the pattern list the custom mode uses. */
   int multiRegionOrder = 0;
   QString multiRegionOrderRule;
+  /* Load limits; zero means no limit. */
+  int maxLoadSeconds = 0;
+  int maxLoadMemoryMB = 0;
   QString namePatternSampleFile;
   QString namePatternSampleRegion;
   QString description;
@@ -91,6 +94,23 @@ public:
   [[nodiscard]] QString configPath () const;
   /* The last snapshot read from the core; refreshed on every change. */
   [[nodiscard]] const DhConfigData &config () const;
+
+  /* What loading a file is predicted to cost, from the core's load-time
+   * history and the region module's estimate. `ok` is false when the core
+   * could not read the file at all (the job then goes ahead unguarded). */
+  struct LoadPrediction
+  {
+    double millis = 0;
+    double low = 0;
+    double high = 0;
+    double memoryBytes = 0;
+    double memoryLow = 0;
+    double memoryHigh = 0;
+    int basis = 3;
+    int samples = 0;
+    bool ok = false;
+  };
+  [[nodiscard]] LoadPrediction loadPrediction (const QString &filename) const;
 
   /* Plugin options. `kind` is 0 for input, 1 for output. */
   [[nodiscard]] bool pluginUseConfigured (const QString &type, int kind) const;

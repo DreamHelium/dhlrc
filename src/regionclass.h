@@ -38,7 +38,9 @@ public:
   [[nodiscard]] static bool hasLocked ();
 
   explicit RegionClass (void *region, const QString &displayName,
-                        const QString &uuid, const QDateTime &dateTime);
+                        const QString &uuid, const QDateTime &dateTime,
+                        const QString &sourcePath = {},
+                        const QString &sourceRegion = {});
   ~RegionClass () override;
 
   /* The wrapped libregion object. Going through locked_region () keeps the
@@ -50,6 +52,12 @@ public:
 
   [[nodiscard]] const QString &uuid () const;
   [[nodiscard]] const QDateTime &dateTime () const;
+  /* Where the region came from: the file it was read from, and the module's
+   * own region index for a multi-region file (empty for a single-region one).
+   * Only used to find the region again when a session is restored, because the
+   * uuid is minted anew on every load. */
+  [[nodiscard]] const QString &sourcePath () const;
+  [[nodiscard]] const QString &sourceRegion () const;
 
   /* One reversible change in the region's history. `description` is what the
    * change list shows, `detail` what the change was (the old and new values),
@@ -179,6 +187,8 @@ private:
   std::unique_ptr<void, void (*) (void *)> region;
   QString displayNameString;
   QString uuidString;
+  QString sourcePathString;
+  QString sourceRegionString;
   QDateTime dateTimeValue;
   std::unique_ptr<InternalLock> internalLock;
   QVector<Change> changeList;

@@ -1,3 +1,4 @@
+#include "notificationcenterui.h"
 #include "manageregionui.h"
 #include "configobjectitems.h"
 #include "configobjectui.h"
@@ -521,7 +522,9 @@ ManageRegionUI::getRegion (qsizetype index)
 }
 
 void
-ManageRegionUI::appendRegion (void *region, const QString &displayName)
+ManageRegionUI::appendRegion (void *region, const QString &displayName,
+                             const QString &sourcePath,
+                             const QString &sourceRegion)
 {
   /* Called from a loading job's worker thread, so the vector is never touched
    * without the lock: the GUI thread walks it to rebuild the rows as soon as
@@ -530,7 +533,7 @@ ManageRegionUI::appendRegion (void *region, const QString &displayName)
   regions.emplace_back (std::make_shared<RegionClass> (
       region, displayName,
       QUuid::createUuid ().toString (QUuid::WithoutBraces),
-      QDateTime::currentDateTime ()));
+      QDateTime::currentDateTime (), sourcePath, sourceRegion));
 }
 
 qsizetype
@@ -603,6 +606,20 @@ ManageRegionUI::save (const QList<int> &list)
       for (auto index : list)
         transRegions << regions[index];
       auto *job = new SaveAllRegionJob ();
+      /* The batch takes long enough that its outcome belongs in the
+       * notification centre and the log, not only in the rows above. */
+      connect (job, &KJob::result, this,
+               [job]
+                 {
+                   if (job->error ())
+                     dh::tasks::report (
+                         2, QStringLiteral ("taskSave"),
+                         _ ("Saving failed"), job->errorText ());
+                   else
+                     dh::tasks::report (
+                         0, QStringLiteral ("taskSave"), _ ("Saved"),
+                         _ ("The regions were written to one file."));
+                 });
       /* Deferred past the current click handler: constructing the jobs locks
        * the regions, which emits `regionChanged` and rebuilds the item frames,
        * and doing that while the button that started it is still in use would
@@ -643,6 +660,17 @@ ManageRegionUI::save (const QList<int> &list)
   for (auto index : list)
     transRegions << regions[index];
   auto *job = new SaveAllRegionJob ();
+  connect (job, &KJob::result, this,
+           [job]
+             {
+               if (job->error ())
+                 dh::tasks::report (2, QStringLiteral ("taskSave"),
+                                    _ ("Saving failed"), job->errorText ());
+               else
+                 dh::tasks::report (0, QStringLiteral ("taskSave"),
+                                    _ ("Saved"),
+                                    _ ("The selected regions were written."));
+             });
   /* Constructing the jobs locks the regions, which emits `regionChanged` and
    * rebuilds the item frames. Defer past the current click handler so the
    * button that started this is not destroyed while in use. */

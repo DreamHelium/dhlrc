@@ -11,6 +11,7 @@
 #include "generalchoosedialog.h"
 #include "mainwindow.h"
 #include "manageregionui.h"
+#include "notificationcenterui.h"
 #include "region.h"
 #include "regionorder.h"
 #include "utility.h"
@@ -139,6 +140,54 @@ encodingName (int value)
 void
 DhLoadJob::start ()
 {
+  /* The configured load limits are checked against the same prediction the
+   * terminal frontend shows, before any decoding work starts. A refused file
+   * reports like any other failure, so the batch counts it and the user reads
+   * why. The limits are zero by default, which means no limit. */
+  if (auto *core = DhCore::instance ())
+    {
+      const auto &config = core->config ();
+      if (config.maxLoadSeconds > 0 || config.maxLoadMemoryMB > 0)
+        {
+          const auto prediction = core->loadPrediction (filename);
+          QString reason;
+          if (prediction.ok)
+            {
+              const double timeLimit = config.maxLoadSeconds * 1000.0;
+              const double memoryLimit
+                  = config.maxLoadMemoryMB * 1024.0 * 1024.0;
+              if (timeLimit > 0 && prediction.millis > timeLimit)
+                reason = QString (_ ("It is estimated to take %1 seconds, over "
+                                     "the %2 second limit. Raise or clear the "
+                                     "load time limit in the settings to open "
+                                     "it."))
+                             .arg (prediction.millis / 1000.0, 0, 'f', 1)
+                             .arg (config.maxLoadSeconds);
+              else if (memoryLimit > 0
+                       && prediction.memoryBytes > memoryLimit)
+                reason = QString (_ ("It is estimated to need %1 MiB, over the "
+                                     "%2 MiB limit. Raise or clear the load "
+                                     "memory limit in the settings to open "
+                                     "it."))
+                             .arg (prediction.memoryBytes / (1024.0 * 1024.0),
+                                   0, 'f', 0)
+                             .arg (config.maxLoadMemoryMB);
+            }
+          if (!reason.isEmpty ())
+            {
+              const QString text
+                  = QStringLiteral ("**%1**:\n\n%2").arg (filename, reason);
+              setErrorText (text);
+              dh::tasks::report (1, QStringLiteral ("loadLimit"),
+                                 _ ("A file was not loaded"), text);
+              qWarning ().noquote () << "task: load limit:" << filename
+                                     << reason;
+              Q_EMIT emitResult ();
+              return;
+            }
+        }
+    }
+
   future
       = QtConcurrent::run (
             [&]
@@ -250,7 +299,8 @@ DhLoadJob::start ()
                              * file itself. */
                             auto displayName
                                 = QFileInfo (filename).completeBaseName ();
-                            ManageRegionUI::appendRegion (region, displayName);
+                            ManageRegionUI::appendRegion (
+                                region, displayName, filename);
                             loaded = true;
                           }
                         if (!loaded)
@@ -479,7 +529,13 @@ DhLoadJob::loadMultiRegion (MultiModuleBase *multiBase, void *object,
       if (displayName.trimmed ().isEmpty ())
         displayName = QStringLiteral ("%1 - %2").arg (fileBaseName).arg (name);
       string_free (rawName);
-      ManageRegionUI::appendRegion (singleRegion, displayName);
+      /* The session restores a tab by this identifier. A region's name is
+       * stable from one opening to the next, while the index depends on the
+       * order the file's hash map happened to enumerate; fall back to the
+       * index only when the module names no region. */
+      const QString regionKey = name.isEmpty () ? QString::number (index) : name;
+      ManageRegionUI::appendRegion (singleRegion, displayName, filename,
+                                    regionKey);
     }
   if (regionList.isEmpty ())
     return false;
@@ -628,7 +684,16 @@ DhAllLoadJob::DhAllLoadJob (QStringList list, bool loadAllRegions,
                    if (this->jobNums > 0)
                      setPercent (this->finishedJobs * 100 / this->jobNums);
                    auto failedText = finishedJob->errorText ();
-                   if (!failedText.isEmpty ())
+                   const bool failed = !failedText.isEmpty ();
+                   if (failed)
+                     {
+                       this->filesFailed += 1;
+                       qWarning ().noquote ()
+                           << "task: loading failed:" << failedText;
+                     }
+                   else
+                     this->filesLoaded += 1;
+                   if (failed)
                      {
                        auto failedWidget = new KMessageWidget ();
                        connect (failedWidget,
@@ -669,6 +734,15 @@ DhAllLoadJob::DhAllLoadJob (QStringList list, bool loadAllRegions,
                    Q_EMIT ManageRegionUI::instance ()->regionChanged ();
                    if (!hasSubjobs ())
                      {
+                       dh::tasks::report (
+                           this->filesFailed > 0 ? 1 : 0,
+                           QStringLiteral ("taskLoad"),
+                           this->filesFailed > 0
+                               ? _ ("Some files could not be loaded")
+                               : _ ("Files loaded"),
+                           QString (_ ("%1 file(s) loaded, %2 failed."))
+                               .arg (this->filesLoaded)
+                               .arg (this->filesFailed));
                        freeInputConfig ();
                        this->messageWidget->deleteLater ();
                        deleteLater ();
@@ -695,10 +769,17 @@ DhAllLoadJob::DhAllLoadJob (QStringList list, bool loadAllRegions,
       connect (job, &DhLoadJob::result, job, [running] { *running = false; });
       connect (job, &DhLoadJob::forceResumeRequested, job,
                [job] { job->forceResume (); });
+      /* The rows and the jobs go away independently: a window closed while a
+       * file is still loading deletes the row, and a queued progress update may
+       * arrive after the job itself has been deleted. The guard makes both
+       * cases a no-op instead of a use after free. */
+      QPointer<DhLoadJob> jobGuard (job);
       connect (job, &DhLoadJob::infoMessage, this,
-               [&, i] (KJob *realjob, const QString &str)
+               [&, i, jobGuard] (KJob *realjob, const QString &str)
                  {
-                   auto castedJob = qobject_cast<DhLoadJob *> (realjob);
+                   auto *castedJob = jobGuard.data ();
+                   if (!castedJob)
+                     return;
                    QString realStr = "%1: %2 (%3%)";
                    QString realFilename = castedJob->getFilename ();
                    QString realPrefix = realFilename;

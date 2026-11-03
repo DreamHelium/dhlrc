@@ -181,6 +181,10 @@ private:
   bool loadAllRegions = false;
   int jobNums;
   int finishedJobs = 0;
+  /* What the batch ended with, for the notification left behind once every
+   * file has been read. */
+  int filesLoaded = 0;
+  int filesFailed = 0;
   /* One cancel flag per file, so a single file can be aborted on its own.
    * They must outlive their jobs, hence kept here. */
   std::vector<std::unique_ptr<const void, void (*) (const void *)>>

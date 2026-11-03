@@ -18,6 +18,12 @@ dhlrc-core = { path = "../dhlrc-core" }
 # does, reading its models and textures through the resource layer.
 dhlrc-render = { path = "../dhlrc-render" }
 dhlrc-resource = { path = "../dhlrc-resource" }
+# The interactive terminal UI: raw mode, alternate screen, and mouse events.
+# It is desktop-only; the command line works on every target.
+crossterm = "0.29"
+# Reading a region file through its gzip stream is how the estimate gets an
+# unpacked size without parsing anything.
+flate2 = { version = "1.1.8", features = ["zlib-rs"] }
 formatx = "0.2.4"
 # Loading the region modules reads their symbols at run time, and `libregion_rs`
 # has to be opened before them and process-wide so a plugin's own `region_new`

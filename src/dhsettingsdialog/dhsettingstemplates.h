@@ -14,8 +14,10 @@ class DhSettingsDialog;
 class KColorButton;
 class QComboBox;
 class QHBoxLayout;
+class QLabel;
 class QLineEdit;
 class QTextEdit;
+class QToolButton;
 class QVBoxLayout;
 
 /* The base every control is built from. A template fills `widget` in
@@ -43,6 +45,30 @@ public:
   virtual void setDefault () const = 0;
   virtual void changeConfig () const = 0;
 
+  /* Called by the dialog once `initWidget` has built the control: folds the
+   * row layout into a container widget (so the whole row can be hidden by the
+   * search filter) and hangs the "modified" dot and the per-row restore
+   * button off it. Templates that add no row have nothing to do. */
+  void finishRow ();
+
+  /* Whether the control currently shows the item's default value. The base
+   * implementation reads the control's own value, so subclasses that use one
+   * of the standard controls need not override it. */
+  [[nodiscard]] virtual bool isDefault () const;
+
+  /* Puts this one row back on its default: the control and the item, then
+   * lets the dialog re-check the marker and the Apply button. */
+  void restoreDefault ();
+
+  /* Shows or hides the dot and the restore button according to `isDefault ()`
+   * and reports whether the row is modified. */
+  bool updateModified ();
+
+  /* Whether the row mentions `needle` anywhere the user can see it. */
+  [[nodiscard]] bool matches (const QString &needle) const;
+
+  [[nodiscard]] QWidget *rowWidget () const { return rowContainer; }
+
   DhSettingItem *item;
   QVBoxLayout *layout;
   DhSettingsDialog *dialog;
@@ -51,12 +77,28 @@ public:
 protected:
   /* Starts a row on the page: a label with the item's text and tooltip, with
    * room to its right for the control. Returns the row so the caller can add
-   * the control (and anything else it needs, like a browse button). */
-  QHBoxLayout *addRow ();
+   * the control (and anything else it needs, like a browse button).
+   *
+   * The layout is put on the page right away, not in `finishRow ()`: an
+   * existing creator (the MultiRegion order rule) looks up the row it just
+   * asked for as the last item of the page layout and adds a button to it.
+   * `finishRow ()` then moves that layout into its container without changing
+   * its position, so those creators keep working.
+   *
+   * `withLabel` is false for the checkbox row, whose control carries the label
+   * itself. */
+  QHBoxLayout *addRow (bool withLabel = true);
 
-  /* The widgets of this row besides `widget`: the label, and for the rows with
-   * more than one control the rest. `setEnabled ()` walks them. */
+  /* The widgets of this row besides `widget`: the label, the buttons added by
+   * the creators and the restore button. `setEnabled ()` walks them. */
   QList<QPointer<QWidget>> rowWidgets;
+
+  QHBoxLayout *rowLayout = nullptr;
+
+private:
+  QWidget *rowContainer = nullptr;
+  QPointer<QLabel> modifiedLabel;
+  QPointer<QToolButton> restoreButton;
 };
 
 class DhBoolSettingTemplate : public DhSettingsTemplate

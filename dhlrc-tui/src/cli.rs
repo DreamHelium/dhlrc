@@ -35,6 +35,14 @@ fn about_render() -> String {
     gettext("Load a structure file and write a rendered PNG")
 }
 
+fn about_settings() -> String {
+    gettext("Change the saved settings in an interactive terminal page")
+}
+
+fn about_loadtime() -> String {
+    gettext("Measure how long files take to load, and predict it from earlier loads")
+}
+
 fn about_completions() -> String {
     gettext("Print a shell completion script")
 }
@@ -150,6 +158,48 @@ fn help_region() -> String {
     )
 }
 
+fn help_loadtime_files() -> String {
+    gettext(
+        "The files to predict; each one is loaded as well unless --predict is \
+         given, so the history learns the real time",
+    )
+}
+
+fn help_predict() -> String {
+    gettext(
+        "Only predict, without loading the files and without recording a \
+         measurement",
+    )
+}
+
+fn help_estimate() -> String {
+    gettext(
+        "Estimate the load time and the memory the load will need, without \
+         loading the file. The estimate reads the region headers (the block \
+         count and dimensions) when it can, and falls back to the file size; \
+         it is a guess, not a measurement",
+    )
+}
+
+fn help_loadtime_json() -> String {
+    gettext("Print the predictions as JSON, for scripts")
+}
+
+fn help_no_record() -> String {
+    gettext("Load the files but do not add the measurement to the history")
+}
+
+fn help_clear() -> String {
+    gettext("Forget every measured load in the history")
+}
+
+fn help_history() -> String {
+    gettext(
+        "Use this file for the measured history instead of the one in the \
+         cache directory (a test or an installation with a read-only cache)",
+    )
+}
+
 fn help_shell() -> String {
     gettext(
         "The shell to emit a completion script for: `bash`, `elvish`, `fish`, \
@@ -217,10 +267,51 @@ pub struct Cli {
 pub enum Command {
     #[command(about = about_modules())]
     Modules(ModulesArgs),
+    #[command(about = about_settings())]
+    Settings,
     #[command(about = about_render())]
     Render(RenderArgs),
+    #[command(about = about_loadtime())]
+    LoadTime(LoadTimeArgs),
     #[command(about = about_completions())]
     Completions(CompletionsArgs),
+}
+
+/// What `loadtime` measures or predicts.
+#[derive(Debug, Args)]
+pub struct LoadTimeArgs {
+    #[arg(value_name = "FILE", help = help_loadtime_files())]
+    pub files: Vec<PathBuf>,
+
+    #[arg(long, help = help_predict())]
+    pub predict: bool,
+
+    #[arg(long, help = help_estimate())]
+    pub estimate: bool,
+
+    #[arg(long, help = help_loadtime_json())]
+    pub json: bool,
+
+    #[arg(long, help = help_no_record())]
+    pub no_record: bool,
+
+    #[arg(long, help = help_clear())]
+    pub clear: bool,
+
+    #[arg(long, value_name = "PATH", help = help_history())]
+    pub history: Option<PathBuf>,
+
+    #[arg(long, value_name = "DIR", help = help_region_dir())]
+    pub region_dir: Option<PathBuf>,
+
+    #[arg(long, value_name = "DIR", help = help_load_dir())]
+    pub load_dir: Option<PathBuf>,
+
+    #[arg(long, value_name = "PATH", help = help_region_lib())]
+    pub region_lib: Option<PathBuf>,
+
+    #[arg(long, value_name = "INDEX|NAME", help = help_region())]
+    pub region: Option<String>,
 }
 
 /// Which modules `modules` reports on.
@@ -376,9 +467,7 @@ fn localize_arg(argument: Arg) -> Arg {
     let argument = match argument.get_action() {
         ArgAction::Help => argument.help(help_flag()),
         ArgAction::Version => argument.help(version_flag()),
-        _ if argument.get_id().as_str() == "subcommand" => {
-            argument.help(help_subcommand_arg())
-        }
+        _ if argument.get_id().as_str() == "subcommand" => argument.help(help_subcommand_arg()),
         _ => argument,
     };
     let heading = if argument.is_positional() {
@@ -396,4 +485,46 @@ fn help_template() -> String {
         "{{before-help}}{{about-with-newline}}\n{} {{usage}}\n\n{{all-args}}{{after-help}}",
         usage_heading()
     )
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn the_load_time_command_takes_files_and_flags() {
+        let parsed = Cli::try_parse_from([
+            "dhlrc-tui",
+            "load-time",
+            "--predict",
+            "--json",
+            "--history",
+            "h.tsv",
+            "a.litematic",
+            "b.schem",
+        ])
+        .unwrap();
+        let Some(Command::LoadTime(args)) = parsed.command else {
+            panic!("expected the load-time command");
+        };
+        assert!(args.predict);
+        assert!(args.json);
+        assert!(!args.no_record);
+        assert_eq!(args.history, Some(PathBuf::from("h.tsv")));
+        assert_eq!(
+            args.files,
+            vec![PathBuf::from("a.litematic"), PathBuf::from("b.schem")]
+        );
+    }
+
+    #[test]
+    fn the_load_time_command_defaults_to_measuring() {
+        let parsed = Cli::try_parse_from(["dhlrc-tui", "load-time", "a.litematic"]).unwrap();
+        let Some(Command::LoadTime(args)) = parsed.command else {
+            panic!("expected the load-time command");
+        };
+        assert!(!args.predict);
+        assert!(!args.json);
+        assert!(args.history.is_none());
+    }
 }

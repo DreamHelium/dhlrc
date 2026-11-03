@@ -130,6 +130,46 @@ RegionWorkspace::closePage (QWidget *page)
     tabs->setCurrentIndex (0);
 }
 
+RegionWorkspace::Page
+RegionWorkspace::currentPage () const
+{
+  QWidget *page = tabs ? tabs->currentWidget () : nullptr;
+  if (page && page == readerUi.data ())
+    return Page::Reader;
+  if (page && page == modifierUi.data ())
+    return Page::Modifier;
+  if (page && page == changesUi.data ())
+    return Page::Changes;
+  if (page && page == renderUi.data ())
+    return Page::Render;
+  if (page && page == materialUi.data ())
+    return Page::Materials;
+  return Page::Reader;
+}
+
+void
+RegionWorkspace::showPage (Page page)
+{
+  switch (page)
+    {
+    case Page::Reader:
+      showReader ();
+      break;
+    case Page::Modifier:
+      showModifier ();
+      break;
+    case Page::Changes:
+      showChanges ();
+      break;
+    case Page::Render:
+      showRender ();
+      break;
+    case Page::Materials:
+      showMaterials ();
+      break;
+    }
+}
+
 void
 RegionWorkspace::showReader ()
 {

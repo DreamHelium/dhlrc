@@ -30,6 +30,17 @@ class RegionWorkspace : public DhWidget
   Q_OBJECT
 
 public:
+  /* Which of the workspace's inner pages is in front. The session restore
+   * saves it, so a reopened region comes back on the page it was left on. */
+  enum class Page
+  {
+    Reader,
+    Modifier,
+    Changes,
+    Render,
+    Materials,
+  };
+
   /* `index` is the region's index in `ManageRegionUI`, as the reader wants
    * it. */
   RegionWorkspace (int index, std::shared_ptr<DhDownloader> downloader,
@@ -45,6 +56,11 @@ public:
   {
     return region;
   }
+
+  /* The page in front now, and a way to bring one forward from a saved
+   * session. */
+  [[nodiscard]] Page currentPage () const;
+  void showPage (Page page);
 
   /* Brings a page to the front, building it on first use. */
   void showReader ();

@@ -8,6 +8,12 @@
 #include "manageregionui.h"
 #include "resourcegetter.h"
 #include <QApplication>
+#include <QFileInfo>
+#include <QJsonArray>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QSaveFile>
+#include <QSettings>
 #include <kcolorschememenu.h>
 #include <libintl.h>
 #include <memory>
@@ -40,6 +46,7 @@
 #include "configobjectitems.h"
 #include "dhaboutui.h"
 #include "dhdirectoryui.h"
+#include "notificationcenterui.h"
 #include "dhgameconfigui.h"
 #include "externalnbtreaderui.h"
 #include "regionworkspace.h"
@@ -128,6 +135,7 @@ enum class SidebarAction
   RegionReader,
   Settings,
   ProgramDirectories,
+  Notifications,
 #ifdef DH_DEBUG_IN_IDE
   Debug,
 #endif
@@ -860,6 +868,8 @@ MainWindow::MainWindow (QWidget *parent) : QMainWindow (parent)
           QStringLiteral ("settings-configure"));
   addRow (SidebarAction::ProgramDirectories, _ ("Program Directories"),
           QStringLiteral ("folder-open"));
+  addRow (SidebarAction::Notifications, _ ("Notifications & Log"),
+          QStringLiteral ("dialog-information"));
 #ifdef DH_DEBUG_IN_IDE
   addRow (SidebarAction::Debug, QStringLiteral ("Debug"),
           QStringLiteral ("applications-development"));
@@ -900,6 +910,9 @@ MainWindow::MainWindow (QWidget *parent) : QMainWindow (parent)
 
   settingsDialog = new DhSettingsDialog (this);
   ownWindow (settingsDialog);
+  /* The page summaries come from the core; the dialog library cannot reach
+   * `DhCore::instance ()`, so the handle is handed over here. */
+  settingsDialog->setCoreHandle (core ? core->handle () : nullptr);
   settingsDialog->setPathText (core ? core->configPath () : QString ());
 
   /* One item per setting the core describes, so adding a setting is one entry
@@ -1114,6 +1127,11 @@ MainWindow::MainWindow (QWidget *parent) : QMainWindow (parent)
                [this] (Qt::ApplicationState) { updateNotificationGate (); });
       updateNotificationGate ();
     }
+
+  /* The window is built; let the event loop show it and then put back the
+   * tabs and the layout of the previous run, if the user wants that. */
+  scheduleSessionSave ();
+  QTimer::singleShot (0, this, &MainWindow::restoreSession);
 }
 
 void
@@ -1139,6 +1157,10 @@ MainWindow::openSidebarEntry (const QModelIndex &index)
       break;
     case SidebarAction::ProgramDirectories:
       openProgramDirectories ();
+      break;
+    case SidebarAction::Notifications:
+      ensureTab (NotificationCenterUI::instance (),
+                 _ ("Notifications & Log"));
       break;
 #ifdef DH_DEBUG_IN_IDE
     case SidebarAction::Debug:
@@ -1256,6 +1278,10 @@ void
 MainWindow::showNotification (int level, const QString &eventId,
                               const QString &title, const QString &text)
 {
+  /* Keep a copy in the notification centre, which outlives the banner and can
+   * be opened after it has gone. */
+  NotificationCenterUI::instance ()->record (level, eventId, title, text);
+
   KMessageWidget *message = nullptr;
   if (!eventId.isEmpty ())
     message = notificationWidgets.value (eventId, nullptr);
@@ -1853,6 +1879,500 @@ MainWindow::restoreSidebarWidth ()
   restoringSidebar = false;
 }
 
+namespace
+{
+/* One tab as the session file names it: the kind of page, and for a region
+ * reader the file and the region's name in it. The separator cannot appear in
+ * a path or a region name, so the key is unambiguous. */
+QString
+sessionTabKey (const QString &type, const QString &file = {}, const QString &region = {})
+{
+  return type + QChar (0x1f) + file + QChar (0x1f) + region;
+}
+
+/* Turn the session an older build wrote (a `QSettings` ini file) into the
+ * current JSON shape, so the format change does not lose anyone's tabs. */
+QJsonObject
+sessionFromIni (const QString &path)
+{
+  QSettings settings (path, QSettings::IniFormat);
+  if (settings.status () != QSettings::NoError)
+    return {};
+
+  QJsonObject window;
+  window[QStringLiteral ("geometry")]
+      = settings.value (QStringLiteral ("window/geometry")).toString ();
+  window[QStringLiteral ("maximized")]
+      = settings.value (QStringLiteral ("window/maximized"), false).toBool ();
+  window[QStringLiteral ("sidebar")]
+      = settings.value (QStringLiteral ("window/sidebar"), 0).toInt ();
+
+  QJsonArray tabs;
+  const int stored = settings.beginReadArray (QStringLiteral ("tabs"));
+  for (int i = 0; i < stored; ++i)
+    {
+      settings.setArrayIndex (i);
+      QJsonObject tab;
+      tab[QStringLiteral ("type")]
+          = settings.value (QStringLiteral ("type")).toString ();
+      tab[QStringLiteral ("file")]
+          = settings.value (QStringLiteral ("file")).toString ();
+      tab[QStringLiteral ("region")]
+          = settings.value (QStringLiteral ("region")).toString ();
+      tab[QStringLiteral ("page")]
+          = settings.value (QStringLiteral ("page")).toInt ();
+      tabs.append (tab);
+    }
+  settings.endArray ();
+
+  QJsonArray regions;
+  const int storedRegions = settings.beginReadArray (QStringLiteral ("regions"));
+  for (int i = 0; i < storedRegions; ++i)
+    {
+      settings.setArrayIndex (i);
+      QJsonObject region;
+      region[QStringLiteral ("file")]
+          = settings.value (QStringLiteral ("file")).toString ();
+      region[QStringLiteral ("region")]
+          = settings.value (QStringLiteral ("region")).toString ();
+      regions.append (region);
+    }
+  settings.endArray ();
+
+  QJsonObject root;
+  root[QStringLiteral ("window")] = window;
+  root[QStringLiteral ("tabs")] = tabs;
+  root[QStringLiteral ("regions")] = regions;
+  root[QStringLiteral ("active")]
+      = settings.value (QStringLiteral ("tabs/active"), -1).toInt ();
+  return root;
+}
+} // namespace
+
+QString
+MainWindow::sessionPath () const
+{
+  auto *core = DhCore::instance ();
+  if (!core || core->configPath ().isEmpty ())
+    return {};
+  return QFileInfo (core->configPath ()).dir ().filePath (QStringLiteral ("session.json"));
+}
+
+void
+MainWindow::scheduleSessionSave ()
+{
+  if (sessionTimer)
+    return;
+  /* A periodic save covers a crash or a kill; the close event saves the final
+   * state. A minute is fine: the session is small and losing at most a minute
+   * of tab changes matters little. */
+  sessionTimer = new QTimer (this);
+  sessionTimer->setInterval (60000);
+  connect (sessionTimer, &QTimer::timeout, this, &MainWindow::saveSession);
+  sessionTimer->start ();
+
+  /* Tabs come and go without a resize or a close, so note those changes too,
+   * a moment later: loading a file opens several tabs in a row. */
+  sessionSaveSoon = new QTimer (this);
+  sessionSaveSoon->setSingleShot (true);
+  sessionSaveSoon->setInterval (2000);
+  connect (sessionSaveSoon, &QTimer::timeout, this, &MainWindow::saveSession);
+  if (tabWidget)
+    {
+      /* A page becoming current covers the usual flow (a file opens a tab and
+       * makes it current); closing a page in the background is left to the
+       * periodic save above. `QTabBar` does not tell outsiders when tabs come
+       * and go, and its insertion hooks are protected. */
+      connect (tabWidget, &QTabWidget::currentChanged, this,
+               [this] { sessionSaveSoon->start (); });
+    }
+}
+
+void
+MainWindow::saveSession ()
+{
+  auto *core = DhCore::instance ();
+  if (!core)
+    return;
+  const QString path = sessionPath ();
+  if (path.isEmpty ())
+    return;
+  const bool enabled
+      = core->settingValue (QStringLiteral ("RestoreSession"))
+        == QLatin1String ("true");
+  if (!enabled)
+    {
+      /* Do not leave a stale session behind to surprise the user when the
+       * setting is turned back on later. */
+      QFile::remove (path);
+      return;
+    }
+
+  QJsonObject window;
+  window[QStringLiteral ("geometry")]
+      = QString::fromLatin1 (saveGeometry ().toBase64 ());
+  window[QStringLiteral ("maximized")] = isMaximized ();
+  const int sidebar = sidebarWidth > 0 ? sidebarWidth
+                                       : splitter->sizes ().value (0);
+  window[QStringLiteral ("sidebar")] = sidebar;
+
+  QJsonArray tabs;
+  int stored = 0;
+  int active = -1;
+  for (int i = 0; i < tabWidget->count (); ++i)
+    {
+      QWidget *page = tabWidget->widget (i);
+      QString type;
+      QString file;
+      QString region;
+      int inner = 0;
+      if (auto *workspace = qobject_cast<RegionWorkspace *> (page))
+        {
+          const auto shared = workspace->regionClass ();
+          /* A page that is not backed by a file (the example region) cannot be
+           * reopened, so it is left out. */
+          if (!shared || shared->sourcePath ().isEmpty ())
+            continue;
+          type = QStringLiteral ("region");
+          file = shared->sourcePath ();
+          region = shared->sourceRegion ();
+          inner = static_cast<int> (workspace->currentPage ());
+        }
+      else if (qobject_cast<ManageRegionUI *> (page))
+        type = QStringLiteral ("manage");
+      else if (qobject_cast<DhDirectoryUI *> (page))
+        type = QStringLiteral ("directories");
+      else if (qobject_cast<NotificationCenterUI *> (page))
+        type = QStringLiteral ("notifications");
+      else
+        continue;
+      QJsonObject tab;
+      tab[QStringLiteral ("type")] = type;
+      if (!file.isEmpty ())
+        tab[QStringLiteral ("file")] = file;
+      if (!region.isEmpty ())
+        tab[QStringLiteral ("region")] = region;
+      if (inner != 0)
+        tab[QStringLiteral ("page")] = inner;
+      tabs.append (tab);
+      if (page == tabWidget->currentWidget ())
+        active = stored;
+      ++stored;
+    }
+
+  /* The manager keeps every region that was loaded, including the ones whose
+   * reader tab is closed; a session that only remembered tabs would silently
+   * forget them. */
+  QJsonArray regions;
+  for (const auto &shared : ManageRegionUI::getRegions ())
+    {
+      if (!shared || shared->sourcePath ().isEmpty ())
+        continue;
+      QJsonObject region;
+      region[QStringLiteral ("file")] = shared->sourcePath ();
+      region[QStringLiteral ("region")] = shared->sourceRegion ();
+      regions.append (region);
+    }
+
+  QJsonObject root;
+  root[QStringLiteral ("version")] = 1;
+  root[QStringLiteral ("window")] = window;
+  root[QStringLiteral ("tabs")] = tabs;
+  root[QStringLiteral ("active")] = active;
+  root[QStringLiteral ("regions")] = regions;
+
+  QSaveFile file (path);
+  if (!file.open (QIODevice::WriteOnly))
+    {
+      qWarning ("session: could not write %s", qUtf8Printable (path));
+      return;
+    }
+  file.write (QJsonDocument (root).toJson (QJsonDocument::Indented));
+  if (!file.commit ())
+    {
+      qWarning ("session: could not write %s", qUtf8Printable (path));
+      return;
+    }
+  qDebug ("session: saved %d tab(s) and %d region(s) to %s", stored,
+          static_cast<int> (regions.size ()), qUtf8Printable (path));
+}
+
+void
+MainWindow::restoreSession ()
+{
+  auto *core = DhCore::instance ();
+  if (!core)
+    return;
+  if (core->settingValue (QStringLiteral ("RestoreSession"))
+      != QLatin1String ("true"))
+    return;
+  const QString path = sessionPath ();
+  if (path.isEmpty ())
+    return;
+
+  QJsonObject root;
+  bool haveSession = false;
+  if (QFileInfo::exists (path))
+    {
+      QFile file (path);
+      if (file.open (QIODevice::ReadOnly))
+        {
+          QJsonParseError error;
+          const QJsonDocument document
+              = QJsonDocument::fromJson (file.readAll (), &error);
+          if (error.error != QJsonParseError::NoError
+              || !document.isObject ())
+            {
+              qWarning ("session: ignoring %s: %s", qUtf8Printable (path),
+                        qUtf8Printable (error.errorString ()));
+              return;
+            }
+          root = document.object ();
+          haveSession = true;
+        }
+    }
+  if (!haveSession)
+    {
+      const QString legacy
+          = QFileInfo (path).dir ().filePath (QStringLiteral ("session.ini"));
+      if (!QFileInfo::exists (legacy))
+        return;
+      root = sessionFromIni (legacy);
+      if (root.isEmpty ())
+        return;
+      qInfo ("session: migrating %s", qUtf8Printable (legacy));
+      /* Write the JSON form now, from the data just read: a save later would
+       * see the pages not yet reopened. */
+      QSaveFile file (path);
+      if (file.open (QIODevice::WriteOnly))
+        {
+          file.write (QJsonDocument (root).toJson (QJsonDocument::Indented));
+          file.commit ();
+        }
+      QFile::remove (legacy);
+    }
+
+  const QJsonObject window = root.value (QStringLiteral ("window")).toObject ();
+  const QByteArray geometry
+      = QByteArray::fromBase64 (window.value (QStringLiteral ("geometry"))
+                                    .toString ()
+                                    .toLatin1 ());
+  if (!geometry.isEmpty ())
+    restoreGeometry (geometry);
+  if (window.value (QStringLiteral ("maximized")).toBool ())
+    showMaximized ();
+
+  restoredTabs.clear ();
+  restoredRegions.clear ();
+  restoredActiveKey.clear ();
+  QStringList files;
+  const QJsonArray tabs = root.value (QStringLiteral ("tabs")).toArray ();
+  for (const auto &value : tabs)
+    {
+      const QJsonObject tab = value.toObject ();
+      const QString type = tab.value (QStringLiteral ("type")).toString ();
+      if (type.isEmpty ())
+        continue;
+      RestoredTab entry;
+      entry.type = type;
+      entry.file = tab.value (QStringLiteral ("file")).toString ();
+      entry.region = tab.value (QStringLiteral ("region")).toString ();
+      entry.page = tab.value (QStringLiteral ("page")).toInt ();
+      if (type == QLatin1String ("region"))
+        {
+          if (entry.file.isEmpty ())
+            continue;
+          RestoredRegion region;
+          region.file = entry.file;
+          region.region = entry.region;
+          region.page = entry.page;
+          restoredRegions.append (region);
+          if (!files.contains (entry.file))
+            files.append (entry.file);
+        }
+      restoredTabs.append (entry);
+    }
+  /* Regions without a reader tab are reloaded into the manager as well. */
+  for (const auto &value : root.value (QStringLiteral ("regions")).toArray ())
+    {
+      const QString file = value.toObject ()
+                               .value (QStringLiteral ("file"))
+                               .toString ();
+      if (!file.isEmpty () && !files.contains (file))
+        files.append (file);
+    }
+  const int active = root.value (QStringLiteral ("active")).toInt (-1);
+  if (active >= 0 && active < restoredTabs.size ())
+    {
+      const RestoredTab &tab = restoredTabs.at (active);
+      restoredActiveKey = sessionTabKey (tab.type, tab.file, tab.region);
+    }
+
+  /* Non-file pages open at once; region tabs follow as their files load. */
+  for (RestoredTab &tab : restoredTabs)
+    {
+      if (tab.type == QLatin1String ("region"))
+        continue;
+      QWidget *page = nullptr;
+      if (tab.type == QLatin1String ("manage"))
+        {
+          ensureTab (ManageRegionUI::instance (), _ ("Manage Region"));
+          page = ManageRegionUI::instance ();
+        }
+      else if (tab.type == QLatin1String ("directories"))
+        {
+          openProgramDirectories ();
+          page = directoriesPage;
+        }
+      else if (tab.type == QLatin1String ("notifications"))
+        {
+          ensureTab (NotificationCenterUI::instance (),
+                     _ ("Notifications & Log"));
+          page = NotificationCenterUI::instance ();
+        }
+      tab.widget = page;
+    }
+
+  const int sidebar = window.value (QStringLiteral ("sidebar")).toInt (0);
+  if (sidebar > 0)
+    {
+      sidebarWidth = sidebar;
+      QTimer::singleShot (0, this, &MainWindow::restoreSidebarWidth);
+    }
+
+  restoredOrderTimer = new QTimer (this);
+  restoredOrderTimer->setSingleShot (true);
+  restoredOrderTimer->setInterval (1500);
+  connect (restoredOrderTimer, &QTimer::timeout, this,
+           &MainWindow::applyRestoredTabOrder);
+
+  if (files.isEmpty ())
+    {
+      applyRestoredTabOrder ();
+      return;
+    }
+  qInfo ("session: restoring %d tab(s) from %s",
+         static_cast<int> (restoredTabs.size ()), qUtf8Printable (path));
+  if (!restoredRegions.isEmpty ())
+    {
+      connect (ManageRegionUI::instance (),
+               &ManageRegionUI::regionChanged, this,
+               &MainWindow::openRestoredRegions, Qt::UniqueConnection);
+      /* Regions already in the manager (nothing else opens one this early, but
+       * the call is cheap) are matched first; the rest are matched as they
+       * load. */
+      openRestoredRegions ();
+    }
+  restoredOrderTimer->start ();
+  qInfo ("session: reloading %d file(s) for %d region(s)", files.size (),
+         static_cast<int> (restoredRegions.size ()));
+  ManageRegionUI::loadFiles (files, true);
+}
+
+void
+MainWindow::openRestoredRegions ()
+{
+  if (restoredRegions.isEmpty ())
+    return;
+  const auto regions = ManageRegionUI::getRegions ();
+  for (int i = restoredRegions.size () - 1; i >= 0; --i)
+    {
+      const RestoredRegion entry = restoredRegions.at (i);
+      for (std::size_t index = 0; index < regions.size (); ++index)
+        {
+          const auto &shared = regions[index];
+          if (!shared || shared->sourcePath () != entry.file
+              || shared->sourceRegion () != entry.region)
+            continue;
+          openRegionReader (static_cast<int> (index));
+          auto *workspace = qobject_cast<RegionWorkspace *> (
+              keyedTab (QStringLiteral ("region-workspace:") + shared->uuid ()));
+          if (workspace)
+            {
+              workspace->showPage (static_cast<RegionWorkspace::Page> (entry.page));
+              for (RestoredTab &tab : restoredTabs)
+                {
+                  if (tab.type == QLatin1String ("region") && !tab.widget
+                      && tab.file == entry.file && tab.region == entry.region)
+                    {
+                      tab.widget = workspace;
+                      break;
+                    }
+                }
+              qDebug ("session: reopened %s#%s",
+                      qUtf8Printable (entry.file),
+                      qUtf8Printable (entry.region));
+            }
+          restoredRegions.removeAt (i);
+          break;
+        }
+    }
+  if (restoredRegions.isEmpty ())
+    {
+      disconnect (ManageRegionUI::instance (),
+                  &ManageRegionUI::regionChanged, this,
+                  &MainWindow::openRestoredRegions);
+      applyRestoredTabOrder ();
+    }
+  else if (restoredOrderTimer)
+    restoredOrderTimer->start ();
+}
+
+void
+MainWindow::applyRestoredTabOrder ()
+{
+  if (!tabWidget || restoredTabs.isEmpty ())
+    return;
+  /* Put the pages back in the order they were saved in. Pages that could not
+   * be restored are simply skipped, so the rest stay together. */
+  int target = 0;
+  for (const RestoredTab &tab : restoredTabs)
+    {
+      QWidget *page = tab.widget;
+      if (!page)
+        continue;
+      const int current = tabWidget->indexOf (page);
+      if (current < 0 || current < target)
+        continue;
+      if (current != target)
+        tabWidget->tabBar ()->moveTab (current, target);
+      ++target;
+    }
+  /* The final order is worth a line: the tabs are reopened in load order, so
+   * a manifest is the only way to see that the saved order came back. */
+  QStringList order;
+  for (int i = 0; i < tabWidget->count (); ++i)
+    {
+      QWidget *page = tabWidget->widget (i);
+      QString label = QStringLiteral ("other");
+      for (const RestoredTab &tab : restoredTabs)
+        if (tab.widget == page)
+          {
+            label = tab.type;
+            if (!tab.file.isEmpty ())
+              label += QLatin1Char (':') + QFileInfo (tab.file).fileName ();
+            if (!tab.region.isEmpty ())
+              label += QLatin1Char ('#') + tab.region;
+            break;
+          }
+      order << label;
+    }
+  qDebug ("session: tab order: %s", qUtf8Printable (order.join (" | ")));
+
+  if (restoredActiveKey.isEmpty ())
+    return;
+  for (const RestoredTab &tab : restoredTabs)
+    {
+      if (!tab.widget)
+        continue;
+      if (sessionTabKey (tab.type, tab.file, tab.region) == restoredActiveKey)
+        {
+          tabWidget->setCurrentWidget (tab.widget);
+          break;
+        }
+    }
+}
+
 void
 MainWindow::resizeEvent (QResizeEvent *event)
 {
@@ -2009,6 +2529,8 @@ MainWindow::openSettings (const QString &group)
 void
 MainWindow::closeEvent (QCloseEvent *event)
 {
+  /* Before the pages are closed: saveSession reads their tab names. */
+  saveSession ();
   closing = true;
   /* Every window the program opened listens to this signal (see
    * `ownWindow ()`), and closes itself; the windows a reader opened are closed

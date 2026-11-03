@@ -218,7 +218,9 @@ public:
   /* The first plugin whose `type ()` equals `type`, or nullptr. */
   static ModuleBase *getModule (const QString &type);
   static QList<LoadObjectBase> getLoadObjectList ();
-  static void appendRegion (void *region, const QString &displayName);
+  static void appendRegion (void *region, const QString &displayName,
+                            const QString &sourcePath = {},
+                            const QString &sourceRegion = {});
   static qsizetype regionNum ();
   /* A copy of the list, taken under the lock below: the loading jobs append
    * their regions from worker threads, so a caller must not walk the vector

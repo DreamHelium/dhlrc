@@ -20,6 +20,7 @@
 //! (not a compound, or without a position) is skipped rather than failing the
 //! load, unless the caller asks for strictness.
 
+use common_rs::estimate::DhlrcEstimate;
 use common_rs::helper_struct::HelperStruct;
 use common_rs::i18n::i18n;
 use common_rs::my_error::MyError;
@@ -430,6 +431,50 @@ fn read_entity(tag: &NBTTag) -> Option<Compound> {
 /// `skip_broken` is the opposite of the `Refuse Incomplete Entities` option:
 /// with it, an entity or block entity that cannot be used is counted and left
 /// out; without it, it is an error.
+/// The optional load-time estimate: the extent comes straight from `Width`,
+/// `Height` and `Length`, and the load creates one block per cell of that box,
+/// so the volume is the block count. The block data itself is not decoded
+/// here — that is what [`read_schematic`] does when the file is actually
+/// loaded. A file missing the palette or the data would not load either, so
+/// it is not estimated.
+pub fn estimate(nbt: &NBTRoot, uncompressed_bytes: u64) -> Option<DhlrcEstimate> {
+    let root = match &nbt.data {
+        NBTTag::Compound(compound) => compound,
+        _ => return None,
+    };
+    let schematic = as_compound(root, "Schematic").unwrap_or(root);
+    let width = as_dimension(schematic, "Width")?;
+    let height = as_dimension(schematic, "Height")?;
+    let length = as_dimension(schematic, "Length")?;
+    if width <= 0 || height <= 0 || length <= 0 {
+        return None;
+    }
+    let (has_palette, has_data) = match as_compound(schematic, "Blocks") {
+        Some(blocks) => (
+            as_compound(blocks, "Palette").is_some(),
+            as_bytes(blocks, "Data").is_some(),
+        ),
+        None => (
+            as_compound(schematic, "Palette").is_some(),
+            as_bytes(schematic, "BlockData").is_some(),
+        ),
+    };
+    if !has_palette || !has_data {
+        return None;
+    }
+    let blocks = width as i64 * height as i64 * length as i64;
+    Some(DhlrcEstimate {
+        regions: 1,
+        blocks,
+        uncompressed_bytes: uncompressed_bytes as i64,
+        size_x: width,
+        size_y: height,
+        size_z: length,
+        blocks_exact: 0,
+        ..DhlrcEstimate::unknown()
+    })
+}
+
 pub fn read_schematic(
     nbt: &NBTRoot,
     skip_broken: bool,

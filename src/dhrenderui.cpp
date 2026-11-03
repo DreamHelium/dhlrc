@@ -6,6 +6,7 @@
 #include "dhcore.h"
 #include "dhdownloadmanager.h"
 #include "dhrenderwidget.h"
+#include "notificationcenterui.h"
 #include "flowlayout.h"
 #include "mainwindow.h"
 #include "region.h"
@@ -870,6 +871,9 @@ DhRenderUI::modifyPicked ()
 
       if (!writtenCells.isEmpty ())
         {
+          dh::tasks::report (
+              0, QStringLiteral ("taskModify"), _ ("Properties changed"),
+              QString (_ ("Changed %1 block(s).")).arg (writtenCells.size ()));
           const QString description
               = QString (_ ("Changed %1 block(s)")).arg (writtenCells.size ());
           regionClass->recordChange (
@@ -1338,6 +1342,9 @@ DhRenderUI::replaceSelection ()
       return;
     }
 
+  dh::tasks::report (
+      0, QStringLiteral ("taskReplace"), _ ("Blocks replaced"),
+      QString (_ ("Replaced %1 block(s).")).arg (writtenCells.size ()));
   const QString description
       = QString (_ ("Replaced %1 block(s)")).arg (writtenCells.size ());
   regionClass->recordChange (

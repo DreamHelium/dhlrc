@@ -12,8 +12,11 @@ use crate::config::{
 use crate::modules::Modules;
 use crate::notification::Level;
 use crate::resource::{Identifier, ResourceEnvironment, ResourceSet};
+/* The optional estimate the region modules can provide, shared with them
+ * through `common-rs`; the layout is mirrored in the header. */
+pub use common_rs::estimate::DhlrcEstimate;
 use std::ffi::{CStr, CString, c_char, c_void};
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::ptr;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Arc, Mutex, OnceLock};
@@ -93,6 +96,9 @@ pub struct DhlrcConfigView {
     /// A `DhlrcRegionOrder`; the rule below is only read for `Custom`.
     pub multi_region_order: i32,
     pub multi_region_order_rule: *const c_char,
+    /// The load limits; zero means no limit.
+    pub max_load_seconds: i32,
+    pub max_load_memory_mb: i32,
     pub name_pattern_sample_file: *const c_char,
     pub name_pattern_sample_region: *const c_char,
     pub description: *const c_char,
@@ -132,6 +138,8 @@ impl ConfigViewData {
             ),
             multi_region_order: region_order_to_int(config.manage.multi_region_order),
             multi_region_order_rule: owned(&mut strings, &config.manage.multi_region_order_rule),
+            max_load_seconds: config.loading.max_seconds as i32,
+            max_load_memory_mb: config.loading.max_memory_mb as i32,
             name_pattern_sample_file: owned(
                 &mut strings,
                 &config.defaults.name_pattern_sample_file,
@@ -624,6 +632,161 @@ pub extern "C" fn dhlrc_core_load_module_info(
     0
 }
 
+/// Asks the region module that matches `filename`'s suffix for an estimate of
+/// the load, without building a region.
+///
+/// Returns 0 and fills `*estimate` when a module answered, or -1 (leaving
+/// `*estimate` as "unknown") when no module could — an old module without the
+/// optional `region_estimate` symbol, a suffix nothing claims, or an
+/// unreadable/unsupported file. The caller then falls back to the file size.
+#[unsafe(no_mangle)]
+pub extern "C" fn dhlrc_core_region_estimate(
+    core: *const DhlrcCore,
+    filename: *const c_char,
+    estimate: *mut DhlrcEstimate,
+) -> i32 {
+    if core.is_null() || filename.is_null() || estimate.is_null() {
+        return -1;
+    }
+    let core = unsafe { &*core };
+    let filename = unsafe { CStr::from_ptr(filename) }.to_string_lossy();
+    let Ok(guard) = core.modules.lock() else {
+        return -1;
+    };
+    match guard
+        .as_ref()
+        .and_then(|modules| modules.region_estimate(Path::new(filename.as_ref())))
+    {
+        Some(value) => {
+            unsafe { *estimate = value };
+            0
+        }
+        None => {
+            unsafe { *estimate = DhlrcEstimate::unknown() };
+            -1
+        }
+    }
+}
+
+/// The predicted load of one file. The layout must match
+/// `DhlrcLoadPrediction` in the header, field for field.
+#[repr(C)]
+pub struct DhlrcLoadPrediction {
+    /// The predicted load time and the range to expect it in, in
+    /// milliseconds; all three are equal for an exact history hit.
+    pub millis: f64,
+    pub low: f64,
+    pub high: f64,
+    /// The predicted peak memory and the range to expect it in, in bytes.
+    pub memory_bytes: f64,
+    pub memory_low: f64,
+    pub memory_high: f64,
+    /// Where the time came from: 0 measured before, 1 from this format, 2
+    /// from other formats, 3 no history (the built-in guess or a region
+    /// module's estimate).
+    pub basis: i32,
+    /// How many measured loads backed the prediction; 0 for a guess.
+    pub samples: i32,
+    /// 1 when the other fields are filled.
+    pub ok: i32,
+}
+
+impl DhlrcLoadPrediction {
+    fn unknown() -> Self {
+        Self {
+            millis: 0.0,
+            low: 0.0,
+            high: 0.0,
+            memory_bytes: 0.0,
+            memory_low: 0.0,
+            memory_high: 0.0,
+            basis: 3,
+            samples: 0,
+            ok: 0,
+        }
+    }
+}
+
+/// Predicts how long `filename` will take to load and how much memory it needs,
+/// from the history in the core's configured cache directory and, when the
+/// history is empty, from the loaded region modules' optional estimate.
+///
+/// The memory number is always a model: the process's own cost plus the
+/// module's block count, or the file size when no module reported one.
+///
+/// Returns 0 and fills `*prediction` on success, or -1 (leaving `*prediction`
+/// as "unknown") for a null argument, an unreadable file, or a poisoned
+/// configuration lock. A file with no history and no matching module is still
+/// predicted (basis 3, from its size), so 0 does not imply any measurement.
+#[unsafe(no_mangle)]
+pub extern "C" fn dhlrc_core_load_prediction(
+    core: *const DhlrcCore,
+    filename: *const c_char,
+    prediction: *mut DhlrcLoadPrediction,
+) -> i32 {
+    if prediction.is_null() {
+        return -1;
+    }
+    if core.is_null() || filename.is_null() {
+        unsafe { *prediction = DhlrcLoadPrediction::unknown() };
+        return -1;
+    }
+    let core = unsafe { &*core };
+    let filename = unsafe { CStr::from_ptr(filename) }.to_string_lossy();
+    let path = Path::new(filename.as_ref());
+    let metadata = match std::fs::metadata(path) {
+        Ok(metadata) => metadata,
+        Err(_) => {
+            unsafe { *prediction = DhlrcLoadPrediction::unknown() };
+            return -1;
+        }
+    };
+    let cache_dir = match core.shared.config.lock() {
+        Ok(config) => config.general.cache_dir(),
+        Err(_) => {
+            unsafe { *prediction = DhlrcLoadPrediction::unknown() };
+            return -1;
+        }
+    };
+    let history = crate::loadtime::History::open(&cache_dir);
+    /* A module estimate only replaces the size-based guess; the history is
+     * read first, exactly like the terminal frontend does. */
+    let estimate = core
+        .modules
+        .lock()
+        .ok()
+        .and_then(|modules| modules.as_ref().and_then(|modules| modules.region_estimate(path)));
+    let predicted = crate::loadtime::predict_for_file(
+        &history,
+        path,
+        metadata.len(),
+        crate::loadtime::modified_millis(&metadata),
+        estimate.as_ref(),
+    );
+    let samples = predicted.samples.min(i32::MAX as usize) as i32;
+    let unpacked = estimate
+        .as_ref()
+        .and_then(|estimate| {
+            (estimate.uncompressed_bytes >= 0).then_some(estimate.uncompressed_bytes as u64)
+        });
+    let memory = crate::loadtime::memory_guess(metadata.len(), unpacked, estimate.as_ref());
+    unsafe {
+        *prediction = DhlrcLoadPrediction {
+            millis: predicted.millis,
+            low: predicted.low,
+            high: predicted.high,
+            memory_bytes: memory.bytes,
+            memory_low: memory.low,
+            memory_high: memory.high,
+            basis: predicted.basis.to_int(),
+            samples,
+            ok: 1,
+        };
+    }
+    0
+}
+
+
 #[unsafe(no_mangle)]
 pub extern "C" fn dhlrc_core_region_module_symbol(
     core: *const DhlrcCore,
@@ -780,6 +943,25 @@ pub extern "C" fn dhlrc_core_setting_get(
             Err(_) => ptr::null_mut(),
         },
         None => ptr::null_mut(),
+    }
+}
+
+/// A one-line, translated summary of the settings on `group`, for a settings
+/// page's hint label and its sidebar tooltip. The caller frees it with
+/// [`string_free`]; a null core or group, or an unknown group, gives null.
+#[unsafe(no_mangle)]
+pub extern "C" fn dhlrc_core_settings_summary(
+    core: *const DhlrcCore,
+    group: *const c_char,
+) -> *mut c_char {
+    if core.is_null() || group.is_null() {
+        return ptr::null_mut();
+    }
+    let _ = core;
+    let group = unsafe { CStr::from_ptr(group) }.to_string_lossy();
+    match CString::new(crate::schema::settings_summary(&group)) {
+        Ok(text) => text.into_raw(),
+        Err(_) => ptr::null_mut(),
     }
 }
 
@@ -1788,9 +1970,57 @@ fn show_to_int(option: ShowOption) -> i32 {
 
 #[cfg(test)]
 mod tests {
-    use super::item_texture;
+    use super::{
+        CString, DhlrcLoadPrediction, dhlrc_core_free, dhlrc_core_load_prediction,
+        dhlrc_core_open, item_texture,
+    };
     use crate::resource::ResourceEnvironment;
     use std::path::PathBuf;
+
+    #[test]
+    fn a_load_prediction_is_reported_for_an_existing_file() {
+        let directory = std::env::temp_dir().join(format!(
+            "dhlrc-prediction-{}-{}",
+            std::process::id(),
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .map(|duration| duration.as_nanos())
+                .unwrap_or_default()
+        ));
+        let _ = std::fs::create_dir_all(&directory);
+        let file = directory.join("probe.nbt");
+        std::fs::write(&file, b"not a region, only predicted").unwrap();
+        let config_dir = directory.join("config");
+        let config = CString::new(config_dir.to_string_lossy().as_bytes()).unwrap();
+        let core = dhlrc_core_open(
+            config.as_ptr(),
+            None,
+            std::ptr::null_mut(),
+            std::ptr::null_mut(),
+        );
+        assert!(!core.is_null(), "the core did not open");
+        let filename = CString::new(file.to_string_lossy().as_bytes()).unwrap();
+        let mut prediction = DhlrcLoadPrediction::unknown();
+        assert_eq!(
+            dhlrc_core_load_prediction(core, filename.as_ptr(), &mut prediction),
+            0
+        );
+        assert_eq!(prediction.ok, 1);
+        assert!(prediction.millis > 0.0);
+        assert!((0..=3).contains(&prediction.basis));
+        assert!(prediction.low <= prediction.millis);
+        assert!(prediction.high >= prediction.millis);
+        assert!(prediction.memory_bytes >= crate::loadtime::GUESS_MEMORY_FIXED_BYTES);
+        assert!(prediction.memory_low <= prediction.memory_bytes);
+        assert!(prediction.memory_high >= prediction.memory_bytes);
+        assert_eq!(
+            dhlrc_core_load_prediction(core, std::ptr::null(), &mut prediction),
+            -1
+        );
+        assert_eq!(prediction.ok, 0);
+        dhlrc_core_free(core);
+        let _ = std::fs::remove_dir_all(&directory);
+    }
 
     /// Exercises the icon lookup against a real client jar when the machine has
     /// one, so the texture names and model fallbacks are checked against actual
