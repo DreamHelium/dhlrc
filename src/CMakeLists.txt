@@ -12,8 +12,9 @@ add_subdirectory(dhsettingsdialog)
 
 find_package(Intl)
 
-string(TIMESTAMP CURRENT_DAY %Y%m%d)
-add_definitions(-DDHLRC_COMPILE_DATE=${CURRENT_DAY})
+# The date the build was configured on; the top-level CMakeLists sets it once
+# so Cargo (dhlrc-tui) and the Qt sources agree.
+add_definitions(-DDHLRC_COMPILE_DATE=${DHLRC_COMPILE_DATE})
 
 #set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
@@ -29,8 +30,7 @@ set(CMAKE_MODULE_PATH ${ECM_MODULE_PATH})
 #include(KDECompilerSettings)
 #include(KDECMakeSettings)
 find_package(KF6 REQUIRED COMPONENTS ColorScheme ConfigWidgets I18n WidgetsAddons CoreAddons IconThemes)
-find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets Svg Concurrent)
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets Svg Concurrent)
+find_package(Qt6 REQUIRED COMPONENTS Widgets Svg Concurrent)
 
 add_definitions(-DQT_NO_SIGNALS_SLOTS_KEYWORDS)
 
@@ -142,30 +142,16 @@ endif ()
 
 ki18n_wrap_ui(TEMP_PROJECT_SOURCES ${ui_files})
 
-if (${QT_VERSION_MAJOR} GREATER_EQUAL 6)
-  qt_add_executable(dhlrc_qt
-            MANUAL_FINALIZATION
-            ${TEMP_PROJECT_SOURCES}
-    )
-  # Define target properties for Android with Qt 6 as:
-  #    set_property(TARGET dhlrc_qt APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR
-  #                 ${CMAKE_CURRENT_SOURCE_DIR}/android)
-  # For more information, see https://doc.qt.io/qt-6/qt-add-executable.html#target-creation
-else ()
-  if (ANDROID)
-    add_library(dhlrc_qt SHARED
-                ${TEMP_PROJECT_SOURCES}
-        )
-    # Define properties for Android with Qt 5 after find_package() calls as:
-    #    set(ANDROID_PACKAGE_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/android")
-  else ()
-    add_executable(dhlrc_qt
-                ${TEMP_PROJECT_SOURCES}
-        )
-  endif ()
-endif ()
+qt_add_executable(dhlrc_qt
+        MANUAL_FINALIZATION
+        ${TEMP_PROJECT_SOURCES}
+)
+# Define target properties for Android with Qt 6 as:
+#    set_property(TARGET dhlrc_qt APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR
+#                 ${CMAKE_CURRENT_SOURCE_DIR}/android)
+# For more information, see https://doc.qt.io/qt-6/qt-add-executable.html#target-creation
 
-target_link_libraries(dhlrc_qt PRIVATE Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::Svg
+target_link_libraries(dhlrc_qt PRIVATE Qt6::Widgets Qt6::Svg
  KF6::ColorScheme
  KF6::ConfigWidgets KF6::I18n KF6::I18nLocaleData region_rs dhlrc_core Qt6::Concurrent ${Intl_LIBRARIES}
  dhsettingsdialog KF6::WidgetsAddons KF6::CoreAddons KF6::IconThemes)
@@ -189,9 +175,9 @@ target_compile_definitions(dhlrc_qt PRIVATE QT_MESSAGELOGCONTEXT)
 # without OpenGL does not have. Where the module is missing the view keeps the
 # CPU picture and the program still builds: the call sites are guarded by
 # `DH_HAVE_OPENGL`.
-find_package(Qt${QT_VERSION_MAJOR} QUIET OPTIONAL_COMPONENTS OpenGL OpenGLWidgets)
-if (TARGET Qt${QT_VERSION_MAJOR}::OpenGLWidgets)
-  target_link_libraries(dhlrc_qt PRIVATE Qt${QT_VERSION_MAJOR}::OpenGLWidgets)
+find_package(Qt6 QUIET OPTIONAL_COMPONENTS OpenGL OpenGLWidgets)
+if (TARGET Qt6::OpenGLWidgets)
+  target_link_libraries(dhlrc_qt PRIVATE Qt6::OpenGLWidgets)
   target_compile_definitions(dhlrc_qt PRIVATE DH_HAVE_OPENGL)
 endif()
 target_link_directories(dhlrc_qt PRIVATE ${CMAKE_BINARY_DIR})
@@ -206,7 +192,7 @@ add_dependencies(dhlrc_qt dhlrc_cargo_build)
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
 # If you are developing for iOS or macOS you should consider setting an
 # explicit, fixed bundle identifier manually though.
-if (${QT_VERSION} VERSION_LESS 6.1.0)
+if (Qt6_VERSION VERSION_LESS 6.1.0)
   set(BUNDLE_ID_OPTION MACOSX_BUNDLE_GUI_IDENTIFIER com.example.dhlrc_qt)
 endif ()
 set_target_properties(dhlrc_qt PROPERTIES
@@ -217,6 +203,4 @@ set_target_properties(dhlrc_qt PROPERTIES
 
 include(GNUInstallDirs)
 
-if (QT_VERSION_MAJOR EQUAL 6)
-  qt_finalize_executable(dhlrc_qt)
-endif ()
+qt_finalize_executable(dhlrc_qt)

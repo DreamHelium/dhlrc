@@ -2,7 +2,14 @@
 
 #include <QByteArray>
 #include <QCoreApplication>
+#include <QLoggingCategory>
 #include <QMetaObject>
+
+/* The core's log records join the program's own log: the message handler
+ * installed by `dh::log` writes them to the daily file and the in-app log,
+ * and forwards them to the terminal, exactly as it does for `qCDebug` and
+ * friends. The category lets a user filter them. */
+Q_LOGGING_CATEGORY (dhlrcCoreLog, "dhlrc.core")
 
 /* The C trampolines: `dhlrc_core_open`/`dhlrc_core_watch_start` need plain C
  * function pointers, so these stay free functions and recover the instance
@@ -21,6 +28,33 @@ dhcore_change_trampoline (void *user, int level, const char *eventId,
   static_cast<DhCore *> (user)->requestReload (level, eventId, title, text);
 }
 
+extern "C" void
+dhcore_log_trampoline (void *, int level, const char *target,
+                       const char *message)
+{
+  const QString text
+      = target && *target
+            ? QStringLiteral ("%1: %2")
+                  .arg (QString::fromUtf8 (target),
+                        QString::fromUtf8 (message))
+            : QString::fromUtf8 (message);
+  switch (level)
+    {
+    case DHLRC_LOG_DEBUG:
+      qCDebug (dhlrcCoreLog).noquote () << text;
+      break;
+    case DHLRC_LOG_INFO:
+      qCInfo (dhlrcCoreLog).noquote () << text;
+      break;
+    case DHLRC_LOG_WARNING:
+      qCWarning (dhlrcCoreLog).noquote () << text;
+      break;
+    default:
+      qCCritical (dhlrcCoreLog).noquote () << text;
+      break;
+    }
+}
+
 static DhCore *dhCore = nullptr;
 
 DhCore *
@@ -33,7 +67,12 @@ void
 DhCore::init (QObject *parent)
 {
   if (!dhCore)
-    dhCore = new DhCore (parent);
+    {
+      /* Before the core is opened, so even the records from `open` arrive
+       * through the program's log. */
+      dhlrc_log_set_sink (&dhcore_log_trampoline, nullptr);
+      dhCore = new DhCore (parent);
+    }
 }
 
 DhCore::DhCore (QObject *parent) : QObject (parent)

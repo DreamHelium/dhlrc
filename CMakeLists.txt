@@ -74,11 +74,17 @@ set(CARGO_TARGET_DIR ${CMAKE_BINARY_DIR}/cargo_build)
 
 find_program(CARGO_EXECUTABLE cargo)
 
+# The build stamp both frontends show: `%Y%m%d`, fixed when the build is
+# configured. The Qt sources get it as a macro and Cargo through the
+# environment, so `dhlrc_qt` and `dhlrc-tui` always report the same date.
+string(TIMESTAMP DHLRC_COMPILE_DATE %Y%m%d)
+
 # Rust adds no runpath of its own, so a copied binary cannot find the shared
 # libraries sitting beside it and a module opened through `dlopen` cannot find
 # `libregion_rs.so`. CMake gives `dhlrc_qt` the build directory as its runpath;
 # the cargo crates get the same hard-coded one here. Windows finds a DLL next to
 # the executable already, so it needs none.
+set(DHLRC_CARGO_ENV_ARGS "DHLRC_COMPILE_DATE=${DHLRC_COMPILE_DATE}")
 if (NOT WIN32)
   # Keep any flags the caller already set, and add the runpath.
   if (DEFINED ENV{RUSTFLAGS} AND NOT "$ENV{RUSTFLAGS}" STREQUAL "")
@@ -86,8 +92,9 @@ if (NOT WIN32)
   else ()
     set(DHLRC_RUSTFLAGS "-C link-arg=-Wl,-rpath,${CMAKE_BINARY_DIR}")
   endif ()
-  set(DHLRC_CARGO_ENV ${CMAKE_COMMAND} -E env "RUSTFLAGS=${DHLRC_RUSTFLAGS}")
+  list(APPEND DHLRC_CARGO_ENV_ARGS "RUSTFLAGS=${DHLRC_RUSTFLAGS}")
 endif ()
+set(DHLRC_CARGO_ENV ${CMAKE_COMMAND} -E env ${DHLRC_CARGO_ENV_ARGS})
 
 # cargo needs the manifest, so the target runs from the source tree rather than
 # the binary dir (which may be outside it).

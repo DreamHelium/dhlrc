@@ -55,54 +55,45 @@ work in progress). After that you can export the structure to the type you wish.
 
 ## Dependencies
 
-See `Cargo.toml` in `*-rs` directories, and `CMakeLists.txt` in `src`.
+The Qt frontend needs the Rust libraries `region-rs` and `dhlrc-core`, and the
+modules supported by `dhlrc-core` should also be written in Rust. It also needs
+Qt 6 and KF6. On Windows, I recommend building with
+[MSYS2](https://www.msys2.org/) (see `build-msys2.sh`).
 
 ## Compile
 
-If CMake is already installed, just compile with these commands:
+Qt GUI (requires Qt 6 and KF6):
 
 ```bash
-cmake -B build
-cmake --build build
+cmake -B build && cmake --build build
 ```
 
-For a headless build without the Qt frontend — only the shared libraries and the
-terminal frontend — configure with `-DDH_BUILD_GUI=OFF`; Qt/KF6 are then not
-needed, and the install omits `libdhlrc_core`, which only the Qt frontend loads
-(the terminal frontend links the core statically). Add `-DDH_TRANSLATIONS=OFF`
-to skip the gettext catalogue too (which otherwise needs `xgettext`/`msgfmt`);
-the programme then runs in English.
+Headless build (shared libraries and terminal frontend only; no Qt/KF6):
 
-On Termux/Android there is no `libintl`, so the Rust translation layer is
-disabled automatically (see `gettext-shim`): the build needs no C library and
-messages stay in English. Combine with `-DDH_TRANSLATIONS=OFF` there.
+```bash
+cmake -B build -DDH_BUILD_GUI=OFF && cmake --build build
+```
 
-On Windows with [MSYS2](https://www.msys2.org/), `build-msys2.sh` drives the
-whole build from the UCRT64 environment: it checks the packages it needs (and
-offers to install the missing ones), configures, builds, and — with `--package`
-— assembles a redistributable archive, or an installer when NSIS is installed.
+Headless build without gettext (e.g. Termux/Android):
+
+```bash
+cmake -B build -DDH_BUILD_GUI=OFF -DDH_TRANSLATIONS=OFF && cmake --build build
+```
+
+Windows ([MSYS2](https://www.msys2.org/) UCRT64):
 
 ```bash
 ./build-msys2.sh            # release build into build-ucrt64/
-./build-msys2.sh --package  # also a portable .zip and, with NSIS installed, a setup .exe
+./build-msys2.sh --package  # also a portable .zip (setup .exe with NSIS)
+./build-msys2.sh --help     # all options
 ```
-
-The installer lets the user choose the frontends (the Qt GUI and/or the terminal
-one), the object codecs and region modules to install, and whether to create
-Start Menu shortcuts. Selecting a region module pulls in the NBT codec it needs
-(a module only works on the object a codec produced). It also registers the
-AppUserModelID the core's desktop notifications are sent as, so Windows names
-them after the application rather than PowerShell.
-
-Run `./build-msys2.sh --help` for the other options (`--debug`, `--no-gui`,
-`--no-translations`, `--offline`, `--clean`, `--build-dir`, `--jobs`).
 
 ## Features
 
 - NBT, Litematica and Sponge schematic (`.schem`) support.
 - Modify base data of the region.
 - A 3D preview that draws a region from its block models and textures, with
-  turning, zooming and block picking (see the [developer document](dev-doc/render.md)).
+  turning, zooming and block picking.
 - Old-school GUI, with notification centre and log view.
 - Restores the previous session at start: the open tabs, the active tab, the
   window size and the sidebar width; regions that were loaded without an open
@@ -121,8 +112,6 @@ there before uninstalling.
 `dhlrc-tui` is an interactive terminal frontend: run it without arguments for
 a mouse-capable settings page with a sidebar; `--help` lists the other
 subcommands.
-
-tty support might be planned.
 
 ## Logs
 

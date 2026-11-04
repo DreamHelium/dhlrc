@@ -32,6 +32,9 @@ libloading = "0.8"
 # The columns in the `modules` output have to line up in Chinese too, where a
 # character is two terminal cells wide.
 unicode-width = "0.2"
+# The log file's UTC timestamps; the same crate the build script uses for the
+# fallback build date.
+time = { version = "0.3", default-features = false, features = ["std"] }
 
 # Android has no libintl; `gettext-shim` stands in and messages stay English.
 [target.'cfg(not(target_os = "android"))'.dependencies]
@@ -39,3 +42,9 @@ gettext-rs = { version = "0.7.7", features = ["gettext-system"] }
 
 [target.'cfg(target_os = "android")'.dependencies]
 gettextrs = { package = "dhlrc-gettext-shim", path = "../gettext-shim" }
+
+# The build stamp `build.rs` falls back to when CMake did not pass one (a
+# plain `cargo build`); the workspace already builds this crate for `time`
+# handling elsewhere, so it costs nothing extra.
+[build-dependencies]
+time = { version = "0.3", default-features = false, features = ["std"] }

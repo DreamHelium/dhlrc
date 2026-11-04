@@ -66,6 +66,15 @@ fn event_loop(app: &mut App, stdout: &mut io::Stdout) -> io::Result<()> {
             return Ok(());
         }
 
+        /* The command output is transient: wake up when it is due to go
+         * instead of waiting for the next key. */
+        if let Some(wait) = app.console_timeout() {
+            if !event::poll(wait)? {
+                app.expire_console();
+                continue;
+            }
+        }
+
         match event::read()? {
             TerminalEvent::Key(key) => {
                 if key.code == KeyCode::Char('c') && key.modifiers.contains(KeyModifiers::CONTROL) {

@@ -55,6 +55,11 @@ required-features = ["render"]
 # Builds the `UtcDateTime` the example's region needs.
 time = "0.3"
 
+# The build stamp `build.rs` falls back to when CMake did not pass one (a
+# plain `cargo build`); the workspace already builds this crate elsewhere.
+[build-dependencies]
+time = { version = "0.3", default-features = false, features = ["std"] }
+
 # Android has no libintl; `gettext-shim` stands in and messages stay English.
 [target.'cfg(not(target_os = "android"))'.dependencies]
 gettext-rs = { version = "0.7.7", features = ["gettext-system"] }

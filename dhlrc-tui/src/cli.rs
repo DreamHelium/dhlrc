@@ -243,6 +243,10 @@ fn version_flag() -> String {
     gettext("Print version")
 }
 
+fn help_log_level() -> String {
+    gettext("Minimum level written to the log file: debug, info, warning or error")
+}
+
 fn help_subcommand_about() -> String {
     gettext("Print this message or the help of the given subcommand(s)")
 }
@@ -261,6 +265,11 @@ fn help_subcommand_arg() -> String {
 pub struct Cli {
     #[command(subcommand)]
     pub command: Option<Command>,
+    /// Minimum level written to the log file (debug, info, warning, error).
+    /// The `DHLRC_LOG_LEVEL` environment variable is used when the option is
+    /// absent.
+    #[arg(long, global = true, value_name = "LEVEL", help = help_log_level())]
+    pub log_level: Option<String>,
 }
 
 #[derive(Debug, Subcommand)]
@@ -421,9 +430,18 @@ pub fn parse() -> Cli {
     Cli::from_arg_matches(&command().get_matches()).unwrap_or_else(|error| error.exit())
 }
 
+/// The `--version` text: the build stamp, then the core library the binary was
+/// built with. The stamp is the date CMake configured the build on (see
+/// `build.rs`), so it matches `dhlrc_qt`'s; the core version is worth showing
+/// because a stale `libdhlrc_core` is otherwise invisible.
+fn version_text() -> String {
+    let stamp = option_env!("DHLRC_BUILD_STAMP").unwrap_or(env!("CARGO_PKG_VERSION"));
+    format!("{stamp} (dhlrc-core {})", dhlrc_core::VERSION)
+}
+
 /// The parser, with the texts `clap` writes itself translated.
 pub fn command() -> clap::Command {
-    let mut command = Cli::command();
+    let mut command = Cli::command().version(version_text());
     /* `clap` adds the `-h`/`-V` arguments and the `help` subcommand while it
      * builds, so build first and translate afterwards. */
     command.build();
@@ -490,6 +508,25 @@ fn help_template() -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn the_version_text_carries_the_date_and_the_core_version() {
+        let text = version_text();
+        let stamp = &text[..8];
+        assert!(
+            stamp.chars().all(|ch| ch.is_ascii_digit()),
+            "the stamp is a date: {text}"
+        );
+        assert!(
+            text.ends_with(&format!("(dhlrc-core {})", dhlrc_core::VERSION)),
+            "the core version is shown: {text}"
+        );
+        assert!(
+            dhlrc_core::VERSION.chars().all(|ch| ch.is_ascii_digit()),
+            "the core version is a date too: {}",
+            dhlrc_core::VERSION
+        );
+    }
 
     #[test]
     fn the_load_time_command_takes_files_and_flags() {

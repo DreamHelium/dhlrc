@@ -83,6 +83,21 @@ extern "C"
   /* Polled between reads; return non-zero to stop the download. */
   typedef int32_t (*DhlrcCancelFunc) (void *user_data);
 
+  /* The severity of a log record, in the order a minimum level filters. */
+  typedef enum
+  {
+    DHLRC_LOG_DEBUG = 0,
+    DHLRC_LOG_INFO = 1,
+    DHLRC_LOG_WARNING = 2,
+    DHLRC_LOG_ERROR = 3,
+  } DhlrcLogLevel;
+
+  /* Called for every log record the core emits. `target` names the module the
+   * record came from; `target` and `message` are borrowed and only valid for
+   * the call. */
+  typedef void (*DhlrcLogFunc) (void *user_data, int32_t level,
+                                const char *target, const char *message);
+
   /* A snapshot of the configuration. Free it with `dhlrc_config_view_free`.
    *
    * The `char *` fields point into the view and stay valid until it is freed;
@@ -119,6 +134,16 @@ extern "C"
     const char *cache_directory;
     const char *language;
   };
+
+  /* The core library's build stamp (for example "20261104"), the date the
+   * build was configured on. Borrowed; valid for the life of the process and
+   * not to be freed. */
+  const char *dhlrc_core_version (void);
+
+  /* Installs the process-wide sink for the core's log records; NULL restores
+   * stderr. Call it before the first core call so nothing is lost. The sink
+   * may run on any thread. */
+  void dhlrc_log_set_sink (DhlrcLogFunc sink, void *user_data);
 
   /* Opens (creating from the defaults if missing) the configuration in
    * `config_dir`, which must hold `config.toml`; pass NULL for the default

@@ -19,12 +19,19 @@ pub mod desktop;
 pub mod download;
 pub mod ffi;
 pub mod loadtime;
+pub mod log;
 pub mod material;
 pub mod modules;
 pub mod notification;
 #[cfg(feature = "render")]
 pub mod render;
 pub mod schema;
+
+/// The core's build stamp (`%Y%m%d`, the date the build was configured on).
+/// The frontends show it beside their own stamp, so the `--version` output
+/// tells which core the binary was built with — and a stale shared library can
+/// be spotted at a glance.
+pub const VERSION: &str = env!("DHLRC_BUILD_STAMP");
 
 /// The resource layer, re-exported so `dhlrc_core::resource` keeps working for
 /// every existing reader while the code itself lives in `dhlrc-resource` — the

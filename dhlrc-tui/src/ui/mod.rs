@@ -14,13 +14,15 @@
 
 use crate::cli::Kind;
 use crate::i18n::gettext;
-use command::{CommandLine, CommandStep, StoredRegion};
+use command::{CommandLine, CommandStep, StoredRegion, TranscriptKind};
 use dhlrc_core::config::{Config, ConfigInit, ConfigPaths, save_config};
 use dhlrc_core::modules::default_dirs;
 use dhlrc_core::schema::{SETTINGS, SettingDef, SettingType, settings_summary};
+use std::time::{Duration, Instant};
 use unicode_width::UnicodeWidthChar;
 
 mod command;
+mod markdown;
 pub mod term;
 
 /// The message ids for "On" and "Off", so a bool reads as words rather than
@@ -406,7 +408,10 @@ pub struct App {
     cmd: CommandLine,
     regions: Vec<StoredRegion>,
     selected: Option<usize>,
-    transcript: Vec<String>,
+    transcript: Vec<command::TranscriptLine>,
+    /// When the command output overlay goes away by itself. The event loop
+    /// sleeps until then; a click, `Esc` or a new command rewrites it.
+    console_deadline: Option<Instant>,
 }
 
 impl App {
@@ -454,6 +459,7 @@ impl App {
             regions: Vec::new(),
             selected: None,
             transcript: Vec::new(),
+            console_deadline: None,
         }
     }
 
@@ -510,8 +516,69 @@ impl App {
         }
     }
 
+    /// Shows the core's notifications the way the Qt frontend does: the first
+    /// title on the status line (red for an error) and every notification's
+    /// details in the console, which steps aside after a few seconds.
+    pub fn show_notifications(&mut self, notifications: Vec<dhlrc_core::Notification>) {
+        let Some(first) = notifications.first() else {
+            return;
+        };
+        for notification in &notifications {
+            let kind = match notification.level {
+                dhlrc_core::Level::Info => TranscriptKind::Output,
+                dhlrc_core::Level::Warning => TranscriptKind::Warning,
+                dhlrc_core::Level::Error => TranscriptKind::Error,
+            };
+            self.push_transcript(
+                format!("{}: {}", notification.title, notification.text),
+                kind,
+            );
+        }
+        self.set_status(
+            first.title.clone(),
+            matches!(first.level, dhlrc_core::Level::Error),
+        );
+        self.console_deadline = Some(Instant::now() + NOTIFICATION_TTL);
+    }
+
     fn set_status(&mut self, text: String, error: bool) {
-        self.status = Some((text, error));
+        /* The footer has room for one line; a multi-line message keeps its
+         * first line here and its details in the console. */
+        let first = text.lines().next().unwrap_or_default().to_owned();
+        self.status = Some((first, error));
+    }
+
+    /// How long the event loop may wait before the command output has to go.
+    /// While a line or an editor is open the overlay is not on a timer.
+    fn console_timeout(&self) -> Option<Duration> {
+        if self.cmd.is_active() || self.edit.is_some() {
+            return None;
+        }
+        self.console_deadline
+            .map(|deadline| deadline.saturating_duration_since(Instant::now()))
+    }
+
+    /// Takes the output overlay down once its time is up, and puts the page's
+    /// own footer line back: the command's one-line status goes with it.
+    fn expire_console(&mut self) {
+        if self.cmd.is_active() || self.edit.is_some() {
+            return;
+        }
+        if self
+            .console_deadline
+            .is_some_and(|deadline| Instant::now() >= deadline)
+        {
+            self.console_deadline = None;
+            self.transcript.clear();
+            self.status = None;
+        }
+    }
+
+    /// Takes the output overlay down now (`Esc`, or a click on the page).
+    fn dismiss_console(&mut self) {
+        self.console_deadline = None;
+        self.transcript.clear();
+        self.status = None;
     }
 
     // -- moving and activating --------------------------------------------
@@ -662,8 +729,7 @@ impl App {
         /* An earlier command's output stays up until it is dismissed; `Esc`
          * closes it before it reaches its old meaning of quitting. */
         if key == Key::Esc && !self.transcript.is_empty() {
-            self.transcript.clear();
-            self.status = None;
+            self.dismiss_console();
             return;
         }
         if key == Key::Char(':') {
@@ -806,6 +872,12 @@ impl App {
         if self.edit.is_some() || self.cmd.is_active() {
             return;
         }
+        /* The command output is an overlay that does not take clicks: a click
+         * on the page puts it away instead of acting on what it covers. */
+        if mouse.kind == MouseKind::Down && !self.transcript.is_empty() {
+            self.dismiss_console();
+            return;
+        }
         if mouse.kind == MouseKind::Down && self.layout.sidebar.contains(mouse.x, mouse.y) {
             let index = (mouse.y - self.layout.sidebar.y) as usize;
             if let Some(page) = Page::ALL.get(index).copied() {
@@ -857,8 +929,13 @@ impl App {
                     return;
                 }
                 if self.layout.settings.contains(mouse.x, mouse.y) {
-                    let offset = (mouse.y - self.layout.setting_first) as usize;
-                    let index = offset + self.scroll;
+                    /* The pane rectangle includes the blank row under the
+                     * header, which is above the first setting row; a click
+                     * there selects nothing. */
+                    let Some(offset) = mouse.y.checked_sub(self.layout.setting_first) else {
+                        return;
+                    };
+                    let index = offset as usize + self.scroll;
                     if index < self.current_rows().len() {
                         let was_selected = index == self.row;
                         self.focus = Focus::Settings;
@@ -910,7 +987,8 @@ impl App {
         match dhlrc_core::load_or_create(&self.paths) {
             Ok(init) => {
                 self.config = init.config;
-                self.set_status(gettext("Configuration reloaded"), false);
+                /* The same notification the Qt frontend shows, from the core. */
+                self.show_notifications(vec![self.paths.reloaded_notification()]);
                 Ok(())
             }
             Err(error) => {
@@ -933,6 +1011,33 @@ impl App {
         if width == 0 || height == 0 {
             return;
         }
+        /* Below this size the three panes and the function bar stop fitting;
+         * say so instead of drawing a squeezed frame. */
+        if width < MIN_WIDTH || height < MIN_HEIGHT {
+            screen.fill(Rect::new(0, 0, width, height), ' ', Style::plain());
+            let title = truncate(
+                &gettext("Terminal too small"),
+                width.saturating_sub(2) as usize,
+            );
+            let hint = truncate(
+                &gettext("Need at least 70×18"),
+                width.saturating_sub(2) as usize,
+            );
+            let y = height / 2;
+            screen.put(
+                width.saturating_sub(text_width(&title) as u16) / 2,
+                y.saturating_sub(1),
+                &title,
+                Style::plain().bold(),
+            );
+            screen.put(
+                width.saturating_sub(text_width(&hint) as u16) / 2,
+                y,
+                &hint,
+                Style::plain().with_fg(Color::DarkGrey),
+            );
+            return;
+        }
 
         let header = Style::plain().bold().on(Color::DarkGrey);
         for x in 0..width {
@@ -942,7 +1047,14 @@ impl App {
         screen.put(1, 0, &title, header.with_fg(Color::White).bold());
         if self.page == Page::Settings {
             let path = self.paths.file.display().to_string();
-            screen.put_right(width.saturating_sub(1), 0, &path, header);
+            /* Room after the title; a long path loses its head, not its tail. */
+            let room = width
+                .saturating_sub(text_width(&title) as u16)
+                .saturating_sub(3) as usize;
+            if room >= 8 {
+                let path = elide_left(&path, room);
+                screen.put_right(width.saturating_sub(1), 0, &path, header);
+            }
         }
 
         self.render_sidebar(screen);
@@ -958,10 +1070,13 @@ impl App {
         let detail_y = height.saturating_sub(2);
         if let Some((text, error)) = &self.status {
             let style = Style::plain().with_fg(if *error { Color::Red } else { Color::Green });
-            screen.put(
+            let spans = markdown::line(text, style);
+            markdown::draw(
+                screen,
                 1,
                 status_y,
-                &truncate(text, width.saturating_sub(2) as usize),
+                &spans,
+                width.saturating_sub(2),
                 style,
             );
         } else if self.edit.is_none() {
@@ -979,12 +1094,17 @@ impl App {
             let value = tail(&edit.buffer, room);
             x = screen.put(x, detail_y, &value, Style::plain().with_fg(Color::Yellow));
             screen.set(x.min(width - 1), detail_y, '▏', Style::plain());
-            screen.put(
-                1,
-                status_y,
-                &gettext("Enter saves, Esc cancels"),
-                Style::plain().with_fg(Color::DarkGrey),
-            );
+            /* A refused value puts its error on this very row; the generic
+             * hint gives way to it instead of painting it over. */
+            let refused = self.status.as_ref().is_some_and(|(_, error)| *error);
+            if !refused {
+                screen.put(
+                    1,
+                    status_y,
+                    &gettext("Enter saves, Esc cancels"),
+                    Style::plain().with_fg(Color::DarkGrey),
+                );
+            }
         } else if self.page == Page::Settings {
             if let Some(def) = self.current_def() {
                 let tooltip = gettext(def.tooltip);
@@ -1047,8 +1167,13 @@ impl App {
         let rows = &self.rows[self.group];
         let visible = body_h.saturating_sub(1) as usize;
         self.scroll = self.scroll.min(rows.len().saturating_sub(visible.max(1)));
-        let value_x = width.saturating_sub(4);
-        let label_width = settings.w.saturating_sub(6).min(settings.w);
+        /* The value column ends two cells before the edge; the label gets a
+         * little more than half of the rest so the two never collide. */
+        let value_right = width.saturating_sub(2);
+        let row_start = settings_x.saturating_add(2);
+        let row_room = value_right.saturating_sub(row_start + 1) as usize;
+        let label_width = (row_room / 2).max(4).min(row_room);
+        let value_width = row_room.saturating_sub(label_width + 1).max(3);
 
         for (offset, def) in rows.iter().enumerate().skip(self.scroll).take(visible) {
             let index = offset;
@@ -1075,7 +1200,8 @@ impl App {
             } else {
                 Style::plain().with_fg(Color::LightCyan)
             };
-            screen.put_right(value_x, y, &value, value_style);
+            let value = elide_left(&value, value_width);
+            screen.put_right(value_right, y, &value, value_style);
         }
 
         let sidebar = self.layout.sidebar;
@@ -1148,12 +1274,18 @@ impl App {
         let y = screen.height.saturating_sub(1);
         self.action_y = y;
         self.actions.clear();
+        /* Quit keeps the last slot; the page entries give up theirs first, so
+         * a narrow terminal never loses the only always-visible exit. */
+        let quit_label = format!("F10 {}", gettext("Quit"));
+        let quit_text = format!(" {quit_label} ");
+        let quit_width = text_width(&quit_text) as u16;
+        let quit_x = width.saturating_sub(quit_width + 1);
         let mut x = 1u16;
         for (index, page) in Page::ALL.iter().enumerate() {
             let label = format!("F{} {}", index + 1, page.title());
             let text = format!(" {label} ");
             let area_width = text_width(&text) as u16;
-            if x + area_width >= width {
+            if x + area_width + 1 >= quit_x {
                 break;
             }
             let style = if *page == self.page {
@@ -1173,16 +1305,13 @@ impl App {
             });
             x += area_width + 1;
         }
-        let label = format!("F10 {}", gettext("Quit"));
-        let text = format!(" {label} ");
-        let area_width = text_width(&text) as u16;
-        if x + area_width <= width {
+        if quit_x > 1 {
             let style = Style::plain().with_fg(Color::White).on(Color::Red).bold();
-            screen.fill(Rect::new(x, y, area_width, 1), ' ', style);
-            screen.put(x + 1, y, &label, style);
+            screen.fill(Rect::new(quit_x, y, quit_width, 1), ' ', style);
+            screen.put(quit_x + 1, y, &quit_label, style);
             self.actions.push(ActionArea {
-                x,
-                width: area_width,
+                x: quit_x,
+                width: quit_width,
                 action: Action::Quit,
             });
         }
@@ -1219,7 +1348,8 @@ impl App {
                 Style::plain()
             };
             screen.fill(Rect::new(0, y, width, 1), ' ', style);
-            screen.put(2, y, &page.title(), style);
+            let label = truncate(&page.title(), width.saturating_sub(3) as usize);
+            screen.put(2, y, &label, style);
         }
         for y in body_y..body_y + body_h {
             screen.set(width, y, '│', Style::plain().with_fg(Color::DarkGrey));
@@ -1273,6 +1403,14 @@ fn normalise(kind: SettingType, text: &str) -> Option<String> {
     }
 }
 
+/// How long a startup or reload notification stays on screen; its title stays
+/// on the status line afterwards.
+const NOTIFICATION_TTL: Duration = Duration::from_secs(6);
+
+/// The smallest frame the three-pane settings layout is designed for.
+const MIN_WIDTH: u16 = 70;
+const MIN_HEIGHT: u16 = 18;
+
 fn text_width(text: &str) -> usize {
     text.chars().map(|c| c.width().unwrap_or(0)).sum()
 }
@@ -1293,6 +1431,31 @@ fn truncate(text: &str, width: usize) -> String {
         used += w;
     }
     out.push('…');
+    out
+}
+
+/// Keeps the end of `text` when it is wider than `width` cells, marking the
+/// cut with a leading ellipsis (paths and long values matter at the tail).
+fn elide_left(text: &str, width: usize) -> String {
+    if text_width(text) <= width {
+        return text.to_owned();
+    }
+    if width == 0 {
+        return String::new();
+    }
+    let chars: Vec<char> = text.chars().collect();
+    let mut out = String::from("…");
+    let mut used = 1;
+    let mut start = chars.len();
+    while start > 0 {
+        let w = chars[start - 1].width().unwrap_or(0);
+        if used + w > width {
+            break;
+        }
+        used += w;
+        start -= 1;
+    }
+    out.extend(&chars[start..]);
     out
 }
 
@@ -1527,7 +1690,7 @@ mod tests {
     }
 
     #[test]
-    fn the_quit_entry_follows_the_pages_without_a_gap() {
+    fn the_quit_entry_is_pinned_to_the_right_edge() {
         let (mut app, _dir) = app();
         let mut screen = Screen::new(140, 30);
         app.render(&mut screen);
@@ -1536,12 +1699,196 @@ mod tests {
             .iter()
             .position(|area| area.action == Action::Quit)
             .expect("the quit entry is drawn");
+        let quit = &app.actions[index];
+        assert_eq!(quit.x + quit.width, screen.width - 1);
         let previous = &app.actions[index - 1];
         assert_eq!(
             previous.action,
             Action::Page(Page::ALL[Page::ALL.len() - 1])
         );
-        assert_eq!(app.actions[index].x, previous.x + previous.width + 1);
+        assert!(
+            previous.x + previous.width < quit.x,
+            "the page entries stop before the quit entry"
+        );
+    }
+
+    #[test]
+    fn a_narrow_frame_keeps_the_quit_entry() {
+        let (mut app, _dir) = app();
+        let mut screen = Screen::new(70, 18);
+        app.render(&mut screen);
+        assert!(app.actions.iter().any(|area| area.action == Action::Quit));
+        assert!(screen.text()[17].contains(&gettext("Quit")));
+    }
+
+    #[test]
+    fn a_click_below_the_header_of_the_settings_pane_selects_nothing() {
+        let (mut app, _dir) = app();
+        let mut screen = Screen::new(100, 30);
+        app.render(&mut screen);
+        let before = (app.row, app.focus);
+        app.handle(&Event::Mouse(Mouse {
+            kind: MouseKind::Down,
+            x: app.layout.settings.x + 3,
+            y: 1,
+        }));
+        assert_eq!((app.row, app.focus), before);
+    }
+
+    #[test]
+    fn a_refused_edit_keeps_its_message_visible() {
+        let (mut app, _dir) = app();
+        app.focus = Focus::Settings;
+        app.row = row_of(&app, "ElapsedMilliseconds");
+        press(&mut app, Key::Enter);
+        app.edit.as_mut().unwrap().buffer = "abc".to_owned();
+        press(&mut app, Key::Enter);
+        assert!(app.edit.is_some(), "the editor stays open");
+        let mut screen = Screen::new(100, 30);
+        app.render(&mut screen);
+        let status = screen.text()[27].clone();
+        assert!(
+            status.contains(&gettext("Not a valid value")),
+            "status row: {status:?}"
+        );
+    }
+
+    #[test]
+    fn the_console_stays_in_the_page_body() {
+        let (mut app, _dir) = app();
+        for _ in 0..3 {
+            press(&mut app, Key::Char(':'));
+            for ch in "help".chars() {
+                press(&mut app, Key::Char(ch));
+            }
+            press(&mut app, Key::Enter);
+        }
+        let mut screen = Screen::new(100, 30);
+        app.render(&mut screen);
+        let rows = screen.text();
+        /* 45 output lines; the console stops at the body's last row. */
+        assert!(rows[25].contains("quit"), "last console row: {:?}", rows[25]);
+        assert!(rows[27].contains(&gettext("Commands:")), "status: {:?}", rows[27]);
+        let tooltip = gettext(app.current_def().unwrap().tooltip);
+        let head: String = tooltip.chars().take(12).collect();
+        assert!(rows[28].contains(&head), "tooltip: {:?}", rows[28]);
+        assert!(rows[29].contains(&gettext("Quit")), "bar: {:?}", rows[29]);
+    }
+
+    #[test]
+    fn the_console_steps_aside_for_the_editor() {
+        let (mut app, _dir) = app();
+        press(&mut app, Key::Char(':'));
+        for ch in "help".chars() {
+            press(&mut app, Key::Char(ch));
+        }
+        press(&mut app, Key::Enter);
+        app.focus = Focus::Settings;
+        app.row = 0;
+        press(&mut app, Key::Enter);
+        assert!(app.edit.is_some(), "the editor opens");
+        let mut screen = Screen::new(100, 30);
+        app.render(&mut screen);
+        let rows = screen.text();
+        assert!(rows[28].contains(&gettext("Editing")), "editor: {:?}", rows[28]);
+        assert!(
+            rows[27].contains(&gettext("Enter saves, Esc cancels")),
+            "hint: {:?}",
+            rows[27]
+        );
+        assert!(
+            !rows.iter().any(|row| row.contains("Leave the program")),
+            "the console is hidden while editing: {rows:?}"
+        );
+    }
+
+    #[test]
+    fn the_console_output_times_out() {
+        let (mut app, _dir) = app();
+        press(&mut app, Key::Char(':'));
+        type_text(&mut app, "help");
+        press(&mut app, Key::Enter);
+        assert!(!app.transcript.is_empty());
+        /* Pretend the overlay has been up for longer than its time. */
+        app.console_deadline = Some(Instant::now() - Duration::from_secs(1));
+        app.expire_console();
+        assert!(app.transcript.is_empty());
+        assert!(app.console_deadline.is_none());
+        assert!(app.status.is_none());
+        let mut screen = Screen::new(100, 30);
+        app.render(&mut screen);
+        let rows = screen.text();
+        assert!(
+            !rows.join("\n").contains("Leave the program"),
+            "the output is gone from the screen"
+        );
+        assert!(rows[27].contains("↑↓"), "the key hint is back: {:?}", rows[27]);
+    }
+
+    #[test]
+    fn a_click_puts_the_console_away_without_acting_on_the_page() {
+        let (mut app, _dir) = app();
+        press(&mut app, Key::Char(':'));
+        type_text(&mut app, "page modules");
+        press(&mut app, Key::Enter);
+        assert!(!app.transcript.is_empty());
+        assert_eq!(app.page, Page::Modules);
+        let mut screen = Screen::new(100, 30);
+        app.render(&mut screen);
+        /* This point is in the sidebar and would switch to Render; with the
+         * output up it only puts the output away. */
+        app.handle(&Event::Mouse(Mouse {
+            kind: MouseKind::Down,
+            x: 5,
+            y: 3,
+        }));
+        assert!(app.transcript.is_empty());
+        assert_eq!(app.page, Page::Modules);
+        assert!(app.console_deadline.is_none());
+    }
+
+    #[test]
+    fn a_multi_line_status_keeps_only_its_first_line() {
+        let (mut app, _dir) = app();
+        app.set_status("first line\nsecond line".to_owned(), true);
+        assert_eq!(app.status.as_ref().unwrap().0, "first line");
+    }
+
+    #[test]
+    fn core_notifications_are_shown_like_the_qt_frontend() {
+        let (mut app, _dir) = app();
+        app.show_notifications(vec![
+            dhlrc_core::Notification::new(
+                "configCreated",
+                dhlrc_core::Level::Info,
+                "Configuration created",
+                "A new file",
+            ),
+            dhlrc_core::Notification::new(
+                "configReset",
+                dhlrc_core::Level::Warning,
+                "Configuration reset",
+                "An old file was kept",
+            ),
+            dhlrc_core::Notification::new(
+                "configFailed",
+                dhlrc_core::Level::Error,
+                "Configuration failed",
+                "It could not be read",
+            ),
+        ]);
+        assert_eq!(app.status.as_ref().unwrap().0, "Configuration created");
+        assert_eq!(app.transcript[0].kind, TranscriptKind::Output);
+        assert_eq!(app.transcript[1].kind, TranscriptKind::Warning);
+        assert_eq!(app.transcript[2].kind, TranscriptKind::Error);
+        assert_eq!(app.transcript[0].text, "Configuration created: A new file");
+        assert!(app.console_deadline.is_some());
+        let mut screen = Screen::new(100, 30);
+        app.render(&mut screen);
+        let text = screen.text().join("\n");
+        for shown in ["A new file", "An old file was kept", "It could not be read"] {
+            assert!(text.contains(shown), "{shown:?} is on the screen");
+        }
     }
 
     #[test]
@@ -1727,7 +2074,7 @@ mod tests {
         press(&mut app, Key::Enter);
         assert!(!app.cmd.is_active());
         assert_eq!(app.page, Page::Modules);
-        assert!(app.transcript.iter().any(|line| line.contains("Modules")));
+        assert!(app.transcript.iter().any(|line| line.text.contains("Modules")));
 
         /* Esc closes the line without running what was typed. */
         press(&mut app, Key::Char(':'));

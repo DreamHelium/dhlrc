@@ -77,6 +77,15 @@ pub type DhlrcDownloadProgressFunc =
 /// Polled between reads; a non-zero return stops the download.
 pub type DhlrcCancelFunc = extern "C" fn(user_data: *mut c_void) -> i32;
 
+/// Called for every log record; `target` and `message` are borrowed and only
+/// valid for the call. `level` is one of the `DHLRC_LOG_*` values.
+pub type DhlrcLogFunc = extern "C" fn(
+    user_data: *mut c_void,
+    level: i32,
+    target: *const c_char,
+    message: *const c_char,
+);
+
 /// A snapshot of the configuration. The layout must match `DhlrcConfigView` in
 /// the header, field for field.
 #[repr(C)]
@@ -198,6 +207,20 @@ pub struct DhlrcCore {
     /// The blocks those resources have, built on first use and dropped when the
     /// resources are configured again.
     catalog: Mutex<Option<Arc<crate::catalog::Catalog>>>,
+}
+
+/// Installs the process-wide log sink; a NULL `sink` restores stderr. Call it
+/// before the first core call so no record is lost.
+#[unsafe(no_mangle)]
+pub extern "C" fn dhlrc_log_set_sink(sink: Option<DhlrcLogFunc>, user_data: *mut c_void) {
+    crate::log::set_c_sink(sink, user_data);
+}
+
+/// The core library's build stamp (for example "20261104"). Borrowed, valid
+/// for the life of the process; do not free.
+#[unsafe(no_mangle)]
+pub extern "C" fn dhlrc_core_version() -> *const c_char {
+    concat!(env!("DHLRC_BUILD_STAMP"), "\0").as_ptr().cast()
 }
 
 #[unsafe(no_mangle)]
@@ -1972,10 +1995,22 @@ fn show_to_int(option: ShowOption) -> i32 {
 mod tests {
     use super::{
         CString, DhlrcLoadPrediction, dhlrc_core_free, dhlrc_core_load_prediction,
-        dhlrc_core_open, item_texture,
+        dhlrc_core_open, dhlrc_core_version, item_texture,
     };
     use crate::resource::ResourceEnvironment;
+    use std::ffi::CStr;
     use std::path::PathBuf;
+
+    #[test]
+    fn the_c_version_matches_the_build_stamp() {
+        let version = unsafe { CStr::from_ptr(dhlrc_core_version()) };
+        let text = version.to_str().unwrap();
+        assert_eq!(text, crate::VERSION);
+        assert!(
+            text.chars().all(|ch| ch.is_ascii_digit()),
+            "the stamp is a date: {text}"
+        );
+    }
 
     #[test]
     fn a_load_prediction_is_reported_for_an_existing_file() {

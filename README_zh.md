@@ -44,37 +44,41 @@ issue，并附上版本号以及 Bug/错误的描述。
 
 ## 依赖
 
-见`*-rs`目录中的`Cargo.toml`, 以及`src`中的`CMakeLists.txt`。
+Qt 界面需要 Rust 库 `region-rs` 和 `dhlrc-core`，`dhlrc-core` 所支持的模块也应使用 Rust 编写。此外还需要 Qt 6 与 KF6。在 Windows 上推荐使用 [MSYS2](https://www.msys2.org/) 构建（见 `build-msys2.sh`）。
 
 ## 编译
 
-如果有CMake，可以直接使用这下两行编译：
+Qt 界面（需要 Qt 6 与 KF6）：
 
 ```bash
-cmake -B build
-cmake --build build
+cmake -B build && cmake --build build
 ```
 
-若不需要 Qt 界面（只编译共享库与终端前端），加上 `-DDH_BUILD_GUI=OFF`，此时不再需要 Qt/KF6；安装时也不会带上只有 Qt 前端才加载的 `libdhlrc_core`（终端前端静态链接核心）。再加上 `-DDH_TRANSLATIONS=OFF` 可跳过 gettext 目录（否则需要 `xgettext`/`msgfmt`），程序则一律显示英文。
+无界面构建（仅共享库与终端前端；无需 Qt/KF6）：
 
-Termux/Android 上没有 `libintl`，Rust 侧的翻译层会自动失效（见 `gettext-shim`）：构建不再需要任何 C 库，字符串保持英文。在那里请一并加上 `-DDH_TRANSLATIONS=OFF`。
+```bash
+cmake -B build -DDH_BUILD_GUI=OFF && cmake --build build
+```
 
-在 Windows 上，配合 [MSYS2](https://www.msys2.org/) 的 `build-msys2.sh` 可从 UCRT64 环境一键构建：脚本会检查所需软件包（并询问是否安装缺少的包）、配置并编译；加上 `--package` 还会打包成可分发压缩包，若安装了 NSIS 则生成安装程序。
+无界面构建（不使用 gettext，如 Termux/Android）：
+
+```bash
+cmake -B build -DDH_BUILD_GUI=OFF -DDH_TRANSLATIONS=OFF && cmake --build build
+```
+
+Windows（[MSYS2](https://www.msys2.org/) UCRT64）：
 
 ```bash
 ./build-msys2.sh            # 以 release 构建到 build-ucrt64/
-./build-msys2.sh --package  # 同时生成便携 .zip；装了 NSIS 还会生成安装程序 .exe
+./build-msys2.sh --package  # 同时生成便携 .zip（装有 NSIS 时生成安装程序 .exe）
+./build-msys2.sh --help     # 全部选项
 ```
-
-安装程序可让用户选择要安装的前端（Qt 界面和/或终端前端）、对象编解码器与区域模块，以及是否创建开始菜单快捷方式；勾选任一区域模块会自动带上它所需的 NBT 编解码器（模块只能处理编解码器解析出的对象）。它还会注册核心的桌面通知所用的 AppUserModelID，使 Windows 把通知显示为本程序而不是 PowerShell。
-
-其它选项（`--debug`、`--no-gui`、`--no-translations`、`--offline`、`--clean`、`--build-dir`、`--jobs`）见 `./build-msys2.sh --help`。
 
 ## 功能
 
 - 支持NBT、投影文件和Sponge结构文件（`.schem`）。
 - 修改区域的基础数据。
-- 3D预览：按方块模型与材质绘制区域，可旋转、缩放并点选方块（见[开发文档](dev-doc/render.md)）。
+- 3D预览：按方块模型与材质绘制区域，可旋转、缩放并点选方块。
 - 老掉牙的界面，带通知中心与日志查看。
 - 启动时恢复上次会话：重新打开标签页、回到当时活动的标签，并恢复窗口大小和侧栏宽度；已经加载但没有打开标签页的区域也会重新加载（可在“设置 -> 通用”中关闭）。
 
@@ -88,8 +92,6 @@ Termux/Android 上没有 `libintl`，Rust 侧的翻译层会自动失效（见 `
 
 `dhlrc-tui` 是可交互的终端前端：不带参数运行时进入支持鼠标的设置页（带侧栏）；
 `--help` 列出其它子命令。
-
-tty支持可能已在计划中。
 
 ## 日志
 

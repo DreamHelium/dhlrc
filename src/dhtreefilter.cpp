@@ -1,22 +1,20 @@
 #include "dhtreefilter.h"
 
-bool
-DhTreeFilter::filterAcceptsRow (int source_row,
-                                const QModelIndex &source_parent) const
+/* A tree filter has to keep the shape of the tree, not just cut out the rows
+ * whose text matches:
+ *
+ * - a row that matches keeps its whole subtree, so filtering for "Data" shows
+ *   what is inside the compound instead of a bare label with nothing under it;
+ * - a row whose descendants match stays visible as the way down to them, and
+ *   its other branches are dropped.
+ *
+ * QSortFilterProxyModel does both already: recursive filtering accepts a row
+ * when one of its descendants matches, and accepting child rows keeps the
+ * children of a matching row. Letting it do the walking also removes the
+ * hand-written recursion that ran again for every row and descended into
+ * subtrees the proxy had already filtered. */
+DhTreeFilter::DhTreeFilter (QObject *parent) : QSortFilterProxyModel (parent)
 {
-  bool filter
-      = QSortFilterProxyModel::filterAcceptsRow (source_row, source_parent);
-  if (filter)
-    return true;
-  else
-    {
-      QModelIndex source_index
-          = sourceModel ()->index (source_row, 0, source_parent);
-      for (int i = 0; i < sourceModel ()->rowCount (source_index); i++)
-        {
-          if (filterAcceptsRow (i, source_index))
-            return true;
-        }
-    }
-  return false;
+  setRecursiveFilteringEnabled (true);
+  setAutoAcceptChildRows (true);
 }

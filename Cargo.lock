@@ -527,6 +527,7 @@ dependencies = [
  "formatx",
  "gettext-rs",
  "libloading",
+ "time",
  "unicode-width",
 ]
 

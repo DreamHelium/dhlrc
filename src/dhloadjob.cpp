@@ -34,6 +34,30 @@ failedMessage (const QString &state, const QString &error)
   return QString (_ ("Failed when %1: %2")).arg (state).arg (error);
 }
 
+/* The message widgets render Markdown, where a single newline is only a soft
+ * break and is shown as a space. An error from a module is often plain text
+ * with one line per attempt (one per encoding, for example); ending those
+ * lines with two spaces keeps them as lines. A blank line is left alone, so
+ * paragraphs stay paragraphs. */
+static QString
+markdownLines (const QString &text)
+{
+  QString normalized = text;
+  normalized.remove (QLatin1Char ('\r'));
+  const QStringList lines = normalized.split (QStringLiteral ("\n"));
+  QString out;
+  for (int i = 0; i < lines.size (); ++i)
+    {
+      if (i)
+        out += QLatin1Char ('\n');
+      out += lines[i];
+      if (i + 1 < lines.size () && !lines[i].trimmed ().isEmpty ()
+          && !lines[i + 1].trimmed ().isEmpty ())
+        out += QStringLiteral ("  ");
+    }
+  return out;
+}
+
 /* The plugin types that can read a file, most likely first.
  *
  * Every candidate shares the object codec that was used to decode the file, so
@@ -701,7 +725,7 @@ DhAllLoadJob::DhAllLoadJob (QStringList list, bool loadAllRegions,
                                 failedWidget, &KMessageWidget::deleteLater);
                        MainWindow::addWidgetToTopArea (failedWidget);
                        failedWidget->setMessageType (KMessageWidget::Error);
-                       failedWidget->setText (failedText);
+                       failedWidget->setText (markdownLines (failedText));
                        failedWidget->setTextFormat (Qt::MarkdownText);
                        QTimer::singleShot (5000, failedWidget,
                                            &KMessageWidget::animatedHide);
@@ -725,7 +749,7 @@ DhAllLoadJob::DhAllLoadJob (QStringList list, bool loadAllRegions,
                            = warningText.arg (loadJob->getFilename (),
                                               loadJob->warnings ().join (
                                                   "\n\n"));
-                       warningWidget->setText (warningText);
+                       warningWidget->setText (markdownLines (warningText));
                        warningWidget->setTextFormat (Qt::MarkdownText);
                        QTimer::singleShot (8000, warningWidget,
                                            &KMessageWidget::animatedHide);

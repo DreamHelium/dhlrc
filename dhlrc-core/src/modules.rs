@@ -160,16 +160,16 @@ fn load_region_modules(dir: &Path) -> Vec<Entry> {
         let library = match open_library(&file) {
             Ok(library) => library,
             Err(error) => {
-                eprintln!(
-                    "dhlrc: could not load region module {}: {error}",
+                crate::log_warning!(
+                    "could not load region module {}: {error}",
                     file.display()
                 );
                 continue;
             }
         };
         let Some(type_name) = read_name(&library, b"region_type") else {
-            eprintln!(
-                "dhlrc: ignoring region module {}: region_type () is missing",
+            crate::log_warning!(
+                "ignoring region module {}: region_type () is missing",
                 file.display()
             );
             continue;
@@ -197,23 +197,23 @@ fn load_object_modules(dir: &Path) -> Vec<Entry> {
         let library = match open_library(&file) {
             Ok(library) => library,
             Err(error) => {
-                eprintln!(
-                    "dhlrc: could not load load module {}: {error}",
+                crate::log_warning!(
+                    "could not load load module {}: {error}",
                     file.display()
                 );
                 continue;
             }
         };
         let Some(base_type) = read_name(&library, b"object_base_type") else {
-            eprintln!(
-                "dhlrc: ignoring load module {}: object_base_type () is missing",
+            crate::log_warning!(
+                "ignoring load module {}: object_base_type () is missing",
                 file.display()
             );
             continue;
         };
         if !has_symbol(&library, b"region_get_object") || !has_symbol(&library, b"object_free") {
-            eprintln!(
-                "dhlrc: ignoring load module {}: region_get_object () or object_free () is missing",
+            crate::log_warning!(
+                "ignoring load module {}: region_get_object () or object_free () is missing",
                 file.display()
             );
             continue;

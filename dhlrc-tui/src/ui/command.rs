@@ -13,19 +13,28 @@
  */
 
 use super::{
-    App, Color, Key, Page, Rect, SETTINGS, Screen, SettingType, Style, gettext, normalise,
-    settings_summary, truncate,
+    App, Color, Key, Page, Rect, SETTINGS, Screen, SettingType, Style, gettext, markdown,
+    normalise, settings_summary, text_width, truncate,
 };
 use crate::region;
 use dhlrc_core::modules::default_dirs;
 use dhlrc_render::scene::Voxels;
 use std::path::{Path, PathBuf};
+use std::time::{Duration, Instant};
+use unicode_width::UnicodeWidthChar;
 
 /// How many command lines the history keeps.
 const HISTORY_CAPACITY: usize = 50;
 
 /// How many output lines the console keeps; older ones scroll away.
 const TRANSCRIPT_CAPACITY: usize = 200;
+
+/// How many candidates the completion list shows at once.
+const COMPLETION_ROWS: usize = 5;
+
+/// How long the output of a command stays on screen as an overlay. It goes
+/// away earlier when the page is clicked or `Esc` is pressed.
+const CONSOLE_TTL: Duration = Duration::from_secs(4);
 
 /// The commands, their syntax and the one-line help. The summary goes through
 /// `gettext` when it is shown, so this table stays the list of message ids.
@@ -143,8 +152,26 @@ pub struct Completion {
     start: usize,
     end: usize,
     candidates: Vec<String>,
-    /// The next candidate a repeated `Tab` inserts.
-    index: usize,
+    /// The candidate the line currently shows. `None` while the list is only
+    /// an offer: nothing is selected and nothing has been inserted yet, so
+    /// there is never a highlight that differs from the line.
+    index: Option<usize>,
+}
+
+/// What a console row is: the command as typed, its output, or an error.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub(super) enum TranscriptKind {
+    Echo,
+    Output,
+    Warning,
+    Error,
+}
+
+/// One row of the command console, with the colour it reads in.
+#[derive(Clone, Debug)]
+pub(super) struct TranscriptLine {
+    pub(super) text: String,
+    pub(super) kind: TranscriptKind,
 }
 
 /// The state of the `:` line: the text, its cursor, the history and the
@@ -230,19 +257,31 @@ impl CommandLine {
                 CommandStep::None
             }
             Key::Left => {
-                self.cursor = self.cursor.saturating_sub(1);
+                /* While the candidate list is open the arrows pick from it,
+                 * so the line shows exactly the selected candidate. */
+                if self.completion.is_some() {
+                    self.cycle_completion(-1);
+                } else {
+                    self.cursor = self.cursor.saturating_sub(1);
+                }
                 CommandStep::None
             }
             Key::Right => {
-                self.cursor = (self.cursor + 1).min(self.input.len());
+                if self.completion.is_some() {
+                    self.cycle_completion(1);
+                } else {
+                    self.cursor = (self.cursor + 1).min(self.input.len());
+                }
                 CommandStep::None
             }
             Key::Home => {
                 self.cursor = 0;
+                self.completion = None;
                 CommandStep::None
             }
             Key::End => {
                 self.cursor = self.input.len();
+                self.completion = None;
                 CommandStep::None
             }
             Key::Up => {
@@ -277,15 +316,8 @@ impl CommandLine {
     /// `Tab` completes the word under the cursor. The first press inserts what
     /// the candidates share and shows the list; a repeated press walks it.
     fn tab(&mut self, regions: &[String]) {
-        if let Some(mut completion) = self.completion.take() {
-            if !completion.candidates.is_empty() {
-                let index = completion.index % completion.candidates.len();
-                let text = quote_candidate(&completion.candidates[index]);
-                let end = self.replace_word(completion.start, completion.end, &text);
-                completion.end = end;
-                completion.index = (index + 1) % completion.candidates.len();
-            }
-            self.completion = Some(completion);
+        if self.completion.is_some() {
+            self.cycle_completion(1);
             return;
         }
 
@@ -305,7 +337,32 @@ impl CommandLine {
             let end = self.replace_word(completion.start, completion.end, &common);
             completion.end = end;
         }
-        completion.index = 0;
+        /* The list is open, but no candidate is picked yet: the highlight and
+         * the line stay in step because there is no highlight until one is. */
+        completion.index = None;
+        self.completion = Some(completion);
+    }
+
+    /// Moves the completion selection by `delta` and previews it in the line,
+    /// so the highlighted candidate is exactly what `Enter` would run.
+    fn cycle_completion(&mut self, delta: isize) {
+        let Some(mut completion) = self.completion.take() else {
+            return;
+        };
+        let count = completion.candidates.len();
+        if count == 0 {
+            self.completion = Some(completion);
+            return;
+        }
+        let index = match completion.index {
+            Some(index) => (index as isize + delta).rem_euclid(count as isize) as usize,
+            None if delta < 0 => count - 1,
+            None => 0,
+        };
+        let text = quote_candidate(&completion.candidates[index]);
+        let end = self.replace_word(completion.start, completion.end, &text);
+        completion.end = end;
+        completion.index = Some(index);
         self.completion = Some(completion);
     }
 
@@ -561,7 +618,7 @@ pub fn completion_candidates(
         start,
         end,
         candidates,
-        index: 0,
+        index: None,
     })
 }
 
@@ -844,13 +901,13 @@ impl App {
         if line.is_empty() {
             return;
         }
-        self.push_transcript(format!(": {line}"));
+        self.push_transcript(format!(": {line}"), TranscriptKind::Echo);
 
         let result = split_words(line).and_then(|words| parse_command(&words));
         match result.and_then(|command| self.execute(command)) {
             Ok(lines) => {
                 for line in &lines {
-                    self.push_transcript(line.clone());
+                    self.push_transcript(line.clone(), TranscriptKind::Output);
                 }
                 if let Some(first) = lines.first() {
                     self.set_status(first.clone(), false);
@@ -858,14 +915,24 @@ impl App {
             }
             Err(message) => {
                 let text = format!("{}: {message}", gettext("Error"));
-                self.push_transcript(text.clone());
+                self.push_transcript(text.clone(), TranscriptKind::Error);
                 self.set_status(text, true);
             }
         }
+        /* The output is a transient overlay, not part of the page. */
+        self.console_deadline = Some(Instant::now() + CONSOLE_TTL);
     }
 
-    fn push_transcript(&mut self, line: String) {
-        self.transcript.push(line);
+    /// Adds output to the console. A message may hold several lines (an error
+    /// from a module often does); each becomes its own row, so nothing is
+    /// glued together by a dropped line break.
+    pub(super) fn push_transcript(&mut self, text: String, kind: TranscriptKind) {
+        for line in text.split('\n') {
+            self.transcript.push(TranscriptLine {
+                text: line.trim_end_matches('\r').to_owned(),
+                kind,
+            });
+        }
         if self.transcript.len() > TRANSCRIPT_CAPACITY {
             let excess = self.transcript.len() - TRANSCRIPT_CAPACITY;
             self.transcript.drain(..excess);
@@ -924,7 +991,8 @@ impl App {
             Parsed::Set(key, value) => self.set_command(&key, &value),
             Parsed::Reload => {
                 self.reload_result()?;
-                Ok(vec![gettext("Configuration reloaded")])
+                /* `reload_result` shows the core's reloaded notification. */
+                Ok(Vec::new())
             }
             Parsed::Save => {
                 self.save_result()?;
@@ -1161,8 +1229,10 @@ impl App {
         )])
     }
 
-    /// Draws the command line, its candidates and the output above it. With the
-    /// line closed, the last output stays visible until `Esc` dismisses it.
+    /// Draws the command line, its candidates below it, and the output above
+    /// it. With the line closed, the last output stays visible until `Esc`
+    /// dismisses it; it keeps to the page body so the status line, the tooltip
+    /// and an open editor stay readable.
     pub(super) fn render_console(&mut self, screen: &mut Screen) {
         let width = screen.width;
         let height = screen.height;
@@ -1171,58 +1241,93 @@ impl App {
         }
 
         if self.cmd.active {
-            let mut bottom = height.saturating_sub(2);
-            if let Some(completion) = self.cmd.completion.as_ref() {
-                let count = completion.candidates.len();
-                let first = completion.index.saturating_sub(4).min(
-                    count.saturating_sub(5.min(count)),
-                );
-                for (offset, candidate) in completion
+            /* Candidates sit in columns like a shell's completion list:
+             * several names per row, and the line directly above them. */
+            let layout = self.cmd.completion.as_ref().map(|completion| {
+                let longest = completion
                     .candidates
                     .iter()
-                    .enumerate()
-                    .skip(first)
-                    .take(5)
-                {
-                    if bottom == 0 {
-                        break;
-                    }
-                    let selected = offset == completion.index % count.max(1);
-                    let style = if selected {
-                        Style::plain()
-                            .with_fg(Color::Black)
-                            .on(Color::Cyan)
-                            .bold()
-                    } else {
-                        Style::plain().with_fg(Color::White).on(Color::DarkGrey)
-                    };
-                    screen.fill(Rect::new(0, bottom, width, 1), ' ', style);
-                    screen.put(
-                        2,
-                        bottom,
-                        &truncate(candidate, width.saturating_sub(4) as usize),
-                        style,
+                    .map(|candidate| text_width(candidate))
+                    .max()
+                    .unwrap_or(0);
+                let (cell, columns) = completion_grid(width, longest);
+                let total = completion.candidates.len().div_ceil(columns);
+                (cell, columns, total.min(COMPLETION_ROWS), total)
+            });
+            let rows = layout.map(|(_, _, shown, _)| shown).unwrap_or(0);
+            let input_y = height.saturating_sub(1 + rows as u16);
+            let bottom = input_y.saturating_sub(1);
+
+            if let (Some(completion), Some((cell, columns, shown, total))) =
+                (self.cmd.completion.as_ref(), layout)
+            {
+                let selected_row = completion.index.map(|index| index / columns);
+                let first_row = match selected_row {
+                    Some(row) => row
+                        .saturating_sub(shown.saturating_sub(1))
+                        .min(total.saturating_sub(shown)),
+                    None => 0,
+                };
+                for (offset, row) in (first_row..first_row + shown).enumerate() {
+                    let y = input_y + 1 + offset as u16;
+                    /* The whole row belongs to the list, or the page shows
+                     * through the gaps between the cells. */
+                    screen.fill(
+                        Rect::new(0, y, width, 1),
+                        ' ',
+                        Style::plain().with_fg(Color::White).on(Color::Black),
                     );
-                    bottom = bottom.saturating_sub(1);
+                    for column in 0..columns {
+                        let index = row * columns + column;
+                        if index >= completion.candidates.len() {
+                            break;
+                        }
+                        let x = 1 + (column * cell) as u16;
+                        if x >= width {
+                            break;
+                        }
+                        let selected = completion.index == Some(index);
+                        let style = if selected {
+                            Style::plain()
+                                .with_fg(Color::Black)
+                                .on(Color::Cyan)
+                                .bold()
+                        } else {
+                            Style::plain().with_fg(Color::White).on(Color::Black)
+                        };
+                        let room = (cell as u16).min(width.saturating_sub(x)) as usize;
+                        screen.fill(Rect::new(x, y, room as u16, 1), ' ', style);
+                        screen.put(
+                            x,
+                            y,
+                            &truncate(
+                                &completion.candidates[index],
+                                room.saturating_sub(1),
+                            ),
+                            style,
+                        );
+                    }
                 }
             }
 
             let room = bottom as usize + 1;
             let shown = room.min(8);
             let start = self.transcript.len().saturating_sub(shown);
-            let lines: Vec<String> = self.transcript[start..].to_vec();
+            let lines: Vec<TranscriptLine> = self.transcript[start..].to_vec();
             for (offset, line) in lines.iter().enumerate() {
                 let y = bottom.saturating_sub((lines.len() - 1 - offset) as u16);
                 draw_console_line(screen, y, line, width);
             }
 
-            render_input(screen, &self.cmd, width, height - 1);
-        } else if !self.transcript.is_empty() {
-            let room = height.saturating_sub(2) as usize;
+            render_input(screen, &self.cmd, width, input_y);
+        } else if !self.transcript.is_empty() && self.edit.is_none() {
+            /* Only the page body, never the footer: the status line, the
+             * tooltip (or the editor prompt) and the function bar stay. */
+            let last = height.saturating_sub(5);
+            let room = last as usize;
             let shown = room;
             let start = self.transcript.len().saturating_sub(shown);
-            let lines: Vec<String> = self.transcript[start..].to_vec();
-            let last = height.saturating_sub(2);
+            let lines: Vec<TranscriptLine> = self.transcript[start..].to_vec();
             for (offset, line) in lines.iter().enumerate() {
                 let y = last.saturating_sub((lines.len() - 1 - offset) as u16);
                 draw_console_line(screen, y, line, width);
@@ -1231,34 +1336,100 @@ impl App {
     }
 }
 
-fn draw_console_line(screen: &mut Screen, y: u16, line: &str, width: u16) {
-    let style = Style::plain().with_fg(Color::White).on(Color::DarkGrey);
+fn draw_console_line(screen: &mut Screen, y: u16, line: &TranscriptLine, width: u16) {
+    /* The command echo, its output and its errors read in different colours,
+     * so the console does not look like the page's summary line. */
+    let style = match line.kind {
+        TranscriptKind::Echo => Style::plain().with_fg(Color::Yellow).on(Color::Black),
+        TranscriptKind::Output => Style::plain().with_fg(Color::LightCyan).on(Color::Black),
+        TranscriptKind::Warning => Style::plain().with_fg(Color::Yellow).on(Color::Black),
+        TranscriptKind::Error => Style::plain().with_fg(Color::Red).on(Color::Black),
+    };
     screen.fill(Rect::new(0, y, width, 1), ' ', style);
-    screen.put(1, y, &truncate(line, width.saturating_sub(2) as usize), style);
+    if line.kind == TranscriptKind::Echo {
+        /* The typed line is shown exactly as typed, not as Markdown. */
+        let spans = [markdown::Span {
+            text: line.text.clone(),
+            style,
+        }];
+        markdown::draw(screen, 1, y, &spans, width.saturating_sub(2), style);
+    } else {
+        let spans = markdown::line(&line.text, style);
+        markdown::draw(screen, 1, y, &spans, width.saturating_sub(2), style);
+    }
+}
+
+/// The completion grid's column width and column count. `longest` is the
+/// widest candidate in terminal cells; one space on each side keeps the
+/// columns apart. A single column is the fallback for a long candidate.
+fn completion_grid(width: u16, longest: usize) -> (usize, usize) {
+    let cell = longest.saturating_add(2).max(3);
+    let columns = (width as usize).saturating_sub(1) / cell;
+    (cell, columns.max(1))
 }
 
 fn render_input(screen: &mut Screen, cmd: &CommandLine, width: u16, y: u16) {
-    let style = Style::plain().on(Color::DarkGrey);
+    let style = Style::plain().on(Color::Black);
     screen.fill(Rect::new(0, y, width, 1), ' ', style);
-    screen.put(0, y, ":", Style::plain().with_fg(Color::Yellow).bold().on(Color::DarkGrey));
+    screen.put(0, y, ":", Style::plain().with_fg(Color::Yellow).bold().on(Color::Black));
 
     let room = width.saturating_sub(3) as usize;
-    let start = cmd.cursor.saturating_sub(room);
-    let text: String = cmd
-        .input
-        .iter()
-        .skip(start)
-        .take(room)
-        .collect::<String>();
-    screen.put(2, y, &text, Style::plain().with_fg(Color::White).on(Color::DarkGrey));
-    let cursor_x = 2 + (cmd.cursor - start) as u16;
-    if cursor_x < width {
-        screen.set(
-            cursor_x,
-            y,
-            '▏',
-            Style::plain().with_fg(Color::Yellow).on(Color::DarkGrey),
-        );
+    /* The line is measured in terminal cells, not characters, so a wide
+     * character (CJK) takes two cells here just as it does on the screen.
+     * Walk back from the cursor until the window is full: the cursor stays
+     * visible and the text scrolls sideways like an editor. */
+    let mut start = cmd.cursor;
+    let mut before = 0usize;
+    while start > 0 {
+        let w = cmd.input[start - 1].width().unwrap_or(0) as usize;
+        if before + w > room {
+            break;
+        }
+        before += w;
+        start -= 1;
+    }
+
+    /* Everything from the window start that still fits on the right. */
+    let mut drawn = 0usize;
+    let mut text = String::new();
+    for &ch in cmd.input.iter().skip(start) {
+        let w = ch.width().unwrap_or(0) as usize;
+        if drawn + w > room {
+            break;
+        }
+        drawn += w;
+        text.push(ch);
+    }
+    screen.put(
+        2,
+        y,
+        &text,
+        Style::plain().with_fg(Color::White).on(Color::Black),
+    );
+
+    let x = 2 + before as u16;
+    if cmd.cursor >= cmd.input.len() {
+        /* At the end the cursor is a bar in the free cell after the text. */
+        if x < width {
+            screen.set(
+                x,
+                y,
+                '▏',
+                Style::plain().with_fg(Color::Yellow).on(Color::Black),
+            );
+        }
+    } else if let Some(&ch) = cmd.input.get(cmd.cursor) {
+        /* Between two characters the cursor paints the character under it
+         * instead of overwriting half of it, so a wide glyph is highlighted
+         * whole and the rest of the row keeps its columns. */
+        let w = ch.width().unwrap_or(0);
+        if w > 0 && x + w as u16 <= width {
+            let cursor = Style::plain().with_fg(Color::Black).on(Color::Yellow);
+            screen.set(x, y, ch, cursor);
+            if w == 2 {
+                screen.set(x + 1, y, '\0', cursor);
+            }
+        }
     }
 }
 
@@ -1281,6 +1452,66 @@ mod tests {
         for ch in text.chars() {
             line.handle_key(Key::Char(ch), &[]);
         }
+    }
+
+    fn drawn(line: &CommandLine, width: u16) -> Screen {
+        let mut screen = Screen::new(width, 1);
+        render_input(&mut screen, line, width, 0);
+        screen
+    }
+
+    #[test]
+    fn the_wide_input_cursor_sits_after_the_text_not_inside_it() {
+        let mut line = line();
+        type_text(&mut line, "加载");
+        let screen = drawn(&line, 80);
+        assert_eq!(screen.cell(2, 0).unwrap().0, '加');
+        assert_eq!(screen.cell(3, 0).unwrap().0, '\0');
+        assert_eq!(screen.cell(4, 0).unwrap().0, '载');
+        assert_eq!(screen.cell(5, 0).unwrap().0, '\0');
+        assert_eq!(screen.cell(6, 0).unwrap().0, '▏');
+    }
+
+    #[test]
+    fn a_cursor_inside_wide_text_highlights_the_whole_character() {
+        let mut line = line();
+        type_text(&mut line, "加载");
+        line.handle_key(Key::Left, &[]);
+        let screen = drawn(&line, 80);
+        /* The character under the cursor is selected, not cut in half. */
+        let (ch, style) = screen.cell(4, 0).unwrap();
+        assert_eq!(ch, '载');
+        assert_eq!(style.bg, Color::Yellow);
+        assert_eq!(screen.cell(5, 0).unwrap().0, '\0');
+        assert_eq!(screen.cell(6, 0).unwrap().0, ' ');
+        /* The character before the cursor is untouched. */
+        assert_eq!(screen.cell(2, 0).unwrap().0, '加');
+        assert_eq!(screen.cell(3, 0).unwrap().0, '\0');
+    }
+
+    #[test]
+    fn a_long_wide_line_scrolls_so_the_cursor_stays_on_screen() {
+        let mut line = line();
+        type_text(&mut line, &"加载".repeat(20));
+        let screen = drawn(&line, 80);
+        /* 77 cells of room: the tail ends at column 77 and the bar is at 78. */
+        assert_eq!(screen.cell(77, 0).unwrap().0, '\0');
+        assert_eq!(screen.cell(78, 0).unwrap().0, '▏');
+        assert_ne!(screen.cell(2, 0).unwrap().0, ' ');
+        assert_eq!(screen.cell(79, 0).unwrap().0, ' ');
+    }
+
+    #[test]
+    fn a_plain_line_still_puts_the_bar_after_the_text() {
+        let mut line = line();
+        type_text(&mut line, "help");
+        assert_eq!(drawn(&line, 80).cell(6, 0).unwrap().0, '▏');
+        /* Home turns the cursor into a block over the first character. */
+        line.handle_key(Key::Home, &[]);
+        let screen = drawn(&line, 80);
+        assert_eq!(screen.cell(2, 0).unwrap().0, 'h');
+        assert_eq!(screen.cell(2, 0).unwrap().1.bg, Color::Yellow);
+        assert_eq!(screen.cell(3, 0).unwrap().0, 'e');
     }
 
     #[test]
@@ -1365,15 +1596,41 @@ mod tests {
         assert_eq!(line.input_text(), "l");
         let completion = line.completion.as_ref().expect("the list is shown");
         assert_eq!(completion.candidates, vec!["load", "list"]);
+        assert_eq!(completion.index, None, "nothing is picked yet");
         line.handle_key(Key::Tab, &[]);
         assert_eq!(line.input_text(), "load");
+        assert_eq!(line.completion.as_ref().unwrap().index, Some(0));
         line.handle_key(Key::Tab, &[]);
         assert_eq!(line.input_text(), "list");
+        assert_eq!(line.completion.as_ref().unwrap().index, Some(1));
         line.handle_key(Key::Tab, &[]);
         assert_eq!(line.input_text(), "load");
+        assert_eq!(line.completion.as_ref().unwrap().index, Some(0));
         /* Escape closes the line and the list with it. */
         line.handle_key(Key::Esc, &[]);
         assert!(!line.is_active());
+    }
+
+    #[test]
+    fn the_arrows_pick_a_candidate_and_preview_it() {
+        let mut line = line();
+        type_text(&mut line, "l");
+        line.handle_key(Key::Tab, &[]);
+        /* The highlighted candidate and the text on the line are one and the
+         * same: picking one writes it into the line immediately. */
+        line.handle_key(Key::Right, &[]);
+        assert_eq!(line.input_text(), "load");
+        assert_eq!(line.completion.as_ref().unwrap().index, Some(0));
+        line.handle_key(Key::Right, &[]);
+        assert_eq!(line.input_text(), "list");
+        assert_eq!(line.completion.as_ref().unwrap().index, Some(1));
+        line.handle_key(Key::Left, &[]);
+        assert_eq!(line.input_text(), "load");
+        assert_eq!(line.completion.as_ref().unwrap().index, Some(0));
+        /* Left from the first candidate wraps to the last one. */
+        line.handle_key(Key::Left, &[]);
+        assert_eq!(line.input_text(), "list");
+        assert_eq!(line.completion.as_ref().unwrap().index, Some(1));
     }
 
     #[test]
@@ -1451,7 +1708,11 @@ mod tests {
     }
 
     fn transcript(app: &App) -> String {
-        app.transcript.join("\n")
+        app.transcript
+            .iter()
+            .map(|line| line.text.as_str())
+            .collect::<Vec<_>>()
+            .join("\n")
     }
 
     #[test]
@@ -1537,7 +1798,69 @@ mod tests {
     }
 
     #[test]
-    fn the_candidate_list_is_drawn_above_the_prompt() {
+    fn a_multi_line_message_keeps_its_line_breaks() {
+        let (mut app, _dir) = app();
+        /* A module error is one message with several lines, one per encoding
+         * it tried; dropping the '\n' used to glue them into one row. */
+        app.push_transcript(
+            "NBT: BigEndian Try's Error Message: `[13]`: io error\nLittleEndian Try's Error Message: `[13]`: io error"
+                .to_owned(),
+            TranscriptKind::Error,
+        );
+        let rows: Vec<&str> = app.transcript.iter().map(|line| line.text.as_str()).collect();
+        assert_eq!(rows.len(), 2);
+        assert!(rows[0].starts_with("NBT: BigEndian"));
+        assert!(rows[1].starts_with("LittleEndian"));
+        let mut screen = Screen::new(100, 30);
+        app.render(&mut screen);
+        let text = screen.text().join("\n");
+        assert!(text.contains("NBT: BigEndian"));
+        assert!(text.contains("LittleEndian Try's"));
+    }
+
+    #[test]
+    fn the_console_colours_echo_output_and_error() {
+        let (mut app, _dir) = app();
+        app.push_transcript(": list".to_owned(), TranscriptKind::Echo);
+        app.push_transcript("one".to_owned(), TranscriptKind::Output);
+        app.push_transcript("bad".to_owned(), TranscriptKind::Error);
+        let mut screen = Screen::new(100, 30);
+        app.render(&mut screen);
+        /* Three lines sit at the bottom of the body: 23, 24 and 25. */
+        assert_eq!(screen.cell(1, 23).unwrap().1.fg, Color::Yellow);
+        assert_eq!(screen.cell(1, 24).unwrap().1.fg, Color::LightCyan);
+        assert_eq!(screen.cell(1, 25).unwrap().1.fg, Color::Red);
+    }
+
+    #[test]
+    fn the_console_background_differs_from_the_summary() {
+        let (mut app, _dir) = app();
+        app.push_transcript("one".to_owned(), TranscriptKind::Output);
+        let mut screen = Screen::new(100, 30);
+        app.render(&mut screen);
+        /* The console is its own strip; the group summary keeps the grey
+         * band it had before, so the two never read as the same surface. */
+        assert_eq!(screen.cell(1, 25).unwrap().1.bg, Color::Black);
+        assert_eq!(screen.cell(1, 26).unwrap().1.bg, Color::DarkGrey);
+    }
+
+    #[test]
+    fn the_console_renders_markdown_and_plain_text_alike() {
+        let (mut app, _dir) = app();
+        app.push_transcript(
+            "**bold** and `code`, 2 * 3, object_base_type".to_owned(),
+            TranscriptKind::Output,
+        );
+        let mut screen = Screen::new(100, 30);
+        app.render(&mut screen);
+        let row = &screen.text()[25];
+        assert_eq!(row.trim_start(), "bold and code, 2 * 3, object_base_type");
+        assert!(screen.cell(1, 25).unwrap().1.bold, "bold span");
+        assert_eq!(screen.cell(10, 25).unwrap().1.fg, Color::Yellow, "code span");
+    }
+
+    #[test]
+    fn the_candidate_list_is_drawn_below_the_prompt() {
         let (mut app, _dir) = app();
         press(&mut app, Key::Char(':'));
         for ch in "l".chars() {
@@ -1546,8 +1869,90 @@ mod tests {
         press(&mut app, Key::Tab);
         let mut screen = Screen::new(100, 30);
         app.render(&mut screen);
-        let text = screen.text().join("\n");
-        assert!(text.contains("list"));
-        assert!(text.contains("load"));
+        /* Two short candidates share one row directly under the line. */
+        let input_y: u16 = 30 - 1 - 1;
+        let rows = screen.text();
+        assert!(
+            rows[input_y as usize].contains(':'),
+            "line: {:?}",
+            rows[input_y as usize]
+        );
+        let list = &rows[(input_y + 1) as usize];
+        assert!(list.contains("load"), "rows: {rows:?}");
+        assert!(list.contains("list"), "rows: {rows:?}");
+        assert_eq!(input_y + 1, rows.len() as u16 - 1, "one list row at the bottom");
+        /* Nothing is highlighted until a candidate is picked. */
+        assert_eq!(screen.cell(1, input_y + 1).unwrap().1.bg, Color::Black);
+        assert_eq!(screen.cell(7, input_y + 1).unwrap().1.bg, Color::Black);
+
+        /* Picking one highlights it and puts it on the line. */
+        press(&mut app, Key::Right);
+        app.render(&mut screen);
+        assert!(screen.text()[input_y as usize].contains("load"));
+        assert_eq!(screen.cell(1, input_y + 1).unwrap().1.bg, Color::Cyan);
+        assert_eq!(screen.cell(7, input_y + 1).unwrap().1.bg, Color::Black);
+    }
+
+    #[test]
+    fn short_candidates_share_a_row_like_a_shell_list() {
+        let (mut app, _dir) = app();
+        press(&mut app, Key::Char(':'));
+        for ch in "page ".chars() {
+            press(&mut app, Key::Char(ch));
+        }
+        press(&mut app, Key::Tab);
+        let mut screen = Screen::new(100, 30);
+        app.render(&mut screen);
+        let rows = screen.text();
+        let input_y = rows
+            .iter()
+            .position(|row| row.starts_with(':'))
+            .expect("the command line is drawn");
+        /* All five page names sit on the single row under the line. */
+        let list = &rows[input_y + 1];
+        for name in ["settings", "modules", "render", "regions", "help"] {
+            assert!(list.contains(name), "{name:?} is missing from {list:?}");
+        }
+        assert_eq!(input_y + 1, rows.len() - 1, "the list is one row");
+    }
+
+    #[test]
+    fn the_candidate_window_follows_the_selection() {
+        let (mut app, _dir) = app();
+        press(&mut app, Key::Char(':'));
+        for ch in "get ".chars() {
+            press(&mut app, Key::Char(ch));
+        }
+        press(&mut app, Key::Tab);
+        for _ in 0..7 {
+            press(&mut app, Key::Right);
+        }
+        let selected = app.cmd.completion.as_ref().unwrap().candidates[6].clone();
+        assert_eq!(app.cmd.input_text(), format!("get {selected}"));
+        let mut screen = Screen::new(100, 30);
+        app.render(&mut screen);
+        let rows = screen.text();
+        let input_y = rows
+            .iter()
+            .position(|row| row.starts_with(':'))
+            .expect("the command line is drawn");
+        /* The highlighted cell is visible and shows the selected candidate:
+         * the fill starts at the cell's first column. */
+        let mut found = None;
+        for y in input_y + 1..rows.len() {
+            let first_cyan = (0..100u16)
+                .find(|&x| screen.cell(x, y as u16).unwrap().1.bg == Color::Cyan);
+            if let Some(x) = first_cyan {
+                found = Some((x, y));
+                break;
+            }
+        }
+        let (x, y) = found.expect("the selected candidate is highlighted");
+        assert_eq!(
+            &rows[y][x as usize..x as usize + selected.chars().count()],
+            selected,
+            "highlighted row: {:?}",
+            rows[y]
+        );
     }
 }

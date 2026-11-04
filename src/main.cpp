@@ -221,6 +221,18 @@ main (int argc, char *argv[])
     }
 #endif
 
+  /* The application name is set before the first cache lookup so the early
+   * log file lands in `.../dhlrc/logs`, the same place as the later one. */
+  QApplication::setApplicationName ("dhlrc");
+
+  /* File logging starts before the core is opened so the records from
+   * `dhlrc_core_open` reach it too. The configured cache directory is only
+   * known once the core has opened the configuration, so `initialize` below
+   * is called again with that directory; until then the platform's cache
+   * location is used, which is where a default configuration lives. */
+  dh::log::initialize (
+      QStandardPaths::writableLocation (QStandardPaths::CacheLocation));
+
   DhCore::init (&a);
 
   /* Old configurations are no longer migrated: when the file was written by an
@@ -279,7 +291,6 @@ main (int argc, char *argv[])
   dh::log::setLevel (dh::log::levelFromString (
       qEnvironmentVariable ("DHLRC_LOG_LEVEL"), dh::log::Level::Info));
 
-  QApplication::setApplicationName ("dhlrc");
   QApplication::setApplicationDisplayName (
       i18n ("Minecraft Structure Modifier"));
   QApplication::setApplicationVersion (dh::versionString ());

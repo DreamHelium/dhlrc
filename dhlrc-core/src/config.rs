@@ -729,8 +729,15 @@ pub fn default_paths() -> ConfigPaths {
 /// Reads the configuration, creating it from the defaults when it is missing.
 ///
 /// A freshly created file is reported through the returned [`ConfigOrigin`], so
-/// the caller can tell the user it appeared.
+/// the caller can tell the user it appeared. Every successful open is also
+/// logged at the info level, so both frontends' logs say which file was used.
 pub fn load_or_create(paths: &ConfigPaths) -> io::Result<ConfigInit> {
+    let init = open_config(paths)?;
+    crate::log_info!("configuration opened from {}", paths.file.display());
+    Ok(init)
+}
+
+fn open_config(paths: &ConfigPaths) -> io::Result<ConfigInit> {
     if paths.file.is_file() {
         let text = fs::read_to_string(&paths.file)?;
         return match toml::from_str::<Config>(&text) {

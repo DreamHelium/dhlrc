@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: dhlrc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-03 22:09+0800\n"
+"POT-Creation-Date: 2026-11-04 23:04+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -330,7 +330,7 @@ msgstr ""
 msgid "Size"
 msgstr ""
 
-#: ../../src/dhdirectoryui.cpp:113 ../../dhlrc-tui/src/ui/command.rs:984
+#: ../../src/dhdirectoryui.cpp:113 ../../dhlrc-tui/src/ui/command.rs:1050
 msgid "Path"
 msgstr ""
 
@@ -409,7 +409,7 @@ msgstr ""
 msgid "Region Loading Order"
 msgstr ""
 
-#: ../../src/dhhelpui.cpp:174 ../../dhlrc-tui/src/ui/mod.rs:294
+#: ../../src/dhhelpui.cpp:174 ../../dhlrc-tui/src/ui/mod.rs:296
 msgid "Help"
 msgstr ""
 
@@ -421,7 +421,7 @@ msgstr ""
 msgid "The article could not be read (%1)."
 msgstr ""
 
-#: ../../src/dhloadjob.cpp:28 ../../src/dhloadjob.cpp:513
+#: ../../src/dhloadjob.cpp:28 ../../src/dhloadjob.cpp:537
 msgid "Loading region type %1"
 msgstr ""
 
@@ -429,95 +429,95 @@ msgstr ""
 msgid "Failed when %1: %2"
 msgstr ""
 
-#: ../../src/dhloadjob.cpp:115
+#: ../../src/dhloadjob.cpp:139
 msgid "gzip"
 msgstr ""
 
-#: ../../src/dhloadjob.cpp:117
+#: ../../src/dhloadjob.cpp:141
 msgid "zlib"
 msgstr ""
 
-#: ../../src/dhloadjob.cpp:119
+#: ../../src/dhloadjob.cpp:143
 msgid "no compression"
 msgstr ""
 
-#: ../../src/dhloadjob.cpp:160
+#: ../../src/dhloadjob.cpp:184
 msgid ""
 "It is estimated to take %1 seconds, over the %2 second limit. Raise or clear "
 "the load time limit in the settings to open it."
 msgstr ""
 
-#: ../../src/dhloadjob.cpp:168
+#: ../../src/dhloadjob.cpp:192
 msgid ""
 "It is estimated to need %1 MiB, over the %2 MiB limit. Raise or clear the "
 "load memory limit in the settings to open it."
 msgstr ""
 
-#: ../../src/dhloadjob.cpp:182
+#: ../../src/dhloadjob.cpp:206
 msgid "A file was not loaded"
 msgstr ""
 
-#: ../../src/dhloadjob.cpp:208 ../../src/dhloadjob.cpp:218
+#: ../../src/dhloadjob.cpp:232 ../../src/dhloadjob.cpp:242
 msgid "Loading File"
 msgstr ""
 
-#: ../../src/dhloadjob.cpp:218
+#: ../../src/dhloadjob.cpp:242
 msgid "Cancelled."
 msgstr ""
 
-#: ../../src/dhloadjob.cpp:239
+#: ../../src/dhloadjob.cpp:263
 msgid "Loading Object %1"
 msgstr ""
 
-#: ../../src/dhloadjob.cpp:375 ../../src/utility.cpp:58
+#: ../../src/dhloadjob.cpp:399 ../../src/utility.cpp:58
 msgid "Select Region(s)"
 msgstr ""
 
-#: ../../src/dhloadjob.cpp:375 ../../src/utility.cpp:58
+#: ../../src/dhloadjob.cpp:399 ../../src/utility.cpp:58
 msgid "Please select region(s)."
 msgstr ""
 
-#: ../../src/dhloadjob.cpp:433 ../../src/dhloadjob.cpp:454
+#: ../../src/dhloadjob.cpp:457 ../../src/dhloadjob.cpp:478
 msgid "The file holds no region this module can read."
 msgstr ""
 
-#: ../../src/dhloadjob.cpp:475
+#: ../../src/dhloadjob.cpp:499
 msgid "Please click `Continue` to choose the region(s) to load."
 msgstr ""
 
-#: ../../src/dhloadjob.cpp:554
+#: ../../src/dhloadjob.cpp:578
 msgid "The file extension points at %1, but the file was read as %2."
 msgstr ""
 
-#: ../../src/dhloadjob.cpp:567
+#: ../../src/dhloadjob.cpp:591
 msgid "The file is not compressed, but the %1 format expects %2."
 msgstr ""
 
-#: ../../src/dhloadjob.cpp:573
+#: ../../src/dhloadjob.cpp:597
 msgid "The file is %1-compressed, but the %2 format expects %3."
 msgstr ""
 
-#: ../../src/dhloadjob.cpp:587
+#: ../../src/dhloadjob.cpp:611
 msgid "The file was decoded as %1, but the %2 format declares %3."
 msgstr ""
 
-#: ../../src/dhloadjob.cpp:627 ../../src/dhloadjob.cpp:634
+#: ../../src/dhloadjob.cpp:651 ../../src/dhloadjob.cpp:658
 msgid "Finish processing %1 of %2 (%3%)."
 msgstr ""
 
-#: ../../src/dhloadjob.cpp:741
+#: ../../src/dhloadjob.cpp:765
 msgid "Some files could not be loaded"
 msgstr ""
 
-#: ../../src/dhloadjob.cpp:742
+#: ../../src/dhloadjob.cpp:766
 msgid "Files loaded"
 msgstr ""
 
-#: ../../src/dhloadjob.cpp:743
+#: ../../src/dhloadjob.cpp:767
 msgid "%1 file(s) loaded, %2 failed."
 msgstr ""
 
-#: ../../src/dhloadjob.cpp:805 ../../src/saveregionjob.cpp:457
+#: ../../src/dhloadjob.cpp:829 ../../src/saveregionjob.cpp:457
 #: ../../src/saveregionjob.cpp:559
 msgid "Continue"
 msgstr ""
@@ -1197,8 +1197,8 @@ msgstr ""
 msgid "Region Reader/Modifier"
 msgstr ""
 
-#: ../../src/mainwindow.cpp:867 ../../dhlrc-tui/src/ui/mod.rs:290
-#: ../../dhlrc-tui/src/ui/mod.rs:1704
+#: ../../src/mainwindow.cpp:867 ../../dhlrc-tui/src/ui/mod.rs:292
+#: ../../dhlrc-tui/src/ui/mod.rs:1984
 msgid "Settings"
 msgstr ""
 
@@ -1323,7 +1323,7 @@ msgid "Saving failed"
 msgstr ""
 
 #: ../../src/manageregionui.cpp:620 ../../src/manageregionui.cpp:671
-#: ../../dhlrc-tui/src/ui/command.rs:931 ../../dhlrc-tui/src/ui/mod.rs:502
+#: ../../dhlrc-tui/src/ui/command.rs:997 ../../dhlrc-tui/src/ui/mod.rs:508
 msgid "Saved"
 msgstr ""
 
@@ -1482,7 +1482,7 @@ msgid ""
 "Item icons need this version's client jar, which has not been downloaded yet."
 msgstr ""
 
-#: ../../src/notificationcenterui.cpp:160 ../../dhlrc-tui/src/ui/command.rs:860
+#: ../../src/notificationcenterui.cpp:160 ../../dhlrc-tui/src/ui/command.rs:916
 msgid "Error"
 msgstr ""
 
@@ -1913,7 +1913,7 @@ msgstr ""
 msgid "%1 (%2)"
 msgstr ""
 
-#: ../../src/version.cpp:15
+#: ../../src/version.cpp:23
 msgid ""
 "Open, inspect and modify Minecraft structure files, and convert them between "
 "the formats the installed region modules support."
@@ -2115,8 +2115,8 @@ msgstr ""
 msgid "Unnamed"
 msgstr ""
 
-#: ../../dhlrc-core/src/config.rs:598 ../../dhlrc-tui/src/ui/command.rs:927
-#: ../../dhlrc-tui/src/ui/mod.rs:913
+#: ../../dhlrc-core/src/config.rs:598 ../../dhlrc-tui/src/ui/command.rs:993
+#: ../../dhlrc-tui/src/ui/mod.rs:965
 msgid "Configuration reloaded"
 msgstr ""
 
@@ -2904,7 +2904,7 @@ msgstr ""
 msgid "codec"
 msgstr ""
 
-#: ../../dhlrc-tui/src/modules.rs:74 ../../dhlrc-tui/src/ui/command.rs:1123
+#: ../../dhlrc-tui/src/modules.rs:74 ../../dhlrc-tui/src/ui/command.rs:1189
 msgid "regions"
 msgstr ""
 
@@ -3363,246 +3363,258 @@ msgstr ""
 msgid "Getting Palette."
 msgstr ""
 
-#: ../../dhlrc-tui/src/ui/command.rs:403
+#: ../../dhlrc-tui/src/ui/command.rs:459
 msgid "Unclosed quote"
 msgstr ""
 
-#: ../../dhlrc-tui/src/ui/command.rs:412
+#: ../../dhlrc-tui/src/ui/command.rs:468
 msgid "Usage"
 msgstr ""
 
-#: ../../dhlrc-tui/src/ui/command.rs:422
+#: ../../dhlrc-tui/src/ui/command.rs:478
 msgid "No command"
 msgstr ""
 
-#: ../../dhlrc-tui/src/ui/command.rs:446
+#: ../../dhlrc-tui/src/ui/command.rs:502
 msgid "Unknown option"
 msgstr ""
 
-#: ../../dhlrc-tui/src/ui/command.rs:464 ../../dhlrc-tui/src/ui/command.rs:475
-#: ../../dhlrc-tui/src/ui/command.rs:485 ../../dhlrc-tui/src/ui/command.rs:829
+#: ../../dhlrc-tui/src/ui/command.rs:520 ../../dhlrc-tui/src/ui/command.rs:531
+#: ../../dhlrc-tui/src/ui/command.rs:541 ../../dhlrc-tui/src/ui/command.rs:885
 msgid "Region numbers start at 1"
 msgstr ""
 
-#: ../../dhlrc-tui/src/ui/command.rs:513 ../../dhlrc-tui/src/ui/command.rs:880
-#: ../../dhlrc-tui/src/ui/command.rs:1535
+#: ../../dhlrc-tui/src/ui/command.rs:569 ../../dhlrc-tui/src/ui/command.rs:946
+#: ../../dhlrc-tui/src/ui/command.rs:1793
 msgid "Unknown command"
 msgstr ""
 
-#: ../../dhlrc-tui/src/ui/command.rs:831 ../../dhlrc-tui/src/ui/command.rs:1504
+#: ../../dhlrc-tui/src/ui/command.rs:887 ../../dhlrc-tui/src/ui/command.rs:1762
 msgid "No such region"
 msgstr ""
 
-#: ../../dhlrc-tui/src/ui/command.rs:889
+#: ../../dhlrc-tui/src/ui/command.rs:955
 msgid "No such page"
 msgstr ""
 
-#: ../../dhlrc-tui/src/ui/command.rs:892
+#: ../../dhlrc-tui/src/ui/command.rs:958
 msgid "Page"
 msgstr ""
 
-#: ../../dhlrc-tui/src/ui/command.rs:897
+#: ../../dhlrc-tui/src/ui/command.rs:963
 msgid "This group has no settings"
 msgstr ""
 
-#: ../../dhlrc-tui/src/ui/command.rs:909
+#: ../../dhlrc-tui/src/ui/command.rs:975
 msgid "Selected"
 msgstr ""
 
-#: ../../dhlrc-tui/src/ui/command.rs:920 ../../dhlrc-tui/src/ui/command.rs:1130
-#: ../../dhlrc-tui/src/ui/command.rs:1495
+#: ../../dhlrc-tui/src/ui/command.rs:986 ../../dhlrc-tui/src/ui/command.rs:1196
+#: ../../dhlrc-tui/src/ui/command.rs:1753
 msgid "No such setting"
 msgstr ""
 
-#: ../../dhlrc-tui/src/ui/command.rs:935
+#: ../../dhlrc-tui/src/ui/command.rs:1001
 msgid "Goodbye"
 msgstr ""
 
-#: ../../dhlrc-tui/src/ui/command.rs:941
+#: ../../dhlrc-tui/src/ui/command.rs:1007 ../../dhlrc-tui/src/ui/mod.rs:1741
 msgid "Commands:"
 msgstr ""
 
-#: ../../dhlrc-tui/src/ui/command.rs:960 ../../dhlrc-tui/src/ui/command.rs:1502
+#: ../../dhlrc-tui/src/ui/command.rs:1026
+#: ../../dhlrc-tui/src/ui/command.rs:1760
 msgid "No regions loaded"
 msgstr ""
 
-#: ../../dhlrc-tui/src/ui/command.rs:962
+#: ../../dhlrc-tui/src/ui/command.rs:1028
 msgid "Regions in memory:"
 msgstr ""
 
-#: ../../dhlrc-tui/src/ui/command.rs:989
+#: ../../dhlrc-tui/src/ui/command.rs:1055
 msgid "Extent"
 msgstr ""
 
-#: ../../dhlrc-tui/src/ui/command.rs:994
+#: ../../dhlrc-tui/src/ui/command.rs:1060
 msgid "blocks"
 msgstr ""
 
-#: ../../dhlrc-tui/src/ui/command.rs:1000
-#: ../../dhlrc-tui/src/ui/command.rs:1004
+#: ../../dhlrc-tui/src/ui/command.rs:1066
+#: ../../dhlrc-tui/src/ui/command.rs:1070
 msgid "Blocks"
 msgstr ""
 
-#: ../../dhlrc-tui/src/ui/command.rs:1005
+#: ../../dhlrc-tui/src/ui/command.rs:1071
 msgid "not counted (region too large)"
 msgstr ""
 
-#: ../../dhlrc-tui/src/ui/command.rs:1017
+#: ../../dhlrc-tui/src/ui/command.rs:1083
 msgid "Closed regions"
 msgstr ""
 
-#: ../../dhlrc-tui/src/ui/command.rs:1027
+#: ../../dhlrc-tui/src/ui/command.rs:1093
 msgid "Closed"
 msgstr ""
 
-#: ../../dhlrc-tui/src/ui/command.rs:1035
+#: ../../dhlrc-tui/src/ui/command.rs:1101
 msgid "Not a file"
 msgstr ""
 
-#: ../../dhlrc-tui/src/ui/command.rs:1054
-#: ../../dhlrc-tui/src/ui/command.rs:1079
+#: ../../dhlrc-tui/src/ui/command.rs:1120
+#: ../../dhlrc-tui/src/ui/command.rs:1145
 msgid "Could not load"
 msgstr ""
 
-#: ../../dhlrc-tui/src/ui/command.rs:1114
-#: ../../dhlrc-tui/src/ui/command.rs:1122
+#: ../../dhlrc-tui/src/ui/command.rs:1180
+#: ../../dhlrc-tui/src/ui/command.rs:1188
 msgid "Loaded"
 msgstr ""
 
-#: ../../dhlrc-tui/src/ui/command.rs:1142
-#: ../../dhlrc-tui/src/ui/command.rs:1146
-#: ../../dhlrc-tui/src/ui/command.rs:1151 ../../dhlrc-tui/src/ui/mod.rs:612
+#: ../../dhlrc-tui/src/ui/command.rs:1208
+#: ../../dhlrc-tui/src/ui/command.rs:1212
+#: ../../dhlrc-tui/src/ui/command.rs:1217 ../../dhlrc-tui/src/ui/mod.rs:654
+#: ../../dhlrc-tui/src/ui/mod.rs:1721
 msgid "Not a valid value"
 msgstr ""
 
-#: ../../dhlrc-tui/src/ui/command.rs:1160
+#: ../../dhlrc-tui/src/ui/command.rs:1226
 msgid "saved"
 msgstr ""
 
-#: ../../dhlrc-tui/src/ui/mod.rs:29
+#: ../../dhlrc-tui/src/ui/mod.rs:31
 msgid "On"
 msgstr ""
 
-#: ../../dhlrc-tui/src/ui/mod.rs:33
+#: ../../dhlrc-tui/src/ui/mod.rs:35
 msgid "Off"
 msgstr ""
 
-#: ../../dhlrc-tui/src/ui/mod.rs:291
+#: ../../dhlrc-tui/src/ui/mod.rs:293
 msgid "Modules"
 msgstr ""
 
-#: ../../dhlrc-tui/src/ui/mod.rs:292
+#: ../../dhlrc-tui/src/ui/mod.rs:294
 msgid "Render"
 msgstr ""
 
-#: ../../dhlrc-tui/src/ui/mod.rs:293
+#: ../../dhlrc-tui/src/ui/mod.rs:295
 msgid "Regions"
 msgstr ""
 
-#: ../../dhlrc-tui/src/ui/mod.rs:306
+#: ../../dhlrc-tui/src/ui/mod.rs:308
 msgid ""
 "List the region modules and object codecs installed next to the executable."
 msgstr ""
 
-#: ../../dhlrc-tui/src/ui/mod.rs:308
+#: ../../dhlrc-tui/src/ui/mod.rs:310
 msgid "The same report the `dhlrc-tui modules` command prints."
 msgstr ""
 
-#: ../../dhlrc-tui/src/ui/mod.rs:311
+#: ../../dhlrc-tui/src/ui/mod.rs:313
 msgid "Load a structure file and write a rendered PNG."
 msgstr ""
 
-#: ../../dhlrc-tui/src/ui/mod.rs:312
+#: ../../dhlrc-tui/src/ui/mod.rs:314
 msgid "The command line version already works:"
 msgstr ""
 
-#: ../../dhlrc-tui/src/ui/mod.rs:314
+#: ../../dhlrc-tui/src/ui/mod.rs:316
 msgid "Choosing the file and the view in this page will come later."
 msgstr ""
 
-#: ../../dhlrc-tui/src/ui/mod.rs:317
+#: ../../dhlrc-tui/src/ui/mod.rs:319
 msgid "Open, inspect and modify a region file."
 msgstr ""
 
-#: ../../dhlrc-tui/src/ui/mod.rs:319
+#: ../../dhlrc-tui/src/ui/mod.rs:321
 msgid ""
 "This page is an entry point for now; the interactive editor will come later."
 msgstr ""
 
-#: ../../dhlrc-tui/src/ui/mod.rs:324
+#: ../../dhlrc-tui/src/ui/mod.rs:326
 msgid ""
 "F1-F5 switch pages, F10 quits. The function bar at the bottom can be clicked."
 msgstr ""
 
-#: ../../dhlrc-tui/src/ui/mod.rs:327
+#: ../../dhlrc-tui/src/ui/mod.rs:329
 msgid ""
 "The other pages are entry points for now; Modules lists what is installed."
 msgstr ""
 
-#: ../../dhlrc-tui/src/ui/mod.rs:329
+#: ../../dhlrc-tui/src/ui/mod.rs:331
 msgid "↑↓ move · PageUp/PageDown scroll · Home/End start or end"
 msgstr ""
 
-#: ../../dhlrc-tui/src/ui/mod.rs:330
+#: ../../dhlrc-tui/src/ui/mod.rs:332
 msgid "Tab switches panes · ←→ step through a list setting"
 msgstr ""
 
-#: ../../dhlrc-tui/src/ui/mod.rs:331
+#: ../../dhlrc-tui/src/ui/mod.rs:333
 msgid "Enter/Space edit, flip or open the selected row · Esc cancels an editor"
 msgstr ""
 
-#: ../../dhlrc-tui/src/ui/mod.rs:333
+#: ../../dhlrc-tui/src/ui/mod.rs:335
 msgid ""
 ": opens the command line (help, page, load, list, select, close, info, get, "
 "set, reload, save, quit)"
 msgstr ""
 
-#: ../../dhlrc-tui/src/ui/mod.rs:335
+#: ../../dhlrc-tui/src/ui/mod.rs:337
 msgid ""
 "In the command line: Enter runs · Tab completes · ↑↓ history · Esc cancels"
 msgstr ""
 
-#: ../../dhlrc-tui/src/ui/mod.rs:336
+#: ../../dhlrc-tui/src/ui/mod.rs:338
 msgid "s saves the configuration · r reloads it from disk · q quits"
 msgstr ""
 
-#: ../../dhlrc-tui/src/ui/mod.rs:338
+#: ../../dhlrc-tui/src/ui/mod.rs:340
 msgid ""
 "Mouse: click a group or row, click again to edit, wheel scrolls the pane "
 "under the pointer."
 msgstr ""
 
-#: ../../dhlrc-tui/src/ui/mod.rs:506
+#: ../../dhlrc-tui/src/ui/mod.rs:512
 msgid "Could not save the configuration"
 msgstr ""
 
-#: ../../dhlrc-tui/src/ui/mod.rs:594 ../../dhlrc-tui/src/ui/mod.rs:976
+#: ../../dhlrc-tui/src/ui/mod.rs:636 ../../dhlrc-tui/src/ui/mod.rs:1065
+#: ../../dhlrc-tui/src/ui/mod.rs:1763
 msgid "Editing"
 msgstr ""
 
-#: ../../dhlrc-tui/src/ui/mod.rs:636
+#: ../../dhlrc-tui/src/ui/mod.rs:678
 msgid "Edit cancelled"
 msgstr ""
 
-#: ../../dhlrc-tui/src/ui/mod.rs:919
+#: ../../dhlrc-tui/src/ui/mod.rs:971
 msgid "Could not reload the configuration"
 msgstr ""
 
-#: ../../dhlrc-tui/src/ui/mod.rs:985
+#: ../../dhlrc-tui/src/ui/mod.rs:993
+msgid "Terminal too small"
+msgstr ""
+
+#: ../../dhlrc-tui/src/ui/mod.rs:997
+msgid "Need at least 70×18"
+msgstr ""
+
+#: ../../dhlrc-tui/src/ui/mod.rs:1078 ../../dhlrc-tui/src/ui/mod.rs:1765
 msgid "Enter saves, Esc cancels"
 msgstr ""
 
-#: ../../dhlrc-tui/src/ui/mod.rs:1176
+#: ../../dhlrc-tui/src/ui/mod.rs:1253 ../../dhlrc-tui/src/ui/mod.rs:1691
+#: ../../dhlrc-tui/src/ui/mod.rs:1745
 msgid "Quit"
 msgstr ""
 
-#: ../../dhlrc-tui/src/ui/mod.rs:1233
+#: ../../dhlrc-tui/src/ui/mod.rs:1337
 msgid ""
 "↑↓ move · Tab switches pane · ←→ changes a list value · Enter/Space edits "
 "· : commands · s saves · r reloads · q quits"
 msgstr ""
 
-#: ../../dhlrc-tui/src/ui/mod.rs:1237
+#: ../../dhlrc-tui/src/ui/mod.rs:1341
 msgid ""
 "↑↓/PageUp/PageDown scroll · click the sidebar or F1-F5 to switch · : "
 "commands · q quits"
