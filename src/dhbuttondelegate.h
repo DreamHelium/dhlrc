@@ -23,9 +23,6 @@ public:
 
 Q_SIGNALS:
   void clickedIndex (const QModelIndex &index) const;
-
-private:
-  QModelIndex m_pressedIndex;
 };
 
 #endif /* DHBUTTONDELEGATE_H */

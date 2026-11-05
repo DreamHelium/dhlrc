@@ -168,11 +168,6 @@ set(LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR})
 
 find_package(Gettext)
 
-set(DH_ENABLE_DEBUG OFF)
-if(DH_ENABLE_DEBUG)
-  add_definitions(-DDH_DEBUG_IN_IDE)
-endif()
-
 # The headless render check (`dhlrc_qt --preview`): a development tool for the
 # 3D view, so a normal build neither compiles it nor offers the options. Turn it
 # on with `-DDH_BUILD_RENDER_CHECK=ON` when checking the two renderers.
@@ -192,11 +187,6 @@ if (DH_TRANSLATIONS)
 else ()
   message(STATUS "DH_TRANSLATIONS is off: no translation catalogue is built")
 endif ()
-
-# Reserved for future?
-#add_subdirectory(src-qml)
-
-#add_subdirectory(resources)
 
 # ---------------------------------------------------------------------------
 # Install

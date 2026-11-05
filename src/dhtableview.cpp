@@ -12,12 +12,6 @@ DhTableView::DhTableView (QWidget *parent) : QTableView (parent)
   setDefaultDropAction (Qt::MoveAction);
   setSelectionMode (SingleSelection);
   setSelectionBehavior (SelectRows);
-
-  // indicateLabel = new QLabel(this);
-  // indicateLabel->setFixedHeight(2);
-  // indicateLabel->setGeometry(1, 0, width(), 2);
-  // indicateLabel->setStyleSheet("border: 1px solid #8B7500;");
-  // indicateLabel->hide();
 }
 
 void

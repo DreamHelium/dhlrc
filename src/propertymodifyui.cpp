@@ -2,6 +2,7 @@
 #include "ui_propertymodifyui.h"
 
 #include "dhcore.h"
+#include "utility.h"
 
 #include <QComboBox>
 #include <QFontDatabase>
@@ -50,25 +51,8 @@ catalogValues (const QString &blockName, quint32 dataVersion)
       const char *rawName = dhlrc_core_block_name (handle, i);
       if (!rawName || blockName != QLatin1String (rawName))
         continue;
-      const size_t propertyCount = dhlrc_core_block_property_count (handle, i);
-      for (size_t p = 0; p < propertyCount; p++)
-        {
-          const char *rawProperty
-              = dhlrc_core_block_property_name (handle, i, p);
-          if (!rawProperty)
-            continue;
-          QStringList values;
-          const size_t valueCount
-              = dhlrc_core_block_property_value_count (handle, i, p);
-          for (size_t v = 0; v < valueCount; v++)
-            {
-              const char *rawValue
-                  = dhlrc_core_block_property_value (handle, i, p, v);
-              if (rawValue)
-                values << QString::fromUtf8 (rawValue);
-            }
-          result.insert (QString::fromUtf8 (rawProperty), values);
-        }
+      for (const auto &property : dh::blockPropertyValues (handle, i))
+        result.insert (property.first, property.second);
       break;
     }
   return result;

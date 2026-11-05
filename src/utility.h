@@ -3,7 +3,12 @@
 
 #include "manageregionui.h"
 
+#include <QByteArray>
+#include <QList>
+#include <QPair>
 #include <QString>
+#include <QStringList>
+#include <cstddef>
 
 namespace dh
 {
@@ -53,6 +58,24 @@ QString expandRegionNamePattern (const QString &pattern,
 /* Builds the labels used when picking a region: the display name plus a short
  * form of the UUID, so equally named regions can still be told apart. */
 QStringList getRegionChoiceLabels ();
+
+/* Copies the UTF-8 form of each pair in `properties` into `nameBytes` and
+ * `dataBytes`, then points `namePointers` / `dataPointers` at those buffers.
+ *
+ * All four lists have to outlive the call into the C ABI that consumes the
+ * pointers: the strings are borrowed, not copied, by `region_set_block_state`.
+ * Appending to `nameBytes` or `dataBytes` afterwards would invalidate them. */
+void propertyPointers (const QList<QPair<QString, QString>> &properties,
+                       QList<QByteArray> &nameBytes,
+                       QList<QByteArray> &dataBytes,
+                       QList<const char *> &namePointers,
+                       QList<const char *> &dataPointers);
+
+/* The values the block catalogue allows for each property of the block at
+ * `index`, in the order the core lists them. Empty when the core has no
+ * catalogue or the index is out of range. */
+QList<QPair<QString, QStringList>>
+blockPropertyValues (DhlrcCore *core, std::size_t index);
 }
 
 #endif /* UTILITY_H */

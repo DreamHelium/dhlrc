@@ -385,7 +385,6 @@ DhLoadJob::start ()
             .onFailed (
                 [&] ()
                   {
-                    qDebug () << "?";
                     Q_EMIT emitResult ();
                   })
             .onCanceled ([&] { Q_EMIT emitResult (); });

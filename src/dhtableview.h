@@ -2,7 +2,6 @@
 #define DHTABLEVIEW_H
 
 #include <qevent.h>
-#include <qlabel.h>
 #include <qnamespace.h>
 #include <qtableview.h>
 
@@ -23,9 +22,6 @@ public:
 protected:
   void dropEvent (QDropEvent *event);
   void resizeEvent (QResizeEvent *event);
-
-private:
-  QLabel *indicateLabel;
 };
 
 #endif /* DHTABLEVIEW_H */

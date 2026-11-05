@@ -2,6 +2,7 @@
 
 #include "manageregionui.h"
 #include "region.h"
+#include "utility.h"
 
 #include <libintl.h>
 
@@ -462,17 +463,9 @@ RegionClass::setBlockState (qint32 x, qint32 y, qint32 z, const QString &name,
   /* Keep the UTF-8 data alive while the C ABI copies it out of the arrays. */
   QList<QByteArray> nameBytes;
   QList<QByteArray> dataBytes;
-  for (const auto &property : properties)
-    {
-      nameBytes.append (property.first.toUtf8 ());
-      dataBytes.append (property.second.toUtf8 ());
-    }
   QList<const char *> namePtrs;
   QList<const char *> dataPtrs;
-  for (const auto &bytes : nameBytes)
-    namePtrs.append (bytes.constData ());
-  for (const auto &bytes : dataBytes)
-    dataPtrs.append (bytes.constData ());
+  dh::propertyPointers (properties, nameBytes, dataBytes, namePtrs, dataPtrs);
   auto nameUtf8 = name.toUtf8 ();
 
   Guard guard (*this);

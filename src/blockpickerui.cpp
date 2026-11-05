@@ -5,6 +5,7 @@
 
 #include "dhcore.h"
 #include "resourcegetter.h"
+#include "utility.h"
 
 #include <QComboBox>
 #include <QDialogButtonBox>
@@ -363,26 +364,7 @@ BlockPickerUI::copyCatalog ()
         continue;
       BlockEntry entry;
       entry.name = QString::fromUtf8 (rawName);
-      const size_t propertyCount = dhlrc_core_block_property_count (handle, i);
-      for (size_t p = 0; p < propertyCount; p++)
-        {
-          const char *rawProperty
-              = dhlrc_core_block_property_name (handle, i, p);
-          if (!rawProperty)
-            continue;
-          QStringList values;
-          const size_t valueCount
-              = dhlrc_core_block_property_value_count (handle, i, p);
-          for (size_t v = 0; v < valueCount; v++)
-            {
-              const char *rawValue
-                  = dhlrc_core_block_property_value (handle, i, p, v);
-              if (rawValue)
-                values << QString::fromUtf8 (rawValue);
-            }
-          entry.properties.append (
-              { QString::fromUtf8 (rawProperty), std::move (values) });
-        }
+      entry.properties = dh::blockPropertyValues (handle, i);
       blocks.append (std::move (entry));
     }
 }

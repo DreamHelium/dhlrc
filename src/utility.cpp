@@ -9,6 +9,7 @@
 #include <QLocale>
 #include <QMessageBox>
 #include <QStandardPaths>
+#include <utility>
 #define _(str) gettext (str)
 
 QString
@@ -129,4 +130,59 @@ dh::expandRegionNamePattern (const QString &pattern, const QString &fileName,
   result.replace (QString::fromUtf8 (fileNamePlaceholder), fileName);
   result.replace (QString::fromUtf8 (regionNamePlaceholder), regionName);
   return result;
+}
+
+void
+dh::propertyPointers (const QList<QPair<QString, QString>> &properties,
+                      QList<QByteArray> &nameBytes,
+                      QList<QByteArray> &dataBytes,
+                      QList<const char *> &namePointers,
+                      QList<const char *> &dataPointers)
+{
+  nameBytes.reserve (properties.size ());
+  dataBytes.reserve (properties.size ());
+  for (const auto &property : properties)
+    {
+      nameBytes.append (property.first.toUtf8 ());
+      dataBytes.append (property.second.toUtf8 ());
+    }
+  /* The pointers are taken only after every byte array is in, so no
+   * reallocation of either list can invalidate them. */
+  namePointers.reserve (nameBytes.size ());
+  dataPointers.reserve (dataBytes.size ());
+  for (const auto &bytes : nameBytes)
+    namePointers.append (bytes.constData ());
+  for (const auto &bytes : dataBytes)
+    dataPointers.append (bytes.constData ());
+}
+
+QList<QPair<QString, QStringList>>
+dh::blockPropertyValues (DhlrcCore *core, std::size_t index)
+{
+  QList<QPair<QString, QStringList>> properties;
+  if (!core)
+    return properties;
+
+  const std::size_t propertyCount
+      = dhlrc_core_block_property_count (core, index);
+  properties.reserve (static_cast<qsizetype> (propertyCount));
+  for (std::size_t p = 0; p < propertyCount; p++)
+    {
+      const char *rawProperty = dhlrc_core_block_property_name (core, index, p);
+      if (!rawProperty)
+        continue;
+      QStringList values;
+      const std::size_t valueCount
+          = dhlrc_core_block_property_value_count (core, index, p);
+      for (std::size_t v = 0; v < valueCount; v++)
+        {
+          const char *rawValue
+              = dhlrc_core_block_property_value (core, index, p, v);
+          if (rawValue)
+            values << QString::fromUtf8 (rawValue);
+        }
+      properties.append (
+          { QString::fromUtf8 (rawProperty), std::move (values) });
+    }
+  return properties;
 }

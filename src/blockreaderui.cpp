@@ -1,5 +1,4 @@
 #include "blockreaderui.h"
-// #include "blocklistui.h"
 #include "dhrenderui.h"
 #include "dhwidget.h"
 #include "mainwindow.h"
@@ -10,7 +9,6 @@
 #include <QLabel>
 #include <QMenu>
 #include <QMessageBox>
-// #include <blockshowui.h>
 #include "regionmodifyui.h"
 
 #include "blocklistui.h"
@@ -188,9 +186,6 @@ BlockReaderUI::BlockReaderUI (int index,
            &BlockReaderUI::textChanged_cb);
   connect (this, &BlockReaderUI::changeVal, ui->progressBar,
            &QProgressBar::setValue);
-  // ui->label_7->setText (_ ("Lack the translation module, will not "
-  //                          "try to get translation!"));
-  // ui->progressBar->hide ();
   connect (downloader.get (), &DhDownloader::progress, this,
            [&] (int value) { Q_EMIT this->changeVal (value); });
   connect (downloader.get (), &DhDownloader::info, this,

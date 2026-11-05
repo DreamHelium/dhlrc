@@ -67,9 +67,6 @@
 #include <QTimer>
 #include <QToolBar>
 #include <QVariant>
-#ifdef DH_DEBUG_IN_IDE
-#include "dhdebugwidget.h"
-#endif
 #include <KActionMenu>
 #include <KColorSchemeManager>
 #include <KColorSchemeMenu>
@@ -136,9 +133,6 @@ enum class SidebarAction
   Settings,
   ProgramDirectories,
   Notifications,
-#ifdef DH_DEBUG_IN_IDE
-  Debug,
-#endif
 };
 
 /* Where a row keeps its `SidebarAction`. */
@@ -870,10 +864,6 @@ MainWindow::MainWindow (QWidget *parent) : QMainWindow (parent)
           QStringLiteral ("folder-open"));
   addRow (SidebarAction::Notifications, _ ("Notifications & Log"),
           QStringLiteral ("dialog-information"));
-#ifdef DH_DEBUG_IN_IDE
-  addRow (SidebarAction::Debug, QStringLiteral ("Debug"),
-          QStringLiteral ("applications-development"));
-#endif
   auto maxLen = 0;
   auto rows = model->rowCount ();
   const QFontMetrics metrics (listView->font ());
@@ -1162,15 +1152,6 @@ MainWindow::openSidebarEntry (const QModelIndex &index)
       ensureTab (NotificationCenterUI::instance (),
                  _ ("Notifications & Log"));
       break;
-#ifdef DH_DEBUG_IN_IDE
-    case SidebarAction::Debug:
-      {
-        auto widget = new DhDebugWidget;
-        widget->setAttribute (Qt::WA_DeleteOnClose);
-        widget->show ();
-      }
-      break;
-#endif
     default:
       break;
     }

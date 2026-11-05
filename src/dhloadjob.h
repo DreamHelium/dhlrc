@@ -104,9 +104,6 @@ public:
 Q_SIGNALS:
   void selfSuspended (KJob *job);
   void selfResumed (KJob *job);
-  void error ();
-  void loadFileSuccess ();
-  void loadObjectSuccess ();
   void loadRegionSuccess ();
   /* Asks the composite to unblock this job. `forceResume ()` is private
    * because only the owner should wake a job, and the row widgets are built by

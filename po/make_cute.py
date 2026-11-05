@@ -59,7 +59,6 @@ KEEP = {
     "NbtReaderUI",
     "RegionModifyUI",
     "PropertyModifyUI",
-    "PaletteAddUI",
     "PaletteListUI",
     "Form",
     "PushButton",

@@ -42,7 +42,6 @@ set(ui_files
         regionmodifyui.ui
         palettelistui.ui
         propertymodifyui.ui
-        #        paletteaddui.ui
         nbtreaderui.ui
 )
 
@@ -110,13 +109,6 @@ set(TEMP_PROJECT_SOURCES
         dhwidget.h dhwidget.cpp
         dhcore.h dhcore.cpp
 )
-
-if(DH_ENABLE_DEBUG)
-  set(TEMP_PROJECT_SOURCES
-    ${TEMP_PROJECT_SOURCES}
-    dhdebugwidget.h
-    dhdebugwidget.cpp)
-endif()
 
 if(DH_BUILD_RENDER_CHECK)
   set(TEMP_PROJECT_SOURCES

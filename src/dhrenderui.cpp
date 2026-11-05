@@ -11,6 +11,7 @@
 #include "mainwindow.h"
 #include "region.h"
 #include "resourcegetter.h"
+#include "utility.h"
 
 #include <QDialog>
 #include <QDialogButtonBox>
@@ -833,17 +834,10 @@ DhRenderUI::modifyPicked ()
             = regionClass->blockState (x, y, z);
         QList<QByteArray> nameBytes;
         QList<QByteArray> dataBytes;
-        for (const auto &property : state.properties)
-          {
-            nameBytes.append (property.first.toUtf8 ());
-            dataBytes.append (property.second.toUtf8 ());
-          }
         QList<const char *> namePtrs;
         QList<const char *> dataPtrs;
-        for (const auto &bytes : nameBytes)
-          namePtrs.append (bytes.constData ());
-        for (const auto &bytes : dataBytes)
-          dataPtrs.append (bytes.constData ());
+        dh::propertyPointers (state.properties, nameBytes, dataBytes, namePtrs,
+                              dataPtrs);
         const QByteArray nameUtf8 = state.name.toUtf8 ();
         for (const auto &cell : cells)
           {
@@ -1290,17 +1284,10 @@ DhRenderUI::replaceSelection ()
    * they have to outlive the write loop. */
   QList<QByteArray> nameBytes;
   QList<QByteArray> dataBytes;
-  for (const auto &property : state.properties)
-    {
-      nameBytes.append (property.first.toUtf8 ());
-      dataBytes.append (property.second.toUtf8 ());
-    }
   QList<const char *> namePtrs;
   QList<const char *> dataPtrs;
-  for (const auto &bytes : nameBytes)
-    namePtrs.append (bytes.constData ());
-  for (const auto &bytes : dataBytes)
-    dataPtrs.append (bytes.constData ());
+  dh::propertyPointers (state.properties, nameBytes, dataBytes, namePtrs,
+                        dataPtrs);
   const QByteArray nameUtf8 = state.name.toUtf8 ();
 
   QVector<DhRenderWidget::BlockCell> writtenCells;
